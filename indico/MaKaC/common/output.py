@@ -210,7 +210,7 @@ class outputGenerator(object):
         """
 
         if acl is None:
-            acl = obj.getRecursiveAllowedToAccessList()
+            acl = obj.get_access_list()
 
         # Populate two lists holding email/group strings instead of
         # Avatar/Group objects
@@ -1347,8 +1347,7 @@ class outputGenerator(object):
     def materialToXMLMarc21(self, obj, out=None):
         if not out:
             out = self._XMLGen
-
-        for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.linked_object == obj,
+        for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.object == obj,
                                            is_deleted=False, _join=AttachmentFolder)
                                      .options(joinedload(Attachment.legacy_mapping))):
             if attachment.can_access(self.__aw.getUser().user):
@@ -1365,26 +1364,23 @@ class outputGenerator(object):
             self.resourceLinkToXMLMarc21(res, out=out)
 
     def _attachment_unique_id(self, attachment, add_prefix=True):
-        unique_id = uniqueId(attachment.folder.linked_object)
-        if add_prefix:
-            unique_id = "INDICO." + unique_id
         if attachment.legacy_mapping:
-            unique_id += "m{}.{}".format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
+            unique_id = 'm{}.{}'.format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
         else:
-            unique_id += "a{}".format(attachment.id)
-
-        return unique_id
+            unique_id = 'a{}'.format(attachment.id)
+        unique_id = '{}{}'.format(uniqueId(attachment.folder.object), unique_id)
+        return 'INDICO.{}'.format(unique_id) if add_prefix else unique_id
 
     def _attachment_access_list(self, attachment):
-        linked_object = attachment.folder.linked_object
-        manager_list = set(linked_object.getRecursiveManagerList())
+        linked_object = attachment.folder.object
+        manager_list = set(linked_object.get_manager_list(recursive=True))
 
         if attachment.is_self_protected:
             return {e.as_legacy for e in attachment.acl} | manager_list
         if attachment.is_inheriting and attachment.folder.is_self_protected:
             return {e.as_legacy for e in attachment.folder.acl} | manager_list
         else:
-            return linked_object.getRecursiveAllowedToAccessList()
+            return linked_object.get_access_list()
 
     def resourceLinkToXMLMarc21(self, attachment, out=None):
         if not out:
@@ -1419,7 +1415,7 @@ class outputGenerator(object):
             out = self._XMLGen
         out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
         out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
-        out.writeTag('subfield', '{} - Minutes'.format(note.linked_object.getTitle()), [['code', 'y']])
+        out.writeTag('subfield', '{} - Minutes'.format(note.object.title), [['code', 'y']])
         out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')
