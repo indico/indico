@@ -226,7 +226,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
                          canModify=legacy_obj.canModify(self._aw),
                          mapClassType={'AcceptedContribution': 'Contribution'})
 
-    def _get_query_options(self, include_contribs=False):
+    def _get_query_options(self, detail_level):
         acl_user_strategy = joinedload('acl_entries').joinedload('user')
         # remote group membership checks will trigger a load on _all_emails
         # but not all events use this so there's no need to eager-load them
@@ -234,11 +234,19 @@ class CategoryEventFetcher(IteratedDataFetcher):
         # acl_user_strategy.noload('_affiliation')
         creator_strategy = joinedload('creator')
         contributions_strategy = subqueryload('contributions')
-        if include_contribs:
-            return acl_user_strategy, creator_strategy, contributions_strategy
-        return acl_user_strategy, creator_strategy
+        subcontributions_strategy = subqueryload('contributions').subqueryload('subcontributions')
+        sessions_strategy = subqueryload('sessions')
+        options = [acl_user_strategy, creator_strategy]
+        if detail_level == 'contributions':
+            options.append(contributions_strategy)
+        if detail_level in {'subcontributions', 'sessions'}:
+            options.append(subcontributions_strategy)
+        if detail_level == 'sessions':
+            options.append(sessions_strategy)
+        return options
 
     def category(self, idlist):
+        self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
         filter = None
         if self._room or self._location or self._eventType:
             def filter(obj):
@@ -258,14 +266,13 @@ class CategoryEventFetcher(IteratedDataFetcher):
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
-                 .options(*self._get_query_options()))
+                 .options(*self._get_query_options(self._detail_level)))
         return self._process((x.as_legacy for x in query), filter)
 
     def event(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        include_contributions = self._detail_level in {'contributions', 'subcontributions', 'sessions'}
         events = (Event.find(Event.id.in_(idlist), ~Event.is_deleted)
-                  .options(*self._get_query_options(include_contribs=include_contributions))
+                  .options(*self._get_query_options(self._detail_level))
                   .all())
 
         ch = ConferenceHolder()
@@ -401,7 +408,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         if self._detail_level in {'contributions', 'subcontributions'}:
             data['contributions'] = []
             for contribution in event.contributions:
-                include_subcontribs = self._detail_level in {'subcontributions', 'sessions'}
+                include_subcontribs = self._detail_level == 'subcontributions'
                 serialized_contrib = self._build_contribution_api_data(contribution, include_subcontribs)
                 data['contributions'].append(serialized_contrib)
         elif self._detail_level == 'sessions':

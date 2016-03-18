@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -153,6 +154,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         return self
 
     @property
+    @memoize_request
     def conveners(self):
         from indico.modules.events.sessions.models.blocks import SessionBlock
         from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
