@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
-from itertools import chain
 from operator import attrgetter
 
 from sqlalchemy.ext.declarative import declared_attr
@@ -33,6 +32,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
+from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, MarkdownText
 
@@ -173,6 +173,8 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         sorted_blocks = sorted(self.blocks, key=attrgetter('timetable_entry.end_dt'), reverse=True)
         return sorted_blocks[0].timetable_entry.end_dt if sorted_blocks else None
 
+    @property
+    @memoize_request
     def conveners(self):
         from indico.modules.events.sessions.models.blocks import SessionBlock
         from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
