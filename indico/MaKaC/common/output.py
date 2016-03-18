@@ -843,8 +843,8 @@ class outputGenerator(object):
 
         out.writeXML(xml)
 
-
     def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
+        event = conf.as_event
 
         if not out:
             out = self._XMLGen
@@ -852,54 +852,48 @@ class outputGenerator(object):
         version = "MARC21_ses-%s_cont-%s_mat-%s"%(includeSession,includeContribution,includeMaterial)
         obj = None
         if not overrideCache:
-            obj = self.cache.loadObject(version, conf)
+            obj = self.cache.loadObject(version, event.as_legacy)
         if obj:
             xml = obj.getContent()
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
-            self._confToXMLMarc21(conf,includeSession,includeContribution,includeMaterial, out=temp)
+            self._event_to_xml_marc_21(event, includeSession, includeContribution, includeMaterial, out=temp)
             xml = temp.getXml()
             # save XML in cache
-            self.cache.cacheObject(version, xml, conf)
+            self.cache.cacheObject(version, xml, event.as_legacy)
         out.writeXML(xml)
 
-    def _confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
+    def _event_to_xml_marc_21(self, event, includeSession=1, includeContribution=1, includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
 
         out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",conf.getTitle(),[["code","a"]])
+        out.writeTag("subfield", event.title, [["code", "a"]])
         out.closeTag("datafield")
 
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",conf.title,[["code","a"]])
+        out.writeTag("subfield", event.title, [["code", "a"]])
+        event_location_info = []
+        if event.venue_name:
+            event_location_info.append(event.venue_name)
+        if event.address:
+            event_location_info.append(event.address)
+        event_room = event.get_room_name(full=False)
+        if event_room:
+            event_location_info.append(event_room)
+        out.writeTag("subfield", ', '.join(event_location_info), [["code", "c"]])
 
-        # XXX: If there is ROOM and not LOCATION....There will be information missed.
-        for l in conf.getLocationList():
-            loc = ""
-            if l.getName() != "":
-                loc = conf.getLocation().getName()
-            if l.getAddress() != "":
-                loc = loc +", "+conf.getLocation().getAddress()
-
-            if conf.getRoom():
-                roomName = self._getRoom(conf.getRoom(), l)
-                loc = loc + ", " + roomName
-
-            if l.getName() != "":
-                out.writeTag("subfield",loc,[["code","c"]])
-
-        sd = conf.getStartDate()
-        ed = conf.getEndDate()
+        sd = event.start_dt
+        ed = event.end_dt
         out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
         out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
 
-        out.writeTag("subfield", uniqueId(conf),[["code","g"]])
+        out.writeTag("subfield", uniqueId(event), [["code", "g"]])
         out.closeTag("datafield")
 
-        for path in conf.getCategoriesPath():
+        for path in event.as_legacy.getCategoriesPath():
             out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("subfield", ":".join(path), [["code","a"]])
             out.closeTag("datafield")
@@ -912,7 +906,7 @@ class outputGenerator(object):
         #    out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","d"]])
         #    out.closeTag("datafield")
         #sd = conf.getAdjustedStartDate(tz)
-        sd = conf.getStartDate()
+        sd = event.start_dt
         if sd is not None:
             out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
@@ -922,32 +916,21 @@ class outputGenerator(object):
         ####################################
 
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",conf.getDescription(),[["code","a"]])
+        out.writeTag("subfield", event.description, [["code", "a"]])
         out.closeTag("datafield")
 
-        if conf.getReportNumberHolder().listReportNumbers():
-            out.openTag("datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
-            for report in conf.getReportNumberHolder().listReportNumbers():
-                out.writeTag("subfield",report[1],[["code","a"]])
-            out.closeTag("datafield")
-
+        self._generate_references(event, out)
 
         out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
-        keywords = conf.getKeywords()
+        # TODO: Fetch keywords from new models (once implemented)
+        keywords = event.as_legacy.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("subfield",keyword,[["code","a"]])
         out.closeTag("datafield")
 
-        import MaKaC.webinterface.simple_event as simple_event
-        import MaKaC.webinterface.meeting as meeting
-        type = "Conference"
-        if self.webFactory.getFactory(conf) == simple_event.WebFactory:
-            type = "Lecture"
-        elif self.webFactory.getFactory(conf) == meeting.WebFactory:
-            type = "Meeting"
         out.openTag("datafield",[["tag","650"],["ind1","2"],["ind2","7"]])
-        out.writeTag("subfield",type,[["code","a"]])
+        out.writeTag("subfield", event.type.capitalize(), [["code", "a"]])
         out.closeTag("datafield")
         #### t o d o
 
@@ -957,42 +940,40 @@ class outputGenerator(object):
 
 
         # tag 700 chair name
-        uList = conf.getChairList()
-        for chair in uList:
+        for chair in event.person_links:
             out.openTag("datafield",[["tag","906"],["ind1"," "],["ind2"," "]])
-            nom = chair.getFamilyName() + " " + chair.getFirstName()
-            out.writeTag("subfield",nom,[["code","p"]])
-            out.writeTag("subfield",chair.getAffiliation(),[["code","u"]])
+            full_name = chair.get_full_name(last_name_first=True, last_name_upper=False, abbrev_first_name=False)
+            out.writeTag("subfield", full_name, [["code", "p"]])
+            out.writeTag("subfield", chair.affiliation, [["code", "u"]])
             out.closeTag("datafield")
 
 
         #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         if includeMaterial:
-            self.materialToXMLMarc21(conf, out=out)
+            self.materialToXMLMarc21(event, out=out)
         #out.closeTag("datafield")
 
-        if conf.note:
-            self.noteToXMLMarc21(conf.note, out=out)
+        if event.note:
+            self.noteToXMLMarc21(event.note, out=out)
 
         #if respEmail != "":
         #    out.openTag("datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
         #   out.writeTag("subfield",respEmail,[["code","f"]])
         #   out.closeTag("datafield")
         # tag 859 email
-        uList = conf.getChairList()
-        for chair in uList:
-            out.openTag("datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
-            out.writeTag("subfield",chair.getEmail(),[["code","f"]])
+        for chair in event.person_links:
+            out.openTag("datafield", [["tag", "859"], ["ind1", " "], ["ind2", " "]])
+            out.writeTag("subfield", chair.person.email, [["code", "f"]])
             out.closeTag("datafield")
 
-        edate = conf.getCreationDate()
+        edate = event.as_legacy.getCreationDate()
         creaDate = datetime( edate.year, edate.month, edate.day )
 
         out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","%d-%s-%sT"%(creaDate.year, string.zfill(creaDate.month,2), string.zfill(creaDate.day,2)),[["code","x"]])
         out.closeTag("datafield")
 
-        edate = conf.getModificationDate()
+        edate = event.as_legacy.getModificationDate()
         modifDate = datetime( edate.year, edate.month, edate.day )
 
         out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
@@ -1000,17 +981,17 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", self._getRecordCollection(conf), [["code","a"]])
+        out.writeTag("subfield", self._getRecordCollection(event), [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO." + uniqueId(conf),[["code","a"]])
+        out.writeTag("subfield", "INDICO." + str(uniqueId(event)), [["code", "a"]])
         out.closeTag("datafield")
 
-        self._generateLinkField(urlHandlers.UHConferenceDisplay, conf,
-                                "Event details", out)
+        self._generate_link_field(url_for('event.conferenceDisplay', confId=event.id, _external=True), 'Event details',
+                                  out)
 
-        self._generateAccessList(conf, out, objId=uniqueId(conf))
+        self._generateAccessList(event, out, objId=uniqueId(event))
 
     def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
@@ -1185,6 +1166,18 @@ class outputGenerator(object):
     ####
     #fb
 
+    def _generate_link_field(self, url, caption, out):
+        out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
+        out.writeTag('subfield', url, [['code', 'u']])
+        out.writeTag('subfield', caption, [['code', 'y']])
+        out.closeTag('datafield')
+
+    def _generate_references(self, obj, out):
+        if obj.references:
+            out.openTag('datafield', [['tag', '088'], ['ind1', ' '], ['ind2', ' ']])
+            for reference in obj.references:
+                out.writeTag('subfield', reference.value, [['code', 'a']])
+            out.closeTag('datafield')
 
     def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
