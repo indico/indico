@@ -1,6 +1,7 @@
 <div class="container" style="max-width: 1000px; overflow: visible;">
 <form class="i-form" id="conferenceCreationForm" action="${ postURL }" method="POST">
     <input type="hidden" name="event_type" value="${ event_type }">
+    <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
 
     <em>${ _("Please follow the steps to create a conference")}</em>
 
