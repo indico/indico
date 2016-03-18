@@ -21,7 +21,7 @@
         {% if linked_to %}
             {% if linked_to.event %}
                 <div class="groupTitleNoBorder event-service-association-title">
-                    {{ event.getTitle() }}<span class="event-service-association-subtitle">{% trans %}Event{% endtrans %}</span>
+                    {{ event.title }}<span class="event-service-association-subtitle">{% trans %}Event{% endtrans %}</span>
                 </div>
                 {% for event_vc_room in linked_to.event[event]|sort(attribute='vc_room.name') %}
                     {{ render_vc_room(event_vc_room, event) }}
@@ -30,7 +30,7 @@
             {% if linked_to.contribution %}
                 {% for contrib, event_vc_rooms in linked_to.contribution.items()|sort(attribute='0.title') %}
                     <div class="groupTitleNoBorder event-service-association-title">
-                        {{ contrib.getTitle() }}<span class="event-service-association-subtitle">{% trans %}Contribution{% endtrans %}</span>
+                        {{ contrib.title }}<span class="event-service-association-subtitle">{% trans %}Contribution{% endtrans %}</span>
                     </div>
                     {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
                         {{ render_vc_room(event_vc_room, event) }}
@@ -38,9 +38,9 @@
                 {% endfor %}
             {% endif %}
             {% if linked_to.block %}
-                {% for block, event_vc_rooms in linked_to.block.items()|sort(attribute='0.title') %}
+                {% for block, event_vc_rooms in linked_to.block.items()|sort(attribute='0.full_title') %}
                     <div class="groupTitleNoBorder event-service-association-title">
-                        {{ block.getFullTitle() }}<span class="event-service-association-subtitle">{% trans %}Session{% endtrans %}</span>
+                        {{ block.full_title }}<span class="event-service-association-subtitle">{% trans %}Session{% endtrans %}</span>
                     </div>
                     {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
                         {{ render_vc_room(event_vc_room, event) }}

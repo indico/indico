@@ -40,7 +40,7 @@ def _inject_event_header(event, **kwargs):
     res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)
     event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]
     if event_vc_rooms:
-        return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
+        return render_template('vc/event_header.html', event=event.as_event, event_vc_rooms=event_vc_rooms)
 
 
 @template_hook('vc-actions')
@@ -70,22 +70,17 @@ def _extend_event_menu(sender, **kwargs):
                          position=14, visible=_visible)
 
 
-@signals.event.session_slot_deleted.connect
-def _session_slot_deleted(session_slot, **kwargs):
-    event = session_slot.getConference()
-    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
-        if event_vc_room.link_object is None:
-            event_vc_room.link_type = VCRoomLinkType.event
-            event_vc_room.link_id = None
-
-
 @signals.event.contribution_deleted.connect
-def _contrib_deleted(contrib, **kwargs):
-    event = contrib.getConference()
-    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
-        if event_vc_room.link_object is None:
-            event_vc_room.link_type = VCRoomLinkType.event
-            event_vc_room.link_id = None
+@signals.event.session_block_deleted.connect
+def _link_object_deleted(obj, **kwargs):
+    for event_vc_room in obj.vc_room_associations:
+        event_vc_room.link_object = obj.event_new
+
+
+@signals.event.session_deleted.connect
+def _session_deleted(sess, **kwargs):
+    for block in sess.blocks:
+        _link_object_deleted(block)
 
 
 @signals.event.deleted.connect

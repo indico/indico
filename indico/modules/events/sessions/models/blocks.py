@@ -72,6 +72,7 @@ class SessionBlock(LocationMixin, db.Model):
     # - legacy_mapping (LegacySessionBlockMapping.session_block)
     # - session (Session.blocks)
     # - timetable_entry (TimetableEntry.session_block)
+    # - vc_room_associations (VCRoomEventAssociation.linked_block)
 
     @declared_attr
     def contribution_count(cls):

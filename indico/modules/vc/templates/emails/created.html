@@ -6,7 +6,7 @@
 
 {% block header -%}
 <p>
-    A videoconferencing room has just been created for the event "<a href="{{ event.getURL() }}">{{ event.title }}</a>".
+    A videoconferencing room has just been created for the event "<a href="{{ event.as_legacy.getURL() }}">{{ event.title }}</a>".
 </p>
 
 <p>

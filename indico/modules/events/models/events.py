@@ -257,6 +257,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)
     # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event_new)
     # - all_notes (EventNote.event_new)
+    # - all_vc_room_associations (VCRoomEventAssociation.event_new)
     # - attachment_folders (AttachmentFolder.linked_event)
     # - clones (Event.cloned_from)
     # - contribution_fields (ContributionField.event_new)
@@ -285,7 +286,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     # - static_sites (StaticSite.event_new)
     # - surveys (Survey.event_new)
     # - timetable_entries (TimetableEntry.event_new)
-    # - vc_room_associations (VCRoomEventAssociation.event_new)
+    # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
     @property
     @memoize_request

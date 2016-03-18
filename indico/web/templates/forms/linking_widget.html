@@ -12,7 +12,7 @@
             {% if dropdown %}
                 {{ form_field(dropdown, "i-linking-dropdown form-subfield") }}
             {% elif subfield.data == 'event' %}
-                <span class='static-text'>{{ form.event.getTitle() }}</span>
+                <span class='static-text'>{{ form.event.title }}</span>
             {% endif %}
         </div>
     {% endfor %}

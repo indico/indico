@@ -40,7 +40,10 @@
                                                    class="i-button icon-edit js-vcroom-edit"
                                                    title="{% trans %}Edit{% endtrans %}"></a>
                                             {% endif %}
-                                            <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Detach{% endtrans %}"></a>
+                                            <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
+                                               data-num-events="{{ vc_room.events | count }}"
+                                               class="i-button icon-remove js-vcroom-remove"
+                                               title="{% trans %}Detach{% endtrans %}"></a>
                                             {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
                                                 {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
                                             {% endif %}
