@@ -26,6 +26,7 @@ from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -33,14 +34,17 @@ from indico.web.menu import SideMenuItem
 
 logger = Logger.get('events.registration')
 
-registration_settings = EventSettingsProxy('registrations', {
+registration_settings = RegistrationSettingsProxy('registrations', {
     # Whether to merge display forms on the participant list
     'merge_registration_forms': True,
     # Columns to show on the participant list when the registration forms are merged
     'participant_list_columns': ['first_name', 'last_name', 'affiliation'],
-    # Columns to show for earch form when they are not merged
-    'participant_list_forms': {}
+    # Order of the forms to show on the participant list
+    'participant_list_forms': [],
+    # Columns to show for each form on the participant list
+    'participant_list_form_columns': {}
 })
+
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):

@@ -258,3 +258,7 @@ class ParticipantsDisplayForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         super(ParticipantsDisplayForm, self).__init__(*args, **kwargs)
+
+
+class ParticipantsDisplayFormColumnsForm(IndicoForm):
+    json = JSONField()

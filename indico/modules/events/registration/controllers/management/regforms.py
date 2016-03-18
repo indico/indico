@@ -28,7 +28,7 @@ from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import (RegistrationFormForm, RegistrationFormScheduleForm,
-                                                      ParticipantsDisplayForm)
+                                                      ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
@@ -37,7 +37,7 @@ from indico.modules.events.registration.util import get_event_section_data, crea
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
 from indico.modules.events.payment import settings as payment_global_settings
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
@@ -74,14 +74,15 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         if form.validate_on_submit():
             data = form.json.data
             registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
-            registration_settings.set(self.event, 'participant_list_columns', data['participant_list_columns'])
+            registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
+            registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
                 regform.publish_registrations_enabled = str(regform.id) in data['participant_list_forms']
 
-        available_columns = {f[0].name: f[1]['title'] for f in PersonalDataType.FIELD_DATA}
+        available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
         disabled_columns = []
-        for column_name in registration_settings.get(self.event, 'participant_list_columns'):
+        for column_name in registration_settings.get_participant_list_columns(self.event):
             if column_name in available_columns:
                 enabled_columns.append({'id': column_name, 'title': available_columns[column_name]})
                 del available_columns[column_name]
@@ -93,7 +94,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         enabled_forms = []
         disabled_forms = []
         # Handle forms that have already been sorted by the user.
-        for form_id in registration_settings.get(self.event, 'participant_list_forms'):
+        for form_id in registration_settings.get_participant_list_form_ids(self.event):
             try:
                 regform = available_forms[form_id]
             except KeyError:
@@ -115,7 +116,31 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
                                                     regforms=regforms, enabled_columns=enabled_columns,
                                                     disabled_columns=disabled_columns, enabled_forms=enabled_forms,
                                                     disabled_forms=disabled_forms, merge_forms=merge_forms,
-                                                    form=form)
+                                                    form=form, is_regform=lambda x: isinstance(x, RegistrationForm))
+
+
+class RHManageRegistrationFormDisplay(RHManageRegFormBase):
+    """Choose the columns to be shown on the participant list for a particular form"""
+
+    def _process(self):
+        form = ParticipantsDisplayFormColumnsForm()
+        if form.validate_on_submit():
+            registration_settings.set_participant_list_columns(self.event, form.json.data['columns'], self.regform)
+            return jsonify_data(flash=False)
+
+        available_fields = {field.id: field for field in self.regform.active_fields}
+        enabled_fields = []
+        for field_id in registration_settings.get_participant_list_columns(self.event, self.regform):
+            try:
+                field = available_fields[field_id]
+            except KeyError:
+                continue
+            enabled_fields.append(field)
+            del available_fields[field_id]
+
+        disabled_fields = available_fields.values()
+        return jsonify_template('events/registration/management/regform_display_form_columns.html', form=form,
+                                enabled_columns=enabled_fields, disabled_columns=disabled_fields)
 
 
 class RHManageParticipants(RHManageRegFormsBase):
