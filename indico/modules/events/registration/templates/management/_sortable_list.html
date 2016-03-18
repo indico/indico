@@ -16,13 +16,15 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, actions_macro=None) -%}
-    <div class="titled-rule">{{ enabled_title }}</div>
-    <ul class="enabled">
-        {{ sortable_items(enabled_items, actions_macro) }}
-    </ul>
-    <div class="titled-rule">{{ disabled_title }}</div>
-    <ul class="disabled">
-        {{ sortable_items(disabled_items, actions_macro) }}
-    </ul>
+{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, actions_macro=none, classes="") -%}
+    <div class="js-sortable-list-widget {{ classes }}">
+        <div class="titled-rule">{{ enabled_title }}</div>
+        <ul class="enabled">
+            {{ sortable_items(enabled_items, actions_macro) }}
+        </ul>
+        <div class="titled-rule">{{ disabled_title }}</div>
+        <ul class="disabled">
+            {{ sortable_items(disabled_items, actions_macro) }}
+        </ul>
+    </div>
 {%- endmacro %}
