@@ -84,7 +84,7 @@ class Location(db.Model):
         'Room',
         backref='location',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        lazy=True
     )
 
     attributes = db.relationship(
@@ -154,7 +154,7 @@ class Location(db.Model):
 
     def get_buildings(self):
         building_rooms = defaultdict(list)
-        for room in self.rooms.all():
+        for room in self.rooms:
             building_rooms[room.building].append(room)
 
         buildings = []

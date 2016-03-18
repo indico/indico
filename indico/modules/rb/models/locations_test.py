@@ -77,7 +77,7 @@ def test_get_equipment_by_name(dummy_location, create_equipment_type):
 
 def test_get_buildings(db, dummy_location, create_room):
     room = create_room()
-    assert dummy_location.rooms.count() == 1
+    assert len(dummy_location.rooms) == 1
     assert room.longitude is None
     assert room.latitude is None
     assert not dummy_location.get_buildings()  # no buildings with coordinates
@@ -89,7 +89,7 @@ def test_get_buildings(db, dummy_location, create_room):
     buildings = dummy_location.get_buildings()
     assert buildings
     for building in buildings:
-        rooms = dummy_location.rooms.filter_by(building=building['number']).all()
+        rooms = [r for r in dummy_location.rooms if r.building == building['number']]
         assert {r['id'] for r in building['rooms']} == {r.id for r in rooms}
         assert any(r.latitude and r.longitude for r in rooms)  # at least one room in the building needs coordinates
         for room in rooms:

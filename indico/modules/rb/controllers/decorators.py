@@ -21,6 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.core.errors import IndicoError, NotFoundError
 from indico.util.decorators import smart_decorator
 from indico.util.i18n import _
+from indico.modules.rb import Room
 from indico.modules.rb.models.locations import Location
 
 
@@ -53,7 +54,7 @@ def requires_room(f, parameter_name='roomID', attribute_name='_room', location_a
 
         room_id = getattr(request, request_attribute).get(parameter_name, None)
         try:
-            room = location.rooms.filter_by(id=room_id).one()
+            room = Room.query.with_parent(location).filter_by(id=room_id).one()
         except NoResultFound:
             raise NotFoundError(_("There is no room at '{1}' with id: {0}").format(room_id, location.name))
         setattr(args[0], attribute_name, room)
