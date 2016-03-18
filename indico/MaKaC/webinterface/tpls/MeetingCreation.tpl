@@ -2,6 +2,7 @@
 <form class="i-form" id="eventCreationForm" action="${ postURL }"  method="POST">
     <input type="hidden" name="event_type" value="${ event_type }">
     <input type="hidden" name="sessionSlots" value="disabled"/>
+    <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
 
     <em>${ _("Please follow the steps to create a meeting")}</em>
 
