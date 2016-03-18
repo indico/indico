@@ -95,16 +95,15 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
         rooms = sorted(self._location.rooms, key=lambda r: natural_sort_key(r.full_name))
         kpi = {}
         if self._with_kpi:
-            kpi['occupancy'] = calculate_rooms_occupancy(self._location.rooms.all())
-            kpi['total_rooms'] = self._location.rooms.count()
-            kpi['active_rooms'] = self._location.rooms.filter_by(is_active=True).count()
-            kpi['reservable_rooms'] = self._location.rooms.filter_by(is_reservable=True).count()
-            kpi['reservable_capacity'] = (self._location.rooms.with_entities(func.sum(Room.capacity))
-                                                              .filter_by(is_reservable=True).scalar())
-            kpi['reservable_surface'] = (self._location.rooms.with_entities(func.sum(Room.surface_area))
-                                                             .filter_by(is_reservable=True).scalar())
-            kpi['booking_stats'] = compose_rooms_stats(self._location.rooms.all())
-            kpi['booking_count'] = Reservation.find(Reservation.room_id.in_(r.id for r in self._location.rooms)).count()
+            kpi['occupancy'] = calculate_rooms_occupancy(self._location.rooms)
+            kpi['total_rooms'] = len(self._location.rooms)
+            kpi['active_rooms'] = sum(1 for room in self._location.rooms if room.is_active)
+            kpi['reservable_rooms'] = sum(1 for room in self._location.rooms if room.is_reservable)
+            kpi['reservable_capacity'] = sum(room.capacity or 0 for room in self._location.rooms if room.is_reservable)
+            kpi['reservable_surface'] = sum(room.surface_area or 0 for room in self._location.rooms
+                                            if room.is_reservable)
+            kpi['booking_stats'] = compose_rooms_stats(self._location.rooms)
+            kpi['booking_count'] = Reservation.find(Reservation.room.has(Room.location == self._location)).count()
         return WPRoomBookingAdminLocation(self,
                                           location=self._location,
                                           rooms=rooms,

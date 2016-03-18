@@ -22,6 +22,7 @@ from operator import attrgetter
 
 from flask import render_template
 from markupsafe import escape, Markup
+from sqlalchemy.orm import joinedload
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
@@ -136,7 +137,7 @@ class IndicoLocationField(JSONField):
     widget = LocationWidget()
 
     def __init__(self, *args, **kwargs):
-        self.locations = Location.query.order_by(db.func.lower(Location.name)).all()
+        self.locations = Location.query.options(joinedload('rooms')).order_by(db.func.lower(Location.name)).all()
         super(IndicoLocationField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):

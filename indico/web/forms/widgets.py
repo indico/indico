@@ -234,7 +234,9 @@ class LocationWidget(JinjaWidget):
             raise TypeError('Unexpected parent type {}'.format(type(parent)))
 
     def get_sorted_rooms(self, location):
-        result = [{'name': room.full_name, 'id': room.id, 'venue_id': room.location_id} for room in location.rooms]
+        result = [{'name': room.full_name, 'id': room.id, 'venue_id': room.location_id}
+                  for room in location.rooms
+                  if room.is_active]
         return sorted(result, key=lambda x: natural_sort_key(x['name']))
 
 
