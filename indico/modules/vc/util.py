@@ -20,28 +20,18 @@ from sqlalchemy.orm import contains_eager
 
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.util.i18n import _
-
-from MaKaC.conference import SessionSlot
 
 
 def get_vc_plugins():
     """Returns a dict containing the available videoconference plugins."""
     from indico.modules.vc import VCPluginMixin
-
-    return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues()
-            if isinstance(p, VCPluginMixin)}
-
-
-def full_block_id(block):
-    return "{}:{}".format(block.session.id, block.id)
+    return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues() if isinstance(p, VCPluginMixin)}
 
 
 def resolve_title(obj):
-    if isinstance(obj, SessionSlot):
-        return obj.getFullTitle().decode('utf-8')
-    else:
-        return obj.getTitle().decode('utf-8')
+    return obj.full_title if isinstance(obj, SessionBlock) else obj.title
 
 
 def get_linked_to_description(obj):
@@ -67,11 +57,15 @@ def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
                      that event)
     """
     from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
-    query = VCRoomEventAssociation.query.options(contains_eager('event_new'))
+    event_strategy = contains_eager('event_new')
+    event_strategy.joinedload('own_room').noload('owner')
+    event_strategy.joinedload('own_venue')
+    query = (VCRoomEventAssociation.query
+             .join(VCRoomEventAssociation.event_new)
+             .options(event_strategy))
     if distinct:
         query = query.distinct(VCRoomEventAssociation.event_id, VCRoomEventAssociation.vc_room_id)
     if from_dt is not None or to_dt is not None:
-        query = query.join(Event)
         if from_dt is not None:
             query = query.filter(Event.start_dt >= from_dt)
         if to_dt is not None:

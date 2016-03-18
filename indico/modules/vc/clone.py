@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.modules.events.cloning import EventCloner
-from indico.modules.vc import VCRoomEventAssociation, get_vc_plugins
+from indico.modules.vc import VCRoomEventAssociation, get_vc_plugins, VCRoomLinkType
 from indico.util.i18n import _
 
 
@@ -47,13 +47,16 @@ class VCCloner(EventCloner):
         db.session.flush()
 
     def _clone_vc_rooms(self, new_event):
-        raise NotImplementedError('TODO adapt together with the rest of the VC module')
-        for old_event_vc_room in VCRoomEventAssociation.find_for_event(self.event, include_hidden=True):
-            event_vc_room = VCRoomEventAssociation(event_id=int(new_event.id),
-                                                   link_type=old_event_vc_room.link_type,
-                                                   link_id=old_event_vc_room.link_id,
-                                                   show=old_event_vc_room.show,
-                                                   data=old_event_vc_room.data)
-            if event_vc_room.link_object is not None:
-                event_vc_room.vc_room = old_event_vc_room.vc_room
-                db.session.add(event_vc_room)
+        for old_event_vc_room in self.old_event.all_vc_room_associations:
+            link_object = None
+            if old_event_vc_room.link_type == VCRoomLinkType.event:
+                link_object = new_event
+            elif old_event_vc_room.link_type == VCRoomLinkType.contribution and self._contrib_map is not None:
+                link_object = self._contrib_map[old_event_vc_room.link_object]
+            elif old_event_vc_room.link_type == VCRoomLinkType.block and self._session_block_map is not None:
+                link_object = self._session_block_map[old_event_vc_room.link_object]
+            if link_object is None:
+                continue
+            event_vc_room = VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
+                                                   link_object=link_object)
+            old_event_vc_room.vc_room.events.append(event_vc_room)

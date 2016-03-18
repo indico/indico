@@ -22,6 +22,8 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.util.decorators import classproperty
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.string import remove_accents
@@ -71,7 +73,7 @@ class VCPluginMixin(object):
 
     def get_vc_room_form_defaults(self, event):
         return {
-            'name': re.sub(r'[^\w_-]', '_', remove_accents(event.getTitle(), reencode=False)),
+            'name': re.sub(r'[^\w_-]', '_', remove_accents(event.title, reencode=False)),
             'show': True,
             'linking': 'event',
             'contribution': '',
@@ -141,7 +143,7 @@ class VCPluginMixin(object):
         """
         name = get_overridable_template_name('event_buttons.html', self, core_prefix='vc/')
         return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room,
-                               event=event_vc_room.event, **kwargs)
+                               event=event_vc_room.event_new, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the videoconference room form
@@ -158,8 +160,10 @@ class VCPluginMixin(object):
                 'show': existing_event_vc_room.show
             }
 
-            if existing_event_vc_room.link_type != VCRoomLinkType.event:
-                kwargs[existing_event_vc_room.link_type.name] = existing_event_vc_room.link_id
+            if existing_event_vc_room.link_type == VCRoomLinkType.contribution:
+                kwargs['contribution'] = existing_event_vc_room.contribution_id
+            elif existing_event_vc_room.link_type == VCRoomLinkType.block:
+                kwargs['block'] = existing_event_vc_room.session_block_id
 
             data = existing_vc_room.data
             data.update(existing_event_vc_room.data)
@@ -176,16 +180,13 @@ class VCPluginMixin(object):
         link_type = VCRoomLinkType[data.pop('linking')]
 
         if link_type == VCRoomLinkType.event:
-            link_id = None
-        else:
-            link_id = contribution_id if link_type == VCRoomLinkType.contribution else block_id
-
-        event_vc_room.event_id = event.id
+            event_vc_room.link_object = event
+        elif link_type == VCRoomLinkType.contribution:
+            event_vc_room.link_object = Contribution.get_one(contribution_id)
+        elif link_type == VCRoomLinkType.block:
+            event_vc_room.link_object = SessionBlock.get_one(block_id)
         event_vc_room.vc_room = vc_room
-        event_vc_room.link_type = link_type
-        event_vc_room.link_id = link_id
         event_vc_room.show = data.pop('show')
-
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
@@ -212,7 +213,7 @@ class VCPluginMixin(object):
         """Checks if a user can manage a vc room"""
         return (user.is_admin or
                 self.can_manage_vc(user) or
-                any(evt_assoc.event.as_event.can_manage(user) for evt_assoc in room.events))
+                any(evt_assoc.event_new.can_manage(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""

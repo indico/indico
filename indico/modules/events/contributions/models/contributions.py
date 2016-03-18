@@ -235,6 +235,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
     # - timetable_entry (TimetableEntry.contribution)
+    # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
     @declared_attr
     def is_scheduled(cls):

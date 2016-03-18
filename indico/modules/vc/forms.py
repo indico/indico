@@ -15,11 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-import re
 
-from datetime import date
-from datetime import timedelta
-from operator import methodcaller, attrgetter
+import re
+from datetime import date, timedelta
+from operator import attrgetter
 
 from flask_pluginengine import current_plugin
 from wtforms.ext.dateutil.fields import DateField
@@ -28,8 +27,9 @@ from wtforms.fields.html5 import IntegerField
 from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, Regexp, ValidationError
 
+from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.models import VCRoom, VCRoomStatus
-from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
@@ -83,9 +83,11 @@ class VCRoomLinkFormBase(IndicoForm):
                                         ('block', _("Session"))],
                                widget=LinkingWidget())
     contribution = SelectField(_("Contribution"),
-                               [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
+                               [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()],
+                               coerce=lambda x: int(x) if x else None)
     block = SelectField(_("Session block"),
-                        [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()])
+                        [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()],
+                        coerce=lambda x: int(x) if x else None)
 
     show = BooleanField(_('Show room'),
                         widget=SwitchWidget(),
@@ -95,9 +97,9 @@ class VCRoomLinkFormBase(IndicoForm):
         self.event = kwargs.pop('event')
         super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
         contrib_choices = [(contrib.id, contrib.title) for contrib in
-                           sorted(self.event.getContributionList(), key=attrgetter('title'))]
-        block_choices = [(full_block_id(block), block.getFullTitle()) for block in
-                         sorted(self.event.getSessionSlotList(), key=methodcaller('getFullTitle'))]
+                           sorted(self.event.contributions, key=attrgetter('title'))]
+        blocks = SessionBlock.find(SessionBlock.session.has((Session.event_new == self.event) & ~Session.is_deleted))
+        block_choices = [(block.id, block.full_title) for block in sorted(blocks, key=attrgetter('full_title'))]
         self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
         self.block.choices = [('', _("Please select a session block"))] + block_choices
 

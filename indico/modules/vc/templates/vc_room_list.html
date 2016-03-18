@@ -27,10 +27,11 @@
 {% endmacro %}
 
 {% macro vc_room_entry(event_vc_room) %}
+    {% set event = event_vc_room.event_new %}
     <tr class="result-group-entry">
         <td class="entry-time">
             <a class="discreet-link" href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}">
-                {{ event_vc_room.event.getStartDate().time() | format_time('HH:mm') }}
+                {{ event.start_dt.time() | format_time('HH:mm') }}
             </a>
         </td>
         <td class="entry-type">
@@ -41,16 +42,15 @@
             {% endif %}
         </td>
         <td class="entry-location">
-            {% if event_vc_room.event.getLocation() and event_vc_room.event.getRoom() and
-                  (event_vc_room.event.getLocation().getName() or event_vc_room.event.getRoom().getName()) %}
-                {% if event_vc_room.event.getRoom().getName() %}
+            {% if event.has_location_info %}
+                {% if event.room_name %}
                     <span class="room">
-                        {{ event_vc_room.event.getRoom().getName() }}
+                        {{ event.room_name }}
                     </span>
                 {% endif %}
-                {% if event_vc_room.event.getLocation().getName %}
+                {% if event.venue_name %}
                     <span class="location">
-                        ({{ event_vc_room.event.getLocation().getName() }})
+                        ({{ event.venue_name }})
                     </span>
                 {% endif %}
             {% else %}
@@ -62,8 +62,8 @@
             {% endif %}
         </td>
         <td class="entry-event">
-            <a class="discreet-link" href="{{ url_for('event.conferenceDisplay', event_vc_room.event) }}">
-                {{ event_vc_room.event.getTitle() }}
+            <a class="discreet-link" href="{{ url_for('event.conferenceDisplay', event) }}">
+                {{ event.title }}
             </a>
         </td>
         <td>

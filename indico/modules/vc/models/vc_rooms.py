@@ -16,7 +16,12 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+from itertools import chain
+
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.event import listen
+from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -28,13 +33,30 @@ from indico.util.date_time import now_utc
 from indico.util.event import unify_event_args
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-from MaKaC.conference import ConferenceHolder
 
 
 class VCRoomLinkType(int, IndicoEnum):
     event = 1
     contribution = 2
     block = 3
+
+
+_columns_for_types = {
+    VCRoomLinkType.event: {'linked_event_id'},
+    VCRoomLinkType.contribution: {'contribution_id'},
+    VCRoomLinkType.block: {'session_block_id'},
+}
+
+
+def _make_checks():
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()))
+    for link_type in VCRoomLinkType:
+        required_cols = available_columns & _columns_for_types[link_type]
+        forbidden_cols = available_columns - required_cols
+        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
+        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+        condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
+        yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
 
 
 class VCRoomStatus(int, IndicoEnum):
@@ -119,7 +141,7 @@ class VCRoom(db.Model):
 
 class VCRoomEventAssociation(db.Model):
     __tablename__ = 'vc_room_events'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = tuple(_make_checks()) + ({'schema': 'events'},)
 
     #: Association ID
     id = db.Column(
@@ -142,17 +164,30 @@ class VCRoomEventAssociation(db.Model):
         index=True,
         nullable=False
     )
-    #: Link type of the vc_room to a event/contribution/session
+    #: Type of the object the vc_room is linked to
     link_type = db.Column(
         PyIntEnum(VCRoomLinkType),
         nullable=False
     )
-    #: Id of the event/contribution/session block the vc_room is linked to
-    link_id = db.Column(
-        db.String,
+    linked_event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
         nullable=True
     )
-    #: If the chatroom should be hidden on the event page
+    session_block_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.session_blocks.id'),
+        index=True,
+        nullable=True
+    )
+    contribution_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contributions.id'),
+        index=True,
+        nullable=True
+    )
+    #: If the vc room should be shown on the event page
     show = db.Column(
         db.Boolean,
         nullable=False,
@@ -173,35 +208,98 @@ class VCRoomEventAssociation(db.Model):
     #: The associated Event
     event_new = db.relationship(
         'Event',
+        foreign_keys=event_id,
         lazy=True,
         backref=db.backref(
-            'vc_room_associations',
+            'all_vc_room_associations',
             lazy='dynamic'
         )
     )
+    #: The linked event (if the VC room is attached to the event itself)
+    linked_event = db.relationship(
+        'Event',
+        foreign_keys=linked_event_id,
+        lazy=True,
+        backref=db.backref(
+            'vc_room_associations',
+            lazy=True
+        )
+    )
+    #: The linked contribution (if the VC room is attached to a contribution)
+    linked_contrib = db.relationship(
+        'Contribution',
+        lazy=True,
+        backref=db.backref(
+            'vc_room_associations',
+            lazy=True
+        )
+    )
+    #: The linked session block (if the VC room is attached to a block)
+    linked_block = db.relationship(
+        'SessionBlock',
+        lazy=True,
+        backref=db.backref(
+            'vc_room_associations',
+            lazy=True
+        )
+    )
+
+    @classmethod
+    def register_link_events(cls):
+        event_mapping = {cls.linked_block: lambda x: x.event_new,
+                         cls.linked_contrib: lambda x: x.event_new,
+                         cls.linked_event: lambda x: x}
+
+        type_mapping = {cls.linked_event: VCRoomLinkType.event,
+                        cls.linked_block: VCRoomLinkType.block,
+                        cls.linked_contrib: VCRoomLinkType.contribution}
+
+        def _set_link_type(link_type, target, value, *unused):
+            if value is not None:
+                target.link_type = link_type
+
+        def _set_event_obj(fn, target, value, *unused):
+            if value is not None:
+                event = fn(value)
+                assert event is not None
+                target.event_new = event
+
+        for rel, fn in event_mapping.iteritems():
+            if rel is not None:
+                listen(rel, 'set', partial(_set_event_obj, fn))
+
+        for rel, link_type in type_mapping.iteritems():
+            if rel is not None:
+                listen(rel, 'set', partial(_set_link_type, link_type))
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), service=self.vc_room.type, event_vc_room_id=self.id)
+        return dict(self.event_new.locator, service=self.vc_room.type, event_vc_room_id=self.id)
 
-    @property
-    def event(self):
-        return ConferenceHolder().getById(str(self.event_id), True)
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
-
-    @property
+    @hybrid_property
     def link_object(self):
         if self.link_type == VCRoomLinkType.event:
-            return self.event
+            return self.linked_event
         elif self.link_type == VCRoomLinkType.contribution:
-            return self.event.getContributionById(self.link_id)
+            return self.linked_contrib
         else:
-            session_id, slot_id = self.link_id.split(':')
-            sess = self.event.getSessionById(session_id)
-            return sess.getSlotById(slot_id) if sess is not None else None
+            return self.linked_block
+
+    @link_object.setter
+    def link_object(self, obj):
+        self.linked_event = self.linked_contrib = self.linked_block = None
+        if isinstance(obj, db.m.Event):
+            self.linked_event = obj
+        elif isinstance(obj, db.m.Contribution):
+            self.linked_contrib = obj
+        elif isinstance(obj, db.m.SessionBlock):
+            self.linked_block = obj
+        else:
+            raise TypeError('Unexpected object: {}'.format(obj))
+
+    @link_object.comparator
+    def link_object(cls):
+        return _LinkObjectComparator(cls)
 
     @return_ascii
     def __repr__(self):
@@ -218,7 +316,7 @@ class VCRoomEventAssociation(db.Model):
         """
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)
-        query = event.vc_room_associations
+        query = event.all_vc_room_associations
         if kwargs:
             query = query.filter_by(**kwargs)
         if not include_hidden:
@@ -241,13 +339,38 @@ class VCRoomEventAssociation(db.Model):
         :param user: the user performing the deletion
         """
         Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-            self.vc_room, self.event, self.link_object)
+            self.vc_room, self.event_new, self.link_object)
         )
         db.session.delete(self)
         db.session.flush()
         if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
             if self.vc_room.status != VCRoomStatus.deleted:
-                self.vc_room.plugin.delete_room(self.vc_room, self.event)
-                notify_deleted(self.vc_room.plugin, self.vc_room, self, self.event, user)
+                self.vc_room.plugin.delete_room(self.vc_room, self.event_new)
+                notify_deleted(self.vc_room.plugin, self.vc_room, self, self.event_new, user)
             db.session.delete(self.vc_room)
+
+
+VCRoomEventAssociation.register_link_events()
+
+
+class _LinkObjectComparator(Comparator):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __clause_element__(self):
+        # just in case
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        if isinstance(other, db.m.Event):
+            return db.and_(self.cls.link_type == VCRoomLinkType.event,
+                           self.cls.linked_event_id == other.id)
+        elif isinstance(other, db.m.SessionBlock):
+            return db.and_(self.cls.link_type == VCRoomLinkType.block,
+                           self.cls.session_block_id == other.id)
+        elif isinstance(other, db.m.Contribution):
+            return db.and_(self.cls.link_type == VCRoomLinkType.contribution,
+                           self.cls.contribution_id == other.id)
+        else:
+            raise TypeError('Unexpected object type {}: {}'.format(type(other), other))
