@@ -25,8 +25,7 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.settings import EventSettingsProxy
-from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
