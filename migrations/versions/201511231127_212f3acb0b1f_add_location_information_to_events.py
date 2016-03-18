@@ -27,6 +27,7 @@ def upgrade():
                   schema='events')
     op.add_column('events', sa.Column('room_name', sa.String(), nullable=False, server_default=''),
                   schema='events')
+    op.create_index(None, 'events', ['venue_id'], unique=False, schema='events')
     op.create_index(None, 'events', ['room_id'], unique=False, schema='events')
     for col in not_null_cols:
         op.alter_column('events', col, server_default=None, schema='events')
