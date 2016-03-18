@@ -59,7 +59,7 @@ def upgrade():
         sa.Column('friendly_id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
-        sa.Column('description', sa.Text(), nullable=True),
+        sa.Column('description', sa.Text(), nullable=False),
         sa.Column('code', sa.String(), nullable=False),
         sa.Column('default_contribution_duration', sa.Interval(), nullable=False),
         sa.Column('is_poster', sa.Boolean(), nullable=False),
