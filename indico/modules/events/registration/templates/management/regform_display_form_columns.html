@@ -23,7 +23,7 @@
             var data = {'columns': []};
             var $form = $('#js-registration-form-columns');
             $form.find('ul.enabled li').each(function() {
-                data.columns.push($(this).attr('id'));
+                data.columns.push($(this).data('item-id'));
             });
             $form.find('#json').val(JSON.stringify(data));
         };

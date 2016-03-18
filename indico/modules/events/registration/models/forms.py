@@ -371,9 +371,7 @@ class RegistrationForm(db.Model):
 
     def get_personal_data_field_id(self, personal_data_type):
         """Returns the field id corresponding to the personal data field with the given name."""
-        field_id = None
         for field in self.active_fields:
             if (isinstance(field, RegistrationFormPersonalDataField) and
                     field.personal_data_type == personal_data_type):
-                field_id = field.id
-        return field_id
+                return field.id

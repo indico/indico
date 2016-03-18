@@ -66,10 +66,10 @@
         </p>
         <ul id="publish-registrations">
             {% for form in regforms %}
-            <li>
-                <input id="{{form.id}}" type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}></input>
-                {{form.title}}
-            </li>
+                <li>
+                    <input data-item-id="{{form.id}}" type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}></input>
+                    {{form.title}}
+                </li>
             {% endfor %}
         </ul>
         <p>
@@ -126,15 +126,15 @@
                 };
                 if (mergeForms) {
                     $form.find('#publish-registrations input:checked').each(function() {
-                        data.participant_list_forms.push($(this).attr('id'));
+                        data.participant_list_forms.push($(this).data('item-id'));
                     });
                 } else {
                     $form.find('#registration-forms ul.enabled li').each(function() {
-                        data.participant_list_forms.push($(this).attr('id'));
+                        data.participant_list_forms.push($(this).data('item-id'));
                     });
                 }
                 $form.find('#participant-list-columns ul.enabled li').each(function() {
-                    data.participant_list_columns.push($(this).attr('id'));
+                    data.participant_list_columns.push($(this).data('item-id'));
                 });
                 $form.find('#json').val(JSON.stringify(data));
             });
