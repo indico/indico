@@ -105,16 +105,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.publish_registrations_enabled,
                                              event_id=int(self.event.id))
-        query = (Registration
-                 .find(Registration.event_id == self.event.id,
-                       Registration.state == RegistrationState.complete,
-                       RegistrationForm.publish_registrations_enabled,
-                       ~RegistrationForm.is_deleted,
-                       ~Registration.is_deleted,
-                       _join=Registration.registration_form,
-                       _eager=Registration.registration_form)
-                 .order_by(*Registration.order_by_name))
-
         def _is_checkin_visible(reg):
             return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
@@ -141,13 +131,38 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
             return table
 
+        def _participant_list_table(regform):
+            def _process_registration(reg, column_ids):
+                columns = [{'text': reg.data_by_field[column_id].friendly_data} for column_id in column_ids]
+                return {'checked_in': _is_checkin_visible(reg), 'columns': columns}
+            active_fields = {field.id: field.title for field in regform.active_fields}
+            column_ids = [column_id
+                          for column_id in registration_settings.get_participant_list_columns(self.event, regform)
+                          if column_id in active_fields]
+            headers = [active_fields[column_id].title() for column_id in column_ids]
+            registrations = [_process_registration(reg, column_ids) for reg in regform.active_registrations]
+            table = {'headers': headers, 'rows': registrations, 'title': regform.title}
+            table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
+            return table
+
         if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [_merged_participant_list_table()]
         else:
-            tables = {}
+            tables = []
+            regforms_dict = {regform.id: regform for regform in regforms if regform.publish_registrations_enabled}
+            for form_id in registration_settings.get_participant_list_form_ids(self.event):
+                try:
+                    tables.append(_participant_list_table(regforms_dict[form_id]))
+                except KeyError:
+                    # The settings might reference forms that are not available anymore (publishing was disabled, etc.)
+                    pass
+                del regforms_dict[form_id]
+            # There might be forms that have not been sorted by the user yet
+            tables += map(_participant_list_table, regforms_dict.viewvalues())
 
         published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
                                                RegistrationForm.event_id == int(self.event.id)).count())
+        no_participants = not any(table['rows'] for table in tables)
 
         return self.view_class.render_template(
             'display/participant_list.html',
@@ -155,7 +170,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             event=self.event,
             regforms=regforms,
             tables=tables,
-            published=published
+            published=published,
+            no_participants=no_participants
         )
 
 

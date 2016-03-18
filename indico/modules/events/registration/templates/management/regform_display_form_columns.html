@@ -1,0 +1,40 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'events/registration/management/_sortable_list.html' import sortable_lists %}
+
+{{ form_header(form, id="js-registration-form-columns") }}
+{{ form_rows(form) }}
+
+<div id="participant-list-form-columns">
+    <div class="i-box titled sortable-column-preview">
+        {{ sortable_lists(_("Shown columns"), enabled_columns,
+                          _("Hidden columns"), disabled_columns) }}
+    </div>
+</div>
+<button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
+
+{{ form_footer(form) }}
+
+<script>
+    (function () {
+        'use strict';
+
+        $('#participant-list-form-columns ul').sortable({
+            connectWith: '#participant-list-form-columns ul',
+            placeholder: 'i-label sortable-item placeholder',
+            forcePlaceholderSize: true
+        });
+
+        function updateHiddenField() {
+            var data = {'columns': []};
+            var $form = $('#js-registration-form-columns');
+            $form.find('ul.enabled li').each(function() {
+                data.columns.push($(this).attr('id'));
+            });
+            $form.find('#json').val(JSON.stringify(data));
+        };
+
+        $('#js-registration-form-columns').on('submit', function() {
+            updateHiddenField();
+        });
+    })();
+</script>

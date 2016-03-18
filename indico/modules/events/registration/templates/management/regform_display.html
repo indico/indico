@@ -2,6 +2,7 @@
 {% from '_switch.html' import switch %}
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'events/registration/management/_sortable_list.html' import sortable_lists %}
 
 {% block title %}
     {%- trans %}Participants display{% endtrans -%}
@@ -13,30 +14,12 @@
     {%- endtrans %}
 {% endblock %}
 
-{% macro sortable_items(items) -%}
-    {% for item in items %}
-        <li class="i-label sortable-item" id="{{ item.id }}">
-            <div class="actions">
-                <div class="toggle-enabled"></div>
-            </div>
-            <div class="title">{{ item.title }}</div>
-            <div class="actions">
-                <div class="move-prev"></div>
-                <div class="move-next"></div>
-            </div>
-        </li>
-    {% endfor %}
-{%- endmacro %}
-
-{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items) -%}
-    <div class="titled-rule">{{ enabled_title }}</div>
-    <ul class="enabled">
-        {{ sortable_items(enabled_items) }}
-    </ul>
-    <div class="titled-rule">{{ disabled_title }}</div>
-    <ul class="disabled">
-        {{ sortable_items(disabled_items) }}
-    </ul>
+{% macro form_actions_macro(form) -%}
+    <a class="icon-settings js-settings-dialog"
+        data-href="{{ url_for('.manage_regform_display', event, form) }}"
+        data-title="{% trans title=form.title %}Customize columns for {{title}}{% endtrans %}"
+        title="{% trans %}Choose which columns of this form are displayed{% endtrans %}"
+        data-qtip-position="right"></a>
 {%- endmacro %}
 
 {% block content %}
@@ -111,7 +94,8 @@
         </p>
         <div class="i-box titled sortable-form-preview">
             {{ sortable_lists(_("Shown registration forms"), enabled_forms,
-                              _("Hidden registration forms"), disabled_forms) }}
+                              _("Hidden registration forms"), disabled_forms,
+                              form_actions_macro) }}
         </div>
     </div>
 
@@ -124,6 +108,7 @@
 
     <script>
         (function () {
+            'use strict';
             function update() {
                 var mergeForms = $('#merge-forms').prop('checked');
                 $('#participant-list-columns').toggle(mergeForms);
@@ -166,6 +151,16 @@
                     data.participant_list_columns.push($(this).attr('id'));
                 });
                 $form.find('#json').val(JSON.stringify(data));
+            });
+
+            $('#registration-forms .js-settings-dialog').on('click', function(evt) {
+                evt.preventDefault();
+                var $this = $(this);
+                ajaxDialog({
+                    trigger: this,
+                    url: $this.data('href'),
+                    title: $this.data('title')
+                });
             });
         })();
     </script>

@@ -24,6 +24,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
@@ -367,3 +368,12 @@ class RegistrationForm(db.Model):
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
+
+    def get_personal_data_field_id(self, personal_data_type):
+        """Returns the field id corresponding to the personal data field with the given name."""
+        field_id = None
+        for field in self.active_fields:
+            if (isinstance(field, RegistrationFormPersonalDataField) and
+                    field.personal_data_type == personal_data_type):
+                field_id = field.id
+        return field_id

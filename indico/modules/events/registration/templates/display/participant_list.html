@@ -42,18 +42,28 @@
 {% endmacro %}
 
 {% macro participant_table(table) %}
-    <table class="i-table tablesorter">
-        {{ table_header(table.headers, table.show_checkin) }}
-        <tbody>
-            {% for row in table.rows %}
-                {{ table_row(row, table.show_checkin) }}
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if table.title %}
+        <h3>{{ table.title }}</h3>
+        {% if not table.rows %}
+            {% call message_box('info', fixed_width=true) %}
+                {% trans %}There are no registrations yet.{% endtrans %}
+            {% endcall %}
+        {% endif %}
+    {% endif %}
+    {% if table.rows %}
+        <table class="i-table tablesorter">
+            {{ table_header(table.headers, table.show_checkin) }}
+            <tbody>
+                {% for row in table.rows %}
+                    {{ table_row(row, table.show_checkin) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endmacro %}
 
 {% block content %}
-    {% if not published %}
+    {% if not published or not tables %}
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no published registrations.{% endtrans %}
         {% endcall %}

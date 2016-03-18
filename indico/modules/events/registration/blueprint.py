@@ -49,7 +49,8 @@ from indico.modules.events.registration.controllers.management.regforms import (
                                                                                 RHRegistrationFormClose,
                                                                                 RHRegistrationFormSchedule,
                                                                                 RHRegistrationFormModify,
-                                                                                RHRegistrationFormStats)
+                                                                                RHRegistrationFormStats,
+                                                                                RHManageRegistrationFormDisplay)
 from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
                                                                                 RHRegistrationFormModifySection,
                                                                                 RHRegistrationFormToggleSection,
@@ -102,6 +103,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/schedule',
                  'schedule_regform', RHRegistrationFormSchedule, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform', RHRegistrationFormModify)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/stats/', 'regform_stats', RHRegistrationFormStats)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/display',
+                 'manage_regform_display', RHManageRegistrationFormDisplay, methods=('GET', 'POST'))
 
 # Registrations management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/', 'manage_reglist', RHRegistrationsListManage)
