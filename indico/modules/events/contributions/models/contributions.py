@@ -237,6 +237,14 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - timetable_entry (TimetableEntry.contribution)
 
     @declared_attr
+    def is_scheduled(cls):
+        from indico.modules.events.timetable.models.entries import TimetableEntry
+        query = (db.exists([1])
+                 .where(TimetableEntry.contribution_id == cls.id)
+                 .correlate_except(TimetableEntry))
+        return db.column_property(query, deferred=True)
+
+    @declared_attr
     def subcontribution_count(cls):
         from indico.modules.events.contributions.models.subcontributions import SubContribution
         query = (db.select([db.func.count(SubContribution.id)])
@@ -268,10 +276,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def track(self):
         return self.event_new.as_legacy.getTrackById(str(self.track_id))
-
-    @property
-    def is_scheduled(self):
-        return self.timetable_entry is not None
 
     @property
     def start_dt(self):
