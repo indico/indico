@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$i-label-horizontal-padding: 10px;
+$i-label-vertical-padding: 4px;
+
 %label {
     @include user-select(none);
     @include border-radius();
@@ -26,7 +29,7 @@
     text-align: center;
     vertical-align: middle;
     line-height: 1em;
-    padding: 4px 10px 4px;
+    padding: $i-label-vertical-padding $i-label-horizontal-padding;
 }
 
 .i-label {
@@ -93,5 +96,12 @@
                 darken($pastel-gray, 0.3*$color-variation) 20px
             );
         }
+    }
+
+    /* Handle on the left of the i-box indicating it can be moved. */
+    > .handle:first-child {
+        @include icon-before('icon-handle');
+        margin-left: -$i-label-horizontal-padding;
+        margin-right: $i-label-horizontal-padding/2;
     }
 }

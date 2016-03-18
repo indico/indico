@@ -1,6 +1,7 @@
 {% macro sortable_items(items, actions_macro) -%}
     {% for item in items %}
         <li class="i-label sortable-item" id="{{ item.id }}">
+            <div class="handle"></div>
             <div class="actions">
                 <div class="toggle-enabled"></div>
             </div>
