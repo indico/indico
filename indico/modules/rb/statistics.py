@@ -20,7 +20,7 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
     working_time_start = datetime.combine(date.today(), Location.working_time_start)
     working_time_end = datetime.combine(date.today(), Location.working_time_end)
     working_time_per_day = (working_time_end - working_time_start).seconds
-    working_days = iterdays(start_date, end_date, skip_weekends=True).count()
+    working_days = sum(1 for __ in iterdays(start_date, end_date, skip_weekends=True))
     return working_days * working_time_per_day * len(rooms)
 
 
