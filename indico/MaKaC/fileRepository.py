@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,36 +22,14 @@ import stat
 import datetime
 import random
 import sys
-from MaKaC.i18n import _
 
-import ZODB
 from persistent import Persistent
-
 from BTrees import OOBTree
-from MaKaC.common.Counter import Counter
 
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.util.i18n import _
 from MaKaC.review import Abstract
-from MaKaC.registration import Registrant
-
-class Repository:
-    """Generic class for file repositories. A file repository knows where to
-        store files (binary, text, ...) and provides services for archiving
-        (by uniquely identifyng them inside the repository) and accessing
-        them.
-       This is a base class that provides a common interface. Any implentation
-        should inherit from this one.
-    """
-    def getInstance( cls ):
-        return None
-    getInstance = classmethod(getInstance)
-
-    def storeFile( self, newFile ):
-        raise Exception( _("not implemented for class %s")%self.__class__.__name__)
-
-    def retireFile( self, file ):
-        raise Exception( _("not implemented for class %s")%self.__class__.__name__)
 
 
 class MaterialLocalRepository(Persistent):
@@ -157,8 +135,6 @@ class MaterialLocalRepository(Persistent):
 
             if (isinstance(newFile.getOwner(), Abstract)):
                 abstract = newFile.getOwner()
-            elif (isinstance(newFile.getOwner(), Registrant)):
-                registrant = newFile.getOwner()
             else:
                 session = newFile.getSession()
                 cont = newFile.getContribution()
@@ -277,41 +253,7 @@ class MaterialLocalRepository(Persistent):
                 raise
             return ''
 
-    def replaceContent( self, id, newContent ):
-        filePath = self.__getFilePath( id )
-        f = open(filePath, "w")
-        f.write( newContent )
-        f.close()
-
     def retireFile( self, file ):
         if not self.__files.has_key( file.getRepositoryId() ):
             return
         del self.__files[ file.getRepositoryId() ]
-
-
-class OfflineRepository(MaterialLocalRepository):
-    """File repositroy keeping the offline sites under a certain path in the local
-        filesystem.
-    """
-
-    _repo_name = "offline"
-
-    def _getRepositoryPath(self):
-        return Config.getInstance().getOfflineStore()
-
-    def storeFile(self, newFile, confId):
-        from MaKaC.common import info
-        volume = info.HelperMaKaCInfo.getMaKaCInfoInstance().getArchivingVolume()
-        new_file_id = self._getNewFileId()
-        destPath = os.path.join(self._getRepositoryPath(), volume, 'offline', confId)
-        if not os.access(destPath, os.F_OK):
-            os.makedirs(destPath)
-        destPath = os.path.join(destPath, newFile.getFileName())
-        relativePath = os.path.join(volume, 'offline', confId, newFile.getFileName())
-        try:
-            shutil.copyfile(newFile.getFilePath(), destPath)
-            self.getFiles()[new_file_id] = relativePath
-            newFile.setArchivedId(self, new_file_id)
-        except IOError:
-            raise Exception(_("Couldn't archive file %s to %s") % (newFile.getFilePath(), destPath))
-        return new_file_id

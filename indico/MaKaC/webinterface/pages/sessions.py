@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,42 +14,34 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from xml.sax.saxutils import quoteattr, escape
+from xml.sax.saxutils import quoteattr
 from datetime import datetime,timedelta
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
     WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.common import info
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.common.utils import isStringHTML
-from MaKaC import user
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.i18n import i18nformat, ngettext
 
-from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ
 from indico.util import json
-from indico.util.date_time import format_date, format_datetime
-import pytz
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
-from MaKaC.user import Avatar
 from MaKaC.common.TemplateExec import render
 
 from indico.core.config import Config
+from indico.web.flask.util import url_for
 
 
 class WPSessionBase(WPConferenceBase):
@@ -69,57 +61,12 @@ class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDispl
         WPSessionDisplayBase.__init__(self, rh, session)
 
 
-class WContributionListDisplayTab(wcomponents.WTemplated):
-
-    def __init__(self, aw, session, tab=None):
-        self._aw = aw
-        self._session = session
-        self._activeTab = tab
-
-    def _getURL(self, sortByField):
-        url = urlHandlers.UHSessionDisplay.getURL(self._session)
-
-        if self._activeTab:
-            url.addParam("tab", self._activeTab)
-
-        return url
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['contributions'] = self._session.getContributionList()
-        vars['accessWrapper'] = self._aw
-        vars['posterSession'] = (self._session.getScheduleType() == "poster")
-        return vars
-
-
-class _NoWitdhdrawFF(filters.FilterField):
-    _id = "no_withdrawn"
-
-    def __init__(self):
-        pass
-
-    def satisfies(self, contrib):
-        return not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn)
-
-
-class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
-
-    def __init__(self, conf):
-        self._fields = {"no_withdrawn": _NoWitdhdrawFF()}
-
-
 class WSessionDisplayBase(WICalExportBase):
 
     def __init__(self,aw,session):
         self._aw = aw
         self._session = session
         self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
-
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -139,7 +86,6 @@ class WSessionDisplayBase(WICalExportBase):
         vars["ttdata"]= schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False)
         vars["eventInfo"]= eventInfo
 
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["session"] = vars["target"] = self._session
         vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
@@ -149,13 +95,7 @@ class WSessionDisplayBase(WICalExportBase):
         return vars
 
 
-# TODO: These classes are actually the same, no?  (Pedro)
-
 class WSessionDisplayFull(WSessionDisplayBase):
-    pass
-
-
-class WSessionDisplayMin(WSessionDisplayBase):
     pass
 
 
@@ -182,14 +122,12 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
                self._includeJSPackage('MaterialEditor') + \
                self._includeJSPackage('Timetable')
 
-class WPSessionModifBase( WPConferenceModifBase ):
+class WPSessionModifBase(WPConferenceModifBase):
+    sidemenu_option = 'timetable'
 
-    def __init__(self, rh, session):
-        WPConferenceModifBase.__init__(self, rh, session.getConference())
+    def __init__(self, rh, session, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, session.getConference(), **kwargs)
         self._session = session
-
-    def _setActiveSideMenuItem( self ):
-        self._timetableMenuItem.setActive()
 
     def _createTabCtrl( self ):
         type = self._session.getConference().getType()
@@ -202,8 +140,8 @@ class WPSessionModifBase( WPConferenceModifBase ):
                 urlHandlers.UHSessionModifSchedule.getURL(self._session) )
         self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
                 urlHandlers.UHSessionModifComm.getURL( self._session ) )
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._session))
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
 
@@ -287,9 +225,8 @@ class WSessionModifMainColors(wcomponents.WTemplated):
 
 class WSessionModifMain(wcomponents.WTemplated):
 
-    def __init__( self, session, mfRegistry ):
+    def __init__(self, session):
         self._session = session
-        self._mfr = mfRegistry
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -323,8 +260,8 @@ class WSessionModifMain(wcomponents.WTemplated):
 
 class WPSessionModification( WPSessionModifBase ):
 
-    def _getTabContent( self, params ):
-        comp=WSessionModifMain(self._session,materialFactories.SessionMFRegistry())
+    def _getTabContent(self, params):
+        comp = WSessionModifMain(self._session)
         return comp.getHTML()
 
 class WPSessionModificationClosed( WPSessionModifBase ):
@@ -434,120 +371,6 @@ class WSessionModifSchedule(wcomponents.WTemplated):
 
         return vars
 
-class ContainerIndexItem:
-
-    def __init__(self, container, day):
-        self._overlap = container.getMaxOverlap(day)
-        self._startPosition = -1
-        self._entryList = []
-        for i in range(0,self._overlap):
-            self._entryList.append(None)
-
-    def setStartPosition(self, counter):
-        self._startPosition = counter
-
-    def getStartPosition(self):
-        return self._startPosition
-
-    def setEntryList(self, newEntryList):
-        # -- Remove the ones which are not in the new entry list
-        i = 0
-        for entry in self._entryList:
-            if entry not in newEntryList:
-                self._entryList[i] = None
-            i += 1
-        # -- Add the new ones to the new entry list
-        for newEntry in newEntryList:
-            if newEntry not in self._entryList:
-                i = 0
-                for entry in self._entryList:
-                    if entry == None:
-                        self._entryList[i] = newEntry
-                        break
-                    i += 1
-
-    def getEntryIndex(self, i):
-        return self._startPosition + i
-
-    def getEntryByPosition(self, i):
-        if i >= 0 and i < len(self._entryList):
-            return self._entryList[i]
-        return 0
-
-    def getOverlap(self):
-        return self._overlap
-
-class ContainerIndex:
-
-    def __init__(self, containerIndex = {}, day = None, hasOverlap = False):
-        self._containerIndex = containerIndex
-        self._day = day
-        self._rowsCounter = 0
-        self._hasOverlap = hasOverlap
-
-    def initialization(self, day, hasOverlap = False):
-        self._containerIndex={}
-        self._day = day
-        self._rowsCounter = 0
-        self._hasOverlap = hasOverlap
-
-    def hasOverlap(self):
-        return self._hasOverlap
-
-    def setHasOverlap(self, hasOverlap):
-        self._hasOverlap = hasOverlap
-
-    def addContainer(self, container):
-        if not self._containerIndex.has_key(container):
-            item = ContainerIndexItem(container, self._day)
-            item.setStartPosition(self._rowsCounter)
-            if self.hasOverlap():
-                self._rowsCounter += item.getOverlap()
-            self._containerIndex[container] = item
-
-    def setContainerEntries(self, container, entryList):
-        if self._containerIndex.has_key(container):
-            self._containerIndex[container].setEntryList(entryList)
-
-    def getEntryIndex(self, container, i):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getEntryIndex(i)
-        return 0
-
-    def getEntryByPosition(self, container, i):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getEntryByPosition(i)
-        return 0
-
-    def getMaxOverlap(self, container):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getOverlap()
-        return 0
-
-    def getStartPosition(self, container):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getStartPosition()
-        return 0
-
-
-class WPModSchEditContrib(WPSessionModifSchedule):
-
-    def __init__(self,rh,contrib):
-        WPSessionModifSchedule.__init__(self,rh,contrib.getSession())
-        self._contrib=contrib
-
-    def _getTabContent(self,params):
-        if self._contrib.getSession().getScheduleType() == "poster":
-            wc=WSessionModContribListEditContrib(self._contrib)
-        else:
-            wc=wcomponents.WSchEditContrib(self._contrib)
-        pars={"postURL":urlHandlers.UHSessionModSchEditContrib.getURL(self._contrib)}
-        return wc.getHTML(pars)
-
 
 class WSessionModifAC(wcomponents.WTemplated):
 
@@ -565,7 +388,7 @@ class WSessionModifAC(wcomponents.WTemplated):
         result = []
         for sessionChair in list:
             sessionChairFossil = fossilize(sessionChair)
-            if isinstance(sessionChair, Avatar):
+            if isinstance(sessionChair, AvatarUserWrapper):
                 isConvener = False
                 if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True
@@ -576,6 +399,7 @@ class WSessionModifAC(wcomponents.WTemplated):
             pendingUser = {}
             pendingUser["email"] = email
             pendingUser["pending"] = True
+            pendingUser['_type'] = 'Avatar'
             result.append(pendingUser)
         return result
 
@@ -711,65 +535,21 @@ class WSessionModContribList(wcomponents.WTemplated):
         if self._filterCrit.getField("status"):
             url.addParam("status",self._filterCrit.getField("status").getValues())
 
-        if self._filterCrit.getField("material"):
-            url.addParam("material",self._filterCrit.getField("material").getValues())
-
         if self._sortingCrit.getField():
             url.addParam("sortBy",self._sortingCrit.getField().getId())
             url.addParam("order","down")
         url.addParam("OK","1")
         return url
 
-    def _getMaterialsHTML(self, contrib, matUrlHandler):
-        materials=[]
-        if contrib.getPaper() is not None:
-            url=matUrlHandler.getURL(contrib.getPaper())
-            iconHTML="""<img border="0" src=%s alt="paper">"""%quoteattr(str(materialFactories.PaperFactory.getIconURL()))
-            if len(contrib.getPaper().getResourceList())>0:
-                r=contrib.getPaper().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.PaperFactory.getTitle().lower())))
-        if contrib.getSlides() is not None:
-            url=matUrlHandler.getURL(contrib.getSlides())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(materialFactories.SlidesFactory.getIconURL()))
-            if len(contrib.getSlides().getResourceList())>0:
-                r=contrib.getSlides().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.SlidesFactory.getTitle().lower())))
-        if contrib.getPoster() is not None:
-            url=matUrlHandler.getURL(contrib.getPoster())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(materialFactories.PosterFactory.getIconURL()))
-            if len(contrib.getPoster().getResourceList())>0:
-                r=contrib.getPoster().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.PosterFactory.getTitle().lower())))
-        video=contrib.getVideo()
-        if video is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="video"> %s</a>"""%(
-                quoteattr(str(matUrlHandler.getURL(video))),
-                quoteattr(str(materialFactories.VideoFactory.getIconURL())),
-                self.htmlText(materialFactories.VideoFactory.getTitle())))
-        minutes=contrib.getMinutes()
-        if minutes is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(matUrlHandler.getURL(minutes))),
-                quoteattr(str(materialFactories.MinutesFactory.getIconURL())),
-                self.htmlText(materialFactories.MinutesFactory.getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        for material in contrib.getMaterialList():
-            url=matUrlHandler.getURL(material)
-            materials.append("""<a href=%s><img src=%s border="0" alt=""> %s</a>"""%(
-                quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
-        return "<br>".join(materials)
+    def _getMaterialsHTML(self, contrib, modify):
+        attached_items = contrib.attached_items
+        if not attached_items:
+            return ''
+        num_files = len(attached_items['files']) + sum(len(f.attachments) for f in attached_items['folders'])
+        return '<a href="{}">{}</a>'.format(
+            url_for('attachments.management' if modify else 'event.sessionDisplay', contrib),
+            ngettext('1 file', '{num} files', num_files).format(num=num_files)
+        )
 
     def _getContribHTML(self,contrib):
         sdate = ""
@@ -792,10 +572,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         if contrib.getType() is not None:
             cType=contrib.getType().getName()
         status=ContribStatusList().getCode(contrib.getCurrentStatus().__class__)
-        if self._session.canCoordinate(self._aw,"modifContribs") or self._session.canModify(self._aw):
-            matUrlHandler=urlHandlers.UHMaterialModification
-        else:
-            matUrlHandler=urlHandlers.UHMaterialDisplay
+        modify = self._session.canCoordinate(self._aw, "modifContribs") or self._session.canModify(self._aw)
         html = """
             <tr>
                 <td><input type="checkbox" name="contributions" value=%s></td>
@@ -812,7 +589,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 """%(quoteattr(str(contrib.getId())),\
                     self.htmlText(contrib.getId()),sdate or "&nbsp;",\
                     strdur or "&nbsp;",cType or "&nbsp;",title or "&nbsp;", speaker or "&nbsp;",\
-                    track or "&nbsp;",status or "&nbsp;", self._getMaterialsHTML(contrib,matUrlHandler) or "&nbsp;")
+                    track or "&nbsp;", status or "&nbsp;", self._getMaterialsHTML(contrib, modify) or "&nbsp;")
         return html
 
     def _getTypeItemsHTML(self):
@@ -851,18 +628,6 @@ class WSessionModContribList(wcomponents.WTemplated):
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
         return "<br>".join(res)
 
-    def _getMaterialItemsHTML(self):
-        res=[]
-        pf,sf=materialFactories.PaperFactory(),materialFactories.SlidesFactory()
-        for (id,caption) in [(pf.getId(),pf.getTitle()),\
-                        (sf.getId(),sf.getTitle()),\
-                        ("--other--", _("other")),("--none--", i18nformat("""--_("no material")--"""))]:
-            checked=""
-            if id in self._filterCrit.getField("material").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="material" value=%s%s> %s"""%(quoteattr(str(id)),checked,self.htmlText(caption)))
-        return "<br>".join(res)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["quickAccessURL"]=quoteattr(str(urlHandlers.UHSessionModContribQuickAccess.getURL(self._session)))
@@ -870,7 +635,6 @@ class WSessionModContribList(wcomponents.WTemplated):
         vars["types"]=self._getTypeItemsHTML()
         vars["tracks"]=self._getTrackItemsHTML()
         vars["status"]=self._getStatusItemsHTML()
-        vars["materials"]=self._getMaterialItemsHTML()
         vars["authSearch"]=""
         authField=self._filterCrit.getField("author")
         if authField is not None:
@@ -1019,17 +783,14 @@ class WSessionModPosterContribList(WSessionModContribList):
         if contrib.getType() is not None:
             cType=contrib.getType().getName()
         status=ContribStatusList().getCode(contrib.getCurrentStatus().__class__)
-        materials=""
-        if contrib.getPaper() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getPaper())
-            materials+="""<a href=%s><img border="0" src=%s alt="paper"></a>"""%(
-                    quoteattr(str(url)),
-                    quoteattr(str(materialFactories.PaperFactory().getIconURL())))
-        if contrib.getSlides() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getSlides())
-            materials+="""<a href=%s><img border="0" src=%s alt="slides"></a>"""%(
-                    quoteattr(str(url)),
-                    quoteattr(str(materialFactories.SlidesFactory().getIconURL())))
+        attached_items = contrib.attached_items
+        materials = None
+        if attached_items:
+            num_files = len(attached_items['files']) + sum(len(f.attachments) for f in attached_items['folders'])
+            materials = '<a href="{}">{}</a>'.format(
+                url_for('attachments.management', contrib),
+                ngettext('1 file', '{num} files', num_files).format(num=num_files)
+            )
         editURL=urlHandlers.UHSessionModContribListEditContrib.getURL(contrib)
         if self._currentSorting!="":
             editURL.addParam("sortBy",self._currentSorting)
@@ -1234,40 +995,6 @@ class WPModParticipantList( WPSessionModifBase ):
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
         params = {"urlDisplayGroup":urlHandlers.UHSessionModParticipantList.getURL(self._session)}
         return wc.getHTML(params)
-
-
-class WPSessionModifRelocate(WPSessionModifBase):
-
-    def __init__(self, rh, session, entry, targetDay):
-        WPSessionModifBase.__init__(self, rh, session)
-        self._targetDay=targetDay
-        self._entry=entry
-
-    def _getPageContent( self, params):
-        wc=wcomponents.WSchRelocate(self._entry)
-        p={"postURL":quoteattr(str(urlHandlers.UHSessionModifScheduleRelocate.getURL(self._entry))), \
-                "targetDay":quoteattr(str(self._targetDay))}
-        return wc.getHTML(p)
-
-
-class WPSessionModifMaterials( WPSessionModifBase ):
-
-    _userData = ['favorite-user-list']
-
-    def __init__(self, rh, session):
-        self._target = session
-        WPSessionModifBase.__init__(self, rh, session)
-
-    def _setActiveTab( self ):
-        self._tabMaterials.setActive()
-
-    ## def _getContent( self, pars ):
-    ##     wc=wcomponents.WShowExistingMaterial(self._target)
-    ##     return wc.getHTML( pars )
-
-    def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
-        return wc.getHTML( pars )
 
 
 class WSessionICalExport(WICalExportBase):

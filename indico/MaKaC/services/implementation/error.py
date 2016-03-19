@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from pprint import pformat
+
+from werkzeug.urls import url_parse
+
 from MaKaC.services.implementation.base import ParameterManager, ServiceBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.errors import MaKaCError
@@ -27,6 +31,8 @@ class SendErrorReport(ServiceBase):
     This service sends an error report to the indico support e-mail
     """
 
+    CHECK_HTML = False
+
     def _sendReport( self ):
         cfg = Config.getInstance()
 
@@ -38,10 +44,12 @@ class SendErrorReport(ServiceBase):
             fromAddr = 'indico-reports@example.org'
 
         toAddr = Config.getInstance().getSupportEmail()
-
         Logger.get('errorReport').debug('mailing %s' % toAddr)
+        subject = "[Indico@{}] Error report".format(url_parse(cfg.getBaseURL()).netloc)
 
-        subject = "[Indico@%s] Error report"%cfg.getBaseURL()
+        request_info = self._requestInfo or ''
+        if isinstance(request_info, (dict, list)):
+            request_info = pformat(request_info)
 
         # build the message body
         body = [
@@ -50,22 +58,21 @@ class SendErrorReport(ServiceBase):
             self._code,
             self._message,
             "Inner error: " + str(self._inner),
-            str(self._requestInfo) if self._requestInfo else '',
+            request_info,
             "-" * 20
         ]
         maildata = {"fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join(body)}
-
-        # send it
         GenericMailer.send(GenericNotification(maildata))
 
     def _checkParams(self):
-        pManager = ParameterManager(self._params)
+        params = self._params or {}  # if params is not specified it's an empty list
+        pManager = ParameterManager(params)
         self._userMail = pManager.extract("userMail", pType=str, allowEmpty=True)
         self._code = pManager.extract("code", pType=str, allowEmpty=True)
         self._message = pManager.extract("message", pType=str, allowEmpty=True)
-        inner = self._params.get('inner', '')
+        inner = params.get('inner', '')
         self._inner = '\n'.join(inner) if isinstance(inner, list) else inner
-        self._requestInfo = pManager.extract("requestInfo", pType=dict)
+        self._requestInfo = pManager.extract("requestInfo", pType=dict, allowEmpty=True)
 
     def _getAnswer(self):
 

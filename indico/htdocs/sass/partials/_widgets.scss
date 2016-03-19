@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.field-area {
+.multi-text-fields {
     $height: 1.6em;
     $width: 200px;
     $input-width: 160px;
@@ -137,4 +137,23 @@ i.info-helper {
     @include icon-before('icon-question');
     @extend .text-superfluous;
     cursor: default;
+}
+
+.static-text-widget {
+    word-wrap: break-word;
+    width: 90%;
+
+    & > p:first-child {
+        margin-top: 0;
+    }
+}
+
+.multiple-items-widget {
+    .sort-handle {
+        cursor: move;
+        @include icon-before('icon-grid2');
+    }
+    .ui-sortable-helper {
+        display: table;
+    }
 }

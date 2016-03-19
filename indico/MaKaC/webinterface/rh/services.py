@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,6 +35,7 @@ class RHIPBasedACL( RHServicesBase ):
         p = adminPages.WPIPBasedACL(self)
         return p.display()
 
+
 class RHIPBasedACLFullAccessGrant( RHServicesBase ):
 
     _uh = urlHandlers.UHIPBasedACLFullAccessGrant
@@ -56,6 +57,7 @@ class RHIPBasedACLFullAccessGrant( RHServicesBase ):
                 ip_acl_mgr.grant_full_access(ipAddress)
 
         self._redirect(urlHandlers.UHIPBasedACL.getURL())
+
 
 class RHIPBasedACLFullAccessRevoke( RHServicesBase ):
 

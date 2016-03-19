@@ -4,7 +4,7 @@
 <%namespace name="common" file="Common.tpl"/>
 
 <li class="meetingContrib">
-        <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True, minutesHidden=not minutes"/>
         ${ template_hook('vc-actions', event=conf, item=item) }
 
     <span class="${timeClass}">
@@ -52,28 +52,18 @@
             )
         % endif
 
-        % if len(item.getAllMaterialList()) > 0:
+        % if item.attached_items:
         <tr>
-            <td class="leftCol">${ _("Material")}:</td>
-            <td>
-            % for material in item.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                <%include file="Material.tpl" args="material=material, contribId=item.getId()"/>
-                % endif
-            % endfor
+            <td class="leftCol icon-attachment inline-attachments-icon"></td>
+            <td class="material-list">
+                ${ render_template('attachments/mako_compat/attachments_inline.html', item=item) }
             </td>
         </tr>
         % endif
     </table>
 
-    % if minutes:
-        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
-        % if minutesText:
-            <div class="minutesTable">
-                <h2>${_("Minutes")}</h2>
-                <span>${common.renderDescription(minutesText)}</span>
-            </div>
-        % endif
+    % if item.note:
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes, can_edit=item.canModify(user) or item.canUserSubmit(user)) }
     % endif
 
     % if item.getSubContributionList():

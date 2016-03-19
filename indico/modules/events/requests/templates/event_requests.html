@@ -1,0 +1,39 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}{% trans %}Logistics{% endtrans %}{% endblock %}
+
+{% block content %}
+    <p>
+        {%- trans -%}
+            You can request additional services for your event. Click one of the service buttons
+            below to send a request to view/modify an existing request.
+        {%- endtrans -%}
+    </p>
+
+    <div class="i-requests-list i-badges-list left">
+        {%- for name, definition in definitions.items()|sort(attribute='1.title') %}
+            {% set req = requests[name] %}
+            <a class="i-badge i-request-{{ req.state.name if req else 'none' }}"
+               href="{{ url_for('requests.event_requests_details', event, type=name) }}">
+                <div class="i-badge-legend">
+                    <span class="i-badge-legend-right">
+                        {%- if not req -%}
+                            {# nothing to show #}
+                        {%- elif req.state.name == 'pending' -%}
+                            {% trans %}Pending{% endtrans %}
+                        {%- elif req.state.name == 'accepted' -%}
+                            {% trans %}Accepted{% endtrans %}
+                        {%- elif req.state.name == 'rejected' -%}
+                            {% trans %}Rejected{% endtrans %}
+                        {%- elif req.state.name == 'withdrawn' -%}
+                            {% trans %}Withdrawn{% endtrans %}
+                        {%- endif -%}
+                    </span>
+                </div>
+                <div class="i-badge-content">
+                    <span class="i-badge-title">{{ definition.title }}</span>
+                </div>
+            </a>
+        {%- endfor %}
+    </div>
+{% endblock %}

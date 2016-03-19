@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, url_for, flash
+from flask import request, url_for, flash, redirect
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -24,6 +24,8 @@ from indico.util.i18n import _
 
 
 class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         resv_id = request.view_args.get('resvID')
         self._reservation = Reservation.get(request.view_args['resvID'])
@@ -33,4 +35,4 @@ class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
     def _process(self):
         db.session.delete(self._reservation)
         flash(_(u'Booking deleted'), 'success')
-        self._redirect(url_for('rooms.roomBooking-search4Bookings'))
+        return redirect(url_for('rooms.roomBooking-search4Bookings'))

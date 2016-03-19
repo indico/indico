@@ -1,9 +1,0 @@
-{% macro warning_message() -%}
-    {% if caller %}
-        <div class="warning-message-box">
-            <div class="message-text">
-                {{ caller() }}
-            </div>
-        </div>
-    {% endif %}
-{% endmacro %}

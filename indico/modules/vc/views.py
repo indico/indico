@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,6 +26,7 @@ class WPVCJinjaMixin(WPJinjaMixin):
 
 
 class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
+    sidemenu_option = 'videoconference'
 
     def getCSSFiles(self):
         return (WPConferenceModifBase.getCSSFiles(self) +
@@ -38,14 +39,12 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
                 self._asset_env['selectize_js'].urls() +
                 self._asset_env['zero_clipboard_js'].urls())
 
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['vc'].setActive()
-
     def _getPageContent(self, params):
         return WPVCJinjaMixin._getPageContent(self, params)
 
 
 class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'videoconference_rooms'
 
     def __init__(self, rh, conf, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
@@ -63,10 +62,6 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('vc-event-page'))
 
 
 class WPVCService(WPVCJinjaMixin, WPMainBase):

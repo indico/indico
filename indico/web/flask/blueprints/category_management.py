@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,16 +34,10 @@ category_mgmt.add_url_rule('/data', 'categoryDataModification', categoryMod.RHCa
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/data/save', 'categoryDataModification-modify', categoryMod.RHCategoryPerformModification,
                            methods=('POST',))
-category_mgmt.add_url_rule('/settings/tasks', 'categoryDataModification-tasksOption', categoryMod.RHCategoryTaskOption,
-                           methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/events', 'categoryModification-actionConferences', categoryMod.RHCategoryActionConferences,
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/subcategories', 'categoryModification-actionSubCategs',
                            categoryMod.RHCategoryActionSubCategs, methods=('GET', 'POST'))
-# Files
-category_mgmt.add_url_rule('/files', 'categoryFiles', categoryMod.RHCategoryFiles)
-category_mgmt.add_url_rule('/files/add', 'categoryFiles-addMaterial', categoryMod.RHAddMaterial, methods=('POST',))
-
 # Protection
 category_mgmt.add_url_rule('/access', 'categoryAC', categoryMod.RHCategoryAC)
 category_mgmt.add_url_rule('/access/visibility', 'categoryAC-setVisibility', categoryMod.RHCategorySetVisibility,
@@ -56,8 +50,3 @@ category_mgmt.add_url_rule('/access/notify-creation', 'categoryConfCreationContr
 # Tools
 category_mgmt.add_url_rule('/tools/', 'categoryTools', categoryMod.RHCategoryTools)
 category_mgmt.add_url_rule('/tools/delete', 'categoryTools-delete', categoryMod.RHCategoryDeletion, methods=('POST',))
-
-# Tasks (unused, possibly even obsolete)
-category_mgmt.add_url_rule('/tasks', 'categoryTasks', categoryMod.RHCategoryTasks, methods=('GET', 'POST'))
-category_mgmt.add_url_rule('/tasks/action', 'categoryTasks-taskAction', categoryMod.RHCategoryTasksAction,
-                           methods=('GET', 'POST'))

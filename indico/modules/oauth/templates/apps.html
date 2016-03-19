@@ -1,0 +1,35 @@
+{% extends 'oauth/apps_base.html' %}
+
+{% block content %}
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {%- trans %}Applications{% endtrans -%}
+            </div>
+            <div class="i-box-buttons toolbar right">
+                <a href="{{ url_for('.app_new') }}" class="i-button icon-plus">
+                    {%- trans %}Register new application{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <p>{% trans %}This is the list of applications authorized to access Indico. Click on the name of an application to see more information.{% endtrans %}</p>
+            <ul class="group-list with-buttons">
+                {% if not applications %}
+                    <li class="italic">
+                        {%- trans %}There aren't any authorized applications.{% endtrans -%}
+                    </li>
+                {% endif %}
+                {% for application in applications %}
+                    <li>
+                        <span class="list-item-title">
+                            <a href="{{ url_for('.app_details', application) }}">
+                                {{ application.name }}
+                            </a>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

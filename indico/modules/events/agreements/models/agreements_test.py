@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -105,28 +105,12 @@ def test_locator():
                                  'confId': event_id}
 
 
-def test_user(dummy_user):
-    agreement = Agreement(user_id=dummy_user.getId())
-    assert agreement.user == dummy_user
-
-
-def test_user_no_user():
-    agreement = Agreement()
-    assert agreement.user is None
-
-
-def test_user_setter(dummy_user):
-    agreement = Agreement()
-    agreement.user = dummy_user
-    assert agreement.user_id == dummy_user.getId()
-
-
 @pytest.mark.parametrize('person_with_user', (True, False))
 def test_create_from_data(dummy_event, dummy_person, dummy_user, person_with_user):
     type_ = 'dummy'
     dummy_person.user = dummy_user if person_with_user else None
-    agreement = Agreement.create_from_data(event=dummy_event, type_=type_, person=dummy_person)
-    assert agreement.event == dummy_event
+    agreement = Agreement.create_from_data(event=dummy_event.as_event, type_=type_, person=dummy_person)
+    assert agreement.event_new == dummy_event.as_event
     assert agreement.type == type_
     assert agreement.state == AgreementState.pending
     assert agreement.uuid
@@ -201,9 +185,9 @@ def test_render_no_definition(monkeypatch):
 
 
 def test_belongs_to():
-    person_identifier = '1234asdf'
-    agreement = Agreement(identifier=person_identifier)
-    assert agreement.identifier == person_identifier
+    agreement = Agreement(identifier='foo')
+    assert agreement.belongs_to(MagicMock(identifier='foo'))
+    assert not agreement.belongs_to(MagicMock(identifier='bar'))
 
 
 @pytest.mark.usefixtures('mock_agreement_definition')
@@ -211,9 +195,3 @@ def test_is_orphan(dummy_event):
     agreement = Agreement(event_id=dummy_event.id)
     agreement.is_orphan()
     agreement.definition.is_agreement_orphan(agreement.event, agreement)
-
-
-def test_belongs_to():
-    agreement = Agreement(identifier='foo')
-    assert agreement.belongs_to(MagicMock(identifier='foo'))
-    assert not agreement.belongs_to(MagicMock(identifier='bar'))

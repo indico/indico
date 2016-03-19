@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -83,10 +83,9 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     new_values.update(existing_values)
     new_values.update(mixinValues)
 
-
     # We have to preserve options not currently present in the bundled indico.conf because they
     # may belong to a plugin. This functionality can lead to forget adding new options to
-    # Configuration.py so be careful my friend.
+    # config.py so be careful my friend.
 
     # We remove vars defined here that aren't options
     for k in ('new_values', 'new_conf', 'existing_conf', 'mixinValues'):
@@ -99,11 +98,11 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
 
     for k in new_values:
         if new_values[k].__class__ == str:
-            regexp = re.compile('^(%s\s*=\s*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)([\'"])([^\'"]*)([\'"])' % k, re.MULTILINE)
             if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s\\3" % result_values[k], new_contents)
+                new_contents = re.sub(regexp, "\\g<1>%r" % result_values[k], new_contents)
             else:
-                new_contents = "%s\n%s = '%s'" % (new_contents, k, result_values[k])
+                new_contents = "%s\n%s = %r" % (new_contents, k, result_values[k])
         elif new_values[k].__class__ == int:
             regexp = re.compile('^(%s\s*=\s*)([0-9]+)' % k, re.MULTILINE)
             if regexp.search(new_contents):
@@ -338,6 +337,7 @@ def _extractDirsFromConf(conf):
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
     fdata = re.sub(r'/opt/indico', prefix, fdata)
+    fdata = re.sub(r"^#\s*SecretKey = ''", "SecretKey = {!r}".format(os.urandom(32)), fdata)
     open(filePath, 'w').write(fdata)
 
 def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
@@ -462,7 +462,8 @@ What do you want to do [c/a]? ''')
                 for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','db','archive'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir=LOCALDATABASEDIR):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db=False, uid=None,
+                        gid=None, dbDir=LOCALDATABASEDIR, upgrade_config=True):
     from indico.core.config import Config
 
     if 'db' in targetDirs:
@@ -485,7 +486,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         if not os.path.exists(newConf):
             # just copy if there is no config yet
             shutil.copy(sourceConf, newConf)
-        else:
+        elif upgrade_config:
             print "Upgrading indico.conf...",
             # upgrade the existing one
             upgrade_indico_conf(newConf, sourceConf)
@@ -584,11 +585,13 @@ For information on how to configure Apache HTTPD, take a look at:
 http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 
 
-Please do not forget to start the scheduler in order to use alarms, creation
-of off-line websites, reminders, etc. You can manage it with the 'indico_scheduler' command.
+Please do not forget to start the Celery worker in order to use background tasks
+such as event reminders and periodic cleanups. You can run it using this command:
+$ indico celery worker -B
 
 %s
 """ % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
+
 
 def _databaseText(cfgPrefix):
     return """If you are running ZODB on this host:

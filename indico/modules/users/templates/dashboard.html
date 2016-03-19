@@ -1,0 +1,308 @@
+{% extends 'users/base.html' %}
+{% from 'users/_category.html' import suggested_category, user_category %}
+
+{% block subtitle -%}
+    {% trans %}Dashboard{% endtrans %}
+{%- endblock %}
+
+{% block user_content %}
+    <div class="dashboard-tab">
+        <div class="quick-access-pane">
+
+            <div class="dashboard-col">
+                <div class="your-details clearfix">
+                    <div class="avatar-image left">
+                        <i class="icon-user"></i>
+                    </div>
+                    <div class="your-details-wrapper left">
+                        <h3>{{ user.full_name }}</h3>
+                        {% if config.DEBUG %}
+                            <div>
+                                <i class="icon-info" title="{% trans %}User ID{% endtrans %}"></i><span>{{ user.id }}</span>
+                            </div>
+                        {% endif %}
+                        {% if user.affiliation %}
+                            <div>
+                                <i class="icon-users"></i><span>{{ user.affiliation }}</span>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <i class="icon-mail"></i><span>{{ user.email }}</span>
+                        </div>
+                        {% if user.phone %}
+                            <div>
+                                <i class="icon-phone"></i><span>{{ user.phone }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="toolbar right">
+                        <div class="group">
+                            <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_profile') }}">Settings</a>
+                        </div>
+                    </div>
+                </div>
+                {% if redis_enabled %}
+                    <div id="yourEvents" class="dashboard-box">
+                        <h3>
+                            {% trans %}Your events at hand{% endtrans %}
+                            {% if session.user.is_admin %}
+                                <a href="#" id="refresh-redis-links"
+                                   style="float: right;" class="icon-loop"
+                                   title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
+                                <script>
+                                    $('#refresh-redis-links').on('click', function(e) {
+                                        e.preventDefault();
+                                        var killProgress = IndicoUI.Dialogs.Util.progress();
+                                        indicoRequest('user.refreshRedisLinks', {
+                                            userId: {{ user.id | tojson }}
+                                        }, function(result, error) {
+                                            if(error) {
+                                                killProgress();
+                                                IndicoUtil.errorReport(error);
+                                                return;
+                                            }
+                                            location.reload();
+                                        });
+                                    });
+                                </script>
+                            {% endif %}
+                        </h3>
+                        <ol></ol>
+                    </div>
+                {% endif %}
+                {% if suggested_categories %}
+                    <div id="suggestedCategories" class="dashboard-box suggestions">
+                        <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
+                        <ol>
+                            {% for category in suggested_categories %}
+                                {{ suggested_category(category.categ, category.path) }}
+                            {% endfor %}
+                        </ol>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="dashboard-col">
+                <div id="yourCategories" class="dashboard-box">
+                    <h3>{% trans %}Your categories{% endtrans %}</h3>
+                    <ol>
+                        {% if not categories %}
+                            <li class="no-event">
+                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
+                            </li>
+                        {% else %}
+                            {% for category in categories.itervalues() %}
+                                {{ user_category(category.categ, category.path, category.managed) }}
+                            {% endfor %}
+                        {% endif %}
+                    </ol>
+                </div>
+                <div id="happeningCategories" class="dashboard-box">
+                    <h3>{% trans %}Happening in your categories{% endtrans %}</h3>
+                    <ol>
+                        {% if not categories %}
+                            <li class="no-event">
+                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
+                            </li>
+                        {% endif %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            var currentLanguage = {{ session.lang | tojson }};
+
+            /* Time formatting */
+            if (currentLanguage === 'fr_FR') {
+                moment.locale('fr', {
+                    calendar: {
+                        lastDay : '[Hier]',
+                        sameDay : "[Aujourd'hui]",
+                        nextDay : '[Demain]',
+                        lastWeek : 'dddd [dernier]',
+                        nextWeek : 'dddd',
+                        sameElse : 'L'
+                    }
+                });
+            } else if (currentLanguage === 'es_ES') {
+                moment.locale('es', {
+                    calendar: {
+                        lastDay : '[Ayer]',
+                        sameDay : '[Today]',
+                        nextDay : '[Mañana]',
+                        lastWeek : 'dddd [pasado]',
+                        nextWeek : 'dddd',
+                        sameElse : 'L'
+                    }
+                });
+            } else {
+                moment.locale('en-gb', {
+                    calendar: {
+                        lastDay : '[Yesterday]',
+                        sameDay : '[Today]',
+                        nextDay : '[Tomorrow]',
+                        lastWeek : '[Last] dddd',
+                        nextWeek : 'dddd',
+                        sameElse : 'L'
+                    }
+                });
+            }
+
+            /* AJAX query */
+            var managementFilter = [
+                "conference_creator", "conference_chair", "conference_manager",
+                "session_manager", "session_coordinator", "contribution_manager"
+            ];
+            var reviewFilter = [
+                "conference_paperReviewManager", "conference_referee", "conference_editor", "conference_reviewer",
+                "contribution_referee", "contribution_editor", "contribution_reviewer",  "track_coordinator"
+            ];
+            var attendanceFilter = [
+                "contribution_submission", "abstract_submitter", "registration_registrant", "survey_submitter"
+            ];
+
+            var api_opts = {
+                limit: '10',
+                from: '-7d',
+                order: 'start',
+                userid: {{ user.id | tojson }},
+                tz: {{ timezone | tojson }}
+            };
+
+            // Your events
+            {% if redis_enabled %}
+                apiRequest("/user/linked_events", api_opts).done(function (resp) {
+                    var html = '';
+                    if (resp.count === 0) {
+                        html += '<li class="no-event"><span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span></li>';
+                    } else {
+                        var now = moment();
+                        var past_events = _.filter(resp.results, function(e) {
+                            return momentDate(e.endDate) < now;
+                        });
+                        var current_events = _.filter(resp.results, function(e) {
+                            return momentDate(e.startDate) < now && now < momentDate(e.endDate);
+                        });
+                        var future_events = _.filter(resp.results, function(e){
+                            return now < momentDate(e.startDate);
+                        });
+                        resp.results = past_events.concat(current_events, future_events);
+                        $.each(resp.results, function (i, item) {
+                            html += '<li id="event-' + item.id + '" class="truncate"> \
+                                     <a href="' + item.url + '" class="truncate"> \
+                                         <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
+                                         <span class="event-title truncate-target">' + item.title + '</span> \
+                                         <span class="item-legend"> \
+                                             <span title="' + $T("You have management rights") + '" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
+                                             <span title="' + $T("You are a reviewer") + '" class="icon-user-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
+                                             <span title="' + $T("You are an attendee") + '" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
+                                         </span> \
+                                     </a>\
+                                 </li>';
+                        });
+                    }
+                    var list = $("#yourEvents ol");
+                    list.append(html);
+                    // Enable tooltips for active roles and delete them for inactive ones
+                    list.find('.contextHelp[title].active').qtip();
+                    list.find('.contextHelp[title]:not(.active)').removeAttr('title');
+                });
+            {% endif %}
+
+            {% if categories %}
+                // Happening in your categories query
+                api_opts['from'] = 'today';
+                apiRequest('/user/categ_events', api_opts).done(function(resp) {
+                    var html = '';
+                    if (resp.count === 0) {
+                        html += '<li class="no-event"> \
+                             <span class="event-title italic text-superfluous">' + $T("Nothing happening in your categories.") + '</span> \
+                         </li>';
+                    } else {
+                        $.each(resp.results, function(i, item) {
+                            html += '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
+                                <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
+                                <span class="event-title truncate-target">' + item.title + '</span> \
+                                <span class="event-category">' + item.category + '</span> \
+                             </a></li>';
+                        });
+                    }
+                    $("#happeningCategories ol").append(html);
+                });
+            {% endif %}
+
+            var momentDate = function(date) {
+                var timezone_offset = {{ offset | tojson }};
+                return moment(date.date + " " + date.time + timezone_offset);
+            };
+
+            {% if suggested_categories %}
+                $('.suggestion-favorite').on('click', function(e) {
+                    var container = $(this).closest('li.category-box');
+                    var $this = $(this);
+                    e.preventDefault();
+
+                    $.ajax({
+                        url: $this.data('href'),
+                        method: 'PUT',
+                        error: handleAjaxError,
+                        success: function() {
+                            container.find('.category-action-extra').remove();
+                            container
+                                .find('.category-action')
+                                .replaceWith($('<span>', {
+                                    'class': 'category-action icon-star active',
+                                    'title': $T('You have favourited this category')
+                                }));
+                            container.appendTo('#yourCategories ol');
+                            if(!$('#suggestedCategories ol > li').length) {
+                                $('#suggestedCategories').remove();
+                            }
+                        }
+                    });
+                });
+
+                $('.suggestion-remove').on('click', function(e) {
+                    var container = $(this).closest('li.category-box');
+                    var $this = $(this);
+                    e.preventDefault();
+
+                    $.ajax({
+                        url: $this.data('href'),
+                        method: 'DELETE',
+                        error: handleAjaxError,
+                        success: function() {
+                            container.remove();
+                            if (!$('#suggestedCategories ol > li').length) {
+                                $('#suggestedCategories').remove();
+                            }
+                        }
+                    });
+                });
+            {% endif %}
+
+            var getDate = function(startDate, endDate) {
+                var now = moment();
+
+                if (momentDate(startDate) < now && now < momentDate(endDate)) {
+                    return $T("Now");
+                } else {
+                    return moment(startDate.date).calendar();
+                }
+            };
+
+            var hasRights = function(rights, filter) {
+                for (var i=0; i < rights.length; i++) {
+                    for (var j=0; j < filter.length; j++) {
+                        if (rights[i] === filter[j]) {
+                            return "active";
+                        }
+                    }
+                }
+                return "";
+            };
+        });
+    </script>
+{% endblock %}

@@ -395,3 +395,7 @@ Html.addScript = function(path) {
 Html.Target = {
         New: "_blank"
 };
+
+Html.$ = function() {
+    return new XElement($.apply(this, arguments).get(0));
+};

@@ -24,8 +24,9 @@
     </span>
   </td>
   <td valign="top" align="right">
-    % if session.getDescription() or len(item.getOwnConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or len(session.getAllMaterialList()) > 0:
+    % if session.getDescription() or len(item.getOwnConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or session.attached_items or item.note:
     <table bgcolor="#f0c060" cellpadding="2" cellspacing="0" border="0" class="results">
+    </tr>
     % if session.getDescription():
       <tr>
       % if showDescriptionTitle:
@@ -53,7 +54,6 @@
       </td>
     </tr>
     % endif
-
     % if (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation):
     <tr>
       <td valign="top" class="headerTitle">
@@ -64,17 +64,21 @@
       </td>
     </tr>
     % endif
-    % if len(session.getAllMaterialList()) > 0:
+    % if item.note or session.attached_items:
     <tr>
-      <td valign="top" class="headerTitle">
-        Material:
-      </td>
+      <td valign="top" class="headerTitle icon-attachment inline-attachments-icon"></td>
       <td class="headerInfo" >
-        % for material in session.getAllMaterialList():
-            % if material.canView(accessWrapper):
-                <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
-            % endif
-        % endfor
+        % if session.attached_items:
+          <span class="material-list">
+            ${ render_template('attachments/mako_compat/attachments_inline.html', item=session) }
+          </span>
+        % endif
+
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">
+                ${ _("Minutes") }
+            </a>
+        % endif
       </td>
     </tr>
     % endif
@@ -84,7 +88,7 @@
     % endif
   </td>
   <td style="padding-right:4px; width:23px">
-      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
   </td>
 </tr>
 </table>

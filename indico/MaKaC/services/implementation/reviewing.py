@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -117,13 +117,7 @@ class ConferenceReviewingAssignStaffBasePRMReferee(ConferenceReviewingAssignStaf
             ProtectedModificationService._checkProtection(self)
 
 
-
 class ConferenceReviewingSetupTextModificationBase(TextModificationBase, ConferenceReviewingPRMBase):
-    #Note: don't change the order of the inheritance here!
-    pass
-
-
-class ConferenceReviewingDateTimeModificationBase (DateTimeModificationBase, ConferenceReviewingPRMBase):
     #Note: don't change the order of the inheritance here!
     pass
 
@@ -367,8 +361,7 @@ class ConferenceReviewingCompetenceModification(ListModificationBase, Conference
         ConferenceReviewingPRMBase._checkParams(self)
         userId = self._params.get("user", None)
         if userId:
-            ph = user.PrincipalHolder()
-            self._user =  ph.getById( userId )
+            self._user = user.AvatarHolder().getById(userId)
         else:
             raise ServiceError("ERR-REV4",_("No user id specified"))
 
@@ -587,11 +580,12 @@ class ConferenceReviewingAssignTeamPRM(ConferenceReviewingPRMBase, UserListModif
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._paperReviewManagersList:
-                self._confPaperReview.addPaperReviewManager(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._paperReviewManagersList:
+                self._confPaperReview.addPaperReviewManager(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._paperReviewManagersList)
+
 
 class ConferenceReviewingRemoveTeamPRM(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes paper review manager from reviewers team for the conference
@@ -623,7 +617,8 @@ class ConferenceReviewingAssignTeamReferee(ConferenceReviewingPRMBase, UserListM
             if not user in self._confPaperReview._refereesList:
                 self._confPaperReview.addReferee(user)
 
-        return True
+        return fossilize(self._confPaperReview._refereesList)
+
 
 class ConferenceReviewingRemoveTeamReferee(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes referee from reviewers team for the conference
@@ -657,11 +652,11 @@ class ConferenceReviewingAssignTeamEditor(ConferenceReviewingPRMBase, UserListMo
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._editorsList:
-                self._confPaperReview.addEditor(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._editorsList:
+                self._confPaperReview.addEditor(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._editorsList)
 
 class ConferenceReviewingRemoveTeamEditor(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference
@@ -695,11 +690,12 @@ class ConferenceReviewingAssignTeamReviewer(ConferenceReviewingPRMBase, UserList
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._reviewersList:
-                self._confPaperReview.addReviewer(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._reviewersList:
+                self._confPaperReview.addReviewer(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._reviewersList)
+
 
 class ConferenceReviewingRemoveTeamReviewer(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference

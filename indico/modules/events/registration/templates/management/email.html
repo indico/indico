@@ -1,0 +1,10 @@
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{{ form_header(form) }}
+{{ form_rows(form) }}
+{% call form_footer(form) %}
+    <input type="submit" class="i-button highlight big" value="{% trans %}Send{% endtrans %}">
+    <input id="preview-email" class="i-button big" type="button" value="{%- trans %}Preview email{% endtrans -%}"
+           data-href="{{ url_for('.email_registrants_preview', regform) }}">
+    <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+{% endcall %}

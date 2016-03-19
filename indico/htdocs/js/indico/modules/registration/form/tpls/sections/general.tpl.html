@@ -1,0 +1,26 @@
+<div ng-model="section.items" ui-sortable="fieldSortableOptions" class="field-list">
+    <div ng-repeat="field in filtered=(section.items | filter: {isEnabled: 'true'})">
+        <div ng-include="tplGeneralField"/>
+    </div>
+</div>
+
+<div ng-if="filtered.length === 0" ng-switch="editMode" class="section-placeholder">
+    <span ng-switch-default>
+        {{ 'This section doesn\'t contain any field' | i18n }}
+    </span>
+    <span ng-switch-when="true">
+        {{ 'Press the ' | i18n }}
+        <i class="icon-plus"></i>
+        {{ ' button to add fields' | i18n }}
+    </span>
+</div>
+
+<div ng-if="editMode">
+    <div ng-if="filtered.length != section.items.length" class="titled-rule section-field-divisor">
+        {{ "Disabled fields" | i18n }}
+        <i class="info-helper" title="{{ 'These fields won\'t be displayed to registrants' | i18n }}"></i>
+    </div>
+    <div ng-repeat="field in section.items | filter: {isEnabled: 'false'}">
+        <div ng-include="tplGeneralField"/>
+    </div>
+</div>

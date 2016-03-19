@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
 from indico.cli.i18n import IndicoI18nManager
 from indico.core import signals
+from indico.core.celery.cli import IndicoCeleryCommand
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
 from indico.web.flask.app import make_app
@@ -41,6 +42,7 @@ def main():
     manager.add_command('plugindb', PluginDatabaseManager)
     manager.add_command('runserver', IndicoDevServer())
     manager.add_command('i18n', IndicoI18nManager)
+    manager.add_command('celery', IndicoCeleryCommand)
     signals.plugin.cli.send(manager)
 
     try:

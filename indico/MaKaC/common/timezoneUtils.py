@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,20 +17,21 @@ from flask import session, has_request_context
 
 from pytz import timezone, all_timezones
 from datetime import datetime, timedelta
-import MaKaC.common.info as info
 import calendar
 import time
+from indico.core.config import Config
+
 
 def nowutc():
     return timezone('UTC').localize(datetime.utcnow())
 
 def server2utc(date):
-    servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+    servertz = Config.getInstance().getDefaultTimezone()
     return timezone(servertz).localize(date).astimezone(timezone('UTC'))
 
 def utc2server(date, naive=True):
     date = date.replace(tzinfo=None)
-    servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+    servertz = Config.getInstance().getDefaultTimezone()
     servertime = timezone('UTC').localize(date).astimezone(timezone(servertz))
     if naive:
         return servertime.replace(tzinfo=None)
@@ -168,7 +169,6 @@ def minDatetime():
 class DisplayTZ:
 
     def __init__(self, aw=None, conf=None, useServerTZ=0):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if not has_request_context():
             sessTimezone = 'LOCAL'
         else:
@@ -177,10 +177,10 @@ class DisplayTZ:
             if useServerTZ == 0 and conf is not None:
                 sessTimezone = conf.getTimezone()
             else:
-                sessTimezone = minfo.getTimezone()
+                sessTimezone = Config.getInstance().getDefaultTimezone()
         self._displayTZ = sessTimezone
         if not self._displayTZ:
-            self._displayTZ = minfo.getTimezone()
+            self._displayTZ = Config.getInstance().getDefaultTimezone()
 
     def getDisplayTZ(self):
         return self._displayTZ
@@ -197,7 +197,6 @@ class SessionTZ:
             try:
                 tz = user.getTimezone()
             except:
-                #tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
                 tz = "LOCAL"
         else:
             tz = "LOCAL"

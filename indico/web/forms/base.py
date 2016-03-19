@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,11 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import weakref
+
+from flask import request, session, flash, g
 from flask_wtf import Form
+from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
+from wtforms.form import FormMeta
 from wtforms.widgets.core import HiddenInput
 
+from indico.core import signals
+from indico.core.auth import multipass
+from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
 
 
@@ -42,7 +51,32 @@ class generated_data(property):
         return _DataWrapper(self.fget(obj))
 
 
+class IndicoFormMeta(FormMeta):
+    def __call__(cls, *args, **kwargs):
+        # If we are instantiating a form that was just extended, don't
+        # send the signal again - it's pointless to extend the extended
+        # form and doing so could actually result in infinite recursion
+        # if the signal receiver didn't specify a sender.
+        if kwargs.pop('__extended', False):
+            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+        extra_fields = values_from_signal(signals.add_form_fields.send(cls))
+        # If there are no extra fields, we don't need any custom logic
+        # and simply create an instance of the original form.
+        if not extra_fields:
+            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+        kwargs['__extended'] = True
+        ext_cls = type(b'_Extended' + cls.__name__, (cls,), {})
+        for name, field in extra_fields:
+            name = 'ext__' + name
+            if hasattr(ext_cls, name):
+                raise RuntimeError(u'Preference collision in {}: {}'.format(cls.__name__, name))
+            setattr(ext_cls, name, field)
+        return ext_cls(*args, **kwargs)
+
+
 class IndicoForm(Form):
+    __metaclass__ = IndicoFormMeta
+
     class Meta:
         def bind_field(self, form, unbound_field, options):
             # We don't set default filters for query-based fields as it breaks them if no query_factory is set
@@ -51,7 +85,40 @@ class IndicoForm(Form):
             no_filter_fields = (QuerySelectField, FieldList)
             filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
-            return unbound_field.bind(form=form, filters=filters, **options)
+            bound = unbound_field.bind(form=form, filters=filters, **options)
+            bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
+            return bound
+
+    def generate_csrf_token(self, csrf_context=None):
+        if not self.csrf_enabled:
+            return None
+        return session.csrf_token
+
+    def validate_csrf_token(self, field):
+        if self.csrf_enabled and field.data != session.csrf_token:
+            if not g.get('flashed_csrf_message'):
+                # Only flash the message once per request. We may end up in here
+                # multiple times if `validate()` is called more than once
+                flash(_(u'It looks like there was a problem with your current session. Please submit the form again.'),
+                      'error')
+                g.flashed_csrf_message = True
+            raise ValidationError(_(u'CSRF token missing'))
+
+    def validate(self):
+        valid = super(IndicoForm, self).validate()
+        if not valid:
+            return False
+        if not all(values_from_signal(signals.form_validated.send(self), single_value=True)):
+            return False
+        self.post_validate()
+        return True
+
+    def post_validate(self):
+        """Called after the form was successfully validated.
+
+        This method is a good place e.g. to override the data of fields in
+        certain cases without going through the hassle of generated_data.
+        """
 
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
@@ -59,15 +126,33 @@ class IndicoForm(Form):
         If `fields` is set, only fields from that list are populated.
         If `skip` is set, fields in that list are skipped.
         If `existing_only` is True, only attributes that already exist on `obj` are populated.
+
+        Attributes starting with ``ext__`` are always skipped as they
+        are from plugin-defined fields which should always be handled
+        separately.
         """
+        def _included(field_name):
+            if fields and field_name not in fields:
+                return False
+            if skip and field_name in skip:
+                return False
+            if existing_only and not hasattr(obj, field_name):
+                return False
+            if field_name.startswith('ext__'):
+                return False
+            return True
+
+        # Populate data from actual fields
         for name, field in self._fields.iteritems():
-            if fields and name not in fields:
-                continue
-            if skip and name in skip:
-                continue
-            if existing_only and not hasattr(obj, name):
+            if not _included(name):
                 continue
             field.populate_obj(obj, name)
+
+        # Populate generated data
+        for name, value in self.generated_data.iteritems():
+            if not _included(name):
+                continue
+            setattr(obj, name, value)
 
     @property
     def visible_fields(self):
@@ -89,13 +174,18 @@ class IndicoForm(Form):
         return all_errors
 
     @property
+    def generated_data(self):
+        """Returns a dict containing all generated data"""
+        cls = type(self)
+        return {field: getattr(self, field).data
+                for field in dir(cls)
+                if isinstance(getattr(cls, field), generated_data)}
+
+    @property
     def data(self):
         """Extends form.data with generated data from properties"""
-        data = super(IndicoForm, self).data
-        cls = type(self)
-        for field in dir(cls):
-            if isinstance(getattr(cls, field), generated_data):
-                data[field] = getattr(self, field).data
+        data = {k: v for k, v in super(IndicoForm, self).data.iteritems() if not k.startswith('ext__')}
+        data.update(self.generated_data)
         return data
 
 
@@ -147,3 +237,45 @@ class FormDefaults(object):
             return self.__defaults[item]
         else:
             raise AttributeError(item)
+
+
+class SyncedInputsMixin(object):
+    """Mixin for a form having inputs using the ``SyncedInputWidget``.
+
+    This mixin will process the synced fields, adding them the necessary
+    attributes for them to render and work properly.  The fields which
+    are synced are defined by ``multipass.synced_fields``.
+
+    :param synced_fields: set -- a subset of ``multipass.synced_fields``
+                          which corresponds to the fields currently
+                          being synchronized for the user.
+    :param synced_values: dict -- a map of all the synced fields (as
+                          defined by ``multipass.synced_fields``) and
+                          the values they would have if they were synced
+                          (regardless of whether it is or not).  Fields
+                          not present in this dict do not show the sync
+                          button at all.
+    """
+
+    def __init__(self, *args, **kwargs):
+        synced_fields = kwargs.pop('synced_fields', set())
+        synced_values = kwargs.pop('synced_values', {})
+        super(SyncedInputsMixin, self).__init__(*args, **kwargs)
+        self.syncable_fields = set(synced_values)
+        for key in ('first_name', 'last_name'):
+            if not synced_values.get(key):
+                synced_values.pop(key, None)
+                self.syncable_fields.discard(key)
+        if self.is_submitted():
+            synced_fields = self.synced_fields
+        provider = multipass.sync_provider
+        provider_name = provider.title if provider is not None else 'unknown identity provider'
+        for field in multipass.synced_fields:
+            self[field].synced = self[field].short_name in synced_fields
+            self[field].synced_value = synced_values.get(field)
+            self[field].provider_name = provider_name
+
+    @property
+    def synced_fields(self):
+        """The fields which are set as synced for the current request."""
+        return set(request.form.getlist('synced_fields')) & self.syncable_fields

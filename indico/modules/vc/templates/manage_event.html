@@ -1,0 +1,103 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_row, form_footer  %}
+
+{% block title %}{% trans %}Current videoconference rooms{% endtrans %}{% endblock %}
+{% block content %}
+    <div class="module-vc vc-management" id="vc-info-container">
+        {% if plugins %}
+            {% if event_vc_rooms %}
+                <table class="i-table-widget">
+                    <thead>
+                         <tr>
+                            <th class="small-column"></th>
+                            <th></th>
+                            <th>{% trans %}Name{% endtrans %}</th>
+                            <th class="col-50"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
+                            {% set vc_room = event_vc_room.vc_room %}
+                            <tr class="vc-room-entry {% if vc_room.status.name == 'deleted' %}deleted{% endif %}">
+                                <td><a href="#" class="icon-next toggle-details"></a></td>
+                                <td>{% if vc_room.plugin %}
+                                        <img class="plugin-logo"
+                                             src="{{ vc_room.plugin.logo_url}}"
+                                             alt="{{ vc_room.friendly_name }}" title="{{ vc_room.friendly_name}}">
+                                    {% else %}
+                                        {{ vc_room.type }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ vc_room.name }}</td>
+                                <td>
+                                    <div class="toolbar vc-toolbar">
+                                        <div class="group">
+                                            {% if vc_room.status.name != 'deleted' %}
+                                                <a class="i-button icon-loop js-vcroom-refresh"
+                                                   title="{% trans %}Check videoconference room status{% endtrans %}"
+                                                   data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
+                                                <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
+                                                   class="i-button icon-edit js-vcroom-edit"
+                                                   title="{% trans %}Edit{% endtrans %}"></a>
+                                            {% endif %}
+                                            <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Detach{% endtrans %}"></a>
+                                            {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
+                                                {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="details-row" colspan="6">
+                                    {% if vc_room.plugin %}
+                                        {{ vc_room.plugin.render_manage_event_info_box(vc_room, event_vc_room, event) | safe }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="info-message-box">
+                    <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
+                </div>
+            {% endif %}
+            <div class="add-room-options right">
+                {% if plugins|length == 1 %}
+                    <a class="i-button i-form-button js-create-room"
+                       data-vc-system="{{ plugins[0].service_name }}"
+                       href="{{ url_for_plugin('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}">
+                        <img src="{{ plugins[0].icon_url }}" alt="">
+                        {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
+                    </a>
+                {% elif plugins|length > 1 %}
+                    <a class="i-button i-form-button icon-plus js-create-room"
+                       href="{{ url_for_plugin('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create') }}">
+                        {%- trans %}Create new room{% endtrans -%}
+                    </a>
+                {% endif %}
+                <span>
+                    <a href="#" id="btn-add-existing"
+                       class="i-button i-form-button icon-plus"
+                       {% if plugins|length == 1 %}
+                           data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=plugins[0].service_name) }}"
+                       {% else %}
+                           data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_search_form') }}"
+                       {% endif %}
+                       >{% trans %}Add existing room{% endtrans %}
+                    </a>
+                </span>
+            </div>
+            <script>
+                eventManageVCRooms();
+            </script>
+        {% else %}
+            <div class="warning-message-box">
+                <div class="message-text">
+                    {% trans %}There are no Videoconference plugins available.{% endtrans %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

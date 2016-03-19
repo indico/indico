@@ -47,7 +47,7 @@
     <div id="key_locationCH" class="tip">
         ${ _("How to obtain a key. Typically a phone number.") }
     </div>
-    <div id="responsibleCH" class="tip">
+    <div id="ownerCH" class="tip">
         <b> ${ _('Required.') }</b>  ${ _('Person who is responsible for the room.') } <br/>
         ${ _('This person will receive notifications and is able to reject bookings.') }
     </div>
@@ -85,6 +85,7 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 <form action="" method="post" enctype="multipart/form-data">
+    ${ form.csrf_token() }
     <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
         <tr>
             <td class="formTitle">
@@ -195,18 +196,7 @@
                         </td>
                         <td colspan="2">
                             <table>
-                                <tr>
-                                    <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                                        <small>${ _("Responsible") }</small>
-                                    </td>
-                                    <td align="left" class="blacktext">
-                                        ${ form.owner_id() }
-                                        <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ room_owner.getFullName() if room_owner else '' }"/>
-                                        <input type="button" value="${ _('Search') }" onclick="searchForUsers();">
-                                        ${ contextHelp('responsibleCH') }
-                                    </td>
-                                </tr>
-                                % for field in ['key_location', 'telephone']:
+                                % for field in ['owner', 'key_location', 'telephone']:
                                     <tr>
                                         <td align="right" valign="top" style="padding-right: 5px;">
                                             <small>${ form[field].label.text }</small>
@@ -497,19 +487,5 @@
                  <td><input id="bookable_hours-{2}-end" name="bookable_hours-{2}-end" style="width: 50px;" type="time"></td> \
             </tr>'.format(btStartLabel, btEndLabel, $('#dailyBookablePeriodsTable tr').length)
         );
-    }
-
-    function searchForUsers() {
-        new ChooseUsersPopup(
-            $T('Select a responsible user'),
-            true,
-            null, false,
-            true, null,
-            true, true, false,
-            function(users) {
-                $E('owner_name').set(users[0].name);
-                $E('owner_id').set(users[0].id);
-            }
-        ).execute();
     }
 </script>

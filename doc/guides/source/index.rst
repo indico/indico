@@ -13,11 +13,8 @@ Contents:
 
    ./UserGuide/index.rst
    ./QuickStartGuides/index.rst
-   ./VideoServicesGuides/index.rst
-   ./Chat/index.rst
    ./PaperReviewingGuides/index.rst
    ./Importer/Importer.rst
-   ./Statistics/index.rst
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst

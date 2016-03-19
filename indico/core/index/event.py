@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.index.base import IOIndex, Index
+from indico.core.index.base import IOIndex, Index, ElementNotFoundException
 from indico.core.index.adapter import IIndexableByStartDateTime
 from indico.util.date_time import utc_timestamp
 from BTrees.OOBTree import OOSet, OOBTree
@@ -45,10 +45,24 @@ class CategoryEventStartDateIndex(Index):
         self._container[categId] =  IOIndex(IIndexableByStartDateTime)
 
     def index_obj(self, obj):
-        self.getCategory(obj.getOwner().getId()).index_obj(obj)
+        try:
+            category = self.getCategory(obj.getOwner().getId())
+        except KeyError:
+            # some legacy events are in categories that don't exist anymore...
+            return
+        category.index_obj(obj)
 
     def unindex_obj(self, obj):
-        self.getCategory(obj.getOwner().getId()).unindex_obj(obj)
+        try:
+            category = self.getCategory(obj.getOwner().getId())
+        except KeyError:
+            # some legacy events are in categories that don't exist anymore...
+            return
+        try:
+            category.unindex_obj(obj)
+        except ElementNotFoundException:
+            # some legacy events are not in this index...
+            pass
 
     def remove_category(self, categId):
         del self._container[categId]

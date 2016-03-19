@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, groups, templates,
-                                   conferenceModif, services, api, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -42,9 +41,6 @@ admin.add_url_rule('/news', 'updateNews', admins.RHUpdateNews)
 # Upcoming events
 admin.add_url_rule('/upcoming-events', 'adminUpcomingEvents', admins.RHConfigUpcoming)
 
-# Task manager
-admin.add_url_rule('/tasks', 'taskManager', taskManager.RHTaskManager)
-
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)
 admin.add_url_rule('/maintenance/pack-db', 'adminMaintenance-pack', maintenance.RHMaintenancePack,
@@ -67,26 +63,6 @@ admin.add_url_rule('/networks/<domainId>/modify', 'domainDataModification-modify
                    methods=('POST',))
 admin.add_url_rule('/networks/<domainId>/details', 'domainDetails', domains.RHDomainDetails)
 admin.add_url_rule('/networks/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
-
-# Users
-admin.add_url_rule('/settings/users/', 'userManagement', users.RHUserManagement)
-admin.add_url_rule('/settings/users/creation', 'userManagement-switchAuthorisedAccountCreation',
-                   users.RHUserManagementSwitchAuthorisedAccountCreation)
-admin.add_url_rule('/settings/users/moderate-creation', 'userManagement-switchModerateAccountCreation',
-                   users.RHUserManagementSwitchModerateAccountCreation)
-admin.add_url_rule('/settings/users/notify-creation', 'userManagement-switchNotifyAccountCreation',
-                   users.RHUserManagementSwitchNotifyAccountCreation)
-admin.add_url_rule('/users/', 'userList', users.RHUsers, methods=('GET', 'POST'))
-admin.add_url_rule('/users/merge', 'userMerge', admins.RHUserMerge, methods=('GET', 'POST'))
-
-# Groups
-admin.add_url_rule('/users/groups/', 'groupList', groups.RHGroups, methods=('GET', 'POST'))
-admin.add_url_rule('/users/groups/<groupId>', 'groupDetails', groups.RHGroupDetails)
-admin.add_url_rule('/users/groups/<groupId>/modify', 'groupModification', groups.RHGroupModification)
-admin.add_url_rule('/users/groups/<groupId>/modify', 'groupModification-update', groups.RHGroupPerformModification,
-                   methods=('POST',))
-admin.add_url_rule('/users/groups/create', 'groupRegistration', groups.RHGroupCreation)
-admin.add_url_rule('/users/groups/create', 'groupRegistration-update', groups.RHGroupPerformCreation, methods=('POST',))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))
@@ -121,12 +97,3 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
                    methods=('POST',))
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
-
-# HTTP API
-admin.add_url_rule('/api/', 'adminServices-apiOptions', api.RHAdminAPIOptions)
-admin.add_url_rule('/api/', 'adminServices-apiOptionsSet', api.RHAdminAPIOptionsSet, methods=('POST',))
-admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
-
-# OAuth
-admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
-admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,6 @@
 
 import itertools
 from datetime import datetime, timedelta
-from operator import itemgetter
 
 from persistent import Persistent
 from pytz import timezone
@@ -34,6 +33,7 @@ from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
+from indico.modules.events import Event
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
@@ -152,109 +152,6 @@ class Index(Persistent):
 
     def notifyModification(self):
         self._p_changed = 1
-
-
-class EmailIndex(Index):
-    _name = "email"
-
-    def indexUser(self, user):
-        for email in user.getEmails():
-            self._addItem(email, user.getId())
-
-    def unindexUser(self, user):
-        for email in user.getEmails():
-            self._withdrawItem(email, user.getId())
-
-    def matchUser(self, email, cs=0, exact=0, accent_sensitive=True):
-        """this match is an approximative case insensitive match"""
-        return self._match(email, cs, exact)
-
-
-class NameIndex(Index):
-    _name = "name"
-
-    def indexUser(self, user):
-        name = user.getName()
-        self._addItem(name, user.getId())
-
-    def unindexUser(self, user):
-        name = user.getName()
-        self._withdrawItem(name, user.getId())
-
-    def matchUser(self, name, cs=0, exact=0, accent_sensitive=False):
-        """this match is an approximative case insensitive match"""
-        return self._match(name, cs, exact, accent_sensitive)
-
-
-class SurNameIndex(Index):
-    _name = "surName"
-
-    def indexUser(self, user):
-        surName = user.getSurName()
-        self._addItem(surName, user.getId())
-
-    def unindexUser(self, user):
-        surName = user.getSurName()
-        self._withdrawItem(surName, user.getId())
-
-    def matchUser(self, surName, cs=0, exact=0, accent_sensitive=False):
-        """this match is an approximative case insensitive match"""
-        return self._match(surName, cs, exact, accent_sensitive)
-
-
-class OrganisationIndex(Index):
-    _name = "organisation"
-
-    def indexUser(self, user):
-        org = user.getOrganisation()
-        self._addItem(org, user.getId())
-
-    def unindexUser(self, user):
-        org = user.getOrganisation()
-        self._withdrawItem(org, user.getId())
-
-    def matchUser(self, org, cs=0, exact=0, accent_sensitive=False):
-        return self._match(org, cs, exact, accent_sensitive)
-
-
-class StatusIndex(Index):
-    _name = "status"
-
-    def __init__(self):
-        Index.__init__(self)
-        from MaKaC.user import AvatarHolder
-        ah = AvatarHolder()
-        for av in ah.getList():
-            self.indexUser(av)
-
-    def indexUser(self, user):
-        status = user.getStatus()
-        self._addItem(status, user.getId())
-
-    def unindexUser(self, user):
-        status = user.getStatus()
-        self._withdrawItem(status, user.getId())
-
-    def matchUser(self, status, cs=0, exact=1, accent_sensitive=True):
-        """this match is an approximative case insensitive match"""
-        return self._match(status, cs, exact)
-
-
-class GroupIndex(Index):
-    _name = "group"
-
-    def indexGroup(self, group):
-        name = group.getName()
-        self._addItem(name, group.getId())
-
-    def unindexGroup(self, group):
-        name = group.getName()
-        self._withdrawItem(name, group.getId())
-
-    def matchGroup(self, name, cs=0, exact=0):
-        if name == "":
-            return []
-        return self._match(name, cs, exact)
 
 
 class CategoryIndex(Persistent):
@@ -1022,24 +919,6 @@ class CategoryDateIndex(Persistent):
             return []
 
 
-class CategoryDateIndexLtd(CategoryDateIndex):
-    """ Version of CategoryDateIndex whiself.ch indexing events
-        on the base of their visibility
-    """
-    def indexConf(self, conf):
-        level = 0
-        for categ in conf.getOwnerPath():
-            if conf.getFullVisibility() > level:
-                self._indexConf(categ.getId(),conf)
-            level+=1
-        if conf.getFullVisibility() > level:
-            self._indexConf("0",conf)
-
-    def buildIndex(self, dbi=None):
-        self._idxCategItem = OOBTree()
-        from MaKaC.conference import CategoryManager
-        self.indexCateg(CategoryManager().getById('0'), dbi=dbi)
-
 class CategoryDayIndex(CategoryDateIndex):
 
     def __init__(self, visibility=True):
@@ -1144,44 +1023,9 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
     _name = "pendingSubmitters"
     pass
 
-class PendingConfSubmittersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingConfSubmitters"
-    pass
-
-class PendingConfSubmittersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingConfSubmittersTasks"
-    pass
-
-class PendingConfManagersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingConfManagers"
-    pass
-
-class PendingConfManagersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingConfManagersTasks"
-    pass
-
-class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingSubmittersTasks"
-    pass
 
 class PendingManagersIndex( PendingQueuesUsersIndex ):
     _name = "pendingManagers"
-    pass
-
-class PendingManagersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingManagersTasks"
-    pass
-
-class PendingCoordinatorsIndex( PendingQueuesUsersIndex ):
-    _name = "pendingCoordinators"
-    pass
-
-class PendingCoordinatorsTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingCoordinatorsTasks"
-    pass
-
-
-class IndexException(Exception):
     pass
 
 
@@ -1279,6 +1123,8 @@ class TextIndex(IntStringMappedIndex):
 class CategoryTitleIndex(object):
 
     def index(self, obj):
+        if not obj.getId():  # newly created root category has id=''
+            return
         self.unindex(obj)
         category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
         db.session.add(category)
@@ -1286,6 +1132,8 @@ class CategoryTitleIndex(object):
             db.session.flush()
 
     def unindex(self, obj):
+        if not obj.getId():  # newly created root category has id=''
+            return
         IndexedCategory.find(id=obj.getId()).delete()
         db.session.flush()
 
@@ -1295,7 +1143,7 @@ class CategoryTitleIndex(object):
                      func.to_tsquery('simple', preprocess_ts_string(search_string))))
                  .limit(limit)
                  .offset(offset))
-        return map(itemgetter(0), query)
+        return [x[0] for x in query]
 
     def initialize(self, items):
         for i, categ in enumerate(items, 1):
@@ -1332,6 +1180,8 @@ class ConferenceIndex(object):
             order = None
 
         return (db.session.query(IndexedEvent.id)
+                  .join(Event, Event.id == IndexedEvent.id)
+                  .filter(~Event.is_deleted)
                   .filter(IndexedEvent.title_vector.op('@@')(
                       func.to_tsquery('simple', preprocess_ts_string(search_string))))
                   .order_by(order))
@@ -1353,14 +1203,8 @@ class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
-                    "status", "calendar", "category", "categoryDate",
-                    "categoryDateAll", "categoryName","conferenceTitle",
-                    "pendingSubmitters", "pendingConfSubmitters",
-                    "pendingConfSubmittersTasks", "pendingConfManagers",
-                    "pendingConfManagersTasks","pendingSubmittersTasks", "pendingManagers",
-                    "pendingManagersTasks", "pendingCoordinators",
-                    "pendingCoordinatorsTasks"]
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName', 'conferenceTitle',
+                     'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1376,19 +1220,7 @@ class IndexesHolder(ObjectHolder):
         if id in Idx:
             return Idx[id]
         else:
-            if id=="email":
-                Idx[str(id)] = EmailIndex()
-            elif id=="name":
-                Idx[str(id)] = NameIndex()
-            elif id=="surName":
-                Idx[str(id)] = SurNameIndex()
-            elif id=="organisation":
-                Idx[str(id)] = OrganisationIndex()
-            elif id=="status":
-                Idx[str(id)] = StatusIndex()
-            elif id=="group":
-                Idx[str(id)] = GroupIndex()
-            elif id=="calendar":
+            if id == "calendar":
                 Idx[str(id)] = CalendarIndex()
             elif id=="category":
                 Idx[str(id)] = CategoryIndex()
@@ -1398,30 +1230,12 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
-            elif id=="pendingConfSubmitters":
-                Idx[str(id)] = PendingConfSubmittersIndex()
-            elif id=="pendingSubmittersTasks":
-                Idx[str(id)] = PendingSubmittersTasksIndex()
-            elif id=="pendingConfSubmittersTasks":
-                Idx[str(id)] = PendingConfSubmittersTasksIndex()
-            elif id=="pendingConfManagers":
-                Idx[str(id)] = PendingConfManagersIndex()
-            elif id=="pendingConfManagersTasks":
-                Idx[str(id)] = PendingConfManagersTasksIndex()
             elif id=="pendingManagers":
                 Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingManagersTasks":
-                Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="pendingCoordinators":
                 Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingCoordinatorsTasks":
-                Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="categoryName":
                 return CategoryTitleIndex()
             elif id=="conferenceTitle":
                 return ConferenceIndex()
             return Idx[str(id)]
-
-
-if __name__ == "__main__":
-    print _("done")

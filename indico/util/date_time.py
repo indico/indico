@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 
 import calendar
 import time
+from collections import OrderedDict
 from datetime import timedelta, datetime
 from datetime import time as dt_time
 
@@ -30,9 +31,9 @@ from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta
 
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-from indico.util.i18n import get_current_locale
+from indico.core.config import Config
+from indico.util.i18n import get_current_locale, _, ngettext
 
 
 now_utc = nowutc
@@ -43,11 +44,30 @@ def utc_timestamp(datetimeVal):
 
 
 def as_utc(dt):
-    """Returns the given datetime with tzinfo=UTC.
+    """Returns the given naive datetime with tzinfo=UTC."""
+    if dt.tzinfo and dt.tzinfo != pytz.utc:
+        raise ValueError("{} already contains non-UTC tzinfo data".format(dt))
+    return pytz.utc.localize(dt) if dt.tzinfo is None else dt
 
-    The given datetime object **MUST** be naive but already contain UTC!
+
+def localize_as_utc(dt, timezone='UTC'):
+    """Localizes a naive datetime with the timezone and returns it as UTC.
+
+    :param dt: A naive :class:`datetime.datetime` object.
+    :param timezone: The timezone from which to localize.  UTC by default.
     """
-    return pytz.utc.localize(dt)
+    timezone = pytz.timezone(timezone)
+    return timezone.localize(dt).astimezone(pytz.utc)
+
+
+def event_to_utc(dt, event):
+    """Converts a datetime of an event to UTC.
+
+    :param dt: A naive :class:`datetime.datetime` object in UTC
+    :param event: An :class:`.Conference` object from which to take the timezone
+    """
+    timezone = DisplayTZ(conf=event).getDisplayTZ()
+    return get_timezone(timezone).localize(dt).astimezone(pytz.utc)
 
 
 def server_to_utc(dt):
@@ -55,13 +75,13 @@ def server_to_utc(dt):
 
     The given datetime **MUST** be naive but already contain the correct time in the server's TZ.
     """
-    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
     return server_tz.localize(dt).astimezone(pytz.utc)
 
 
 def utc_to_server(dt):
     """Converts the given UTC datetime to the server's TZ."""
-    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
     return dt.astimezone(server_tz)
 
 
@@ -69,6 +89,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     """
     Basically a wrapper around Babel's own format_datetime
     """
+    if format == 'code':
+        format = 'dd/MM/yyyy HH:mm'
     if not locale:
         locale = get_current_locale()
     if keep_tz:
@@ -77,18 +99,21 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     elif not timezone and dt.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
-        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        timezone = Config.getInstance().getDefaultTimezone()
 
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 
-def format_date(d, format='medium', locale=None):
+def format_date(d, format='medium', locale=None, timezone=None):
     """
     Basically a wrapper around Babel's own format_date
     """
+    if format == 'code':
+        format = 'dd/MM/yyyy'
     if not locale:
         locale = get_current_locale()
-
+    if timezone and isinstance(d, datetime) and d.tzinfo:
+        d = d.astimezone(pytz.timezone(timezone))
     return _format_date(d, format=format, locale=locale).encode('utf-8')
 
 
@@ -96,12 +121,14 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     """
     Basically a wrapper around Babel's own format_time
     """
+    if format == 'code':
+        format = 'HH:mm'
     if not locale:
         locale = get_current_locale()
     if not timezone and t.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
-        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        timezone = Config.getInstance().getDefaultTimezone()
     if timezone:
         timezone = get_timezone(timezone)
 
@@ -116,6 +143,58 @@ def format_timedelta(td, format='short', locale=None):
         locale = get_current_locale()
 
     return _format_timedelta(td, format=format, locale=locale).encode('utf-8')
+
+
+def format_human_timedelta(delta, granularity='seconds'):
+    """Formats a timedelta in a human-readable way
+
+    :param delta: the timedelta to format
+    :param granularity: the granularity, i.e. the lowest unit that is
+                        still displayed. when set e.g. to 'minutes',
+                        the output will never contain seconds unless
+                        the whole timedelta spans less than a minute.
+                        Accepted values are 'seconds', 'minutes',
+                        'hours' and 'days'.
+    """
+    field_order = ('days', 'hours', 'minutes', 'seconds')
+    long_names = {
+        'seconds': lambda n: ngettext(u'{0} second', u'{0} seconds', n).format(n),
+        'minutes': lambda n: ngettext(u'{0} minute', u'{0} minutes', n).format(n),
+        'hours': lambda n: ngettext(u'{0} hour', u'{0} hours', n).format(n),
+        'days': lambda n: ngettext(u'{0} day', u'{0} days', n).format(n),
+    }
+    short_names = {
+        'seconds': lambda n: ngettext(u'{0}s', u'{0}s', n).format(n),
+        'minutes': lambda n: ngettext(u'{0}m', u'{0}m', n).format(n),
+        'hours': lambda n: ngettext(u'{0}h', u'{0}h', n).format(n),
+        'days': lambda n: ngettext(u'{0}d', u'{0}d', n).format(n),
+    }
+
+    values = OrderedDict((key, 0) for key in field_order)
+    values['seconds'] = delta.total_seconds()
+    values['days'], values['seconds'] = divmod(values['seconds'], 86400)
+    values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
+    values['minutes'], values['seconds'] = divmod(values['seconds'], 60)
+    for key, value in values.iteritems():
+        values[key] = int(value)
+    # keep all fields covered by the granularity, and if that results in
+    # no non-zero fields, include otherwise excluded ones
+    used_fields = set(field_order[:field_order.index(granularity) + 1])
+    available_fields = [x for x in field_order if x not in used_fields]
+    used_fields -= {k for k, v in values.iteritems() if not v}
+    while not sum(values[x] for x in used_fields) and available_fields:
+        used_fields.add(available_fields.pop(0))
+    for key in available_fields:
+        values[key] = 0
+    nonzero = OrderedDict((k, v) for k, v in values.iteritems() if v)
+    if not nonzero:
+        return long_names[granularity](0)
+    elif len(nonzero) == 1:
+        key, value = nonzero.items()[0]
+        return long_names[key](value)
+    else:
+        parts = [short_names[key](value) for key, value in nonzero.iteritems()]
+        return u' '.join(parts)
 
 
 def format_human_date(dt, format='medium', locale=None):
@@ -282,3 +361,12 @@ def round_up_month(date, from_day=1):
         return date + relativedelta(day=1, months=+1)
     else:
         return date
+
+
+def strftime_all_years(dt, fmt):
+    """Exactly like datetime.strftime but supports year<1900"""
+    assert '%%Y' not in fmt  # unlikely but just in case
+    if dt.year >= 1900:
+        return dt.strftime(fmt)
+    else:
+        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', unicode(dt.year))

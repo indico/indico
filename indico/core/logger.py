@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,11 +20,12 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request, session
-from ZODB.POSException import POSError
+from pprint import pformat
+
+from flask import request, has_request_context
+from indico.web.util import get_request_info
 
 from indico.core.config import Config
-from MaKaC.common.contextManager import ContextManager
 
 
 class AddIDFilter(logging.Filter):
@@ -32,10 +33,7 @@ class AddIDFilter(logging.Filter):
         if not logging.Filter.filter(self, record):
             return False
         # Add request ID if available
-        try:
-            record.request_id = request.id
-        except RuntimeError:
-            record.request_id = '0' * 12
+        record.request_id = request.id if has_request_context() else '0' * 12
         return True
 
 
@@ -46,6 +44,13 @@ class ExtraIndicoFilter(AddIDFilter):
         return AddIDFilter.filter(self, record)
 
 
+class CeleryFilter(AddIDFilter):
+    def filter(self, record):
+        if not AddIDFilter.filter(self, record):
+            return False
+        return record.name.split('.')[0] == 'celery'
+
+
 class IndicoMailFormatter(logging.Formatter):
     def format(self, record):
         s = logging.Formatter.format(self, record)
@@ -54,32 +59,7 @@ class IndicoMailFormatter(logging.Formatter):
         return s + self._getRequestInfo()
 
     def _getRequestInfo(self):
-        rh = ContextManager.get('currentRH', None)
-        info = ['Additional information:']
-
-        try:
-            info.append('Request: %s' % request.id)
-            info.append('URL: %s' % request.url)
-
-            if request.url_rule:
-                info.append('Endpoint: {0}'.format(request.url_rule.endpoint))
-
-            info.append('Method: %s' % request.method)
-            if rh:
-                info.append('Params: %s' % rh._getTruncatedParams())
-
-            if session:
-                try:
-                    info.append('User: {0}'.format(session.user))
-                except POSError:
-                    # If the DB connection is closed getting the avatar may fail
-                    info.append('User id: {0}'.format(session.get('_avatarId')))
-            info.append('IP: %s' % request.remote_addr)
-            info.append('User Agent: %s' % request.user_agent)
-            info.append('Referer: %s' % (request.referrer or 'n/a'))
-        except RuntimeError, e:
-            info.append('Not available: %s' % e)
-        return '\n\n%s' % '\n'.join(x.encode('utf-8') if isinstance(x, unicode) else x for x in info)
+        return '\n\n\nRequest data:\n\n{}'.format(pformat(get_request_info()))
 
 
 class LoggerUtils:
@@ -213,6 +193,7 @@ class Logger:
         # Lists of filters for each handler
         filters = {'indico': [AddIDFilter('indico')],
                    'other': [ExtraIndicoFilter()],
+                   'celery': [CeleryFilter()],
                    'smtp': [AddIDFilter('indico')]}
 
         config = Config.getInstance()
@@ -228,6 +209,8 @@ class Logger:
             defaultArgs = {
                 'indico': ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
                 'other': ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
+                'celery': ("FileHandler", "('%s', 'a')" % cls._log_path('celery.log'), 'DEBUG'),
+                'stderr': ('StreamHandler', '()', 'DEBUG'),
                 'smtp': (
                     "handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
                     % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")

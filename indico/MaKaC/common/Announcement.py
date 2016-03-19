@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,17 +19,8 @@ from indico.core.db import DBMgr
 
 
 class AnnoucementMgr(Persistent):
-
     def __init__(self):
-        self.speed = "2"
         self.text = ""
-
-    # TODO: Speed should be removed since no longer used.
-    def setSpeed(self, speed):
-        self.speed = speed
-
-    def getSpeed(self):
-        return self.speed
 
     def setText(self, text):
         self.text = text

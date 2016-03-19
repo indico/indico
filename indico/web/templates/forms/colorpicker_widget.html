@@ -1,0 +1,14 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="i-color-field">
+        <div class="clickable-wrapper">
+            <span class="color-preview"></span>
+            <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text">
+        </div>
+    </div>
+    <script>
+        $('.i-color-field').colorpicker();
+        $('.i-color-field input').clearableinput();
+    </script>
+{% endblock %}

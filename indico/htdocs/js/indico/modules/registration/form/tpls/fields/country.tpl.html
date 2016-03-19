@@ -1,0 +1,17 @@
+<ng-form name="nestedForm">
+    <select
+        id="field-{{ section.id }}-{{ field.id }}"
+        name="{{ fieldName }}"
+        ng-model="userdata[fieldName]"
+        ng-required="field.isRequired"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+        <option value="">
+            {{ '-- Select a country --' | i18n }}
+        </option>
+        <option ng-repeat="item in field.choices"
+            ng-selected="item.countryKey === userdata[fieldName]"
+            value="{{ item.countryKey }}">
+            {{ item.caption }}
+        </option>
+    </select>
+</ng-form>

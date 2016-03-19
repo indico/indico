@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -160,6 +160,7 @@ class ServiceBase(RequestHandlerBase):
     """
 
     UNICODE_PARAMS = False
+    CHECK_HTML = True
 
     def __init__(self, params):
         if not self.UNICODE_PARAMS:
@@ -168,8 +169,7 @@ class ServiceBase(RequestHandlerBase):
         self._requestStarted = False
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
-        self._aw.setIP(request.remote_addr)
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None
         self._tohttps = request.is_secure
@@ -221,10 +221,11 @@ class ServiceBase(RequestHandlerBase):
         self._checkParams()
         self._checkProtection()
 
-        try:
-            security.Sanitization.sanitizationCheck(self._target, self._params, self._aw)
-        except HtmlForbiddenTag as e:
-            raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
+        if self.CHECK_HTML:
+            try:
+                security.Sanitization.sanitizationCheck(self._target, self._params, self._aw, ['requestInfo'])
+            except HtmlForbiddenTag as e:
+                raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
 
         if self._doProcess:
             if Config.getInstance().getProfile():
@@ -283,12 +284,9 @@ class ProtectedDisplayService(ProtectedService):
         the user is authorized to view the target resource
         """
         if not self._target.canAccess( self.getAW() ):
-
-            from MaKaC.conference import Link, LocalFile
-
+            from MaKaC.conference import Resource
             # in some cases, the target does not directly have an owner
-            if (isinstance(self._target, Link) or
-                isinstance(self._target, LocalFile)):
+            if isinstance(self._target, Resource):
                 target = self._target.getOwner()
             else:
                 target = self._target
@@ -340,18 +338,9 @@ class AdminService(LoggedOnlyService):
     """
     A AdminService can only be accessed by administrators
     """
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection
-        """
-
+    def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
-
-        # If there are no administrators, allow to add one
-        # Otherwise, forbid access to users that are not admin
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        adminList = minfo.getAdminList()
-        if not self._getUser().isAdmin() and len( adminList.getList() ) !=0 :
+        if not session.user.is_admin:
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:
@@ -429,6 +418,7 @@ class DateTimeModificationBase( TextModificationBase ):
         except TimingError,e:
             raise ServiceError("ERR-E2", e.getMessage())
 
+
 class ListModificationBase:
     """ Base class for a list modification.
         The class that inherits from this must have:
@@ -450,45 +440,16 @@ class ListModificationBase:
 
         return self._value
 
-class TwoListModificationBase:
-    """ Base class for two lists modification.
-        The class that inherits from this must have:
-        -a _handleGet() method that returns a list, given self._destination
-        -a _handleSet() method which can use self._value and self._destination to process the input.
-        self._value will be a list. self._destination will be 'left' or 'right'
-    """
-
-    def _getAnswer(self):
-        self._destination = self._params.get('destination', None)
-        if self._destination == None or (self._destination != 'right' and self._destination != 'left'):
-            #TODO: add this error to the wiki
-            raise ServiceError("ERR-E4", 'Destination list not set to "right" or "left"')
-
-        if self._params.has_key('value'):
-            pm = ParameterManager(self._params)
-            self._value = pm.extract("value", pType=list, allowEmpty=False)
-        else:
-            self._value = None
-
-        if self._value == None:
-            return self._handleGet()
-        else:
-            self._handleSet()
-
-        return self._value
-
 
 class ExportToICalBase(object):
 
     def _checkParams(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._apiMode = minfo.getAPIMode()
         user = self._getUser()
         if not user:
             raise ServiceAccessError("User is not logged in!")
-        apiKey = user.getAPIKey()
+        apiKey = user.api_key
         if not apiKey:
             raise ServiceAccessError("User has no API key!")
-        elif apiKey.isBlocked():
+        elif apiKey.is_blocked:
             raise ServiceAccessError("This API key is blocked!")
         self._apiKey = apiKey

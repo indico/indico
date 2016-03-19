@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,14 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.conference import IMaterialMinimalFossil,\
-        IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
-from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
-    IContributionParticipationTTMgmtFossil, IContributionParticipationFossil
-from MaKaC.common.contextManager import ContextManager
+from MaKaC.fossils.conference import IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
+from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil, IContributionParticipationFossil
+
 
 class ISchEntryFossil(IFossil):
 
@@ -167,6 +164,29 @@ class IContribSchEntryFossil(ISchEntryFossil):
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
 
+class IAttachmentFossil(IFossil):
+    def id(self):
+        pass
+
+    def title(self):
+        pass
+
+    def download_url(self):
+        pass
+
+
+class IFolderFossil(IFossil):
+    def id(self):
+        pass
+
+    def title(self):
+        pass
+
+    def attachments(self):
+        pass
+    attachments.result = IAttachmentFossil
+
+
 class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
 
     def getURL(self):
@@ -179,10 +199,13 @@ class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
     getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
     getPDF.name = "pdf"
 
-    def getMaterial(self):
+    def getAttachments(self):
         """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getAllViewableMaterialList()
-    getMaterial.result = IMaterialMinimalFossil
+    getAttachments.produce = lambda s: s.getOwner().attached_items
+    getAttachments.result = {
+        'indico.modules.attachments.models.folders.AttachmentFolder': IFolderFossil,
+        'indico.modules.attachments.models.attachments.Attachment': IAttachmentFossil
+    }
 
     def getPresenters(self):
         """ Entry Presenters """
@@ -351,15 +374,18 @@ class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
     getEntries.result = {"MaKaC.schedule.ContribSchEntry": IContribSchEntryDisplayFossil,
                          "MaKaC.schedule.BreakTimeSchEntry": IBreakTimeSchEntryFossil}
 
-    def getMaterial(self):
-        """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getSession().getAllMaterialList()
-    getMaterial.result = IMaterialMinimalFossil
-
     def getConveners(self):
         """ Entry Conveners """
     getConveners.produce = lambda s: s.getOwner().getOwnConvenerList()
     getConveners.result = IConferenceParticipationMinimalFossil
+
+    def getAttachments(self):
+        """ Entry Material """
+    getAttachments.produce = lambda s: s.getOwner().getSession().attached_items
+    getAttachments.result = {
+        'indico.modules.attachments.models.folders.AttachmentFolder': IFolderFossil,
+        'indico.modules.attachments.models.attachments.Attachment': IAttachmentFossil
+    }
 
 
 class ILinkedTimeSchEntryMgmtFossil(ILinkedTimeSchEntryFossil):
@@ -387,12 +413,3 @@ class IConferenceScheduleDisplayFossil(IFossil):
     getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
                          "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
                          "ContribSchEntry": IContribSchEntryDisplayFossil}
-
-
-class IConferenceScheduleMgmtFossil(IFossil):
-
-    def getEntries(self):
-        """ Schedule Entries """
-    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
-                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
-                         "ContribSchEntry": IContribSchEntryMgmtFossil}

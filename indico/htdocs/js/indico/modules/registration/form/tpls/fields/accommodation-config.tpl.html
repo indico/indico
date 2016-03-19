@@ -1,0 +1,86 @@
+<ng-form name="nestedAccommodationConfigForm">
+    <table class="regFormDialogEditDatesOffset">
+        <tr class="regFormDialogCaptionLine">
+            <td>
+                <label class="regFormDialogCaptionLine">
+                    <span>{{ 'Arrival dates' | i18n }}:</span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'From' | i18n }}</td>
+            <td>
+                <input
+                    id="arrival-from-{{ section.id }}-{{ field.id }}"
+                    type="text"
+                    date-format="dd/mm/yy"
+                    ng-model="formData.arrivalDateFrom"
+                    validation="validationStarted"
+                    tabindex="-1"
+                    ng-class="{hasError: validationStarted && !arrivalDatesValid()}"
+                    ng-model="formData.arrivalDateFrom"
+                    nd-jquery-datepicker>
+            </td>
+            <td rowspan="2">
+                <span ng-if="!arrivalDatesValid()" class="error-message-tag">
+                    {{ 'Specified date range is not valid.' | i18n }}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'To' | i18n }}</td>
+            <td>
+                <input
+                    id="arrival-to-{{ section.id }}-{{ field.id }}"
+                    type="text"
+                    validation="validationStarted"
+                    date-format="dd/mm/yy"
+                    tabindex="-1"
+                    ng-class="{hasError: validationStarted && !arrivalDatesValid()}"
+                    ng-model="formData.arrivalDateTo"
+                    nd-jquery-datepicker>
+            </td>
+        </tr>
+
+        <tr class="regFormDialogCaptionLine">
+            <td colspan="3">
+                <label class="regFormDialogCaptionLine">
+                    <span>{{ 'Departure dates' | i18n }}:</span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'From' | i18n }}</td>
+            <td>
+                <input
+                    id="departure-from-{{ section.id }}-{{ field.id }}"
+                    type="text"
+                    validation="validationStarted"
+                    date-format="dd/mm/yy"
+                    tabindex="-1"
+                    ng-class="{hasError: validationStarted && !departureDatesValid()}"
+                    ng-model="formData.departureDateFrom"
+                    nd-jquery-datepicker>
+            </td>
+            <td rowspan="2">
+                <span ng-if="!departureDatesValid()" class="error-message-tag">
+                    {{ 'Specified date range is not valid.' | i18n }}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'To' | i18n }}</td>
+            <td>
+                <input
+                    type="text"
+                    id="departure-to-{{ section.id }}-{{ field.id }}"
+                    validation="validationStarted"
+                    date-format="dd/mm/yy"
+                    tabindex="-1"
+                    ng-class="{hasError: validationStarted && !departureDatesValid()}"
+                    ng-model="formData.departureDateTo"
+                    nd-jquery-datepicker>
+            </td>
+        </tr>
+    </table>
+</ng-form>

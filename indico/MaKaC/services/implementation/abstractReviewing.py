@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.fossilize import fossilize
 import MaKaC.user as user
 
+from indico.util.user import principal_from_fossil
 
 ##########################################
 ###  Abstract reviewing questions classes
@@ -158,10 +159,9 @@ class AbstractReviewingAddReviewer(AbstractReviewingBase):
         self._reviewerList = pm.extract("userList", pType=list, allowEmpty=False)
 
     def _getAnswer(self):
-        for reviewer in self._reviewerList:
-            ah = user.AvatarHolder()
-            av = ah.getById(reviewer["id"])
-            self._conf.getTrackById(self._trackId).addCoordinator(av)
+        principals = [principal_from_fossil(f, allow_pending=True) for f in self._reviewerList]
+        for reviewer in principals:
+            self._conf.getTrackById(self._trackId).addCoordinator(reviewer)
         return fossilize(self._conf.getTrackById(self._trackId).getCoordinatorList())
 
 
@@ -207,4 +207,3 @@ methodMap = {
     "team.addReviewer": AbstractReviewingAddReviewer,
     "team.removeReviewer": AbstractReviewingRemoveReviewer
     }
-

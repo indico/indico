@@ -84,6 +84,7 @@
             ${ _('This location supports dynamic equipment management.') }
           </p>
           <form action="${ urlHandlers.UHRoomBookingSaveEquipment.getURL(location) }" method="POST">
+            <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
             <p>
               <input type="text" id="newEquipmentName" name="newEquipmentName" value="" size="28">
               <input type="submit" class="i-button" value="Add">
@@ -91,6 +92,7 @@
           </form>
           % if equipment_types:
             <form action="${ urlHandlers.UHRoomBookingDeleteEquipment.getURL(location) }" method="POST">
+              <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
               <p>
                 <select name="removeEquipmentName" id="removeEquipmentName">
                   % for eq in equipment_types:
@@ -127,6 +129,7 @@
                 ${ _('This location supports dynamic attributes management.') }
             </p>
             <form action="${ urlHandlers.UHRoomBookingSaveCustomAttributes.getURL(location) }" method="POST">
+              <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
               <table>
                 <tr>
                     <td style="width: 200px;">
@@ -156,7 +159,11 @@
                       <input type="checkbox" name="${ 'cattr_hid_' + attr.name }" ${ 'checked' if attr.is_hidden else '' }>
                     </td>
                     <td>
-                      <input type="button" class="i-button js-delete-attribute" value="Remove" data-href="${ url_for('rooms_admin.roomBooking-deleteCustomAttribute', location, removeCustomAttributeName=attr.name) }">
+                      <input type="button" class="i-button" value="Remove"
+                             data-href="${ url_for('rooms_admin.roomBooking-deleteCustomAttribute', location, removeCustomAttributeName=attr.name) }"
+                             data-method="POST"
+                             data-title="${ _('Delete attribute?') }"
+                             data-confirm="${ _('Do you really want to delete this attribute?') }">
                     </td>
                   </tr>
                 % endfor
@@ -245,10 +252,11 @@
         });
         new ConfirmPopup($T("Delete room"), $T("Are you sure you want to delete this room? All related bookings will also be deleted. this action is PERMANENT!"), function(confirmed) {
             if (confirmed) {
+                var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
                 $('<form>', {
                     method: 'POST',
                     action: url
-                }).appendTo(document.body).submit();
+                }).append(csrf).appendTo(document.body).submit();
             }
         }).open();
     });
@@ -323,7 +331,7 @@ indicoRequest(
         if (!error) {
             var aspectsListField = new MapAspectListField(
                 'AspectsListDiv',
-                'PeopleList',
+                'user-list',
                 result,
                 newAspectsHandler,
                 editAspectHandler,
@@ -479,14 +487,3 @@ indicoRequest(
 </td>
 </tr>
 </table>
-<script>
-    $('.js-delete-attribute').on('click', function() {
-        if (!confirm($T('Do you really want to delete this attribute?'))) {
-            return;
-        }
-        $('<form>', {
-            action: $(this).data('href'),
-            method: 'post'
-        }).appendTo('body').submit();
-    });
-</script>

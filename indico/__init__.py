@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.util.patches import apply_patches
+from indico.util.mimetypes import register_custom_mimetypes
+
+register_custom_mimetypes()
 
 # monkey-patches for older Python versions
 apply_patches()
-
-__import__('pkg_resources').declare_namespace(__name__)

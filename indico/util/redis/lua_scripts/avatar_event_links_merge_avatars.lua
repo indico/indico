@@ -21,7 +21,7 @@ for _, event in ipairs(avatar_src_events) do
 end
 
 -- Merge avatar=>event mapping. Ignore source weights - they should be the same anyway.
-redis.call('ZUNIONSTORE', avatar_events_key, 2, avatar_events_key, avatar_src_events_key, 'WEIGHTS', 1, 0)
+redis.call('ZUNIONSTORE', avatar_events_key, 2, avatar_events_key, avatar_src_events_key, 'WEIGHTS', 1, 1, 'AGGREGATE', 'MAX')
 
 -- Remove source from avatar=>event mapping
 redis.call('DEL', avatar_src_events_key)

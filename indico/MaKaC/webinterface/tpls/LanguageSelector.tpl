@@ -1,6 +1,7 @@
 <%page args="Languages=None, IsHeader=None, dark=None"/>
 
-<form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }" style="display:none;">
+<form id="languageForm" method="post" action="${ url_for('misc.changeLang') }" style="display:none;">
+    <input type="hidden" name="next" value="${ _request.relative_url }">
     <input id="languageInputHidden" type="hidden" name="lang" value="${ SelectedLanguage.lower() }">
 </form>
 
@@ -22,7 +23,7 @@ languageLink.observeClick(function(e) {
     var inputHidden = $E('languageInputHidden');
 
     // build a dictionary that represents the menu
-    % for k,v in Languages.iteritems():
+    % for k,v in sorted(Languages.items(), key=lambda x: x[1]):
         menuItems['${ v }'] = {action:function() {inputHidden.dom.value = '${ k }'; form.dom.submit()}, display:'${ v }'};
     % endfor
 

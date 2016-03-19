@@ -1,0 +1,31 @@
+{% extends 'emails/base.html' %}
+
+{% block header_recipient -%}
+    {person_name}
+{%- endblock %}
+
+{% block body %}
+    {% block body_text %}
+        There is an agreement you are requested to sign for the event:<br>
+        <strong>{{ event.title }}</strong><br><br>
+
+        {% block body_agreement_request %}
+            You can sign it on the following page:
+        {% endblock %}<br>
+        {agreement_link}
+    {% endblock %}
+
+    {% if session %}
+        <br><br>
+        Best regards<br>
+        {{ session.user.full_name }}
+    {% endif %}
+{%- endblock %}
+
+{% block footer_title %}Agreements{% endblock %}
+{% block footer %}
+    {# Show default footer if sent from command line #}
+    {% if not session.user %}
+        {{ super() }}
+    {% endif %}
+{% endblock %}

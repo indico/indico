@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ type("ListOfUsersManager", [], {
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
                                                     onlyOne, showToggleFavouriteButtons, false,
-                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv);
+                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv, self.allowExternal);
         chooseUsersPopup.execute();
     },
 
@@ -60,15 +60,22 @@ type("ListOfUsersManager", [], {
         indicoRequest(
                 method, params,
                 function(result, error) {
-                    if (!error) {
+                    if (progress) {
+                        killProgress();
+                    }
+                    if (error) {
+                        IndicoUtil.errorReport(error);
+                        return;
+                    }
+                    if (result === 'confirm_remove_self') {
+                        var msg = $T.gettext('This is the last entry for yourself. By removing it you may lose access to the event unless you are a category manager.');
+                        confirmPrompt(msg).then(function() {
+                            params.force = '1';
+                            self._manageUserList(method, params, progress);
+                        });
+                    } else {
                         self._updateUsersList(result);
                         self._drawUserList();
-                        if (progress)
-                            killProgress();
-                    } else {
-                        if (progress)
-                            killProgress();
-                        IndicoUtil.errorReport(error);
                     }
                 }
         );
@@ -81,62 +88,57 @@ type("ListOfUsersManager", [], {
     },
 
     _personName: function(user) {
+        var self = this,
+            data = {};
+
         if (user._type && user._type.indexOf("Group") != -1) {
-            var fullName = user.name;
+            data.name = user.name;
         } else {
-            if (user.pending) {
-                var fullName = $T('Non-registered user');
+            if (user.pending || user._type == 'Email') {
+                data.name = user.email;
             } else {
-                var fullName = user.familyName.toUpperCase() + (user.firstName?(', ' + user.firstName):'');
+                data.name = user.firstName + ' ' + user.familyName;
             }
         }
-        if (this.nameOptions['title'] && user.title) {
-            fullName = user.title + ' ' + fullName;
-        }
-        if (this.nameOptions['affiliation'] && user.affiliation) {
-            fullName += " (" + user.affiliation + ")";
-        }
-        if ((this.nameOptions['email'] || user.pending) && user.email) {
-            fullName += '<small> (' + user.email + ')</small>';
-        }
-        return fullName;
+
+        $.each(['affiliation', 'email'], function(i, prop) {
+            if (self.nameOptions[prop] && user[prop]) {
+                data[prop] = user[prop];
+            }
+        });
+
+        return data;
     },
 
-    _component_order: ['remove', 'edit', 'favorite', 'menu', 'arrows'],
+    _component_order: ['favorite', 'edit', 'remove', 'menu', 'arrows'],
 
     _components: {
 
         menu: function(user) {
             var self = this;
             if (!user.pending && user._type.indexOf("Group") == -1) {
-                var optionsMenuSpan = $('<span/>').css('float', 'right');
-                var optionsMenuLink = $('<a/>').attr({
+                var optionsMenuLink = $('<a>').attr({
                     id: user.id,
-                    'class': 'dropDownMenu fakeLink',
-                    style: 'margin-left:15px; margin-right:15px'
-                }).append($T('More')).click(function(event) {
+                    'class': 'user-menu icon-handle',
+                }).click(function(event) {
                     self.userOptions.onMenu.call(self, this, user);
                 });
-                optionsMenuSpan.append(optionsMenuLink);
-                return optionsMenuSpan;
+                return optionsMenuLink;
             }
         },
 
         favorite: function(user) {
             if (user._type == "Avatar") {
-                return $('<span/>').css({'float':'right'}).
-                    html(new ToggleFavouriteButton(user, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
+                return create_favorite_button(user.id);
             }
         },
 
         remove: function(user) {
             var self = this;
             // remove icon
-            return $('<img/>').attr({
-                src: imageSrc("remove"), alt: $T('Remove ') + self.userCaption,
+            return $('<i>').attr({
                 title: $T('Remove this ') + self.userCaption + $T(' from the list'),
-                'class': 'UIRowButton2',
-                style: "margin-right:10px; float:right; cursor:pointer;"
+                'class': 'remove-user icon-close',
             }).click(function(event) {
                 self.userOptions.onRemove.call(self, user);
             });
@@ -145,12 +147,10 @@ type("ListOfUsersManager", [], {
 
         edit: function(user, callback) {
             var self = this;
-            return $('<img />').attr({
-                src: imageSrc("edit"),
+            return $('<i>').attr({
                 alt: $T('Edit ') + this.userCaption,
                 title: $T('Edit this ') + this.userCaption,
-                'class': 'UIRowButton2',
-                style:'float: right; cursor: pointer;'
+                'class': 'edit-user icon-edit',
             }).click(function(event) {
                 self.userOptions.onEdit.call(self, user);
             });
@@ -201,7 +201,12 @@ type("ListOfUsersManager", [], {
             var kindOfUser = "pending";
             this._manageUserList(this.methods["remove"], this._getRemoveParams(user.email, kindOfUser), this.blockOnRemove);
         } else {
-            this._manageUserList(this.methods["remove"], this._getRemoveParams(user.id), this.blockOnRemove);
+            var params = $.extend(
+                {},
+                this._getRemoveParams(user.id),
+                {principal: _.pick(user, '_type', 'id', 'provider')}
+            );
+            this._manageUserList(this.methods["remove"], params, this.blockOnRemove);
         }
     },
 
@@ -275,21 +280,36 @@ type("ListOfUsersManager", [], {
         var container = $(this.inPlaceListElem.dom).html('');
 
         this.usersList.each(function(val, idx) {
-            var user = val;
-            var elemStyle = self.elementClass;
-            if (user._type == 'Group')
-                elemStyle = "UIGroup";
+            var user = val,
+                class_ = self.elementClass,
+                data = self._personName(user);
 
-            var row = $('<li/>').attr('class', elemStyle);
+            if (user._type && ~user._type.indexOf('Group'))
+                class_ = "item-group";
+
+            var row = $('<li>').attr('class', class_),
+                info = $('<div class="info">').appendTo(row),
+                actions = $('<span class="actions">').appendTo(row);
 
             _(self._component_order).each(function(opt, idx) {
                 if (self.userOptions[opt]) {
                     var comp = self._components[opt].call(self, user, self.userOptions[opt]);
-                    row.append(comp);
+                    actions.append(comp);
                 }
             });
-            row.append($('<span class="nameLink" />').append(
-                    self._personName(user)));
+
+            $.each(['name', 'email', 'affiliation'], function(i, key) {
+                if (data[key] !== undefined) {
+                    info.append($('<span class="' + key + '">').text(data[key]));
+                }
+            });
+
+            $.each(data.roles || [], function(i, role) {
+                info.append($('<span class="role">').text(role));
+            });
+
+            row.append(actions);
+
             container.append(row);
         });
         this._checkEmptyList();
@@ -369,7 +389,7 @@ type("ListOfUsersManager", [], {
 },
 
     function(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
-             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu) {
+             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu, allowExternal) {
 	    var self = this;
         this.confId = confId;
         this.methods = methods;
@@ -415,6 +435,7 @@ type("ListOfUsersManager", [], {
         }
 
         this.addManagementMenu();
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
     }
 );
 

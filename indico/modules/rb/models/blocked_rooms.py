@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
 
 from datetime import datetime, time
 from operator import attrgetter
@@ -47,7 +49,7 @@ class BlockedRoom(db.Model):
     state = db.Column(
         PyIntEnum(BlockedRoomState),
         nullable=False,
-        default=State.pending
+        default=BlockedRoomState.pending
     )
     rejected_by = db.Column(
         db.String
@@ -67,13 +69,17 @@ class BlockedRoom(db.Model):
         index=True
     )
 
+    # relationship backrefs:
+    # - blocking (Blocking.blocked_rooms)
+    # - room (Room.blocked_rooms)
+
     @property
     def state_name(self):
-        return self.State(self.state).title
+        return BlockedRoomState(self.state).title
 
     @classmethod
     def find_with_filters(cls, filters):
-        q = cls.find(_eager=BlockedRoom.blocking, _join=Blocking)
+        q = cls.find(_eager=BlockedRoom.blocking, _join=BlockedRoom.blocking)
         if filters.get('room_ids'):
             q = q.filter(BlockedRoom.room_id.in_(filters['room_ids']))
         if filters.get('start_date') and filters.get('end_date'):
@@ -85,16 +91,16 @@ class BlockedRoom(db.Model):
 
     def reject(self, user=None, reason=None):
         """Reject the room blocking."""
-        self.state = self.State.rejected
+        self.state = BlockedRoomState.rejected
         if reason:
             self.rejection_reason = reason
         if user:
-            self.rejected_by = user.getFullName()
+            self.rejected_by = user.full_name
         notify_request_response(self)
 
     def approve(self, notify_blocker=True):
         """Approve the room blocking, rejecting all colliding reservations/occurrences."""
-        self.state = self.State.accepted
+        self.state = BlockedRoomState.accepted
 
         # Get colliding reservations
         start_dt = datetime.combine(self.blocking.start_date, time())
@@ -123,7 +129,7 @@ class BlockedRoom(db.Model):
             _join=Reservation
         )
 
-        reason = u'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
+        reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
 
         for reservation in reservations:
             if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
@@ -143,7 +149,7 @@ class BlockedRoom(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<BlockedRoom({0}, {1}, {2})>'.format(
+        return '<BlockedRoom({0}, {1}, {2})>'.format(
             self.blocking_id,
             self.room_id,
             self.state_name

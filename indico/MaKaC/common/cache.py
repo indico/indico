@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,18 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from Configuration import Config
-from MaKaC.errors import MaKaCError
+import cPickle as pickle
+import datetime
+import hashlib
+import os
+import time
+from itertools import izip
+
+from indico.core.config import Config
 from indico.core.logger import Logger
-from MaKaC.common import timezoneUtils
-from MaKaC.common.utils import OSSpecific
-from MaKaC.common.contextManager import ContextManager
 from indico.util.fs import silentremove
 from indico.util.redis import redis
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.utils import OSSpecific
 
-import hashlib, os, shutil, datetime, time
-import cPickle as pickle
-from itertools import izip
 
 class CacheStorage(object):
     __CACHE_STORAGE_LIST = {}
@@ -122,7 +124,8 @@ class MemcachedCacheStorage(CacheStorage):
         return hashlib.sha256(os.path.join(self._name, path, name)).hexdigest()
 
     def save(self, path, name, data):
-        self._connect().set(self._makeKey(path, name), pickle.dumps(data), self.getTTL())
+        self._connect().set(self._makeKey(path, name), pickle.dumps(data),
+                            MemcachedCacheClient.convert_ttl(self.getTTL()))
 
     def load(self, path, name, default=None):
         obj = self._connect().get(self._makeKey(path, name))
@@ -305,6 +308,15 @@ class _NoneValue(object):
 
 
 class CacheClient(object):
+    """This is an abstract class. A cache client provide a simple API to get/set/delete cache entries.
+
+    Implementation must provide the following methods:
+    - set(self, key, val, ttl)
+    - get(self, key)
+    - delete(self, key)
+
+    The unit for the ttl arguments is a second.
+    """
     def set_multi(self, mapping, ttl=0):
         for key, val in mapping.iteritems():
             self.set(key, val, ttl)
@@ -320,6 +332,15 @@ class CacheClient(object):
     def delete_multi(self, keys):
         for key in keys:
             self.delete(key)
+
+    def set(self, key, val, ttl=0):
+        raise NotImplementedError
+
+    def get(self, key):
+        raise NotImplementedError
+
+    def delete(self, key):
+        raise NotImplementedError
 
 
 class NullCacheClient(CacheClient):
@@ -470,7 +491,33 @@ class FileCacheClient(CacheClient):
         return 1
 
 
+class MemcachedCacheClient(CacheClient):
+    """Memcached-based cache client"""
+
+    @staticmethod
+    def convert_ttl(ttl):
+        """Convert a ttl in seconds to a timestamp for use with memcached."""
+        return (int(time.time()) + ttl) if ttl else 0
+
+    def __init__(self, servers):
+        import memcache
+        self._client = memcache.Client(servers)
+
+    def set(self, key, val, ttl=0):
+        return self._client.set(key, val, self.convert_ttl(ttl))
+
+    def get(self, key):
+        return self._client.get(key)
+
+    def delete(self, key):
+        return self._client.delete(key)
+
+
 class GenericCache(object):
+    """A simple cache interface that supports various backends.
+
+    The backends are accessed through the CacheClient interface.
+    """
     def __init__(self, namespace):
         self._client = None
         self._namespace = namespace
@@ -479,6 +526,10 @@ class GenericCache(object):
         return 'GenericCache(%r)' % self._namespace
 
     def _connect(self):
+        """Connect to the CacheClient.
+
+        This method must be called before accessing ``self._client``.
+        """
         # Maybe we already have a client in this instance
         if self._client is not None:
             return
@@ -491,8 +542,7 @@ class GenericCache(object):
         # If not, create a new one
         backend = Config.getInstance().getCacheBackend()
         if backend == 'memcached':
-            import memcache
-            self._client = memcache.Client(Config.getInstance().getMemcachedServers())
+            self._client = MemcachedCacheClient(Config.getInstance().getMemcachedServers())
         elif backend == 'redis':
             self._client = RedisCacheClient(Config.getInstance().getRedisCacheURL())
         elif backend == 'files':
@@ -521,6 +571,12 @@ class GenericCache(object):
         return ts
 
     def set(self, key, val, time=0):
+        """Set key to val with optional validity time.
+
+        :param key: the key of the cache entry
+        :param val: any python object that can be pickled
+        :param time: number of seconds or a datetime.timedelta
+        """
         self._connect()
         time = self._processTime(time)
         Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))

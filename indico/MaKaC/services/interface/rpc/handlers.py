@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -72,17 +72,13 @@ endpointMap = {
     "search": importModule('MaKaC.services.implementation.search'),
     "material": importModule('MaKaC.services.implementation.material'),
     "reviewing": importModule('MaKaC.services.implementation.reviewing'),
-    "minutes": importModule('MaKaC.services.implementation.minutes'),
     "news": importModule('MaKaC.services.implementation.news'),
     "category": importModule('MaKaC.services.implementation.category'),
     "upcomingEvents": importModule('MaKaC.services.implementation.upcoming'),
     "timezone": importModule('MaKaC.services.implementation.timezone'),
-    "scheduler": importModule('MaKaC.services.implementation.scheduler'),
     "abstractReviewing": importModule('MaKaC.services.implementation.abstractReviewing'),
     "abstract": importModule('MaKaC.services.implementation.abstract'),
     "abstracts": importModule('MaKaC.services.implementation.abstracts'),
     "admin": importModule('MaKaC.services.implementation.admin'),
-    "reportNumbers": importModule('MaKaC.services.implementation.reportNumbers'),
-    "oauth": importModule('MaKaC.services.implementation.oauth'),
-    "registration": importModule('MaKaC.services.implementation.registration')
+    "reportNumbers": importModule('MaKaC.services.implementation.reportNumbers')
 }

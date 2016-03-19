@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,13 +19,16 @@ and transparent way the system configuration (this is mainly done through the
 Config class).
 """
 
+import ast
 import copy
 import os
 import socket
 import sys
 import urlparse
 
+import pytz
 from flask import request, current_app
+from werkzeug.urls import url_parse
 
 import MaKaC
 from indico.core.db import DBMgr
@@ -147,11 +150,11 @@ class Config:
                      "arrowRightMenuConfSelected": "arrowRightMenuConfSelected.png",
                      "bulletMenuConf": "bulletMenuConf.png",
                      "logoIndico": "logo_indico.png",
+                     "logoIndicoWhite": "logo_indico_white.png",
                      "indico_small": "indico_small.png",
                      "indico_co": "indico_co.png",
                      "login": "pict_login.png",
                      "tt_time": "tt_time.png",
-                     "table": "img_table.png",
                      "lectureMenu": "pict_event_negb.png",
                      "meetingMenu": "pict_meet_negb.png",
                      "conferenceMenu": "pict_conf_negb.png",
@@ -189,7 +192,6 @@ class Config:
                      "smallEmail": "smallEmail.png",
                      "closed": "closed.png",
                      "closeIcon": "close.png",
-                     "alarmIcon": "alarm.png",
                      "badge": "badge.png",
                      "badgeMargins": "badge_margins.png",
                      "loading": "loading.gif",
@@ -217,19 +219,6 @@ class Config:
                      "smallClone": "smallClone.png",
                      "file_edit": "file_edit.png",
                      "file_protect": "file_protect.png",
-                     "form_CheckBox": "form_CheckBox.png",
-                     "form_Select": "form_Select.png",
-                     "form_PasswordBox": "form_PasswordBox.png",
-                     "form_RadioButton": "form_RadioButton.png",
-                     "form_TextArea": "form_TextArea.png",
-                     "form_TextBox": "form_TextBox.png",
-                     "form_TextBox_": "form_TextBox_.png",
-                     "form_CheckBox_": "form_CheckBox_.png",
-                     "form_Select_": "form_Select_.png",
-                     "form_PasswordBox_": "form_PasswordBox_.png",
-                     "form_RadioButton_": "form_RadioButton_.png",
-                     "form_Text_": "form_Text_.png",
-                     "form_TextArea_": "form_TextArea_.png",
                      "add": "add.png",
                      "add_faded": "add_faded.png",
                      "remove": "remove.png",
@@ -275,8 +264,6 @@ class Config:
                      "star": "star.png",
                      "starGrey": "starGrey.png",
                      "calendarWidget": "calendarWidget.png",
-                     "syncOff": "sync_off.png",
-                     "syncOn": "sync_on.png",
                      "facebook": "facebook.png",
                      "twitter": "twitter.png",
                      "gplus": "gplus.png",
@@ -474,8 +461,6 @@ class Config:
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',
         'BaseSecureURL'             : 'https://localhost/',
-        'LoginURL'                  : "",
-        'RegistrationURL'           : "",
         'ConfigurationDir'          : "/opt/indico/etc",
         'DocumentationDir'          : "/opt/indico/doc",
         'HtdocsDir'                 : "/opt/indico/htdocs",
@@ -496,25 +481,22 @@ class Config:
         'SupportEmail'              : 'root@localhost',
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
-        'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
-        'DisplayLoginPage'          : "yes",
-        'AuthenticatorList'         : [('Local',{})],
         'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
         'AuthenticatedEnforceSecure': 'no',
-        'MaxUploadFilesTotalSize'   : '0',
-        'MaxUploadFileSize'         : '0',
+        'MaxUploadFilesTotalSize'   : 0,
+        'MaxUploadFileSize'         : 0,
         'ForceConflicts'            : 0,
         'PropagateAllExceptions'    : False,
         'Debug'                     : False,
         'EmbeddedWebserver'         : False,
-        'EmbeddedWebserverBaseURL'  : None,
-        'OAuthAccessTokenTTL'       : 10000,
+        'OAuthGrantTokenTTL'        : 120,
         'MobileURL'                 : '',
         'CheckinURL'                : 'http://old.indico-software.org/wiki/apps/check-in',
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
+        'UseProxy'                  : False,
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
@@ -525,7 +507,24 @@ class Config:
         'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {},
         'JanitorUserId'             : 0,
-        'Plugins'                   : {}
+        'Plugins'                   : {},
+        'AuthProviders'             : {},
+        'IdentityProviders'         : {},
+        'ProviderMap'               : {},
+        'LocalIdentities'           : True,
+        'ExternalRegistrationURL'   : '',
+        'SecretKey'                 : None,
+        'DefaultTimezone'           : 'UTC',
+        'CeleryBroker'              : None,
+        'CeleryResultBackend'       : None,
+        'CeleryConfig'              : {},
+        'ScheduledTaskOverride'     : {},
+        'CheckinAppClientId'        : None,
+        'FlowerClientId'            : None,
+        'FlowerURL'                 : None,
+        'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
+        'AttachmentStorage'         : 'default',
+        'TrackerURL'                : 'http://localhost:5000/api'
     }
 
     if sys.platform == 'win32':
@@ -545,26 +544,6 @@ class Config:
         self.__readConfigFile()
         self._shelf = None
 
-
-    def updateValues(self, newValues):
-        """The argument is a dictionary.
-        This function updates only the values provided by the dictionary"""
-        for k in newValues:
-            if k in self._configVars:
-                self._configVars[k] = newValues[k]
-
-    def forceReload(self):
-        '''Forces Config to reread indico.conf and repopulate all of its variables'''
-        # We don't use __import__ or reload because if the file changes are done too fast
-        # Python doesn't see the changes and inconsistencies appear.
-        #     __import__('MaKaC.common.MaKaCConfig') < DOESNT WORK
-        #     reload(MaKaCConfig)                    < DOESNT WORK
-        execfile(os.path.abspath(os.path.join(os.path.dirname(__file__), 'MaKaCConfig.py')))
-        new_vals = locals()
-        for k in self._configVars:
-            if k in new_vals:
-                self._configVars[k] = new_vals[k]
-
     def reset(self, custom={}):
         """
         Resets the config to the default values (ignoring indico.conf) and
@@ -583,12 +562,17 @@ class Config:
         self._deriveOptions()
 
     def _deriveOptions(self):
-
         webinterface_dir = os.path.join(os.path.dirname(MaKaC.__file__), 'webinterface')
+
+        override = os.environ.get('INDICO_CONF_OVERRIDE')
+        if override:
+            override = ast.literal_eval(override)
+            assert isinstance(override, dict)
+            self._configVars.update(override)
 
         # Variables whose value is derived automatically
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
-        # Configuration.py will become fat again if you don't follow this advice.
+        # config.py will become fat again if you don't follow this advice.
         self._configVars.update({
             'TPLVars'                   : {"MaKaCHomeURL": self.getBaseURL()},
             'FileTypes'                 : FILE_TYPES,
@@ -611,8 +595,6 @@ class Config:
             'TPLDir'                    : os.path.abspath(os.path.join(webinterface_dir, 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
-            'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),
-            'FileConverterResponseURL'  : self.getFileConverter().get("response_url", ""),
             'ImagesBaseURL'             : self.getImagesBaseURL(),
             'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : MaKaC.__version__,
@@ -646,7 +628,6 @@ class Config:
         # options that are derived automatically
         self._deriveOptions()
 
-
         self.__tplFiles = {}
 
         if self.getSanitizationLevel() not in range(4):
@@ -670,6 +651,13 @@ class Config:
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
+
+        if self.getDefaultTimezone() not in pytz.all_timezones_set:
+            raise ValueError('Invalid default timezone: {}'.format(self.getDefaultTimezone()))
+
+        if self.getAttachmentStorage() not in self.getStorageBackends():
+            raise ValueError('Attachment storage "{}" is not defined in storage backends'.format(
+                self.getAttachmentStorage()))
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf
@@ -701,10 +689,10 @@ class Config:
             return False
 
     def getShortCategURL(self):
-        return '%s/c/' % self.getBaseURL()
+        return '%s/c/' % (self.getBaseSecureURL() or self.getBaseURL())
 
     def getShortEventURL(self):
-        return '%s/e/' % self.getBaseURL()
+        return '%s/e/' % (self.getBaseSecureURL() or self.getBaseURL())
 
     def getSmtpUseTLS(self):
         return self._yesOrNoVariable('SmtpUseTLS')
@@ -725,9 +713,6 @@ class Config:
             return None
         else:
             return val
-
-    def getDisplayLoginPage(self):
-        return self._yesOrNoVariable('DisplayLoginPage')
 
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
@@ -773,7 +758,7 @@ class Config:
         """gives back the css stylesheet name used by Indico"""
         template = 'Default'
 
-        # NOTE: don't move the import outside because we need Configuration.py
+        # NOTE: don't move the import outside because we need config.py
         # to be loaded from setup.py and at that point we don't have db access
         # and therefore the import will fail.
         import MaKaC.common.info as info
@@ -882,45 +867,38 @@ class Config:
             return id
         return self.__systemIcons[id]
 
-    def getArchivedFileURL(self, localFile):
-        return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
-
-
-    def hasFileConverter(self):
-        return self.getFileConverter().get("conversion_server", "") != ""
-
     def getSharedTempDir(self):
         std = self.getUploadedFilesSharedTempDir()
         if std == "":
             std = self.getUploadedFilesTempDir()
         return std
 
-    def getAuthenticatorConfigById(self, authId):
-        for auth, config in self.getAuthenticatorList():
-            if auth == authId:
-                return config
-        return {}
-
     def getImagesBaseURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/images"
         else:
-            return "%s/images" % self.getBaseURL()
+            return url_parse("%s/images" % self.getBaseURL()).path
 
     def getImagesBaseSecureURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/images"
         else:
-            return "%s/images" % self.getBaseSecureURL()
+            return url_parse("%s/images" % self.getBaseSecureURL()).path
 
     def getCssBaseURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/css"
         else:
-            return "%s/css" % self.getBaseURL()
+            return url_parse("%s/css" % self.getBaseURL()).path
 
     def getFontsBaseURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/fonts"
         else:
-            return "%s/fonts" % self.getBaseURL()
+            return url_parse("%s/fonts" % self.getBaseURL()).path
+
+    def getScriptBaseURL(self):
+        if ContextManager.get('offlineMode', False):
+            return 'static/js'
+        else:
+            return url_parse('%s/js' % self.getBaseURL()).path

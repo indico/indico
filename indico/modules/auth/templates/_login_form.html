@@ -1,0 +1,17 @@
+{% from 'forms/_form.html' import form_header, form_footer %}
+
+{% macro login_form(provider, form) %}
+    {{ form_header(form, id='login-form', i_form=false) }}
+        <input type="hidden" name="_provider" value="{{ provider.name }}">
+        <input type="submit" id="hidden-submit" style="display: none;">
+        {% for field in (form.visible_fields if form.visible_fields is defined else form) if field.short_name != 'csrf_token' %}
+            {{ field(placeholder=field.label.text, required=field.flags.required) }}
+        {% endfor %}
+        {% if provider.name == 'indico' or provider.settings.reset_password_url %}
+            <div class="forgot-my-password">
+                {% set url = url_for('.resetpass') if provider.name == 'indico' else provider.settings.reset_password_url %}
+                <a href="{{ url }}">{% trans %}Forgot my password{% endtrans %}</a>
+            </div>
+        {% endif %}
+    {{ form_footer(form, i_form=false) }}
+{% endmacro %}

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,10 +23,10 @@ import pytest
 from indico.core.errors import IndicoError
 from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
-from indico.testing.mocks import MockAvatarHolder
 from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_start, get_day_end
 from indico.util.struct.iterables import powerset
@@ -83,9 +83,10 @@ def test_urls(dummy_room):
     assert dummy_room.small_photo_url is not None
 
 
-def test_has_photo(dummy_room):
+def test_has_photo(db, dummy_room):
     assert not dummy_room.has_photo
-    dummy_room.photo_id = 0
+    dummy_room.photo = Photo()
+    db.session.flush()
     assert dummy_room.has_photo
 
 
@@ -184,7 +185,7 @@ def test_location_name(dummy_room, dummy_location):
     (2, False, True,  False, u'2 people, private, needs confirmation'),
     (2, True,  True,  False, u'2 people, public, needs confirmation'),
     (2, False, False, False, u'2 people, private, auto-confirmation'),
-    (2, False, True,  True,  u'2 people, private, needs confirmation, video conference')
+    (2, False, True,  True,  u'2 people, private, needs confirmation, videoconference')
 ))
 def test_marker_description(db, create_room, create_equipment_type,
                             capacity, is_reservable, reservations_need_confirmation, has_vc, expected):
@@ -196,19 +197,13 @@ def test_marker_description(db, create_room, create_equipment_type,
     assert room.marker_description == expected
 
 
-def test_owner(dummy_room, dummy_user):
+def test_owner(dummy_room, dummy_avatar):
+    assert dummy_room.owner == dummy_avatar
+
+
+def test_owner_after_change(dummy_room, dummy_user):
+    dummy_room.owner = dummy_user
     assert dummy_room.owner == dummy_user
-
-
-def test_owner_after_change(dummy_room, create_user):
-    other_user = create_user('other')
-    dummy_room.owner = other_user
-    assert dummy_room.owner == other_user
-
-
-def test_owner_with_no_id(dummy_room):
-    dummy_room.owner_id = None
-    assert dummy_room.owner is None
 
 
 @pytest.mark.parametrize(('value', 'emails'), (
@@ -445,11 +440,11 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
-def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
+def test_find_with_filters(db, dummy_room, create_room, dummy_avatar, create_equipment_type, create_room_attribute,
                            dummy_reservation):
     # Simple testcase that ensures we find the room when many filters are used
     other_room = create_room()
-    assert set(Room.find_with_filters({}, dummy_user)) == {dummy_room, other_room}
+    assert set(Room.find_with_filters({}, dummy_avatar)) == {dummy_room, other_room}
     create_room_attribute(u'attr')
     eq = create_equipment_type(u'eq')
     dummy_room.capacity = 100
@@ -466,7 +461,7 @@ def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equip
                'repeatability': 'None',
                'start_dt': dummy_reservation.start_dt,
                'end_dt': dummy_reservation.end_dt}
-    assert set(Room.find_with_filters(filters, dummy_user)) == {dummy_room}
+    assert set(Room.find_with_filters(filters, dummy_avatar)) == {dummy_room}
 
 
 def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):
@@ -530,10 +525,10 @@ def test_find_with_filters_only_public(dummy_room, create_room_attribute,
 
 @pytest.mark.parametrize(('owner_id', 'match'), (
     (1337, True),
-    (u'other', False)
+    (123,  False)
 ))
 def test_find_with_filters_only_my_rooms(dummy_room, create_user, owner_id, match):
-    user = MockAvatarHolder().getById(owner_id) or create_user(owner_id)
+    user = create_user(owner_id, legacy=True)
     if match:
         assert set(Room.find_with_filters({'is_only_my_rooms': True}, user)) == {dummy_room}
     else:
@@ -628,18 +623,18 @@ def test_has_live_reservations(dummy_room, create_reservation):
         bool_matrix('..1010.',                 expect=True) +           # no group
         bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
 )
-def test_can_be_booked(dummy_room, create_user, create_room_attribute,
+def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_group,
                        is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
     create_room_attribute(u'allowed-booking-group')
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     dummy_room.is_active = is_active
     dummy_room.is_reservable = is_reservable
     if in_group:
-        user.groups.add(u'bookers')
+        user.local_groups.add(create_group(123).group)
     if is_owned_by:
         dummy_room.owner = user
     if has_group:
-        dummy_room.set_attribute_value(u'allowed-booking-group', u'bookers')
+        dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
     assert dummy_room.can_be_booked(user, ignore_admin=ignore_admin) == expected
     assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
 
@@ -653,19 +648,19 @@ def test_can_be_booked(dummy_room, create_user, create_room_attribute,
         bool_matrix('..1010.',                 expect=True) +           # no group
         bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
 )
-def test_can_be_prebooked(dummy_room, create_user, create_room_attribute,
+def test_can_be_prebooked(dummy_room, create_user, create_room_attribute, create_group,
                           is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
     create_room_attribute(u'allowed-booking-group')
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     dummy_room.is_active = is_active
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = True
     if in_group:
-        user.groups.add(u'bookers')
+        user.local_groups.add(create_group(123).group)
     if is_owned_by:
         dummy_room.owner = user
     if has_group:
-        dummy_room.set_attribute_value(u'allowed-booking-group', u'bookers')
+        dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
     assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
 
 
@@ -674,21 +669,19 @@ def test_can_be_prebooked(dummy_room, create_user, create_room_attribute,
     (True,  True,  True),
     (True,  False, False),
 ))
-def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
-    user = create_user(u'user')
+def test_can_be_booked_prebooked_no_rb_access(dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
+    other_user = create_user(123)
     if has_acl:
-        acl = [(u'Avatar', dummy_user.id)]
+        rb_settings.acls.add_principal('authorized_principals', dummy_user)
         if in_acl:
-            acl.append((u'Avatar', user.id))
-        rb_settings.set('authorized_principals', acl)
-        db.session.flush()
-    assert dummy_room.can_be_booked(user) == expected
-    assert dummy_room.can_be_prebooked(user) == expected
+            rb_settings.acls.add_principal('authorized_principals', other_user)
+    assert dummy_room.can_be_booked(other_user) == expected
+    assert dummy_room.can_be_prebooked(other_user) == expected
 
 
 @pytest.mark.parametrize(('is_owner', 'is_admin', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected):
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     if is_owner:
         dummy_room.owner = user
     assert dummy_room.can_be_overridden(user) == expected
@@ -699,7 +692,7 @@ def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected
     (False, False)
 ))
 def test_can_be_modified_deleted(dummy_room, create_user, is_admin, expected):
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=True)
     assert dummy_room.can_be_modified(user) == expected
     assert dummy_room.can_be_deleted(user) == expected
 
@@ -714,18 +707,19 @@ def test_can_be_no_user(dummy_room):
 
 @pytest.mark.parametrize(('is_owner', 'has_group', 'in_group', 'expected'),
                          bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
-def test_ownership_functions(dummy_room, create_user, create_room_attribute, is_owner, has_group, in_group, expected):
-    user = create_user(u'user')
+def test_ownership_functions(dummy_room, create_user, create_room_attribute, create_group,
+                             is_owner, has_group, in_group, expected):
+    other_user = create_user(123)
     create_room_attribute(u'manager-group')
     if is_owner:
-        dummy_room.owner = user
+        dummy_room.owner = other_user
     if has_group:
-        dummy_room.set_attribute_value(u'manager-group', u'managers')
+        dummy_room.set_attribute_value(u'manager-group', u'123')
     if in_group:
-        user.groups.add(u'managers')
-    assert dummy_room.is_owned_by(user) == expected
-    assert Room.user_owns_rooms(user) == expected
-    assert set(Room.get_owned_by(user)) == ({dummy_room} if expected else set())
+        other_user.local_groups.add(create_group(123).group)
+    assert dummy_room.is_owned_by(other_user) == expected
+    assert Room.user_owns_rooms(other_user) == expected
+    assert set(Room.get_owned_by(other_user)) == ({dummy_room} if expected else set())
 
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'max_advance_days', 'days_delta', 'success'), (
@@ -738,7 +732,7 @@ def test_ownership_functions(dummy_room, create_user, create_room_attribute, is_
     (False, False, 10,   15, False)
 ))
 def test_check_advance_days(create_user, dummy_room, is_admin, is_owner, max_advance_days, days_delta, success):
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     dummy_room.max_advance_days = max_advance_days
     end_date = date.today() + timedelta(days=days_delta)
     if is_owner:
@@ -760,7 +754,7 @@ def test_check_advance_days_no_user(dummy_room):
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'fits', 'success'), bool_matrix('...', expect=any))
 def test_check_bookable_hours(db, dummy_room, create_user, is_admin, is_owner, fits, success):
-    user = create_user(u'user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     if is_owner:
         dummy_room.owner = user
     dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]

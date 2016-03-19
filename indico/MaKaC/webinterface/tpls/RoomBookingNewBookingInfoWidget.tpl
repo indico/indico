@@ -1,7 +1,7 @@
 <%page args="form=None"/>
 
 <%
-    fields = ['booked_for_id', 'contact_email', 'contact_phone', 'booking_reason']
+    fields = ['booked_for_user', 'contact_email', 'contact_phone', 'booking_reason']
     field_args = {
         'booking_reason': {'rows': 3, 'placeholder': _('Reason...')}
     }
@@ -21,10 +21,6 @@
                     </span>
                 % endif
                 ${ form[field](**field_args.get(field, {})) }
-                % if field == 'booked_for_id':
-                    ${ form.booked_for_name(readonly=True) }
-                    <input type="button" id="searchUsers" value="${ _('Search') }" class="i-button">
-                % endif
                 % if helpers.get(field):
                     <i class="info-helper" title="${ helpers[field] }"></i>
                 % endif
@@ -34,18 +30,15 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        $('#booked_for_name, #searchUsers').on('click', function() {
-            new ChooseUsersPopup(
-                $T('Select a user'),
-                true, null, false, true, null, true, true, false,
-                function(users) {
-                    $('#booked_for_name').val(users[0].name);
-                    $('#booked_for_id').val(users[0].id);
-                    $('#contact_email').val(users[0].email);
-                    $('#contact_phone').val(users[0].phone);
-                }
-            ).execute();
-        });
+    $('#booked_for_user').on('change', function() {
+        var user = JSON.parse($(this).val())[0];
+        if (user) {
+            $('#contact_email').val(user.email);
+            $('#contact_phone').val(user.phone);
+        }
     });
+
+    % if not reservation:
+        $('#booked_for_user').trigger('change');
+    % endif
 </script>

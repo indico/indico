@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,6 +20,7 @@ import cgi
 import shutil
 import xml.sax.saxutils as saxutils
 import uuid
+import re
 
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
@@ -39,7 +40,7 @@ from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 from MaKaC.common.TemplateExec import render as tpl_render
 import subprocess
-import os
+import pkg_resources
 import tempfile
 from MaKaC.common.logger import Logger
 
@@ -47,9 +48,11 @@ from mako.template import Template
 
 from indico.core.config import Config
 from indico.util import mdx_latex
+from indico.util.string import render_markdown
 import markdown
 from PIL import Image as PILImage
-from indico.util.string import sanitize_for_platypus
+from indico.util.string import sanitize_for_platypus, to_unicode
+
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -107,49 +110,49 @@ def modifiedFontSize(fontsize, lowerNormalHigher):
 
 alreadyRegistered = False
 
+
 def setTTFonts():
     global alreadyRegistered
     if not alreadyRegistered:
-        # Import fonts from indico.extra (separate package)
-        import indico.extra.fonts
-
-        dir=os.path.split(os.path.abspath(indico.extra.fonts.__file__))[0]
-        pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(dir,'LiberationSerif-Regular.ttf')))
-        pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'LiberationSerif-Bold.ttf')))
-        pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'LiberationSerif-Italic.ttf')))
-        pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'LiberationSerif-BoldItalic.ttf')))
+        distribution = pkg_resources.get_distribution('indico-fonts')
+        font_dir = os.path.join(distribution.location, 'indico_fonts')
+        pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(font_dir, 'LiberationSerif-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(font_dir, 'LiberationSerif-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(font_dir, 'LiberationSerif-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(font_dir, 'LiberationSerif-BoldItalic.ttf')))
         addMapping('Times-Roman', 0, 0, 'Times-Roman')
         addMapping('Times-Roman', 1, 0, 'Times-Bold')
         addMapping('Times-Roman', 0, 1, 'Times-Italic')
         addMapping('Times-Roman', 1, 1, 'Times-Bold-Italic')
-        pdfmetrics.registerFont(TTFont('Sans', os.path.join(dir,'LiberationSans-Regular.ttf')))
-        pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(dir, 'LiberationSans-Bold.ttf')))
-        pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(dir,'LiberationSans-Italic.ttf')))
-        pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(dir, 'LiberationSans-BoldItalic.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans', os.path.join(font_dir, 'LiberationSans-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(font_dir, 'LiberationSans-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(font_dir, 'LiberationSans-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(font_dir, 'LiberationSans-BoldItalic.ttf')))
         addMapping('Sans', 0, 0, 'Sans')
         addMapping('Sans', 1, 0, 'Sans-Bold')
         addMapping('Sans', 0, 1, 'Sans-Italic')
         addMapping('Sans', 1, 1, 'Sans-Bold-Italic')
-        pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'LiberationMono-Regular.ttf')))
-        pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'LiberationMono-Bold.ttf')))
-        pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'LiberationMono-Italic.ttf')))
-        pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'LiberationMono-BoldItalic.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier', os.path.join(font_dir, 'LiberationMono-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(font_dir, 'LiberationMono-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(font_dir, 'LiberationMono-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(font_dir, 'LiberationMono-BoldItalic.ttf')))
         addMapping('Courier', 0, 0, 'Courier')
         addMapping('Courier', 1, 0, 'Courier-Bold')
         addMapping('Courier', 0, 1, 'Courier-Italic')
         addMapping('Courier', 1, 1, 'Courier-Bold-Italic')
-        pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-4.4.1.ttf')))
-        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-4.1.0.ttf')))
-        pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_It-4.0.6.ttf')))
-        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(font_dir, 'LinLibertine_Re-4.4.1.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(font_dir, 'LinLibertine_Bd-4.1.0.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(font_dir, 'LinLibertine_It-4.0.6.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic',
+                                       os.path.join(font_dir, 'LinLibertine_BI-4.0.5.ttf')))
         addMapping('LinuxLibertine', 0, 0, 'LinuxLibertine')
         addMapping('LinuxLibertine', 1, 0, 'LinuxLibertine-Bold')
         addMapping('LinuxLibertine', 0, 1, 'LinuxLibertine-Italic')
         addMapping('LinuxLibertine', 1, 1, 'LinuxLibertine-Bold-Italic')
-        pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
-        pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
-        #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
+        pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(font_dir, 'kochi-mincho-subst.ttf')))
+        pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(font_dir, 'kochi-gothic-subst.ttf')))
         alreadyRegistered = True
+
 
 class Int2Romans:
 
@@ -175,8 +178,8 @@ class Paragraph(platypus.Paragraph):
     """
     add a part attribute for drawing the name of the current part on the laterPages function
     """
-    def __init__(self, test, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        platypus.Paragraph.__init__(self, test, style, bulletText, frags, caseSensitive)
+    def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
+        platypus.Paragraph.__init__(self, to_unicode(text), style, bulletText, frags, caseSensitive)
         self._part = part
 
     def setPart(self, part):
@@ -212,8 +215,8 @@ class TableOfContentsEntry(Paragraph):
         Class used to create table of contents entry with its number.
         Much faster than table of table of contents from platypus lib
     """
-    def __init__(self, test, pageNumber,style, part="", bulletText=None, frags=None, caseSensitive=1):
-        Paragraph.__init__(self, test, style, part, bulletText, frags, caseSensitive)
+    def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
+        Paragraph.__init__(self, to_unicode(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
         self._pageNumber = pageNumber
 
@@ -708,8 +711,11 @@ class PDFLaTeXBase(object):
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
+        def _convert_markdown(text):
+            return render_markdown(text, md=md.convert).encode('utf-8')
+
         self._args = {
-            'md_convert': md.convert
+            'md_convert': _convert_markdown
         }
 
     def generate(self):

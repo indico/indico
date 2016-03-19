@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,10 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from datetime import datetime
 from flask import session
 import os
-import re
 import pytz
 
 import MaKaC.common.info as info
@@ -24,23 +24,17 @@ import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPError404
 import MaKaC.conference as conference
 from indico.core.config import Config
-from indico.core.db import DBMgr
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import TimeTablePlain, AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
-from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
 import zipfile
 from cStringIO import StringIO
 from MaKaC.i18n import _
@@ -49,32 +43,14 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.http_api.hooks.event import CategoryEventHook
-from indico.web.flask.util import send_file
 from indico.core import signals
+from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout.views import WPPage
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
-
-
-class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams( self, params )
-        RHSignInBase._checkParams(self, params)
-        if self._returnURL == "":
-            self._returnURL = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-
-        self._disabledAccountURL = lambda av: urlHandlers.UHConfDisabledAccount.getURL(self._conf, av)
-        self._unactivatedAccountURL = lambda av: urlHandlers.UHConfUnactivatedAccount.getURL(self._conf, av)
-        self._signInPage = conferences.WPConfSignIn( self, self._conf )
-        self._signInPageFailed = conferences.WPConfSignIn( self, self._conf, login = self._login, msg = _("Wrong login or password")  )
-
-    def _addExtraParamsToURL(self):
-        pass
-
-    def _process(self):
-        return self._makeLoginProcess()
+from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
@@ -94,244 +70,6 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         self._redirect(url)
 
 
-class RHConfDisabledAccount( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-        self._userId = params.get( "userId", "" ).strip()
-
-    def _process( self ):
-        av = user.AvatarHolder().getById( self._userId )
-        p = conferences.WPConfAccountDisabled( self, self._conf, av )
-        return p.display()
-
-
-class RHConfUnactivatedAccount( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-        self._userId = params.get( "userId", "" ).strip()
-
-    def _process( self ):
-        av = user.AvatarHolder().getById(self._userId)
-        p = conferences.WPConfUnactivatedAccount( self, self._conf, av )
-        return p.display()
-
-
-class RHConfSendActivation( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-        self._userId = params.get( "userId", "" ).strip()
-
-    def _process( self ):
-        av = user.AvatarHolder().getById(self._userId)
-        sm = mail.sendConfirmationRequest(av, self._conf)
-        sm.send()
-        self._redirect( urlHandlers.UHConfSignIn.getURL( self._conf ) )
-
-
-class _UserUtils:
-
-    def setUserData( self, a, userData):
-        a.setName( userData["name"] )
-        a.setSurName( userData["surName"] )
-        a.setTitle( userData["title"] )
-        a.setOrganisation( userData["organisation"] )
-        a.setAddress( userData["address"] )
-        a.setEmail( userData["email"] )
-        a.setTelephone( userData["telephone"] )
-        a.setFax( userData["fax"] )
-        ##################################
-        # Fermi timezone awareness       #
-        ##################################
-        a.setTimezone(userData["timezone"])
-        a.setDisplayTZMode(userData["displayTZMode"])
-        ##################################
-        # Fermi timezone awareness(end)  #
-        ##################################
-    setUserData = classmethod(setUserData)
-
-
-class RHConfUserCreation(conferenceBase.RHConferenceBase):
-    _uh = urlHandlers.UHConfUserCreation
-
-    def _checkProtection(self):
-        pass
-
-    def _checkParams(self, params):
-        self._params = params
-        conferenceBase.RHConferenceBase._checkParams(self, params)
-        self._save = params.get("Save", "")
-        self._returnURL = params.get("returnURL", "").strip()
-        self._doNotSanitizeFields.append("password")
-        self._doNotSanitizeFields.append("passwordBis")
-
-    def _process(self):
-        save = False
-        authManager = AuthenticatorMgr()
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._params["msg"] = ""
-        if self._save:
-            save = True
-            #check submited data
-            if not self._params.get("name",""):
-                self._params["msg"] += _("You must enter a name.")+"<br>"
-                save = False
-            if not self._params.get("surName",""):
-                self._params["msg"] += _("You must enter a surname.")+"<br>"
-                save = False
-            if not self._params.get("organisation",""):
-                self._params["msg"] += _("You must enter the name of your organisation.")+"<br>"
-                save = False
-            if not self._params.get("email",""):
-                self._params["msg"] += _("You must enter an email address.")+"<br>"
-                save = False
-            if not self._params.get("login",""):
-                self._params["msg"] += _("You must enter a login.")+"<br>"
-                save = False
-            if not self._params.get("password",""):
-                self._params["msg"] += _("You must define a password.")+"<br>"
-                save = False
-            if self._params.get("password","") != self._params.get("passwordBis",""):
-                self._params["msg"] += _("You must enter the same password twice.")+"<br>"
-                save = False
-            if not authManager.isLoginAvailable(self._params.get("login", "")):
-                self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
-                save = False
-            if not self._validMail(self._params.get("email","")):
-                self._params["msg"] += _("You must enter a valid email address")
-                save = False
-        if save:
-            #Data are OK, Now check if there is an existing user or create a new one
-            ah = user.AvatarHolder()
-            res =  ah.match({"email": self._params["email"]}, exact=1, searchInAuthenticators=False)
-            if res:
-                #we find a user with the same email
-                a = res[0]
-                #check if the user have an identity:
-                if a.getIdentityList():
-                    self._redirect(urlHandlers.UHConfUserExistWithIdentity.getURL(self._conf, a))
-                    return
-                else:
-                    #create the identity to the user and send the comfirmation email
-                    li = user.LoginInfo(self._params["login"], self._params["password"])
-                    id = authManager.createIdentity(li, a, "Local")
-                    authManager.add(id)
-                    DBMgr.getInstance().commit()
-                    if minfo.getModerateAccountCreation():
-                        mail.sendAccountCreationModeration(a).send()
-                    else:
-                        mail.sendConfirmationRequest(a, self._conf).send()
-                        if minfo.getNotifyAccountCreation():
-                            mail.sendAccountCreationNotification(a).send()
-            else:
-                a = user.Avatar()
-                _UserUtils.setUserData( a, self._params )
-                ah.add(a)
-                li = user.LoginInfo( self._params["login"], self._params["password"] )
-                id = authManager.createIdentity( li, a, "Local" )
-                authManager.add( id )
-                DBMgr.getInstance().commit()
-                if minfo.getModerateAccountCreation():
-                    mail.sendAccountCreationModeration(a).send()
-                else:
-                    mail.sendConfirmationRequest(a).send()
-                    if minfo.getNotifyAccountCreation():
-                        mail.sendAccountCreationNotification(a).send()
-            self._redirect( urlHandlers.UHConfUserCreated.getURL( self._conf, a ) )
-        else:
-            p = conferences.WPConfUserCreation( self, self._conf, self._params )
-            return p.display()
-
-    def _validMail(self,email):
-        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",email):
-            return True
-        return False
-
-class RHConfUserCreated( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams( self, params )
-        self._av = user.AvatarHolder().getById(params["userId"])
-
-    def _process( self ):
-        p = conferences.WPConfUserCreated( self, self._conf, self._av )
-        return p.display()
-
-
-class RHConfActivate( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-        self._userId = params.get( "userId", "" ).strip()
-        self._key = params.get( "key", "" ).strip()
-        self._returnURL = params.get( "returnURL", "").strip()
-
-
-    def _process( self ):
-        av = user.AvatarHolder().getById(self._userId)
-        if av.isActivated():
-            p = conferences.WPConfAccountAlreadyActivated( self, self._conf, av )
-            return p.display()
-            #return "your account is already activated"
-        if av.isDisabled():
-            p = conferences.WPConfAccountDisabled( self, self._conf, av )
-            return p.display()
-            #return "your account is disabled. please, ask to enable it"
-        elif self._key == av.getKey():
-            av.activateAccount()
-            p = conferences.WPConfAccountActivated( self, self._conf, av, self._returnURL )
-            return p.display()
-            #return "Your account is activate now"
-        else:
-            return "Wrong key. Please, ask for a new one"
-
-
-class RHConfUserExistWithIdentity( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams( self, params )
-        self._av = user.AvatarHolder().getById(params["userId"])
-
-    def _process( self ):
-        p = conferences.WPConfUserExistWithIdentity( self, self._conf, self._av )
-        return p.display()
-
-
-class RHConfSendLogin( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams( self, params )
-        self._userId = params.get( "userId", "" ).strip()
-        self._email = params.get("email", "").strip()
-
-    def _process( self ):
-        av = None
-        if self._userId != "":
-            av = user.AvatarHolder().getById(self._userId)
-        elif self._email != "":
-            try:
-                av = user.AvatarHolder().match({"email": self._email}, exact=1)[0]
-            except IndexError:
-                pass
-        if av:
-            mail.send_login_info(av, self._conf)
-        self._redirect(urlHandlers.UHConfSignIn.getURL(self._conf))
-
-
-class RHConfResetPassword(RHResetPasswordBase, RHConferenceBase):
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        RHResetPasswordBase._checkParams(self, params)
-
-    def _getWP(self):
-        return conferences.WPConfResetPassword(self, self._conf)
-
-    def _getRedirectURL(self):
-        return urlHandlers.UHConfSignIn.getURL(self._conf)
-
-
 class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
 
     def _checkParams( self, params ):
@@ -346,7 +84,7 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
 
     def _checkProtection(self):
         # check users allowed by plugins
-        if any(values_from_signal(signals.event.core.has_read_access.send(self._conf, user=session.user))):
+        if any(values_from_signal(signals.event.has_read_access.send(self._conf, user=session.user))):
             return
         RHConferenceBaseDisplay._checkProtection(self)
 
@@ -370,11 +108,10 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
-            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+            view = layout_settings.get(self._conf, 'timetable_theme')
             # if no default view was attributed, then get the configuration default
-            if view == "" or not styleMgr.existsStyle(view):
-                view =styleMgr.getDefaultStyleForEventType( type )
-                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
+            if not view or not styleMgr.existsStyle(view):
+                view = styleMgr.getDefaultStyleForEventType(type)
         isLibxml = True
         warningText = ""
         try:
@@ -387,15 +124,11 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
             if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:
-                self._page = None
-                intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._target)
-                for page in intPagesMgr.getPagesList():
-                    if page.isHome():
-                        self._page = page
-                if not self._page:
-                    p = conferences.WPConferenceDisplay( self, self._target )
+                event = self._conf.as_event
+                if event.default_page_id is None:
+                    p = conferences.WPConferenceDisplay(self, self._conf)
                 else:
-                    p = conferences.WPInternalPageDisplay(self,self._target, self._page)
+                    p = WPPage.render_template('page.html', self._conf, page=event.default_page).encode('utf-8')
         elif view in styleMgr.getXSLStyles():
             if not isLibxml:
                 warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
@@ -409,7 +142,7 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
             else:
                 p = conferences.WPConferenceDisplay( self, self._target )
 
-        return warningText + p.display(**params)
+        return warningText + (p if isinstance(p, basestring) else p.display(**params))
 
 
 class RHRelativeEvent(RHConferenceBaseDisplay):
@@ -452,11 +185,10 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
-            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+            view = self._target.getDefaultStyle()
             # if no default view was attributed, then get the configuration default
             if view == "":
-                view =styleMgr.getDefaultStyleForEventType(type)
-                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle(view)
+                view = styleMgr.getDefaultStyleForEventType(type)
         # create the html factory
         if view in styleMgr.getXSLStyles() and isLibxml:
             p = conferences.WPXSLConferenceDisplay(self, self._target, view, type, self._reqParams)
@@ -468,45 +200,6 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
         if view == "xml" and self._reqParams.get('fr') == 'no':
             self._responseUtil.content_type = 'text/xml'
         return p.display()
-
-
-class RHConferenceGetLogo(RHConferenceBase):
-
-    def _process(self):
-        logo = self._target.getLogo()
-        if not logo:
-            raise MaKaCError(_("This event does not have a logo"))
-        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), no_cache=False, conditional=True)
-
-
-class RHConferenceGetCSS(RHConferenceBase):
-
-    """
-    CSS which is used just for a conference.
-    """
-
-    def _process(self):
-        sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        css = sm.getLocalCSS()
-        if css:
-            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', no_cache=False, conditional=True)
-        return ""
-
-
-class RHConferenceGetPic(RHConferenceBaseDisplay):
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._picId = params.get("picId", "")
-
-    def _process(self):
-        im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
-        if im.getPic(self._picId):
-            pic = im.getPic(self._picId).getLocalFile()
-            return send_file(pic.getFileName(), pic.getFilePath(), pic.getFileType())
-        else:
-            self._responseUtil.status = 404
-            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
 class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
@@ -600,7 +293,7 @@ class RHConferenceTimeTable(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceTimeTable
 
     def _process( self ):
-        defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+        defStyle = self._target.getDefaultStyle()
         if defStyle in ["", "static", "parallel"]:
             p = conferences.WPConferenceTimeTable( self, self._target )
             return p.display( **self._getRequestParams() )
@@ -636,7 +329,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
             self._showSpeakerAffiliation = True
         # Keep track of the used layout for getting back after cancelling
         # the export.
-        self._view = params.get("view", displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle())
+        self._view = params.get("view", self._target.getDefaultStyle())
 
     def _reduceFontSize( self ):
         index = self.fontsizes.index(self._fontsize)
@@ -932,64 +625,6 @@ class RHAbstractBook(RHConferenceBaseDisplay):
             return send_file(pdfFilename, cacheFile, 'PDF')
 
 
-class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConfParticipantsRefusal
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams(self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process(self):
-        params = self._getRequestParams()
-        participantId = params["participantId"]
-        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
-        if status == 'accepted':
-            raise NoReportError(_('You have already accepted the invitation.'))
-        elif status == 'rejected':
-            raise NoReportError(_('You have already rejected the invitation.'))
-        if self._cancel:
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-            self._redirect(url)
-        elif self._confirm:
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            participant.setStatusRefused()
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-            self._redirect(url)
-        else:
-            return conferences.WPConfModifParticipantsRefuse(self, self._conf).display(**params)
-
-
-class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConfParticipantsInvitation
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams(self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process( self ):
-        params = self._getRequestParams()
-        participantId = params["participantId"]
-        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
-        if status == 'accepted':
-            raise NoReportError(_('You have already accepted the invitation.'))
-        elif status == 'rejected':
-            raise NoReportError(_('You have already rejected the invitation.'))
-        if self._cancel:
-            if not self._conf.getParticipation().setParticipantRejected(participantId):
-                raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
-        elif self._confirm:
-            if not self._conf.getParticipation().setParticipantAccepted(participantId):
-                raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
-        else:
-            return conferences.WPConfModifParticipantsInvite( self, self._conf ).display(**params)
-
-
 class RHConferenceToiCal(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
@@ -1042,29 +677,6 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
 
 
-class RHInternalPageDisplay(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHInternalPageDisplay
-
-    def _checkParams(self, params):
-        self._page = None
-        RHConferenceBaseDisplay._checkParams(self, params)
-
-        if 'pageId' in params:
-            pageId = params.get("pageId")
-            intPagesMgr = internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf)
-            self._page = intPagesMgr.getPageById(pageId)
-            self._target = self._conf
-
-            if self._page is None:
-                raise NotFoundError(_("The web page you are trying to access does not exist"))
-        else:
-            raise NotFoundError(_("The web page you are trying to access does not exist"))
-
-    def _process(self):
-        p = conferences.WPInternalPageDisplay(self, self._conf, self._page)
-        return p.display()
-
-
 class RHConferenceLatexPackage(RHConferenceBaseDisplay):
 
     def _process(self):
@@ -1110,55 +722,3 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
         zipdata.seek(0)
 
         return send_file(filename, zipdata, 'ZIP', inline=False)
-
-
-class RHFullMaterialPackage(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConferenceDisplayMaterialPackage
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-
-    def _process( self ):
-
-        wf = self.getWebFactory()
-        if wf!=None : #Event == Meeting/Lecture
-            p = wf.getDisplayFullMaterialPackage(self,self._target)
-        else : #Event == Conference
-            p = conferences.WPDisplayFullMaterialPackage(self,self._target)
-        return p.display()
-
-
-class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConferenceDisplayMaterialPackagePerform
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._days = self._normaliseListParam(params.get("days", []))
-        self._mainResource = (params.get("mainResource", "") != "")
-        self._fromDate = ""
-        fromDay = params.get("fromDay", "")
-        fromMonth = params.get("fromMonth", "")
-        fromYear = params.get("fromYear", "")
-        if fromDay != "" and fromMonth != "" and fromYear != "" and \
-                fromDay != "dd" and fromMonth != "mm" and fromYear != "yyyy":
-            self._fromDate = "%s %s %s" % (fromDay, fromMonth, fromYear)
-        self._cancel = "cancel" in params
-        self._materialTypes = self._normaliseListParam(
-            params.get("materialType", []))
-        self._sessionList = self._normaliseListParam(
-            params.get("sessionList", []))
-
-    def _process(self):
-        if not self._cancel:
-            if self._materialTypes != []:
-                p = ConferencePacker(self._conf, self._aw)
-                path = p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(), self._sessionList)
-                if not p.getItems():
-                    raise NoReportError(_("The selected package does not contain any items."))
-                return send_file('full-material.zip', path, 'ZIP', inline=False)
-            else:
-                raise NoReportError(
-                    _("You have to select at least one material type"))
-        else:
-            self._redirect(
-                urlHandlers.UHConferenceDisplay.getURL(self._conf))

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,18 +21,12 @@ Indico HTTP export API
 from indico.web.http_api.hooks.base import DataFetcher, HTTPAPIHook
 from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
-from indico.web.http_api.hooks.registration import RegistrantsHook
-from indico.web.http_api.hooks.user import UserInfoHook
 # The following imports are NOT unused - without them these modules would never
 # be imported and thus their api hooks wouldn't be registered at all
+import indico.modules.attachments.api.hooks
+import indico.modules.events.api
 import indico.modules.events.agreements.api
+import indico.modules.events.registration.api
+import indico.modules.events.notes.api
 import indico.modules.rb.api
-
-
-API_MODE_KEY            = 0  # public requests without API key, authenticated requests with api key
-API_MODE_ONLYKEY        = 1  # all requests require an API key
-API_MODE_SIGNED         = 2  # public requests without API key, authenticated requests with api key and signature
-API_MODE_ONLYKEY_SIGNED = 3  # all requests require an API key, authenticated requests need signature
-API_MODE_ALL_SIGNED     = 4  # all requests require an api key and a signature
-
-API_MODES = (API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+import indico.modules.users.api

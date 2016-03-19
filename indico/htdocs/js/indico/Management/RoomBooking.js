@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -463,81 +463,8 @@ type("RoomListWidget", ["ListWidget"],
         this.removeProcess = removeProcess;
         this.useValue = useValue || false;
         if (!exists(style)) {
-            style = "UIPeopleList";
+            style = "user-list";
         }
         this.ListWidget(style);
     }
-);
-
-/**
- * Creates a form field with a list of rooms.
- * Rooms can be added from an initial list of rooms or from a 'Add Room' button.
- */
-type("RoomListField", ["IWidget"], {
-
-    getRoom: function() {
-        return $L(this.roomList);
-    },
-
-    clear: function() {
-        this.roomList.clearList();
-    },
-
-    draw: function() {
-
-        var self = this;
-
-        var chooserDiv = Html.div({style:{marginTop: pixels(10)}});
-        var callback = function(){
-            chooserDiv.set(roomChooser.draw(),addRoomButton);
-        };
-
-        if(this.allowNew) {
-            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback, null, null, null, false);
-            var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
-            addRoomButton.observeClick(function(){
-                var selectedValue = roomChooser.select.get();
-                self.newProcess(selectedValue, function(result){
-                    if (result) {
-                        var roomName = $('>option:selected', roomChooser.select.dom).text();
-                        self.roomList.set(selectedValue, roomName);
-                    }
-                });
-            });
-        }
-
-        return Widget.block([Html.div(this.roomDivStyle,this.roomList.draw()), chooserDiv]);
-    }
-},
-    /*
-     * @param {String} roomDivStyle A CSS class for the div that will sourround the room list.
-     * @param {String} roomListStyle A CSS class for the room list. It will be passed to the inner roomListWidget.
-     * @param {list} initialRooms A list of  room that will appear initially.
-     * @param {Boolean} allowNew If True, a 'Add Room' button will be present.
-     * @param {Function} newProcess A function that will be called when a new room is added to the list.
-     * @param {Function} removeProcess A function that will be called when a room is removed.
-     */
-    function(roomDivStyle, roomListStyle, initialRooms, allowNew, newProcess, removeProcess) {
-
-        var self = this;
-        this.roomList = new RoomListWidget(roomListStyle, function(roomToRemove, setResult) {
-            return removeProcess(roomToRemove, function(result) {
-                setResult(result);
-                if(result) {
-                    self.roomList.set(roomToRemove, null);
-                }
-            });
-        }, true);
-        this.roomDivStyle = any(roomDivStyle, "UIPeopleListDiv");
-
-        if (exists(initialRooms)) {
-            each (initialRooms,function(room, guid){
-                self.roomList.set(guid, room);
-            });
-        }
-
-        this.allowNew = any(allowNew, false);
-        this.newProcess = any(newProcess, roomListNothing);
-
-     }
 );

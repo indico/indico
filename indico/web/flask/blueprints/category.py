@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,7 +32,6 @@ category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', category
 category.add_url_rule('/<categId>/events.rss', 'categoryDisplay-rss', categoryDisplay.RHCategoryToRSS)
 category.add_url_rule('/<categId>/events.ics', 'categoryDisplay-ical', categoryDisplay.RHCategoryToiCal)
 category.add_url_rule('/<categId>/icon', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
-category.add_url_rule('/<categId>/statistics', 'categoryStatistics', categoryDisplay.RHCategoryStatistics)
 
 # Overview
 category.add_url_rule('/<categId>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)

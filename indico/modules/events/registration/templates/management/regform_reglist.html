@@ -1,0 +1,181 @@
+{% extends 'layout/full_content_base.html' %}
+{% from 'events/registration/management/_reglist.html' import render_registration_list %}
+
+{% block title %}
+    {%- trans %}Registration{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans title=regform.title %}List of registrations for "{{ title }}"{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="registrations">
+        <div class="toolbar">
+            <div class="group left">
+                <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
+                   title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
+                    <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="group left">
+                <button class="i-button icon-settings js-dialog-action js-customize-report {% if filtering_enabled %} highlight{% endif %}"
+                   data-href="{{ url_for('.customize_reglist', regform) }}"
+                   data-title="{% trans %}Registration list configuration{% endtrans %}">
+                    {% trans %}Customize report{% endtrans %}
+                </button>
+            </div>
+            <div class="group left">
+                <div id="indico-user-to-add" class="hidden"></div>
+                <a class="i-button arrow icon-plus" data-toggle="dropdown">
+                    {% trans %}Add new{% endtrans %}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="{{ url_for('.create_registration', regform) }}"
+                           data-title="{% trans %}Register a user that doesn't exist in Indico{% endtrans %}">
+                            {% trans %}New user{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="js-add-user"
+                           data-href="{{ url_for('.create_registration', regform) }}"
+                           data-title="{% trans %}Register a Indico user{% endtrans %}">
+                            {% trans %}Indico user{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+                <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
+                   data-href="{{ url_for('.delete_registrations', regform) }}"
+                   data-method="POST"
+                   data-confirm="{% trans %}Do you really want to delete the selected registrations?{% endtrans %}">
+                    {%- trans %}Remove{% endtrans -%}
+                </a>
+            </div>
+            <div class="group left">
+                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
+                            {%- trans %}PDF (table style){% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
+                            {%- trans %}PDF (book style){% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
+                    </li>
+                </ul>
+                <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Actions{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-mail js-dialog-send-email js-requires-selected-row disabled"
+                           data-href="{{ url_for('.email_registrants', regform) }}"
+                           data-title="{% trans %}Send email{% endtrans %}">
+                            {%- trans %}Email{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-tag js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_print_badges', regform) }}">
+                            {%- trans %}Print Badges{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           class="icon-attachment js-requires-selected-row disabled js-submit-reglist-form regform-download-attachments"
+                           data-href="{{ url_for('.registrations_attachments_export', regform) }}">
+                            {%- trans %}Download attachments{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
+                {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
+                {% if regform.moderation_enabled or pending_registrations %}
+                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                        {%- trans %}Moderation{% endtrans -%}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"
+                               data-href="{{ url_for('.registrations_modify_status', regform) }}"
+                               data-approve="1"
+                               data-method="POST"
+                               data-confirm="{% trans %}Do you really want to approve the selected registrations?{% endtrans %}">
+                                {%- trans %}Approve registrations{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
+                               data-href="{{ url_for('.registrations_modify_status', regform) }}"
+                               data-approve="0"
+                               data-method="POST"
+                               data-confirm="{% trans %}Do you really want to reject the selected registrations?{% endtrans %}">
+                                {%- trans %}Reject registrations{% endtrans -%}
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Check-in control{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
+                           data-method="POST"
+                           data-check-in="1"
+                           data-href="{{ url_for('.registrations_check_in', regform) }}">
+                            {%- trans %}Check-in{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
+                           data-href="{{ url_for('.registrations_check_in', regform) }}"
+                           data-method="POST"
+                           data-check-in="0"
+                           data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
+                           data-title="{% trans %}Reset check-in{% endtrans %}">
+                            {%- trans %}Reset check-in{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group right">
+                <a class="i-button icon-link js-static-url"
+                   data-href="{{ url_for('.generate_static_url', regform) }}"
+                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
+            </div>
+            <div class="group right">
+                <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                    {{ regform.active_registrations|length }}
+                </span>
+            </div>
+        </div>
+        {{ render_registration_list(registrations, visible_cols_regform_items, basic_columns, total_registrations) }}
+
+        <div class="toolbar right">
+            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
+                {% trans %}Back{% endtrans %}
+            </a>
+        </div>
+    </div>
+
+    <script>
+        setupRegistrationList();
+    </script>
+{% endblock %}

@@ -26,7 +26,6 @@
                         <font face="arial" color="#333333"><u>${ title }</u></font>
                     </td>
                 </tr>
-                ${ material }
             </table>
         </td>
     </tr>

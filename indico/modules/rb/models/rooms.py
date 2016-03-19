@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,22 +18,20 @@ import ast
 import json
 from datetime import date
 
-from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, func, or_, cast, Date
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
-from MaKaC.user import AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
 from indico.core.db.sqlalchemy.util.queries import escape_like
-from indico.core.errors import IndicoError
 from indico.core.errors import NoReportError
-from indico.modules.rb.utils import rb_check_user_access
+from indico.modules.groups import GroupProxy
+from indico.modules.rb.util import rb_check_user_access, rb_is_admin
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -47,6 +45,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, natural_sort_key
+from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
 
 
@@ -165,7 +164,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         db.String
     )
     owner_id = db.Column(
-        db.String,
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     is_active = db.Column(
@@ -234,6 +235,24 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
+
+    #: The owner of the room. If the room has the `manager-group`
+    #: attribute set, any users in that group are also considered
+    #: owners when it comes to management privileges.
+    #: Use :meth:`is_owned_by` for ownership checks that should
+    #: also check against the management group.
+    owner = db.relationship(
+        'User',
+        # subquery load since a normal joinedload breaks `get_with_data`
+        lazy='subquery',
+        backref=db.backref(
+            'owned_rooms',
+            lazy='dynamic'
+        )
+    )
+
+    # relationship backrefs:
+    # - location (Location.rooms)
 
     @hybrid_property
     def is_auto_confirm(self):
@@ -329,17 +348,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         infos.append(_(u'public') if self.is_public else _(u'private'))
         infos.append(_(u'auto-confirmation') if self.is_auto_confirm else _(u'needs confirmation'))
         if self.has_vc:
-            infos.append(_(u'video conference'))
+            infos.append(_(u'videoconference'))
 
         return u', '.join(map(unicode, infos))
-
-    @property
-    def owner(self):
-        return AvatarHolder().getById(self.owner_id)
-
-    @owner.setter
-    def owner(self, user):
-        self.owner_id = user.getId()
 
     @property
     def notification_emails(self):
@@ -353,6 +364,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.name
         )
 
+    @cached(_cache)
     def has_equipment(self, equipment_name):
         return self.available_equipment.filter_by(name=equipment_name).count() > 0
 
@@ -522,7 +534,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return ~occurrences_filter & ~blockings_filter
 
     @staticmethod
-    def find_with_filters(filters, avatar=None):
+    def find_with_filters(filters, user=None):
         from indico.modules.rb.models.locations import Location
 
         equipment_count = len(filters.get('available_equipment', ()))
@@ -588,8 +600,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             # This may trigger additional SQL queries but is_public is cached and doing this check here is *much* easier
             rooms = [r for r in rooms if r.is_public]
         if filters.get('is_only_my_rooms'):
-            assert avatar is not None
-            rooms = [r for r in rooms if r.is_owned_by(avatar)]
+            assert user is not None
+            rooms = [r for r in rooms if r.is_owned_by(user)]
         if capacity:
             # Unless it would result in an empty resultset we don't want to show rooms with >20% more capacity
             # than requested. This cannot be done easily in SQL so we do that logic here after the SQL query already
@@ -609,63 +621,65 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def get_blocked_rooms(self, *dates, **kwargs):
         states = kwargs.get('states', (BlockedRoom.State.accepted,))
         return (self.blocked_rooms
-                .options(joinedload(BlockedRoom.blocking))
                 .join(BlockedRoom.blocking)
+                .options(contains_eager(BlockedRoom.blocking))
                 .filter(or_(Blocking.is_active_at(d) for d in dates),
                         BlockedRoom.state.in_(states))
                 .all())
 
-    def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
-        if not avatar or not rb_check_user_access(avatar):
+    @unify_user_args
+    def _can_be_booked(self, user, prebook=False, ignore_admin=False):
+        if not user or not rb_check_user_access(user):
             return False
 
-        if (not ignore_admin and avatar.isRBAdmin()) or (self.is_owned_by(avatar) and self.is_active):
+        if (not ignore_admin and rb_is_admin(user)) or (self.is_owned_by(user) and self.is_active):
             return True
 
         if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
             group_name = self.get_attribute_value('allowed-booking-group')
-            if not group_name or avatar.is_member_of_group(group_name):
+            if not group_name or user in GroupProxy.get_named_default_group(group_name):
                 return True
 
         return False
 
-    def can_be_booked(self, avatar, ignore_admin=False):
+    def can_be_booked(self, user, ignore_admin=False):
         """
         Reservable rooms which does not require pre-booking can be booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self._can_be_booked(avatar, ignore_admin=ignore_admin)
+        return self._can_be_booked(user, ignore_admin=ignore_admin)
 
-    def can_be_prebooked(self, avatar, ignore_admin=False):
+    def can_be_prebooked(self, user, ignore_admin=False):
         """
         Reservable rooms can be pre-booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self._can_be_booked(avatar, prebook=True, ignore_admin=ignore_admin)
+        return self._can_be_booked(user, prebook=True, ignore_admin=ignore_admin)
 
-    def can_be_overridden(self, avatar):
-        if not avatar:
+    def can_be_overridden(self, user):
+        if not user:
             return False
-        return avatar.isRBAdmin() or self.is_owned_by(avatar)
+        return rb_is_admin(user) or self.is_owned_by(user)
 
-    def can_be_modified(self, avatar):
+    def can_be_modified(self, user):
         """Only admin can modify rooms."""
-        if not avatar:
+        if not user:
             return False
-        return avatar.isRBAdmin()
+        return rb_is_admin(user)
 
-    def can_be_deleted(self, avatar):
-        return self.can_be_modified(avatar)
+    def can_be_deleted(self, user):
+        return self.can_be_modified(user)
 
+    @unify_user_args
     @cached(_cache)
-    def is_owned_by(self, avatar):
+    def is_owned_by(self, user):
         """Checks if the user is managing the room (owner or manager)"""
-        if self.owner_id == avatar.id:
+        if self.owner == user:
             return True
         manager_group = self.get_attribute_value('manager-group')
         if not manager_group:
             return False
-        return avatar.is_member_of_group(manager_group.encode('utf-8'))
+        return user in GroupProxy.get_named_default_group(manager_group)
 
     @hybrid_method
     def is_in_digest_window(self, exclude_first_day=False):
@@ -700,7 +714,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:
             return True
-        if user and (user.isRBAdmin() or self.is_owned_by(user)):
+        if user and (rb_is_admin(user) or self.is_owned_by(user)):
             return True
         advance_days = (end_date - date.today()).days
         ok = advance_days < self.max_advance_days
@@ -711,7 +725,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
-        if user and (user.isRBAdmin() or self.is_owned_by(user)):
+        if user and (rb_is_admin(user) or self.is_owned_by(user)):
             return True
         bookable_hours = self.bookable_hours.all()
         if not bookable_hours:

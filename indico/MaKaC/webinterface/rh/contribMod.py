@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,32 +13,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from cStringIO import StringIO
+
+from flask import session
+
+
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.util.string import to_unicode
+from indico.web.flask.util import send_file
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.conference as conference
-import MaKaC.user as user
-import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.common import log
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
-from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.errors import FormValuesError
-from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.web.flask.util import send_file
-from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHContribModifBase(RHModificationBaseProtected):
@@ -343,10 +340,9 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
                 spk = self._newSpeaker(presenter)
                 sc.newSpeaker(spk)
 
-            logInfo = sc.getLogInfo()
-            logInfo["subject"] = "Created new subcontribution: %s" %sc.getTitle()
-            self._target.getConference().getLogHandler().logAction(logInfo,
-                                                       log.ModuleNames.TIMETABLE)
+            self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                                             u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
+                                             session.user, data=sc.getLogInfo())
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
         else:
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
@@ -462,22 +458,6 @@ class RHSetSession(RHContribModifBase):
         self._target.setSession(self._session)
         url=urlHandlers.UHContributionModification.getURL(self._target)
         self._redirect(url)
-
-class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon ):
-    _uh = urlHandlers.UHContribModifMaterialBrowse
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._contrib = self._target
-        materialId = params["materialId"]
-
-        self._material = self._target = self._contrib.getMaterialById(materialId)
-
-    def _process(self):
-        return RHMaterialDisplayCommon._process(self)
-
-    def _processManyMaterials(self):
-        self._redirect(urlHandlers.UHContribModifMaterials.getURL(self._material.getOwner()))
 
 
 class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):
@@ -628,35 +608,3 @@ class RHContributionToPDF(RHContributionModification):
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ContribToPDF(self._target)
         return send_file(filename, pdf.generate(), 'PDF')
-
-
-class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
-    _uh = urlHandlers.UHContribModifMaterials
-
-    def _checkProtection(self):
-        """ This disables people that are not conference managers or track coordinators to
-            delete files from a contribution.
-        """
-        RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkProtection(self)
-        for key in self._paramsForCheckProtection.keys():
-            if key.find("delete")!=-1:
-                RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkParams(self, params)
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-        # note from DavidMC: i wrote this long parameter name in order
-        # not to overwrite a possibly existing _params in a base class
-        # we need to store the params so that _checkProtection can know
-        # if the action is to upload a file, delete etc.
-        self._paramsForCheckProtection = params
-
-    def _process(self):
-        if self._target.getOwner().isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        p = contributions.WPContributionModifMaterials( self, self._target )
-        return p.display(**self._getRequestParams())

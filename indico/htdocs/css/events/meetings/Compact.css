@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,31 +33,18 @@ td {
    color: #000;
 }
 
-a:link {
-   color: #0000FF;
-   background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
-   text-decoration: none;
-}
 a:visited {
    color: #0000FF;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
    text-decoration: none;
 }
 a:active {
    color: #E25300;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
 }
 a:hover {
    color: #E25300;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
 }
 a.img:hover {
    color: #00c;

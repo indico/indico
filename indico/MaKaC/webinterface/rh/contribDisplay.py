@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,18 +24,13 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.errors import MaKaCError, ModificationError, NoReportError
-import MaKaC.common.timezoneUtils as timezoneUtils
-import MaKaC.webinterface.materialFactories as materialFactories
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from MaKaC.errors import ModificationError, NoReportError
 
 from indico.core.config import Config
 from indico.util.i18n import _
+from indico.modules.events.api import ContributionHook
 from indico.web.flask.util import send_file
-from indico.web.http_api.hooks.event import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
-from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
@@ -134,15 +129,3 @@ class RHContributionToMarcXML(RHContributionDisplay):
         outgen.contribToXMLMarc21(self._target, xmlgen)
         xmlgen.closeTag("marc:record")
         return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
-
-
-class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() )  and not self._target.canUserSubmit(self.getAW().getUser()):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise ModificationError()

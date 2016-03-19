@@ -1,0 +1,70 @@
+{% macro _category_path(category, truncated_path) %}
+    {% set first_node, inner_nodes, last_node, truncated = truncated_path %}
+    <span class="category-path">
+        <ul {% if truncated %} title="{{ ' » '.join(category.getCategoryPathTitles()[:-1]) }}"{% endif %}>
+            {% if first_node is not none %}<li>{{ first_node }}</li>{% endif %}
+            {% if truncated %}
+                <li data-tooltip-anchor>&hellip;</li>
+            {% endif %}
+            {% if inner_nodes is not none %}
+                {% for inner_node in inner_nodes -%}
+                <li>{{ inner_node }}</li>
+            {%- endfor %}
+            {% endif %}
+            {% if last_node is not none %}<li>{{ last_node }}</li>{% endif %}
+        </ul>
+    </span>
+{% endmacro %}
+
+{% macro _category_item(category, truncated_path, extra_info='') %}
+    <li class="category-box">
+        <div>
+            <span class="category-info">
+                <a href="{{ category.url }}" class="category-title">{{ category.getTitle() }}</a>
+                {{ _category_path(category, truncated_path) }}
+                {{ caller() }}
+            {# The caller must provide the closing span tag (</span>). #}
+            {# TODO This should be changed once Jinja is updated to 2.8 with support for set block. #}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro user_category(category, truncated_path, is_manager) %}
+    {% call _category_item(category, truncated_path) %}
+        </span>
+        {% if is_manager %}
+            <span title="{% trans %}You have management rights{% endtrans %}" class="category-action icon-medal active"></span>
+        {% else %}
+            <span title="{% trans %}You have favorited this category{% endtrans %}" class="category-action icon-star active"></span>
+        {% endif %}
+    {% endcall %}
+{% endmacro %}
+
+{% macro suggested_category(category, truncated_path) %}
+    {% call _category_item(category, truncated_path) %}
+        <div class="category-action-extra">
+            <a href="#"
+               data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
+               title="{% trans %}Click here to add this category to your favorites.{% endtrans %}"
+               class="icon-star active suggestion-favorite">
+                <span>{% trans %}Add to favourites{% endtrans %}</span>
+            </a>
+        </div></span>
+        <a href="#"
+           data-href="{{ url_for('.user_suggestions_remove', category_id=category.getId()) }}"
+           title="{% trans %}Click here to remove this suggestion. It will not be suggested again.{% endtrans %}"
+           class="category-action icon-close active suggestion-remove">
+        </a>
+    {% endcall %}
+{% endmacro %}
+
+{% macro favorite_category(category, truncated_path) %}
+    {% call _category_item(category, truncated_path) %}
+        </span>
+        <a href="#"
+           data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
+           title="{% trans %}Remove from favorites{% endtrans %}"
+           class="category-action icon-close js-delete-category">
+        </a>
+    {% endcall %}
+{% endmacro %}

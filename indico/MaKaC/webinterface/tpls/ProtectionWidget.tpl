@@ -3,6 +3,8 @@
     <div class="protectionWidgetSection">
         % if protection[0] == "DomainProtected":
             ${_("The information on this web page is restricted for display on the %s") % protection[1]}
+        % elif protection[0] == "Public":
+            ${_("The information on this web page is visible to anyone")}
         % else:
             ${_("The information on this web page is restricted for display to named individuals or specific groups.")}
         % endif
@@ -10,7 +12,7 @@
     <div class="protectionWidgetSection">
         % if protection[0] == "DomainProtected":
             ${protectionDisclaimerProtected}
-        % else:
+        % elif protection[0] == "Restricted":
             ${protectionDisclaimerRestricted}
         % endif
     </div>
@@ -19,7 +21,7 @@
     </div>
 </div>
 
-<a id="protectionLink" class="icon-shield arrow i-button protection-${protection[0].lower()}">${protection[1]}</a>
+<a id="protectionLink" class="${'icon-shield' if protection[0] != 'Public' else 'icon-earth'} arrow i-button protection-${protection[0].lower()}">${protection[1]}</a>
 
 
 <script type="text/javascript">

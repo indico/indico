@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,6 @@
  @import "partials/toolbars";
 
 %text-input {
-    @extend %font-size-body;
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
@@ -72,13 +71,24 @@ input[type=checkbox].validate {
     }
 }
 
-input[type=number] {
+input[type=time] {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button,
+    &::-webkit-clear-button {
+        -webkit-appearance: none;
+        padding-right: 0;
+    }
+}
+
+input[type=number], input[type=time] {
     -moz-appearance: textfield;
     padding-right: 0;
 
-    &::-webkit-inner-spin-button {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
         cursor: pointer;
         margin-left: 4px;
+        padding-top: 1px;
         position: relative;
     }
 }
@@ -87,7 +97,7 @@ textarea {
     @extend %text-input;
 }
 
-select {
+select, ul {
     &.hasError {
         @include border-all($red);
         color: $red;
@@ -123,6 +133,7 @@ span[contenteditable] {
         display: none;
 
         &:checked + label,
+        &:checked:disabled + label,
         &:checked:not(:disabled) + label:hover {
             @include gradient(#387EE5, #5D95EA);
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
@@ -168,148 +179,39 @@ span[contenteditable] {
     }
 }
 
+$dropdown-transition-step: 0.05s;
+$dropdown-transition: $dropdown-transition-step ease-out;
 
-// Toggle Switch
-$switch-transition-step: 0.05s;
-$switch-label-transition: $switch-transition-step ease-out;
-$switch-handle-transition: 2*$switch-transition-step ease-out;
-$switch-shadow-color: lighten($light-black, $color-variation);
-$switch-shadow-border: inset 0 0 0 0.08em;
-$switch-shadow-blur: 0.16em;
-$switch-left-shadow: -(0.05em + $switch-shadow-blur) 0 $switch-shadow-blur -$switch-shadow-blur $switch-shadow-color;
-$switch-right-shadow: 0.05em + $switch-shadow-blur 0 $switch-shadow-blur -$switch-shadow-blur $switch-shadow-color;
-$switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
-%switch-elem {
-    position: relative;
-    z-index: 100;
-
-    display: inline-block;
-    width: 50%;
-    height: 100%;
-
-    text-align: center;
-    text-transform: uppercase;
-    line-height: 2;
-    font-size: 0.8em;
-    font-weight: normal;
-}
-%switch-elem-visible {
+%dropdown-visible {
     visibility: visible;
     opacity: 1.0;
-    @include transition(visibility $switch-label-transition 3*$switch-transition-step,
-                                opacity $switch-label-transition 2*$switch-transition-step);
+    @include transition(visibility $dropdown-transition,
+                        opacity $dropdown-transition,
+                        height $dropdown-transition,
+                        padding $dropdown-transition);
 }
-%switch-elem-hidden {
+
+%dropdown-hidden {
     visibility: hidden;
     opacity: 0.0;
-    @include transition(visibility $switch-label-transition 1*$switch-transition-step,
-                                opacity $switch-label-transition 0*$switch-transition-step);
+    height: 0 !important;
+    padding: 0 !important;
+    @include transition(visibility $dropdown-transition,
+                        opacity $dropdown-transition,
+                        height $dropdown-transition,
+                        padding $dropdown-transition);
 }
-.switch {
-    position: relative;
 
-    display: inline-block;
-    width: 6em;
-    height: 1.6em;
-
+%form-field {
     @include border-radius();
-    background-color: lighten($dark-gray, $color-variation);
-    box-shadow: $switch-shadow-border $dark-gray, $switch-inner-shadow;
-    @include user-select(none);
-
-    & > .switch-label {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-
-        cursor: pointer;
-
-        &:before {
-            @extend %switch-elem;
-            @extend %switch-elem-visible;
-
-            color: $light-black;
-            content: attr(data-off);
-        }
-        &:after {
-            @extend %switch-elem;
-            @extend %switch-elem-hidden;
-
-            color: $light-blue;
-            content: attr(data-on);
-        }
-    }
-    & > .switch-handle {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 99;
-
-        display: inline-block;
-        width: 50%;
-        height: 100%;
-        @include border-radius();
-
-        background: #EAEAEA;
-        box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
-
-        @include transition(left $switch-handle-transition 1*$switch-transition-step,
-                            background $switch-handle-transition 1*$switch-transition-step,
-                            box-shadow $switch-handle-transition 1*$switch-transition-step);
-        cursor: pointer;
-
-    }
-
-    input {
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: none;
-        opacity: 0;
-
-        &:checked {
-            & + .switch-label {
-                &:before { @extend %switch-elem-hidden; }
-                &:after { @extend %switch-elem-visible; }
-
-                & + .switch-handle {
-                    left: 50%;
-
-                    background-color: $blue;
-                    box-shadow: $switch-shadow-border $dark-blue, $switch-left-shadow;
-                 }
-            }
-        }
-
-        &:disabled {
-            & + .switch-label {
-                cursor: default;
-
-                &:before, &:after { color: $gray; }
-            }
-            & + .switch-label + .switch-handle {
-                    background-color: #EAEAEA;
-                    box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
-                    cursor: default;
-            }
-            &:checked + .switch-label + .switch-handle { box-shadow: $switch-shadow-border $gray, $switch-left-shadow; }
-        }
-
-        &:not(:disabled) {
-            & + .switch-label:hover + .switch-handle {
-                background: #E2E2E2;
-                @include gradient(#F7F7F7, #E2E2E2);
-            }
-
-            &:checked + .switch-label:hover + .switch-handle {
-                background: darken($blue, $color-variation);
-                @include gradient($blue, darken($blue, $color-variation));
-            }
-        }
-    }
+    height: 2.5em;
+    padding: 0.5em 1em;
+    line-height: 1.5;
+    color: $black;
+    border: 1px solid $gray;
+    @include transition-property(border-color, box-shadow);
+    @include transition-duration(0.12s, 0.12s);
+    @include transition-timing-function(ease-in-out, ease-in-out);
 }
 
 .i-form {
@@ -341,6 +243,34 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
             padding-left: 1em;
             padding-right: 1em;
             margin-bottom: 0.7em;
+
+            > .i-linking {
+                width: 400px;
+                > label {
+                    width: 28%;
+                    padding: 0.7em 0;
+                }
+                > .i-linking-dropdown,
+                > span.static-text {
+                    display: inline-block !important;
+                    width: 65% !important;
+                }
+                > .i-linking-dropdown > select { width: 100%; }
+
+                > input:checked + label {
+                    + .i-linking-dropdown,
+                    + span {
+                        @extend %dropdown-visible;
+                    }
+                }
+
+                > input:not(:checked) + label {
+                    + .i-linking-dropdown,
+                    + span {
+                        @extend %dropdown-hidden;
+                    }
+                }
+            }
         }
 
         .form-label {
@@ -350,6 +280,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
             min-height: 2.5em;
             line-height: 1.5;
             position: relative;
+            word-wrap: break-word;
         }
 
         .form-label-middle {
@@ -366,22 +297,18 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
         .form-field {
             > .form-row,
+            > .datetime-widget,
             > textarea,
             > select,
-            > input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
+            > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+            input.clearabletext,
+            .i-form-field-width {
                 width: 400px;
             }
 
-            textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
-                @include border-radius();
-                height: 2.5em;
-                padding: 0.5em 1em;
-                line-height: 1.5;
-                color: $black;
-                border: 1px solid $gray;
-                @include transition-property(border-color, box-shadow);
-                @include transition-duration(0.12s, 0.12s);
-                @include transition-timing-function(ease-in-out, ease-in-out);
+            textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+            .i-form-field-button {
+                @extend %form-field;
             }
 
             .i-has-action > input {
@@ -393,13 +320,47 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                 width: 10em;
             }
 
+            > .form-row.i-has-action.i-synced-input {
+                padding-right: 0;
+
+                > textarea,
+                > input {
+                   width: 90%;
+                }
+
+                > .i-button {
+                    width: 10%;
+                }
+            }
+
+            > .form-row .i-button {
+                height: 2.5em;
+                line-height: 1.5em;
+
+                &:before {
+                    vertical-align: middle;
+                    font-size: 1.3em;
+                }
+            }
+
+            > .enable-input {
+                &, > span {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                > span:first-child {
+                    margin-right: 1em;
+                }
+                margin-left: 2em;
+            }
+
             input[type="checkbox"],
             input[type="radio"] {
                 margin: 0;
                 vertical-align: middle;
             }
 
-            input[type=number] {
+            input[type=number], input[type=time] {
                 padding-right: 0 !important;
 
                 &::-webkit-inner-spin-button {
@@ -407,6 +368,11 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                     margin-left: 1em;
                     margin-top: -0.5em;
                 }
+            }
+
+            button {
+                height: 2.5em;
+                vertical-align: top;
             }
 
             input.table-input {
@@ -430,11 +396,14 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
             .static-text {
                 display: block;
-                height: 2.5em;
-                padding: 0.5em 1em 0.5em 0;
+                padding: 0.5em 0.5em 0 0;
                 line-height: 1.5;
                 color: $black;
                 width: 400px;
+                .form-field-description {
+                    font-style: italic;
+                    color: $light-black;
+                }
             }
 
             :invalid {
@@ -448,6 +417,46 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
             .ui-datepicker-trigger {
                 right: 24px;
+            }
+
+            .multi-text-fields {
+                max-height: none;
+                max-width: 400px;
+
+                li {
+                    height: auto;
+                    width: auto;
+
+                    &:last-of-type .handle {
+                        color: white;
+                    }
+                }
+
+                .handle {
+                    @extend %form-field;
+                    border-right: 0;
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    padding: 0;
+                    line-height: 2.5em;
+                    width: 2em;
+                    text-align: center;
+                }
+
+                input {
+                    border-top-left-radius: 0 !important;
+                    border-bottom-left-radius: 0 !important;
+                    float: none;
+                }
+
+                .i-button-remove {
+                    float: none;
+                    height: auto;
+
+                    i:before {
+                        cursor: pointer;
+                    }
+                }
             }
         }
 
@@ -468,7 +477,6 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
             .form-label {
                 float: none;
                 text-align: left;
-                width: 100%;
             }
 
             .form-field {
@@ -490,7 +498,9 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         }
 
         .form-field-description {
+            font-style: italic;
             margin-top: 0.25em;
+            margin-bottom: 0.5em;
             width: 400px;
         }
 
@@ -519,9 +529,9 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     &.vertical {
         .form-label {
             float: none;
-            text-align: left;
-            width: 100%;
             height: 1em;
+            margin-bottom: -1em;
+            text-align: left;
         }
 
         .form-label-empty {
@@ -532,6 +542,10 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         .form-field {
             width: 100%;
             margin-top: 0.4em;
+        }
+
+        .form-group-footer .form-label {
+            display: none;
         }
     }
 
@@ -548,13 +562,14 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     fieldset {
         border: 0;
         margin-bottom: 1em;
-        border-radius: 0.2em;
+        padding: 0;
 
         legend {
             font-weight: bold;
             font-size: 1.3em;
             border-bottom: 1px solid #ebebeb;
             width: 100%;
+            padding-left: 0;
             padding-bottom: 0.5em;
             margin-bottom: 0.3em;
         }
@@ -572,6 +587,20 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
         & + .form-group-footer {
             margin-top: -1em;
+        }
+
+        &.collapsible legend {
+            cursor: pointer;
+        }
+
+        &.initially-collapsed div.fieldset-content {
+            display: none;
+        }
+    }
+
+    &.no-block-padding {
+        .form-block {
+            padding-left: 0;
         }
     }
 }
@@ -596,6 +625,46 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     &.loading:before {
         opacity: 0.4;
         visibility: visible;
+    }
+}
+
+.timedelta-widget {
+    input[type=number] {
+        display: inline;
+        width: 6em;
+    }
+
+    select {
+        display: inline;
+        width: auto;
+    }
+}
+
+.datetime-widget {
+    .datepicker {
+        width: 40%;
+    }
+
+    .timepicker {
+        width: 30%;
+    }
+
+    .timezone {
+        @include icon-before('icon-earth');
+        color: $light-black;
+        position: relative;
+        right: 24px;
+        top: 2px;
+    }
+
+    .clear-pickers {
+        font-size: 1.3em;
+        vertical-align: sub;
+
+        &:hover {
+            color: $red;
+            cursor: pointer;
+        }
     }
 }
 
@@ -641,19 +710,42 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     }
 }
 
+%tilted-strips-bg {
+    background-color: lighten($pastel-gray, $light-color-variation);
+    background: repeating-linear-gradient(
+        -40deg,
+        lighten($pastel-gray, 0.5*$color-variation),
+        lighten($pastel-gray, 0.5*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 20px
+    );
+    font-style: italic;
+    color: $dark-gray !important;
+}
+
 .i-has-action {
-@extend %toolbar-group;
-> input {
+    @extend %toolbar-group;
+    position: relative;
+    > input {
         display: inline-block;
     }
 
+    > textarea {
+        @include border-top-right-radius(0 !important);
+    }
 
-    > input, > .i-button {
+    > textarea, > input {
         height: 2.5em;
         vertical-align: middle;
         line-height: 1.2em;
         margin: 0;
         padding: 0 0.8em;
+    }
+
+    > textarea + .i-button {
+        position: absolute;
+        top: 0;
+        border-left: 0;
     }
 
     +  .i-has-action-message {
@@ -662,6 +754,29 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         opacity: 0;
         height: 1em;
         vertical-align: middle;
+    }
+}
+
+.i-has-action.i-synced-input {
+    > input[type=checkbox] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        opacity: 0;
+    }
+    > label.i-synced-label {
+        text-align: center;
+        line-height: 2.3em;
+    }
+
+    > input[type=checkbox]:not(:checked) ~ .i-synced-label:before { color: $light-black; }
+    > input[type=checkbox]:checked ~ .i-synced-label:before { color: $blue; }
+
+    > input[type=text], textarea {
+        &[readonly] {
+            @extend %tilted-strips-bg;
+        }
     }
 }
 
@@ -683,5 +798,35 @@ dd > .i-has-action {
     }
     > input {
         width: 110px;
+    }
+}
+
+
+.PluginOptionPeopleListDiv.disabled {
+    background-color: lighten($pastel-gray, $light-color-variation);
+    background: repeating-linear-gradient(
+        -40deg,
+        lighten($pastel-gray, 0.5*$color-variation),
+        lighten($pastel-gray, 0.5*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 20px
+    );
+    font-style: italic;
+    color: $dark-gray !important;
+    pointer-events: none;
+
+    .actions { display: none; }
+}
+
+
+.advanced-placeholders {
+    margin-top: 0.5em;
+
+    .toggle {
+        margin-top: 0.5em;
+    }
+
+    .placeholders {
+        padding: 0.25em 0;
     }
 }

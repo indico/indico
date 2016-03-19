@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,11 +20,13 @@ Basic fossils for data export
 
 from hashlib import md5
 
+from indico.modules.attachments.api.util import build_material_legacy_api_data, build_folders_api_data
+from indico.modules.events.notes.util import build_note_api_data
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.fossils.conference import ISessionSlotFossil
+from MaKaC.fossils.conference import ISessionSlotFossil, ISessionFossil
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -126,55 +128,16 @@ class IContributionParticipationMetadataFossil(IFossil):
         pass
 
 
-class IResourceMetadataFossil(IFossil):
-
-    def getName(self):
-        pass
-
-
-class ILocalFileMetadataFossil(IResourceMetadataFossil):
-
-    def getId(self):
-        pass
-
-    def getURL(self):
-        pass
-    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
-    getURL.name = 'url'
-
-    def getFileName(self):
-        pass
-
-
-class ILinkMetadataFossil(IResourceMetadataFossil):
-
-    def getURL(self):
-        pass
-    getURL.name = 'url'
-
-
-class IMaterialMetadataFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getTitle( self ):
-        pass
-
-    def getResourceList(self):
-        pass
-    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
-    getResourceList.name = 'resources'
-    getResourceList.filterBy = 'access'
-
-
 class _IncludeMaterialFossil(IFossil):
 
-    def getAllMaterialList(self):
+    def getMaterial(self):
         pass
-    getAllMaterialList.name = 'material'
-    getAllMaterialList.result = IMaterialMetadataFossil
-    getAllMaterialList.filterBy = 'access'
+    getMaterial.produce = build_material_legacy_api_data
+    getMaterial.convert = Conversion.addLegacyMinutes
+
+    def getFolders(self):
+        pass
+    getFolders.produce = build_folders_api_data
 
 
 class _IncludeACLFossil(IFossil):
@@ -220,6 +183,10 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
     def getTimezone(self):
         pass
 
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
+
     def getChairList(self):
         pass
     getChairList.name = 'chairs'
@@ -257,6 +224,7 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
 
     def getCreator(self):
         pass
+    getCreator.produce = lambda x: x.as_event.creator.as_avatar
     getCreator.result = IConferenceChairMetadataFossil
 
     def getCreationDate(self):
@@ -343,8 +311,12 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFo
         pass
     getKeywords.produce = lambda x: x.getKeywords().splitlines() if x.getKeywords().strip() else []
 
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
 
-class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
+
+class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil, _IncludeMaterialFossil):
 
     def getId(self):
         pass
@@ -360,6 +332,10 @@ class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
         pass
     getSpeakerList.name = 'speakers'
     getSpeakerList.result = IContributionParticipationMetadataFossil
+
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
 
 
 class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
@@ -388,7 +364,15 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
     getContributionList.filterBy = 'access'
 
 
+class ISessionMinimalFossil(_IncludeMaterialFossil, ISessionFossil):
+    pass
+
+
 class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
+
+    def getSession(self):
+        pass
+    getSession.result = ISessionMinimalFossil
 
     def getId(self):
         pass
@@ -405,6 +389,10 @@ class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
 
     def getDescription(self):
         pass
+
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
 
 
 class ISessionMetadataFossil(ISessionMetadataBaseFossil):

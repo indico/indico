@@ -1,0 +1,24 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="dz-{{ field.id }}" class="dropzone" data-options="{{ options|tojson|forceescape }}" data-value="{{ field.data|tojson|forceescape }}">
+        <div class="dropzone-inner">
+            <div class="dropzone-previews"></div>
+            <div class="select-files-btn">
+                <div class="dz-message">
+                    {% trans %}Drag file here{% endtrans %}
+                    <span class="message-seperator">- or -</span>
+                </div>
+                <button type="button" class="i-button">
+                    {%- trans %}Choose from your computer{% endtrans -%}
+                </button>
+            </div>
+        </div>
+    </div>
+    <input class="change-trigger" type="hidden" value="{{ 'initial-file' if field.data else 'no-file' }}" name="__file_change_trigger">
+    <script>
+    $(document).ready(function() {
+        setupDropzone('#dz-{{ field.id }}');
+    });
+    </script>
+{% endblock %}

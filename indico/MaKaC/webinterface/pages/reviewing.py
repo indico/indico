@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     """
 
     _userData = ['favorite-user-list']
+    sidemenu_option = 'paper_reviewing'
 
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
@@ -81,9 +82,6 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
     def _getTabContent(self, params):
         return "nothing"
-
-    def _setActiveSideMenuItem(self):
-        self._reviewingMenuItem.setActive()
 
     def _setActiveTab(self):
         pass

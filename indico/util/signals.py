@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -70,10 +70,10 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
     :return: dict mapping object names to objects
     """
     objects = values_from_signal(signal_response, return_plugins=True)
-    mapping = {getattr(cls, name_attr): cls for _, cls in objects}
     if plugin_attr is not None:
         for plugin, cls in objects:
-            setattr(mapping[getattr(cls, name_attr)], plugin_attr, plugin)
+            setattr(cls, plugin_attr, plugin)
+    mapping = {getattr(cls, name_attr): cls for _, cls in objects}
     conflicting = {cls for _, cls in objects} - set(mapping.viewvalues())
     if conflicting:
         names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))

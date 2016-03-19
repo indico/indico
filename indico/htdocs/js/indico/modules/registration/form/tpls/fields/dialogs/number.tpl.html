@@ -1,0 +1,11 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Minimum' | i18n }}
+    </label>
+    <input type="number" name="minValue"
+        ng-model="formData.minValue"
+        ng-init="formData.minValue = (formData.minValue || getDefaultFieldSetting('defaultMinValue'))"
+        ng-class="{hasError: validationStarted && optionsForm.minValue.$invalid}"
+        size="20"
+        min="0"/>
+</div>

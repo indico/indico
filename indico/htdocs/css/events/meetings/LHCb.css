@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,8 +18,9 @@
 @import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
-    background: #39109c url('../../../images/lhcblogo.png') left top no-repeat;
-    background-position: 25px 45px;
+    background: #013D7C url('../../../images/lhcblogo.jpg') left top no-repeat;
+    background-position: 25px 25px;
+    background-size: 150px;
     padding-left: 200px;
     border-top-left-radius: 0.2em;
     border-top-right-radius: 0.2em;

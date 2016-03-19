@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -273,7 +273,7 @@ $line-gray: darken($light-gray, 10%);
   }
 }
 
-.layout-wrapper {
+.information .layout-wrapper {
   .row {
     width: 100%;
     clear: both;
@@ -284,7 +284,7 @@ $line-gray: darken($light-gray, 10%);
     @include grid-column(3);
     @include box-sizing(border-box);
     float: left;
-    padding: 0 1em 0 1em;
+    padding: 0 1em 0 1em !important;
 
     &> h2 {
       font-size: 1.2em;

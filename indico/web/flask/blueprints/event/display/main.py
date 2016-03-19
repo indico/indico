@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,9 @@ from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import DBMgr
+from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _
+from indico.util.string import is_legacy_id
 from indico.web.flask.blueprints.event.display import event
 from MaKaC.webinterface.rh import conferenceDisplay
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
@@ -29,6 +31,7 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
     from MaKaC.conference import ConferenceHolder
     from MaKaC.common.url import ShortURLMapper
 
+    func = None
     with DBMgr.getInstance().global_connection():
         ch = ConferenceHolder()
         su = ShortURLMapper()
@@ -54,10 +57,14 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
                 # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
                 url = url_for('.shorturl', confId=confId)
                 func = lambda: redirect(url, 301)
-        else:
-            raise NotFound(
-                _('The specified event with id or tag "%s" does not exist or has been deleted') % confId)
+        elif is_legacy_id(confId):
+            mapping = LegacyEventMapping.find_first(legacy_event_id=confId)
+            if mapping is not None:
+                url = url_for('event.conferenceDisplay', confId=mapping.event_id)
+                func = lambda: redirect(url, 301)
 
+    if func is None:
+        raise NotFound(_('The specified event with id or tag "{}" does not exist or has been deleted').format(confId))
     return func()
 
 
@@ -76,12 +83,6 @@ event.add_url_rule('/prev', 'conferenceDisplay-prev', conferenceDisplay.RHRelati
 # Event access
 event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDisplay.RHConferenceAccessKey,
                    methods=('GET', 'POST'))
-
-# Event layout
-event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', conferenceDisplay.RHConferenceGetCSS)
-event.add_url_rule('/logo', 'conferenceDisplay-getLogo', conferenceDisplay.RHConferenceGetLogo, methods=('GET', 'POST'))
-event.add_url_rule('/picture/<picId>.<picExt>', 'conferenceDisplay-getPic', conferenceDisplay.RHConferenceGetPic)
-event.add_url_rule('/picture/<picId>', 'conferenceDisplay-getPic', conferenceDisplay.RHConferenceGetPic)
 
 # Machine-readable formats
 event.add_url_rule('/event.ics', 'conferenceDisplay-ical', conferenceDisplay.RHConferenceToiCal)

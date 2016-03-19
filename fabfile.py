@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -231,6 +231,19 @@ def install_angular():
             local('cp css/angular.css {0}'.format(dest_dir_css))
 
 
+@recipe('chartist.js')
+def install_chartist_js():
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'chartist.js')):
+            dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'chartist.js/')
+            dest_dir_css = os.path.join(lib_dir(env.src_dir, 'css'), 'chartist.js/')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('mkdir -p {0}'.format(dest_dir_css))
+            local('cp dist/chartist.js {0}/'.format(dest_dir_js))
+            local('cp dist/scss/chartist.scss {0}/'.format(dest_dir_css))
+            local('cp -r dist/scss/settings {0}/'.format(dest_dir_css))
+
+
 @recipe('ui-sortable')
 def install_ui_sortable():
     with node_env():
@@ -250,7 +263,7 @@ def install_jquery():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'jquery')):
             local('npm install')
-            local('grunt')
+            local('grunt uglify dist')
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
@@ -363,6 +376,19 @@ def install_zeroclipboard():
         local('cp dist/ZeroClipboard.swf {0}/'.format(dest_dir))
 
 
+@recipe('dropzone.js')
+def install_dropzone_js():
+    """
+    Install Dropzone from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'dropzone')):
+        dest_js_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'dropzone.js/')
+        dest_css_dir = os.path.join(lib_dir(env.src_dir, 'css'), 'dropzone.js/')
+        local('mkdir -p {0} {1}'.format(dest_js_dir, dest_css_dir))
+        local('cp dist/dropzone.js {0}/'.format(dest_js_dir))
+        local('cp dist/dropzone.css {0}/'.format(dest_css_dir))
+
+
 @recipe('selectize.js')
 def install_selectize_js():
     with lcd(os.path.join(env.ext_dir, 'selectize.js')):
@@ -372,6 +398,36 @@ def install_selectize_js():
         local('cp dist/js/standalone/selectize.js {0}/'.format(dest_js_dir))
         local('cp dist/css/selectize.css {0}/'.format(dest_css_dir))
         local('cp dist/css/selectize.default.css {0}/'.format(dest_css_dir))
+
+
+@recipe('jquery-typeahead')
+def install_jquery_typeahead():
+    with lcd(os.path.join(env.ext_dir, 'jquery-typeahead')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        dest_css_dir = lib_dir(env.src_dir, 'css')
+        local('mkdir -p {0} {1}'.format(dest_js_dir, dest_css_dir))
+        local('cp src/jquery.typeahead.js {0}'.format(dest_js_dir))
+        local('cp src/jquery.typeahead.css {0}'.format(dest_css_dir))
+
+
+@recipe('jquery-tablesorter')
+def install_jquery_tablesorter():
+    with lcd(os.path.join(env.ext_dir, 'jquery-tablesorter')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {0}'.format(dest_js_dir))
+        local('cp dist/js/jquery.tablesorter.js {0}'.format(dest_js_dir))
+
+
+@recipe('moment.js')
+def install_moment_js():
+    with lcd(os.path.join(env.ext_dir, 'moment.js')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'moment.js')
+        local('mkdir -p {0} {0}/locale'.format(dest_dir))
+
+        local('cp moment.js {0}/'.format(dest_dir))
+        local('cp locale/en-gb.js {0}/locale/'.format(dest_dir))
+        local('cp locale/fr.js {0}/locale/'.format(dest_dir))
+        local('cp locale/es.js {0}/locale/'.format(dest_dir))
 
 
 # Tasks
@@ -695,9 +751,6 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
     """
     Create an Indico release - source and binary distributions
     """
-
-    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric',
-                        'sphinx', 'repoze.sphinx.autointerface']
 
     py_versions = py_versions.split('/') if py_versions else env.py_versions
     upload_to = upload_to.split('/') if upload_to else []

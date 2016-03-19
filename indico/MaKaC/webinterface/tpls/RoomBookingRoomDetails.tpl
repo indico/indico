@@ -1,17 +1,3 @@
-<script type="text/javascript">
-  function submit_delete() {
-    if (confirm(
-          "${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }"
-        )
-    ) {
-      var frm = document.forms['submits'];
-      frm.action = '${ delete_room_url }';
-      frm.submit();
-    }
-  }
-</script>
-
-
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
   <div id="whereIsKeyHelp" class="tip">
@@ -117,7 +103,7 @@
                     </td>
                     <td width="20%" align="right" class="thumbnail">
                       % if room.photo_id:
-                        <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ _('Room Photo') }">
+                        <a href="${ room.large_photo_url }" class="js-lightbox" title="${ _('Room Photo') }">
                           <img border="1px" height="100" src="${ room.small_photo_url }" alt="${ _('Room Photo') }">
                         </a>
                       % endif
@@ -328,7 +314,6 @@
                           <span class="titleCellFormat">${ _('Actions') }</span>
                         </td>
                         <td colspan="2">
-                          <form id="submits" name="submits" action="#" method="post">
                             <div style="float:left; padding-top: 15px;">
                               % if room.can_be_booked(user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('Book') }</a>
@@ -339,11 +324,14 @@
                                 <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
                               % endif
                               % if room.can_be_deleted(user):
-                                <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
+                                <button class="i-button" data-href="${ delete_room_url }" data-method="POST"
+                                   data-title="${ _('Delete Room?') }"
+                                   data-confirm="${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }">
+                                    ${ _('Delete') }
+                                </button>
                               % endif
                               <a class="i-button" href="${ stats_url }">${ _('Stats') }</a>
                             </div>
-                          </form>
                         </td>
                       </tr>
                       <tr>

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -32,6 +32,9 @@ $(document).ready(function() {
         });
     });
 
+    // Remove ui-widget-content style from static tabs as it messes up e.g. link colors
+    $('.static-tabs').find('.ui-widget-content').addBack().removeClass('ui-widget-content');
+
     $('.main-breadcrumb a[href="#"]').css({cursor: 'default', outline: 'none'}).on('click', function(e) {
         e.preventDefault();
     });
@@ -54,7 +57,10 @@ $(document).ready(function() {
         if (!$(this).attr('title').trim()) {
             return;
         }
-        var extraOpts = $(this).data('qtipOpts') || {};
+
+        var extraOpts = $(this).data('qtipOpts') || {},
+            qtipClass = $(this).data('qtip-style');
+
         $(this).qtip($.extend(true, {}, {
             overwrite: false,
             show: {
@@ -79,6 +85,11 @@ $(document).ready(function() {
             hide: {
                 event: "mouseleave"
             },
+
+            style: {
+                classes: qtipClass ? 'qtip-' + qtipClass : null
+            },
+
             onHide: function() {
                 // If the parent element is destroyed we need to destroy the qTip too
                 $(this).qtip('destroy');
@@ -86,12 +97,13 @@ $(document).ready(function() {
         }, extraOpts), event);
     });
 
-    // Enable colorbox for links with rel="lightbox"
-    $('body').on('click', 'a[nofollow="lightbox"]', function() {
+    // Enable colorbox for links with .js-lightbox
+    $('body').on('click', 'a.js-lightbox', function() {
         $(this).colorbox({
             maxHeight: '90%',
             maxWidth: '90%',
             loop: false,
+            photo: true,
             returnFocus: false
         });
     });
@@ -104,14 +116,84 @@ $(document).ready(function() {
         }
     });
 
-    $(".body").on("click", "[data-confirm]", function(event){
-        var self = this;
+    $('.js-dropdown').each(function() {
+        this.id = this.id || uniqueId();
+        $(this).parent().dropdown({selector: '#' + this.id});
+    });
+
+    $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
+        var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){
-            if(confirmed){
-                window.location = self.getAttribute("href");
+            if (confirmed){
+                if ($this.is('form')) {
+                    $this.submit();
+                } else {
+                    window.location = $this.attr('href');
+                }
             }
         }).open();
         return false;
+    });
+
+    $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href], a[data-method][data-href]', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var url = $this.data('href');
+        var method = $this.data('method').toUpperCase();
+        var params = $this.data('params') || {};
+        var update = $this.data('update');
+        if (!$.isPlainObject(params)) {
+            throw new Error('Invalid params. Must be valid JSON if set.');
+        }
+
+        function execute() {
+            var evt = $.Event('indico:confirmed');
+            $this.trigger(evt);
+
+            // Handle custom code
+            if (evt.isDefaultPrevented()) {
+                return;
+            }
+
+            // Handle html update
+            if (update) {
+                $.ajax({
+                    method: method,
+                    url: url,
+                    data: params,
+                    error: handleAjaxError,
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    success: function(data) {
+                        $(update).html(data.html);
+                    }
+                });
+                return;
+            }
+
+            // Handle normal GET/POST
+            if (method === 'GET') {
+                location.href = build_url(url, params);
+            } else if (method === 'POST') {
+                var form = $('<form>', {
+                    action: url,
+                    method: method
+                });
+                form.append($('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')}));
+                $.each(params, function(key, value) {
+                    form.append($('<input>', {type: 'hidden', name: key, value: value}));
+                });
+                form.appendTo('body').submit();
+            }
+        }
+
+        var promptMsg = $this.data('confirm');
+        var confirmed;
+        if (!promptMsg) {
+            confirmed = $.Deferred().resolve();
+        } else {
+            confirmed = confirmPrompt(promptMsg, $(this).data('title') || $T('Confirm action'));
+        }
+        confirmed.then(execute);
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
@@ -151,6 +233,17 @@ $(document).ready(function() {
     });
 
     $('input, textarea').placeholder();
+
+    // Prevent BACK in browser with backspace when focused on a readonly field
+    $('input, textarea').on('keydown', function(e) {
+        if (this.readOnly && e.which == K.BACKSPACE) {
+            e.preventDefault();
+        }
+    });
+
+    $('input.permalink').on('focus', function() {
+        this.select();
+    });
 
     showFormErrors();
 });

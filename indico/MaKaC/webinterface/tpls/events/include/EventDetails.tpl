@@ -25,63 +25,26 @@
 </tr>
 % endif
 
-% if participants:
-<tr id="eventParticipants">
-    <td class="leftCol">${_("Participants")}</td>
-    <td id="eventListParticipants">${participants}</td>
-</tr>
-% endif
-
-% if len(materials) > 0:
+% if files or folders:
 <tr id="materialList">
-    <td class="leftCol">${_("Material")}:</td>
+    <td class="leftCol icon-attachment inline-attachments-icon"></td>
     <td>
-        <div class="materialList clearfix">
-        % for material in materials:
-            <%include file="Material.tpl" args="material=material"/>
-        % endfor
+        <div class="material-list clearfix">
+            ${ render_template('attachments/mako_compat/attachments_inline.html', files=files, folders=folders) }
         </div>
-        % if minutes:
-            <% minutesText = conf.getMinutes().getText() if conf.getMinutes() else None %>
-            % if minutesText:
-            <center>
-                <div class="minutesTable">
-                    <h2>${_("Minutes")}</h2>
-                    <span>${common.renderDescription(minutesText)}</span>
-                </div>
-            </center>
-            % endif
-        % endif
     </td>
 </tr>
 % endif
 
-% if len(lectures) > 0:
+% if lectures:
 <tr id="lectureLinks">
     <td class="leftCol">${_("Other occasions")}</td>
     <td>
     % for lecture in lectures:
-        <a href="${urlHandlers.UHMaterialDisplay.getURL(lecture)}">\
-<img src="${Config.getInstance().getBaseURL()}/images/${lecture.title}.png" alt="${lecture.title}"/></a>&nbsp;
+        <a href="${lecture.attachments[0].link_url}">\
+        <img src="${Config.getInstance().getBaseURL()}/images/${lecture.title}.png" alt="${lecture.title}"/></a>&nbsp;
     % endfor
     </td>
-</tr>
-% endif
-
-% if registrationOpen:
-<tr>
-    <td class="leftCol">${_("Registration")}</td>
-    <td>
-        ${_("Want to participate?")}
-        <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
-    </td>
-</tr>
-% endif
-
-% if evaluationLink:
-<tr>
-    <td class="leftCol">${_("Evaluation")}</td>
-    <td><a href="${evaluationLink}">${_("Evaluate this event")}</a></td>
 </tr>
 % endif
 
@@ -110,4 +73,3 @@ ${ template_hook('event-header', event=conf) }
 
 </tbody>
 </table>
-<%include file="ApplyParticipation.tpl"/>

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,25 +13,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-import urllib
+
+from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.navigation as navigation
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
 from indico.core.config import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
+
+from indico.web.flask.util import url_for
 
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
@@ -106,8 +104,8 @@ class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
 
 class WPSubContributionModifBase( WPConferenceModifBase ):
 
-    def __init__( self, rh, subContribution ):
-        WPConferenceModifBase.__init__( self, rh, subContribution.getConference() )
+    def __init__(self, rh, subContribution, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, subContribution.getConference(), **kwargs)
         self._subContrib = self._target = subContribution
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
@@ -133,9 +131,8 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHSubContributionModification.getURL( self._target ) )
-        #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Material"), \
-                urlHandlers.UHSubContribModifMaterials.getURL( self._target ) )
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._subContrib))
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSubContribModifTools.getURL( self._target ) )
         self._setActiveTab()
@@ -148,11 +145,9 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
 
         return banner + body
 
-    def _setActiveSideMenuItem(self):
-        if self._contrib.isScheduled():
-            self._timetableMenuItem.setActive(True)
-        else:
-            self._contribListMenuItem.setActive(True)
+    @property
+    def sidemenu_option(self):
+        return 'timetable' if self._contrib.isScheduled() else 'contributions'
 
     def _getTabContent( self, params ):
         return "nothing"
@@ -177,26 +172,9 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
         return WSubContribModifTool().getHTML({"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )})
 
 
-class WPSubContributionModifMaterials( WPSubContributionModifBase ):
-    #TODO: maybe join it with contributions.WPContributionModifMaterials
-
-    _userData = ['favorite-user-list']
-
-    def __init__(self, rh, subcontribution):
-        WPSubContributionModifBase.__init__(self, rh, subcontribution)
-
-    def _setActiveTab( self ):
-        self._tabMaterials.setActive()
-
-    def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
-        #pars["materialTypes"] = self._matTypes
-        return wc.getHTML()
-
-
 class WPSubContributionModification( WPSubContribModifMain ):
     def _getTabContent( self, params ):
-        wc = WSubContribModifMain( self._target, materialFactories.ContribMFRegistry() )
+        wc = WSubContribModifMain(self._target)
         place = ""
         if self._target.getLocation() is not None:
             place = self._target.getLocation().getName()
@@ -280,7 +258,7 @@ class WPSubContributionModificationClosed( WPSubContribModifMain ):
             message = _("The event is currently locked and you cannot modify it in this status. ")
             if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
                 message += _("If you unlock the event, you will be able to modify its details again.")
-            url = urlHandlers.UHConferenceOpen.getURL(self._subContrib.getOwner().getConference())
+            url = url_for('event_management.unlock', self._subContrib.getOwner().getConference())
             unlockButtonCaption = _("Unlock event")
         return wcomponents.WClosed().getHTML({"message": message,
                                              "postURL":url,
@@ -289,9 +267,8 @@ class WPSubContributionModificationClosed( WPSubContribModifMain ):
 
 class WSubContribModifMain(wcomponents.WTemplated):
 
-    def __init__( self, subContribution, mfRegistry ):
+    def __init__(self, subContribution):
         self._subContrib = subContribution
-        self._mfRegistry = mfRegistry
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -309,7 +286,7 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["contribId"] = self._subContrib.getContribution().getId()
         vars["subContribId"] = self._subContrib.getId()
         vars["presenters"] = fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-        vars["authors"] = fossilize(self._subContrib.getContribution().getAllAuthors())
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._subContrib.getConference(), 10))
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
 

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,18 +20,42 @@ Module containing the Indico exception class hierarchy
 
 import traceback
 
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
+
 from indico.util.i18n import _
 from indico.util.translations import ensure_str
+
+
+def get_error_description(exception):
+    """Gets a user-friendy description for an exception
+
+    This overrides some HTTPException messages to be more suitable
+    for end-users.
+    """
+    try:
+        description = exception.description
+    except AttributeError:
+        return unicode(exception.message)
+    if isinstance(exception, Forbidden) and description == Forbidden.description:
+        return _(u"You are not allowed to access this page.")
+    elif isinstance(exception, NotFound) and description == NotFound.description:
+        return _(u"The page you are looking for doesn't exist.")
+    elif isinstance(exception, BadRequest) and description == BadRequest.description:
+        return _(u"The request was invalid or contained invalid arguments.")
+    else:
+        return unicode(description)
 
 
 class IndicoError(Exception):
 
     code = -32000  # json-rpc server specific errors starting code
 
-    def __init__(self, message='', area='', explanation=''):
+    def __init__(self, message='', area='', explanation='', http_status_code=None):
         self.message = message
         self._area = area
         self._explanation = explanation
+        if http_status_code is not None:
+            self.http_status_code = http_status_code
 
     @ensure_str
     def __str__(self):
@@ -91,22 +115,10 @@ class KeyAccessError(AccessControlError):
     pass
 
 
-class HostnameResolveError(IndicoError):
-    """
-    Hostname resolution failed
-    """
-
-
 class ModificationError(AccessControlError):
     @ensure_str
     def __str__(self):
         return _('you are not authorised to modify this {0}').format(self._object_type)
-
-
-class AdminError(AccessControlError):
-    @ensure_str
-    def __str__(self):
-        return _('only administrators can access this {0}').format(self._object_type)
 
 
 class TimingError(IndicoError):
@@ -123,15 +135,6 @@ class EntryTimingError(TimingError):
     pass
 
 
-class UserError(IndicoError):
-    @ensure_str
-    def __str__(self):
-        if self._message:
-            return self._message
-        else:
-            return _('Error creating user')
-
-
 class NotLoggedError(IndicoError):
     pass
 
@@ -145,14 +148,6 @@ class NoReportError(IndicoError):
 
 
 class NotFoundError(IndicoError):
-    pass
-
-
-class HtmlScriptError(IndicoError):
-    pass
-
-
-class HtmlForbiddenTag(IndicoError):
     pass
 
 

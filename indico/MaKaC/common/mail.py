@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -65,22 +65,24 @@ class GenericMailer:
     @staticmethod
     def _prepare(notification):
         fromAddr = notification.getFromAddr()
-        toList = filter(None, notification.getToList())
-        ccList = filter(None, notification.getCCList())
+        replyAddr = getattr(notification, '_replyAddr', None)
+        toList = set(filter(None, notification.getToList()))
+        ccList = set(filter(None, notification.getCCList()))
         if hasattr(notification, "getBCCList"):
-            bccList = notification.getBCCList()
+            bccList = set(notification.getBCCList())
         else:
-            bccList = []
+            bccList = set()
 
         msg = MIMEMultipart()
         msg["Subject"] = to_unicode(notification.getSubject()).strip()
         msg["From"] = fromAddr
-        if toList:
-            msg["To"] = ', '.join(toList)
+        msg["To"] = ', '.join(toList) if toList else 'Undisclosed-recipients:;'
         if ccList:
             msg["Cc"] = ', '.join(ccList)
+        if replyAddr:
+            msg['Reply-to'] = replyAddr
 
-        if not (msg["To"] or msg["Cc"]):
+        if not toList and not ccList and not bccList:
             return
 
         try:
@@ -128,30 +130,36 @@ class GenericMailer:
             if code != 235:
                 raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))
 
-        # XXX: Does this actually use BCC/CC properly?!
-        to_addrs = set(msgData['toList']) | set(msgData['ccList']) | set(msgData['bccList'])
+        to_addrs = msgData['toList'] | msgData['ccList'] | msgData['bccList']
         try:
-            Logger.get('mail').info("Mailing %s  CC: %s" % (msgData['toList'], msgData['ccList']))
+            Logger.get('mail').info('Sending email: To: {} / CC: {} / BCC: {}'.format(
+                ', '.join(msgData['toList']) or 'None',
+                ', '.join(msgData['ccList']) or 'None',
+                ', '.join(msgData['bccList']) or 'None'))
             server.sendmail(msgData['fromAddr'], to_addrs, msgData['msg'])
-        except smtplib.SMTPRecipientsRefused,e:
+        except smtplib.SMTPRecipientsRefused as e:
+            raise MaKaCError('Email address is not valid: {}'.format(e.recipients))
+        finally:
             server.quit()
-            raise MaKaCError("Email address is not valid: %s" % e.recipients)
-        server.quit()
-        Logger.get('mail').info('Mail sent to %s' % msgData['toList'])
+        Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
 
     @classmethod
-    def _log(cls, data):
-        data['conference'].getLogHandler().logEmail(data['data'], data['module'], data['user'])
-
-    @classmethod
-    def sendAndLog(cls, notification, conference, module='', user=None, skipQueue=False):
+    def sendAndLog(cls, notification, conference, module=None, user=None, skipQueue=False):
+        from indico.modules.events.logs import EventLogRealm, EventLogKind
+        if isinstance(notification, dict):
+            # Wrap a raw dictionary in a notification class
+            from MaKaC.webinterface.mail import GenericNotification
+            notification = GenericNotification(notification)
         cls.send(notification, skipQueue=skipQueue)
-        logData = {
-            'contentType': notification.getContentType(),
-            'fromAddr': notification.getFromAddr(),
-            'toList': notification.getToList(),
-            'ccList': notification.getCCList(),
-            'subject': notification.getSubject(),
-            'body': notification.getBody()
+        log_data = {
+            u'content_type': to_unicode(notification.getContentType()),
+            u'from': to_unicode(notification.getFromAddr()),
+            u'to': map(to_unicode, notification.getToList()),
+            u'cc': map(to_unicode, notification.getCCList()),
+            u'bcc': map(to_unicode, notification.getBCCList()),
+            u'subject': to_unicode(notification.getSubject()).strip(),
+            u'body': to_unicode(notification.getBody()).strip()
         }
-        conference.getLogHandler().logEmail(logData, module, user)
+        summary = u'Sent email: {}'.format(log_data[u'subject'])
+        conference.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or u'Unknown'), summary, user,
+                       type_=u'email', data=log_data)

@@ -1,4 +1,4 @@
-<%inherit file="Administrative.tpl"/>
+<%inherit file="AdministrativeAllMaterial.tpl"/>
 <%!
   allMaterial = True
   hideTime = True
@@ -27,16 +27,6 @@
                 <div align="center">
                 <hr width="50%"/>
             </div>
-</%block>
-
-<%block name="eventMaterial">
-    % if len(conf.getAllMaterialList()) > 0:
-        % for material in conf.getAllMaterialList():
-            % if material.canView(accessWrapper):
-               <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
-            % endif
-        % endfor
-    % endif
 </%block>
 
 <%block name="printSchedule" args="showOrder">

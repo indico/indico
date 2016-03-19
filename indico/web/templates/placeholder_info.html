@@ -1,0 +1,35 @@
+{% macro render_placeholders(advanced) %}
+    {%- set br = joiner('<br>'|safe) -%}
+    {% for placeholder in placeholders if placeholder.advanced == advanced and placeholder.description is not none -%}
+        {{ br() }}
+        <span style="font-style: normal;">{{ placeholder.friendly_name }}</span>:
+        {{ placeholder.description }} {% if placeholder.required %}(required){% endif %}
+    {% endfor %}
+    {% for placeholder in placeholders if placeholder.advanced == advanced and placeholder is subclassof ParametrizedPlaceholder -%}
+        {% for param, description in placeholder.iter_param_info(**placeholder_kwargs) %}
+            {{ br() }}
+            <span style="font-style: normal;">{ {{- placeholder.name -}}:{{- param -}} }</span>:
+            {{ description }} {% if placeholder.required %}(required){% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endmacro %}
+
+
+<strong>{% trans %}Available placeholders{% endtrans %}</strong><br>
+{{ render_placeholders(false) }}
+
+{% if placeholders|selectattr('advanced')|list|count %}
+    <div class="advanced-placeholders">
+        <strong>{% trans %}Advanced placeholders{% endtrans %}</strong> (<a href="#" class="toggle">{% trans %}toggle{% endtrans %}</a>)
+        <br>
+        <div class="placeholders" style="display: none;">
+            {{ render_placeholders(true) }}
+        </div>
+        <script>
+            $('.advanced-placeholders .toggle').on('click', function(e) {
+                e.preventDefault();
+                $(this).siblings('.placeholders').slideToggle();
+            }).removeClass('toggle');
+        </script>
+    </div>
+{% endif %}

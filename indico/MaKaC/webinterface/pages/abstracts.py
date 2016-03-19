@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ from xml.sax.saxutils import quoteattr
 import urllib
 from pytz import timezone
 
+from MaKaC.common.search import get_authors_from_author_index
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
@@ -31,7 +32,6 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
-from indico.core import config as Configuration
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
@@ -43,7 +43,7 @@ from indico.util.string import render_markdown, natural_sort_key
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
 
-    _linkname = "CFA"
+    _linkname = 'call_for_abstracts'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -64,7 +64,7 @@ class WPCFAInactive(WPConferenceDefaultDisplayBase):
 
 class WCFANotYetOpened(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -79,19 +79,16 @@ class WCFANotYetOpened(WConfDisplayBodyBase):
 
 
 class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'abstract_submission'
 
     def _getBody(self, params):
         wc = WCFANotYetOpened(self._getAW(), self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
-
 
 class WCFAClosed(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -106,6 +103,7 @@ class WCFAClosed(WConfDisplayBodyBase):
 
 
 class WPCFAClosed(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'abstract_submission'
 
     def __init__(self, rh, conf, is_modif):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
@@ -115,14 +113,10 @@ class WPCFAClosed(WPConferenceDefaultDisplayBase):
         wc = WCFAClosed(self._getAW(), self._conf)
         return wc.getHTML({'is_modif': self._is_modif})
 
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
-
 
 class WConfCFA(WConfDisplayBodyBase):
 
-    _linkname = "CFA"
+    _linkname = 'call_for_abstracts'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -164,18 +158,16 @@ class WConfCFA(WConfDisplayBodyBase):
 
 class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEConferenceCFA
+    menu_entry_name = 'call_for_abstracts'
 
     def _getBody(self, params):
         wc = WConfCFA(self._getAW(), self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaOpt)
-
 
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
+    menu_entry_name = 'abstract_submission'
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -197,14 +189,10 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
         wc = WAbstractDataModification( self._conf )
         return wc.getHTML( params )
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
-
 
 class WUserAbstracts(WConfDisplayBodyBase):
 
-    _linkname = "ViewAbstracts"
+    _linkname = 'user_abstracts'
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -248,14 +236,11 @@ class WUserAbstracts(WConfDisplayBodyBase):
 
 class WPUserAbstracts( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEUserAbstracts
+    menu_entry_name = 'user_abstracts'
 
     def _getBody( self, params ):
         wc = WUserAbstracts( self._getAW(), self._conf )
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaViewSubmissionsOpt)
 
 
 class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
@@ -402,7 +387,7 @@ class WPAbstractDisplay(WPAbstractDisplayBase):
 
 class WAbstractDataModification(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, conf):
         self._conf = conf
@@ -430,6 +415,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         vars["abstractTitle"] = quoteattr(str(vars.get("title", "")))
         vars["prAuthors"] = fossilize(vars.get("prAuthors", []))
         vars["coAuthors"] = fossilize(vars.get("coAuthors", []))
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._conf, 10))
         cfaMgr = self._conf.getAbstractMgr()
         vars["tracksMandatory"] = cfaMgr.areTracksMandatory()
         vars["tracks"] = self._conf.getTrackList()
@@ -521,6 +507,7 @@ class WPAbstractRecovery( WPAbstractDisplayBase ):
 
 
 class WPAbstractManagementBase( WPConferenceModifBase ):
+    sidemenu_option = 'abstracts'
 
     def __init__( self, rh, abstract ):
         self._abstract = self._target = abstract
@@ -549,10 +536,10 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
             urlHandlers.UHAbstractModTools.getURL( self._abstract))
 
         # Sub tabs for the track judgements
-        self._subTabTrack = self._tabTracks.newSubTab( "byTrack", "Judgement details",\
-                urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract))
-        self._subTabRating = self._tabTracks.newSubTab( "byRating", "Rating per question",\
-                urlHandlers.UHAbstractTrackOrderByRating.getURL(self._abstract))
+        self._subTabTrack = self._tabTracks.newSubTab(
+            "byTrack", _("Judgement details"), urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract))
+        self._subTabRating = self._tabTracks.newSubTab(
+            "byRating", _("Rating per question"), urlHandlers.UHAbstractTrackOrderByRating.getURL(self._abstract))
 
         self._setActiveTab()
 
@@ -562,9 +549,6 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
         banner = wcomponents.WAbstractBannerModif(self._abstract).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + html
-
-    def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive(True)
 
     def _getTabContent( self, params ):
         return "nothing"
@@ -765,6 +749,7 @@ class WAbstractManagment(wcomponents.WTemplated):
             co_authors.append(self._getAuthorHTML(author))
         vars["primary_authors"] = "<br>".join(primary_authors)
         vars["co_authors"] = "<br>".join(co_authors)
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._conf, 10))
         speakers = []
         for spk in self._abstract.getSpeakerList():
             speakers.append(self._getAuthorHTML(spk))
@@ -1408,7 +1393,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                         answerValues.append("%.2f" % ans.getValue())
                     rating = "%.2f" % status.getJudValue()
                     total = "%.2f" % status.getTotalJudValue()
-                    imgIcon = Configuration.Config.getInstance().getSystemIconURL("collapsd.png")
+                    imgIcon = Config.getInstance().getSystemIconURL("collapsd.png")
                     detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answerValues, rating, total)
 
                 tracks += "<tr bgcolor=\"%s\">"%color

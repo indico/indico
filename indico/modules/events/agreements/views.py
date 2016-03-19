@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,9 +30,7 @@ class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
 
 class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/agreements/'
+    sidemenu_option = 'agreements'
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['agreements'].setActive()

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,19 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.conference import CategoryManager
-
 from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.common import search
 
-from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.user import IAvatarFossil, IGroupFossil
+from MaKaC.fossils.user import IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
-from MaKaC.services.implementation.user import UserComparator
-
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
+from indico.modules.groups import GroupProxy
 
 #################################
 # User and group search
@@ -36,16 +31,7 @@ from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 class SearchBase(ServiceBase):
 
     def _checkParams(self):
-        """ Checks for external authenticators
-            For now the underlying MaKaC.common.search code only supports
-            1 external authenticator, so we just see if a proper external authenticator is present or not
-        """
-        self._searchExt = False
-        for authenticatorName in AuthenticatorMgr().getAuthenticatorIdList():
-            authParamName = "searchExternal-" + authenticatorName
-            if authParamName in self._params and self._params[authParamName]:
-                self._searchExt = True
-                break
+        self._searchExt = self._params.get('search-ext', False)
 
 
 class SearchUsers(SearchBase):
@@ -65,8 +51,7 @@ class SearchUsers(SearchBase):
                                      self._confId, self._exactMatch, self._searchExt)
 
         # will use either IAvatarFossil or IContributionParticipationFossil
-        fossilizedResults = fossilize(results)
-        fossilizedResults.sort(cmp=UserComparator.cmpUsers)
+        fossilizedResults = fossilize(sorted(results, key=lambda av: (av.getStraightFullName(), av.getEmail())))
 
         return fossilizedResults
 
@@ -75,50 +60,18 @@ class SearchGroups(SearchBase):
 
     def _checkParams(self):
         SearchBase._checkParams(self)
-        self._group = self._params.get("group", "")
+        self._group = self._params.get("group", "").strip()
+        self._exactMatch = self._params.get("exactMatch", False)
 
     def _getAnswer(self):
-
-        results = search.searchGroups(self._group, self._searchExt)
-
-        fossilizedResults = fossilize(results, IGroupFossil)
-        fossilizedResults.sort(cmp=UserComparator.cmpGroups)
-
-        for fossilizedGroup in fossilizedResults:
+        results = [g.as_legacy_group for g in GroupProxy.search(self._group, exact=self._exactMatch)]
+        fossilized_results = fossilize(results, IGroupFossil)
+        for fossilizedGroup in fossilized_results:
             fossilizedGroup["isGroup"] = True
-
-        return fossilizedResults
-
-
-class SearchUsersGroups(ServiceBase):
-
-    def _getAnswer(self):
-        results = {}
-        users = search.searchUsers(surName=self._params.get("surName", ""),
-                                   name=self._params.get("name", ""),
-                                   organisation=self._params.get("organisation", ""),
-                                   email=self._params.get("email", ""),
-                                   conferenceId=self._params.get("conferenceId", None),
-                                   exactMatch=self._params.get("exactMatch", False),
-                                   searchExt=self._params.get("searchExt", False))
-
-        groups = search.searchGroups(group=self._params.get("group", ""),
-                                     searchExt=self._params.get("searchExt", False))
-
-        fossilizedUsers = [human.fossilize(IAvatarFossil) for human in users]
-        fossilizedGroups = [group.fossilize(IGroupFossil) for group in groups]
-
-        fossilizedUsers.sort(cmp=UserComparator.cmpUsers)
-        fossilizedGroups.sort(cmp=UserComparator.cmpGroups)
-
-        results["people"] = fossilizedUsers
-        results["groups"] = fossilizedGroups
-
-        return results
+        return fossilized_results
 
 
 methodMap = {
     "users": SearchUsers,
     "groups": SearchGroups,
-    "usersGroups": SearchUsersGroups
 }

@@ -1,0 +1,19 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans %}Send new agreements{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans %}To selected people{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form) }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        <input type="submit" class="i-button highlight big" value="{% trans %}Send{% endtrans %}">
+        <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}

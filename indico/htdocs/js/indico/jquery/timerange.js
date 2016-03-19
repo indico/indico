@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -69,7 +69,7 @@
                 callback: function() {
                     self._updateSlider();
                 }
-            }
+            };
 
             self.startTime = $('<input>', {
                 type: 'text',
@@ -123,6 +123,15 @@
                     self._trigger('change', this);
                 }
             });
+        },
+
+        _setOption: function(key, value) {
+            if (key === 'disabled') {
+                this.slider.slider(value ? 'disable' : 'enabled');
+                this.startTime.prop('disabled', !!value);
+                this.endTime.prop('disabled', !!value);
+            }
+            this._super(key, value);
         },
 
         _updateInputs: function(event, ui) {

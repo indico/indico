@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,13 +25,12 @@ from indico.web.flask.util import url_for
 
 
 class WPRoomsBase(WPAdminsBase):
-    def _setActiveSideMenuItem(self):
-        self._roomsMenuItem.setActive()
+    sidemenu_option = 'rb'
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
 
-        if session.user.isAdmin():
+        if session.user.is_admin:
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
                 _('Room Booking'),

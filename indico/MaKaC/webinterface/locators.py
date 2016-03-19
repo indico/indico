@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,9 +17,10 @@
 import MaKaC.conference as conference
 import MaKaC.errors as errors
 import MaKaC.domain as domain
+from MaKaC.paperReviewing import reviewing_factory_get
 import MaKaC.roomMapping as roomMapping
-import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
+
 
 class CategoryWebLocator:
 
@@ -85,16 +86,13 @@ class WebLocator:
         self.__reviewId = None
         self.__materialId = None
         self.__resId = None
-        self.__alarmId = None
         self.__trackId = None
         self.__abstractId = None
-        self.__menuLinkId = None
         self.__contribTypeId = None
         self.__slotId = None
         self.__notifTplId = None
         self.__location = None
         self.__roomID = None
-        self.__registrantId = None
 
     def setCategory( self, params, mustExist=1 ):
         if not ("categId" in params.keys()) or params["categId"].strip()=="":
@@ -125,14 +123,6 @@ class WebLocator:
                 raise errors.MaKaCError( _("notificationTemplate id not set"))
         else:
             self.__notifTplId = params["notifTplId"]
-
-    def setMenuLink( self, params, mustExist=1 ):
-        self.setConference(params)
-        if not ("linkId" in params.keys()) or params["linkId"].strip=="":
-            if mustExist:
-                raise errors.MaKaCError( _("link id not set"))
-        else:
-            self.__menuLinkId = params["linkId"]
 
     def setContribType( self, params ):
         self.setConference(params)
@@ -229,34 +219,12 @@ class WebLocator:
         else:
             self.__reviewId = params["reviewId"]
 
-    def setAlarm(self, params, mustExist=1 ):
-        self.setConference( params )
-        #self.setConference( params )
-        if not ("alarmId" in params.keys()) or \
-            params["alarmId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("alarm id not set"))
-        else:
-            self.__alarmId = params["alarmId"]
-
-    def setRegistrant( self, params, mustExist=1  ):
-        self.setConference( params )
-        if not ("registrantId" in params.keys()) or \
-           params["registrantId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("registrant id not set"))
-        else:
-            self.__registrantId = params["registrantId"]
-
     def setMaterial( self, params, mustExist=1 ):
         if "confId" in params.keys() and params["confId"] != None:
             if "reviewId" in params.keys():
                 self.setReview(params, 0)
             elif "abstractId" in params.keys():
                 self.setAbstract(params, mustExist)
-                return
-            elif "registrantId" in params.keys():
-                self.setRegistrant(params, mustExist)
                 return
             else:
                 self.setSubContribution( params, 0 )
@@ -289,28 +257,19 @@ class WebLocator:
             if not conference.CategoryManager().hasKey(self.__categId):
                 raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
             obj = conference.CategoryManager().getById(self.__categId)
-            if self.__materialId:
-                obj=obj.getMaterialById(self.__materialId)
-            if self.__resId:
-                obj=obj.getResourceById( self.__resId )
+            if self.__materialId is not None or self.__resId is not None:
+                return None  # obsolete - attachments don't use WebLocator
             return obj
         if not self.__confId:
             return None
         obj = conference.ConferenceHolder().getById( self.__confId )
         if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
-        fr = materialFactories.ConfMFRegistry
         if self.__notifTplId:
             obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
             return obj
-        if self.__alarmId:
-            obj = obj.getAlarmById( self.__alarmId )
-            return obj
         if self.__trackId:
             obj = obj.getTrackById( self.__trackId )
-            return obj
-        if self.__menuLinkId:
-            obj = obj.getDisplayMgr().getMenu().getLinkById(self.__menuLinkId)
             return obj
         if self.__contribTypeId:
             obj = obj.getContribTypeById(self.__contribTypeId)
@@ -321,24 +280,16 @@ class WebLocator:
                 raise errors.NoReportError("The abstract you are trying to access does not exist or has been deleted")
             if self.__resId:
                 return obj.getAttachmentById( self.__resId )
-        if self.__registrantId:
-            obj = obj.getRegistrantById( self.__registrantId )
-            if obj == None:
-                raise errors.NoReportError("The registrant you are trying to access does not exist or has been deleted")
-            if self.__resId:
-                return obj.getAttachmentById( self.__resId )
         if self.__sessionId:
             obj = obj.getSessionById( self.__sessionId )
-            fr = materialFactories.SessionMFRegistry
             if obj == None:
                 raise errors.NoReportError("The session you are trying to access does not exist or has been deleted")
         if self.__slotId:
             obj = obj.getSlotById( self.__slotId )
         if self.__contribId:
             obj = obj.getContributionById( self.__contribId )
-            fr = materialFactories.ContribMFRegistry
             if obj == None:
-                raise errors.NoReportError("The contribution you are trying to access does not exist or has been deleted")
+                raise errors.NoReportError(_("The contribution you are trying to access does not exist or has been deleted"))
         if self.__reviewId:
             #obj must be a Contribution
             obj = obj.getReviewManager().getReviewById(self.__reviewId)
@@ -346,18 +297,12 @@ class WebLocator:
                 raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
         if self.__subContribId and self.__contribId:
             obj = obj.getSubContributionById( self.__subContribId )
-            fr = materialFactories.ContribMFRegistry
             if obj == None:
                 raise errors.NoReportError("The subcontribution you are trying to access does not exist or has been deleted")
         if not self.__materialId:
             return obj
-        #first we check if it refers to a special type of material
-        mat = None
-        f = fr.getById( self.__materialId )
-        if f:
-            mat = f.get( obj )
-        if not mat:
-            mat = obj.getMaterialById( self.__materialId )
-        if not self.__resId:
+        assert self.__materialId == 'reviewing'
+        mat = reviewing_factory_get(obj)
+        if mat is None or self.__resId is None:
             return mat
-        return mat.getResourceById( self.__resId )
+        return mat.getResourceById(self.__resId)

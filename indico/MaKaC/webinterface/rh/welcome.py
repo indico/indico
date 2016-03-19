@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,13 +20,20 @@ import MaKaC.webinterface.pages.welcome as welcome
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 
-class RHWelcome( base.RHDisplayBaseProtected ):
+from indico.modules.users import User
+from indico.web.flask.util import url_for
+
+
+class RHWelcome(base.RHDisplayBaseProtected):
     _uh = urlHandlers.UHWelcome
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         self._target = conference.CategoryManager().getRoot()
 
-    def _process( self ):
-        wfReg = webFactoryRegistry.WebFactoryRegistry()
-        p = welcome.WPWelcome( self, self._target, wfReg )
-        return p.display()
+    def _process(self):
+        if not User.has_rows():
+            self._redirect(url_for('bootstrap.index'))
+        else:
+            wfReg = webFactoryRegistry.WebFactoryRegistry()
+            p = welcome.WPWelcome(self, self._target, wfReg)
+            return p.display()

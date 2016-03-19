@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,3 +20,6 @@ _signals = Namespace()
 
 from indico.core.signals.event.contributions import *
 from indico.core.signals.event.core import *
+from indico.core.signals.event.notes import *
+from indico.core.signals.event.registration import *
+from indico.core.signals.event.surveys import *

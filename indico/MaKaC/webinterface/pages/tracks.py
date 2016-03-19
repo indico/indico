@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,7 +18,6 @@ from xml.sax.saxutils import quoteattr, escape
 from urllib import quote
 from datetime import datetime,timedelta
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.conferences import WContribParticipantList
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import wcomponents
@@ -28,52 +27,17 @@ from MaKaC.common import filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
 from MaKaC.common.TemplateExec import render
 
 
-class WPTrackBase(WPConferenceBase):
+class WPTrackModifBase(WPConferenceModifBase):
+    sidemenu_option = 'program'
 
-    def __init__( self, rh, track, subTrack=None):
-        WPConferenceBase.__init__( self, rh, track.getConference() )
-        self._track = track
-        self._subTrack = subTrack
-
-
-class WPTrackDisplayBase( WPTrackBase ):
-    pass
-
-
-class WPTrackDefaultDisplayBase( WPTrackDisplayBase, WPConferenceDefaultDisplayBase ):
-
-    def __init__( self, rh, track ):
-        WPTrackDisplayBase.__init__( self, rh, track )
-
-    def _applyDecoration( self, body ):
-        return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
-
-    def _display(self,params):
-        return WPConferenceDefaultDisplayBase._display(self,params)
-
-
-class WPTrackDisplay( WPTrackDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WTrackDisplay( self._getAW(), self._track )
-        pars = { \
-"trackModifURL": urlHandlers.UHTrackModification.getURL( self._track ), \
-"materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-"contribURLGen": urlHandlers.UHContributionDisplay.getURL }
-        return wc.getHTML( pars )
-
-
-class WPTrackModifBase( WPConferenceModifBase ):
-
-    def __init__( self, rh, track, subTrack=None):
-        WPConferenceModifBase.__init__( self, rh, track.getConference() )
+    def __init__(self, rh, track, subTrack=None):
+        WPConferenceModifBase.__init__(self, rh, track.getConference())
         self._track = track
         self._subTrack = subTrack
 
@@ -107,9 +71,6 @@ class WPTrackModifBase( WPConferenceModifBase ):
 
     def _setActiveTab( self ):
         pass
-
-    def _setActiveSideMenuItem( self ):
-        self._programMenuItem.setActive()
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
@@ -689,12 +650,13 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
         return wc.getHTML(pars)
 
 
-class WPTrackAbstractModifBase( WPConferenceModifBase ):
+class WPTrackAbstractModifBase(WPConferenceModifBase):
+    sidemenu_option = 'program'
 
-    def __init__( self, rh, track, abstract ):
+    def __init__(self, rh, track, abstract):
         self._abstract = abstract
         self._track = track
-        WPConferenceModifBase.__init__( self, rh, self._track.getConference() )
+        WPConferenceModifBase.__init__(self, rh, self._track.getConference())
 
     def _getNavigationDrawer(self):
         pars = {"target": self._abstract, "isModif": True, "track": self._track}
@@ -722,9 +684,6 @@ class WPTrackAbstractModifBase( WPConferenceModifBase ):
 
     def _getTabContent( self, params ):
         return _("nothing")
-
-    def _setActiveSideMenuItem(self):
-        self._programMenuItem.setActive()
 
 
 class WTrackAbstractModification( wcomponents.WTemplated ):
@@ -827,10 +786,12 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
                 comment = i18nformat("""%s<font color="red">_("In conflict with"): <br> %s</font>""")%(comment, "<br>".join(l) )
         rl = self._abstract.getReallocationTargetedList( self._track )
         if rl:
-            comment = i18nformat("""%s<br><br><font color="green">_("Proposed by") <i>%s</i>(%s): <br>%s</font>""")%(comment, \
-                    self.htmlText( rl[0].getTrack().getTitle() ), \
-                    self._getAuthorHTML( rl[0].getResponsible() ), \
-                    self.htmlText( rl[0].getComment() ) )
+            comment = i18nformat("""%s<br><br><font color="green">_("Proposed by") <i>%s</i>(%s): <br>%s</font>""") % (
+                comment,
+                self.htmlText(rl[0].getTrack().getTitle()),
+                self._getAuthorHTML(rl[0].getResponsible()) if rl[0].getResponsible() else '',
+                self.htmlText(rl[0].getComment())
+            )
         return comment
 
     def _getContribHTML(self):
@@ -1151,9 +1112,6 @@ class WTrackModContribList(wcomponents.WTemplated):
 
         if self._filterCrit.getField("status"):
             url.addParam("status",self._filterCrit.getField("status").getValues())
-
-#        if self._filterCrit.getField("material"):
-#            url.addParam("material",self._filterCrit.getField("material").getValues())
 
         if self._sortingCrit.getField():
             url.addParam("sortBy",self._sortingCrit.getField().getId())

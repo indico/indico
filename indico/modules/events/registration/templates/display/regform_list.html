@@ -1,0 +1,73 @@
+{% if event.getType() == 'conference' %}
+    {% extends 'events/registration/display/_event_registration_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+{% endif %}
+
+{% block subtitle %}
+    {% trans %}Available forms{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <table id="regforms-list" class="i-table-widget">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{% trans %}Opens{% endtrans %}</th>
+                <th>{% trans %}Closes{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for regform in regforms %}
+                <tr>
+                    <td>
+                        {% if event.as_event.can_manage(session.user, 'registration') %}
+                            <a href="{{ url_for('.manage_regform', regform) }}">{{ regform.title }}</a>
+                        {% else %}
+                            {{ regform.title }}
+                        {% endif %}
+                    </td>
+                    <td>{{ regform.start_dt | format_datetime if regform.start_dt else _('Not started') }}</td>
+                    <td>{{ regform.end_dt | format_datetime if regform.end_dt else _('No deadline') }}</td>
+                    <td class="regform-actions">
+                        {% if session.user and regform.get_registration(user=session.user) %}
+                            <a href="{{ url_for('.display_regform', regform) }}"
+                               class="i-button highlight"
+                               title="{% trans %}You have already registered{% endtrans %}">
+                                {% trans %}Check details{% endtrans %}
+                            </a>
+                        {% elif not regform.is_open %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Registration is closed{% endtrans %}">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% elif regform.limit_reached %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        {% trans %}No registration forms available for this event{% endtrans %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if event.getType() != 'conference' %}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}

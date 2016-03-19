@@ -1,0 +1,26 @@
+<div ng-controller="BillableCtrl">
+    <ng-form name="nestedForm">
+        <input type="number"
+            id="field-{{ section.id }}-{{ field.id }}"
+            ng-model="userdata[fieldName]"
+            name="{{ fieldName }}"
+            size="{{ field.length }}"
+            min="{{ field.minValue || getDefaultFieldSetting('defaultMinValue') }}"
+            ng-required="field.isRequired"
+            ng-disabled="!regMetadata.manager && paymentBlocked(field, userdata, regMetadata)"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
+    </ng-form>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.min " class="error-message-tag">
+        {{ 'The value must be at least {0}' | i18n:field.minValue }}
+    </span>
+    <span ng-if="changesPrice(field)">
+        <span class="regFormPrice">{{ field.price }}</span>
+        <nd-currency currency="currency"></nd-currency>
+        <span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
+        <span>{{ subtotal }}</span>
+        <nd-currency currency="currency"></nd-currency>
+    </span>
+</div>

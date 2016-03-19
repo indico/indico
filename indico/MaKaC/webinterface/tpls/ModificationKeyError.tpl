@@ -7,8 +7,8 @@
     <tr>
         <td align="center">
         <form action=${url} method="POST">
-        %if loginURL:
-            <a class="loginHighlighted" style="padding:4px 17px" href="${ loginURL}"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the modification key here:")}
+        %if not _session.user:
+            <a class="loginHighlighted" style="padding:4px 17px" href="${ url_for_login(_request.relative_url) }"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the modification key here:")}
         %else:
             ${ _("Please enter it here:")}
         % endif

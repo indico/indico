@@ -1,0 +1,92 @@
+{% macro menu_entry(entry) -%}
+    <div class="menu-entry {%- if entry.is_root and entry.children %} with-children{% endif %}"
+         data-position="{{ entry.position }}"
+         data-position-url="{{ url_for('.menu_entry_position', entry) }}"
+         data-entry-id="{{ entry.id }}">
+        <div class="i-label drag-handle
+            {%- if entry.type.name == 'separator' %} disabled
+            {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
+            {%- if not entry.is_enabled %} striped{% endif %}">
+            <i class="entry-{{ entry.type.name }}"></i>
+            <span class="title">
+                {% if config.DEBUG %}<span class="position">{{ entry.position + 1}}</span>{% endif %}
+                {{ entry.localized_title }}
+            </span>
+            <span class="right actions">
+                {% if entry.type.name == 'page' %}
+                    <a class="{% if not entry.page.is_default %}not-{% endif %}default" href="#"
+                       data-href="{{ url_for('.menu_entry_toggle_default', entry) }}"
+                       data-method="POST"
+                       title="{% trans %}Toggle default event homepage{% endtrans %}"
+                    ></a>
+                {% endif %}
+                <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
+                   data-href="{{ url_for('.menu_entry_toggle_enabled', entry) }}"
+                   data-method="POST"
+                ></a>
+                {% if not entry.is_separator %}
+                    <a href="#" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
+                {% endif %}
+                {% if entry.type.name in ('user_link', 'page', 'separator') %}
+                    <a href="#" class="delete-entry"
+                         data-method="DELETE"
+                         data-href="{{ url_for('.menu_delete_entry', entry) }}"
+                         data-title="{% trans%}Remove the menu entry?{% endtrans %}"
+                         data-confirm="
+                            {%- if not entry.is_separator -%}
+                                {%- trans name='&quot;{}&quot;'.format(entry.localized_title) -%}
+                                    Are you sure you want to remove {{ name }}?
+                                {%- endtrans -%}
+                            {% else %}
+                                {%- trans %}Are you sure you want to remove this spacer?{% endtrans -%}
+                            {% endif %}">
+                    </a>
+                {% endif %}
+            </span>
+        </div>
+        {% if entry.is_root and entry.children %}
+            {{ menu_entries(entry.children, connect_menu=entry.type.name in ('user_link', 'page')) }}
+        {% elif entry.type.name in ('user_link', 'page') %}
+            {{ menu_entries([], connect_menu=true) }}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{% macro menu_entries(entries, connect_menu=False) -%}
+    {# empty class as the :empty pseudo selector fails if there are white spaces, \t or \n between the <ul> tags #}
+    <ul class="menu-entries {%- if connect_menu %} connect-menu{% endif %}{% if not entries %} empty {% endif %}"
+        data-empty-text="{% trans %}Drop here to create a nested entry.{% endtrans %}">
+        {%- for entry in entries if not entry.is_orphaned %}
+            <li {% if entry.type.name in ('user_link', 'page') -%}
+                    class="{% if entry.is_root -%}
+                        allow-nested {%- if not entry.children %} nestable{% endif -%}
+                    {%- else -%}
+                        nestable
+                    {%- endif -%}"
+                {%- endif %}>
+                {{- menu_entry(entry) -}}
+            </li>
+        {% endfor -%}
+    </ul>
+{%- endmacro %}
+
+
+{% macro menu_entry_display(entry, root_entry=true, active_entry_id=none) %}
+    {%- if entry.is_separator -%}
+        <li class="spacer"></li>
+    {%- else -%}
+        {% set menu_class = 'menuConfTitle' if root_entry else 'menuConfMiddleCell' %}
+        <li class="{{ menu_class }}
+            {%- if entry.id == active_entry_id %} selected menuConfSelected
+                    {%- if not root_entry %} sublink{% endif -%}
+            {%- endif %}">
+            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>{{ entry.localized_title }}</a>
+            {%- if root_entry and entry.children -%}
+                <ul class="inner">
+                    {%- for child in entry.children if child.is_visible -%}
+                        {{ menu_entry_display(child, root_entry=False, active_entry_id=active_entry_id) }}
+                    {%- endfor -%}
+                </ul>
+            {%- endif -%}
+    {%- endif -%}
+{% endmacro %}

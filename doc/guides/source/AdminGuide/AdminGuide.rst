@@ -106,82 +106,18 @@ Users
 The *Users and Groups* option allows you to control and modify any of
 the users accounds and groups.
 
---------------
-
-Manually Creating a User
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-To manually create a new account use the *New User* button in the
-*Users and Groups* menu, *Manage Users* tab. You will be presented
-with the same form as a user creating his own account;
-fill it in and submit it in order to create the account. You will still
-need to activate the account.
 
 --------------
 
 Searching for Users
 ~~~~~~~~~~~~~~~~~~~
 
-You can search for a user by surname, first name, email
-address or organisation. If you are not sure of the full details you
-can enter only one of the options or the first few letters and you will
-be shown all the users that match your search. The Search filter is
-found by clicking on *Users and Groups* > *Manage Users*.
+You can search for a user by surname, first name, email address or organisation.
+If you are not sure of the full details you can enter only one of the options or
+the first few letters and you will be shown all the users that match your
+search. The Search filter is found by clicking on *Users*. User profiles can be
+accessed and modified by clicking on the results.
 
---------------
-
-Manually Activating an Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To activate an account from within the administration area, go to
-the *Users and Groups* option, *Manage Users* tab and search for the user's
-account using the filter. Then select the account you wish to
-activate, this will take you to the user's details:
-
-|image5|
-
-If an account has not been activated its status will be *not
-confirmed*. Click the button *activate the account* next to the status
-in order to activate the account. The account status will then be
-changed to *activated* and the user for that account will now be able
-to log in.
-
---------------
-
-Modifying a User's Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-From the Account Details screen above you have the option to modify
-the user's details. From here you are able to modify the user
-affiliation, email address, postal address, telephone number,
-fax number, default timezone, default language, etc.
-
---------------
-
-Creating Additional Logins for a User
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A user may have more than one login (username and password) on
-their account, this can be useful if the user has certain access
-rights with one login but not with another, they can then choose
-which login to use when using Indico.
-
-|image6|
-
-To create a new login account for a user, click on the *create a new
-account* button. This will take you to a screen where you can enter
-a new username and password. Once the new account is added it will
-show in the User Details screen as above.
-
---------------
-
-Deleting Additional Logins
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To delete any additional account login select those accounts for
-that user that you wish to delete and use the *delete selected
-accounts* option from the User Details screen above. However, a user
-must have at least one login account.
 
 --------------
 
@@ -195,15 +131,8 @@ manage an event, you could make a group of Managers for each event
 and then assign each set to an event, as apposed to adding each
 individual user.
 
-To create a new group use the *New Group* feature in the *Users
-and Groups* menu, *Manage Groups* tab. You will be asked for a
-group name and a description.
-
-|image7|
-
-You can then start to add or remove users from the group.
-
-|image8|
+To create a new group use the *Create new Group* feature in the *Groups* menu.
+You will be asked for a group name and users to add.
 
 You can assign a group of users to Access Control in the same way
 as you can add individual users. Once your group(s) is/are created
@@ -253,87 +182,10 @@ From here you are able to:
    to save memory by using the *pack* option, this will keep the
    current version of the database.
 
--
-   Delete Websessions. The database stores temporary information for
-   the period in which an end user is navigating Indico, for example,
-   websessions. Websessions are stored in the database until you choose
-   to delete them.
-
 
 |image11|
 
-You will be asked to confirm the deletion of temporary files and
-websessions as well as packing of the database.
-
 --------------
-
-Plugins
------------
-
-The plugins area is accessible from the *Plugins* menu.
-From here you are able to:
-
--
-   Load the plugin types that are installed within Indico. This can be done
-   manually by clicking in *Reload the plugins manually* button or
-   automatically when you enter in the page by activating the checkbox
-   *Reload all plugins every time you open*.
-
--
-   Enable and disable the plugin types by clicking in the red/green square.
-
-|image12|
-
-
-Search plugin
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This plugin allows to choose which search engine to use in order to perfom a search action in Indico.
-From here you can activate the different search engine adapters and choose the one to use
-by default, if there are more than one.
-
-Currently, the only search engine plugin is developed for *Invenio*. You need
-to setup the Invenio server and select the mode:
-
-* redirection to the search engine web server
-* fetching, only PUBLIC, results from the search engine server and rendering them using Indico UI
-* fetching, PUBLIC and PRIVATE, results from the search engine server and rendering them using Indico UI
-
-You will also need to activate the corresponding Livesync plugin in `Livesync plugin <#livesync-plugin>`_ in order to
-keep up-to-date the indexes and contents in the Search Engine Server.
-
-|image13|
-
-
-Outlook calendar notification plugin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This plugin allows to synchronize information about Indico events with the participants personal Microsoft Outlook calendars.
-If a user is added as a registrant/participant of the conference/meeting, a notification about the event is sent to his Outlook calendar.
-The calendar notification is updated every time the event details are changed.
-
-The calendar notification contains the following information about the event:
-
-* title
-* description
-* time
-* location
-* link to event page
-
-This plugin is enabled by default for each user but the user can disable it from the *User Personal Preferences* page.
-The Synchronization is run at a specific interval by the indico-scheduler.
-
-To run the scheduler task for synchronizing events which the calendar, you have to run following commands in *indico_shell*::
-
-    from indico.ext.calendaring.outlook.tasks import OutlookTaskRegistry
-    OutlookTaskRegistry.register()
-
-|image14|
-
-
-Livesync plugin
-~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 Administration scripts
 ========================
@@ -359,13 +211,6 @@ For more information type in console ::
 .. |image2| image:: AdminGuidePics/start2.png
 .. |image3| image:: AdminGuidePics/admin1.png
 .. |image4| image:: AdminGuidePics/admin2.png
-.. |image5| image:: AdminGuidePics/admin3.png
-.. |image6| image:: AdminGuidePics/admin4.png
-.. |image7| image:: AdminGuidePics/admin5.png
-.. |image8| image:: AdminGuidePics/admin6.png
 .. |image9| image:: AdminGuidePics/admin7.png
 .. |image10| image:: AdminGuidePics/admin8.png
 .. |image11| image:: AdminGuidePics/admin9.png
-.. |image12| image:: AdminGuidePics/admin10.png
-.. |image13| image:: AdminGuidePics/admin11.png
-.. |image14| image:: AdminGuidePics/admin12.png

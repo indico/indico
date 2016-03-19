@@ -6,7 +6,7 @@
                     <table cellpadding="0" cellspacing="0" border="0" width="${ titleTabPixels }px">
                         <tr>
                             <td width="27px"><a href="${ trackDisplayURL }"><img class="imglink" src="${ imgGestionGrey }" alt="Viewing interface"></a></td>
-                            <td align="right" class="menutitle">Track</td>
+                            <td align="right" class="menutitle">${_("Track")}</td>
                         </tr>
                     </table>
                 </td>

@@ -1,0 +1,11 @@
+{% extends 'events/registration/emails/registration_creation_to_registrant.html' %}
+
+{% block subject_prefix -%}
+    Registration modified
+{%- endblock %}
+
+{% block registration_header_text -%}
+    Your registration {{ render_registration_info() }} has been modified.
+    {{ render_text_pending() }}
+    {{ render_text_unpaid() }}
+{%- endblock %}

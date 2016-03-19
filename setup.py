@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,11 +29,11 @@ from distutils.command import bdist
 
 
 import pkg_resources
-from setuptools.command import develop, sdist, bdist_egg, easy_install, test
+from setuptools.command import develop, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 
 
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
+DEPENDENCY_URLS = ["https://github.com/indico/indico-fonts/releases/"]
 
 
 class vars(object):
@@ -250,130 +250,6 @@ Please specify the directory where you'd like it to be placed.
         open(filePath, 'w').write(fdata)
 
 
-class test_indico(test.test):
-    """
-    Test command for Indico
-    """
-
-    description = "Test Suite Framework"
-    user_options = (test.test.user_options + [('specify=', None, "Use nosetests style (file.class:testcase)"),
-                    ('coverage', None, "Output coverage report in html"),
-                    ('unit', None, "Run only Unit tests"),
-                    ('functional', None, "Run only Functional tests"),
-                    ('pylint', None, "Run python source analysis"),
-                    ('jsunit', None, "Run js unit tests"),
-                    ('jslint', None, "Run js source analysis"),
-                    ('jscoverage', None, "Output coverage report in html for js"),
-                    ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
-                    ('log=', None, "Log to console, using specified level"),
-                    ('browser=', None, "Browser to use for functional tests"),
-                    ('mode=', None, "Mode to use for functional tests"),
-                    ('server-url=', None, "Server URL to use for functional tests"),
-                    ('xml', None, "XML output"),
-                    ('html', None, "Make an HTML report (when possible)"),
-                    ('record', None, "Record tests (for --functional)"),
-                    ('silent', None, "Don't output anything in the console, just generate the report"),
-                    ('clean-shutdown', None,
-                     "Do not kill this script right after the tests finished without waiting for db shutdown.")])
-    boolean_options = []
-
-    specify = None
-    coverage = False
-    unit = False
-    functional = False
-    browser = None
-    pylint = False
-    jsunit = False
-    jslint = False
-    jscoverage = False
-    jsspecify = None
-    silent = False
-    mode = None
-    server_url = None
-    clean_shutdown = False
-    html = False
-    record = False
-    log = False
-    xml = False
-
-    def _wrap(self, func, *params):
-        def wrapped():
-            self.res = func(*params)
-        self.with_project_on_sys_path(wrapped)
-        return self.res
-
-    def finalize_options(self):
-        testsToRun = []
-
-        allTests = ['unit', 'functional']
-
-        for testType in allTests:
-            if getattr(self, testType):
-                testsToRun.append(testType)
-
-        if self.jsspecify and 'jsunit' not in testsToRun:
-            testsToRun.append('jsunit')
-
-        if not testsToRun:
-            testsToRun = allTests
-        self.testsToRun = testsToRun
-
-    def run(self):
-
-        if self.distribution.install_requires:
-            self.distribution.fetch_build_eggs(self.distribution.install_requires)
-        if self.distribution.tests_require:
-            self.distribution.fetch_build_eggs(self.distribution.tests_require)
-
-        from indico.tests import TestManager
-
-        options = {'silent': self.silent,
-                   'killself': not self.clean_shutdown,
-                   'html': self.html,
-                   'browser': self.browser,
-                   'mode': self.mode,
-                   'specify': self.specify,
-                   'coverage': self.coverage,
-                   'record': self.record,
-                   'server_url': self.server_url,
-                   'log': self.log,
-                   'xml': self.xml}
-
-        # get only options that are active
-        options = dict((k, v) for (k, v) in options.iteritems() if v)
-
-        manager = TestManager()
-        result = self._wrap(manager.main, self.testsToRun, options)
-
-        sys.exit(result)
-
-    def download(self, url, path):
-        """Copy the contents of a file from a given URL
-        to a local file.
-        """
-        import urllib
-        webFile = urllib.urlopen(url)
-        localFile = open(os.path.join(path, url.split('/')[-1]), 'w')
-        localFile.write(webFile.read())
-        webFile.close()
-        localFile.close()
-
-    def unzip(self, zipPath, inZipPath, targetFile):
-        """extract the needed file from zip and then delete the zip"""
-        import zipfile
-        try:
-            zfobj = zipfile.ZipFile(zipPath)
-            outfile = open(targetFile, 'wb')
-            outfile.write(zfobj.read(inZipPath))
-            outfile.flush()
-            outfile.close()
-
-            #delete zip file
-            os.unlink(zipPath)
-        except NameError, e:
-            print e
-
-
 class egg_filename(Command):
     description = "Get the file name of the generated egg"
     user_options = []
@@ -407,17 +283,7 @@ if __name__ == '__main__':
 
     from MaKaC.consoleScripts.installBase import setIndicoInstallMode, upgrade_indico_conf
 
-    #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
-    tempLoggingDir = None
-    if 'test' in sys.argv:
-        import logging
-        import tempfile
-        tempLoggingDir = tempfile.mkdtemp()
-        logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'),
-                            level=logging.DEBUG)
-        setIndicoInstallMode(False)
-    else:
-        setIndicoInstallMode(True)
+    setIndicoInstallMode(True)
 
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
@@ -429,17 +295,14 @@ if __name__ == '__main__':
 
     dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 
-    foundPackages = list('MaKaC.%s' % pkg for pkg in
-                         find_packages(where='indico/MaKaC'))
+    foundPackages = list('MaKaC.{}'.format(pkg) for pkg in find_packages(where='indico/MaKaC'))
     foundPackages.append('MaKaC')
     foundPackages.append('htdocs')
 
     # add our namespace package
-    foundPackages += list('indico.%s' % pkg for pkg in
-                          find_packages(where='indico',
-                                        exclude=['htdocs*', 'MaKaC*']))
+    foundPackages += ['indico.{}'.format(pkg) for pkg in find_packages(where='indico', exclude=['htdocs*', 'MaKaC*'])]
     foundPackages.append('indico')
-    foundPackages += list('indico_zodbimport.' + pkg for pkg in find_packages(where='indico_zodbimport'))
+    foundPackages += ['indico_zodbimport.{}'.format(pkg) for pkg in find_packages(where='indico_zodbimport')]
     foundPackages.append('indico_zodbimport')
 
     cmdclass = {'sdist': sdist_indico,
@@ -447,9 +310,7 @@ if __name__ == '__main__':
                 'bdist_egg': _bdist_egg_indico(dataFiles),
                 'develop_config': develop_config,
                 'develop': develop_indico,
-                'test': test_indico,
-                'egg_filename': egg_filename
-                }
+                'egg_filename': egg_filename}
 
     setup(name="indico",
           cmdclass=cmdclass,
@@ -466,7 +327,6 @@ if __name__ == '__main__':
           license="http://www.gnu.org/licenses/gpl-3.0.txt",
           entry_points="""
             [console_scripts]
-            indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico = indico.cli.manage:main
@@ -478,6 +338,24 @@ if __name__ == '__main__':
             [indico.zodb_importers]
             roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
             payment = indico_zodbimport.modules.payment:PaymentImporter
+            api = indico_zodbimport.modules.api:APIImporter
+            users = indico_zodbimport.modules.users:UserImporter
+            groups = indico_zodbimport.modules.groups:GroupImporter
+            static_sites = indico_zodbimport.modules.static_sites:StaticSitesImporter
+            event_alarms = indico_zodbimport.modules.event_alarms:EventAlarmImporter
+            legacy_events = indico_zodbimport.modules.legacy_events:LegacyEventImporter
+            legacy_categories = indico_zodbimport.modules.legacy_categories:LegacyCategoryImporter
+            event_logs = indico_zodbimport.modules.event_logs:EventLogImporter
+            event_notes = indico_zodbimport.modules.event_notes:EventNoteImporter
+            attachments = indico_zodbimport.modules.attachments:AttachmentImporter
+            event_images = indico_zodbimport.modules.event_images:EventImageImporter
+            event_stubs = indico_zodbimport.modules.event_stubs:EventStubImporter
+            event_menus = indico_zodbimport.modules.event_menus:EventMenuImporter
+            event_layout = indico_zodbimport.modules.event_layout:EventLayoutImporter
+            event_surveys = indico_zodbimport.modules.event_surveys:SurveyImporter
+            event_managers = indico_zodbimport.modules.event_managers:EventManagerImporter
+            event_regforms = indico_zodbimport.modules.event_regforms:EventRegformImporter
+            event_participants = indico_zodbimport.modules.event_participants:EventParticipantsImporter
             """,
           zip_safe=False,
           packages=foundPackages,
@@ -486,13 +364,6 @@ if __name__ == '__main__':
                        'MaKaC': os.path.join('indico', 'MaKaC')},
           package_data={'indico': ['*.*']},
           include_package_data=True,
-          namespace_packages=['indico'],
           install_requires=_getInstallRequires(),
-          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf', 'contextlib2'],
           data_files=dataFiles,
-          dependency_links=DEPENDENCY_URLS
-          )
-
-    #delete the temp folder used for logging
-    if 'test' in sys.argv:
-        shutil.rmtree(tempLoggingDir)
+          dependency_links=DEPENDENCY_URLS)

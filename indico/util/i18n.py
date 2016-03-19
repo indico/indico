@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ from babel import negotiate_locale
 from babel.core import Locale, LOCALE_ALIASES
 from babel.messages.pofile import read_po
 from babel.support import Translations, NullTranslations
-from flask import session, request, has_request_context, current_app, has_app_context
+from flask import session, request, has_request_context, current_app, has_app_context, g
 from flask_babelex import Babel, get_domain, Domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
@@ -85,16 +85,20 @@ def lazy_gettext(string, plugin_name=None):
     return make_lazy_string(gettext_unicode, string, plugin_name=plugin_name)
 
 
+def orig_string(lazy_string):
+    """Get the original string from a lazy string"""
+    return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
+
+
 def smart_func(func_name, plugin_name=None):
     def _wrap(*args, **kwargs):
         """
         Returns either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively)
         """
-        if (has_request_context() and session.lang) or func_name != 'ugettext':
+        if has_request_context() or func_name != 'ugettext':
             # straight translation
             return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
-
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
@@ -188,17 +192,18 @@ IndicoTranslations().install(unicode=True)
 
 
 @babel.localeselector
-def set_best_lang():
+def set_best_lang(check_session=True):
     """
     Get the best language/locale for the current user. This means that first
     the session will be checked, and then in the absence of an explicitly-set
     language, we will try to guess it from the browser settings and only
     after that fall back to the server's default.
     """
-
     if not has_request_context():
         return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-    elif session.lang is not None:
+    elif 'lang' in g:
+        return g.lang
+    elif check_session and session.lang is not None:
         return session.lang
 
     # try to use browser language
@@ -214,7 +219,11 @@ def set_best_lang():
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
             resolved_lang = minfo.getLang()
 
-    session.lang = resolved_lang
+    # As soon as we looked up a language, cache it during the request.
+    # This will be returned when accessing `session.lang` since there's code
+    # which reads the language from there and might fail (e.g. by returning
+    # lazy strings) if it's not set.
+    g.lang = resolved_lang
     return resolved_lang
 
 

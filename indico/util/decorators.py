@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,14 +20,27 @@ from functools import wraps
 from flask import request
 from werkzeug.exceptions import NotFound
 
-from indico.core.errors import IndicoError, NotFoundError
-from indico.core.logger import Logger
 from indico.util.json import create_json_error_answer
 
 
 class classproperty(property):
     def __get__(self, obj, type=None):
         return self.fget.__get__(None, type)()
+
+
+class strict_classproperty(classproperty):
+    """A classproperty that does not work on instances.
+
+    This is useful for properties which would be confusing when
+    accessed through an instance.  However, using this property
+    still won't allow you to set the attribute on the instance
+    itself, so it's really just to stop people from accessing
+    the property in an inappropriate way.
+    """
+    def __get__(self, obj, type=None):
+        if obj is not None:
+            raise AttributeError('Attribute is not available on instances of {}'.format(type.__name__))
+        return super(strict_classproperty, self).__get__(obj, type)
 
 
 class cached_classproperty(property):
@@ -85,6 +98,8 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
     """
+    from indico.core.errors import IndicoError, NotFoundError
+    from indico.core.logger import Logger
     no_tb_exceptions = (NotFound, NotFoundError)
 
     def _jsonify_error(f):
@@ -106,10 +121,14 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
                     request, exception.__class__.__name__, exception, tb
                 ).rstrip())
 
+            # allow e.g. NoReportError to specify a status code without possibly
+            # breaking old code that expects it with a 200 code.
+            # new variable name since python2 doesn't have `nonlocal`...
+            used_status = getattr(exception, 'http_status_code', status)
             if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
-                return create_json_error_answer(exception, status=status)
+                return create_json_error_answer(exception, status=used_status)
             else:
-                args[0]._responseUtil.status = status
+                args[0]._responseUtil.status = used_status
                 return f(*args, **kw)
         return wrapper
     if function:

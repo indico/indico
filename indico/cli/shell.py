@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,8 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import itertools
+import os
+import re
+import sys
 from functools import partial
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 
 import transaction
 from flask import current_app
@@ -25,50 +29,80 @@ from werkzeug.local import LocalProxy
 
 import MaKaC
 from indico.core import signals
+from indico.core.celery import celery
 from indico.core.config import Config
-from indico.util.console import colored, strip_ansi
 from indico.core.db import DBMgr, db
 from indico.core.index import Catalog
+from indico.core.plugins import plugin_engine
+from indico.modules.events import Event
+from indico.util.console import strip_ansi, cformat
+from indico.util.fossilize import clearCache
+from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import Conference, ConferenceHolder, CategoryManager
-from MaKaC.user import AvatarHolder, GroupHolder
-from indico.web.flask.util import IndicoConfigWrapper
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
     if not name:
         name = element.__name__
     namespace[name] = element
-
-    attrs = {}
-    if color[-1] == '!':
-        color = color[:-1]
-        attrs['attrs'] = ['bold']
-
     if doc:
-        info.append(colored('+ {0} : {1}'.format(name, doc), color, **attrs))
+        info.append(cformat('+ %%{%s}{}%%{white!} ({})' % color).format(name, doc))
     else:
-        info.append(colored('+ {0}'.format(name), color, **attrs))
+        info.append(cformat('+ %%{%s}{}' % color).format(name))
+
+
+def _add_to_context_multi(namespace, info, elements, names=None, doc=None, color='green'):
+    if not names:
+        names = [x.__name__ for x in elements]
+    for name, element in zip(names, elements):
+        namespace[name] = element
+    if doc:
+        info.append(cformat('+ %%{white!}{}:%%{reset} %%{%s}{}' % color).format(doc, ', '.join(names)))
+    else:
+        info.append(cformat('+ %%{%s}{}' % color).format(', '.join(names)))
+
+
+def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name__'), color='cyan'):
+    def _get_module(obj):
+        segments = tuple(obj.__module__.split('.'))
+        if segments[0].startswith('indico_'):  # plugin
+            return 'plugin:{}'.format(segments[0])
+        elif segments[:2] == ('indico', 'modules'):
+            return 'module:{}'.format(segments[2])
+        elif segments[:2] == ('indico', 'core'):
+            return 'core:{}'.format(segments[2])
+        else:
+            return '.'.join(segments[:-1] if len(segments) > 1 else segments)
+
+    items = [(_get_module(obj), get_name(obj), obj) for obj in objects]
+    for module, items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
+        names, elements = zip(*((x[1], x[2]) for x in items))
+        _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
 
 
 class IndicoShell(Shell):
     def __init__(self):
-        banner = colored('\nIndico v{} is ready for your commands!\n'.format(MaKaC.__version__),
-                         'yellow', attrs=['bold'])
+        banner = cformat('%{yellow!}Indico v{} is ready for your commands!').format(MaKaC.__version__)
         super(IndicoShell, self).__init__(banner=banner, use_bpython=False)
         self._context = None
         self._info = None
         self._quiet = False
 
+    def __call__(self, app, *args, **kwargs):
+        with app.test_request_context(base_url=Config.getInstance().getBaseURL()):
+            return self.run(*args, **kwargs)
+
     def run(self, no_ipython, use_bpython, quiet):
         context = self.get_context()
         if not quiet:
-            self.banner = '\n'.join(self._info + [self.banner])
+            self.banner = '\n'.join(self._info + ['', self.banner])
         if use_bpython:
             # bpython does not support escape sequences :(
             # https://github.com/bpython/bpython/issues/396
             self.banner = strip_ansi(self.banner)
+        clearCache()
         with context['dbi'].global_connection():
             super(IndicoShell, self).run(no_ipython or use_bpython, not use_bpython)
 
@@ -88,28 +122,42 @@ class IndicoShell(Shell):
             self._info = []
 
             add_to_context = partial(_add_to_context, context, self._info)
-
-            for attr in ('date', 'time', 'datetime', 'timedelta'):
-                add_to_context(getattr(datetime, attr), doc='stdlib datetime.{}'.format(attr), color='yellow')
-
-            add_to_context(Conference)
-            add_to_context(ConferenceHolder)
-            add_to_context(CategoryManager)
-            add_to_context(AvatarHolder)
-            add_to_context(GroupHolder)
-            add_to_context(Catalog)
-            add_to_context(IndexesHolder)
-            add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config')
-            add_to_context(LocalProxy(HelperMaKaCInfo.getMaKaCInfoInstance), 'minfo')
-            add_to_context(current_app, 'app')
-
-            for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
-                if hasattr(cls, '__table__'):
-                    add_to_context(cls, color='cyan')
-
+            add_to_context_multi = partial(_add_to_context_multi, context, self._info)
+            add_to_context_smart = partial(_add_to_context_smart, context, self._info)
+            # Common stdlib modules
+            self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
+            add_to_context_multi([getattr(datetime, attr) for attr in ('date', 'time', 'datetime', 'timedelta')] +
+                                 [itertools, re, sys, os],
+                                 color='yellow')
+            # Legacy Indico
+            self._info.append(cformat('*** %{magenta!}Legacy%{reset} ***'))
+            add_to_context_multi([Conference, ConferenceHolder, CategoryManager, Catalog, IndexesHolder], color='green')
+            add_to_context(LocalProxy(HelperMaKaCInfo.getMaKaCInfoInstance), 'minfo', color='green')
+            # Models
+            self._info.append(cformat('*** %{magenta!}Models%{reset} ***'))
+            models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))
+                      if hasattr(cls, '__table__')]
+            add_to_context_smart(models)
+            # Tasks
+            self._info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))
+            tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
+            add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
+            # Plugins
+            self._info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
+            plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
+                                                         key=attrgetter('name'))]
+            add_to_context_multi(plugins, color='yellow!')
+            # Utils
+            self._info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
+            add_to_context(celery, 'celery', doc='celery app', color='blue!')
             add_to_context(DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
             add_to_context(transaction, doc='transaction module', color='cyan!')
-            signals.plugin.shell_context.send(add_to_context=add_to_context)
+            add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
+            add_to_context(current_app, 'app', doc='flask app')
+            add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')
+            add_to_context(Event.get, 'EE', doc='get event by id (Event)')
+            # Stuff from plugins
+            signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
 
         return self._context

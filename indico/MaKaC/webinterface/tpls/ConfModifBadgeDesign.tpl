@@ -676,7 +676,7 @@
             </div>
 
             <div class="left panel">
-              <i class="icon-pictures left" title="${_("Background")}"></i>
+              <i class="icon-image left" title="${_("Background")}"></i>
               <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" class="left">
                 <input name="file" type="file" style="margin-bottom: 1em;" />
                 <%block name="background_options">

@@ -1,0 +1,15 @@
+{% set vc_equipment = reservation.get_vc_equipment().all() -%}
+
+{% if reservation.needs_vc_assistance -%}
+The user requested ASSISTANCE with videoconferencing equipment.
+{%- else -%}
+The user DIDN'T request assistance with videoconferencing equipment.
+{%- endif %}
+
+{%- if vc_equipment %}
+
+The user is going to use the following videoconferencing equipment:
+{%- for item in vc_equipment %}
+    {{ item.name }}
+{%- endfor %}
+{%- endif %}

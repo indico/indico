@@ -1,0 +1,14 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Input type' | i18n }}
+    </label>
+    <select name="itemType" ng-model="formData.itemType"
+            ng-init="formData.itemType=getDefaultFieldSetting('defaultRadioItemType')">
+        <option value="dropdown" ng-selected="formData.itemType == 'dropdown'">
+            {{ 'Drop-down list' | i18n }}
+        </option>
+        <option value="radiogroup" ng-selected="formData.itemType == 'radiogroup'">
+            {{ 'Radio group' | i18n }}
+        </option>
+    </select>
+</div>

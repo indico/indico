@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,6 @@
  */
 
 @import "base";
-@import "compass";
 
 @import "partials/_jquery-indico-clearableinput";
 @import "roombooking/bars";
@@ -331,6 +330,16 @@ table.booking-stats {
             font-weight: bold;
             padding-left: 25px;
             text-align: right;
+        }
+    }
+}
+
+.rb-menu-column .sideBar {
+    > .content {
+        padding-top: 0;
+
+        > ul {
+            margin-top: 0;
         }
     }
 }

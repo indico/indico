@@ -1,0 +1,15 @@
+{% extends 'rb/emails/base_email.txt' %}
+{% block recipient %}{{ blocking.created_by_user.first_name }}{% endblock %}
+
+{% block email_body -%}
+Your room blocking request has been {{ verb }} by a room manager.
+
+Room: {{ blocked_room.room.full_name }}
+Action: {{ verb }}
+{%- if blocked_room.state == blocked_room.State.rejected %}
+Reason: {{ blocked_room.rejection_reason or '(none)' }}
+{%- endif %}
+
+You can view the details of your blocking here:
+{{ url_for('rooms.blocking_details', blocking_id=blocking.id, _external=true) }}
+{%- endblock %}

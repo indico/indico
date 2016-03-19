@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,14 +27,10 @@ event_mgmt.add_url_rule('/contributions/perform-action', 'confModifContribList-c
                         conferenceModif.RHContribsActions, methods=('POST',))
 event_mgmt.add_url_rule('/contributions/pdf', 'confModifContribList-contribsToPDFMenu',
                         conferenceModif.RHContribsToPDFMenu, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contributions/material-package', 'confModifContribList-matPkg',
-                        conferenceModif.RHMaterialPackage, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contributions/moveToSession', 'confModifContribList-moveToSession',
                         conferenceModif.RHMoveContribsToSession, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contributions/participants', 'confModifContribList-participantList',
                         conferenceModif.RHContribsParticipantList, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contributions/proceedings', 'confModifContribList-proceedings', conferenceModif.RHProceedings,
-                        methods=('GET', 'POST'))
 
 with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     # Main
@@ -55,13 +51,9 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     event_mgmt.add_url_rule('/contribution/<contribId>/withdraw', 'contributionModification-withdraw',
                             contribMod.RHWithdraw, methods=('POST',))
 
-    # Material
-    event_mgmt.add_url_rule('/contribution/<contribId>/material/', 'contributionModification-materials',
-                            contribMod.RHMaterials, methods=('GET', 'POST'))
+    # Material (also used to upload papers for reviewing!)
     event_mgmt.add_url_rule('/contribution/<contribId>/material/add', 'contributionModification-materialsAdd',
                             contribMod.RHMaterialsAdd, methods=('POST',))
-    event_mgmt.add_url_rule('/contribution/<contribId>/material/browse/<materialId>',
-                            'contributionModification-browseMaterial', contribMod.RHContribModifMaterialBrowse)
 
     # Protection
     event_mgmt.add_url_rule('/contribution/<contribId>/access/', 'contributionAC', contribMod.RHContributionAC,
@@ -94,10 +86,6 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/modify/save',
                             'subContributionModification-modifData', subContribMod.RHSubContributionModifData,
                             methods=('POST',))
-    event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/material/',
-                            'subContributionModification-materials', subContribMod.RHMaterials, methods=('GET', 'POST'))
-    event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/material/add',
-                            'subContributionModification-materialsAdd', subContribMod.RHMaterialsAdd, methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/tools/', 'subContributionTools',
                             subContribMod.RHSubContributionTools)
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/tools/delete',

@@ -6,7 +6,6 @@
 from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
 from xml.sax.saxutils import escape
 
 wr = webFactoryRegistry.WebFactoryRegistry()
@@ -186,7 +185,7 @@ additionalInfo = confObj.getContactInfo()
         <table width="100%">
             <tr>
                 <td class="blacktext" style="width: 79%">
-                    <ul id="chairPersonsList" class="UIAuthorList"></ul>
+                    <ul id="chairPersonsList" class="user-list"></ul>
                 </td>
                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">

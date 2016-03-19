@@ -1,0 +1,44 @@
+{% extends 'events/registration/emails/base_registration_details.html' %}
+
+{% block subject_message -%}
+    New {% if registration.state.name == 'pending' %}pending{% endif %} registration
+{%- endblock %}
+
+{% block registration_header -%}
+    <p>Dear organizer,</p>
+    <p>
+        {% block registration_header_text %}
+            There is a new registration {{ render_registration_info() }}.
+            {{ render_text_pending() }}
+            {{ render_text_manage() }}
+        {% endblock %}
+    </p>
+{%- endblock %}
+
+{% block registration_footer %}
+    <p>
+        To manage this registration form follow this link:
+        <a href="{{ url_for('event_registration.manage_regform', registration.registration_form, _external=true) }}">
+            Manage registration form
+        </a>
+    </p>
+{% endblock %}
+
+
+{% macro render_registration_info() -%}
+    for the event <strong>{{ event.title }}</strong>
+    under <strong>{{ registration.full_name }}</strong>
+{%- endmacro %}
+
+
+{% macro render_text_pending() %}
+    {% if registration.state.name == 'pending' %}
+        Please notice it's waiting for manual approval by a manager.
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_text_manage() %}
+    You can manage this registration
+    <a href="{{ url_for('event_registration.registration_details', registration, _external=true) }}">here</a>.
+{% endmacro %}

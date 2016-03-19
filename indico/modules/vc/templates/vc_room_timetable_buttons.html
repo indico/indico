@@ -1,0 +1,38 @@
+{% set vc_room = event_vc_room.vc_room %}
+{% set plugin = vc_room.plugin %}
+
+<div class="toolbar right vc-toolbar">
+    <div class="group">
+        <span class="i-button i-button-small label vc-room-info" id="vc-room-{{ event_vc_room.id }}"><img src="{{ vc_room.plugin.icon_url }}" style="width: 18px;"></span>
+        {% block buttons %}{% endblock %}
+    </div>
+    {{ template_hook('event-timetable-vc-extra-buttons', event_vc_room=event_vc_room) }}
+</div>
+<div style="display: none;">
+    <span>{{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}</span>
+</div>
+<script>
+    $('#vc-room-{{ event_vc_room.id }}').qtip({
+        content: {
+            text: $('#vc-room-{{ event_vc_room.id }}').closest('.toolbar.right.vc-toolbar').next('div')
+        },
+        position: {
+            my: 'top middle',
+            at: 'bottom middle'
+        },
+        show: {
+            solo: true
+        },
+        hide: {
+            event: 'mouseleave',
+            fixed: true,
+            delay: 500,
+            effect: function() {
+                $(this).fadeOut(300);
+            }
+        },
+        style: {
+            classes: 'qtip-rounded qtip-shadow qtip-popup vc-room-info-qtip'
+        }
+    });
+</script>

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,18 +16,22 @@
 
 """Some pages for dealing with generic application errors
 """
-from flask import session, request
-import traceback
+import json
 import sys
+import traceback
 from xml.sax.saxutils import quoteattr
 
+from flask import session, request
+
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from indico.core.config import Config
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.i18n import _
+from indico.core.config import Config
 from indico.util.i18n import i18nformat
+from indico.web.util import get_request_info
+
 
 class WGenericError( WTemplated ):
 
@@ -63,7 +67,7 @@ class WGenericError( WTemplated ):
         show_details = Config.getInstance().getDebug()
         if not show_details:
             try:
-                show_details = session.user and session.user.isAdmin()
+                show_details = session.user and session.user.is_admin
             except Exception:
                 # We are handling some error so we cannot know if accessing the session user works
                 # If it fails we simply don't show details...
@@ -125,18 +129,8 @@ class WGenericError( WTemplated ):
             """%("\n".join( tracebackList ), rh.__name__, url, "<br>".join(params), \
                     "\n".join( headers ), userHTML )
         vars["errorDetails"] = details
-        userStr = """-- "none" --"""
-        if av:
-            userStr = "[%s] %s <%s>"%(av.getId(), av.getFullName(), av.getEmail() )
-        report = ["exception message => %s"%str( ex ), \
-                    "exception type => %s" %str(ty), \
-                    "traceback => \n%s"%"\n".join(tracebackList), \
-                    "request handler => %s"%self._rh.__class__, \
-                    "url => %s" % request.url.encode('utf-8'),
-                    "parameters => \n%s"%"\n".join(params), \
-                    "headers => \n%s"%"\n".join(headers), \
-                    "user => %s"%userStr ]
-        vars["reportMsg"] = quoteattr( "\n".join( report ) )
+        vars["reportMsg"] = quoteattr(json.dumps({'request_info': get_request_info(),
+                                                  'traceback': traceback.format_exc()}))
         return vars
 
 class WUnexpectedError( WGenericError ):
@@ -191,18 +185,9 @@ class WAccessKeyError( WTemplated ):
     def getVars( self ):
         from MaKaC.conference import Conference,Material, Resource
         vars = WTemplated.getVars( self )
-        vars["loginURL"] = ""
-        if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
-        elif isinstance(self._rh._target,Material):
-            vars["type"] = "file"
-            vars["url"] = quoteattr( str( urlHandlers.UHMaterialEnterAccessKey.getURL(self._rh._target) ) )
-        elif isinstance(self._rh._target,Resource):
-            vars["type"] = "file"
-            vars["url"] = quoteattr( str( urlHandlers.UHFileEnterAccessKey.getURL(self._rh._target) ) )
         else:
             vars["type"] = "presentation"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target.getConference()) ) )
@@ -312,9 +297,6 @@ class WModificationKeyError( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["loginURL"] = ""
-        if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         vars["msg"] = self._msg
         redirectURL = ""
         if hasattr(self._rh, "_redirectURL"):

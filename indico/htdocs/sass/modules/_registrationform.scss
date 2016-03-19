@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -36,6 +36,8 @@
 
 .regform-section-title {
     @extend %i-box-title;
+
+    margin-right: 10px;
 }
 
 // ============================================================================
@@ -44,7 +46,6 @@
 
 .regform-section {
     @extend %regform-section;
-    width:750px;
 
     .i-box-header {
         table {
@@ -121,6 +122,18 @@
             top: -3px;
         }
     }
+
+    &.manager-only {
+        .section-sortable-handle {
+            background-color: $dark-yellow;
+            &:hover {
+                background-color: white;
+            }
+        }
+        .i-box-title {
+            @include icon-before('icon-user-reading');
+        }
+    }
 }
 
 .regform-field {
@@ -130,7 +143,7 @@
     margin: 2px -10px;
     padding: 0 10px;
     // TODO Any better idea? This is hackish as hell
-    width: 102.8%;
+    width: 102.6%;
     word-break: break-word;
 
     &.disabled {
@@ -168,6 +181,29 @@
         padding: 5px 2px 10px 2px;
     }
 
+    .email-info {
+        margin-top: 0.5em;
+        padding: 0.2em;
+        background-color: $light-green;
+        color: $light-black;
+
+        &.warning {
+            @include icon-before(icon-warning);
+            background-color: $light-yellow;
+            &:before {
+                margin-right: 0.2em;
+            }
+        }
+
+        &.error {
+            @include icon-before(icon-warning);
+            background-color: $light-red;
+            &:before {
+                margin-right: 0.2em;
+            }
+        }
+    }
+
     .field-input {
         vertical-align: top;
         padding-top: 3px;
@@ -188,29 +224,26 @@
     @extend %regform-section;
     margin-bottom: 15px;
 
-    .regform-done-title {
-        @include border-bottom(lighten($gray, $color-variation));
-        display: block;
-        font-size: 1.3em;
-        margin: 15px 0 5px 0;
+    table.registration-info {
+        border-collapse: collapse;
+        width: 100%;
+
+        &.payment-info {
+            td {
+                padding: 3px;
+            }
+        }
     }
 
-    .regform-done-metadata {
-        line-height: $toolbar-thin-height;
-        margin: 0 1em;
-
-        > span:not(:last-child) {
-            margin-right: 0.7em;
+    tr.regform-done-title {
+        td {
+            @include border-bottom(lighten($gray, $color-variation));
+            padding: 15px 0 5px 0;
+            font-size: 1.3em;
         }
 
-        .label {
-            color: $black;
-            font-weight: bold;
-        }
-
-        .content {
-            color: $light-black;
-            font-style: italic;
+        &:first-child td {
+            padding: 0;
         }
     }
 
@@ -222,13 +255,14 @@
         border-bottom: 1px dashed lighten($gray, $color-variation);
         border-right: 1px dashed lighten($gray, $color-variation);
         color: $dark-gray;
+        font-weight: normal;
         text-align: right;
-        padding-right: 8px;
+        padding: 0 8px 0 0;
         width: 120px;
     }
 
     .regform-done-data {
-        padding-left: 5px;
+        padding: 0 0 0 5px;
         vertical-align: top;
     }
 
@@ -237,7 +271,7 @@
         font-weight: bold;
 
         &:not(:first-child) {
-            padding-left: 15px;
+            padding: 0 0 0 15px;
         }
     }
 
@@ -246,7 +280,11 @@
             vertical-align: top;
 
             &:not(:first-child) {
-                padding-left: 15px;
+                padding: 0 0 0 15px;
+            }
+
+            span.section-name {
+                color: $dark-gray;
             }
         }
 
@@ -259,9 +297,13 @@
         @include border-top(lighten($gray, $color-variation));
         font-weight: bold;
         padding-top: 5px;
+
+        strong {
+            padding-right: 1em;
+        }
     }
 
-    .regform-done-conditions {
+    .regform-done-footer {
         margin-top: 20px;
 
         input[type=checkbox] {
@@ -271,6 +313,12 @@
 
         td:first-child {
             width: 100%;
+        }
+
+        td.regform-done-footer-button {
+            .i-button {
+                white-space: nowrap;
+            }
         }
     }
 
@@ -307,41 +355,8 @@
         }
     }
 
-    .payment-terms-agreement {
+    .payment-conditions-agreement {
         color: $light-black;
-    }
-}
-
-.regform-add-field-qtip {
-    @include border-all();
-    background: white;
-
-    .qtip-content {
-        text-align: center;
-    }
-
-    .qtip-titlebar {
-        @include border-bottom();
-        padding: 5px 0;
-    }
-
-    .qtip-title {
-        color: $light-black;
-        text-align: center;
-        font-size: 1.2em;
-    }
-
-    .ui-tooltip-content {
-        padding: 0px;
-    }
-
-    .ui-tooltip-titlebar {
-        border-bottom: none !important;
-        background: transparent;
-    }
-
-    .i-big-button {
-        margin: 2px 0;
     }
 }
 
@@ -369,7 +384,12 @@
         text-align: center;
         width: 100%;
     }
+
+    .management-page & {
+        margin-bottom: 1em;
+    }
 }
+
 
 // ============================================================================
 // Editable-specific
@@ -500,7 +520,32 @@
             margin: 0 2px;
         }
     }
+
+    .deleted-option-warning {
+        margin-left: 1em;
+        color: $yellow;
+        vertical-align: middle;
+    }
+
+    .billable-items-warning {
+        margin-left: 0.5em;
+        color: $yellow;
+        font-size: 1.1em;
+    }
 }
+
+.regform-field.billable-disabled {
+    background-color: lighten($pastel-gray, 5%);
+    padding-top: 10px;
+
+    .billable-disabled-warning {
+        width: 50px;
+        margin-left: 0.5em;
+        font-size: 2em;
+        color: $gray;
+    }
+}
+
 
 // ============================================================================
 // Section-specific
@@ -609,10 +654,6 @@
     tr.regFormDialogCaptionLine td {
         padding-top: 0.5em;
     }
-
-    input {
-        width: 40px;
-    }
 }
 
 .regFormDialogCaption {
@@ -650,6 +691,10 @@ input.regFormTitleInputMgmt {
     color: $dark-blue;
     font-style: normal;
     font-weight: bold;
+}
+
+input[name='price'].ng-invalid, input[name='placesLimit'].ng-invalid, input[name='maxExtraSlots'].ng-invalid {
+    border: 1px solid red;
 }
 
 textarea.regFormDescriptionInputMgmt {
@@ -980,32 +1025,11 @@ textarea.regFormDescriptionInputMgmt {
 // RegistrantsListStats-related
 // ============================================================================
 
-.i-box.registrant-stats {
-    &> .i-box-header {
-        & > .i-box-title { float: left; }
-        & > .i-box-header-text {
-            color: $light-black;
-            font-style: italic;
-
-            &.currency-info {
-                @include border-radius();
-                font-style: normal;
-                font-weight: bold;
-                font-size: 0.8em;
-                float: right;
-                text-align: center;
-                color: $light-gray;
-                background-color: $dark-blue;
-                padding: 0.3em;
-
-            }
-
-            &.headline { clear: both; }
-        }
-    }
+.registrant-stats > .i-box {
     &> .i-box-content {
-        &> table.registrant-stats {
+        &> table {
             border-collapse: collapse;
+            width: 100%;
 
             thead {
                 tr:last-child th {
@@ -1160,5 +1184,266 @@ textarea.regFormDescriptionInputMgmt {
         @include user-select(none);
 
         margin-top: -1.2em;
+    }
+}
+
+.reglist-filter-dialog {
+    max-width: 1200px;
+}
+
+%enabled-action {
+    @include icon-before('icon-eye');
+}
+
+%not-enabled-action {
+    @include icon-before('icon-eye-blocked');
+    color: $red !important;
+}
+
+.reglist-filter {
+    padding-bottom: 14em;
+    position: relative;
+
+    > .i-label {
+        margin: 5px;
+        padding-bottom: 0;
+        padding-left: 0;
+        text-align: left;
+        font-weight: bold;
+
+        > * {
+            line-height: 1.2em;
+            height: 1.2em;
+            vertical-align: middle;
+        }
+
+        &.reglist-column {
+            width: 12em;
+
+            > .title {
+                max-width: 90%;
+                min-width: 90%;
+                height: 100%;
+                padding-bottom: 4px;
+                padding-left: 10px;
+                box-sizing: border-box;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                display: inline-block;
+                overflow: hidden;
+                color: $light-black;
+
+                &:before {
+                    margin-right: 0.5em;
+                }
+            }
+
+            &:hover {
+                .title:before {
+                    color: $yellow;
+                }
+            }
+
+            > .actions {
+                max-width: 10%;
+                visibility: hidden;
+
+                .trigger {
+                    cursor: pointer;
+                }
+
+                > span.enabled {
+                    @extend %enabled-action;
+                    &:hover {
+                        @extend %not-enabled-action;
+                    }
+                }
+                > span:not(.enabled) {
+                    @extend %not-enabled-action;
+                    &:hover {
+                        @extend %enabled-action;
+                    }
+                }
+            }
+
+            &:hover > .actions {
+                visibility: visible;
+                > .not-default {
+                    display: inline !important;
+                }
+            }
+
+            &.filter {
+                cursor: pointer;
+            }
+        }
+
+        &.active {
+            .title:before {
+                color: $indico-blue;
+            }
+        }
+    }
+
+    ul.dropdown {
+        line-height: auto;
+        height: auto;
+        z-index: 1;
+        max-height: 12em;
+        overflow: auto;
+        min-width: 12em;
+        box-sizing: border-box;
+
+        > li > label {
+            color: $black;
+            margin-left: 0.5em;
+            line-height: 2;
+            height: 2em;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+    }
+
+    > .bottom-buttons {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+}
+
+.registrations {
+    thead {
+        font-weight: bold;
+
+        th {
+            border-left: 0;
+
+            &:not(.sorter-false){
+                cursor: pointer;
+            }
+
+            &:before {
+                @include transition(transform 0.3s ease-out);
+                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                display: inline-block;
+            }
+
+            &.header-sort-asc {
+                @include icon-before('icon-arrow-down');
+            }
+
+            &.header-sort-desc {
+                @include icon-before('icon-arrow-down');
+
+                &:before {
+                    @include rotate(-180deg);
+                }
+            }
+
+            > div {
+                display: inline-block;
+            }
+        }
+    }
+}
+
+
+.invitation-list {
+    .invitation-table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+
+        td {
+            padding: 0.35rem 5px 0.35rem 0;
+
+            &:first-child {
+                padding-left: 5px;
+            }
+
+            &.name {
+                font-weight: bold;
+                width: 34%;
+            }
+
+            &.email {
+                width: 34%;
+            }
+
+            &.affiliation {
+                width: 30%;
+            }
+
+            &.actions {
+                font-size: 1.2em;
+                padding: 0 5px;
+                width: 2%;
+                white-space: nowrap;
+
+                a {
+                    color: $dark-gray;
+                    vertical-align: sub;
+                    visibility: hidden;
+
+                    &:hover {
+                        color: $blue;
+                    }
+                }
+            }
+        }
+
+        tr:nth-child(odd) > td {
+            background: $light-gray;
+        }
+
+        tr:hover > td {
+            background: $light-blue !important;
+
+            &.actions a {
+                visibility: visible;
+            }
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 2em;
+        }
+    }
+
+    .titled-rule {
+        margin-top: 0;
+    }
+}
+
+.registration-info {
+    tr.deleted-field {
+        background-color: $light-yellow;
+
+        td {
+            padding: 0.5em;
+
+            .deleted-field-warning {
+                color: $yellow;
+            }
+        }
+    }
+}
+
+.regform-section {
+    input[type="time"]::-webkit-clear-button {
+        display: none;
+    }
+}
+
+#registration-details {
+    .registration-unpaid {
+        color: $yellow;
+    }
+    .registration-complete,
+    .registration-checked-in {
+        color: $green;
+    }
+    .registration-rejected,
+    .registration-withdrawn, {
+        color: $red;
     }
 }

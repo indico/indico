@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,13 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder
+from indico.util.user import iter_acl
 
 
 class Blocking(db.Model):
@@ -32,7 +37,9 @@ class Blocking(db.Model):
         primary_key=True
     )
     created_by_id = db.Column(
-        db.String,
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     created_dt = db.Column(
@@ -55,15 +62,26 @@ class Blocking(db.Model):
         nullable=False
     )
 
-    allowed = db.relationship(
+    _allowed = db.relationship(
         'BlockingPrincipal',
         backref='blocking',
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        collection_class=set
     )
+    allowed = association_proxy('_allowed', 'principal', creator=lambda v: BlockingPrincipal(principal=v))
     blocked_rooms = db.relationship(
         'BlockedRoom',
         backref='blocking',
         cascade='all, delete-orphan'
+    )
+    #: The user who created this blocking.
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'blockings',
+            lazy='dynamic'
+        )
     )
 
     @hybrid_method
@@ -74,23 +92,13 @@ class Blocking(db.Model):
     def is_active_at(self, d):
         return (self.start_date <= d) & (d <= self.end_date)
 
-    @property
-    def created_by_user(self):
-        return AvatarHolder().getById(self.created_by_id)
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = user.getId()
-
     def can_be_modified(self, user):
         """
         The following persons are authorized to modify a blocking:
         - owner (the one who created the blocking)
         - admin (of course)
         """
-        if not user:
-            return False
-        return user == self.created_by_user or user.isRBAdmin()
+        return user and (user == self.created_by_user or rb_is_admin(user))
 
     def can_be_deleted(self, user):
         return self.can_be_modified(user)
@@ -108,20 +116,17 @@ class Blocking(db.Model):
         if self.created_by_user == user:
             return True
         if not explicit_only:
-            if user.isRBAdmin():
+            if rb_is_admin(user):
                 return True
             elif room and room.is_owned_by(user):
                 return True
-        for principal in self.allowed:
-            if principal.entity.containsUser(user):
-                return True
-        return False
+        return any(user in principal for principal in iter_acl(self.allowed))
 
     @return_ascii
     def __repr__(self):
-        return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
+        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
-            self.created_by_id,
+            self.created_by_user,
             self.reason,
             self.start_date,
             self.end_date

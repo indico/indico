@@ -1,0 +1,12 @@
+{% extends 'rb/emails/base_email.txt' %}
+{% block recipient %}{{ reservation.created_by_user.first_name }}{% endblock %}
+
+{% block email_body -%}
+{% block body %}{% endblock %}
+
+Booking details:
+{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=true) }}
+
+Remember you can always check your bookings here:
+{{ url_for('rooms.my_bookings', _external=true) }}
+{%- endblock %}

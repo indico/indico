@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,42 +15,84 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "compass/css3/box-sizing";
+
 .fixed-width {
     max-width: 800px !important;
-}
-
-.titled-rule {
-    color: $dark-gray;
-    font-size: 0.9em;
-    margin: 10px 0;
-    overflow: hidden;
-    text-align: center;
-
-    &:before,
-    &:after {
-        box-shadow: 1px 1px 1px $light-gray;
-        background-color: $gray;
-        content: "";
-        display: inline-block;
-        height: 1px;
-        position: relative;
-        vertical-align: middle;
-        width: 50%;
-    }
-
-    &:before {
-        right: 0.5em;
-        margin-left: -50%;
-    }
-
-    &:after {
-        left: 0.5em;
-        margin-right: -50%;
-    }
 }
 
 .fixed-width-page {
     margin-left: auto;
     margin-right: auto;
     width: 1000px;
+
+    .page-content {
+        max-width: 1000px;
+    }
+}
+
+.fixed-width-event-page {
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+
+    .page-content {
+        max-width: 800px;
+    }
+}
+
+.full-width-content-page {
+    .management-page > .page-content {
+        max-width: 100% !important;
+    }
+}
+
+.layout-wrapper {
+    .row {
+        .column {
+            @include box-sizing(border-box);
+            float: left;
+            padding: 0 1em 0 1em;
+
+            &.col-20 {
+                width: 20%;
+            }
+
+            &.col-40 {
+                width: 40%;
+            }
+
+            &.col-50 {
+                width: 50%;
+            }
+
+            &.col-60 {
+                width: 60%;
+            }
+
+            &.col-80 {
+                width: 80%;
+            }
+
+            &.col-full {
+                width: 100%;
+            }
+
+            &:first-of-type {
+                padding-left: 0;
+            }
+
+            &:last-of-type {
+                padding-right: 0;
+            }
+        }
+
+        &:after { // same as .clearfix
+            content: ".";
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+    }
 }

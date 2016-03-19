@@ -1,0 +1,23 @@
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
+    <div class="multiple-input-field" id="{{ field.id }}-widget"></div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            $('#{{ field.id }}-widget').multitextfield({
+                sortable: {{ field.sortable | tojson }},
+                valueField: $('#{{ field.id }}'),
+                fieldName: {{ field.field_name | tojson }},
+                fieldsCaption: {{ field.field_caption | tojson }}
+            });
+        })();
+    </script>
+{% endblock %}

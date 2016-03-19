@@ -11,6 +11,7 @@
 <%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form id="searchForm" method="POST" action="">
+    ${ form.csrf_token() }
     <input type="hidden" name="step" value="1">
 
     <h2 class="group-title">
@@ -30,11 +31,11 @@
 </form>
 
 <script>
-    var userId = "rb-user-${ user.getId() if _session.user else 'not-logged' }";
+    var userId = "rb-user-${ _session.user.id if _session.user else 'not-logged' }";
     var rbUserData = $.jStorage.get(userId, {});
     var maxRoomCapacity = ${ max_room_capacity };
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
-    var myRooms = ${ [r.id for r in _session.user.get_rooms()] | j, n };
+    var myRooms = ${ my_rooms | j, n };
 
     $(document).ready(function() {
         initWidgets();

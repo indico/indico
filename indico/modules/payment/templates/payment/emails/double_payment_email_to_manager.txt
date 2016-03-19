@@ -1,6 +1,0 @@
-Dear manager of the event {{ event.getTitle() }},
-
-There has been a duplicated payment for the registrant with ID {{ registrant.getId() }}.
-Please, check with the registrant to see if there was some misunderstanding or whatever.
-
-Regards.

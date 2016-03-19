@@ -6,7 +6,7 @@
     <tr>
         <td>
             % if room.has_photo:
-                <a href="${ room.large_photo_url }" nofollow="lightbox">
+                <a href="${ room.large_photo_url }" class="js-lightbox">
                     <img border="1px" height="100" src="${ room.small_photo_url }"/>
                 </a>
             % endif

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -93,7 +93,7 @@
             var vcLabel = $('label[for="uses_vc"]');
             vcLabel.toggleClass('text-error', vcErrors);
             if (vcErrors) {
-                vcLabel.attr('title', 'You need to select at least one piece of Video Conference equipment');
+                vcLabel.attr('title', 'You need to select at least one piece of Videoconference equipment');
             }
             else {
                 vcLabel.qtip('destroy', true).removeAttr('title');
@@ -247,7 +247,10 @@
                         location.href = data.url;
                     } else {
                         var error_box = $('.js-booking-creation-error-box').clone().show();
-                        error_box.find('.js-booking-creation-error-message').text(data.msg);
+                        var errors = error_box.find('.js-booking-creation-error-message');
+                        $.each(data.msg.split('\n'), function addError(_, error) {
+                            errors.append($('<li>', {text: error}));
+                        });
                         new AlertPopup($T("Booking creation error"), error_box[0]).open();
                     }
                 },

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,6 @@ from BTrees.OOBTree import OOBTree
 from indico.core.index.event import CategoryEventStartDateIndex
 
 from indico.core.db import DBMgr
-from indico.modules.oauth.components import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
 
 
 # TODO: decorator for annoying 'db parameter'
@@ -27,8 +26,6 @@ from indico.modules.oauth.components import UserOAuthRequestTokenIndex, UserOAut
 class Catalog(OOBTree):
     _indexMap = {
         'categ_conf_sd': CategoryEventStartDateIndex,
-        'user_oauth_access_token': UserOAuthAccessTokenIndex,
-        'user_oauth_request_token': UserOAuthRequestTokenIndex
         }
 
     @classmethod

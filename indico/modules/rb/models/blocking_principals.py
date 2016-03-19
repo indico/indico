@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,47 +14,36 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalMixin
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder, GroupHolder
 
 
-class BlockingPrincipal(db.Model):
+class BlockingPrincipal(PrincipalMixin, db.Model):
     __tablename__ = 'blocking_principals'
     __table_args__ = {'schema': 'roombooking'}
+    principal_backref_name = 'in_blocking_acls'
+    unique_columns = ('blocking_id',)
 
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
     blocking_id = db.Column(
         db.Integer,
         db.ForeignKey('roombooking.blockings.id'),
-        primary_key=True,
-        nullable=False
-    )
-    entity_type = db.Column(
-        db.String,
-        primary_key=True,
-        nullable=False
-    )
-    entity_id = db.Column(
-        db.String,
-        primary_key=True,
         nullable=False
     )
 
-    @property
-    def entity(self):
-        if self.entity_type == 'Avatar':
-            return AvatarHolder().getById(self.entity_id)
-        else:  # Group, LDAPGroup
-            return GroupHolder().getById(self.entity_id)
-
-    @property
-    def entity_name(self):
-        return 'User' if self.entity_type == 'Avatar' else 'Group'
+    # relationship backrefs:
+    # - blocking (Blocking._allowed)
 
     @return_ascii
     def __repr__(self):
-        return u'<BlockingPrincipal({0}, {1}, {2})>'.format(
+        return '<BlockingPrincipal({}, {}, {})>'.format(
+            self.id,
             self.blocking_id,
-            self.entity_id,
-            self.entity_type
+            self.principal
         )

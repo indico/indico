@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,32 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.accessControl as accessControl
 from MaKaC.common import timezoneUtils
-from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
 
+
 class WPMainBase(base.WPDecorated):
+    sidemenu_option = None
 
-    def _createMenu( self ):
-        self._showAdmin = self._isAdmin or self._isCategoryManager
-
-    def _setCurrentMenuItem( self ):
-        return
-
-    def _display( self, params ):
-        sideMenu = self._getSideMenu()
-        self._setCurrentMenuItem()
+    def _display(self, params):
+        target = self._rh.getTarget()
 
         # Check if user is administrator
-        adminList = accessControl.AdminList.getInstance()
-        self._isAdmin = ( not adminList.getList() and self._getAW().getUser() != None ) or adminList.isAdmin( self._getAW().getUser() )
-        self._isCategoryManager = self._isAdmin or \
-                                  isinstance(self._rh.getTarget(), Category) and self._rh.getTarget().canModify(self._getAW()) or \
-                                  isinstance(self._rh.getTarget(), Conference) and self._rh.getTarget().getOwnerList()!=[] and self._rh.getTarget().getOwner().canModify(self._getAW())
+        self._isAdmin = session.user and session.user.is_admin
+        self._isCategoryManager = (
+            self._isAdmin or
+            (isinstance(target, Category) and target.canModify(self._getAW())) or
+            (isinstance(target, Conference) and target.getOwner() and target.getOwner().canModify(self._getAW())))
         self._showAdmin = self._isAdmin or self._isCategoryManager
 
         self._timezone = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
@@ -47,12 +42,15 @@ class WPMainBase(base.WPDecorated):
         body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
                          isFrontPage=self._isFrontPage(),
                          isRoomBooking=self._isRoomBooking(),
-                         sideMenu=sideMenu).getHTML({"subArea": self._getSiteArea()})
+                         sideMenu=self._getSideMenu()).getHTML({"subArea": self._getSiteArea()})
 
         return self._applyDecoration(body)
 
     def _getBody(self, params):
-        return _("nothing yet")
+        raise NotImplementedError('_getBody() needs to be overridden.')
+
+    def _getSideMenu(self):
+        return ''
 
 
 class WMainBase(wcomponents.WTemplated):
@@ -72,14 +70,11 @@ class WMainBase(wcomponents.WTemplated):
         vars["isFrontPage"] = self._isFrontPage
         vars["isRoomBooking"] = self._isRoomBooking
 
-        vars["sideMenu"] = None
-        if self._sideMenu:
-            vars["sideMenu"] = self._sideMenu.getHTML()
-
         vars["navigation"] = ""
         if self._navigation:
             vars["navigation"] = self._navigation.getHTML(vars)
 
         vars["timezone"] = self._timezone
+        vars['sideMenu'] = self._sideMenu
 
         return vars

@@ -1,0 +1,15 @@
+*.tpl linguist-language=mako
+doc/* linguist-documentation
+indico/htdocs/js/calendar/* linguist-vendored
+indico/htdocs/js/ckeditor/* linguist-vendored
+indico/htdocs/js/moment/* linguist-vendored
+indico/htdocs/js/jquery/date.js linguist-vendored
+indico/htdocs/js/jquery/jquery-extra-selectors.js linguist-vendored
+indico/htdocs/js/jquery/jquery-migrate.js linguist-vendored
+indico/htdocs/js/jquery/jquery-ui.js linguist-vendored
+indico/htdocs/js/jquery/jquery.colorbox.js linguist-vendored
+indico/htdocs/js/jquery/jquery.colorpicker.js linguist-vendored
+indico/htdocs/js/jquery/jquery.form.js linguist-vendored
+indico/htdocs/js/jquery/jquery.placeholder.js linguist-vendored
+indico/htdocs/js/jquery/jquery.typewatch.js linguist-vendored
+indico/htdocs/js/jquery/jstorage.js linguist-vendored

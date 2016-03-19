@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,15 +20,16 @@ from flask_pluginengine import current_plugin
 
 from indico.core.notifications import email_sender, make_email
 from indico.core.plugins import get_plugin_template_module
-from indico.modules.events.agreements.placeholders import replace_placeholders
+from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 
 
 def make_email_template(template, agreement, email_body=None):
     func = get_template_module if not current_plugin else get_plugin_template_module
     if not email_body:
-        email_body = agreement.definition.get_email_body_template(agreement.event).get_body()
-    email_body = replace_placeholders(email_body, agreement.definition.get_email_placeholders(), agreement)
+        email_body = agreement.definition.get_email_body_template(agreement.event_new).get_body()
+    email_body = replace_placeholders('agreement-email', email_body, definition=agreement.definition,
+                                      agreement=agreement)
     return func(template, email_body=email_body)
 
 

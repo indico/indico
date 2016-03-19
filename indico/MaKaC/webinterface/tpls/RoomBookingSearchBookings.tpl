@@ -5,6 +5,7 @@
 <%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form method="post" action="" id="searchBookings">
+    ${ form.csrf_token() }
     <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Taking place in') }
@@ -169,7 +170,7 @@
 
 <script>
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
-    var myRooms = ${ [r.id for r in _session.user.get_rooms()] | j, n };
+    var myRooms = ${ my_rooms | j, n };
 
     function adjustDates(s, e) {
         if (s.datepicker('getDate') > e.datepicker('getDate'))

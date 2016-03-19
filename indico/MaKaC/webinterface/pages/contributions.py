@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
-import MaKaC.webinterface.materialFactories as materialFactories
+from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -31,11 +31,13 @@ from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar, AvatarHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
+from indico.web.flask.util import url_for
 
 from MaKaC.common.TemplateExec import render
 
@@ -79,12 +81,6 @@ class WContributionDisplayBase(WICalExportBase):
 
     def _getAuthorURL(self, author):
         return urlHandlers.UHContribAuthorDisplay.getURL(self._contrib, authorId=author.getId())
-
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
 
     def _getStatusReviewing(self):
         from MaKaC.paperReviewing import ConferencePaperReview as CPR
@@ -154,7 +150,6 @@ class WContributionDisplayBase(WICalExportBase):
             vars["statusText"] = _("Paper not yet submitted")
             vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
         vars["prefixUpload"] = "Re-" if statusReviewing not in ["Accept", "Reject", None] else ""
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return vars
 
@@ -194,8 +189,8 @@ class WPContributionDisplay(WPContributionDefaultDisplayBase):
 
 class WPContributionModifBase(WPConferenceModifBase):
 
-    def __init__(self, rh, contribution):
-        WPConferenceModifBase.__init__(self, rh, contribution.getConference())
+    def __init__(self, rh, contribution, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, contribution.getConference(), **kwargs)
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
@@ -213,8 +208,8 @@ class WPContributionModifBase(WPConferenceModifBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab("main", _("Main"),
                                              urlHandlers.UHContributionModification.getURL(self._target))
-        self._tabMaterials = self._tabCtrl.newTab("materials", _("Material"),
-                                                  urlHandlers.UHContribModifMaterials.getURL(self._target))
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._contrib))
         self._tabSubCont = self._tabCtrl.newTab("subCont", _("Sub Contribution"),
                                                 urlHandlers.UHContribModifSubCont.getURL(self._target))
         if self._canModify:
@@ -283,11 +278,9 @@ class WPContributionModifBase(WPConferenceModifBase):
     def _setupTabCtrl(self):
         pass
 
-    def _setActiveSideMenuItem(self):
-        if self._target.isScheduled():
-            self._timetableMenuItem.setActive(True)
-        else:
-            self._contribListMenuItem.setActive(True)
+    @property
+    def sidemenu_option(self):
+        return 'timetable' if self._target.isScheduled() else 'contributions'
 
     def _getPageContent(self, params):
         self._createTabCtrl()
@@ -336,65 +329,10 @@ class WPContributionModifTools(WPContributionModifBase):
         return wcomponents.WContribModifTool().getHTML({"deleteContributionURL": urlHandlers.UHContributionDelete.getURL(self._target)})
 
 
-class WPContributionModifMaterials(WPContributionModifBase):
-
-    _userData = ['favorite-user-list']
-
-    def __init__(self, rh, contribution):
-        WPContributionModifBase.__init__(self, rh, contribution)
-
-    def _setActiveTab(self):
-        self._tabMaterials.setActive()
-
-    def _getTabContent(self, pars):
-        wc = wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
-        return wc.getHTML(pars)
-
-
-class WAuthorTable(wcomponents.WTemplated):
-
-    def __init__(self, authList, contrib):
-        self._list = authList
-        self._conf = contrib.getConference()
-        self._contrib = contrib
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        urlGen = vars.get("modAuthorURLGen", None)
-        l = []
-        for author in self._list:
-            authCaption = author.getFullName()
-            if author.getAffiliation() != "":
-                authCaption = "%s (%s)" % (authCaption, author.getAffiliation())
-            if urlGen:
-                authCaption = """<a href=%s>%s</a>""" % (urlGen(author), self.htmlText(authCaption))
-            href = "\"\""
-            if author.getEmail() != "":
-                mailtoSubject = """[%s] _("Contribution") %s: %s""" % (self._conf.getTitle(), self._contrib.getId(), self._contrib.getTitle())
-                mailtoURL = "mailto:%s?subject=%s" % (author.getEmail(), urllib.quote(mailtoSubject))
-                href = quoteattr(mailtoURL)
-            emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """ % (href, Config.getInstance().getSystemIconURL("smallEmail"))
-            upURLGen = vars.get("upAuthorURLGen", None)
-            up = ""
-            if upURLGen is not None:
-                up = """<a href=%s><img src=%s border="0" alt="up"></a>""" % (quoteattr(str(upURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))))
-            downURLGen = vars.get("downAuthorURLGen", None)
-            down = ""
-            if downURLGen is not None:
-                down = """<a href=%s><img src=%s border="0" alt="down"></a>""" % (quoteattr(str(downURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))))
-            l.append("""<input type="checkbox" name="selAuthor" value=%s>%s%s%s %s""" % (quoteattr(author.getId()), up, down, emailHtml, authCaption))
-        vars["authors"] = "<br>".join(l)
-        vars["remAuthorsURL"] = vars.get("remAuthorsURL", "")
-        vars["addAuthorsURL"] = vars.get("addAuthorsURL", "")
-        vars["searchAuthorURL"] = vars.get("searchAuthorURL", "")
-        return vars
-
-
 class WContribModifMain(wcomponents.WTemplated):
 
-    def __init__(self, contribution, mfRegistry, eventType="conference"):
+    def __init__(self, contribution, eventType="conference"):
         self._contrib = contribution
-        self._mfRegistry = mfRegistry
         self._eventType = eventType
 
     def _getAbstractHTML(self):
@@ -496,6 +434,8 @@ class WContribModifMain(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+
+        vars["suggested_authors"] = self._getParticipantsList(get_authors_from_author_index(self._contrib.getConference(), 10))
         vars["eventType"] = self._eventType
         vars["withdrawnNotice"] = self._getWithdrawnNoticeHTML()
         vars["locator"] = self._contrib.getLocator().getWebForm()
@@ -563,7 +503,7 @@ class WContribModifMain(wcomponents.WTemplated):
 class WPContributionModification(WPContribModifMain):
 
     def _getTabContent(self, params):
-        wc = WContribModifMain(self._contrib, materialFactories.ContribMFRegistry())
+        wc = WContribModifMain(self._contrib)
         return wc.getHTML()
 
 
@@ -584,7 +524,7 @@ class WPContributionModificationClosed(WPContribModifMain):
             message = _("The event is currently locked and you cannot modify it in this status. ")
             if self._conf.canModify(self._rh.getAW()):
                 message += _("If you unlock the event, you will be able to modify its details again.")
-            url = urlHandlers.UHConferenceOpen.getURL(self._contrib.getConference())
+            url = url_for('event_management.unlock', self._contrib.getConference())
             unlockButtonCaption = _("Unlock event")
         return wcomponents.WClosed().getHTML({"message": message,
                                              "postURL": url,
@@ -630,7 +570,7 @@ class WContribModifAC(wcomponents.WTemplated):
         result = []
         for submitter in self._contrib.getSubmitterList():
             submitterFossil = fossilize(submitter)
-            if isinstance(submitter, Avatar):
+            if isinstance(submitter, AvatarUserWrapper):
                 isSpeaker = False
                 if self._contrib.getConference().getType() == "conference":
                     isPrAuthor = False
@@ -717,7 +657,7 @@ class WSubContributionCreation(wcomponents.WTemplated):
         vars["durationMinutes"] = vars.get("durationMinutes", "15")
         vars["keywords"] = vars.get("keywords", "")
         vars["locator"] = self.__owner.getLocator().getWebForm()
-        vars["authors"] = fossilize(self._contribution.getAllAuthors())
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._contribution.getConference(), 10))
         vars["eventType"] = self._contribution.getConference().getType()
         return vars
 
@@ -914,17 +854,6 @@ class WPContributionDeletion( WPContributionModifTools ):
                 'contribList': [self._target],
                 'postURL': urlHandlers.UHContributionDelete.getURL(self._target)
                 })
-
-
-class WPContributionReportNumberEdit(WPContributionModifBase):
-
-    def __init__(self, rh, contribution, reportNumberSystem):
-        WPContributionModifBase.__init__(self, rh, contribution)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _getTabContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "contribution")
-        return wc.getHTML()
 
 
 class WContributionICalExport(WICalExportBase):

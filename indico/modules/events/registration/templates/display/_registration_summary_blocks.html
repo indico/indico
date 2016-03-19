@@ -1,0 +1,177 @@
+{% macro render_registration_info(registration, from_management=false) %}
+    {% for section in registration.sections_with_answered_fields if from_management or not section.is_manager_only -%}
+        <tr class="regform-done-title">
+            <td colspan="2">{{ section.title }}</td>
+        </tr>
+        {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
+            <tr class="{{ 'deleted-field' if from_management and (field.is_deleted or section.is_deleted) }}">
+                <th class="regform-done-caption">{{ field.title }}</th>
+                <td class="regform-done-data">
+                    {{- render_data(registration, field, from_management) -}}
+                    {% if from_management and (field.is_deleted or section.is_deleted) -%}
+                        <span class="icon-warning deleted-field-warning right"
+                              data-qtip-style="warning"
+                              title="{% trans %}This field no longer exists{% endtrans %}">
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+        {%- endfor %}
+    {%- endfor %}
+{% endmacro %}
+
+{% macro render_data(registration, field, from_management=false) %}
+    {% set data = registration.data_by_field -%}
+    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' -%}
+    {% if field.input_type == 'accommodation' and friendly_data %}
+        <div>
+            {% trans arrival_date=friendly_data['arrival_date'] | format_date -%}
+                <strong>Arrival:</strong> {{ arrival_date }}
+            {%- endtrans %}
+        </div>
+        <div>
+            {% trans departure_date=friendly_data['departure_date'] | format_date -%}
+                <strong>Departure:</strong> {{ departure_date }}
+            {%- endtrans %}
+        </div>
+        <div>
+            {% trans accommodation=friendly_data['choice'] -%}
+                <strong>Accommodation:</strong> {{ accommodation }}
+            {%- endtrans %}
+        </div>
+    {% elif field.input_type == 'multi_choice' and friendly_data %}
+        <ul>
+            {% for item in friendly_data -%}
+                <li>{{ item }}</li>
+            {%- endfor %}
+        </ul>
+    {% elif field.input_type == 'file' and friendly_data and from_management %}
+        <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ friendly_data }}</a>
+    {% elif friendly_data %}
+        {{- friendly_data -}}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_registration_summary(registration, from_management=false) %}
+    <div id="registration-summary" class="regform-done">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Summary{% endtrans %}
+            </div>
+            <div class="i-box-metadata">
+                <span class="label">
+                    {% trans %}Reference:{% endtrans %}
+                </span>
+                <span class="content">
+                    #{{ registration.friendly_id }}
+                </span>
+                <span class="label">
+                    {% trans %}Date:{% endtrans %}
+                </span>
+                <span class="content">
+                    {{ registration.submitted_dt|format_date }}
+                </span>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <table class="registration-info">
+                {{ render_registration_info(registration, from_management) }}
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_invoice(registration, payment_enabled, payment_conditions=false) %}
+    {% if registration.price %}
+        <div id="payment-summary" class="regform-done">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {% trans %}Invoice{% endtrans %}
+                </div>
+                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
+                    <div class="payment-status payment-not-paid right">
+                        {% trans %}Not paid{% endtrans %}
+                        <i class="icon-time"></i>
+                    </div>
+                {% elif registration.transaction.status.name == 'successful' %}
+                    <div class="payment-status payment-done right">
+                        {% trans %}Paid{% endtrans %}
+                        <i class="icon-checkbox-checked"></i>
+                    </div>
+                {% elif registration.transaction and registration.transaction.status.name == 'pending' %}
+                    <div class="payment-status payment-pending right">
+                        {% trans %}Pending{% endtrans %}
+                        <i class="icon-time"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                <table class="registration-info payment-info">
+                    <tr>
+                        <td class="regform-done-table-title">
+                            {% trans %}Item{% endtrans %}
+                        </td>
+                        <td class="regform-done-table-title">
+                            {% trans %}Value{% endtrans %}
+                        </td>
+                        <td class="regform-done-table-title text-right">
+                            {% trans %}Cost{% endtrans %}
+                        </td>
+                    </tr>
+                    {% for item in registration.billable_data %}
+                        <tr class="regform-done-table-item">
+                            <td class="text-left">
+                                {{- item.field_data.field.title }}
+                                <span class="section-name">({{ item.field_data.field.parent.title -}})</span>
+                            </td>
+                            <td class="text-left">
+                                {% if item.field_data.field.input_type == 'accommodation' and item.friendly_data %}
+                                    {% trans nights=item.friendly_data.nights,
+                                             choice=item.friendly_data.choice -%}
+                                        {{ choice }} ({{ nights }} night)
+                                    {%- pluralize -%}
+                                        {{ choice }} ({{ nights }} nights)
+                                    {%- endtrans %}
+                                {% elif item.field_data.field.input_type == 'multi_choice' %}
+                                    {{ item.friendly_data | join(', ') }}
+                                {% else %}
+                                   {{ item.friendly_data }}
+                                {% endif %}
+                            </td>
+                            <td class="text-right">{{ item.render_price() }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% if registration.base_price %}
+                        <tr class="regform-done-table-item">
+                            <td class="text-left">
+                                {% trans %}Registration fee{% endtrans %}
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                                {{ registration.render_base_price() }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if registration.price_adjustment %}
+                        <tr class="regform-done-table-item">
+                            <td class="text-left">
+                                {% trans %}Price adjustment{% endtrans %}
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                                {{ registration.render_price_adjustment() }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="regform-done-table-total text-right" colspan="3">
+                            <strong>{% trans %}Total{% endtrans %}</strong>
+                            {{ registration.render_price() }}
+                        </td>
+                    </tr>
+                </table>
+                {{ caller() }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}

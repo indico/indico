@@ -1,0 +1,27 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Columns' | i18n }}
+    </label>
+    <input type="number" name="numberOfColumns"
+        ng-model="formData.numberOfColumns"
+        ng-init="formData.numberOfColumns=getDefaultFieldSetting('defaultNumberOfColumns')"
+        ng-class="{hasError: validationStarted && optionsForm.numberOfColumns.$invalid}"
+        size="20"
+        min="1"
+        max="60">
+    <i class="info-helper" title="{{ 'Maximum 60. Leave empty for default.' | i18n }}"></i>
+</div>
+
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Rows' | i18n }}
+    </label>
+    <input type="number" name="numberOfRows"
+        ng-init="formData.numberOfRows=getDefaultFieldSetting('defaultNumberOfRows')"
+        ng-model="formData.numberOfRows"
+        ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
+        size="20"
+        min="1"
+        max="20">
+    <i class="info-helper" title="{{ 'Maximum 20. Leave empty for default.' | i18n }}"></i>
+</div>

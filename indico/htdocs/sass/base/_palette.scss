@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$darker-blue: #005272;
 $dark-blue: #007CAC;
 $blue: #5D95EA;
 $pastel-blue: #CDE1FF;
@@ -30,16 +31,22 @@ $gray: #bbb;
 $pastel-gray: #dfdfdf;
 $light-gray: #f9f9f9;
 
-$light-black: #777;
 $black: #555;
+$light-black: #777;
 
+$dark-green: #67A766;
 $green: #0B8D00;
 $pastel-green: #67A766;
-$dark-green: #67A766;
 $light-green: #DEF2DE;
 
-$yellow: #E99E18;
-$light-yellow: #FFE6BA;
 $dark-yellow: #9C793B;
+$yellow: #E99E18;
+$postit-yellow: #FFFFA5;
+$light-yellow: #FFE6BA;
+
+$orange: #B14300;
 
 $separator-color: #EBEBEB;
+
+$link: #0b63a5;
+$indico-blue: #00A4E4;

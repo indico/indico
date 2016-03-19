@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,13 +21,15 @@ Session-related services
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import AvatarHolder
 import MaKaC.domain as domain
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.user import principal_from_fossil
 
 
 class SessionBase(conferenceServices.ConferenceBase):
@@ -101,14 +103,6 @@ class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
         SessionModifBase._checkProtection( self )
 
 
-class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
-
-    def _checkProtection(self):
-        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "modifContribs"):
-            return
-        SessionModifBase._checkProtection( self )
-
-
 class SessionSlotBase(SessionBase):
 
     def _checkParams( self ):
@@ -160,57 +154,44 @@ class SessionSlotModifCoordinationBase(SessionSlotModifBase, SessionModifCoordin
     def _checkProtection(self):
         SessionModifCoordinationBase._checkProtection( self )
 
-class SessionSlotModifUnrestrictedTTCoordinationBase(SessionSlotModifBase, SessionModifUnrestrictedTTCoordinationBase):
-
-    def _checkProtection(self):
-        SessionModifUnrestrictedTTCoordinationBase._checkProtection( self )
-
-class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, SessionModifUnrestrictedContribMngCoordBase):
-
-    def _checkProtection(self):
-        SessionModifUnrestrictedContribMngCoordBase._checkProtection( self )
 
 class SessionProtectionUserList(SessionModifBase):
     def _getAnswer(self):
         #will use IAvatarFossil or IGroupFossil
         return fossilize(self._session.getAllowedToAccessList())
 
+
 class SessionProtectionAddUsers(SessionModifBase):
+    def _getAccessList(self):
+        result = fossilize(self._session.getAllowedToAccessList())
+        # get pending users
+        for email in self._session.getAccessController().getAccessEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
-
-        self._usersData = self._params['value']
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
+        for principal in self._principals:
+            self._session.grantAccess(principal)
+        return self._getAccessList()
 
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._session.grantAccess(userToAdd)
 
 class SessionProtectionRemoveUser(SessionModifBase):
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
-            self._session.revokeAccess(userToRemove)
+        self._session.revokeAccess(self._principal)
 
 
 class SessionChairListBase(SessionModifBase):
@@ -231,7 +212,7 @@ class SessionChairListBase(SessionModifBase):
         result = []
         for sessionChair in list:
             sessionChairFossil = fossilize(sessionChair)
-            if isinstance(sessionChair, Avatar):
+            if isinstance(sessionChair, AvatarUserWrapper):
                 isConvener = False
                 if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True
@@ -251,18 +232,15 @@ class SessionAddExistingChair(SessionChairListBase):
     def _checkParams(self):
         SessionChairListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            person = ph.getById(user["id"])
-            if person is None:
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
+        for principal in self._principals:
             if self._kindOfList == "manager":
-                self._session.grantModification(person)
+                self._session.grantModification(principal)
             elif self._kindOfList == "coordinator":
-                self._session.addCoordinator(person)
+                self._session.addCoordinator(principal)
         return self._getSessionChairList()
 
 
@@ -287,11 +265,11 @@ class SessionRemoveChair(SessionChairListBase):
                     # the user is not in the list of conveners (the table is not updated). Do nothing and update the list
                     pass
         else:
-            ph = PrincipalHolder()
+            principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
             if self._kindOfList == "manager":
-                self._session.revokeModification(ph.getById(self._chairId))
+                self._session.revokeModification(principal)
             elif self._kindOfList == "coordinator":
-                self._session.removeCoordinator(ph.getById(self._chairId))
+                self._session.removeCoordinator(principal)
         return self._getSessionChairList()
 
 

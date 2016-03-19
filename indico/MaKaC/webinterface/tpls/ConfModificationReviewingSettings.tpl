@@ -2,7 +2,6 @@
 <% from MaKaC.paperReviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
-<% import MaKaC.common.Configuration as Configuration %>
 <table width="90%" border="0" style="padding-bottom:5px;">
     <tr>
         <td nowrap class="groupTitle">${ _("Step 1 - Choose type of paper reviewing")}

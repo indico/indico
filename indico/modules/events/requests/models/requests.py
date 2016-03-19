@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -49,6 +49,7 @@ class Request(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -71,6 +72,8 @@ class Request(db.Model):
     #: ID of the user creating the request
     created_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     #: the date/time the request was created
@@ -83,6 +86,8 @@ class Request(db.Model):
     #: ID of the user processing the request
     processed_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=True
     )
     #: the date/time the request was accepted/rejected
@@ -96,6 +101,36 @@ class Request(db.Model):
         nullable=True
     )
 
+    #: The user who created the request
+    created_by_user = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=[created_by_id],
+        backref=db.backref(
+            'requests_created',
+            lazy='dynamic'
+        )
+    )
+    #: The user who processed the request
+    processed_by_user = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=[processed_by_id],
+        backref=db.backref(
+            'requests_processed',
+            lazy='dynamic'
+        )
+    )
+    #: The Event this agreement is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'requests',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
@@ -104,24 +139,6 @@ class Request(db.Model):
     @event.setter
     def event(self, event):
         self.event_id = int(event.getId())
-
-    @property
-    def created_by_user(self):
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.created_by_id))
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = int(user.getId())
-
-    @property
-    def processed_by_user(self):
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.processed_by_id))
-
-    @processed_by_user.setter
-    def processed_by_user(self, user):
-        self.processed_by_id = int(user.getId())
 
     @property
     def definition(self):
@@ -155,7 +172,7 @@ class Request(db.Model):
         :return: a dict mapping request types to a :class:`Request`
                  or if `type_` was specified, a single :class:`Request` or `None`
         """
-        query = cls.find(event_id=int(event.getId()))
+        query = event.requests
         if type_ is not None:
             return (query.filter_by(type=type_)
                     .order_by(cls.created_dt.desc())

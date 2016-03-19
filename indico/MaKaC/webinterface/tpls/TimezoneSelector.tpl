@@ -12,8 +12,9 @@ var tzSelector = new TimezoneSelector(
         '${ urlHandlers.UHResetSession.getURL() }'
 );
 
-$("#timezoneSelectorLink").qtip({
-
+$('#timezoneSelectorLink').on('click', function(e) {
+    e.preventDefault();
+}).qtip({
     style: {
         width: '300px',
         classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone',

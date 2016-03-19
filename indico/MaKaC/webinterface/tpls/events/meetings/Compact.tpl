@@ -40,7 +40,16 @@
     </td>
     <td colspan="1" bgcolor="#90c0f0">
     <div style="float:right">
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
+        % if item.note:
+            <div class="toolbar right thin">
+                <div class="group">
+                    <a href="${ url_for('event_notes.view', item) }" class="i-button">
+                        ${ _("Minutes") }
+                    </a>
+                </div>
+            </div>
+        % endif
     </div>
     <span style="font-weight:bold;">${session.getTitle()}</span>
     %  if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
@@ -55,17 +64,13 @@
         (${getLocationInfo(item)[1]})
     % endif
     <div style="float:right">
-        % for material in session.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                    <%include file="${INCLUDE}/Material.tpl" args="material=material, sessionId=item.getId()"/>
-                    % endif
-        % endfor
+        ${ render_template('attachments/mako_compat/attachments_inline.html', item=session) }
     </div>
     </td>
     </tr>
     % if len(item.getSchedule().getEntries()) > 0:
         <% countContribs = 0 %>
-        % for subitem in item.getSchedule().getEntries():
+        % for subitem in sorted(item.getSchedule().getEntries(), key=lambda x: (x.getStartDate(), x.getTitle())):
                 <%
                     if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                         subitem = subitem.getOwner()
@@ -95,16 +100,25 @@
                             - ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, spanClass='speakerList',italicAffilation=False, separator=' ')}
                       % endif
                   &nbsp;
+                  % if getLocationInfo(item) != getLocationInfo(item.getConference()):
+                      (${getLocationInfo(item)[1]})
+                  % endif
+
                   <div style="float:right">
                       <div style="float:left">
-                          % for material in item.getAllMaterialList():
-                                    % if material.canView(accessWrapper):
-                                    <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
-                                    % endif
-                          % endfor
+                          ${ render_template('attachments/mako_compat/attachments_inline.html', item=item) }
                       </div>
                       <div style="float:right">
-                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False"/>
+                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False, minutesEditActions=True"/>
+                        % if item.note:
+                            <div class="toolbar right thin">
+                                <div class="group">
+                                    <a href="${ url_for('event_notes.view', item) }" class="i-button">
+                                        ${ _("Minutes") }
+                                    </a>
+                                </div>
+                            </div>
+                        % endif
                       </div>
                   </div>
         </td>
@@ -126,13 +140,24 @@
 <tr>
     <td>
     <span style="font-weight:bold;">
-    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
+    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False, minutesEditActions=True"/>
+    % if conf.note:
+        <div class="toolbar right thin">
+            <div class="group">
+                <a href="${ url_for('event_notes.view', conf) }" class="i-button normal-button">
+                    ${ _("Minutes") }
+                </a>
+            </div>
+        </div>
+    % endif
     ${conf.getTitle()}
     </span><br/>
     ${common.renderEventTimeCompact(startDate, endDate)}
+    <br>
+    ${common.renderLocation(conf)}
     <br/><br/>
     </td>
-    <td>
+    <td style="width: 1%; white-space: nowrap;">
     <table class="headerLegendsBorder" cellpadding="1" align="right">
     <tr>
         <td>

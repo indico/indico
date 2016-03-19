@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,7 +26,9 @@ from werkzeug.datastructures import OrderedMultiDict, MultiDict
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.errors import IndicoError
-from indico.modules.rb.utils import rb_check_user_access
+from indico.modules.auth import Identity
+from indico.modules.users import User
+from indico.modules.rb.util import rb_check_user_access
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
@@ -35,8 +37,6 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RoomBookingHookBase(HTTPAPIHook):
@@ -179,17 +179,19 @@ class BookRoomHook(HTTPAPIHook):
             raise HTTPAPIError('You cannot make bookings in the past')
 
         username = get_query_parameter(self._queryParams, 'username')
-        avatars = username and filter(None, AuthenticatorMgr().getAvatarByLogin(username).itervalues())
-        if not avatars:
+        if not username:
+            raise HTTPAPIError('No username provided')
+        users = User.find_all(~User.is_deleted, Identity.identifier == username)
+        if not users:
             raise HTTPAPIError('Username does not exist')
-        elif len(avatars) != 1:
-            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(avatars)))
-        avatar = avatars[0]
+        elif len(users) != 1:
+            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(users)))
+        user = users[0]
 
         self._params = {
             'room_id': get_query_parameter(self._queryParams, 'roomid'),
             'reason': get_query_parameter(self._queryParams, 'reason'),
-            'booked_for': avatar,
+            'booked_for': user,
             'from': self._fromDT,
             'to': self._toDT
         }
@@ -216,9 +218,9 @@ class BookRoomHook(HTTPAPIHook):
             'repeat_frequency': RepeatFrequency.NEVER,
             'repeat_interval': 0,
             'room_id': self._room.id,
-            'booked_for_id': self._params['booked_for'].getId(),
-            'contact_email': self._params['booked_for'].getEmail(),
-            'contact_phone': self._params['booked_for'].getTelephone(),
+            'booked_for_user': self._params['booked_for'],
+            'contact_email': self._params['booked_for'].email,
+            'contact_phone': self._params['booked_for'].phone,
             'booking_reason': self._params['reason']
         })
         try:
@@ -353,7 +355,7 @@ def _ical_serialize_reservation(cal, data, now):
 
 def _add_server_tz(dt):
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()))
+        return dt.replace(tzinfo=get_timezone(Config.getInstance().getDefaultTimezone()))
     return dt
 
 

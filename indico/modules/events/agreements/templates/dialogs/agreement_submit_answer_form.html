@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans %}Submit answer for{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {{ agreement.person_name }}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form, id='agreement-upload-form', multipart=True) }}
+    {{ form_rows(form) }}
+
+    {% call form_footer(form) %}
+        <input type="submit" class="i-button big highlight" value="{% trans %}Submit{% endtrans %}" disabled>
+        <a href="#" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            function accepts_agreement(form) {
+                return form.find(':input[name=answer]:checked').val() == '1';
+            }
+
+            function validate(form) {
+                if (!form.find(':input[name=answer]:checked').length) {
+                    return false;
+                }
+                var valid = true;
+                form.find(':input:visible').each(function() {
+                    var $this = $(this);
+                    if ($this.is(':checkbox:not(:checked)') || !$this.val()) {
+                        valid = false;
+                        return false;
+                    }
+                });
+                return valid;
+            }
+
+            var form = $('#agreement-upload-form');
+            $('#form-group-document').hide();
+            $('#form-group-upload_confirm').hide();
+            form.find(':input[name=answer]').on('change', function() {
+                if (accepts_agreement(form)) {
+                    $('#form-group-document').show();
+                    $('#form-group-upload_confirm').show();
+                } else {
+                    $('#form-group-document').hide();
+                    $('#form-group-upload_confirm').hide();
+                }
+            });
+
+
+            form.on('change', ':input', function() {
+                form.find('input:submit').prop('disabled', !validate(form));
+            });
+        })();
+    </script>
+{% endblock %}
+

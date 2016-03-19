@@ -13,7 +13,7 @@
     ${ tracks }
 </table>
 % if not judgements:
-    <span style="padding-left: 10px;">There are no assessments yet.</span>
+    <span style="padding-left: 10px;">${_("There are no assessments yet.")}</span>
 % endif
 % if ratingAverage:
     <br>

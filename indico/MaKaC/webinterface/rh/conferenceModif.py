@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,31 +18,27 @@ import os
 from cStringIO import StringIO
 import tempfile
 import types
-from flask import session, request
+from flask import session, request, flash, redirect
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-import MaKaC.common.timezoneUtils as timezoneUtils
 from BTrees.OOBTree import OOBTree
+from werkzeug.exceptions import Forbidden
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.core.config import Config
-from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
-    ConferenceClosedError, NoReportError, NotFoundError
+from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -52,44 +48,45 @@ import MaKaC.webinterface.common.registrantNotificator as registrantNotificator
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
+from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker
 from MaKaC.common import pendingQueues
-from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
+from MaKaC.export.excel import AbstractListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from indico.modules.events import notify_pending
 from indico.modules.events.requests.util import is_request_manager
-from indico.util.i18n import i18nformat, set_best_lang
+from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
-from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.fossils.conference import ISessionBasicFossil
 
-from indico.modules.scheduler import Client
+from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for
+from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 
 
-class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
+class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
 
-    def _checkParams( self, params ):
-        RHConferenceBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
 
-    def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+    def _checkProtection(self):
+        RHModificationBaseProtected._checkProtection(self)
 
-    def _displayCustomPage( self, wf ):
+    def _displayCustomPage(self, wf):
         return None
 
-    def _displayDefaultPage( self ):
+    def _displayDefaultPage(self):
         return None
 
-    def _process( self ):
+    def _process(self):
         wf = self.getWebFactory()
-        if wf != None:
-            res = self._displayCustomPage( wf )
-            if res != None:
+        if wf is not None:
+            res = self._displayCustomPage(wf)
+            if res is not None:
                 return res
         return self._displayDefaultPage()
 
@@ -187,7 +184,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._requests_manager = is_request_manager(session.user)
@@ -195,7 +191,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
                                                single_value=True)
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
+        if not (self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
             RHConferenceModifKey._checkProtection(self)
 
     def _process(self):
@@ -206,8 +202,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._conf.canModify(self.getAW()):
             url = urlHandlers.UHConferenceModification.getURL( self._conf )
 
-        elif self._isRegistrar:
-            url = urlHandlers.UHConfModifRegForm.getURL( self._conf )
         elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
@@ -238,57 +232,6 @@ class RHConferenceCloseModifKey(RHConferenceBase):
             url = self._redirectURL
         else:
             url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        self._redirect(url)
-
-
-class RHConferenceClose(RHConferenceModifBase):
-    _uh = urlHandlers.UHConferenceClose
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._confirm = params.has_key("confirm")
-        self._cancel = params.has_key("cancel")
-
-    def _process(self):
-
-        if self._cancel:
-            url = urlHandlers.UHConferenceModification.getURL(self._conf)
-            self._redirect(url)
-        elif self._confirm:
-            self._target.setClosed(True)
-            url = urlHandlers.UHConferenceModification.getURL(self._conf)
-            self._redirect(url)
-        else:
-            return conferences.WPConfClosing(self, self._conf).display()
-
-
-class RHConferenceOpen(RHConferenceModifBase):
-    _allowClosed = True
-
-    def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
-
-        user = self._getUser()
-        if user is self._conf.getCreator():
-            return
-        # If we are not the creator, check if we have category admin privileges
-        hasAccess = False
-        for owner in self._conf.getOwnerList():
-            if owner.canUserModify(user): # category or system admin
-                hasAccess = True
-                break
-        if not hasAccess:
-            if self._conf.isClosed():
-                raise ConferenceClosedError(self._target.getConference())
-            else:
-                raise ModificationError()
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-
-    def _process(self):
-        self._target.setClosed(False)
-        url = urlHandlers.UHConferenceModification.getURL(self._conf)
         self._redirect(url)
 
 
@@ -483,6 +426,10 @@ class RHConfRemoveAllSubmissionRights( RHConferenceModifBase ):
     def _process( self ):
         for cont in self._target.getContributionList():
             cont.revokeAllSubmitters()
+        event = self._conf.as_event
+        for entry in set(event.acl_entries):
+            if entry.has_management_role('submit', explicit=True):
+                event.update_principal(entry.principal, del_roles={'submit'})
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
 class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
@@ -495,135 +442,6 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
                     ses.grantModification(convener,False)
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
-class RHConfModifTools( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifTools
-    _allowClosed = True
-
-    def _process( self ):
-        p = conferences.WPConfDisplayAlarm(self, self._target)
-        return p.display()
-
-
-class RHConfDeletion(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfDeletion
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process( self ):
-        if self._cancel:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
-        elif self._confirm:
-            parent=None
-            if self._conf.getOwnerList()!=[]:
-                parent=self._conf.getOwnerList()[0]
-            self._conf.delete()
-            if parent is not None:
-                self._redirect( urlHandlers.UHCategoryModification.getURL(parent) )
-            else:
-                self._redirect( urlHandlers.UHWelcome.getURL() )
-        else:
-            return conferences.WPConfDeletion( self, self._conf ).display()
-
-class RHConfModifParticipants( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifParticipants
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipants( self, self._target ).display()
-
-class RHConfModifParticipantsSetup(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsSetup
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipantsSetup( self, self._target ).display()
-
-class RHConfModifParticipantsPending(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsPending
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        elif self._target.getParticipation().getPendingParticipantList() and nowutc() < self._target.getStartDate():
-            return conferences.WPConfModifParticipantsPending( self, self._target ).display()
-        else:
-            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-class RHConfModifParticipantsDeclined(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsDeclined
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        elif self._target.getParticipation().getDeclinedParticipantList():
-            return conferences.WPConfModifParticipantsDeclined( self, self._target ).display()
-        else:
-            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-
-class RHConfModifParticipantsAction(RHConfModifParticipants):
-    _uh = urlHandlers.UHConfModifParticipantsAction
-
-    def _process( self ):
-        params = self._getRequestParams()
-        selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
-        toList = []
-        if selectedList == []:
-            raise FormValuesError(_("No participant selected! Please select at least one."))
-        else:
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                toList.append(participant)
-        excel = ParticipantsListToExcel(self._conf, list=toList)
-        return send_file('ParticipantList.csv', StringIO(excel.getExcelFile()), 'CSV')
-
-
-class RHConfModifParticipantsStatistics(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsStatistics
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipantsStatistics( self, self._target ).display()
-
-#######################################################################################
-
-class RHConfAllParticipants( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfAllSessionsConveners
-
-    def _process(self):
-        p = conferences.WPConfAllParticipants( self, self._conf )
-        return p.display()
-
-
-class RHConfModifLog (RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifLog
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams( self, params )
-
-        if params.get("view",None) is not None :
-            if params["view"] == "Action Log" :
-                params["view"] = "action"
-            elif params["view"] == "Email Log" :
-                params["view"] = "email"
-            elif params["view"] == "Custom Log" :
-                params["view"] = "custom"
-            elif params["view"] == "General Log" :
-                params["view"] = "general"
-
-    def  _process(self):
-        params = self._getRequestParams()
-        p = conferences.WPConfModifLog( self, self._target )
-        return p.display(**params)
 
 #######################################################################################
 
@@ -826,8 +644,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
     def _process( self ):
         params = self._getRequestParams()
         paramNames = params.keys()
-        options = { "materials"     : "cloneMaterials"    in paramNames,
-                    "access"        : "cloneAccess"       in paramNames,
+        options = { "access"        : "cloneAccess"       in paramNames,
                     "keys"          : "cloneAccess"       in paramNames,
                     "authors"       : "cloneTimetable"    in paramNames,
                     "contributions" : "cloneTimetable"    in paramNames,
@@ -836,9 +653,6 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     "tracks"        : "cloneTracks"       in paramNames,
                     "registration"  : "cloneRegistration" in paramNames,
                     "abstracts"     : "cloneAbstracts"    in paramNames,
-                    "alerts"        : "cloneAlerts"       in paramNames,
-                    "participants"  : "cloneParticipants" in paramNames,
-                    "evaluation"    : "cloneEvaluation"   in paramNames,
                     "managing"      : self._getUser()
                     }
         #we notify the event in case any plugin wants to add their options
@@ -1053,149 +867,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         else:
             return nbClones
 
-
-
-
 ####################################################################################
-
-class RHConfDisplayAlarm( RHConferenceModifBase ):
-
-    def _process( self ):
-        p = conferences.WPConfDisplayAlarm( self, self._conf )
-        return p.display()
-
-class RHConfAddAlarm( RHConferenceModifBase ):
-
-    def _process( self ):
-        p = conferences.WPConfAddAlarm( self, self._conf )
-        return p.display()
-
-
-class RHCreateAlarm(RHConferenceModifBase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        if not params.has_key("fromAddr") or params.get("fromAddr","")=="":
-            raise FormValuesError( _("""Please choose a "FROM" address for this alarm"""))
-        self._fromAddr=params.get("fromAddr")
-
-        if not params.has_key("toAllParticipants") and (not params.has_key("defineRecipients")
-                                                        or (params.has_key("defineRecipients") and params.get("Emails","")=="")):
-            raise FormValuesError( _("""Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."""))
-        self._toAllParticipants = params.get("toAllParticipants", False)
-        self._defineRecipients = params.get("defineRecipients", False)
-        self._emails = params.get("Emails","")
-
-        self._dateType = params.get("dateType", "")
-        self._year = int(params["year"])
-        self._month = int(params["month"])
-        self._day = int(params["day"])
-        self._hour = int(params["hour"])
-        self._minute = int(params["minute"])
-        self._timeBefore = int(params.get("timeBefore", 0))
-        if self._dateType == "2" and self._timeBefore <= 0:
-            raise FormValuesError(_("Time before the beginning of the event should be bigger than zero"))
-        self._timeTypeBefore = params["timeTypeBefore"]
-        self._note = params.get("note", "")
-        self._includeConf = params.get("includeConf", None)
-        self._alarmId = params.get("alarmId", None)
-        self._testAlarm = False
-
-    def _initializeAlarm(self, dryRun=False):
-        if dryRun:  # sending now
-            dtStart = timezoneUtils.nowutc()
-            relative = None
-        else:
-            if self._dateType == "1":  # given date
-                dtStart = timezone(self._conf.getTimezone()).localize(datetime(self._year,
-                                                                              self._month,
-                                                                              self._day,
-                                                                              self._hour,
-                                                                              self._minute)).astimezone(timezone('UTC'))
-                relative = None
-            elif self._dateType == "2":  # N days/hours before the event
-                if self._timeTypeBefore == "days":
-                    delta = timedelta(days=self._timeBefore)
-                elif self._timeTypeBefore == "hours":
-                    delta = timedelta(0, self._timeBefore * 3600)
-                dtStart = self._target.getStartDate() - delta
-                relative = delta
-            else:
-                raise MaKaCError(_("Wrong value has been choosen for 'when to send the alarm'"))
-
-        if self._alarmId:
-            al = self._conf.getAlarmById(self._alarmId)
-            c = Client()
-            if dryRun:
-                c.dequeue(al)
-            else:
-                c.moveTask(al, dtStart)
-            al.setRelative(relative)
-        else:
-            al = self._conf.newAlarm(relative or dtStart, enqueue=not dryRun)
-
-        al.setToAddrList([])
-        if(self._defineRecipients or self._testAlarm):
-            for addr in self._emails.split(","):
-                addr = addr.strip()
-                if addr:
-                    al.addToAddr(addr)
-
-        al.setFromAddr(self._fromAddr)
-
-        if self._includeConf and self._includeConf == "1":
-            al.setConfSummary(True)
-        else:
-            al.setConfSummary(False)
-
-        al.setSubject("Event reminder: %s"%self._conf.getTitle())
-
-        al.setNote(self._note)
-
-        al.setToAllParticipants(self._toAllParticipants)
-        self._al = al
-
-class RHConfSendAlarmNow( RHCreateAlarm ):
-
-    def _checkParams( self, params ):
-        RHCreateAlarm._checkParams( self, params )
-
-        self._initializeAlarm(dryRun = True)
-
-    def _process( self ):
-        RHCreateAlarm._process(self)
-        if self._al:
-            self._al.run(check = False)
-            self._al.setStartedOn(timezoneUtils.nowutc())
-            self._al.setEndedOn(timezoneUtils.nowutc())
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
-
-class RHConfSaveAlarm( RHCreateAlarm ):
-
-    def _checkParams( self, params ):
-        RHCreateAlarm._checkParams( self, params )
-
-        if not params.has_key("dateType") or params.get("dateType","")=="":
-            raise FormValuesError(_("Please choose when to send this alarm"))
-
-        self._initializeAlarm()
-
-    def _process(self):
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
-
-class RHConfDeleteAlarm( RHAlarmBase ):
-
-    def _process(self):
-        if self._alarm.getEndedOn():
-            raise MaKaCError(_("The alarm can not be deleted"))
-        self._alarm.delete()
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._conf ) )
-
-
-class RHConfModifyAlarm( RHAlarmBase ):
-
-    def _process(self):
-        return conferences.WPConfModifyAlarm( self, self._conf, self._alarm ).display()
 
 
 class RHConfModifProgram( RHConferenceModifBase ):
@@ -2023,6 +1695,9 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
             for t in abstract.getTrackList():
                 x.writeTag("Track", t.getTitle())
+            accepted_track = abstract.getAcceptedTrack()
+            if accepted_track:
+                x.writeTag('AcceptedTrack', accepted_track.getTitle())
 
             x.closeTag("abstract")
 
@@ -2051,588 +1726,6 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
 
 #-------------------------------------------------------------------------------------
 
-class RHConfModifDisplayCustomization( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayCustomization
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        p = conferences.WPConfModifDisplayCustomization(self, self._target)
-        return p.display()
-
-class RHConfModifDisplayMenu( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayMenu
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-
-    def _process( self ):
-        p = conferences.WPConfModifDisplayMenu(self, self._target, self._linkId)
-        return p.display()
-
-class RHConfModifDisplayResources( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayResources
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        p = conferences.WPConfModifDisplayResources(self, self._target)
-        return p.display()
-
-class RHConfModifDisplayConfHeader( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayConfHeader
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._optionalParams={}
-        if params.has_key("modifiedText"):
-            self._optionalParams["modifiedText"]=params.has_key("modifiedText")
-
-    def _process( self ):
-        p = conferences.WPConfModifDisplayConfHeader(self, self._target, optionalParams=self._optionalParams )
-        return p.display()
-
-class RHConfModifDisplayAddLink( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayAddLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._cancel = params.get("cancel", "")
-        self._submit = params.get("submit", "")
-        self._params = params
-
-    def _process( self ):
-        if self._cancel:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            target = menu
-            if self._linkId:
-                target = menu.getLinkById(self._linkId)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(target))
-        elif self._submit:
-            #create the link
-            name = self._params.get("name", "[empty name]")
-            if name.strip()=="":
-                name="[empty name]"
-            url = self._params.get("URL", "")
-            displayTarget = self._params.get("displayTarget", "_blank")
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            target = menu
-            if self._linkId:
-                target = menu.getLinkById(self._linkId)
-            link = displayMgr.ExternLink(name, url)
-            link.setCaption(name)
-            link.setDisplayTarget(displayTarget)
-            target.addLink(link)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-        else:
-            p = conferences.WPConfModifDisplayAddLink(self, self._target, self._linkId )
-            return p.display()
-
-
-class RHConfModifDisplayAddPage( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayAddLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._cancel = params.get("cancel", "")
-        self._submit = params.get("submit", "")
-        self._params = params
-
-    def _process( self ):
-        if self._cancel:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            target = menu
-            if self._linkId:
-                target = menu.getLinkById(self._linkId)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(target))
-        elif self._submit:
-            #create the page
-            intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf)
-            intPage=internalPagesMgr.InternalPage(self._conf)
-            intPage.setTitle(self._params.get("title","[no title]"))
-            intPage.setContent(self._params.get("content",""))
-            intPagesMgr.addPage(intPage)
-            #create the link
-            name = self._params.get("name", "[empty name]")
-            if name.strip()=="":
-                name="[empty name]"
-            content = self._params.get("content", "")
-            displayTarget = self._params.get("displayTarget", "_blank")
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            target = menu
-            if self._linkId:
-                target = menu.getLinkById(self._linkId)
-            link = displayMgr.PageLink(name, intPage)
-            link.setCaption(name)
-            link.setDisplayTarget(displayTarget)
-            target.addLink(link)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-        else:
-            p = conferences.WPConfModifDisplayAddPage(self, self._target, self._linkId )
-            return p.display()
-
-class RHConfModifDisplayAddSpacer( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayAddSpacer
-
-
-    def _process( self ):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        spacer = displayMgr.Spacer()
-        menu.addLink(spacer)
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(spacer))
-
-
-class RHConfModifDisplayRemoveLink( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayRemoveLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._cancel = params.get("cancel", "")
-        self._confirm = params.get("confirm", "")
-
-
-    def _process( self ):
-        if self._cancel:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-        elif self._confirm:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if isinstance(link, displayMgr.SystemLink):
-                raise MaKaCError( _("You cannot remove a system link"))
-            parent = link.getParent()
-            if link.getType() == "page":
-                page = link.getPage()
-                internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf).removePage(page)
-            parent.removeLink(link)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(self._target))
-        else:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if link is None:
-                raise NotFoundError( _("The link you are trying to delete no longer exists"))
-            if isinstance(link, displayMgr.SystemLink):
-                raise MaKaCError( _("You cannot remove a system link"))
-            p = conferences.WPConfModifDisplayRemoveLink(self, self._target, link )
-            return p.display()
-
-
-class RHConfModifDisplayToggleLinkStatus( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayToggleLinkStatus
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-
-
-    def _process( self ):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link=menu.getLinkById(self._linkId)
-        if link.isEnabled():
-            link.disable()
-        else:
-            link.enable()
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayToggleHomePage( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayToggleHomePage
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-
-
-    def _process( self ):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link=menu.getLinkById(self._linkId)
-        if link.getPage().isHome():
-            link.getPage().setHome(False)
-        else:
-            for page in internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf).getPagesList():
-                page.setHome(False)
-            link.getPage().setHome(True)
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayUpLink( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayUpLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-
-
-    def _process( self ):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link = menu.getLinkById(self._linkId)
-        parent = link.getParent()
-        parent.upLink(link)
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayDownLink( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayDownLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-
-
-    def _process( self ):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link = menu.getLinkById(self._linkId)
-        parent = link.getParent()
-        parent.downLink(link)
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayToggleTimetableView(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifDisplayToggleTimetableView
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._linkId = params.get("linkId", "")
-
-    def _process(self):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link = menu.getLinkById(self._linkId)
-        menu.set_timetable_detailed_view(not menu.is_timetable_detailed_view())
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayToggleTTDefaultLayout(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifDisplayToggleTTDefaultLayout
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._linkId = params.get("linkId", "")
-
-    def _process(self):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        link = menu.getLinkById(self._linkId)
-        menu.toggle_timetable_layout()
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-
-class RHConfModifDisplayModifyData(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifDisplayRemoveLink
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._linkId = params.get("linkId", "")
-        self._cancel = params.get("cancel", "")
-        self._confirm = params.get("confirm", "")
-        self._params = params
-
-    def _process(self):
-
-        if self._cancel:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-        elif self._confirm:
-            #create the link
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if isinstance(link, displayMgr.SystemLink):
-                raise MaKaCError( _("You cannot modify a system link"))
-            name=self._params.get("name","[empty name]")
-            if name.strip()=="":
-                name="[empty name]"
-            link.setCaption(name)
-            if isinstance(link, displayMgr.ExternLink):
-                link.setURL(self._params["url"])
-            elif isinstance(link, displayMgr.PageLink):
-                link.getPage().setContent(self._params.get("content",""))
-            link.setDisplayTarget(self._params.get("displayTarget", "_blank"))
-            self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-        else:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if isinstance(link, displayMgr.SystemLink):
-                raise MaKaCError( _("You cannot modify a system link"))
-            if isinstance(link, displayMgr.ExternLink):
-                p = conferences.WPConfModifDisplayModifyData(self, self._target, link )
-            else:
-                p = conferences.WPConfModifDisplayModifyPage(self, self._target, link )
-            return p.display()
-
-class RHConfModifDisplayModifySystemData( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayRemoveLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._cancel = params.get("cancel", "")
-        self._confirm = params.get("confirm", "")
-        self._params = params
-
-    def _process( self ):
-
-        if self._cancel:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-        elif self._confirm:
-            #create the link
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if isinstance(link, displayMgr.SystemLink):
-                name=self._params.get("name","[empty name]")
-                if name.strip()=="":
-                    name="[empty name]"
-                link.setCaption(name)
-        else:
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            link = menu.getLinkById(self._linkId)
-            if isinstance(link, displayMgr.SystemLink):
-                p = conferences.WPConfModifDisplayModifySystemData(self, self._target, link )
-                return p.display()
-        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
-
-class RHConfModifFormatTitleColorBase( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._formatOption = params.get("formatOption", "")
-        self._colorCode = params.get("colorCode", "")
-        self._apply =  params.has_key( "apply" )
-        self._remove =  params.has_key( "remove" )
-
-    def _process( self ):
-        format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
-        if self._formatOption:
-            if self._apply:
-                format.setColorCode(self._formatOption, "#" + self._colorCode)
-            elif self._remove:
-                format.clearColorCode(self._formatOption)
-        redirecturl = urlHandlers.UHConfModifDisplayCustomization.getURL(self._conf)
-        redirecturl.addParam("formatOption", self._formatOption)
-        self._redirect("%s#colors"%redirecturl)
-
-class RHConfModifFormatTitleBgColor( RHConfModifFormatTitleColorBase ):
-    _uh = urlHandlers.UHConfModifFormatTitleBgColor
-
-class RHConfModifFormatTitleTextColor( RHConfModifFormatTitleColorBase ):
-    _uh = urlHandlers.UHConfModifFormatTitleBgColor
-
-class RHConfSaveLogo( RHConferenceModifBase ):
-
-    def _getNewTempFile( self ):
-        cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
-        tempFileName = tempfile.mkstemp( suffix="IndicoLogo.tmp", dir = tempPath )[1]
-        return tempFileName
-
-    def _saveFileToTemp(self, fs):
-        fileName = self._getNewTempFile()
-        fs.save(fileName)
-        return fileName
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        if not hasattr(self,"_filePath"):
-            self._filePath = self._saveFileToTemp(params["file"])
-            self._tempFilesToDelete.append(self._filePath)
-        self._fileName = params["file"].filename
-
-
-    def _process( self ):
-        f = conference.LocalFile()
-        f.setName( "Logo" )
-        f.setDescription( "This is the logo for the conference" )
-        f.setFileName( self._fileName )
-        f.setFilePath( self._filePath )
-        self._conf.setLogo( f )
-        self._redirect( "%s#logo"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
-
-
-class RHConfRemoveLogo( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        self._conf.removeLogo()
-        self._redirect( "%s#logo"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
-
-class RHConfSaveCSS( RHConferenceModifBase ):
-
-    def _getNewTempFile( self ):
-        cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
-        tempFileName = tempfile.mkstemp( suffix="IndicoCSS.tmp", dir = tempPath )[1]
-        return tempFileName
-
-    def _saveFileToTemp(self, fs):
-        fileName = self._getNewTempFile()
-        fs.save(fileName)
-        return fileName
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._params = params
-        if self._params.has_key("FP"):
-            self._filePath = self._params["FP"]
-            self._fileName = "TemplateInUse"
-        else:
-            if not hasattr(self,"_filePath"):
-                self._filePath = self._saveFileToTemp(params["file"])
-                self._tempFilesToDelete.append(self._filePath)
-            self._fileName = params["file"].filename
-        if self._fileName.strip() == "":
-            raise FormValuesError(_("Please, choose the file to upload first"))
-
-    def _process( self ):
-        f = conference.LocalFile()
-        f.setName( "CSS" )
-        f.setDescription( "This is the css for the conference" )
-        f.setFileName( self._fileName )
-        f.setFilePath( self._filePath )
-        sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        sm.setCSS( f )
-        self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
-
-
-class RHConfRemoveCSS( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        sm.removeCSS()
-        # Since this function makes sure no template is used make sure that
-        # one of the standard ones is not used
-        sm.useLocalCSS()
-        self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
-
-
-class RHConfModifPreviewCSS(RHConferenceModifBase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        # Call a webpage that will handle the task
-        CSS_Temp_Id = self._params.get("cssId", "")
-        p = conferences.WPConfModifPreviewCSS(self, self._conf, CSS_Temp_Id)
-        return p.display()
-
-
-class RHConfUseCSS( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._params = params
-        self._selectedTpl = self._params.get("selectedTpl")
-
-    def _process( self ):
-        styleMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        if self._selectedTpl == "css":
-            styleMgr.useLocalCSS()
-        elif self._selectedTpl:
-            styleMgr.setCSS(self._selectedTpl)
-        self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
-
-class RHConfSavePic( RHConferenceModifBase ):
-
-    def __init__(self):
-        RHConferenceModifBase.__init__(self)
-        self._tempFiles = {}
-
-    def _getNewTempFile( self ):
-        cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
-        tempFileName = tempfile.mkstemp( suffix="IndicoPic.tmp", dir = tempPath )[1]
-        return tempFileName
-
-    def _saveFileToTemp(self, fs):
-        if fs not in self._tempFiles:
-            fileName = self._getNewTempFile()
-            fs.save(fileName)
-            self._tempFiles[fs] = fileName
-        return self._tempFiles[fs]
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._filePath = self._saveFileToTemp(params["file"])
-        self._tempFilesToDelete.append(self._filePath)
-        self._fileName = params["file"].filename
-        self._params = params
-
-
-    def _process( self ):
-        if self._fileName == "":
-            return json.dumps({'status': "ERROR", 'info': {'message':_("No file has been attached")}})
-        f = conference.LocalFile()
-        f.setFileName( self._fileName )
-        f.setFilePath( self._filePath )
-        im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
-        pic = im.addPic( f )
-        info={"name": f.getFileName(),
-                "id": f.getId(),
-                "picURL": str(urlHandlers.UHConferencePic.getURL(pic))}
-        return json.dumps({'status': "OK", 'info': info}, textarea=True)
-
-class RHConfModifTickerTapeAction( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
-        self._tickerTape=dm.getTickerTape()
-        self._status=params.has_key("ttStatus")
-        self._saveText=params.has_key("savettText")
-        self._text=params.get("ttText","")
-        self._simpleTextEnabled=params.has_key("simpleText")
-        self._nowHappeningEnabled=params.has_key("nowHappening")
-
-    def _process( self ):
-        url=urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf )
-        if self._status:
-            self._tickerTape.setActive(not self._tickerTape.isActive())
-        if self._saveText:
-            self._tickerTape.setText(self._text)
-            url.addParam("modifiedText", "True")
-        if self._nowHappeningEnabled:
-            self._tickerTape.setNowHappeningEnabled(not self._tickerTape.isNowHappeningEnabled())
-        if self._simpleTextEnabled:
-            self._tickerTape.setSimpleTextEnabled(not self._tickerTape.isSimpleTextEnabled())
-        self._redirect( "%s#tickertape"%url )
-
-class RHConfModifToggleSearch( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._displayMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
-        self._searchEnabled=self._displayMgr.getSearchEnabled()
-
-    def _process( self ):
-        url=urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf )
-        self._displayMgr.setSearchEnabled(not self._searchEnabled)
-        self._redirect( "%s#headerFeatures"%url )
-
-
-class RHConfModifToggleNavigationBar( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._displayMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
-        self._navigationBarEnabled=self._displayMgr.getDisplayNavigationBar()
-
-    def _process( self ):
-        url=urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf )
-        self._displayMgr.setDisplayNavigationBar(not self._navigationBarEnabled)
-        self._redirect( "%s#headerFeatures"%url )
 
 class RHConfAddContribType(RHConferenceModifBase):
     _uh = urlHandlers.UHConfAddContribType
@@ -2721,7 +1814,6 @@ class ContribFilterCrit(filters.FilterCriteria):
         contribFilters.TypeFilterField.getId():contribFilters.TypeFilterField, \
         contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField, \
         contribFilters.TrackFilterField.getId():contribFilters.TrackFilterField, \
-        contribFilters.MaterialFilterField.getId():contribFilters.MaterialFilterField, \
         contribFilters.SessionFilterField.getId():contribFilters.SessionFilterField }
 
 
@@ -2765,12 +1857,6 @@ class RHContributionList(RHContributionListBase):
         sessionData["track"] = map(lambda track: track.getId(), self._conf.getTrackList())
         sessionData["session"] = map(lambda ses: ses.getId(), self._conf.getSessionList())
         sessionData["status"] = map(lambda status: ContribStatusList.getId(status), ContribStatusList.getList())
-        lmaterial = []
-        paperId = materialFactories.PaperFactory().getId()
-        slidesId = materialFactories.SlidesFactory().getId()
-        for matId in ["--other--","--none--",paperId,slidesId]: # wtf? doesn't that simply re-create the list?
-            lmaterial.append(matId)
-        sessionData["material"] = lmaterial
         sessionData["typeShowNoValue"] = True
         sessionData["trackShowNoValue"] = True
         sessionData["sessionShowNoValue"] = True
@@ -2784,7 +1870,6 @@ class RHContributionList(RHContributionListBase):
         """
 
         sessionData["status"] = []
-        sessionData["material"] = []
         sessionData.update(params)
         sessionData["type"] = utils.normalizeToList(params.get('types', []))
         sessionData["track"] = utils.normalizeToList(params.get('tracks', []))
@@ -2888,7 +1973,7 @@ class RHContributionList(RHContributionListBase):
         # Save the web session
         session['ContributionFilterConf%s' % self._conf.getId()] = sessionData
         self._filterCrit = self._buildFilteringCriteria(sessionData)
-        self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip()])
+        self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip(), 'date'])
         self._order = sessionData.get("order", "down")
         self._authSearch = sessionData.get("authSearch", "")
 
@@ -3045,8 +2130,6 @@ class RHContribsActions:
             return RHMoveContribsToSession().process(params)
         elif params.has_key("PKG"):
             return RHMaterialPackage().process(params)
-        elif params.has_key("PROC"):
-            return RHProceedings().process(params)
         return "no action to do"
 
 
@@ -3085,7 +2168,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
 
-            contrib_pdf = ContribsToPDF(self._conf, self._contribs)
+            contrib_pdf = ContribsToPDF(self._conf, self._contribs, tz)
             fpath = contrib_pdf.generate()
 
             return send_file(filename, fpath, 'PDF')
@@ -3105,7 +2188,7 @@ class RHContribsToPDF(RHConferenceModifBase):
         filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
-        pdf = ContribsToPDF(self._conf, self._contribs)
+        pdf = ContribsToPDF(self._conf, self._contribs, tz)
         return send_file(filename, pdf.generate(), 'PDF')
 
 
@@ -3278,32 +2361,21 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
         return send_file('abstractFiles.zip', path, 'ZIP', inline=False)
 
 
-class RHMaterialPackage(RHConferenceModifBase):
+class RHMaterialPackage(RHConferenceModifBase, AttachmentPackageGeneratorMixin):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self._contribIds = self._normaliseListParam(params.get("contributions", []))
-        self._contribs = []
-        for id in self._contribIds:
-            self._contribs.append(self._conf.getContributionById(id))
 
     def _process(self):
-        if not self._contribs:
-            return "No contribution selected"
-        p=ContribPacker(self._conf)
-        path=p.pack(self._contribs, ZIPFileHandler())
-        if not p.getItems():
-            raise NoReportError(_("The selected package does not contain any items"))
-        return send_file('material.zip', path, 'ZIP', inline=False)
-
-
-class RHProceedings(RHConferenceModifBase):
-
-    def _process( self ):
-        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
-        p=ProceedingsPacker(self._conf)
-        path=p.pack(ZIPFileHandler())
-        return send_file('proceedings.zip', path, 'ZIP', inline=False)
+        if not self._contribIds:
+            flash(_('You did not select any contributions.'), 'warning')
+            return redirect(url_for('event_mgmt.confModifContribList', self._conf))
+        attachments = self._filter_by_contributions(self._contribIds, None)
+        if not attachments:
+            flash(_('The selected contributions do not have any materials.'), 'warning')
+            return redirect(url_for('event_mgmt.confModifContribList', self._conf))
+        return self._generate_zip_file(attachments)
 
 
 class RHAbstractBook( RHConfModifCFABase ):
@@ -3324,46 +2396,6 @@ class RHAbstractBookToogleShowIds( RHConfModifCFABase ):
         self._conf.getBOAConfig().setShowIds(not self._conf.getBOAConfig().getShowIds())
         self._redirect( urlHandlers.UHConfModAbstractBook.getURL( self._conf ) )
 
-class RHFullMaterialPackage(RHConferenceModifBase):
-    _uh=urlHandlers.UHConfModFullMaterialPackage
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        p = conferences.WPFullMaterialPackage(self,self._target)
-        return p.display()
-
-
-class RHFullMaterialPackagePerform(RHConferenceModifBase):
-    _uh=urlHandlers.UHConfModFullMaterialPackagePerform
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._days=self._normaliseListParam(params.get("days",[]))
-        self._mainResource = (params.get("mainResource","") != "")
-        self._fromDate = ""
-        fromDay = params.get("fromDay","")
-        fromMonth = params.get("fromMonth","")
-        fromYear = params.get("fromYear","")
-        if fromDay != "" and fromMonth != "" and fromYear != "" and \
-           fromDay != "dd" and fromMonth != "mm" and fromYear != "yyyy":
-            self._fromDate = "%s %s %s"%(fromDay, fromMonth, fromYear)
-        self._cancel = params.has_key("cancel")
-        self._materialTypes=self._normaliseListParam(params.get("materialType",[]))
-        self._sessionList = self._normaliseListParam(params.get("sessionList",[]))
-
-    def _process( self ):
-        if not self._cancel:
-            if self._materialTypes:
-                p=ConferencePacker(self._conf, self._aw)
-                path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
-                if not p.getItems():
-                    raise NoReportError(_("The selected package does not contain any items."))
-                return send_file('full-material.zip', path, 'ZIP', inline=False)
-            raise NoReportError(_("You have to select at least one material type"))
-        else:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
 
 class RHModifSessionCoordRights( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfPerformDataModif
@@ -3388,13 +2420,8 @@ class RHConfModifPendingQueues( RHConferenceModifBase ):
         p = conferences.WPConfModifPendingQueues( self, self._target, self._getRequestParams().get("tab","conf_submitters") )
         return p.display()
 
+
 class RHConfModifPendingQueuesActionConfMgr:
-    """
-    class to select the action to do with the selected pending conference submitters
-    """
-
-    _uh = urlHandlers.UHConfModifPendingQueuesActionConfMgr
-
     def process(self, params):
         if 'remove' in params:
             return RHConfModifPendingQueuesRemoveConfMgr().process(params)
@@ -3402,57 +2429,55 @@ class RHConfModifPendingQueuesActionConfMgr:
             return RHConfModifPendingQueuesReminderConfMgr().process(params)
         return "no action to do"
 
-class RHConfModifPendingQueuesRemoveConfMgr( RHConferenceModifBase ):
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfMgrs = []
-        for id in self._pendingConfMgrIds:
-            self._pendingConfMgrs.extend(self._conf.getPendingQueuesMgr().getPendingConfManagersByEmail(id))
-        self._remove=params.has_key("confirm")
-        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+class RHConfModifPendingQueuesRemoveConfMgr(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
+        self._remove = 'confirm' in params
+        self._confirmed = 'confirm' in params or 'cancel' in params
 
-    def _process( self ):
-        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
-        url.addParam("tab","conf_managers")
-        if self._pendingConfMgrs == []:
+    def _process(self):
+        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab", "conf_managers")
+        if not self._emails:
             self._redirect(url)
-        if self._confirmed:
+        elif self._confirmed:
             if self._remove:
-                for ps in self._pendingConfMgrs:
-                    self._conf.getPendingQueuesMgr().removePendingConfManager(ps)
+                for email in self._emails:
+                    self._conf.as_event.update_principal(EmailPrincipal(email), full_access=False)
             self._redirect(url)
         else:
-            wp = conferences.WPConfModifPendingQueuesRemoveConfMgrConfirm(self, self._conf, self._pendingConfMgrIds)
+            wp = conferences.WPConfModifPendingQueuesRemoveConfMgrConfirm(self, self._conf, self._emails)
             return wp.display()
 
-class RHConfModifPendingQueuesReminderConfMgr( RHConferenceModifBase ):
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfMgrs = []
-        for email in self._pendingConfMgrIds:
-            self._pendingConfMgrs.append(self._conf.getPendingQueuesMgr().getPendingConfManagersByEmail(email))
-        self._send=params.has_key("confirm")
-        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+class RHConfModifPendingQueuesReminderConfMgr(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
+        self._send = 'confirm' in params
+        self._confirmed = 'confirm' in params or 'cancel' in params
 
-
-    def _process( self ):
-        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
-        url.addParam("tab","conf_managers")
-        if self._pendingConfMgrs == []:
+    def _process(self):
+        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab", "conf_managers")
+        if not self._emails:
             self._redirect(url)
-        if self._confirmed:
+        elif self._confirmed:
             if self._send:
-                pendings=pendingQueues.PendingConfManagersHolder()
-                for pss in self._pendingConfMgrs:
-                    pendings._sendReminderEmail(pss)
+                emails = set(self._emails)
+                entries = {entry
+                           for entry in self._conf.as_event.acl_entries
+                           if (entry.type == PrincipalType.email and entry.principal.email in emails and
+                               entry.has_management_role())}
+                for entry in entries:
+                    notify_pending(entry)
             self._redirect(url)
         else:
-            wp = conferences.WPConfModifPendingQueuesReminderConfMgrConfirm(self, self._conf, self._pendingConfMgrIds)
+            wp = conferences.WPConfModifPendingQueuesReminderConfMgrConfirm(self, self._conf, self._emails)
             return wp.display()
+
 
 class RHConfModifPendingQueuesActionConfSubm:
     """
@@ -3473,21 +2498,18 @@ class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfSubms = []
-        for id in self._pendingConfSubmIds:
-            self._pendingConfSubms.extend(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(id))
         self._remove=params.has_key("confirm")
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
 
     def _process( self ):
         url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
         url.addParam("tab","conf_submitters")
-        if self._pendingConfSubms == []:
+        if not self._pendingConfSubmIds:
             self._redirect(url)
         if self._confirmed:
             if self._remove:
-                for ps in self._pendingConfSubms:
-                    self._conf.getPendingQueuesMgr().removePendingConfSubmitter(ps)
+                for email in self._pendingConfSubmIds:
+                    self._conf.as_event.update_principal(EmailPrincipal(email), del_roles={'submit'})
             self._redirect(url)
         else:
             wp = conferences.WPConfModifPendingQueuesRemoveConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
@@ -3497,10 +2519,7 @@ class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfSubms = []
-        for email in self._pendingConfSubmIds:
-            self._pendingConfSubms.append(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(email))
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
         self._send=params.has_key("confirm")
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
 
@@ -3508,16 +2527,20 @@ class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
     def _process( self ):
         url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
         url.addParam("tab","conf_submitters")
-        if self._pendingConfSubms == []:
+        if not self._emails:
             self._redirect(url)
         if self._confirmed:
             if self._send:
-                pendings=pendingQueues.PendingConfSubmittersHolder()
-                for pss in self._pendingConfSubms:
-                    pendings._sendReminderEmail(pss)
+                emails = set(self._emails)
+                entries = {entry
+                           for entry in self._conf.as_event.acl_entries
+                           if (entry.type == PrincipalType.email and entry.principal.email in emails and
+                               entry.has_management_role('submit', explicit=True))}
+                for entry in entries:
+                    notify_pending(entry)
             self._redirect(url)
         else:
-            wp = conferences.WPConfModifPendingQueuesReminderConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
+            wp = conferences.WPConfModifPendingQueuesReminderConfSubmConfirm(self, self._conf, self._emails)
             return wp.display()
 
 class RHConfModifPendingQueuesActionSubm:
@@ -3778,40 +2801,6 @@ class RHConfMoveAbsFieldDown( RHConfModifCFABase ):
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
 
-class RHScheduleMoveEntryUp(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=self._conf.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        date=None
-        if self._entry is not None:
-            self._conf.getSchedule().moveUpEntry(self._entry)
-            date=self._entry.getStartDate()
-        if date is None:
-            self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
-        else:
-            self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
-
-
-class RHScheduleMoveEntryDown(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=self._conf.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        date=None
-        if self._entry is not None:
-            self._conf.getSchedule().moveDownEntry(self._entry)
-            date=self._entry.getStartDate()
-        if date is None:
-            self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
-        else:
-            self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
-
-
 class RHReschedule(RHConferenceModifBase):
 
     def _checkParams(self, params):
@@ -3854,86 +2843,17 @@ class RHReschedule(RHConferenceModifBase):
             self._redirect("%s#%s" % (urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
 
-class RHRelocate(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=None
-        if params.has_key("contribId"):
-            self._entry = self._conf.getContributionById(params.get("contribId",""))
-            self._schEntry = self._entry.getSchEntry()
-        elif params.has_key("schEntryId"):
-            if params.has_key("sessionId") and params.has_key("slotId"):
-                self._oldSch = self._conf.getSessionById(params.get("sessionId","")).getSlotById(params.get("slotId","")).getSchedule()
-            else:
-                self._oldSch = self._conf.getSchedule()
-            try:
-                self._schEntry = self._entry = self._oldSch.getEntryById(params.get("schEntryId",""))
-            except:
-                raise MaKaCError( _("Cannot find target item"))
-        else:
-            raise MaKaCError( _("No contribution to relocate"))
-        self._contribPlace=params.get("targetId","")
-        self._cancel=params.has_key("CANCEL")
-        self._ok=params.has_key("OK")
-        self._targetDay=params.get("targetDay","")
-        self._check=int(params.get("check","1"))
-
-    def _process(self):
-        if not self._cancel:
-            if not self._ok:
-                p=conferences.WPConfModifRelocate(self,self._conf, self._entry, self._targetDay)
-                return p.display()
-            else:
-                if self._contribPlace.strip() != "":
-                    if self._contribPlace!="conf":
-                        s,ss=self._contribPlace.split(":")
-                        session=self._conf.getSessionById(s)
-                        if session is not None:
-                            slot=session.getSlotById(ss)
-                            if slot is not None:
-                                self._schEntry.getSchedule().removeEntry(self._schEntry)
-                                if isinstance(self._entry, conference.Contribution):
-                                    self._entry.setSession(session)
-                                slot.getSchedule().addEntry(self._schEntry, check=self._check)
-                    else:
-                        self._schEntry.getSchedule().removeEntry(self._schEntry)
-                        self._conf.getSchedule().addEntry(self._schEntry, check=self._check)
-        self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
-
-class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifAddMaterials
-
-    def __init__(self):
-        RHConferenceModifBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
-
-
-class RHMaterialsShow(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifShowMaterials
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        p = conferences.WPConfModifExistingMaterials( self, self._target )
-        return p.display()
 
 # ============================================================================
 # === Badges related =========================================================
 # ============================================================================
 
 ##------------------------------------------------------------------------------------------------------------
-class RHConfBadgeBase(RHConferenceModifBase):
 
-    def _checkProtection( self ):
-        if not self._target.canManageRegistration(self.getAW().getUser()):
-            RHConferenceModifBase._checkProtection(self)
+
+class RHConfBadgeBase(RHConferenceModifBase):
+    ROLE = 'registration'
+
 
 """
 Badge Design and Printing classes
@@ -4104,7 +3024,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
 
         self.__registrantList = params.get("registrantList","all")
         if self.__registrantList != "all":
-            self.__registrantList = self.__registrantList.split(',')
+            self.__registrantList = self.__registrantList.split(',') if self.__registrantList else []
 
 
     def _process(self):
@@ -4112,10 +3032,10 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
-            if self._conf.getRegistrantsList() == []:
-                return  _("There are no registrants, so no badges to print.")
-            elif self.__templateId == None:
-                return  _("There is no badge template selected for this conference.")
+            if not self.__registrantList:
+                return _("There are no registrations to print badges for.")
+            elif self.__templateId is None:
+                return _("There is no badge template selected for this conference.")
 
             if self.__keepPDFOptions:
                 #we store the pdf options into the conference
@@ -4142,7 +3062,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                                              self.__drawDashedRectangles,
                                              self.__registrantList,
                                              self.__landscape)
-            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=False)
 
 
 class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
@@ -4153,6 +3073,13 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
         object (if we are creating a new template and it has not been stored yet)
         or in the corresponding template if we are editing a template.
     """
+
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConfBadgeBase._checkProtection(self)
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
@@ -4205,6 +3132,13 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
         The background can be obtained from the archived files
         or from the temporary files.
     """
+
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConfBadgeBase._checkProtection(self)
 
     def _checkParams(self, params):
         RHConfBadgeBase._checkParams(self, params)
@@ -4400,6 +3334,13 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         or in the corresponding template if we are editing a template.
     """
 
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConferenceModifBase._checkProtection(self)
+
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesSharedTempDir()
@@ -4461,6 +3402,13 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
         or from the temporary files.
     """
 
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConferenceModifBase._checkProtection(self)
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
@@ -4499,14 +3447,3 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                 key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
                 filePath = os.path.join(tempPath, session[key][int(self.__backgroundId)][0])
                 return self.__fileBin(filePath)
-
-
-class RHConfOffline(RHConferenceModifBase):
-
-    def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
-
-    def _process(self):
-        if not Config.getInstance().getOfflineStore():
-            raise MaKaCError(_("This feature is not enabled"))
-        return conferences.WPConfOffline(self, self._conf).display()

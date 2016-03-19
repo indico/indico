@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -348,12 +348,12 @@
             var myRooms = self.options.myRooms;
 
             var icons = ["icon-camera", "icon-broadcast", 'icon-projector', "icon-unlocked", "icon-user"];
-            var activetitles = [$T("Video conference available"),
+            var activetitles = [$T("Videoconference available"),
                                 $T("Webcast/Recording available"),
                                 $T('Projector available'),
                                 $T("Public room"),
                                 $T("Maximum capacity")];
-            var disabledtitles = [$T("Video conference not available"),
+            var disabledtitles = [$T("Videoconference not available"),
                                   $T("Webcast/Recording not available"),
                                   $T('Projector not available'),
                                   $T("Private room")];
@@ -370,7 +370,7 @@
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
 
-                var pic = $("<a class='roompicture'/>")
+                var pic = $('<a>', {'class': 'roompicture js-lightbox'})
                     .append($("<img src='" + rooms[index].small_photo_url + "'/>"))
                     .prependTo(item);
                 if (rooms[index].has_photo) {
@@ -378,7 +378,6 @@
                         .attr("title", $T("Expand picture"))
                         .addClass("active");
                     pic.attr("href", rooms[index].large_photo_url);
-                    pic.attr("nofollow", "lightbox");
                 }
 
                 var checkbox = $("<span class='checkbox'/>").prependTo(item);

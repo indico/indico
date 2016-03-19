@@ -1,61 +1,49 @@
-{% set value_json = field._value() | tojson %}
-<div class="form-row" data-tooltip-anchor>
-    <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
-    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
-    <span></span>
-</div>
-<script>
-    (function() {
-        var field = $('#{{ field.id }}');
-        var principals = JSON.parse(field.val());
+{% extends 'forms/base_widget.html' %}
 
-        {% if field.multiple %}
-            function addPrincipal(newPrincipals, setResult) {
-                // remove existing ones first to avoid duplicates
-                _.each(newPrincipals, function(principal) {
-                    principals = _.without(principals, _.findWhere(principals, {
-                        _type: principal._type,
-                        id: principal.id
-                    }));
+
+{% block html %}
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
+    <input type="text" id="display-{{ field.id }}" placeholder="{% trans %}Choose user...{% endtrans %}" readonly>
+    <button type="button" id="choose-{{ field.id }}" class="i-button" data-tooltip-anchor>{% trans %}Choose{% endtrans %}</button>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $(function() {
+            'use strict';
+
+            var button = $('#choose-{{ field.id }}');
+            var display = $('#display-{{ field.id }}');
+            var field = $('#{{ field.id }}');
+
+            {% if not field.flags.required %}
+                display.clearableinput({
+                    clearOnEscape: false,
+                    focusOnClear: false,
+                    onClear: function() {
+                        field.principalfield('remove');
+                    }
                 });
-                principals = principals.concat(newPrincipals);
-                field.val(JSON.stringify(principals));
-                setResult(true);
-            }
-            function removePrincipal(principal, setResult) {
-                principals = _.without(principals, _.findWhere(principals, {
-                    _type: principal.get('_type'),
-                    id: principal.get('id')
-                }));
-                field.val(JSON.stringify(principals));
-                setResult(true);
-            }
-            var widget = new UserListField(
-                'PluginOptionPeopleListDiv', 'PeopleList', principals,
-                true, null, true,
-                {{ field.groups | tojson }},
-                null, null, false, false, false, true,
-                addPrincipal, userListNothing, removePrincipal
-            );
-        {% else %}
-            function addUser(newUser, setResult) {
-                field.val(JSON.stringify(newUser));
-                setResult(true);
-            }
+            {% endif %}
 
-            function removeUser(setResult) {
-                field.val('[]');
-                setResult(true);
-            }
-            var widget = new SingleUserField(principals[0],
-                    {{ field.name|tojson }},
-                    true, true, null,
-                    null, false,
-                    false, true,
-                    addUser, removeUser);
-        {% endif %}
+            field.principalfield({
+                allowExternalUsers: {{ field.allow_external | tojson }},
+                enableGroupsTab: {{ field.groups | tojson }},
+                onUpdate: function(users) {
+                    var name = users[0] ? users[0].name : '';
+                    {% if not field.flags.required %}
+                        display.clearableinput('setValue', name);
+                    {% else %}
+                        display.val(name);
+                    {% endif %}
+                }
+            });
 
+            display.add(button).on('click', function() {
+                field.principalfield('choose');
+            });
+        });
+    </script>
+{% endblock %}
 
-        $E('userGroupList-{{ field.id }}').set(widget.draw());
-    })();
-</script>

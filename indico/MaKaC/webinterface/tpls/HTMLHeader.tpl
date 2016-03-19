@@ -9,7 +9,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <meta content="${self_._rh.csrf_token}" name="csrf-token" id="csrf-token"/>
+        <meta content="${_session.csrf_token}" name="csrf-token" id="csrf-token">
 
 % if social.get('facebook', {}).get('appId', None):
         <meta property="fb:app_id" content="${social['facebook']['appId']}"/>
@@ -21,8 +21,8 @@
         </script>
 % endif
 
-        <script type="text/javascript">
-            var ScriptRoot = "${ baseUrl }/js/";
+        <script>
+            var ScriptRoot = ${ conf.getScriptBaseURL() | n,j };
         </script>
         <script type="text/javascript" src="${ url_for('assets.i18n_locale', locale_name=language) }"></script>
         <script type="text/javascript" src="${ url_for('assets.js_vars_global') }"></script>
@@ -43,27 +43,21 @@
             <link rel="stylesheet" type="text/css" href="${cssFile}">
         % endfor
 
-        <!-- page-specific, directly inserted Javascript -->
-        <script>
-            ${ "\n\n".join(extraJS) }
-        </script>
-
         <!-- global JS variables -->
         <script>
-        <% user = page._rh.getAW().getUser() %>
         % if user:
             IndicoGlobalVars.isUserAuthenticated = true;
-            IndicoGlobalVars.userData = ${ jsonEncode(page._getJavaScriptUserData()) };
         % else:
             IndicoGlobalVars.isUserAuthenticated = false;
         % endif
         </script>
+
+        <script type="text/javascript" src="${ url_for('assets.js_vars_user') }"></script>
 
         <!-- other page-specific things -->
         ${ page._getHeadContent() }
 
         ${ template_hook('html-head', template=self) }
     </head>
-    <body data-user-id="${ user.getId() if user else 'null' }">
+    <body data-user-id="${ user.getId() if user else 'null' }" data-debug="${ _app.debug|n,j }">
         ${ page._getWarningMessage() }
-

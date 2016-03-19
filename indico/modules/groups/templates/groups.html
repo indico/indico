@@ -1,0 +1,97 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% macro group_table(groups, show_members=false, show_provider=false) %}
+    <table class="i-table-widget">
+        <thead>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                {% if show_members %}
+                    <th class="small-column">{% trans %}Members{% endtrans %}</th>
+                {% endif %}
+                {% if show_provider %}
+                    <th class="small-column">{% trans %}Provider{% endtrans %}</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+                <tr>
+                    <td><a href="{{ url_for('.group_details', group) }}">{{ group.name }}</a></td>
+                    {% if show_members %}
+                        <td>{{ group.group.members|count }}</td>
+                    {% endif %}
+                    {% if show_provider %}
+                        <td style="white-space: nowrap;">{{ provider_titles[group.provider] }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+
+{% block title %}{% trans %}Groups{% endtrans %}{% endblock %}
+
+{%- block content %}
+    <div class="i-box-group vert">
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Local groups{% endtrans -%}
+                </div>
+                <div class="i-box-buttons toolbar right">
+                    <div class="group">
+                        <a class="i-button icon-plus" href="{{ url_for('.group_add') }}">
+                            {%- trans %}Create new group{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="i-box-content">
+                {{ group_table(groups, show_members=true) }}
+            </div>
+        </div>
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Search groups{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                {% if providers %}
+                    <p>
+                        {% trans providers=providers|map(attribute='title')|join(', ') -%}
+                            This Indico instance also supports external groups from identity providers ({{ providers }}).
+                        {%- endtrans %}
+                        <br>
+                        {% trans -%}
+                            The search form below will search both local groups and external groups, unless specified otherwise.
+                        {%- endtrans %}
+                    </p>
+                {% endif %}
+
+                {{ form_header(form) }}
+                {{ form_rows(form) }}
+                {% call form_footer(form) %}
+                    <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
+                {% endcall %}
+
+                {% if search_results is not none %}
+                    {% if not search_results %}
+                        <h3>{% trans %}No groups could be found.{% endtrans %}</h3>
+                    {% else %}
+                        <h3>
+                            {% trans count=search_results|count -%}
+                                There is one group matching your search criteria.
+                            {% pluralize %}
+                                There are {{ count }} groups matching your search criteria.
+                            {%- endtrans %}
+                        </h3>
+                        {{ group_table(search_results, show_provider=true) }}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{%- endblock %}

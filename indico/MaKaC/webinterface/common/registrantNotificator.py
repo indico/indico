@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,8 +16,6 @@
 
 from indico.web.flask.util import url_for
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.review as review
-from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.common.baseNotificator import TplVar, Notification
 
@@ -174,7 +172,7 @@ class EmailNotificator(Notificator):
         if params.has_key("conf"):
             GenericMailer.sendAndLog(self.apply(registrant,params),
                                      params["conf"],
-                                     log.ModuleNames.REGISTRATION)
+                                     'Registration')
         else:
             GenericMailer.send(self.apply(registrant,params))
 
@@ -187,6 +185,6 @@ class EmailNotificator(Notificator):
         notification =  Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
         if params.has_key("conf"):
             GenericMailer.sendAndLog(notification, params["conf"],
-                                     log.ModuleNames.REGISTRATION)
+                                     'Registration')
         else:
             GenericMailer.send(notification)

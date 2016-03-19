@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -57,7 +57,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._room_id = request.args.get('roomID')
 
     def _process(self):
-        key = str(sorted(dict(request.args, lang=session.lang, user=session.user.getId()).items()))
+        key = str(sorted(dict(request.args, lang=session.lang, user=session.user.id).items()))
         html = self._cache.get(key)
         if not html:
             default_location = Location.default_location
@@ -78,15 +78,15 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
 
 class RHRoomBookingSearchRooms(RHRoomBookingBase):
-    menu_item = 'roomSearch'
+    menu_item = 'search_rooms'
 
     def _get_form_data(self):
         return request.form
 
     def _checkParams(self):
         defaults = FormDefaults(location=Location.default_location)
-        self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
-        if (not session.user or not session.user.has_rooms) and not hasattr(self, 'search_criteria'):
+        self._form = SearchRoomsForm(self._get_form_data(), obj=defaults, csrf_enabled=False)
+        if (not session.user or not Room.user_owns_rooms(session.user)) and not hasattr(self, 'search_criteria'):
             # Remove the form element if the user has no rooms and we are not using a shortcut
             del self._form.is_only_my_rooms
 
@@ -99,7 +99,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
             rooms = Room.find_with_filters(form.data, session.user)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
         equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
-        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
+        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(is_active=True),
                                         equipment_locations=equipment_locations).display()
 
 
@@ -115,7 +115,7 @@ class RHRoomBookingSearchRoomsShortcutBase(RHRoomBookingSearchRooms):
 
 
 class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
-    menu_item = 'myRoomList'
+    menu_item = 'room_list'
     search_criteria = {
         'is_only_my_rooms': True,
         'location': None
@@ -138,14 +138,14 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
         return WPRoomBookingRoomDetails(self, **kwargs)
 
     def _process(self):
-        occurrences = ReservationOccurrence.find_all(
+        occurrences = ReservationOccurrence.find(
             Reservation.room_id == self._room.id,
             ReservationOccurrence.start_dt >= self._calendar_start,
             ReservationOccurrence.end_dt <= self._calendar_end,
             ReservationOccurrence.is_valid,
-            _join=Reservation,
+            _join=ReservationOccurrence.reservation,
             _eager=ReservationOccurrence.reservation
-        )
+        ).options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY).all()
 
         return self._get_view(room=self._room, start_dt=self._calendar_start, end_dt=self._calendar_end,
                               occurrences=occurrences).display()

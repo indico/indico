@@ -1,0 +1,64 @@
+{% extends 'events/logs/entry_base.html' %}
+
+{% block entry_detail_rows %}
+    {% if data.from %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                {% trans %}From{% endtrans %}
+            </td>
+            <td class="i-table value searchable">
+                {{ data.from }}
+            </td>
+        </tr>
+    {% endif %}
+    {% if data.to %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                {% trans %}To{% endtrans %}
+            </td>
+            <td class="i-table value searchable">
+                {{ data.to|join(', ') }}
+            </td>
+        </tr>
+    {% endif %}
+    {% if data.cc %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                CC
+            </td>
+            <td class="i-table value searchable">
+                {{ data.cc|join(', ') }}
+            </td>
+        </tr>
+    {% endif %}
+    {% if data.bcc %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                BCC
+            </td>
+            <td class="i-table value searchable">
+                {{ data.bcc|join(', ') }}
+            </td>
+        </tr>
+    {% endif %}
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
+            {% trans %}Subject{% endtrans %}
+        </td>
+        <td class="i-table value searchable">
+            {{ data.subject }}
+        </td>
+    </tr>
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
+            {% trans %}Body{% endtrans %}
+        </td>
+        <td class="i-table value searchable">
+            {% if data.content_type == 'text/plain' %}
+                <pre class="mono">{{ data.body }}</pre>
+            {% else %}
+                {{ data.body | safe }}
+            {% endif %}
+        </td>
+    </tr>
+{% endblock %}

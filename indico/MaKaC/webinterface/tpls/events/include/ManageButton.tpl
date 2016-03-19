@@ -1,21 +1,31 @@
-<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False"/>
+<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, minutesHidden=True, minutesToggle=True, minutesEditActions=False"/>
 
 <%
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
+    showManageButton = not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink'])
 %>
-% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
-    % if manageLink:
+
+% if manageLink:
+    % if showManageButton:
         <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
-    % else:
-        <div class="toolbar right">
-            <div class="group">
-                <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
-            </div>
-        </div>
     % endif
+% else:
+    <div class="toolbar right thin">
+        % if minutesToggle and item.note:
+            ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
+        % endif
+        % if showManageButton:
+            <div class="group">
+                <a class="meeting-timetable-item-edit i-button icon-edit arrow" id="${menuName}"></a>
+            </div>
+        % endif
+    </div>
+% endif
+
+% if showManageButton:
     <script type="text/javascript">
         var menuLink = null;
         $E('${menuName}').observeClick(function() {
@@ -50,55 +60,94 @@
                 menuOptions['cloneEvent'] = {action: '${info["cloneLink"]}', display: $T('Clone event')};
             % endif
 
-            % if 'minutesLink' in info:
-                menuOptions['editMinutes'] = {action: function(m) {
-                    IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
-                    m.close();
-                    return false;}, display: $T('Edit minutes')};
-            % endif
-
-            <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
-                menuOptions['deleteMinutes'] = {action: function(m) {
-                    var popupHandler = function(action){
-                        if(action){
-                            IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
-                        }
-                        m.close();
-
+            <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
+            % if info.get('minutesLink'):
+                % if note_item.note is None:
+                    menuOptions['addMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Add minutes'),
+                                url: ${ url_for('event_notes.edit', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Add minutes')
                     };
-                    (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete these minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
-                    return false;}, display: $T('Delete minutes')};
-            % endif
-
-            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
-                menuOptions['compileMinutes'] = {action: function(m) {
-                    var popupHandler = function(action){
-                        if(action){
-                            IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
-                        }
-                        m.close();
+                % endif
+                % if note_item.note is None and getItemType(item) == 'Conference' and note_item.scheduled_notes and item.getVerboseType() != "Lecture":
+                    menuOptions['compileMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Edit minutes'),
+                                url: ${ url_for('event_notes.compile', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Compile minutes')
                     };
-                    (new ConfirmPopup($T('Compile minutes'),$T('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.'),popupHandler, $T("Yes"), $T("No"))).open();
-                    return false;}, display: $T('Compile minutes')};
+                % endif
+                % if note_item.note and minutesEditActions:
+                    menuOptions['editMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Edit minutes'),
+                                url: ${ url_for('event_notes.edit', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Edit minutes')
+                    };
+                % endif
+                % if note_item.note and minutesEditActions:
+                    menuOptions['deleteMinutes'] = {
+                        action: function(m) {
+                            confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {
+                                $.ajax({
+                                    url: ${ url_for('event_notes.delete', note_item) | n,j },
+                                    method: 'POST',
+                                    error: handleAjaxError,
+                                    success: function() {
+                                        location.reload();
+                                    }
+                                });
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Delete minutes')
+                    };
+                % endif
             % endif
 
             % if 'materialLink' in info:
-                menuOptions['addMaterial'] = {action: function(m) {
-                    IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                        ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);
-                    m.close();
-                    return false;}, display: $T('Add material')};
-                % if getItemType(item) == 'Conference' and item.getConference().getAllMaterialList() or \
-                getItemType(item) == 'SubContribution' and item.getAllMaterialList() or \
-                getItemType(item) == 'Contribution' and item.getContribution().getAllMaterialList() or \
-                getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
-                    menuOptions['editMaterial'] = {action: function(m) {
-                         IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                             ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, false);
-                         m.close();
-                         return false;}, display: $T('Edit material')};
-                % endif
+                menuOptions['editMaterial'] = {
+                    action: function(m) {
+                        openAttachmentManager(${item.getLocator() | n,j});
+                        m.close();
+                    },
+                    display: $T('Manage material')
+                };
             % endif
 
             if (menuLink && menuLink.isOpen()) {

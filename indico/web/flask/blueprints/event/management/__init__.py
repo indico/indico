@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,18 +21,12 @@ event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>
 import indico.web.flask.blueprints.event.management.main
 import indico.web.flask.blueprints.event.management.general
 import indico.web.flask.blueprints.event.management.tools
-import indico.web.flask.blueprints.event.management.layout
 import indico.web.flask.blueprints.event.management.protection
 import indico.web.flask.blueprints.event.management.lists
-import indico.web.flask.blueprints.event.management.evaluation
 import indico.web.flask.blueprints.event.management.rooms
-import indico.web.flask.blueprints.event.management.registration
 import indico.web.flask.blueprints.event.management.abstracts
 import indico.web.flask.blueprints.event.management.tracks
 import indico.web.flask.blueprints.event.management.schedule
-import indico.web.flask.blueprints.event.management.participants
 import indico.web.flask.blueprints.event.management.contributions
 import indico.web.flask.blueprints.event.management.sessions
 import indico.web.flask.blueprints.event.management.paperreviewing
-import indico.web.flask.blueprints.event.management.misc
-import indico.web.flask.blueprints.event.management.eticket

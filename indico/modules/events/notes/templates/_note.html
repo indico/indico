@@ -1,0 +1,68 @@
+{% macro render_note(note, hidden=true, can_edit=false, for_event=none) %}
+    {% if note %}
+        {% if for_event %}
+            <div id="event-note-section">
+                {{ _render_note_box(note=note, event=for_event, hidden=hidden, can_edit=can_edit) }}
+            </div>
+        {% else %}
+            <div class="note-area-wrapper">
+                <div class="note-area {{ _togglable_classes(hidden) }}">
+                    {{ _render_note_box(note=note, can_edit=can_edit) }}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_toggle_button(note, note_is_hidden) %}
+    <div class="group i-selection note-visibility-toggle">
+        {% set hash = uuid() %}
+        <input type="checkbox" class="js-toggle-note-cb" id="toggle-note-{{ note.id }}-{{ hash }}" {% if not note_is_hidden %}checked{% endif %}>
+        <label for="toggle-note-{{ note.id }}-{{ hash }}" class="i-button icon-file-text js-show-note-toggle"
+               title="">{% trans %}Minutes{% endtrans %}</label>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_note_box(note, event=none, hidden=false, can_edit=false) %}
+    <div class="padded-box">
+        <div class="padded-box-pad icon-file-text"></div>
+        <div class="padded-box-content">
+            {{ _render_note_actions(note=note, event=event, hidden=hidden, can_edit=can_edit) }}
+            <div class="note-text {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
+                {{ note.html|safe }}
+            </div>
+            {% if event %}
+                <div class="no-note-text {{ _togglable_classes(hidden=not hidden) }}">
+                    {% trans %}There are minutes attached to this event.{% endtrans %}
+                    <a href="#" class="js-show-note-toggle">{% trans %}Show them{% endtrans %}</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_note_actions(note, event=none, hidden=true, can_edit=false) %}
+    <div class="note-actions {% if event %}{{ _togglable_classes(hidden) }}{% endif %}">
+        {% if event %}
+            <a href="#" class="js-show-note-toggle">{% trans %}Hide{% endtrans %}</a>
+        {% endif %}
+        <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
+           class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
+        {% if can_edit %}
+            <a href="#" class="icon-edit js-note-editor" title="{% trans %}Edit minutes{% endtrans %}"
+               data-href="{{ url_for('event_notes.edit', note) }}"></a>
+            <a href="#" class="icon-remove" title="{% trans %}Delete minutes{% endtrans %}"
+               data-href="{{ url_for('event_notes.delete', note) }}" data-method="POST"
+               data-title="{% trans %}Delete minutes?{% endtrans %}"
+               data-confirm="{% trans %}Do you want to delete the attached minutes?{% endtrans %}"></a>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% macro _togglable_classes(hidden) -%}
+    togglable {% if hidden %}weak-hidden{% endif %}
+{%- endmacro %}

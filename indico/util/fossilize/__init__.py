@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -251,7 +251,7 @@ class Fossilizable(object):
                                   **kwargs)
 
     @classmethod
-    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType={}, **kwargs):
+    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType=None, **kwargs):
         """
         Fossilizes the object, using the fossil provided by `interface`.
 
@@ -262,6 +262,8 @@ class Fossilizable(object):
         :type useAttrCache: boolean
         """
 
+        mapClassType = dict(mapClassType or {}, AvatarUserWrapper='Avatar', AvatarProvisionalWrapper='Avatar',
+                            EmailPrincipal='Email')
         interface = cls.__obtainInterface(obj, interfaceArg)
 
         name = interface.getName()
@@ -347,6 +349,8 @@ class Fossilizable(object):
                 converterArgs = dict((name, kwargs[name])
                                      for name in converterArgNames
                                      if name in kwargs)
+                if '_obj' in converterArgNames:
+                    converterArgs['_obj'] = obj
                 try:
                     methodResult = convertFunction(methodResult, **converterArgs)
                 except:

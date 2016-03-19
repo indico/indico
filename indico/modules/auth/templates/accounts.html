@@ -1,0 +1,176 @@
+{% extends 'users/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{% block subtitle -%}
+    {% trans %}Accounts{% endtrans %}
+{%- endblock %}
+
+{% block user_content %}
+    {% if indico_config.LocalIdentities %}
+        <div class="i-box-group vert">
+            <div class="i-box titled">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        {% trans %}Local Account{% endtrans %}
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    {% if not user.local_identity %}
+                        <span id="no-local-acccount" {%- if form.is_submitted() %} style="display: none;"{% endif %}>
+                            {% trans %}You don't have a local account yet.{% endtrans %}
+                            <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>
+                        </span>
+                        <div id="credentials-form" {%- if not form.is_submitted() %} style="display: none;"{% endif %}>
+                            {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
+                            {{ form_rows(form) }}
+                            {% call form_footer(form) %}
+                                <input class="i-button big highlight" type="submit"
+                                       value="{% trans %}Create account{% endtrans %}" data-disabled-until-change>
+                                <a href="#" class="i-button big js-hide-form">
+                                    {% trans %}Cancel{% endtrans %}
+                                </a>
+                            {% endcall %}
+                        </div>
+                    {% else %}
+                        {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
+                        {{ form_rows(form) }}
+                        {% call form_footer(form) %}
+                            <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
+                        {% endcall %}
+                    {% endif %}
+                    {% if user.secondary_local_identities %}
+                        <p>
+                        </p>
+                        <ul id="local-secondary" class="group-list with-buttons">
+                            <li>
+                                {% trans count = user.secondary_local_identities|count -%}
+                                    You have another local account that has been used in the past.
+                                {% pluralize %}
+                                    You have {{ count }} other local accounts that have been used in the past.
+                                {%- endtrans -%}
+                                <a href="#" class="js-toggle-secondary-accounts">
+                                    {% trans %}Show{% endtrans %}</a>
+                                <a href="#" class="js-toggle-secondary-accounts" style="display: none">
+                                    {% trans %}Hide{% endtrans %}</a>
+                            </li>
+                            {% for identity in user.secondary_local_identities %}
+                                <li style="display: none">
+                                    <span class="list-item-title">
+                                        <i class="icon-user"></i>
+                                        <span>{{ identity.identifier }}</span>
+                                    </span>
+                                    <span class="right">
+                                        <span class="list-item-info">
+                                            <span>
+                                                <span class="label">
+                                                    {% trans %}Last login:{% endtrans %}
+                                                </span>
+                                                <span class="content">
+                                                    {% if identity.last_login_dt %}
+                                                        {{ identity.last_login_dt | format_datetime('short') }}
+                                                    {% else %}
+                                                        {% trans %}Never{% endtrans %}
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <button class="i-button"
+                                            data-href="{{ url_for('.remove_account', identity) }}"
+                                            data-method="post"
+                                            data-title="{% trans %}Remove account{% endtrans %}"
+                                            data-confirm="{% trans %}Do you really want to remove this account?{% endtrans %}">
+                                            {% trans %}Remove{% endtrans %}
+                                        </button>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}External Accounts{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <p>
+                    {% trans %}External accounts linked with your Indico profile.{% endtrans %}
+                </p>
+                <ul class="group-list with-buttons">
+                    {% if user.external_identities %}
+                        {% for identity in user.external_identities | sort(attribute='safe_last_login_dt', reverse=True) %}
+                            <li>
+                                <span class="list-item-title">
+                                    {{ provider_titles[identity.provider] }}
+                                </span>
+                                <small>
+                                    ({{ identity.identifier }})
+                                </small>
+                                <span class="right">
+                                    <span class="list-item-info">
+                                        <span>
+                                            <span class="label">
+                                                {% trans %}Last login:{% endtrans %}
+                                            </span>
+                                            <span class="content">
+                                                {% if identity.last_login_dt %}
+                                                    {{ identity.last_login_dt | format_datetime('short') }}
+                                                {% else %}
+                                                    {% trans %}Never{% endtrans %}
+                                                {% endif %}
+                                            </span>
+                                        </span>
+                                    </span>
+                                    {% if identity.id == session.login_identity %}
+                                        <button class="i-button" disabled
+                                            title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
+                                            {% trans %}Unlink{% endtrans %}
+                                        </button>
+                                    {% else %}
+                                        <button class="i-button right"
+                                            data-href="{{ url_for('.remove_account', identity) }}"
+                                            data-method="post"
+                                            data-title="{% trans %}Unlink account{% endtrans %}"
+                                            data-confirm="{% trans %}Do you really want to unlink this account?{% endtrans %}">
+                                            {% trans %}Unlink{% endtrans %}
+                                        </button>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                    <li>
+                        <span class="account-no-identities">
+                            {% trans %}You have no external accounts connected{% endtrans %}
+                        </span>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('.js-show-form').on('click', function(e) {
+            e.preventDefault();
+            $('#no-local-acccount').hide();
+            $('#credentials-form').show();
+        });
+
+        $('.js-hide-form').on('click', function(e) {
+            e.preventDefault();
+            $('#no-local-acccount').show();
+            $('#credentials-form').hide();
+        });
+
+        $('.js-toggle-secondary-accounts').on('click', function(e) {
+            e.preventDefault();
+            $('.js-toggle-secondary-accounts').toggle();
+            $('#local-secondary > li:not(:first-child)').toggle();
+        });
+    </script>
+{% endblock %}

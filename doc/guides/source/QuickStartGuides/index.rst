@@ -12,7 +12,6 @@ Contents:
    :numbered:
    :maxdepth: 1
 
-   ./QSGAgendaUsers/index.rst
    ./QSGContributionManager/index.rst
    ./QSGSessionCoordinator/index.rst
    ./QSGSessionManager/index.rst

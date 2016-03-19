@@ -1,0 +1,67 @@
+{% extends 'events/surveys/management/_survey_base.html' %}
+
+{% block subtitle %}
+    {% trans %}Submission{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    {% if submission.user %}
+        {% trans submitter_name=submission.user.full_name -%}
+            Submitter: {{ submitter_name }}
+        {%- endtrans %}
+    {% else %}
+        {% trans -%}
+            Submitter: <em>Anonymous</em>
+        {%- endtrans %}
+    {% endif %}
+    <br>
+    {% trans submission_dt=submission.submitted_dt | format_datetime -%}
+        Date of submission: {{ submission_dt }}
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="survey-submission" class="i-box-content">
+        {% for section in survey.sections if section.children -%}
+            <div class="i-box titled">
+                {%- if section.display_as_section %}
+                    <div class="i-box-header">
+                        <div class="i-box-title">{{ section.title }}</div>
+                    </div>
+                {% endif -%}
+                <div class="i-box-content">
+                    <dl class="i-data-list">
+                        {%- for question in section.children -%}
+                            {%- if question.id in answers %}
+                                <dt><strong>{{ question.title }}</strong></dt>
+                                <dd>{{ _render_answer(answers[question.id]) }}</dd>
+                            {% endif -%}
+                        {%- endfor -%}
+                    </dl>
+                </div>
+            </div>
+        {%- endfor %}
+        <div style="margin-top: 10px;">
+            <a href="{{ url_for('.manage_survey', submission.survey) }}" class="i-button big" data-button-back>
+                {%- trans %}Back{% endtrans -%}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% macro _render_answer(answer) %}
+    {%- set answer_data = answer.answer_data -%}
+    {%- if answer_data is sequence and answer_data is not string -%}
+        <ul class="answer-data">
+            {% for item in answer_data %}
+                <li>{{ item }}</li>
+            {% endfor -%}
+        </ul>
+    {%- else %}
+        {% if answer_data %}
+            {{ answer_data|replace('\n', '<br>'|safe) }}
+        {% else %}
+            <em>{% trans %}N/A{% endtrans %}</em>
+        {% endif %}
+    {%- endif %}
+{% endmacro %}

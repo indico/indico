@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,16 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
 import re
-import string
 import urlparse
 
-from flask import request, session, url_for, has_request_context
+from flask import request, has_request_context
 
-import MaKaC.user as user
 from MaKaC.common.url import URL, EndpointURL
-from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
@@ -147,28 +143,6 @@ class URLHandler(object):
         return cls._getURL(**cls._getParams(target, params))
 
 
-class SecureURLHandler(URLHandler):
-    @classmethod
-    def getURL(cls, target=None, **params):
-        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
-
-
-class OptionallySecureURLHandler(URLHandler):
-    @classmethod
-    def getURL(cls, target=None, secure=False, **params):
-        return cls._getURL(_force_secure=secure, **cls._getParams(target, params))
-
-
-class UserURLHandler(URLHandler):
-    """Strips the userId param if it's the current user"""
-
-    @classmethod
-    def _translateParams(cls, params):
-        if 'userId' in params and session.get('_avatarId') == params['userId']:
-            del params['userId']
-        return params
-
-
 # Hack to allow secure Indico on non-80 ports
 def setSSLPort(url):
     """
@@ -177,7 +151,7 @@ def setSSLPort(url):
     SSL port is extracted from loginURL (MaKaCConfig)
     """
     # Set proper PORT for images requested via SSL
-    sslURL = Config.getInstance().getLoginURL() or Config.getInstance().getBaseSecureURL()
+    sslURL = Config.getInstance().getBaseSecureURL()
     sslPort = ':%d' % (urlparse.urlsplit(sslURL).port or 443)
 
     # If there is NO port, nothing will happen (production indico)
@@ -188,79 +162,6 @@ def setSSLPort(url):
 
 class UHWelcome(URLHandler):
     _endpoint = 'misc.index'
-
-
-class UHSignIn(URLHandler):
-    _endpoint = 'user.signIn'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        if Config.getInstance().getLoginURL():
-            url = URL(Config.getInstance().getLoginURL())
-        else:
-            url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHSignInSSO(SecureURLHandler):
-    _endpoint = "user.signIn-sso"
-
-
-class UHActiveAccount(URLHandler):
-    _endpoint = 'user.signIn-active'
-
-
-class UHSendActivation(URLHandler):
-    _endpoint = 'user.signIn-sendActivation'
-
-
-class UHDisabledAccount(URLHandler):
-    _endpoint = 'user.signIn-disabledAccount'
-
-
-class UHSendLogin(URLHandler):
-    _endpoint = 'user.signIn-sendLogin'
-
-
-class UHUnactivatedAccount(URLHandler):
-    _endpoint = 'user.signIn-unactivatedAccount'
-
-
-class UHSignOut(URLHandler):
-    _endpoint = 'user.logOut'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHOAuthRequestToken(URLHandler):
-    _endpoint = 'oauth.oauth-request_token'
-
-
-class UHOAuthAuthorization(URLHandler):
-    _endpoint = 'oauth.oauth-authorize'
-
-
-class UHOAuthAccessTokenURL(URLHandler):
-    _endpoint = 'oauth.oauth-access_token'
-
-
-class UHOAuthAuthorizeConsumer(UserURLHandler):
-    _endpoint = 'oauth.oauth-authorize_consumer'
-
-
-class UHOAuthThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-thirdPartyAuth'
-
-
-class UHOAuthUserThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-userThirdPartyAuth'
 
 
 class UHIndicoNews(URLHandler):
@@ -339,10 +240,6 @@ class UHConferenceSendEmail(URLHandler):
     _endpoint = 'event.EMail-send'
 
 
-class UHRegistrantsSendEmail(URLHandler):
-    _endpoint = 'event_mgmt.EMail-sendreg'
-
-
 class UHConvenersSendEmail(URLHandler):
     _endpoint = 'event_mgmt.EMail-sendconvener'
 
@@ -355,30 +252,6 @@ class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
 
 
-class UHConferenceLogo(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getLogo'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
-
-
-class UHConferenceCSS(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getCSS'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return cls.getURL(target, _ignore_static=True, **params)
-
-
-class UHConferencePic(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getPic'
-
-
-class UHConfModifPreviewCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-previewCSS'
-
-
 class UHCategoryIcon(URLHandler):
     _endpoint = 'category.categoryDisplay-getIcon'
 
@@ -387,12 +260,6 @@ class UHConferenceModification(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification'
 
 
-class UHConfModifShowMaterials(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-materialsShow'
-
-
-class UHConfModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-materialsAdd'
 
 # ============================================================================
 # ROOM BOOKING ===============================================================
@@ -425,42 +292,8 @@ class UHRoomBookingRoomStats(URLHandler):
     _endpoint = 'rooms.roomBooking-roomStats'
 
 
-class UHRoomBookingBookingDetails(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingDetails'
-
-    @classmethod
-    def _translateParams(cls, params):
-        # confId is apparently unused and thus just ugly
-        params.pop('confId', None)
-        return params
-
-
-class UHRoomBookingModifyBookingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-modifyBookingForm'
-
-
 class UHRoomBookingDeleteBooking(URLHandler):
     _endpoint = 'rooms.roomBooking-deleteBooking'
-
-
-class UHRoomBookingCloneBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-cloneBooking'
-
-
-class UHRoomBookingCancelBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-cancelBooking'
-
-
-class UHRoomBookingAcceptBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-acceptBooking'
-
-
-class UHRoomBookingRejectBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectBooking'
-
-
-class UHRoomBookingCancelBookingOccurrence(URLHandler):
-    _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
 
 
 # RB Administration
@@ -494,14 +327,6 @@ class UHRoomBookingDeleteEquipment(URLHandler):
 
 class UHRoomBookingSaveCustomAttributes(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
-
-
-class UHConferenceClose(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-close'
-
-
-class UHConferenceOpen(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-open'
 
 
 class UHConfDataModif(URLHandler):
@@ -797,14 +622,6 @@ class UHSessionOpen(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-open'
 
 
-class UHSessionCreation(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule'
-
-
-class UHContribCreation(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule'
-
-
 class UHContribToXMLConfManager(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-xml'
 
@@ -844,10 +661,6 @@ class UHContribModifAC(URLHandler):
 
 class UHContributionSetVisibility(URLHandler):
     _endpoint = 'event_mgmt.contributionAC-setVisibility'
-
-
-class UHContribModifMaterialMgmt(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-materials'
 
 
 class UHContribModifAddMaterials(URLHandler):
@@ -910,104 +723,6 @@ class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 
 
-class UHConfModifParticipants(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants'
-
-
-class UHConfModifLog(URLHandler):
-    _endpoint = 'event_mgmt.confModifLog'
-
-
-class UHInternalPageDisplay(URLHandler):
-    _endpoint = 'event.internalPage'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        params = target.getLocator()
-        url = os.path.join("internalPage-%s.html" % params["pageId"])
-        return url
-
-
-class UHConfModifDisplay(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay'
-
-
-class UHConfModifDisplayCustomization(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-custom'
-
-
-class UHConfModifDisplayMenu(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-menu'
-
-
-class UHConfModifDisplayResources(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-resources'
-
-
-class UHConfModifDisplayConfHeader(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-confHeader'
-
-
-class UHConfModifDisplayAddLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addLink'
-
-
-class UHConfModifDisplayAddPage(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addPage'
-
-
-class UHConfModifDisplayModifyData(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-modifyData'
-
-
-class UHConfModifDisplayModifySystemData(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-modifySystemData'
-
-
-class UHConfModifDisplayAddSpacer(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addSpacer'
-
-
-class UHConfModifDisplayRemoveLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeLink'
-
-
-class UHConfModifDisplayToggleLinkStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleLinkStatus'
-
-
-class UHConfModifDisplayToggleHomePage(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleHomePage'
-
-
-class UHConfModifDisplayUpLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-upLink'
-
-
-class UHConfModifDisplayDownLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-downLink'
-
-
-class UHConfModifDisplayToggleTimetableView(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleTimetableView'
-
-
-class UHConfModifDisplayToggleTTDefaultLayout(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleTTDefaultLayout'
-
-
-class UHConfModifFormatTitleBgColor(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-formatTitleBgColor'
-
-
-class UHConfModifFormatTitleTextColor(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-formatTitleTextColor'
-
-
-class UHConfDeletion(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-delete'
-
-
 class UHConfClone(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-clone'
 
@@ -1032,165 +747,6 @@ class UHConfAllSpeakersAction(URLHandler):
     _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
 
-class UHConfDisplayAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-displayAlarm'
-
-
-class UHConfAddAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-addAlarm'
-
-
-class UHSaveAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-saveAlarm'
-
-
-class UHModifySaveAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-modifySaveAlarm'
-
-
-class UHSendAlarmNow(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-sendAlarmNow'
-
-
-class UHConfDeleteAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-deleteAlarm'
-
-
-class UHConfModifyAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-modifyAlarm'
-
-
-class UHSaveLogo(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-saveLogo'
-
-
-class UHRemoveLogo(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeLogo'
-
-
-class UHSaveCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-saveCSS'
-
-
-class UHUseCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-useCSS'
-
-
-class UHRemoveCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeCSS'
-
-
-class UHSavePic(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-savePic'
-
-
-class UHConfModifParticipantsSetup(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-setup'
-
-
-class UHConfModifParticipantsPending(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-pendingParticipants'
-
-
-class UHConfModifParticipantsDeclined(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-declinedParticipants'
-
-
-class UHConfModifParticipantsAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-action'
-
-
-class UHConfModifParticipantsStatistics(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-statistics'
-
-
-class UHConfParticipantsInvitation(URLHandler):
-    _endpoint = 'event.confModifParticipants-invitation'
-
-
-class UHConfParticipantsRefusal(URLHandler):
-    _endpoint = 'event.confModifParticipants-refusal'
-
-
-class UHConfModifToggleSearch(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleSearch'
-
-
-class UHConfModifToggleNavigationBar(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleNavigationBar'
-
-
-class UHTickerTapeAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-tickerTapeAction'
-
-
-class UHUserManagement(URLHandler):
-    _endpoint = 'admin.userManagement'
-
-
-class UHUserManagementSwitchAuthorisedAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchAuthorisedAccountCreation'
-
-
-class UHUserManagementSwitchNotifyAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchNotifyAccountCreation'
-
-
-class UHUserManagementSwitchModerateAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchModerateAccountCreation'
-
-
-class UHUsers(URLHandler):
-    _endpoint = 'admin.userList'
-
-
-class UHUserCreation(URLHandler):
-    _endpoint = 'user.userRegistration'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        if Config.getInstance().getRegistrationURL():
-            url = URL(Config.getInstance().getRegistrationURL())
-        else:
-            url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHUserMerge(URLHandler):
-    _endpoint = 'admin.userMerge'
-
-
-class UHConfSignIn(SecureURLHandler):
-    _endpoint = 'event.confLogin'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=""):
-        url = cls._getURL()
-        if conf is not None:
-            url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHConfUserCreation(URLHandler):
-    _endpoint = 'event.confUser'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        if Config.getInstance().getRegistrationURL():
-            url = URL(Config.getInstance().getRegistrationURL())
-        else:
-            url = cls._getURL()
-        if conf is not None:
-            url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
 class UHConfUser(URLHandler):
     @classmethod
     def getURL(cls, conference, av=None):
@@ -1201,34 +757,6 @@ class UHConfUser(URLHandler):
                 loc.update(av.getLocator())
             url.setParams(loc)
         return url
-
-
-class UHConfDisabledAccount(UHConfUser):
-    _endpoint = 'event.confLogin-disabledAccount'
-
-
-class UHConfUnactivatedAccount(UHConfUser):
-    _endpoint = 'event.confLogin-unactivatedAccount'
-
-
-class UHConfUserCreated(UHConfUser):
-    _endpoint = 'event.confUser-created'
-
-
-class UHConfSendLogin(UHConfUser):
-    _endpoint = 'event.confLogin-sendLogin'
-
-
-class UHConfSendActivation(UHConfUser):
-    _endpoint = 'event.confLogin-sendActivation'
-
-
-class UHConfUserExistWithIdentity(UHConfUser):
-    _endpoint = 'event.confUser-userExists'
-
-
-class UHConfActiveAccount(UHConfUser):
-    _endpoint = 'event.confLogin-active'
 
 
 class UHConfEnterAccessKey(UHConfUser):
@@ -1245,109 +773,6 @@ class UHConfEnterModifKey(UHConfUser):
 
 class UHConfCloseModifKey(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
-
-
-class UHUserCreated(UHConfUser):
-    _endpoint = 'user.userRegistration-created'
-
-
-class UHUserActive(UserURLHandler):
-    _endpoint = 'user.userRegistration-active'
-
-
-class UHUserDisable(UserURLHandler):
-    _endpoint = 'user.userRegistration-disable'
-
-
-class UHUserDashboard(UserURLHandler):
-    _endpoint = 'user.userDashboard'
-
-
-class UHUserDetails(UserURLHandler):
-    _endpoint = 'user.userDetails'
-
-
-class UHUserBaskets(UserURLHandler):
-    _endpoint = 'user.userBaskets'
-
-
-class UHUserPreferences(UserURLHandler):
-    _endpoint = 'user.userPreferences'
-
-
-class UHUserAPI(UserURLHandler):
-    _endpoint = 'user.userAPI'
-
-
-class UHUserAPICreate(UserURLHandler):
-    _endpoint = 'user.userAPI-create'
-
-
-class UHUserAPIBlock(UserURLHandler):
-    _endpoint = 'user.userAPI-block'
-
-
-class UHUserAPIDelete(UserURLHandler):
-    _endpoint = 'user.userAPI-delete'
-
-
-class UHUserRegistration(URLHandler):
-    _endpoint = 'user.userRegistration'
-
-
-class UHUserIdentityCreation(UserURLHandler):
-    _endpoint = 'user.identityCreation'
-
-
-class UHUserRemoveIdentity(UserURLHandler):
-    _endpoint = 'user.identityCreation-remove'
-
-
-class UHUserExistWithIdentity(UHConfUser):
-    _endpoint = 'user.userRegistration-UserExist'
-
-
-class UHUserIdPerformCreation(UserURLHandler):
-    _endpoint = 'user.identityCreation-create'
-
-
-class UHUserIdentityChangePassword(UserURLHandler):
-    _endpoint = 'user.identityCreation-changePassword'
-
-
-class UHGroups(URLHandler):
-    _endpoint = 'admin.groupList'
-
-
-class UHNewGroup(URLHandler):
-    _endpoint = 'admin.groupRegistration'
-
-
-class UHGroupPerformRegistration(URLHandler):
-    _endpoint = 'admin.groupRegistration-update'
-
-
-class UHGroupDetails(URLHandler):
-    _endpoint = 'admin.groupDetails'
-
-
-class UHGroupModification(URLHandler):
-    _endpoint = 'admin.groupModification'
-
-
-class UHGroupPerformModification(URLHandler):
-    _endpoint = 'admin.groupModification-update'
-
-
-class UHPrincipalDetails:
-    @classmethod
-    def getURL(cls, member):
-        if isinstance(member, user.Group):
-            return UHGroupDetails.getURL(member)
-        elif isinstance(member, user.Avatar):
-            return UHUserDetails.getURL(member)
-        else:
-            return ''
 
 
 class UHDomains(URLHandler):
@@ -1434,47 +859,12 @@ class UHAdminsProtection(URLHandler):
     _endpoint = 'admin.adminProtection'
 
 
-class UHMaterialModification(URLHandler):
-    @classmethod
-    def getURL(cls, material, returnURL=""):
-        from MaKaC import conference
-
-        owner = material.getOwner()
-        # return handler depending on parent type
-        if isinstance(owner, conference.Category):
-            handler = UHCategModifFiles
-        elif isinstance(owner, conference.Conference):
-            handler = UHConfModifShowMaterials
-        elif isinstance(owner, conference.Session):
-            handler = UHSessionModifMaterials
-        elif isinstance(owner, conference.Contribution):
-            handler = UHContribModifMaterials
-        elif isinstance(owner, conference.SubContribution):
-            handler = UHSubContribModifMaterials
-        else:
-            raise Exception('Unknown material owner type: %s' % owner)
-
-        return handler.getURL(owner, returnURL=returnURL)
-
-
-class UHMaterialEnterAccessKey(URLHandler):
-    _endpoint = 'files.materialDisplay-accessKey'
-
-
-class UHFileEnterAccessKey(URLHandler):
-    _endpoint = 'files.getFile-accessKey'
-
-
 class UHCategoryModification(URLHandler):
     _endpoint = 'category_mgmt.categoryModification'
 
     @classmethod
     def getActionURL(cls):
         return ''
-
-
-class UHCategoryAddMaterial(URLHandler):
-    _endpoint = 'category_mgmt.categoryFiles-addMaterial'
 
 
 class UHCategoryActionSubCategs(URLHandler):
@@ -1505,28 +895,12 @@ class UHCategoryDeletion(URLHandler):
     _endpoint = 'category_mgmt.categoryTools-delete'
 
 
-class UHCategModifTasks(URLHandler):
-    _endpoint = 'category_mgmt.categoryTasks'
-
-
-class UHCategModifFiles(URLHandler):
-    _endpoint = 'category_mgmt.categoryFiles'
-
-
-class UHCategModifTasksAction(URLHandler):
-    _endpoint = 'category_mgmt.categoryTasks-taskAction'
-
-
 class UHCategoryDataModif(URLHandler):
     _endpoint = 'category_mgmt.categoryDataModification'
 
 
 class UHCategoryPerformModification(URLHandler):
     _endpoint = 'category_mgmt.categoryDataModification-modify'
-
-
-class UHCategoryTasksOption(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification-tasksOption'
 
 
 class UHCategorySetVisibility(URLHandler):
@@ -1614,10 +988,6 @@ class UHSubContributionDelete(URLHandler):
     _endpoint = 'event_mgmt.subContributionTools-delete'
 
 
-class UHSubContribModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-materialsAdd'
-
-
 class UHSubContribModifTools(URLHandler):
     _endpoint = 'event_mgmt.subContributionTools'
 
@@ -1626,20 +996,12 @@ class UHSessionModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification'
 
 
-class UHSessionModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-materials'
-
-
 class UHSessionDataModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-modify'
 
 
 class UHSessionFitSlot(URLHandler):
     _endpoint = 'event_mgmt.sessionModifSchedule-fitSlot'
-
-
-class UHSessionModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-materialsAdd'
 
 
 class UHSessionModifSchedule(URLHandler):
@@ -1678,30 +1040,8 @@ class UHContributionModification(URLHandler):
     _endpoint = 'event_mgmt.contributionModification'
 
 
-class UHContribModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-materials'
-
-
 class UHSubContribModification(URLHandler):
     _endpoint = 'event_mgmt.subContributionModification'
-
-
-class UHSubContribModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-materials'
-
-
-class UHMaterialDisplay(URLHandler):
-    _endpoint = 'files.materialDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params = target.getLocator()
-            resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
-            if len(resources) == 1:
-                return UHFileAccess.getStaticURL(resources[0])
-            return "materialDisplay-%s.html" % params["materialId"]
-        return cls._getURL()
 
 
 class UHConferenceProgram(URLHandler):
@@ -1785,38 +1125,6 @@ class UHSubContributionModification(URLHandler):
 class UHFileAccess(URLHandler):
     _endpoint = 'files.getFile-access'
 
-    @staticmethod
-    def generateFileStaticLink(target):
-        from MaKaC import conference
-
-        params = target.getLocator()
-        owner = target.getOwner().getOwner()
-
-        if isinstance(owner, conference.Conference):
-            path = "events/conference"
-        elif isinstance(owner, conference.Session):
-            path = "agenda/%s-session" % owner.getId()
-        elif isinstance(owner, conference.Contribution):
-            path = "agenda/%s-contribution" % owner.getId()
-        elif isinstance(owner, conference.SubContribution):
-            path = "agenda/%s-subcontribution" % owner.getId()
-        else:
-            return None
-        url = os.path.join("files", path, params["materialId"], params["resId"] + "-" + target.getName())
-        return url
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return cls.generateFileStaticLink(target) or cls.getURL(target, _ignore_static=True, **params)
-
-
-class UHVideoWmvAccess(URLHandler):
-    _endpoint = 'files.getFile-wmv'
-
-
-class UHVideoFlashAccess(URLHandler):
-    _endpoint = 'files.getFile-flash'
-
 
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
@@ -1832,10 +1140,6 @@ class UHAbstractRecovery(URLHandler):
 
 class UHConfModifContribList(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList'
-
-
-class UHContribModifMaterialBrowse(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-browseMaterial'
 
 
 class UHContribModSetTrack(URLHandler):
@@ -2095,24 +1399,12 @@ class UHConfModMoveContribsToSession(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList-moveToSession'
 
 
-class UHConferenceDisplayMaterialPackage(URLHandler):
-    _endpoint = 'event.conferenceDisplay-matPkg'
-
-
-class UHConferenceDisplayMaterialPackagePerform(URLHandler):
-    _endpoint = 'event.conferenceDisplay-performMatPkg'
-
-
 class UHConfAbstractBook(URLHandler):
     _endpoint = 'event.conferenceDisplay-abstractBook'
 
     @classmethod
     def getStaticURL(cls, target=None, **params):
         return "files/generatedPdf/BookOfAbstracts.pdf"
-
-
-class UHConfAbstractBookLatex(URLHandler):
-    _endpoint = 'event.conferenceDisplay-abstractBookLatex'
 
 
 class UHConferenceToiCal(URLHandler):
@@ -2137,34 +1429,6 @@ class UHAbstractReviewingTeam(URLHandler):
 
 class UHConfModScheduleDataEdit(URLHandler):
     _endpoint = 'event_mgmt.confModifSchedule-edit'
-
-
-class UHConfModMaterialPackage(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-matPkg'
-
-
-class UHConfModProceedings(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-proceedings'
-
-
-class UHConfModFullMaterialPackage(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-matPkg'
-
-
-class UHConfModFullMaterialPackagePerform(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-performMatPkg'
-
-
-class UHConfOffline(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-offline'
-
-
-class UHOfflineEventAccess(URLHandler):
-    _endpoint = 'event_mgmt.getFile-offlineEvent'
-
-
-class UHTaskManager(URLHandler):
-    _endpoint = 'admin.taskManager'
 
 
 class UHUpdateNews(URLHandler):
@@ -2219,26 +1483,6 @@ class UHIPBasedACLFullAccessRevoke(URLHandler):
     _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
 
 
-class UHAdminAPIOptions(URLHandler):
-    _endpoint = 'admin.adminServices-apiOptions'
-
-
-class UHAdminAPIOptionsSet(URLHandler):
-    _endpoint = 'admin.adminServices-apiOptionsSet'
-
-
-class UHAdminAPIKeys(URLHandler):
-    _endpoint = 'admin.adminServices-apiKeys'
-
-
-class UHAdminOAuthConsumers(URLHandler):
-    _endpoint = 'admin.adminServices-oauthConsumers'
-
-
-class UHAdminOAuthAuthorized(URLHandler):
-    _endpoint = 'admin.adminServices-oauthAuthorized'
-
-
 class UHBadgeTemplates(URLHandler):
     _endpoint = 'admin.badgeTemplates'
 
@@ -2259,259 +1503,6 @@ class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
 
 
-# ------- Static webpages ------
-
-class UHStaticConferenceDisplay(URLHandler):
-    _relativeURL = "./index.html"
-
-
-class UHStaticMaterialDisplay(URLHandler):
-    _relativeURL = "none-page-material.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Conference, Link, Video, Session
-
-        if target is not None:
-            if len(target.getResourceList()) == 1:
-                res = target.getResourceList()[0]
-                # TODO: Remove the "isinstance", it's just for CHEP04
-                if isinstance(res, Link):# and not isinstance(target, Video):
-                    return res.getURL()
-                else:
-                    return UHStaticResourceDisplay.getRelativeURL(res)
-            else:
-                contrib = target.getOwner()
-                relativeURL = None
-                if isinstance(contrib, Contribution):
-                    spk = ""
-                    if len(contrib.getSpeakerList()) > 0:
-                        spk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (contrib.getId(), spk)
-                    relativeURL = "./%s-material-%s.html" % (contribDirName, cls._normalisePathItem(target.getId()))
-                elif isinstance(contrib, Conference):
-                    relativeURL = "./material-%s.html" % cls._normalisePathItem(target.getId())
-                elif isinstance(contrib, Session):
-                    relativeURL = "./material-s%s-%s.html" % (contrib.getId(), cls._normalisePathItem(target.getId()))
-
-                if escape:
-                    relativeURL = utf8rep(relativeURL)
-
-                return relativeURL
-        return cls._relativeURL
-
-
-class UHStaticConfAbstractBook(URLHandler):
-    _relativeURL = "./abstractBook.pdf"
-
-
-class UHStaticConferenceProgram(URLHandler):
-    _relativeURL = "./programme.html"
-
-
-class UHStaticConferenceTimeTable(URLHandler):
-    _relativeURL = "./timetable.html"
-
-
-class UHStaticContributionList(URLHandler):
-    _relativeURL = "./contributionList.html"
-
-
-class UHStaticConfAuthorIndex(URLHandler):
-    _relativeURL = "./authorIndex.html"
-
-
-class UHStaticContributionDisplay(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None, prevPath=".", escape=True):
-        url = cls._relativeURL
-        if target is not None:
-            spk = ""
-            if len(target.getSpeakerList()) > 0:
-                spk = target.getSpeakerList()[0].getFamilyName().lower()
-            contribDirName = "%s-%s" % (target.getId(), spk)
-            track = target.getTrack()
-            if track is not None:
-                url = "./%s/%s/%s.html" % (prevPath, track.getTitle().replace(" ", "_"), contribDirName)
-            else:
-                url = "./%s/other_contributions/%s.html" % (prevPath, contribDirName)
-
-        if escape:
-            url = utf8rep(url)
-
-        return url
-
-
-class UHStaticSessionDisplay(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None):
-        return "./sessions/s%s.html" % target.getId()
-
-
-class UHStaticResourceDisplay(URLHandler):
-    _relativeURL = "none-page-resource.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Conference, Video, Link, Session
-
-        relativeURL = cls._relativeURL
-        if target is not None:
-            mat = target.getOwner()
-            contrib = mat.getOwner()
-            # TODO: Remove the first if...cos it's just for CHEP.
-            # Remove as well in pages.conferences.WMaterialStaticDisplay
-            #if isinstance(mat, Video) and isinstance(target, Link):
-            #    relativeURL = "./%s.rm"%os.path.splitext(os.path.basename(target.getURL()))[0]
-            #    return relativeURL
-            if isinstance(contrib, Contribution):
-                relativeURL = "./%s-%s-%s-%s" % (cls._normalisePathItem(contrib.getId()), target.getOwner().getId(),
-                                                 target.getId(), cls._normalisePathItem(target.getFileName()))
-            elif isinstance(contrib, Conference):
-                relativeURL = "./resource-%s-%s-%s" % (target.getOwner().getId(), target.getId(),
-                                                       cls._normalisePathItem(target.getFileName()))
-            elif isinstance(contrib, Session):
-                relativeURL = "./resource-s%s-%s-%s" % (contrib.getId(), target.getId(),
-                                                        cls._normalisePathItem(target.getFileName()))
-
-            if escape:
-                relativeURL = utf8rep(relativeURL)
-
-            return relativeURL
-
-
-class UHStaticTrackContribList(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        url = cls._relativeURL
-        if target is not None:
-            url = "%s.html" % (target.getTitle().replace(" ", "_"))
-
-        if escape:
-            url = utf8rep(url)
-        return url
-
-
-class UHMStaticMaterialDisplay(URLHandler):
-    _relativeURL = "none-page.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Link, Session, SubContribution
-
-        if target is not None:
-            if len(target.getResourceList()) == 1:
-                res = target.getResourceList()[0]
-                if isinstance(res, Link):
-                    return res.getURL()
-                else:
-                    return UHMStaticResourceDisplay.getRelativeURL(res)
-            else:
-                owner = target.getOwner()
-                parents = "./material"
-                if isinstance(owner, Session):
-                    parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
-                elif isinstance(owner, Contribution):
-                    if isinstance(owner.getOwner(), Session):
-                        parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
-                                                        cls._normalisePathItem(owner.getOwner().getTitle()))
-                    spk = ""
-                    if len(owner.getSpeakerList()) > 0:
-                        spk = owner.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (owner.getId(), spk)
-                    parents = "%s/contrib-%s" % (parents, contribDirName)
-                elif isinstance(owner, SubContribution):
-                    contrib = owner.getContribution()
-                    if isinstance(contrib.getOwner(), Session):
-                        parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
-                                                        cls._normalisePathItem(contrib.getOwner().getTitle()))
-                    contribspk = ""
-                    if len(contrib.getSpeakerList()) > 0:
-                        contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (contrib.getId(), contribspk)
-                    subcontspk = ""
-                    if len(owner.getSpeakerList()) > 0:
-                        subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
-                    subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
-                    parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
-                relativeURL = "%s/material-%s.html" % (parents, cls._normalisePathItem(target.getId()))
-
-                if escape:
-                    relativeURL = utf8rep(relativeURL)
-                return relativeURL
-        return cls._relativeURL
-
-
-class UHMStaticResourceDisplay(URLHandler):
-    _relativeURL = "none-page.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Session, SubContribution
-
-        if target is not None:
-
-            mat = target.getOwner()
-            owner = mat.getOwner()
-            parents = "./material"
-            if isinstance(owner, Session):
-                parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
-            elif isinstance(owner, Contribution):
-                if isinstance(owner.getOwner(), Session):
-                    parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
-                                                    cls._normalisePathItem(owner.getOwner().getTitle()))
-                spk = ""
-                if len(owner.getSpeakerList()) > 0:
-                    spk = owner.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName = "%s-%s" % (owner.getId(), spk)
-                parents = "%s/contrib-%s" % (parents, contribDirName)
-            elif isinstance(owner, SubContribution):
-                contrib = owner.getContribution()
-                if isinstance(contrib.getOwner(), Session):
-                    parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
-                                                    cls._normalisePathItem(contrib.getOwner().getTitle()))
-                contribspk = ""
-                if len(contrib.getSpeakerList()) > 0:
-                    contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName = "%s-%s" % (contrib.getId(), contribspk)
-                subcontspk = ""
-                if len(owner.getSpeakerList()) > 0:
-                    subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
-                subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
-                parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
-
-            relativeURL = "%s/resource-%s-%s-%s" % (parents, cls._normalisePathItem(target.getOwner().getTitle()),
-                                                    target.getId(), cls._normalisePathItem(target.getFileName()))
-            if escape:
-                relativeURL = utf8rep(relativeURL)
-            return relativeURL
-        return cls._relativeURL
-
-
-# ------- END: Static webpages ------
-
 class UHContribAuthorDisplay(URLHandler):
     _endpoint = 'event.contribAuthorDisplay'
 
@@ -2530,141 +1521,8 @@ class UHConfTimeTableCustomizePDF(URLHandler):
         return "files/generatedPdf/Conference.pdf"
 
 
-class UHConfRegistrationForm(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay'
-
-
-class UHConfRegistrationFormDisplay(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-display'
-
-
-class UHConfRegistrationFormCreation(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-creation'
-
-
-class UHConfRegistrationFormConditions(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-conditions'
-
-
-class UHConfRegistrationFormSignIn(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-signIn'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        url = cls._getURL()
-        url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam("returnURL", returnURL)
-        return url
-
-
-class UHConfRegistrationFormCreationDone(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-creationDone'
-
-    @classmethod
-    def getURL(cls, registrant):
-        url = cls._getURL()
-        if not session.user:
-            url.setParams(registrant.getLocator())
-            url.addParam('authkey', registrant.getRandomId())
-        else:
-            url.setParams(registrant.getConference().getLocator())
-        return url
-
-
-class UHConferenceTicketPDF(URLHandler):
-    _endpoint = 'event.e-ticket-pdf'
-
-    @classmethod
-    def getURL(cls, conf):
-        url = cls._getURL()
-        user = ContextManager.get("currentUser")
-        if user:
-            registrant = user.getRegistrantById(conf.getId())
-            if registrant:
-                url.setParams(registrant.getLocator())
-                url.addParam('authkey', registrant.getRandomId())
-        return url
-
-
-class UHConfRegistrationFormModify(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-modify'
-
-
-class UHConfRegistrationFormPerformModify(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-performModify'
-
-
-class UHConfModifRegForm(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm'
-
-
-class UHConfModifRegFormChangeStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-changeStatus'
-
-
-class UHConfModifRegFormDataModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-dataModif'
-
-
-class UHConfModifRegFormPerformDataModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-performDataModif'
-
-
-class UHConfModifRegFormActionStatuses(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-actionStatuses'
-
-
-class UHConfModifRegFormStatusModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-modifStatus'
-
-
-class UHConfModifRegFormStatusPerformModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifStatus'
-
-
-class UHConfModifRegistrationModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationModification'
-
-
-class UHConfModifRegistrationModificationSectionQuery(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationModificationSection-query'
-
-
-class UHConfModifRegistrantList(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants'
-
-
-class UHConfModifRegistrantNew(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-newRegistrant'
-
-
-class UHConfModifRegistrantListAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-action'
-
-
-class UHConfModifRegistrantPerformRemove(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-remove'
-
-
-class UHRegistrantModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modification'
-
-
-class UHRegistrantAttachmentFileAccess(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
-
-
-class UHCategoryStatistics(URLHandler):
-    _endpoint = 'category.categoryStatistics'
-
-
 class UHCategoryToiCal(URLHandler):
     _endpoint = 'category.categoryDisplay-ical'
-
-
-class UHCategoryToRSS(URLHandler):
-    _endpoint = 'category.categoryDisplay-rss'
 
 
 class UHCategoryToAtom(URLHandler):
@@ -2675,56 +1533,12 @@ class UHCategOverviewToRSS(URLHandler):
     _endpoint = 'category.categOverview-rss'
 
 
-class UHConfRegistrantsList(URLHandler):
-    _endpoint = 'event.confRegistrantsDisplay-list'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return "confRegistrantsDisplay.html"
-
-
-class UHConfModifRegistrantSessionModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifySessions'
-
-
-class UHConfModifRegistrantSessionPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifySessions'
-
-
-class UHConfModifRegistrantAccoModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyAccommodation'
-
-
-class UHConfModifRegistrantAccoPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyAccommodation'
-
-
-class UHConfModifRegistrantSocialEventsModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifySocialEvents'
-
-
-class UHConfModifRegistrantSocialEventsPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifySocialEvents'
-
-
-class UHConfModifRegistrantReasonPartModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyReasonParticipation'
-
-
-class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyReasonParticipation'
-
-
 class UHConfModifPendingQueues(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues'
 
 
 class UHConfModifPendingQueuesActionConfSubm(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues-actionConfSubmitters'
-
-
-class UHConfModifPendingQueuesActionConfMgr(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfManagers'
 
 
 class UHConfModifPendingQueuesActionSubm(URLHandler):
@@ -2737,26 +1551,6 @@ class UHConfModifPendingQueuesActionMgr(URLHandler):
 
 class UHConfModifPendingQueuesActionCoord(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues-actionCoordinators'
-
-
-class UHConfModifRegistrantMiscInfoModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyMiscInfo'
-
-
-class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyMiscInfo'
-
-
-class UHConfModifRegistrantStatusesModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyStatuses'
-
-
-class UHConfModifRegistrantStatusesPerformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyStatuses'
-
-
-class UHGetCalendarOverview(URLHandler):
-    _endpoint = 'category.categOverview'
 
 
 class UHCategoryCalendarOverview(URLHandler):
@@ -2984,112 +1778,6 @@ class UHConfModifPosterPrintingPDF(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-posterPrintingPDF'
 
 
-class UHJsonRpcService(OptionallySecureURLHandler):
-    _endpoint = 'api.jsonrpc'
-
-    @classmethod
-    def getStaticURL(cls, target=None, **params):
-        return ""
-
-
-class UHAPIExport(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='export')
-
-
-class UHAPIAPI(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='api')
-
-
-############
-#Evaluation# DISPLAY AREA
-############
-
-class UHConfEvaluationMainInformation(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation'
-
-
-class UHConfEvaluationDisplay(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-display'
-
-
-class UHConfEvaluationDisplayModif(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-modif'
-
-
-class UHConfEvaluationSignIn(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-signIn'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        url = cls._getURL()
-        url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHConfEvaluationSubmit(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-submit'
-
-
-class UHConfEvaluationSubmitted(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-submitted'
-
-
-############
-#Evaluation# MANAGEMENT AREA
-############
-class UHConfModifEvaluation(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation'
-
-
-class UHConfModifEvaluationSetup(URLHandler):
-    """same result as UHConfModifEvaluation."""
-    _endpoint = 'event_mgmt.confModifEvaluation-setup'
-
-
-class UHConfModifEvaluationSetupChangeStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-changeStatus'
-
-
-class UHConfModifEvaluationSetupSpecialAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-specialAction'
-
-
-class UHConfModifEvaluationDataModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-dataModif'
-
-
-class UHConfModifEvaluationPerformDataModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-performDataModif'
-
-
-class UHConfModifEvaluationEdit(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-edit'
-
-
-class UHConfModifEvaluationEditPerformChanges(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-editPerformChanges'
-
-
-class UHConfModifEvaluationPreview(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-preview'
-
-
-class UHConfModifEvaluationResults(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-results'
-
-
-class UHConfModifEvaluationResultsOptions(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-resultsOptions'
-
-
-class UHConfModifEvaluationResultsSubmittersActions(URLHandler):
-    _endpoint = 'event_mgmt.confModifEvaluation-resultsSubmittersActions'
-
-
 class UHResetSession(URLHandler):
     _endpoint = 'misc.resetSessionTZ'
 
@@ -3202,15 +1890,6 @@ class UHPaperReviewingDisplay(URLHandler):
     _endpoint = 'event.paperReviewingDisplay'
 
 
-#### End of reviewing
-class UHChangeLang(URLHandler):
-    _endpoint = 'misc.changeLang'
-
-
-class UHAbout(URLHandler):
-    _endpoint = 'misc.about'
-
-
 class UHContact(URLHandler):
     _endpoint = 'misc.contact'
 
@@ -3235,7 +1914,6 @@ class UHHelper(object):
         "Category": UHCategoryDisplay,
         "CategoryMap": UHCategoryMap,
         "CategoryOverview": UHCategoryOverview,
-        "CategoryStatistics": UHCategoryStatistics,
         "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
         "Contribution": UHContributionDisplay,

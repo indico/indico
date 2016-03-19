@@ -1,0 +1,5 @@
+{% extends 'rb/emails/reservations/base_email_to_vc_support.txt' %}
+
+{% block body -%}
+An occurrence of a booking has been CANCELLED for the {{ occurrence.start_dt | format_date(locale='en_GB') }}.
+{%- endblock %}

@@ -1,0 +1,67 @@
+{% extends 'layout/base.html' %}
+
+{% macro render_reminders(reminders) %}
+    <ul class="group-list with-buttons no-content-before">
+        {% for reminder in reminders %}
+            <li>
+                <strong>
+                    <a href="{{ url_for('.edit', reminder) }}">
+                        {%- if reminder.is_relative -%}
+                            {{ reminder.event_start_delta|format_human_timedelta('hours') }} before the event
+                        {%- else -%}
+                            {{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} <small>({{ timezone }})</small>
+                        {%- endif -%}
+                    </a>
+                    {% if reminder.is_relative %}
+                        <i class="icon-alarm" title="{{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} ({{ timezone }})"></i>
+                    {% endif %}
+                </strong>
+                {% if not reminder.is_sent %}
+                    <span class="right">
+                        <button class="i-button"
+                                data-method="POST" data-href="{{ url_for('.delete', reminder) }}"
+                                data-title="{% trans %}Delete reminder{% endtrans %}"
+                                data-confirm="{% trans %}Do you really want to delete this reminder?{% endtrans %}">
+                            {%- trans %}Delete{% endtrans -%}
+                        </button>
+                    </span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% set pending_reminders = reminders|rejectattr('is_sent')|list %}
+{% set sent_reminders = reminders|selectattr('is_sent')|list %}
+
+{% block title %}{% trans %}Reminders{% endtrans %}{% endblock %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width reminders">
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
+                <a class="i-button icon-plus right" href="{{ url_for('.add', event) }}">
+                    {%- trans %}Add Reminder{% endtrans -%}
+                </a>
+            </div>
+            <div class="i-box-content">
+                {% if pending_reminders %}
+                    {{ render_reminders(pending_reminders) }}
+                {% else %}
+                    <span class="empty">{% trans %}There are no pending reminders.{% endtrans %}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if sent_reminders %}
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title">{%- trans %}Sent Reminders{% endtrans -%}</div>
+                </div>
+                <div class="i-box-content">
+                    {{ render_reminders(sent_reminders) }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

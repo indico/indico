@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import print_function, unicode_literals
 
 import os
 import time
@@ -31,7 +33,8 @@ from indico.core.db.sqlalchemy.util.management import delete_all_tables
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
-from indico.util.console import cformat
+from indico.modules.users.models.users import User
+from indico.util.console import cformat, clear_line
 from indico.util.decorators import classproperty
 from indico.web.flask.wrappers import IndicoFlask
 from indico_zodbimport.util import UnbreakingDB, get_storage
@@ -56,10 +59,11 @@ class Importer(object):
     #: Specify plugins that need to be loaded for the import (e.g. to access its .settings property)
     plugins = frozenset()
 
-    def __init__(self, sqlalchemy_uri, zodb_uri, destructive):
+    def __init__(self, sqlalchemy_uri, zodb_uri, destructive, quiet):
         self.sqlalchemy_uri = sqlalchemy_uri
         self.zodb_uri = zodb_uri
         self.destructive = destructive
+        self.quiet = quiet
         self.zodb_root = None
         self.app = None
         self.tz = None
@@ -68,6 +72,7 @@ class Importer(object):
     @classmethod
     def command(cls):
         @click.command()
+        @click.option('--quiet', '-q', is_flag=True, default=False, help="Use less verbose/spammy output")
         @click.pass_obj
         def _command(obj, **kwargs):
             cls(**dict(obj, **kwargs)).run()
@@ -79,14 +84,14 @@ class Importer(object):
         return command
 
     def __repr__(self):
-        return '<{}({}, {}, {})>'.format(type(self).__name__, self.sqlalchemy_uri, self.zodb_uri)
+        return '<{}({}, {})>'.format(type(self).__name__, self.sqlalchemy_uri, self.zodb_uri)
 
     def run(self):
         self.setup()
         start = time.time()
         with self.app.app_context():
             self.migrate()
-        print 'migration took {:.06f} seconds'.format((time.time() - start))
+        print('migration took {:.06f} seconds'.format((time.time() - start)))
 
     def setup(self):
         update_session_options(db)  # get rid of the zope transaction extension
@@ -97,8 +102,8 @@ class Importer(object):
         app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_uri
         plugin_engine.init_app(app)
         if not plugin_engine.load_plugins(app):
-            print cformat('%{red!}Could not load some plugins: {}%{reset}').format(
-                ', '.join(plugin_engine.get_failed_plugins(app)))
+            print(cformat('%{red!}Could not load some plugins: {}%{reset}').format(
+                ', '.join(plugin_engine.get_failed_plugins(app))))
             sys.exit(1)
         db.init_app(app)
         import_all_models()
@@ -116,12 +121,12 @@ class Importer(object):
                 sys.exit(1)
 
             if self.destructive:
-                print cformat('%{yellow!}*** DANGER')
-                print cformat('%{yellow!}***%{reset} '
+                print(cformat('%{yellow!}*** DANGER'))
+                print(cformat('%{yellow!}***%{reset} '
                               '%{red!}ALL DATA%{reset} in your database %{yellow!}{!r}%{reset} will be '
-                              '%{red!}PERMANENTLY ERASED%{reset}!').format(db.engine.url)
+                              '%{red!}PERMANENTLY ERASED%{reset}!').format(db.engine.url))
                 if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
-                    print 'Aborting'
+                    print('Aborting')
                     sys.exit(1)
                 delete_all_tables(db)
                 stamp()
@@ -129,10 +134,11 @@ class Importer(object):
             if self.has_data():
                 # Usually there's no good reason to migrate with data in the DB. However, during development one might
                 # comment out some migration tasks and run the migration anyway.
-                print cformat('%{yellow!}*** WARNING')
-                print cformat('%{yellow!}***%{reset} Your database is not empty, migration will most likely fail!')
+                print(cformat('%{yellow!}*** WARNING'))
+                print(cformat('%{yellow!}***%{reset} Your database is not empty, migration may fail or add duplicate '
+                              'data!'))
                 if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
-                    print 'Aborting'
+                    print('Aborting')
                     sys.exit(1)
 
     def connect_zodb(self):
@@ -158,8 +164,8 @@ class Importer(object):
         sql = 'SELECT COUNT(*) FROM "information_schema"."schemata" WHERE "schema_name" = :name'
         count = db.engine.execute(db.text(sql), name='plugin_{}'.format(name)).scalar()
         if not count:
-            print cformat('%{red!}Plugin schema does not exist%{reset}')
-            print cformat('Run %{yellow!}indico plugindb upgrade --plugin {}%{reset} to create it').format(name)
+            print(cformat('%{red!}Plugin schema does not exist%{reset}'))
+            print(cformat('Run %{yellow!}indico plugindb upgrade --plugin {}%{reset} to create it').format(name))
             return False
         return True
 
@@ -180,12 +186,25 @@ class Importer(object):
     def migrate(self):
         raise NotImplementedError
 
-    def fix_sequences(self, schema=None):
+    def update_merged_users(self, db_column, msg_in):
+        self.print_step("Updating merged users in {}".format(msg_in))
+        for obj in db_column.class_.find(User.merged_into_id != None, _join=db_column):  # noqa
+            initial_user = getattr(obj, db_column.key)
+            while getattr(obj, db_column.key).merged_into_user:
+                merged_into_user = getattr(obj, db_column.key).merged_into_user
+                setattr(obj, db_column.key, merged_into_user)
+            msg = cformat('%{cyan}{}%{reset} -> %{cyan}{}%{reset}').format(initial_user, getattr(obj, db_column.key))
+            self.print_success(msg, always=True)
+        db.session.commit()
+
+    def fix_sequences(self, schema=None, tables=None):
         for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
             table = getattr(cls, '__table__', None)
             if table is None:
                 continue
             elif schema is not None and table.schema != schema:
+                continue
+            elif tables is not None and cls.__tablename__ not in tables:
                 continue
             # Check if we have a single autoincrementing primary key
             candidates = [col for col in table.c if col.autoincrement and col.primary_key]
@@ -197,6 +216,77 @@ class Importer(object):
             query = select([func.setval(sequence_name, func.max(serial_col) + 1)], table)
             db.session.execute(query)
         db.session.commit()
+
+    def print_msg(self, msg, always=False):
+        """Prints a message to the console.
+
+        By default, messages are not shown in quiet mode, but this
+        can be changed using the `always` parameter.
+        """
+        if self.quiet:
+            if not always:
+                return
+            clear_line()
+        print(msg)
+
+    def print_step(self, msg):
+        """Prints a message about a migration step to the console
+
+        This message is always shown, even in quiet mode.
+        """
+        self.print_msg(cformat('%{white!}{}%{reset}').format(msg), True)
+
+    def print_prefixed(self, prefix, prefix_color, msg, always=False, event_id=None):
+        """Prints a prefixed message to the console."""
+        parts = [
+            cformat('%%{%s}{}%%{reset}' % prefix_color).format(prefix),
+            cformat('%{white!}{:>6s}%{reset}').format(unicode(event_id)) if event_id is not None else None,
+            msg
+        ]
+        self.print_msg(' '.join(filter(None, parts)), always)
+
+    def print_info(self, msg, always=False, has_event=True):
+        """Prints an info message to the console.
+
+        By default, info messages are not shown in quiet mode.
+        They are prefixed with blank spaces to align with other
+        messages.
+
+        When calling this in a loop that is invoked a lot, it is
+        recommended to add an explicit ``if not self.quiet`` check
+        to avoid expensive `cformat` or `format` calls for a message
+        that is never displayed.
+        """
+        self.print_msg(' ' * (11 if has_event else 4) + msg, always)
+
+    def print_success(self, msg, always=False, event_id=None):
+        """Prints a success message to the console.
+
+        By default, success messages are not shown in quiet mode.
+        They are prefixed with three green plus signs.
+
+        When calling this in a loop that is invoked a lot, it is
+        recommended to add an explicit ``if not self.quiet`` check
+        to avoid expensive `cformat` or `format` calls for a message
+        that is never displayed.
+        """
+        self.print_prefixed('+++', 'green', msg, always, event_id)
+
+    def print_warning(self, msg, always=True, event_id=None):
+        """Prints a warning message to the console.
+
+        By default, warnings are displayed even in quiet mode.
+        Warning messages are with three yellow exclamation marks.
+        """
+        self.print_prefixed('!!!', 'yellow!', msg, always, event_id)
+
+    def print_error(self, msg, event_id=None):
+        """Prints an error message to the console
+
+        Errors are always displayed, even in quiet mode.
+        They are prefixed with three red exclamation marks.
+        """
+        self.print_prefixed('!!!', 'red!', msg, True, event_id)
 
 
 def main():

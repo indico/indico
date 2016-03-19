@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
+from indico.modules.rb.util import rb_is_admin
 import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.roomMapping as roomMapping
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -22,12 +25,13 @@ from MaKaC.webinterface import locators
 from MaKaC.errors import AccessError
 
 
-class RHRoomMapperProtected( admins.RHAdminBase ):
-    def _checkProtection( self ):
-        if self._getUser() is None:
+class RHRoomMapperProtected(admins.RHAdminBase):
+    def _checkProtection(self):
+        if session.user is None:
             self._checkSessionUser()
-        elif not self._getUser().isRBAdmin():
-            raise AccessError( "You are not authorized to take this action." )
+        elif not rb_is_admin(session.user):
+            raise AccessError("You are not authorized to take this action.")
+
 
 class RHRoomMappers( RHRoomMapperProtected ):
     _uh = urlHandlers.UHRoomMappers

@@ -6,7 +6,7 @@
 <% from pytz import timezone %>
 
 <div id="buttonBar" class="sessionButtonBar">
-    % if session.canModify(self_._aw):
+    % if session.canModify(self_._aw) or session.canCoordinate(self_._aw):
         <a href="${str(urlHandlers.UHSessionModification.getURL(session))}" style="font-weight: bold" >${_("Edit")}</a> |
     % endif
     <% pdfUrl = urlHandlers.UHConfTimeTablePDF.getURL(session.getConference()) %>
@@ -20,26 +20,8 @@
 </h1>
 <div class="sessionMainContent abstractMainContent">
     <div class="sessionRightPanel abstractRightPanel">
-        <% location = session.getLocation() %>
-        <% room = session.getRoom() %>
-        % if (room and room.getName()) or location:
-            <div class="sessionRightPanelSection">
-                <h2 class="sessionSectionTitle">${_("Place")}</h2>
-                <div>
-                % if location:
-                    <div><span style="font-weight:bold">${_("Location")}: </span>${location.getName()}</div>
-                    % if location.getAddress() is not None and location.getAddress() != "":
-                        <div><span style="font-weight:bold">${_("Address")}: </span>${location.getAddress()}</div>
-                    % endif
-                % endif
-                % if room and room.getName():
-                    <div><span style="font-weight:bold">${_("Room")}: </span>${linking.RoomLinker().getHTMLLink(room, location)}</div>
-                % endif
-                </div>
-            </div>
-        % endif
         <% canEditFiles = self_._aw.getUser() and session.canModify(self_._aw) %>
-        % if session.getAllMaterialList() or canEditFiles:
+        % if session.attached_items or canEditFiles:
             <div class="sessionRightPanelSection" style="border: none;">
                 <h2 class="sessionSectionTitle">${_("Files")}</h2>
                     % if canEditFiles:
@@ -47,15 +29,17 @@
                             <a class="fakeLink" id="manageMaterial">${_("Edit files")}</a>
                         </div>
                     % endif
+                <ul class="subList">
+                % for attachment in session.attached_items.get('files', []):
+                    <li><a href="${attachment.download_url}" target="_blank" title="${attachment.title}">${attachment.title}</a></li>
+                % endfor
+                </ul>
                 <ul>
-                % for material in session.getAllMaterialList():
-                    <% if not material.canView(self_._aw):
-                        continue
-                    %>
-                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">${material.getTitle()}</a>
+                % for folder in session.attached_items.get('folders',[]):
+                    <li>${folder.title}
                         <ul class="subList">
-                         % for resource in material.getResourceList():
-                            <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">${getResourceName(resource)}</a></li>
+                         % for attachment in folder.attachments:
+                            <li><a href="${attachment.download_url}" target="_blank" title="${attachment.title}">${attachment.title}</a></li>
                          % endfor
                         </ul>
                     </li>
@@ -73,9 +57,9 @@
                 <% eDate = session.getAdjustedEndDate(tz) %>
                 ${_("Date")}:
                 % if sDate.date() == eDate.date():
-                    <span style="font-weight: bold"> ${format_datetime(sDate, format='d MMM HH:mm')} - ${format_time(eDate)}</span>
+                    <span style="font-weight: bold"> ${format_datetime(sDate, format='d MMM HH:mm', timezone=tz)} - ${format_time(eDate, timezone=tz)}</span>
                 % else:
-                    ${_("from")} <span style="font-weight: bold">${format_datetime(sDate, 'd MMM HH:mm')} </span> ${_("to")} <span style="font-weight: bold">${format_datetime(eDate, 'd MMM HH:mm')}</span>
+                    ${_("from")} <span style="font-weight: bold">${format_datetime(sDate, 'd MMM HH:mm', timezone=tz)} </span> ${_("to")} <span style="font-weight: bold">${format_datetime(eDate, 'd MMM HH:mm', timezone=tz)}</span>
                 % endif
             </div>
         </div>
@@ -96,7 +80,7 @@
                       <li>
                         <span class="time">
                           % if sDate.date() != eDate.date():
-                            ${format_datetime(slot['startDate'], 'd MMM HH:mm')} - ${format_time(slot['endDate'])}
+                            ${format_datetime(slot['startDate'], 'd MMM HH:mm', timezone=tz)} - ${format_time(slot['endDate'], timezone=tz)}
                           % endif
                         </span>
                         % if slot['title']:
@@ -175,12 +159,9 @@
         $('#timeTableDiv').hide();
     });
 
-    $("#manageMaterial").click(function(){
-      IndicoUI.Dialogs.Material.editor(${session.getConference().getOwner().getId() |n,j},
-                                       ${session.getConference().getId() |n,j}, ${session.getId() |n,j},'','',
-                                       ${session.getAccessController().isProtected() |n,j},
-                                       ${session.getMaterialRegistry().getMaterialList(session.getConference()) |n,j},
-                                       ${'Indico.Urls.UploadAction.session'}, true);
+    $("#manageMaterial").click(function(e){
+        e.preventDefault();
+        openAttachmentManager(${session.getLocator() | n,j});
     });
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
   });

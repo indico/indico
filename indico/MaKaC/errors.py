@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ class MaKaCError(Exception, Fossilizable):
     fossilizes(IErrorReportFossil)
 
     def __init__(self, msg="", area="", explanation=None):
-        self._msg = msg
+        self._msg = self.message = msg
         self._area = area
         self._explanation = explanation
 
@@ -106,15 +106,6 @@ class ModificationError(AccessControlError):
         return _("you are not authorised to modify this %s") % self.objType
 
 
-class AdminError(AccessControlError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        return _("only administrators can access this %s") % self.objType
-
-
 class TimingError(MaKaCError):
     """
     Timetable problems
@@ -133,18 +124,6 @@ class EntryTimingError(TimingError):
     """
     """
     pass
-
-
-class UserError(MaKaCError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        if self._msg:
-            return self._msg
-        else:
-            return _("Error creating user")
 
 
 class NotLoggedError(MaKaCError):
@@ -178,9 +157,7 @@ class NotFoundError(MaKaCError):
         super(NotFoundError, self).__init__(title, explanation=message)
 
 
-class HtmlForbiddenTag(MaKaCError):
-    """
-    """
+class HtmlForbiddenTag(NoReportError):
     pass
 
 

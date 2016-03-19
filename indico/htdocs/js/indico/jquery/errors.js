@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -24,12 +24,23 @@
             try {
                 data = JSON.parse(data.responseText);
             } catch(e) {
-                // Can't do much here.. it's an error and we dno't have any details.
+                IndicoUI.Dialogs.Util.error({
+                    code: data.status,
+                    type: 'unknown',
+                    message: data.statusText.toLowerCase(),
+                    data: {},
+                    inner: null,
+                    requestInfo: {
+                        url: data._requestURL  // set in beforeSend callback
+                    }
+                });
                 return true;
             }
         }
-        if (data.error) {
-            IndicoUI.Dialogs.Util.error(data.error);
+        // data.data.error is only needed for angular error handlers
+        var error = data.error || (data.data && data.data.error);
+        if (error) {
+            IndicoUI.Dialogs.Util.error(error);
             return true;
         }
     };

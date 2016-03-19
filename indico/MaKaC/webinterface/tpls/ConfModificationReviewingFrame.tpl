@@ -57,10 +57,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                                        setResult(true);
+                                        setResult(true, result);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                                        setResult(false);
+                                        setResult(false, result);
                                     }
                                 }
                             );
@@ -98,7 +98,7 @@
                             }else removeReferee();
                         };
 
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                 ${ jsonEncode(fossilize(ConfReview.getRefereesList())) },
                                 true,null,
                                 true, false, null, null,
@@ -127,7 +127,7 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                                        setResult(true);
+                                        setResult(true, result);
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
@@ -170,7 +170,7 @@
 
                         };
 
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                 ${ jsonEncode(fossilize(ConfReview.getReviewersList())) },
                                 true,null,
                                 true, false, null, null,
@@ -203,7 +203,7 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                                        setResult(true);
+                                        setResult(true, result);
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
@@ -242,7 +242,7 @@
                                 }).open();
                             }else removeEditor();
                         };
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                                    ${ jsonEncode(fossilize(ConfReview.getEditorsList())) },
                                                    true,null,
                                                    true, false, null, null,

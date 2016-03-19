@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -256,15 +256,16 @@ type("AuthorsManager", [], {
 
 },
 
-function(initialPrAuthors, initialCoAuthors, showSpeaker) {
+function(initialPrAuthors, initialCoAuthors, showSpeaker, suggestedAuthors) {
     this.showSpeaker = any(showSpeaker, false);
 	this.root = 'author_';
     this.counter = -1;
+    this.suggestedAuthors = suggestedAuthors;
     this.prAuthors = new AuthorListManager($E('inPlacePrAuthors'),
-            $E('inPlacePrAuthorsMenu'),  "primary author", initialPrAuthors, this);
+            $E('inPlacePrAuthorsMenu'),  "primary author", initialPrAuthors, this, this.suggestedAuthors);
 
     this.coAuthors = new AuthorListManager($E('inPlaceCoAuthors'),
-            $E('inPlaceCoAuthorsMenu'),  "co-author", initialCoAuthors, this);
+            $E('inPlaceCoAuthorsMenu'),  "co-author", initialCoAuthors, this, this.suggestedAuthors);
 });
 
 
@@ -280,7 +281,7 @@ type("AuthorListManager", [], {
             var menuItems = {};
 
             menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add author"), true, this.confId, false,
-                    true, true, false, true); }, display: $T('Search User')};
+                    true, self.suggestedAuthors, false, true); }, display: $T('Search User')};
             menuItems["defineNew"] = {action: function(){ self._addNonExistingUser(); }, display: $T('Define New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
@@ -585,11 +586,12 @@ type("AuthorListManager", [], {
 
 },
 
-    function(inPlaceListElem, inPlaceMenu, userCaption, initialList, authorsManager) {
+    function(inPlaceListElem, inPlaceMenu, userCaption, initialList, authorsManager, suggestedAuthors) {
         this.inPlaceListElem = inPlaceListElem;
         this.inPlaceMenu = inPlaceMenu;
         this.userCaption = userCaption;
         this.authorsManager = authorsManager;
+        this.suggestedAuthors = suggestedAuthors;
         if (this.userCaption == 'primary author') {
             this.presenterDiv = 'prPresenterDiv_';
             this.cb = 'prCb_';
@@ -733,14 +735,20 @@ type("AbstractFilesManager", [],
 
     _buildExistingElement: function(pos) {
         var file = this.initialMaterial[pos];
-        var div = Html.div({id:'divExFile_' + pos, className:'existingAttachment'});
+        var div = Html.div({id: 'divExFile_' + pos, className: 'existingAttachment'});
         var a = Html.a({href: file['url']}, file['file']['fileName']);
+        var fileId = this._extractFileIdFromUrl(file['url']);
         div.append(a);
         var imageRemove = this._getImageRemove(pos);
         div.append(imageRemove);
-        var inputHidden = Html.input('hidden', {name: 'existingFile'}, file['id']);
+        var inputHidden = Html.input('hidden', {name: 'existingFile'}, fileId);
         div.append(inputHidden);
         return div;
+    },
+
+    _extractFileIdFromUrl: function(file) {
+        var filename = file.split('/').reverse()[0];
+        return parseInt(filename.substring(0, filename.indexOf('.')), 10);
     },
 
     _getImageRemove: function(pos) {
@@ -978,19 +986,21 @@ type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
     {
         _initializeForm: function() {
             this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
-            this.fieldOptions = $("<div></div>").fieldarea({fields_caption: $T("option"),
-                                                            parameter_manager: this._parameterManager,
-                                                            ui_sortable: true});
+            this.fieldOptions = $("<div></div>").multitextfield({
+                fieldsCaption: $T("option"),
+                parameterManager: this._parameterManager,
+                sortable: true
+            });
             this._form.push([$T("Options"), this.fieldOptions]);
         },
 
         __fillForm: function(field) {
             this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
-            this.fieldOptions.fieldarea("setInfo", field["options"]);
+            this.fieldOptions.multitextfield("setInfo", field["options"]);
         },
 
         __preSubmit: function() {
-            this.info.set("options", this.fieldOptions.fieldarea("getInfo"));
+            this.info.set("options", this.fieldOptions.multitextfield("getInfo"));
         }
     },
 

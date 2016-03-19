@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,24 +19,20 @@ Asynchronous request handlers for category-related services.
 
 from datetime import datetime
 from flask import session
-from indico.util.redis import suggestions
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
-from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
-from indico.util.redis import write_client as redis_write_client
-import MaKaC.common.info as info
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.user import principal_from_fossil
 from MaKaC import domain
 from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -196,7 +192,7 @@ class SetShowPastEventsForCateg(CategoryDisplayBase):
         if self._showPastEvents:
             fpef.add(cid)
         else:
-            fpef.remove(cid)
+            fpef.discard(cid)
         session.modified = True
 
 class CategoryProtectionUserList(CategoryModifBase):
@@ -205,41 +201,37 @@ class CategoryProtectionUserList(CategoryModifBase):
         return fossilize(self._categ.getAllowedToAccessList())
 
 class CategoryProtectionAddUsers(CategoryModifBase):
+    def _getAccessList(self):
+        result = fossilize(self._categ.getAllowedToAccessList())
+        # get pending users
+        for email in self._categ.getAccessController().getAccessEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def _checkParams(self):
 
         CategoryModifBase._checkParams(self)
 
-        self._usersData = self._params['value']
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._categ.grantAccess(userToAdd)
+        for principal in self._principals:
+            self._categ.grantAccess(principal)
+        return self._getAccessList()
 
 class CategoryProtectionRemoveUser(CategoryModifBase):
 
     def _checkParams(self):
         CategoryModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
-            self._categ.revokeAccess(userToRemove)
+        self._categ.revokeAccess(self._principal)
 
 class CategoryContactInfoModification( CategoryTextModificationBase ):
     """
@@ -276,11 +268,12 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
     def _checkParams(self):
         CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in pm.extract("userList", pType=list, allowEmpty=False)]
+        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue=True)
 
     def _sendMail(self, currentList, newManager):
-        if isinstance(newManager, Avatar):
+        if isinstance(newManager, AvatarUserWrapper):
             managerName = newManager.getStraightFullName()
         else:
             managerName = newManager.getName()
@@ -296,19 +289,16 @@ Indico Team
         maildata = { "fromAddr": "%s" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
-
     def _getAnswer(self):
-        ph = PrincipalHolder()
         if self._kindOfList == "modification":
             currentList = self._categ.getManagerList()[:]
-            for user in self._userList:
-                newManager = ph.getById(user["id"])
-                self._categ.grantModification(newManager)
-                if self._sendEmailManagers and len(currentList) > 0:
-                    self._sendMail(currentList, newManager)
+            for principal in self._principals:
+                self._categ.grantModification(principal)
+                if self._sendEmailManagers and currentList:
+                    self._sendMail(currentList, principal)
         elif self._kindOfList == "confCreation":
-            for user in self._userList:
-                self._categ.grantConferenceCreation(ph.getById(user["id"]))
+            for principal in self._principals:
+                self._categ.grantConferenceCreation(principal)
         return self._getControlUserList()
 
 
@@ -316,15 +306,13 @@ class CategoryRemoveControlUser(CategoryControlUserListBase):
 
     def _checkParams(self):
         CategoryControlUserListBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
         if self._kindOfList == "modification":
-            self._categ.revokeModification(ph.getById(self._userId))
+            self._categ.revokeModification(self._principal)
         elif self._kindOfList == "confCreation":
-            self._categ.revokeConferenceCreation(ph.getById(self._userId))
+            self._categ.revokeConferenceCreation(self._principal)
         return self._getControlUserList()
 
 class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
@@ -336,11 +324,9 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
     def _getAnswer(self):
         result = {}
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(self._apiKey, '/export/categ/%s.ics' % self._target.getId())
         result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] =  urls["authRequestURL"]
+        result["authRequestURL"] = urls["authRequestURL"]
         return result
 
 class CategoryProtectionToggleDomains(CategoryModifBase):
@@ -361,75 +347,6 @@ class CategoryProtectionToggleDomains(CategoryModifBase):
             self._target.freeDomain(d)
 
 
-class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        CategoryDisplayBase._checkParams(self)
-        userId = ParameterManager(self._params).extract('userId', pType=str, allowEmpty=True)
-        if userId is not None:
-            self._avatar = AvatarHolder().getById(userId)
-        else:
-            self._avatar = self._aw.getUser()
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-        if not self._avatar.canUserModify(self._aw.getUser()):
-            raise ServiceAccessError('Access denied')
-
-
-class CategoryFavoriteAdd(CategoryBasketBase):
-
-    def _getAnswer(self):
-        if self._categ is conference.CategoryManager().getRoot():
-            raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
-        self._avatar.linkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unignore(self._avatar, 'category', self._categ.getId())
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
-class CategoryFavoriteDel(CategoryBasketBase):
-
-    def _getAnswer(self):
-        self._avatar.unlinkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
-class CategorySuggestionDel(CategoryBasketBase):
-    def _getAnswer(self):
-        suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -444,7 +361,4 @@ methodMap = {
     "protection.removeConfCreator": CategoryRemoveControlUser,
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
-    "favorites.addCategory": CategoryFavoriteAdd,
-    "favorites.delCategory": CategoryFavoriteDel,
-    "suggestions.delSuggestion": CategorySuggestionDel
 }

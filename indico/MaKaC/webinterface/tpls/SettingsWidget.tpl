@@ -6,7 +6,8 @@
     </div>
     <div class="settingsSeparator"></div>
     <div class="settingsWidgetSection">
-        <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }">
+        <form id="languageForm" method="post" action="${ url_for('misc.changeLang') }">
+            <input type="hidden" name="next" value="${ _request.relative_url }">
             <span>${_("Language:")}</span>
             <select name="lang" onchange="$E('languageForm').dom.submit();">
             % for k, v in sorted(Languages.iteritems(), key=lambda x: x[1]):
@@ -16,9 +17,9 @@
         </form>
     </div>
     % if currentUser:
-        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></div>
-        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserPreferences.getURL(currentUser) }">${ _("My preferences") }</a></div>
-        % if currentUser.isAdmin():
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard') }">${ _("My profile") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences') }">${ _("My preferences") }</a></div>
+        % if _session.user.is_admin:
             <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
         % endif
         % if 'login_as_orig_user' in _session:
@@ -29,7 +30,7 @@
             </div>
         % endif
         <div style="border-bottom: 1px solid #DDDDDD; margin-bottom:5px; margin-top:10px"></div>
-        <div class="settingsWidgetSection"><a href="${ logoutURL }">${ _("Logout") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for_logout(_request.relative_url) }">${ _("Logout") }</a></div>
     % endif
 </div>
 

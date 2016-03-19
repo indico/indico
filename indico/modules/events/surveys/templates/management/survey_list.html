@@ -1,0 +1,68 @@
+{% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_rows %}
+
+{% block title %}
+    {%- trans %}Surveys{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        Surveys can be used to make questionnaires for the event and collect people's answers.
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% for survey in surveys %}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-file-check
+                            {% if survey.is_active %}survey-active{% endif %}
+                            {% if survey.has_ended %}survey-finished{% endif %}"></div>
+                <div class="text">
+                    <div class="label">{{ survey.title }}</div>
+                    {% if survey.is_active %}
+                        {% trans %}
+                            The survey is live.
+                        {% endtrans %}
+                    {% elif survey.has_ended %}
+                        {% trans %}
+                            The survey finished.
+                        {% endtrans %}
+                    {% else %}
+                        {% trans %}
+                            The survey is not running.
+                        {% endtrans %}
+                    {% endif %}
+                </div>
+                <div class="toolbar right">
+                    <div class="group">
+                        <a href="#" class="i-button icon-remove"
+                           data-href="{{ url_for('.delete_survey', survey) }}"
+                           data-method="POST"
+                           data-title="{% trans %}Delete survey?{% endtrans %}"
+                           data-confirm="{% trans title=survey.title %}Do you really want to delete the survey &quot;{{ title }}&quot;?{% endtrans %}">
+                            {% trans %}Delete{% endtrans %}
+                        </a>
+                    </div>
+                    <div class="group">
+                        <a href="{{ url_for('.manage_survey', survey) }}" class="i-button highlight icon-settings">
+                            {% trans %}Manage{% endtrans %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {%- call message_box('info', fixed_width=true) -%}
+            {% trans %}There are no surveys yet.{% endtrans %}
+        {%- endcall %}
+    {% endfor %}
+    <div class="toolbar">
+        <div class="group right">
+            <a href="{{ url_for('.create', event) }}" class="i-button">
+                {% trans %}Create survey{% endtrans %}
+            </a>
+        </div>
+    </div>
+{% endblock %}

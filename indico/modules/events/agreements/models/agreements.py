@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -60,7 +60,9 @@ class Agreement(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
-        nullable=False
+        db.ForeignKey('events.events.id'),
+        nullable=False,
+        index=True
     )
     #: Type of agreement
     type = db.Column(
@@ -96,7 +98,10 @@ class Agreement(db.Model):
     )
     #: ID of a linked user
     user_id = db.Column(
-        db.Integer
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
     )
     #: The date and time the agreement was signed
     signed_dt = db.Column(
@@ -121,6 +126,25 @@ class Agreement(db.Model):
     #: Definition-specific data of the agreement
     data = db.Column(
         JSON
+    )
+
+    #: The user this agreement is linked to
+    user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'agreements',
+            lazy='dynamic'
+        )
+    )
+    #: The Event this agreement is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'agreements',
+            lazy='dynamic'
+        )
     )
 
     @hybrid_property
@@ -170,17 +194,6 @@ class Agreement(db.Model):
         return {'confId': self.event_id,
                 'id': self.id}
 
-    @property
-    def user(self):
-        if self.user_id is None:
-            return None
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.user_id))
-
-    @user.setter
-    def user(self, user):
-        self.user_id = user.getId()
-
     @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
@@ -189,7 +202,7 @@ class Agreement(db.Model):
 
     @staticmethod
     def create_from_data(event, type_, person):
-        agreement = Agreement(event=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
+        agreement = Agreement(event_new=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
         agreement.identifier = person.identifier
         agreement.person_email = person.email
         agreement.person_name = person.name
@@ -217,7 +230,6 @@ class Agreement(db.Model):
         self.state = AgreementState.pending
         self.attachment = None
         self.attachment_filename = None
-        self.data = None
         self.reason = None
         self.signed_dt = None
         self.signed_from_ip = None
@@ -232,4 +244,4 @@ class Agreement(db.Model):
         return self.identifier == person.identifier
 
     def is_orphan(self):
-        return self.definition.is_agreement_orphan(self.event, self)
+        return self.definition.is_agreement_orphan(self.event_new, self)

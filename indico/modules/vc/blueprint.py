@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,12 +18,11 @@ from __future__ import unicode_literals
 
 from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelectService, RHVCManageEventCreate,
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
-                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList,
-                                           RHVCRoomModify)
+                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
-vc_blueprint = _bp = IndicoBlueprint('vc', __name__, template_folder='templates')
+_bp = IndicoBlueprint('vc', __name__, template_folder='templates', virtual_template_folder='vc')
 
 # Global management
 _bp.add_url_rule('/service/videoconference', 'vc_room_list', RHVCRoomList)
@@ -45,10 +44,6 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/attach/',
                  'manage_vc_rooms_search_form', RHVCManageAttach, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/search/',
                  'manage_vc_rooms_search', RHVCManageSearch)
-
-# Room management
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/room/',
-                 'vc_room_modify', RHVCRoomModify, methods=('POST',))
 
 # Event page
 _bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RHVCEventPage)

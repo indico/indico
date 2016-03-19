@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -96,9 +96,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         var MAX_MATERIAL_FIELDS = 5;
         var files = [Html.input('file', {name: 'file'})];
         var urlBoxes = [Html.edit({name: 'url'})];
-        var toPDFCheckbox = Html.checkbox({style: {verticalAlign: 'middle'}}, true);
         var currentResourceLocation;
-        toPDFCheckbox.dom.name = 'topdf';
 
         var self = this;
 
@@ -130,24 +128,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                         if(i == 0 && files.length < MAX_MATERIAL_FIELDS) {
                             args.push(addInputLink);
                         }
-                    }
-                    if (Indico.PDFConversion.HasFileConverter){
-                        var pdfDivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
-                                $T("Convert to PDF"));
-                        var pdfDiv = Html.div({style:{marginTop: '5px'}},
-                                toPDFCheckbox,
-                                pdfDivLabel
-                                );
-                        $(pdfDivLabel.dom).qtip({
-                            content: {
-                                text: $T("The only available file formats are: ") + Indico.PDFConversion.AvailablePDFConversions.toString().replace(/\./g,' ')
-                            },
-                            position: {
-                                target: 'mouse',
-                                adjust: { mouse: true, x: 11, y: 13 }
-                            }
-                        });
-                        args.push(pdfDiv);
                     }
 
                     return Html.div.apply(null, args);
@@ -546,7 +526,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         this.password = Html.input('password',{});
 
         this.userList = new UserListField(
-            'ShortPeopleListDiv', 'PeopleList',
+            'ShortPeopleListDiv', 'user-list',
             null, true, null,
             true, true, null, null,
             false, false, false, true,
@@ -758,18 +738,11 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var self = this;
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-        self.args.includeFavList = IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids']);
         var users = indicoSource(method, self.args);
 
         users.state.observe(function(state) {
             if (state == SourceState.Loaded) {
-                var result = users.get();
-                if (self.args.includeFavList) {
-                    self.allowedUsers = result[0];
-                    updateFavList(result[1]);
-                } else {
-                    self.allowedUsers = result;
-                }
+                self.allowedUsers = users.get();
                 killProgress();
                 hook.set(true);
             } else if (state == SourceState.Error) {
@@ -782,7 +755,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
     _drawUserList: function(){
 
         return new UserListField(
-                'ShortPeopleListDiv', 'PeopleList',
+                'ShortPeopleListDiv', 'user-list',
                 this.allowedUsers, true, null,
                 true, true, null, null,
                 false, false, false, true,
@@ -1260,9 +1233,9 @@ type("ResourceListWidget", ["ListWidget"], {
                 list.append(Html.li({},Html.span({},Html.strong({},label+": "),value)));
             };
 
-            labelAndValue('File Name',info.get('fileName'));
-            labelAndValue('Size',Math.floor(info.get('fileSize')/1024)+ " KB");
-            labelAndValue('Creation Date',info.get('creationDate'));
+            labelAndValue($T('File Name'),info.get('fileName'));
+            labelAndValue($T('Size'),Math.floor(info.get('fileSize')/1024)+ " KB");
+            labelAndValue($T('Creation Date'),info.get('creationDate'));
 
             var filetype = info.get('fileType');
 

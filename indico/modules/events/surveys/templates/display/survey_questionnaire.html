@@ -1,0 +1,48 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_row, form_row_static %}
+
+{% block title %}
+    {%- trans %}Survey{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {{ survey.title }}
+    {% if event.getType() != 'conference' %}
+        <small>({{ event.getTitle() }})</small>
+    {% endif %}
+{% endblock %}
+
+{% block description %}
+    {{ survey.introduction }}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form, id='survey-questionnaire', orientation='vertical') }}
+    {% for section in survey.sections if section.children %}
+        {% call form_fieldset(section.title, section.description|replace('\n', '<br>'|safe),
+                              render_as_fieldset=section.display_as_section) %}
+            {% for item in section.children %}
+                {% if item.type.name == 'question' %}
+                    {{ form_row(form['question_{}'.format(item.id)]) }}
+                {% elif item.type.name == 'text' %}
+                    {% call form_row_static(single_row=false, skip_label=true) %}
+                        {{ item.description|replace('\n', '<br>'|safe) }}
+                    {% endcall %}
+                {% endif %}
+            {% endfor %}
+        {% endcall %}
+    {% endfor %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save answers{% endtrans %}">
+        {% if back_button_endpoint is not none %}
+            <a href="{{ url_for(back_button_endpoint, event) }}" class="i-button big" data-button-back>
+                {%- trans %}Back{% endtrans -%}
+            </a>
+        {% endif %}
+    {% endcall %}
+
+    <script>
+        // allow deselecting a horizontal radio button unless it's required
+        $('#survey-questionnaire .inline-vcentered input:radio:not([required])').resettableRadioButtons();
+    </script>
+{% endblock %}

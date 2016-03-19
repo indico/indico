@@ -1,0 +1,151 @@
+{% extends 'events/surveys/management/_survey_base.html' %}
+
+{% block content %}
+    {% if survey.state.name == 'not_ready' %}
+        {% include 'events/surveys/management/survey_actions/not_ready.html' %}
+    {% elif survey.state.name == 'ready_to_open' %}
+        {% include 'events/surveys/management/survey_actions/ready_to_open.html' %}
+    {% elif survey.state.name in ('active_and_clean', 'active_and_answered') %}
+        {% include 'events/surveys/management/survey_actions/active.html' %}
+    {% elif survey.state.name == 'finished' %}
+        {% include 'events/surveys/management/survey_actions/finished.html' %}
+    {% endif %}
+
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}General settings{% endtrans %}
+                </div>
+                {% trans %}Edit settings for this survey.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.edit_survey', survey) }}" class="i-button icon-edit">
+                    {% trans %}Edit{% endtrans %}
+                </a>
+            </div>
+        </div>
+
+        {% if survey.state.name != 'not_ready' %}
+            <div class="section">
+                <div class="icon icon-clipboard"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Questionnaire{% endtrans %}
+                    </div>
+                    {% trans %}Add, remove or modify questions.{% endtrans %}
+                </div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('.manage_questionnaire', survey) }}" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2>
+        {% trans %}Submissions{% endtrans %}
+    </h2>
+
+    {% if survey.submissions %}
+        <div>
+            <div class="toolbar left">
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" id="select-all">
+                        {% trans %}All{% endtrans %}
+                    </a></li>
+                    <li><a href="#" id="select-none">
+                        {% trans %}None{% endtrans %}
+                    </a></li>
+                </ul>
+            </div>
+            <div class="toolbar right">
+                <div class="group">
+                    <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
+                        {% trans %}Results{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                        {%- trans %}Export{% endtrans -%}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" data-href="{{ url_for('.export_submissions_csv', survey) }}"
+                               class="icon-file-excel js-submission-action js-export-submissions">
+                                {% trans %}CSV{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-href="{{ url_for('.export_submissions_excel', survey) }}"
+                               class="icon-file-excel js-submission-action js-export-submissions">
+                                {% trans %}XLSX (Excel){% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="group">
+                    <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
+                            data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
+                            data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
+                            data-method="DELETE" class="i-button icon-remove" disabled>
+                        {% trans %}Delete{% endtrans %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <table id="submission-list" class="i-table-widget fixed-width">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{% trans %}ID{% endtrans %}</th>
+                    <th>{% trans %}Submitted{% endtrans %}</th>
+                    <th>{% trans %}User{% endtrans %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for submission in survey.submissions %}
+                    {{ _render_submission_row(submission) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">
+                {% trans %}There are no submissions yet.{% endtrans %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro _render_submission_row(submission) %}
+    <tr>
+        <td>
+            <input type="checkbox" class="inline-vcentered submission-ids" value="{{ submission.id }}">
+        </td>
+        <td>
+            <a href="{{ url_for('.display_submission', submission) }}">{{ submission.id }}</a>
+        </td>
+        <td>{{ submission.submitted_dt|format_datetime }}</td>
+        <td>
+            {% if submission.user %}
+                {{ submission.user.full_name }}
+            {% else %}
+                <em>{% trans %}Anonymous{% endtrans %}</em>
+            {% endif %}
+        </td>
+        <td>
+            <a href="#" class="icon-remove right js-delete-submission"
+               data-href="{{ url_for('.delete_submissions', survey) }}"
+               data-method="DELETE"
+               data-title="{% trans %}Remove submission?{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to remove this submission?{% endtrans %}"
+               data-submission-id="{{ submission.id }}"></a>
+        </td>
+    </tr>
+{% endmacro %}

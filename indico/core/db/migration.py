@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,18 +34,11 @@ globalname_dict = {
     "PersistentList": ("persistent.list", None),
     'SlotSchedule': ('MaKaC.schedule', 'SlotSchedule'),
     'PosterSlotSchedule': ('MaKaC.schedule', 'PosterSlotSchedule'),
-    "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup"),
-    "PeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
-    "PeriodicUniqueTask": ("indico.modules.scheduler.tasks.periodic", None),
-    "TaskOccurrence": ("indico.modules.scheduler.tasks.periodic", None),
-    "CategoryStatisticsUpdaterTask": ("indico.modules.scheduler.tasks.periodic", None),
-    "FoundationSyncTask": ("indico.modules.scheduler.tasks.periodic", None),
-    "SamplePeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
-    'RoomReservationTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'FoundationSyncTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'LiveSyncUpdateTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler')
+    'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler'),
+    'Avatar': ('indico.modules.users.legacy', 'AvatarUserWrapper'),
+    'Group': ('indico.modules.groups.legacy', 'LocalGroupWrapper'),
+    'LDAPGroup': ('indico.modules.groups.legacy', 'LDAPGroupWrapper'),
+    'CERNGroup': ('indico.modules.groups.legacy', 'LDAPGroupWrapper')
 }
 
 modulename_dict = {

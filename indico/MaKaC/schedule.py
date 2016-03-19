@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 """
 import copy
 from persistent import Persistent
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError,\
     EntryTimingError
@@ -27,15 +27,13 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
 from indico.util.date_time import iterdays
-from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
-        IContribSchEntryMgmtFossil, IBreakTimeSchEntryFossil,\
-        IBreakTimeSchEntryMgmtFossil,\
-        ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
+from MaKaC.fossils.schedule import (IContribSchEntryDisplayFossil, IContribSchEntryMgmtFossil,
+                                    IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil,
+                                    ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil,
+                                    IAttachmentFossil, IFolderFossil)
 from MaKaC.common.cache import GenericCache
-from MaKaC.errors import NoReportError
 from indico.util.decorators import classproperty
 
 
@@ -594,8 +592,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
     """
     """
 
-#    fossilizes(IConferenceScheduleDisplayFossil, IConferenceScheduleMgmtFossil)
-
     def __init__(self,conf):
         TimeSchedule.__init__(self,conf)
 
@@ -937,6 +933,8 @@ class TimeSchEntry(SchEntry):
 
 class LinkedTimeSchEntry(TimeSchEntry):
 
+    ITEM_TYPE = 'session'
+
     fossilizes(ILinkedTimeSchEntryDisplayFossil,
                ILinkedTimeSchEntryMgmtFossil)
 
@@ -1097,6 +1095,8 @@ class IndTimeSchEntry(TimeSchEntry):
 
 
 class BreakTimeSchEntry(IndTimeSchEntry):
+
+    ITEM_TYPE = 'break'
 
     fossilizes(IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil)
 
@@ -1420,6 +1420,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
+    ITEM_TYPE = 'contribution'
+
     fossilizes(IContribSchEntryDisplayFossil,
                IContribSchEntryMgmtFossil )
 
@@ -1499,15 +1501,14 @@ class ScheduleToJson(object):
     @staticmethod
     def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
 
+        fossil_mgmt_dict = {
+            BreakTimeSchEntry: IBreakTimeSchEntryMgmtFossil,
+            ContribSchEntry: IContribSchEntryMgmtFossil,
+            LinkedTimeSchEntry: ILinkedTimeSchEntryMgmtFossil
+        }
+
         if mgmtMode:
-            if isinstance(obj, BreakTimeSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            elif isinstance(obj, ContribSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            elif isinstance(obj, LinkedTimeSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, ILinkedTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            else:
-                entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
+            entry = ScheduleToJson.obtainFossil(obj, tz, fossil_mgmt_dict, mgmtMode, useAttrCache)
         else:
             # the fossils used for the display of entries
             # will be taken by default, since they're first

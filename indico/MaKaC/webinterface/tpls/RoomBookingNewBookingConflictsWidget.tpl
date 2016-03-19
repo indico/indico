@@ -92,8 +92,7 @@
 <div class="error-message-box js-booking-creation-error-box" style="display: none;">
     <div class="message-text">
         <p>${ _("Your reservation could not be modified:") if reservation else _("Your reservation could not be created:") }</p>
-        <ul>
-            <li class="js-booking-creation-error-message"></li>
+        <ul class="js-booking-creation-error-message">
         </ul>
     </div>
 </div>

@@ -1,0 +1,78 @@
+{% extends 'events/payment/management/_base.html' %}
+
+{% block description %}
+    {% trans -%}
+        Event-wide payment settings
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}General settings{% endtrans %}
+                </div>
+                {% trans %}Configure general settings for payments.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.event_settings_edit', event) }}" class="i-button icon-edit">
+                    {% trans %}Configure{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h3>
+        {% trans %}Payment methods{% endtrans %}
+    </h3>
+
+    <div class="i-badges-list left i-badges-list-hover i-payments-list">
+        <a class="i-badge i-payment-enabled i-payment-manual"
+           title="{% trans %}Method only available for managers from the managment area. Can't be disabled.{% endtrans %}">
+            <div class="i-badge-legend">
+                <span class="i-badge-legend-right i-payment-status-enabled">
+                    {% trans %}enabled{% endtrans %}
+                </span>
+            </div>
+            <div class="i-badge-content">
+                <span class="i-badge-img icon-coins"></span>
+                <span class="i-badge-title">
+                    {% trans %}Manual{% endtrans %}
+                </span>
+            </div>
+        </a>
+        {%- for short_name, method in methods %}
+            <a id="plugin-{{ method.name }}" class="js-plugin-edit i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
+               data-title="{% trans %}Payment method settings{% endtrans %}"
+               href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
+                <div class="i-badge-legend">
+                    <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                    <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
+                </div>
+                <div class="i-badge-content">
+                    <span class="i-badge-img">
+                        <img src="{{ method.logo_url }}">
+                    </span>
+                    <span class="i-badge-title">
+                        {{ method.title }}
+                    </span>
+                </div>
+            </a>
+        {%- endfor %}
+    </div>
+
+    <script>
+        $('.js-plugin-edit').ajaxDialog({
+            onClose: function closePluginDialog(data) {1
+                if (!data) {
+                    return;
+                }
+                var plugin = $('#plugin-' + data.plugin);
+                plugin.toggleClass('i-payment-enabled', data.enabled);
+                plugin.toggleClass('i-payment-disabled', !data.enabled);
+            }
+        });
+    </script>
+{% endblock %}

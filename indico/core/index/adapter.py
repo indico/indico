@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,28 +22,4 @@ class IIndexableByStartDateTime(Interface):
     def getAdjustedStartDate(self):
         """
         Returns a tz-aware datetime
-        """
-
-
-class IIndexableByEndDateTime(Interface):
-
-    def getAdjustedEndDate(self):
-        """
-        Returns a tz-aware datetime
-        """
-
-
-class IIndexableByArbitraryDateTime(Interface):
-
-    def getIndexingDateTime():
-        """
-        Return an arbitrary tz-aware datetime (class will decide what)
-        """
-
-
-class IIndexableById(Interface):
-
-    def getId():
-        """
-        Return the id of the object
         """

@@ -25,7 +25,7 @@
 
     % if logo_img:
         \begin{figure}[h!]
-            \includegraphics[max width=0.85\linewidth, min width=0.5\linewidth, max height=10em]{${logo_img | latex_escape}}
+            \includegraphics[max width=0.85\linewidth, min width=0.5\linewidth, max height=10em]{${logo_img}}
             \centering
         \end{figure}
     % endif

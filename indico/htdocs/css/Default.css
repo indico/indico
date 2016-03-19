@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -133,7 +133,6 @@ code {
 }
 
 pre {
-   font-family: arial, serif;
    white-space: pre-wrap;       /* css-3 */
    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
    white-space: -o-pre-wrap;    /* Opera 7 */
@@ -1098,14 +1097,6 @@ a.confSubSection:hover {
    font-weight: bold;
 }
 
-/*.marquee {
-   vertical-align: middle;
-   text-align: center;
-   border: 1px solid #5294CC;
-   width:60%;
-   background:#F6F6F6;
-}*/
-
 .categoryManagers {
     font-size: 13px;
     color: #444;
@@ -1122,38 +1113,13 @@ a.confSubSection:hover {
    background-repeat: no-repeat;
 }
 
-.VCTab {
-   background-image: url(../images/videoconference.png);
-   background-repeat: no-repeat;
-}
-
-.participantsTab {
-   background-image: url(../images/participants.png);
-   background-repeat: no-repeat;
-}
-
 .timetableTab {
    background-image: url(../images/pocketwatch.png);
    background-repeat: no-repeat;
 }
 
-.filesTab {
-   background-image: url(../images/folder.png);
-   background-repeat: no-repeat;
-}
-
-.logsTab {
-   background-image: url(../images/penpaper.png);
-   background-repeat: no-repeat;
-}
-
 .listingsTab {
    background-image: url(../images/listings.png);
-   background-repeat: no-repeat;
-}
-
-.moveTab {
-   background-image: url(../images/greenarrow.png);
    background-repeat: no-repeat;
 }
 
@@ -1242,355 +1208,6 @@ span.horizontalSeparator {
     color: #AAAAAA;
     padding-left: 5px;
     padding-right: 5px;
-}
-
-/********************/
-/**** Evaluation ****/
-/********************/
-
-.evaluationForm {
-    width: 940px;
-    margin: 30px auto;
-    background-color: white;
-    padding: 50px 30px;
-}
-
-/* Edit - left menu */
-table.evalEditLeftMenu {
-    vertical-align:middle;
-    text-align:left;
-    margin-left:5px;
-    border:1px solid black;
-    width:125px;
-}
-table.evalEditLeftMenu td {
-    vertical-align:middle;
-    white-space:nowrap;
-    border:1px solid #cccccc;
-}
-table.evalEditLeftMenu a {
-    color:#000000;
-    background:transparent;
-    text-decoration:none;
-}
-table.evalEditLeftMenu a:hover {
-    color:#E25300;
-    font-weight:bold;
-}
-
-/* Setup */
-table.notificationShow tr{
-    vertical-align:top;
-}
-table.notificationShow td.small{
-    font-size:10px;
-}
-table.evalSetupSpecialActions td {
-    font-size:10px;
-}
-table.evalSetupSpecialActions form {
-    margin:0;
-}
-table.evalSetupSpecialActions form input {
-    width:130px;
-}
-table.evalationSetupImportXml {
-    border-top-width:0;
-    border-right-width:0;
-    border-bottom-width:0;
-    border-left:1px solid #777777;
-}
-table.evalationSetupImportXml input {
-    margin-bottom:0;
-}
-/* Setup DataModif */
-table.DataModif {
-    width:80%;
-    border:0;
-    border-left:1px solid #777777;
-}
-table.DataModif td.titleCellTD{
-    white-space:nowrap;
-}
-table.DataModif td.modifRight{
-    width:90%;
-}
-table.notificationEdit {
-    width:100%;
-    border-collapse: collapse
-}
-table.notificationEdit tr{
-    vertical-align:top;
-}
-table.notificationEdit td.notifTitle{
-    font-weight:bold;
-}
-table.notificationEdit td.notifLeft{
-    color:black;
-    width:1%;
-}
-table.notificationEdit td.notifMain {
-    width:90%;
-}
-
-table.groupTable td.notifMain textarea{
-    width:100%;
-}
-
-table.notificationEdit td.notifMain textarea{
-    width:100%;
-    height:60px;
-}
-table.notificationEdit td.notifRight {
-    width:1000px;
-    color:black;
-    white-space:nowrap;
-}
-
-/* Edit one question */
-table.evalEditMain {
-    vertical-align:middle;
-    border-collapse:collapse;
-    margin-left:50px;
-    border:0 solid white;
-    width:575px;
-}
-table.evalEditMain td.titleCellTD {
-    width:125px;
-}
-table.evalEditMain td.inputCelTD select {
-    margin-left:10px;
-}
-table.evalEditMain td.inputCelTD input {
-    margin-left:10px;
-}
-table.evalEditMain td.inputCelTD textarea {
-    width:98%;
-    height:70px;
-    margin-left:10px;
-}
-table.evalEditMain td.inputCelTD input.textType {
-    width:98%;
-}
-table.evalEditMain td.inputCelTD input.choiceItemText {
-
-}
-table.evalEditMain td.inputCelTD input.btn {
-    margin-left:10px;
-}
-table.evalEditMain td.inputCelTD input.shortInput {
-    width:40%;
-}table.evalEditMain td.errorCelTD {
-    text-align:center;
-    color:red;
-}
-table.evalEditMain td.submitCelTD {
-    text-align:center;
-}
-
-/* Edit form structure */
-table.evalEditViewContainer{
-    margin-left:3px;
-    border-width:0;
-    width:90%;
-}
-table.evalEditViewContainer td{
-    vertical-align:top;
-}
-table.evalEditView {
-    vertical-align:middle;
-    border-collapse:collapse;
-    border:1px solid black;
-    width:100%;
-}
-table.evalEditView td {
-    padding:5px;
-}
-table.evalEditView td.inputCelTD {
-    width:50%;
-    vertical-align:top;
-}
-table.evalEditView td.inputCelTD input.textType {
-    margin-left:0;
-    width:100%;
-}
-table.evalEditView td.inputCelTD input.passwordType {
-    margin-left:0;
-    width:100%;
-}
-table.evalEditView td.inputCelTD input {
-    margin-bottom:0;
-}
-table.evalEditView td.inputCelTD textarea {
-    width:100%;
-    height:70px;
-    margin-left:0;
-}
-table.evalEditView td.commentCelTD {
-    padding-top:5px;
-    padding-right:30px;
-    padding-bottom:15px;
-    padding-left:15px;
-    font-size:x-small;
-    text-align:justify;
-}
-table.evalEditView td.displayField {
-    font-weight:bold;
-}
-table.evalEditViewActions {
-    border:0;
-    border-spacing:0;
-    padding:1px;
-    margin-right:0;
-    padding-right:0;
-}
-table.evalEditViewActions td {
-    padding:0;
-}
-table.evalEditViewActions form {
-    margin:0;
-}
-table.evalEditViewActions select {
-    border:0;
-    font-size:10px;
-}
-
-/* Preview */
-table.evalEditPreview {
-    vertical-align:middle;
-    border-collapse:collapse;
-    border:1px solid #eeeeee;
-    width:90%;
-}
-table.evalEditPreview tr.evalEditPreviewTrGrey {
-    background-color:#eeeeee;
-}
-table.evalEditPreview td {
-    padding:5px;
-    width:50%;
-    vertical-align:top;
-}
-table.evalEditPreview td.inputCelTD{
-    text-align:left;
-}
-table.evalEditPreview td.inputCelTD font {
-    color:black;
-    width:100%;
-    height:100%;
-}
-table.evalEditPreview td.inputCelTD input.textType {
-    margin-left:0;
-    width:90%;
-}
-table.evalEditPreview td.inputCelTD input.passwordType {
-    margin-left:0;
-    width:90%;
-}
-table.evalEditPreview td.inputCelTD input {
-    margin-bottom:0;
-}
-table.evalEditPreview td.inputCelTD textarea {
-    width:90%;
-    height:70px;
-    margin-left:0;
-}
-table.evalEditPreview td.commentCelTD {
-    padding-top:5px;
-    padding-right:30px;
-    padding-bottom:15px;
-    padding-left:15px;
-    font-size:x-small;
-    text-align:justify;
-}
-table.evalEditPreview td.displayField {
-    font-weight:bold;
-}
-table.evalEditPreviewTitle {
-    width:90%;
-}
-table.evalEditPreviewTitle td.title{
-    text-align:center;
-    /*white-space:nowrap;*/
-    border-bottom:2px solid #777777;
-}
-table.noticeMain {
-    width:80%;
-    text-align:center;
-}
-table.noticeMain td.td{
-    text-align:center;
-}
-table.noticeMain td.title{
-    text-align:center;
-}
-
-/* Results */
-fieldset.evalationResultsFieldset{
-    padding:20px;
-    width:80%;
-    text-align:left;
-}
-fieldset.evalationResultsFieldset legend{
-    color:black;
-}
-fieldset.evalationResultsFieldset ul li{
-    margin: 0.5em 0 0.5em 0;
-}
-fieldset.evalationResultsFieldset p{
-    padding-left: 2.5em;
-}
-fieldset.evalationResultsFieldset td{
-    font-size:10px;
-}
-fieldset.evalationResultsFieldset table.statsGraphContainer {
-    width:100%;
-}
-fieldset.evalationResultsFieldset table.statsGraphContainer td.statsGraphHead{
-    width:30%;
-    text-align:right;
-}
-fieldset.evalationResultsFieldset table.statsHead{
-    width:100%;
-}
-fieldset.evalationResultsFieldset table.statsGraph{
-    width:100%;
-    border-collapse:collapse;
-}
-fieldset.evalationResultsFieldset td.blue{
-    border:1px solid #888;
-    height:15px;
-    background-color:#d0ecff;
-}
-fieldset.evalationResultsFieldset td.green{
-    border:1px solid #888;
-    height:15px;
-    background-color:#9de47b;
-}
-fieldset.evalationResultsFieldset td.yellow{
-    border:1px solid #888;
-    height:15px;
-    background-color:#fde47b;
-}
-fieldset.evalationResultsFieldset td.pink{
-    border:1px solid #888;
-    height:15px;
-    background-color:#f2e3f4;
-}
-a.greyLink{
-    color:#777777;
-    font-weight:bold;
-}
-a.greyLink:hover{
-    color:#E25300;
-}
-table.evalationResultsSubmitters {
-    border-top-width:0;
-    border-right-width:0;
-    border-bottom-width:0;
-    border-left:1px solid #777777;
-}
-table.evalationResultsSubmitters input {
-    margin-bottom:0;
 }
 
 /* UI Components */
@@ -1741,33 +1358,10 @@ li.unselectable {
     color: #888888;
 }
 
-div.UIPeopleListDiv { /* for lists of users in forms */
-    margin-top: 10px;
-    margin-bottom: 10px;
-    height: 200px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
 div.PluginOptionPeopleListDiv {
     border: 1px dashed #CCCCCC;
     min-height: 25px;
     min-width: 320px;
-}
-
-div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
-    overflow: auto;
-}
-
-div.UISearchPeopleListDiv {
-    height: 200px;
-    border: 1px solid #CCCCCC;
-    margin-top:10px;
-    max-width:450px;
-    min-width:450px;
-    overflow:auto;
-    width:100%;
 }
 
 div.UISuggestedPeopleListDiv {
@@ -1775,7 +1369,7 @@ div.UISuggestedPeopleListDiv {
     height: 300px;
 }
 
-ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList, ul.UIAuthorList { /* UIPeopleList: for all lists of users, among them, found users */
+ul.UISuggestedPeopleList, ul.UIAuthorList {
     border: none;
     display: block;
     list-style-type: none;
@@ -1783,7 +1377,7 @@ ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList, ul.UIAuthorList { /* U
     margin: 0;
 }
 
-ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorList li {
+ul.UISuggestedPeopleList li, ul.UIAuthorList li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
@@ -1793,36 +1387,20 @@ ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorLi
     vertical-align: middle;
 }
 
-ul.UIPeopleList li, ul.UISuggestedPeopleList, ul.UIAuthorList li {
+ul.UISuggestedPeopleList, ul.UIAuthorList li {
     border-bottom: 1px dotted #DDDDDD;
     cursor: pointer;
 }
 
-ul.PeopleList li:hover {
-    background: #ECECEC;
-}
-
-ul.UIPeopleList li:hover, ul.UISuggestedPeopleList li:hover {
+ul.UISuggestedPeopleList li:hover {
     background-color: #FFF6DF !important;
 }
 
-ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
-    border-bottom: none;
-    font-style: italic;
-    padding: 10px;
-    cursor: auto;
-    line-height: normal;
-}
-
-ul.UIPeopleList li.listMessage:hover, ul.UISuggestedPeopleList li.listMessage:hover
-{
-    background-color: transparent !important;
-}
-ul.UIPeopleList li .nameLink, ul.UIAuthorList li .nameLink {
+ul.UIAuthorList li .nameLink {
     padding: 0px 0px 4px 30px;
 }
 
-ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail {
+ul.UISuggestedPeopleList li .foundUserEmail {
     font-style: italic;
     font-size: 8pt;
     padding-left: 5px;
@@ -1830,20 +1408,8 @@ ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail 
     display:none;
 }
 
-ul.UIPeopleList li:hover > .foundUserEmail, ul.UISuggestedPeopleList li:hover > .foundUserEmail {
+ul.UISuggestedPeopleList li:hover > .foundUserEmail {
     display:inline;
-}
-
-ul.UIPeopleList li.selectedUser {
-    background-color: #CDEB8B !important;
-}
-
-ul.UIPeopleList li.unselectedUser {
-}
-
-ul.UIPeopleList li.unselectable {
-    cursor: default;
-    color: #888888;
 }
 
 div.searchUsersButtonDiv {
@@ -1926,23 +1492,6 @@ div.UITitleBar .UITitleText h1{
 div#UILoadDiv h1{
     color: black;
     margin-top: 30px;
-}
-
-ul.UIPeopleList li.UIPerson
-{
-    background: transparent url("../images/user.png") left top no-repeat;
-}
-
-ul.UIPeopleList li.UIGroup
-{
-    background: transparent url("../images/group.png") left top no-repeat;
-
-}
-
-ul.UIPeopleList li.UIError
-{
-    background: #EEEEEE url("../images/remove.png") left center no-repeat;
-    padding-left: 20px;
 }
 
 .arrowExpandIcon
@@ -2318,6 +1867,12 @@ ul.horizontalMenu li{
     line-height: 1.5;
 }
 
+img.headerLogo {
+    margin: 7px 10px;
+    border: none;
+    height: 52px;
+}
+
 div.headerAboutIndico
 {
     position: absolute;
@@ -2384,8 +1939,11 @@ div.filterDiv
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     background-color: #777;
-    color: white;
     display: none;
+}
+
+div.filterDiv strong {
+    color: white;
 }
 
 
@@ -2536,11 +2094,6 @@ ul.menuList li
     background: #ebebeb;
     padding-left: 20px;
     font-weight: bold;
-}
-
-li.sideMenu_disabled
-{
-    color: #999;
 }
 
 ul.menuList li.active
@@ -2838,32 +2391,6 @@ div.reviewersPRUserListDiv {
     overflow: auto;
 }
 
-ul.userList, ul.allowedUserList {
-    padding-left: 0;
-    margin: 0;
-    list-style-type: none;
-    display: block;
-    border: medium none;
-
-}
-
-ul.userList li , ul.allowedUserList li {
-    padding-right: 5px;
-    display: block;
-    line-height: 28px;
-    margin: 0 0 0;
-    padding-left: 5px;
-    vertical-align: middle;
-}
-
-ul.allowedUserList li {
-    line-height: 21px;
-}
-
-ul.userList li:hover, ul.allowedUserList li:hover {
-    background-color: #ECECEC;
-}
-
 span.userListInfo {
     display: block;
     padding-left: 70px;
@@ -2906,13 +2433,6 @@ div.ACModifButtonEntry {
 
 div.ACUserListDiv {
     margin-bottom: 20px;
-}
-
-div.ACUserListDiv ul.UIPeopleList {
-    background-color: #FAFAFA;
-    border: 1px solid #999999;
-    min-height: 200px;
-    width: 550px;
 }
 
 .bannerTitle
@@ -3749,6 +3269,7 @@ div.timetableContribution  {
 
 .timetableBlock {
     box-shadow: 0px 0px 5px #DDD;
+    min-height: 26px;
 }
 
 /* Timetable drag n drop */
@@ -3954,20 +3475,6 @@ div.exclusivePopupTopBg {
     behavior: url(border-radius.htc);
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
-}
-
-div.exclusivePopup .title {
-    font-size: 17px;
-    padding-left: 10px;
-    padding-right: 50px;
-    padding-bottom: 10px;
-    background-color:  #F8F8F8;
-    border-bottom: 1px solid #CCC;
-}
-
-div.exclusivePopup .titleWrapper {
-    position: relative;
-    top: -10px;
 }
 
 div.exclusivePopup .printLink {
@@ -5946,58 +5453,6 @@ span.num_events {
     color: #aaa;
 }
 
-.bookingLaunchLink {
-	font-weight: bold;
-}
-
-.videoServiceWrapperInline {
-    display: inline-block;
-    padding-left: 5px;
-}
-
-.videoServiceType {
-    font-weight: bold;
-}
-
-.videoServiceTitle {
-    font-style: italic;
-}
-
-.videoServiceInlinePopup {
-    font-size: 1.1em;
-    line-height: 1.4em;
-    display: block;
-    width: 350px;
-}
-
-.videoServiceInlinePopup .lineWrapper {
-    display: block;
-    width: auto;
-    clear: both;
-}
-
-.videoServiceInlinePopup .lineWrapper .leftCol {
-    font-weight: bold;
-    display: inline-block;
-    text-align: right;
-    width: 25%;
-    padding-right: 5px;
-    float: left;
-}
-
-.videoServiceInlinePopup .lineWrapper .rightCol {
-    display: inline-block;
-    width: 50%;
-    float: left;
-}
-
-.videoServiceInlinePopup .lineWrapper .rightCol a{
-    font-size: 10.5px;
-}
-.videoServiceInlinePopup .lineWrapper .rightCol input {
-    font-size: 10.5px;
-}
-
 .subGroupTitleRegForm {
    font-size: 13px;
    font-family: Verdana, Arial;
@@ -6583,36 +6038,6 @@ ul.conveners ul.names .affiliation {
     display: inline-block;
     color: white;
     font-weight: bold;
-}
-
-.offlineTasksGenerated {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #9AC33A;
-}
-
-.offlineTasksQueued {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #A4CCC9;
-}
-
-.offlineTasksFailed {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #B93725;
-}
-
-.offlineTasksExpired {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #E0A565;
-}
-
-.offlineTask {
-    width: 1px;
-    white-space: nowrap;
-    padding: 1px 20px 3px 0px;
 }
 
 .contributionReviewingStatusRejected, .abstractStatusRejected, .abstractStatusDuplicated, .abstractStatusWithdrawn {

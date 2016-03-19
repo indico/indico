@@ -5,9 +5,9 @@
     <script  type="text/javascript">
         //---- chairperson management
 
-        var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
+        var uf = new UserListField('VeryShortPeopleListDiv', 'user-list',
                 null, true, null,
-                true, false, false, {"grant-manager": [${ jsonEncode(_("event modification"))}, false], "presenter-grant-submission": [$T("submission rights"), false]},
+                true, false, null, {"grant-manager": [${ jsonEncode(_("event modification"))}, false], "presenter-grant-submission": [$T("submission rights"), false]},
                 true, false, true,
                 userListNothing, userListNothing, userListNothing);
 

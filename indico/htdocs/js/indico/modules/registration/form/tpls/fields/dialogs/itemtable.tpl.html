@@ -1,0 +1,43 @@
+<div class="toolbar thin">
+    <a class="i-button" ng-click="addItem()">{{ 'Create new item' | i18n }}</a>
+    <a class="i-button" ng-click="sortItems()">{{ 'Sort alphabetically' | i18n }}</a>
+    <div ng-if="settings.withExtraSlots"
+         class="group i-selection">
+        <div class="inline-vcentered">
+            <input type="checkbox" id="withExtraSlots-{{ field.id == -1 ? field.$$hashKey : field.id }}"
+                   name="withExtraSlots" ng-model="formData.withExtraSlots">
+
+            <label class="i-button" for="withExtraSlots-{{ field.id == -1 ? field.$$hashKey : field.id }}">
+                {{ 'Advanced options' | i18n }}
+            </label>
+        </div>
+    </div>
+</div>
+
+<nd-table
+    config="settings.editionTable"
+    form-data="formData.choices">
+</nd-table>
+
+<div ng-if="validationStarted && !hasRadioItems()" class="errorMessage">
+    {{ 'Add at least one item' | i18n }}
+</div>
+<div ng-if="validationStarted && settingsError" class="errorMessage">
+    {{ "Some fields have errors. Correct them before saving the configuration." | i18n }}
+</div>
+
+<div ng-if="settings.defaultValue" class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Default item' | i18n }}
+    </label>
+    <select name="defaultItem" ng-model="formData.defaultItem">
+        <option value="" ng-selected="field.defaultItem == null">
+            {{ 'None' | i18n }}
+        </option>
+        <option ng-repeat="el in formData.choices"
+            ng-selected="field.defaultItem == el.caption || field.defaultItem == el.id"
+            value="{{ el.caption }}">
+            {{ el.caption }}
+        </option>
+    </select>
+</div>

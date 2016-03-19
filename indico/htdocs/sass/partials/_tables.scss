@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -36,9 +36,17 @@ table.i-table {
 tr.i-table {
     border-bottom: 1px solid #E5E5E5;
     border-top: 1px solid #E5E5E5;
+
+    &.selected {
+        background-color: $pastel-blue !important;
+    }
+
+    &:hover {
+        background-color: $light-gray;
+    }
 }
 
-td.i-table {
+td.i-table, th.i-table {
     @include box-sizing(border-box);
     border-left: 2px solid transparent;
     overflow: hidden;
@@ -52,17 +60,16 @@ td.i-table {
         font-style: italic;
     }
 
-    &[class*="icon-"] {
-         width: 30px;
-
-         &:before {
-            color: $black !important;
-            font-size: 1.2em;
-         }
-    }
-
     & ~ td.i-table {
         border-left: none !important;
+    }
+
+    &.checkbox-column {
+        width: 2.5em;
+    }
+
+    &.id-column {
+        width: 3em;
     }
 }
 
@@ -93,37 +100,40 @@ h3.i-table {
 // ============================================================================
 
 tr.i-table.interactive {
-    &.active {
-        @include single-transition(background-color);
-        background-color: #F4F4F4;
-
-        > td.i-table {
-            border-left-color: lighten($gray, $color-variation);
-        }
-    }
-
-    &.no-border-bottom {
-        border-bottom: none !important;
-    }
-
-    > td.i-table {
+    > td {
         @include user-select(none);
         cursor: pointer;
     }
 
+    &.active {
+        @include single-transition(background-color);
+        background-color: $light-gray;
+
+        > td {
+            border-left-color: lighten($gray, $color-variation);
+        }
+    }
+
     &:hover {
-        > td.i-table,
-        + tr.i-table.content-wrapper > td.i-table {
+        > td,
+        + tr.details-row > td.i-table {
             border-left-color: $blue;
         }
     }
 
+    &.show-details {
+        border-bottom: none !important;
+    }
+
+    &:not(.show-details) + tr.details-row {
+        display: none;
+    }
 }
 
-tr.i-table.content-wrapper {
+tr.i-table.details-row {
     border-top: none;
 
-    > td.i-table {
+    > td {
         border-left-color: lighten($gray, $color-variation);
         padding: 0px;
     }
@@ -158,40 +168,6 @@ tr.i-table.content {
         > td.i-table.caption,
         > td.i-table.value {
             border-bottom: none;
-        }
-    }
-}
-
-
-// ============================================================================
-// View specifics
-// ============================================================================
-
-td.i-table {
-    &.log-caption {
-        width: 175px;
-    }
-
-    &.log-module {
-        font-weight: bold;
-        width: 150px;
-    }
-
-    &.log-subject {
-        width: auto;
-    }
-
-    &.log-stamp {
-        text-align: right;
-        text-overflow: clip;
-        width: 230px;
-
-        span.user-name {
-           display: inline-block;
-           max-width: 120px;
-           overflow: hidden;
-           text-overflow: ellipsis;
-           vertical-align: bottom;
         }
     }
 }

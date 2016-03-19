@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -142,6 +142,17 @@ div.session-bar {
     }
 
     .i-button {
+        &.protection-public {
+            background: $green;
+            border-color: $green;
+            color: #fff !important;
+
+            &:hover {
+                color: #fafafa !important;
+                background: lighten($green, 5%);
+            }
+        }
+
         &.protection-restricted {
             background: $red;
             border-color: $red;
@@ -221,30 +232,4 @@ div.impersonation-header {
         font-family: 'icomoon-ultimate';
         content: "\3b";
     }
-}
-
-
-/* Header for new pages */
-.content-page-header {
-    border-bottom: 1px solid $separator-color;
-    margin-bottom: 1.2em;
-
-    h1, h2 {
-        display: inline-block;
-        vertical-align: baseline;
-    }
-
-    h2 {
-        color: $light-black;
-        margin-left: 1em;
-        font-size: 1.2em;
-    }
-}
-
-.content-page-description {
-    @extend %font-family-title;
-    max-width: 800px;
-    color: $dark-gray;
-    font-size: 1.2em;
-    margin-bottom: 2em;
 }

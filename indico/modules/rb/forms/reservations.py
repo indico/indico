@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,10 +22,10 @@ from wtforms.fields.core import SelectMultipleField, StringField, BooleanField, 
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
 from wtforms_components import TimeField
 from wtforms.widgets.core import HiddenInput
-from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
+from wtforms.fields.simple import TextAreaField, SubmitField
 
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import IndicoEmail, UsedIf
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.util.i18n import _
@@ -51,8 +51,8 @@ class BookingSearchForm(IndicoForm):
     is_cancelled = BooleanField('Is Cancelled')
     is_archived = BooleanField('Is Archived')
 
-    uses_vc = BooleanField('Uses Video Conference')
-    needs_vc_assistance = BooleanField('Video Conference Setup Assistance')
+    uses_vc = BooleanField(_('Uses Videoconference'))
+    needs_vc_assistance = BooleanField(_('Videoconference Setup Assistance'))
     needs_assistance = BooleanField('General Assistance')
 
     @generated_data
@@ -78,7 +78,7 @@ class NewBookingFormBase(IndicoForm):
             raise ValidationError('Invalid repeat step')
 
     def validate_start_dt(self, field):
-        if field.data.date() < date.today() and not session.user.isAdmin():
+        if field.data != field.object_data and field.data.date() < date.today() and not session.user.is_admin:
             raise ValidationError(_(u'The start time cannot be in the past.'))
 
     def validate_end_dt(self, field):
@@ -110,8 +110,7 @@ class NewBookingPeriodForm(NewBookingFormBase):
 
 
 class NewBookingConfirmForm(NewBookingPeriodForm):
-    booked_for_id = HiddenField(_(u'User'), [InputRequired()])
-    booked_for_name = StringField()  # just for displaying
+    booked_for_user = PrincipalField(_(u'User'), [DataRequired()], allow_external=True, serializable=False)
     contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
@@ -125,13 +124,13 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
 
     def validate_used_equipment(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Video Conference equipment is not used.'))
+            raise ValidationError(_(u'Videoconference equipment is not used.'))
         elif not field.data and self.uses_vc.data:
-            raise ValidationError(_(u'You need to select some Video Conference equipment'))
+            raise ValidationError(_(u'You need to select some Videoconference equipment'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Video Conference equipment is not used.'))
+            raise ValidationError(_(u'Videoconference equipment is not used.'))
 
 
 class NewBookingSimpleForm(NewBookingConfirmForm):
@@ -144,12 +143,29 @@ class ModifyBookingForm(NewBookingSimpleForm):
     submit_update = SubmitField(_(u'Update booking'))
 
     def __init__(self, *args, **kwargs):
-        self._old_start_date = kwargs.pop('old_start_date')
+        self._old_start_dt = kwargs.pop('old_start_dt')
+        self._old_end_dt = kwargs.pop('old_end_dt')
         super(ModifyBookingForm, self).__init__(*args, **kwargs)
         del self.room_id
         del self.submit_book
         del self.submit_prebook
 
     def validate_start_dt(self, field):
-        if field.data.date() < self._old_start_date and not session.user.isAdmin():
+        super(NewBookingSimpleForm, self).validate_start_dt(field)
+        new_start_dt = field.data
+        now = datetime.now()
+
+        if self._old_start_dt < now and new_start_dt != self._old_start_dt and not session.user.is_admin:
+            raise ValidationError(_(u"The start time is in the past and cannot be modified."))
+        if self._old_start_dt >= now and new_start_dt < now and not session.user.is_admin:
             raise ValidationError(_(u'The start time cannot be moved into the past.'))
+
+    def validate_end_dt(self, field):
+        super(NewBookingSimpleForm, self).validate_end_dt(field)
+        new_end_dt = field.data
+        now = datetime.now()
+
+        if self._old_end_dt < now and new_end_dt != self._old_end_dt and not session.user.is_admin:
+            raise ValidationError(_(u"The end time is in the past and cannot be modified."))
+        if self._old_end_dt >= now and new_end_dt < now and not session.user.is_admin:
+            raise ValidationError(_(u'The end time cannot be moved into the past.'))

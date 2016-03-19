@@ -1,0 +1,42 @@
+{% if event.getType() == 'conference' %}
+    {% extends 'events/registration/display/_event_regform_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+{% endif %}
+
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Modify registration{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    #{{registration.friendly_id}}: {{registration.first_name}} {{ registration.last_name }}
+{% endblock %}
+
+{% block content %}
+    {% if registration.can_be_modified or registration.invitation %}
+        <div ng-app="nd" ng-controller="AppCtrl">
+            <div nd-reg-form
+                conf-id="{{ event.id }}"
+                conf-sections="{{ sections | tojson | forceescape }}"
+                conf-currency="{{ registration.currency }}"
+                post-url="{{ request.url | tojson | forceescape }}"
+                check-email-url="{{ url_for('.check_email', regform) | tojson | forceescape }}"
+                registration-data="{{ registration_data | tojson | forceescape }}"
+                registration-meta-data="{{ registration_metadata | tojson | forceescape }}"
+                registration-uuid="{{ registration.uuid }}"
+                update-mode="true"></div>
+        </div>
+    {% else %}
+        {% call message_box('error') %}
+            {% if not registration.registration_form.is_modification_open -%}
+                {% trans %}The modification period is over{% endtrans %}
+            {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
+                {% trans %}Modification is not allowed after payment.{% endtrans %}
+            {%- else -%}
+                {% trans %}The event organizer has disabled data modification.{% endtrans %}
+            {%- endif %}
+        {% endcall %}
+    {% endif %}
+{% endblock %}

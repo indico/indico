@@ -1,0 +1,88 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+{% macro _render_column_selector(item, filter_choices, special_item=false) %}
+    {% set filters = filters['items'] if special_item else filters['fields'] %}
+    <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
+         data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
+        <a class="title {% if filter_choices %}icon-filter{% endif %}" data-toggle="dropdown">
+            {{- item.title -}}
+        </a>
+        {% if filter_choices %}
+            <ul class="dropdown" style="display: none">
+                {% for value, caption in filter_choices.iteritems() %}
+                    <li>
+                        <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
+                               id="field_{{ item.id }}_option_{{ value }}"
+                               {% if value in filters[item.id] %}
+                                   checked
+                               {% endif %}>
+                        <label for="field_{{ item.id }}_option_{{ value }}">
+                            {{ caption }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <span class="right actions">
+            <span class="trigger icon-eye"></span>
+        </span>
+    </div>
+{% endmacro %}
+
+{% macro _render_regform_item_col_selector(section) %}
+    <h3>{{ section.title }}</h3>
+    {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
+        {% set filter_choices = child_item.field_impl.filter_choices %}
+        {{ _render_column_selector(child_item, filter_choices) }}
+    {% endfor %}
+{% endmacro %}
+
+<div class="action-box">
+    <div class="section">
+        <div class="icon icon-wrench"></div>
+        <div class="toolbar right">
+            <a class="i-button js-reset-btn icon-close warning" type="button">
+                {%- trans %}Clear filters{% endtrans -%}
+            </a>
+        </div>
+        <div class="text">
+            <div class="label">Customize registration list</div>
+            <div>
+                {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
+                {%- trans -%}
+                    Change the configuration of the registration list by enabling/disabling the columns listed below, or by applying filtering ({{ filter_icon }}) options.
+                {%- endtrans -%}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="success-message-box js-clear-filters-message" style="display: none">
+    <div class="message-text">
+        {%- trans -%}
+            All filters have been cleared.
+        {%- endtrans -%}
+    </div>
+</div>
+<form class="reglist-filter" method="POST">
+    <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
+           value="{{ visible_cols_regform_items | tojson | forceescape }}">
+    <h3>{% trans %}General registration info{% endtrans %}</h3>
+
+    {% for item in special_items.itervalues() %}
+        {% set filter_choices = item.get('filter_choices') %}
+        {{ _render_column_selector(item, filter_choices, special_item=true) }}
+    {% endfor %}
+
+    {% for section in regform.sections if not section.is_deleted %}
+        {{ _render_regform_item_col_selector(section) }}
+    {% endfor %}
+
+    <div class="bottom-buttons">
+        <input class="i-button big highlight" type="submit" data-disabled-until-change
+               value="{% trans %}Apply{% endtrans %}">
+        <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    </div>
+</form>
+<script>
+    setupRegistrationListFilter();
+</script>

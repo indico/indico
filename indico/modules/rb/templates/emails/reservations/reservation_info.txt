@@ -1,0 +1,5 @@
+Room:  {{ reservation.room.full_name }}
+For:  {{ reservation.booked_for_name }}
+Reason: {{ reservation.booking_reason }}
+Dates: {{ reservation.start_dt | format_date(locale='en_GB') }} - {{ reservation.end_dt | format_date(locale='en_GB') }}
+Hours: {{ reservation.start_dt | format_time(locale='en_GB') }} - {{ reservation.end_dt | format_time(locale='en_GB') }}

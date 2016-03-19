@@ -1,0 +1,41 @@
+{% extends 'layout/full_page_base.html' %}
+{% from 'forms/_form.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
+{% set show_extra_form = local and not must_verify_email %}
+
+{% block title %}
+    {% trans %}Create a new Indico profile{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% include 'flashed_messages.html' %}
+
+    {% if must_verify_email and not email_sent %}
+        <p>
+            {% trans -%}
+                To create a new Indico profile you first need to verify your email address.
+            {%- endtrans %}
+        </p>
+    {% endif %}
+    {% if email_sent %}
+        <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
+    {% else %}
+        {{ form_header(form, id='register-form') }}
+        {% call form_fieldset(_('User information'), render_as_fieldset=show_extra_form) %}
+            {{ form_row(form.email, widget_attrs=widget_attrs.email) }}
+            {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone'), widget_attrs=widget_attrs) }}
+        {% endcall %}
+        {% if show_extra_form %}
+            {% call form_fieldset(_('Login details')) %}
+                {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
+            {% endcall %}
+        {% endif %}
+        {% call form_footer(form) %}
+            <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
+            {% if must_verify_email %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Send me a verification email{% endtrans %}">
+            {% else %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico profile{% endtrans %}">
+            {% endif %}
+        {% endcall %}
+    {% endif %}
+{% endblock %}

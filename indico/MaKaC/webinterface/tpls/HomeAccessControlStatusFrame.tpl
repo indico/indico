@@ -30,7 +30,11 @@
 
             var removeUser = function(user, setResult){
                 jsonRpc(Indico.Urls.JsonRpcService, "category.protection.removeAllowedUser",
-                        {'category': ${ self_._rh._target.getId() }, value: {'id': user.get('id')}},
+                        {'category': ${ self_._rh._target.getId() }, value: {
+                            '_type': user.get('_type'),
+                            'id': user.get('id'),
+                            'provider': user.get('provider')
+                        }},
                         function(result, error){
                             if (exists(error)) {
                                 IndicoUtil.errorReport(error);
@@ -49,7 +53,7 @@
                                 IndicoUtil.errorReport(error);
                                 setResult(false);
                             } else {
-                                setResult(true);
+                                setResult(true, result);
                             }
                         });
             };
@@ -57,7 +61,7 @@
             // ---- List of users allowed to view the categ/event/material/resource
 
             var allowedUsersList = new UserListField(
-                    'userListDiv', 'userList',
+                    'userListDiv', 'user-list',
                     allowedList, true, null,
                     true, true, null, null,
                     false, false, false, false,

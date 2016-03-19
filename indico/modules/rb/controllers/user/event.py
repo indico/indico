@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -80,15 +80,12 @@ class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
-        try:
-            self.event_id = int(self.event.getId())
-        except ValueError:
-            raise NoReportError(_('Room booking tools are not available for legacy events.'))
+        self.event_id = int(self.event.getId())
 
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
-        reservations = Reservation.find_all(event_id=self.event_id)
+        reservations = self.event_new.reservations.all()
         if not reservations:
             self._redirect(url_for('event_mgmt.rooms_choose_event', self.event))
             return

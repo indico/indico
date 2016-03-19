@@ -1,0 +1,38 @@
+{% extends 'events/surveys/management/survey_actions/_base.html' %}
+
+{% block label %}
+    {% trans %}Survey is live{% endtrans %}
+{% endblock %}
+
+{% block survey_icon_classes -%}
+    survey-active
+{%- endblock %}
+
+{% block text %}
+    {% if not survey.end_dt %}
+        {% trans %}Close now or schedule the deadline{% endtrans %}
+    {% else %}
+        {% set tz = survey.event.tz %}
+        {% trans date=survey.end_dt|format_date(timezone=tz), time=survey.end_dt|format_time(timezone=tz) -%}
+            Scheduled to close on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
+        {%- endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block buttons %}
+    <div class="group">
+        <a href="#" class="i-button icon-time js-survey-schedule-dialog"
+           data-href="{{ url_for('.schedule_survey', survey) }}"
+           data-title="{% trans %}Schedule survey{% endtrans %}">
+            {% trans %}Reschedule{% endtrans %}
+        </a>
+    </div>
+    {% block now_button %}
+        <div class="group">
+            <a href="#" data-href="{{ url_for('.close_survey', survey) }}" data-method="POST"
+               class="i-button highlight">
+                {% trans %}Close now{% endtrans %}
+            </a>
+        </div>
+    {% endblock %}
+{% endblock %}

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,10 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base/palette';
-@import 'base/defaults';
-@import 'base/layout';
-@import 'base/reset';
-@import 'base/theme';
-@import 'base/typography';
-@import 'base/utilities';
+@import "base/animation";
+@import "base/palette";
+@import "base/defaults";
+@import "base/layout";
+@import "base/pages";
+@import "base/reset";
+@import "base/theme";
+@import "base/typography";
+@import "base/utilities";
+@import "compass";

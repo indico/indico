@@ -1,0 +1,63 @@
+{% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {% trans %}Tasks{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="tasks">
+        {%- call message_box('info', fixed_width=True) -%}
+            {%- if flower_url -%}
+                {%- trans -%}
+                    Monitor Indico's Celery tasks with Flower <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
+                {%- endtrans -%}
+            {%- else -%}
+                {%- trans -%}
+                    Indico uses Celery to manage tasks, which can be monitored using Flower.<br>
+                    Configure the Flower URL in <span class="mono">indico.conf</span> to have a link displayed here.
+                {%- endtrans %}
+            {%- endif -%}
+        {%- endcall %}
+        <h2>{% trans %}Periodic Tasks{% endtrans %}</h2>
+        <table class="i-table-widget fixed-width">
+            <thead>
+                <tr>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Schedule{% endtrans %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {%- for task in tasks %}
+                    <tr>
+                        <td>{{ task.name }}</td>
+                        <td>{{ render_task_schedule(task) }}</td>
+                        <td>{{ render_task_label(task) }}</td>
+                    </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% macro render_task_schedule(task) -%}
+    {%- if not task.disabled -%}
+        {% set schedule = task.custom_schedule or task.schedule %}
+        {%- if schedule is instanceof timedelta -%}
+            {%- trans interval=schedule|format_human_timedelta -%}every {{ interval }}{%- endtrans -%}
+        {%- else -%}
+            <span class="mono">{{ schedule }}</span>
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro render_task_label(task) -%}
+    {%- if task.disabled -%}
+        <span class="i-label danger right">{%- trans -%}disabled{%- endtrans -%}</span>
+    {%- elif task.custom_schedule -%}
+        <span class="i-label highlight right">{% trans %}custom schedule{% endtrans %}</span>
+    {%- else -%}
+        <span class="i-label right">{% trans %}default{% endtrans %}</span>
+    {%- endif -%}
+{%- endmacro %}

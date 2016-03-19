@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,6 @@ behind to ensure the persistence.
 
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 from persistent import Persistent
 
 
@@ -45,16 +44,11 @@ class ModuleHolder( ObjectHolder ):
         from indico.modules import news
         from indico.modules import cssTpls
         from indico.modules import upcoming
-        from indico.modules import scheduler
-        from indico.modules import offlineEvents
-
 
         ModuleHolder._availableModules = {
-            news.NewsModule.id                    : news.NewsModule,
-            cssTpls.CssTplsModule.id              : cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id      : upcoming.UpcomingEventsModule,
-            scheduler.SchedulerModule.id          : scheduler.SchedulerModule,
-            offlineEvents.OfflineEventsModule.id  : offlineEvents.OfflineEventsModule
+            news.NewsModule.id: news.NewsModule,
+            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule,
+            upcoming.UpcomingEventsModule.id: upcoming.UpcomingEventsModule,
         }
 
     def _newId( self ):

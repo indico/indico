@@ -196,6 +196,7 @@ function jsonRpcCommit(url, method, params, value, handler) {
  * @return {XMLHttpRequest} request
  */
 function jsonRpc(url, method, params, handler) {
+        url = build_url(url, {_method: method});  // add method to query string to get better logs
         return jsonRequest(url, {
                 version: "1.1",
                 origin: location.href,
@@ -346,10 +347,7 @@ function apiRequest(path, payload, opts) {
         data: payload,
         type: opts.method,
         cache: false, // we really don't want caching for AJAX requests!
-        dataType: 'json',
-        headers: {
-            'X-CSRF-Token': $('#csrf-token').attr('content')
-        }
+        dataType: 'json'
     }).fail(function(xhr, status, error) {
         var errorMessage = 'Unknown Error';
         var resp, code = '';

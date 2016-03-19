@@ -1,0 +1,44 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}{% trans %}Payment settings{% endtrans %}{% endblock %}
+
+{% block subtitle %}{{ plugin.title }}{% endblock %}
+
+{% block content %}
+    {% if not can_modify %}
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans %}You cannot modify this payment method.{% endtrans %}<br>
+            {{ template_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
+        {% endcall %}
+    {% endif %}
+
+    {% if invalid_regforms %}
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans -%}
+                This payment method only supports these currencies:
+            {%- endtrans %}
+            <em>{{ plugin.valid_currencies|join(', ') }}</em>.<br>
+            {% trans -%}
+                The following registration forms won't be able to use this method:
+            {%- endtrans %}
+            <ul>
+                {% for regform in invalid_regforms %}
+                    <li>{{ regform.title }} (<em>{{ regform.currency }}</em>)</li>
+                {% endfor %}
+            </ul>
+        {% endcall %}
+    {% endif %}
+
+    {{ form_header(form) }}
+    {{ form_rows(form, widget_attrs=widget_attrs) }}
+    {% call form_footer(form) %}
+        {% if can_modify and not invalid_currency %}
+            <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+            <a href="{{ url_for('.event_settings', event) }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+        {% else %}
+            <a href="{{ url_for('.event_settings', event) }}" class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</a>
+        {% endif %}
+    {% endcall %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'oauth/apps_base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block subtitle %}
+    {%- trans %}Register new application{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form, orientation='vertical') }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" data-disabled-until-change value="{% trans %}Register{% endtrans %}">
+        <a href="{{ url_for('.apps') }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}

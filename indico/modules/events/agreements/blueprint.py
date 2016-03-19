@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,8 +28,8 @@ from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgr
                                                           RHAgreementManagerDetailsToggleNotifications,
                                                           RHAgreementManagerDetailsDownloadAgreement)
 
-agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates',
-                                             url_prefix='/event/<confId>')
+_bp = IndicoBlueprint('agreements', __name__, template_folder='templates', virtual_template_folder='events/agreements',
+                      url_prefix='/event/<confId>')
 
 # Event management
 _bp.add_url_rule('/manage/agreements/', 'event_agreements', RHAgreementManager)
@@ -48,7 +48,7 @@ _bp.add_url_rule('/manage/agreements/<definition>/submit/<id>', 'event_agreement
                  RHAgreementManagerDetailsSubmitAnswer, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/agreements/<definition>/submit/', 'event_agreements_details_submit_answer',
                  RHAgreementManagerDetailsSubmitAnswer, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/agreements/<definition>/download/<id>/<filename>', 'download_file',
+_bp.add_url_rule('/manage/agreements/<definition>/download/<int:id>/<filename>', 'download_file',
                  RHAgreementManagerDetailsDownloadAgreement)
 
 # Event

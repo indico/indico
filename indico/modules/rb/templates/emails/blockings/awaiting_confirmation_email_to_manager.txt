@@ -1,0 +1,20 @@
+{% extends 'rb/emails/base_email.txt' %}
+{% block recipient %}{{ owner.first_name }}{% endblock %}
+
+{% block email_body -%}
+{{ blocking.created_by_user.full_name }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.
+
+{% if blocked_rooms | length == 1 -%}
+Room: {{ blocked_rooms[0].room.full_name }}
+{%- else -%}
+Rooms:
+    {% for blocked_room in blocked_rooms -%}
+    {{ blocked_room.room.full_name }}
+    {% endfor %}
+{%- endif %}
+Reason: {{ blocking.reason }}
+Dates: {{ blocking.start_date | format_date(locale='en_GB') }} - {{ blocking.end_date | format_date(locale='en_GB') }}
+
+You can approve or reject this blocking request here:
+{{ url_for('rooms.blocking_my_rooms', state='pending', _external=true) }}
+{%- endblock %}

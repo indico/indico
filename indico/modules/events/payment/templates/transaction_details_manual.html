@@ -1,0 +1,10 @@
+{% extends 'events/payment/transaction_details.html' %}
+{% block details %}
+    {% if not transaction.data._migrated %}
+        <dt>{% trans %}Marked as paid by{% endtrans %}</dt>
+        <dd>{{ transaction.data.changed_by_name }}</dd>
+    {% elif transaction.data._old_provider %}
+        <dt>{% trans %}Migrated from{% endtrans %}</dt>
+        <dd>{{ transaction.data._old_provider }}</dd>
+    {% endif %}
+{% endblock %}

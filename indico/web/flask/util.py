@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,8 +20,9 @@ import inspect
 import os
 import re
 import time
+from importlib import import_module
 
-from flask import request, redirect, Blueprint, jsonify, render_template
+from flask import request, redirect, Blueprint
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
@@ -30,9 +31,54 @@ from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
 from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
 from werkzeug.urls import url_parse
-from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
+from indico.util.contextManager import ContextManager
+from indico.util.fs import secure_filename
+from indico.util.locators import get_locator
+from indico.web.util import jsonify_data
+
+
+def discover_blueprints():
+    """Discovers all blueprints inside the indico package
+
+    Only blueprints in a ``blueprint.py`` module or inside a
+    ``blueprints`` package are loaded. Any other files are not touched
+    or even imported.
+
+    :return: a ``blueprints, compat_blueprints`` tuple containing two
+             sets of blueprints
+    """
+    # Don't use pkg_resources since `indico` is still a namespace package...`
+    up_segments = ['..'] * __name__.count('.')
+    package_root = os.path.normpath(os.path.join(__file__, *up_segments))
+    modules = set()
+    for root, dirs, files in os.walk(package_root):
+        for name in files:
+            if not name.endswith('.py') or name.endswith('_test.py'):
+                continue
+            segments = ['indico'] + os.path.relpath(root, package_root).replace(os.sep, '.').split('.') + [name[:-3]]
+            if segments[-1] == 'blueprint':
+                modules.add('.'.join(segments))
+            elif 'blueprints' in segments[:-1]:
+                if segments[-1] == '__init__':
+                    modules.add('.'.join(segments[:-1]))
+                else:
+                    modules.add('.'.join(segments))
+
+    blueprints = set()
+    compat_blueprints = set()
+    for module_name in sorted(modules):
+        module = import_module(module_name)
+        for name in dir(module):
+            obj = getattr(module, name)
+            if name.startswith('__') or not isinstance(obj, Blueprint):
+                continue
+            if obj.name.startswith('compat_'):
+                compat_blueprints.add(obj)
+            else:
+                blueprints.add(obj)
+    return blueprints, compat_blueprints
 
 
 def _convert_request_value(x):
@@ -114,7 +160,7 @@ def legacy_rule_from_endpoint(endpoint):
         return '/' + endpoint + '.py'
 
 
-def make_compat_redirect_func(blueprint, endpoint, view_func=None):
+def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_conv=None):
     def _redirect(**view_args):
         # In case of POST we can't safely redirect since the method would switch to GET
         # and thus the request would most likely fail.
@@ -123,6 +169,9 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None):
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
         view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
+        if view_args_conv is not None:
+            for oldkey, newkey in view_args_conv.iteritems():
+                view_args[newkey] = view_args.pop(oldkey, None)
         try:
             target = _url_for('%s.%s' % (blueprint.name, endpoint), **view_args)
         except BuildError:
@@ -201,22 +250,29 @@ def url_for(endpoint, *targets, **values):
         locator = {}
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
-                try:
-                    target_locator = target.locator
-                except AttributeError:
-                    target_locator = target.getLocator()
-                locator.update(target_locator)
+                locator.update(get_locator(target))
         intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
+
+    static_site_mode = bool(ContextManager.get('offlineMode'))
+    values.setdefault('_external', static_site_mode)
 
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
 
-    return _url_for(endpoint, **values)
+    url = _url_for(endpoint, **values)
+    if static_site_mode and not values['_external']:
+        # for static sites we assume all relative urls need to be
+        # mangled to a filename
+        # we should really fine a better way to handle anything
+        # related to offline site urls...
+        from indico.modules.events.static.util import url_to_static_filename
+        url = url_to_static_filename(url)
+    return url
 
 
 def url_rule_to_js(endpoint):
@@ -271,10 +327,7 @@ def redirect_or_jsonify(location, flash=True, **json_data):
     :param json_data: the data to include in the json response
     """
     if request.is_xhr:
-        json_data.setdefault('success', True)
-        if flash:
-            json_data['flashed_messages'] = render_template('flashed_messages.html')
-        return jsonify(**json_data)
+        return jsonify_data(flash=flash, **json_data)
     else:
         return redirect(location)
 
@@ -289,7 +342,7 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False, safe=True):
     """Sends a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -301,9 +354,11 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     much nicer if e.g. a PDF file can be displayed inline so don't disable it unless really necessary.
     `conditional` is very useful when sending static files such as CSS/JS/images. It will allow the browser to retrieve
     the file only if it has been modified (based on mtime and size).
+    `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
+    text/html mimetypes
     """
 
-    name = secure_filename(name)
+    name = secure_filename(name, 'file')
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
@@ -313,6 +368,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
     if _is_office_mimetype(mimetype):
         inline = False
+    if safe and mimetype == 'text/html':
+        inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional)
@@ -321,6 +378,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         if not app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)
+    if safe:
+        rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
     if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', filename=name)
@@ -420,6 +479,10 @@ class ResponseUtil(object):
 
         if self._redirect:
             return self.make_redirect()
+
+        # Return a plain string if that's all we have
+        if not res and not self.modified:
+            return ''
 
         res = app.make_response((res, self.status, self.headers))
         if self.content_type:

@@ -1,5 +1,5 @@
-    <% canModify = blocking.can_be_modified(user) %>
-    <% canDelete = blocking.can_be_deleted(user) %>
+    <% canModify = blocking.can_be_modified(_session.user) %>
+    <% canDelete = blocking.can_be_deleted(_session.user) %>
     <span class="groupTitleNoBorder">Room Blocking</span><br />
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
@@ -28,7 +28,7 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("By")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ blocking.created_by_user.getFullName() }</td>
+                                            <td align="left" class="blacktext">${ blocking.created_by_user.full_name }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Date")}&nbsp;&nbsp;</small></td>
@@ -47,14 +47,14 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
                                     % if canModify:
-                                        <form style="display:inline;" action="${ url_for('rooms.modify_blocking', blocking_id=blocking.id) }" method="get">
-                                            <input type="submit" class="btn" value="${ _("Modify")}" />
-                                        </form>
+                                        <a class="i-button" href="${ url_for('rooms.modify_blocking', blocking_id=blocking.id) }">${ _("Modify")}</a>
                                     % endif
                                     % if canDelete:
-                                        <form id="deleteBlockingForm" style="display:inline;" action="${ url_for('rooms.delete_blocking', blocking_id=blocking.id) }" method="post">
-                                            <input type="submit" id="deleteBlocking" class="btn" value="${ _("Delete")}" />
-                                        </form>
+                                        <input type="button" class="i-button" value="${ _("Delete")}"
+                                               data-href="${ url_for('rooms.delete_blocking', blocking_id=blocking.id) }"
+                                               data-method="POST"
+                                               data-title="${ _('Delete blocking?') }"
+                                               data-confirm="${ _('Do you really want to delete this blocking?') }">
                                     % endif
                                 </td>
                             </tr>
@@ -65,10 +65,12 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in blocking.allowed:
+                                        % for principal in sorted(blocking.allowed, key=lambda x: (not x.is_group, x.name)):
                                             <tr class="blockingHover blockingPadding">
-                                                <td>${ principal.entity_name }</td>
-                                                <td>${ principal.entity.getFullName() }</td>
+                                                <td>
+                                                    <i class="icon-${'users' if principal.is_group else 'user'}"></i>
+                                                    ${ principal.name }
+                                                </td>
                                             </tr>
                                         % endfor
                                     </table>
@@ -111,15 +113,4 @@
             </td>
         </tr>
     </table>
-    <br />
-
-    <script>
-        $('#deleteBlocking').on('click', function(e) {
-            e.preventDefault();
-            new ConfirmPopup($T('Delete blocking'), $T('Do you really want to DELETE this blocking?'), function(confirmed) {
-                if (confirmed) {
-                    $('#deleteBlockingForm').submit();
-                }
-            }).open();
-        });
-    </script>
+    <br>

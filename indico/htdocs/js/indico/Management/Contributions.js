@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
         this.authorsList = authorsList;
         this.eventType = eventType;
 
-        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", false,
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "item-user", false,
             {submission: false, management: false, coordination: false},
             {title: false, affiliation: true, email:false},
             {remove: true, edit: true, favorite: false, arrows: false, menu: false}, initialList, true, false, inPlaceMenu);
@@ -107,7 +107,7 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
         this.authorsList = authorsList;
         this.eventType = eventType;
 
-        this.ListOfUsersManagerForForm(null, inPlaceListElem, userCaption, "UIPerson", false,
+        this.ListOfUsersManagerForForm(null, inPlaceListElem, userCaption, "item-user", false,
                 {submission: false, management: false, coordination: false},
                 {title: false, affiliation: true, email:false},
                 {remove: true, edit: true, favorite: false, arrows: false, menu: false}, [], true, false, inPlaceMenu);
@@ -134,33 +134,20 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
     _personName: function(user) {
         var content = this.ListOfUsersManager.prototype._personName.call(this, user);
         if (user._type == 'Avatar') {
-            var roles = '';
-            var counter = 0;
+            var roles = [];
+
             if (user.isPrAuthor) {
-                roles += $T('Primary author');
-                counter += 1;
+                roles.push($T('Primary author'));
             }
             if (user.isCoAuthor) {
-                if (counter > 0)
-                    roles += $T(', Co-author');
-                else
-                    roles += $T('Co-author');
-                counter += 1;
+                roles.push($T('Co-author'));
             }
             if (user.isSpeaker) {
-                if (counter > 0)
-                    roles += $T(', ') + this.speakerCaptionCapital;
-                else
-                    roles += this.speakerCaptionCapital;
-                counter += 1;
+                roles.push(this.speakerCaptionCapital);
             }
-            if (counter == 0)
-                return content;
-            else
-                return content += '<small class="roleSmall">' + roles +  '</small>';
-        } else {
-            return content;
+            content.roles = roles;
         }
+        return content;
     },
 
     onMenu : function(element, user) {
@@ -228,7 +215,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
                         'addAsAuthor': 'contribution.protection.submissionControl.addAsAuthor',
                         'removeAsAuthor':'contribution.protection.submissionControl.removeAsAuthor'};
 
-        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", true, {},
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "item-user", true, {},
                 {title: false, affiliation: false, email:false},
                 {remove: true, edit: false, favorite: true, arrows: false, menu: true}, initialList);
     }

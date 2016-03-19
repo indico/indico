@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,15 +17,17 @@
 import posixpath
 from urlparse import urlparse
 
-from flask import request, session, render_template, g, jsonify
+from flask import request, session, render_template, g
 
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from indico.core import signals
 from indico.web import assets
 from indico.core.config import Config
+from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
+from indico.util.string import to_unicode
+from indico.web.util import jsonify_template
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
@@ -62,7 +64,7 @@ class WPJinjaMixin:
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
         if request.is_xhr:
-            return jsonify(html=cls.render_template_func(template, **context))
+            return jsonify_template(template, _render_func=cls.render_template_func, **context)
         else:
             context['_jinja_template'] = template
             return cls(g.rh, *wp_args, **context).display()
@@ -114,7 +116,6 @@ class WPBase():
 
         #store page specific CSS and JS
         self._extraCSS = []
-        self._extraJS = []
 
     def _getBaseURL(self):
         if request.is_secure and Config.getInstance().getBaseSecureURL():
@@ -129,11 +130,16 @@ class WPBase():
         self._title = newTitle.strip()
 
     def getCSSFiles(self):
-        return self._asset_env['base_css'].urls() + \
-            self._asset_env['screen_sass'].urls()
+        return (self._asset_env['base_css'].urls() +
+                self._asset_env['dropzone_css'].urls() +
+                self._asset_env['screen_sass'].urls() +
+                self._asset_env['attachments_sass'].urls() +
+                self._asset_env['users_sass'].urls())
 
     def getJSFiles(self):
-        return self._asset_env['base_js'].urls()
+        return (self._asset_env['base_js'].urls() +
+                self._asset_env['dropzone_js'].urls() +
+                self._asset_env['modules_attachments_js'].urls())
 
     def _includeJSPackage(self, pkg_names, prefix='indico_'):
         if not isinstance(pkg_names, list):
@@ -142,22 +148,6 @@ class WPBase():
         return [url
                 for pkg_name in pkg_names
                 for url in self._asset_env[prefix + pkg_name.lower()].urls()]
-
-    def _getJavaScriptUserData(self):
-        """
-        Returns structured data that should be passed on to the client side
-        but depends on user data (can't be in vars.js.tpl)
-        """
-
-        user = self._getAW().getUser()
-
-        from MaKaC.webinterface.asyndico import UserDataFactory
-
-        userData = dict((packageName,
-                         UserDataFactory(user).build(packageName))
-                        for packageName in self._userData)
-
-        return userData
 
     def _getHeadContent( self ):
         """
@@ -173,9 +163,6 @@ class WPBase():
         return ""
 
     def _getHTMLHeader( self ):
-        from MaKaC.webinterface.pages.conferences import WPConfSignIn
-        from MaKaC.webinterface.pages.signIn import WPSignIn
-        from MaKaC.webinterface.pages.registrationForm import WPRegistrationFormSignIn
         from MaKaC.webinterface.rh.base import RHModificationBaseProtected
         from MaKaC.webinterface.rh.admins import RHAdminBase
 
@@ -199,7 +186,6 @@ class WPBase():
             "page": self,
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
-            "extraJS": self._extraJS,
             "language": session.lang or info.getLang(),
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
@@ -233,12 +219,6 @@ class WPBase():
                             self._getHTMLFooter() )
 
 
-    def addExtraJSFile(self, filename):
-        self._extraJSFiles.append(filename)
-
-    def addExtraJS(self, jsCode):
-        self._extraJS.append(jsCode)
-
     # auxiliar functions
     def _escapeChars(self, text):
         # Not doing anything right now - it used to convert % to %% for old-style templates
@@ -251,10 +231,10 @@ class WPDecorated(WPBase):
         return "DisplayArea"
 
     def getLoginURL( self ):
-        return urlHandlers.UHSignIn.getURL(request.url)
+        return url_for_login(next_url=request.relative_url)
 
     def getLogoutURL( self ):
-        return urlHandlers.UHSignOut.getURL(request.url)
+        return url_for_logout(next_url=request.relative_url)
 
 
     def _getHeader( self ):
@@ -275,10 +255,10 @@ class WPDecorated(WPBase):
         wc = wcomponents.WFooter(isFrontPage=self._isFrontPage())
         return wc.getHTML({ "subArea": self._getSiteArea() })
 
-    def _applyDecoration( self, body ):
-        """
-        """
-        return "<div class=\"wrapper\"><div class=\"main\">%s%s</div></div>%s"%( self._getHeader(), body, self._getFooter() )
+    def _applyDecoration(self, body):
+        return u'<div class="wrapper"><div class="main">{}{}</div></div>{}'.format(to_unicode(self._getHeader()),
+                                                                                   to_unicode(body),
+                                                                                   to_unicode(self._getFooter()))
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
@@ -308,20 +288,14 @@ class WPDecorated(WPBase):
         """
         return None
 
-    def _getSideMenu(self):
-        """
-            Overload and return side menu whenever there is one
-        """
-        return None
-
 
 class WPNotDecorated(WPBase):
 
     def getLoginURL(self):
-        return urlHandlers.UHSignIn.getURL(request.url)
+        return url_for_login(next_url=request.relative_url)
 
     def getLogoutURL(self):
-        return urlHandlers.UHSignOut.getURL(request.url)
+        return url_for_logout(next_url=request.relative_url)
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
@@ -332,6 +306,3 @@ class WPNotDecorated(WPBase):
 
     def _getNavigationDrawer(self):
         return None
-
-
-

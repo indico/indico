@@ -1,0 +1,16 @@
+<div class="toolbar thin">
+    <a class="i-button" ng-click="addAccommodationOption()">{{ 'Add a new accommodation' | i18n }}</a>
+</div>
+<div id="editionTable" class="regFormDialogEditionTable">
+    <nd-table
+        config="config.editionTable"
+        form-data="formData.choices">
+    </nd-table>
+
+    <span ng-if="validationStarted && !hasAccommodationOptions()" class="errorMessage">
+        {{ 'Add at least one item' | i18n }}
+    </span>
+    <span ng-if="validationStarted && settingsError" class="errorMessage">
+        {{ "Some fields have errors. Correct them before saving the configuration." | i18n }}
+    </span>
+</div>

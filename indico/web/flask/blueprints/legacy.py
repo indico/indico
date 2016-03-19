@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,34 +23,9 @@ legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for xmlGateway.py
-legacy.add_url_rule('/xmlGateway.py',
-                    'xmlGateway',
-                    mod_rh_xmlGateway.RHLoginStatus,
-                    methods=('GET', 'POST'))
-
 legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
                     'xmlGateway-getCategoryInfo',
                     mod_rh_xmlGateway.RHCategInfo,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
-                    'xmlGateway-getStatsIndico',
-                    mod_rh_xmlGateway.RHStatsIndico,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/loginStatus',
-                    'xmlGateway-loginStatus',
-                    mod_rh_xmlGateway.RHLoginStatus,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/signIn',
-                    'xmlGateway-signIn',
-                    mod_rh_xmlGateway.RHSignIn,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/signOut',
-                    'xmlGateway-signOut',
-                    mod_rh_xmlGateway.RHSignOut,
                     methods=('GET', 'POST'))
 
 
@@ -79,10 +54,9 @@ legacy_endpoints = {
     'adminLayout-addStyle', 'adminLayout-deleteStyle', 'adminLayout-saveSocial', 'adminLayout-saveTemplateSet',
     'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList',
     'adminList-switchNewsActive', 'adminMaintenance', 'adminMaintenance-pack', 'adminMaintenance-performPack',
-    'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminProtection', 'adminServices-apiKeys',
-    'adminServices-apiOptions', 'adminServices-apiOptionsSet', 'adminServices-ipbasedacl',
-    'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke', 'adminServices-oauthAuthorized',
-    'adminServices-oauthConsumers', 'adminSystem', 'adminSystem-modify',
+    'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminProtection', 'adminServices-ipbasedacl',
+    'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke',
+    'adminSystem', 'adminSystem-modify',
     'adminUpcomingEvents', 'assignContributions', 'assignContributions-downloadAcceptedPapers', 'badgeTemplates',
     'badgeTemplates-badgeDesign', 'badgeTemplates-badgePrinting', 'categoryAC', 'categoryAC-setVisibility',
     'categoryConfCreationControl-setCreateConferenceControl', 'categoryConfCreationControl-setNotifyCreation',
@@ -132,7 +106,7 @@ legacy_endpoints = {
     'confModifEvaluation-edit', 'confModifEvaluation-editPerformChanges', 'confModifEvaluation-performDataModif',
     'confModifEvaluation-preview', 'confModifEvaluation-results', 'confModifEvaluation-resultsOptions',
     'confModifEvaluation-resultsSubmittersActions', 'confModifEvaluation-setup', 'confModifEvaluation-specialAction',
-    'confModifListings-allSpeakers', 'confModifListings-allSpeakersAction', 'confModifLog', 'confModifParticipants',
+    'confModifListings-allSpeakers', 'confModifListings-allSpeakersAction', 'confModifParticipants',
     'confModifParticipants-action', 'confModifParticipants-declinedParticipants', 'confModifParticipants-invitation',
     'confModifParticipants-pendingParticipants', 'confModifParticipants-refusal', 'confModifParticipants-setup',
     'confModifParticipants-statistics', 'confModifPendingQueues', 'confModifPendingQueues-actionConfSubmitters',
@@ -189,8 +163,7 @@ legacy_endpoints = {
     'identityCreation', 'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove',
     'index', 'internalPage', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
     'myconference', 'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news',
-    'oauth-access_token', 'oauth-authorize', 'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth',
-    'oauth-userThirdPartyAuth', 'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
+    'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
     'paperReviewingDisplay-uploadPaper', 'payment', 'posterTemplates', 'posterTemplates-posterDesign',
     'posterTemplates-posterPrinting', 'resetSessionTZ', 'roomBooking', 'roomBooking-acceptBooking',
     'roomBooking-admin', 'roomBooking-adminLocation', 'roomBooking-bookingDetails',

@@ -1,0 +1,20 @@
+{% extends 'forms/base_widget.html' %}
+{% set current_value, current_unit = field._value() %}
+
+
+{% block html %}
+    <div class="timedelta-widget">
+        {# The order of these two fields matters! If you change it, update
+           `process_formdata` and `_value` in TimeDeltaField accordingly! #}
+        <input type="number" name="{{ field.name }}" id="{{ field.id }}-value" value="{{ current_value }}"
+               {% if field.flags.required %} required min="1"{% endif %}
+               {{ input_args|html_params }}>
+        <select id="{{ field.id }}-unit" name="{{ field.name }}" data-tooltip-anchor
+                {% if field.flags.required %} required{% endif %}
+                {{ input_args|html_params }}>
+            {% for unit, name in field.choices %}
+                <option value="{{ unit }}" {%- if unit == current_unit %} selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}

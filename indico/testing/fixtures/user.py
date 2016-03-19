@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,64 +16,63 @@
 
 import pytest
 
-from indico.testing.mocks import MockAvatar, MockAvatarHolder, MockGroupHolder, MockGroup
-from MaKaC.user import AvatarHolder, GroupHolder
+from indico.modules.groups.models.groups import LocalGroup
+from indico.modules.rb import settings as rb_settings
+from indico.modules.users import User
 
 
-@pytest.yield_fixture
-def create_user(monkeypatch_methods):
+@pytest.fixture
+def create_user(db):
     """Returns a callable which lets you create dummy users"""
-    monkeypatch_methods('MaKaC.user.AvatarHolder', MockAvatarHolder)
+    def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
+                     legacy=False):
+        user = User.get(id_)
+        if user:
+            return user.as_avatar if legacy else user
+        user = User()
+        user.id = id_
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email or u'{}@example.com'.format(id_)
+        user.is_admin = admin
+        user.local_groups = {g.group for g in (groups or ())}
+        db.session.add(user)
+        db.session.flush()
+        if rb_admin:
+            rb_settings.acls.add_principal('admin_principals', user)
+        db.session.flush()
+        return user.as_avatar if legacy else user
 
-    _avatars = []
-    ah = AvatarHolder()
-
-    def _create_user(id_, name='Pig', surname='Guinea', rb_admin=False, email=None, groups=None):
-        avatar = MockAvatar()
-        avatar.id = id_
-        avatar.name = name
-        avatar.surname = surname
-        avatar.email = email or '{}@example.com'.format(id_)
-        avatar.groups = groups or set()
-        avatar.rb_admin = rb_admin
-        ah.add(avatar)
-        _avatars.append(avatar)
-        return avatar
-
-    yield _create_user
-
-    for avatar in _avatars:
-        ah.remove(avatar)
+    return _create_user
 
 
 @pytest.fixture
 def dummy_user(create_user):
-    """Creates a mocked dummy avatar"""
-    return create_user(1337)
+    """Creates a mocked user"""
+    return create_user(1337, legacy=False)
 
 
-@pytest.yield_fixture
-def create_group(monkeypatch_methods):
+@pytest.fixture
+def dummy_avatar(dummy_user):
+    """Creates a mocked dummy legacy avatar"""
+    return dummy_user.as_avatar
+
+
+@pytest.fixture
+def create_group(db):
     """Returns a callable which lets you create dummy groups"""
-    monkeypatch_methods('MaKaC.user.GroupHolder', MockGroupHolder)
-
-    _groups = []
-    gh = GroupHolder()
-
     def _create_group(id_):
-        group = MockGroup()
+        group = LocalGroup()
         group.id = id_
-        gh.add(group)
-        _groups.append(group)
-        return group
+        group.name = u'dummy-{}'.format(id_)
+        db.session.add(group)
+        db.session.flush()
+        return group.proxy
 
-    yield _create_group
-
-    for group in _groups:
-        gh.remove(group)
+    return _create_group
 
 
 @pytest.fixture
 def dummy_group(create_group):
     """Creates a mocked dummy group"""
-    return create_group('dummy')
+    return create_group(1337)

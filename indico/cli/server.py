@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,11 +21,11 @@ import os
 import signal
 import socket
 import sys
-from SocketServer import TCPServer
 
 import werkzeug.serving
 from flask import current_app
 from flask_script import Command, Option
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
 from werkzeug.serving import WSGIRequestHandler
@@ -163,19 +163,20 @@ class WerkzeugServer(object):
         if not self.ssl:
             self.ssl_context = None
         elif not self.ssl_cert and not self.ssl_key:
-            self._patch_shutdown_request()
             self.ssl_context = 'adhoc'
         else:
-            self._patch_shutdown_request()
-            self.ssl_context = SSL.Context(SSL.SSLv23_METHOD)
-            self.ssl_context.use_privatekey_file(self.ssl_key)
-            self.ssl_context.use_certificate_chain_file(self.ssl_cert)
+            self.ssl_context = (self.ssl_cert, self.ssl_key)
 
     def make_server(self):
         assert self._server is None
         app = self.app
         if self.use_debugger:
             app = DebuggedIndico(app, self.evalex_whitelist)
+            if Config.getInstance().getUseProxy():
+                # this applies ProxyFix a second time (it's also done in configure_app),
+                # but the debugger MUST receive the proper ip address or evalex ip restrictions
+                # might not work as expected
+                app = ProxyFix(app)
         self._server = werkzeug.serving.make_server(self.host, self.port, app, threaded=True,
                                                     request_handler=QuietWSGIRequestHandler if self.quiet else None,
                                                     ssl_context=self.ssl_context)
@@ -221,28 +222,6 @@ class WerkzeugServer(object):
             cfg_dir = Config.getInstance().getConfigurationDir()
             extra_files = [os.path.join(cfg_dir, name) for name in ('logging.conf', 'indico.conf')]
             werkzeug.serving.run_with_reloader(self._run_new_server, extra_files)
-
-    @staticmethod
-    def _patch_shutdown_request():
-        # Fix SocketServer's shutdown not working with pyopenssl
-        def my_shutdown_request(self, request):
-            """Called to shutdown and close an individual request."""
-            try:
-                #explicitly shutdown.  socket.close() merely releases
-                #the socket and waits for GC to perform the actual close.
-                try:
-                    request.shutdown(socket.SHUT_WR)
-                except TypeError:
-                    # ssl sockets don't support an argument
-                    try:
-                        request.shutdown()
-                    except SSL.Error:
-                        pass
-            except socket.error:
-                pass  # some platforms may raise ENOTCONN here
-            self.close_request(request)
-
-        TCPServer.shutdown_request = my_shutdown_request
 
 
 def _can_bind_port(port):
@@ -321,11 +300,6 @@ def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_ur
     elif requested_port != used_port:
         netloc = '{0}:{1}'.format(url_data.netloc.partition(':')[0], used_port)
         base_url = '{0}://{1}{2}'.format(url_data.scheme, netloc, url_data.path)
-
-    # If we need to perform internal requests for some reason we want to use the true host:port
-    server_netloc = '{0}:{1}'.format(host, port) if port != default_port else host
-    config._configVars['EmbeddedWebserverBaseURL'] = urlparse.urlunsplit(
-        urlparse.urlsplit(base_url)._replace(netloc=server_netloc))
 
     # We update both BaseURL and BaseSecureURL to something that actually works.
     # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"

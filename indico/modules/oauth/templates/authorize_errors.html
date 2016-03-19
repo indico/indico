@@ -1,0 +1,17 @@
+{% extends 'oauth/authorize.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block auth_content %}
+    {% call message_box('error') %}
+        <div>
+            {% trans -%}
+                There was an error during the OAuth authorization process:
+            {%- endtrans %}
+        </div>
+        <div>
+            <code>
+                {{ error }}
+            </code>
+        </div>
+    {% endcall %}
+{% endblock %}

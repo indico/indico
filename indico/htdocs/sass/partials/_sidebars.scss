@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,43 +17,31 @@
 
 .sideBar {
     float: right;
-    font-size: 14px;
     width: 340px;
-
-    .content {
-        @include border-radius();
-        background: #ECECEC image-url('../images/grey_gradient.png') scroll repeat-x bottom left;
-        padding: 20px 20px 50px 20px;
-    }
 
     h1 {
         margin: 0;
         padding: 0;
-        color: #777;
+        color: $light-black;
         font-size: 15px;
     }
 
     ul {
-        margin: 15px 0px 0px 0px;
         padding: 0;
         list-style-type: none;
     }
 
-    li {
-        margin-bottom: 10px;
-    }
-
-    a {
-        font-size: 12px;
-    }
-
     em {
-        color: #777;
+        color: $light-black;
+    }
+
+    .content {
+        @include border-radius();
+        background-color: #ECECEC;
+        padding: 2em;
     }
 
     a {
-        font-size: 14px;
-
         &.advanced {
             font-style: italic;
         }
@@ -63,54 +51,175 @@
             font-size: 14px;
         }
     }
-
-    .active {
-        font-weight: bold;
-    }
 }
 
-.sideMenu {
+.side-menu {
+    @extend %font-family-title;
     float: left;
     width: 200px;
     margin-right: 30px;
     margin-left: 30px;
+    font-size: 1.1em;
+    @include user-select(none);
+    background: #ECECEC;
 
-    .separator {
-        font-weight: normal;
-        font-style: italic;
-        font-size: 12px;
-        color: #777;
-        padding: 7px 0;
-        border-bottom: 1px dotted #999;
-    }
-
-    .separatorNoText {
-        font-size: 1px;
-        height: 1px;
+    ul.menu-items > li.section {
         padding: 0;
-        margin-top: 0;
-        border-bottom: 1px dotted #999;
+
+        .title-wrapper {
+            @include icon-before('icon-arrow-down');
+            padding: 10px;
+            cursor: pointer;
+
+            &:before {
+                @include transition(transform 0.3s ease-out);
+                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                display: inline-block;
+            }
+        }
+
+        &.collapsed {
+            // We do not hide the <ul> here since we use JS to animate opening/closing a section
+            .title-wrapper:before {
+                @include rotate(-90deg);
+            }
+        }
     }
 
-    .content {
-        padding-top: 10px;
+    ul.menu-items {
+        min-height: 200px;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        > li {
+            border-bottom: 1px solid darken($pastel-gray, 2%);
+            margin: 0;
+
+            padding: 10px 10px 10px 27px;
+            display: block;
+
+            &.disabled {
+                color: $dark-gray;
+            }
+
+            .title {
+                color: $black;
+                cursor: pointer;
+
+                &:before {
+                    margin-right: 0.5rem;
+                }
+            }
+
+            a.title {
+                color: $dark-blue;
+
+                &:hover {
+                    color: $darker-blue;
+                }
+            }
+
+            > ul {
+                font-size: 0.95em;
+                padding: 0;
+            }
+
+            > ul > li {
+                padding: 5px 5px 5px 27px;
+                display: block;
+
+                &:last-child {
+                    margin-bottom: 5px;
+                }
+            }
+
+            &:last-child > ul > li:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 }
 
-.managementSideMenu {
-    margin-left: 0px;
-    margin-right: 15px;
+ul.menu-items li.active {
+    position: relative;
+    background-color: $pastel-gray;
+
+    > a {
+        font-weight: normal;
+    }
+
+    &:before {
+        display: block;
+        content: ".";
+        color: transparent;
+        font-size: 0;
+        border-right: 2px solid $link;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+}
+
+.side-menu.old-style-menu {
+    @include border-radius();
+    margin: 0px 15px 0 0;
+
+    > ul.menu-items {
+        margin-top: 15px;
+        border-bottom: 1px solid $gray;
+    }
 
     .corner {
         width: 15px;
         height: 15px;
+        margin-right: -15px;
         float: right;
         background: transparent image-url('../images/grey_corners.png') scroll no-repeat -30px 0;
     }
+}
 
-    .content {
-        @include border-radius(0);
-        margin-right: 15px;
-        min-height: 200px;
+.menu {
+
+    &.vertical {
+        padding: 0;
+
+        >.item {
+            display: block;
+            height: auto!important;
+            vertical-align: middle;
+            line-height: 1;
+            text-decoration: none;
+            padding: 1em;
+            border-bottom: 1px solid $separator-color;
+            position: relative;
+            @include transition-property(opacity, background-color);
+            @include transition-duration(.1s, .1s);
+            @include transition-timing-function(ease-out, ease-in);
+
+            &:hover {
+                cursor: pointer;
+                background-color: $light-gray;
+                color: $link;
+            }
+
+            &.active {
+                font-weight: bold;
+                background-color: $light-gray;
+
+                &:before {
+                    display:block;
+                    content:".";
+                    color:transparent;
+                    font-size:0;
+                    border-left:2px solid $link;
+                    height:100%;
+                    position:absolute;
+                    left:0;
+                    top:0;
+                }
+            }
+        }
     }
 }

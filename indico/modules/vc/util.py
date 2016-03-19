@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
@@ -25,7 +24,7 @@ from MaKaC.conference import SessionSlot
 
 
 def get_vc_plugins():
-    """Returns a dict containing the available video conference plugins."""
+    """Returns a dict containing the available videoconference plugins."""
     from indico.modules.vc import VCPluginMixin
 
     return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues()
@@ -70,7 +69,7 @@ def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
     if distinct:
         query = query.distinct(VCRoomEventAssociation.event_id, VCRoomEventAssociation.vc_room_id)
     if from_dt is not None or to_dt is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == db.cast(VCRoomEventAssociation.event_id, db.String))
+        query = query.join(IndexedEvent, IndexedEvent.id == VCRoomEventAssociation.event_id)
         if from_dt is not None:
             query = query.filter(IndexedEvent.start_date >= from_dt)
         if to_dt is not None:

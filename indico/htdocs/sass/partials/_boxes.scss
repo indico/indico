@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
+@import 'partials/toolbars';
+
 
 // ============================================================================
 // Base classes and mixins
@@ -33,6 +36,49 @@
     font-size: 14px;
 }
 
+%box-hr {
+    height: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $gray;
+    margin-left: -10px;
+    margin-right: -10px;
+
+    &.inline {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+%i-box-empty {
+    color: $dark-gray;
+    display: block;
+    font-size: 1em;
+    font-style: italic;
+    text-align: left;
+}
+
+%i-box-sortable-handle {
+    @include icon-before('icon-handle');
+    @include transition(background-color $default-transition-duration $default-transition-function);
+    background-color: lighten($dark-gray, $color-variation);
+    cursor: move;
+
+    &:before {
+        color: $light-gray;
+    }
+
+    &:active,
+    &:hover {
+        background-color: white;
+
+        &:before {
+            color: $dark-gray;
+        }
+    }
+}
+
 
 // ============================================================================
 // Boxes
@@ -45,7 +91,55 @@
     @include single-box-shadow();
 
     background: white;
+    color: $black;
     padding: 10px;
+
+    hr {
+        @extend %box-hr;
+    }
+    > .empty {
+        @extend %i-box-empty;
+    }
+
+    .ui-i-box-sortable-handle {
+        @extend %i-box-sortable-handle;
+        @include transition(
+            background-color $default-transition-duration $default-transition-function,
+            height $default-transition-duration $default-transition-function
+        );
+
+        font-size: 1.2em;
+        height: 10px;
+        margin: -10px -10px 10px -10px;
+        text-align: center;
+
+        &:hover,
+        &:active {
+            @include border-bottom();
+            height: 20px;
+
+            &:before {
+                color: $dark-gray;
+                top: 3px;
+            }
+        }
+
+        &:before {
+            @include rotate(90deg);
+            @include single-transition(top);
+            display: inline-block;
+            position: relative;
+            top: -3px;
+        }
+    }
+
+    .i-box-footer {
+        background-color: $light-gray;
+        box-shadow: inset 0px 15px 20px -20px $dark-gray;
+        overflow: auto;
+        padding: 10px;
+        margin: 10px -10px -10px;
+    }
 }
 
 .i-box.titled {
@@ -73,18 +167,67 @@
             margin: 0;
             padding: 0;
         }
+
+        .i-box-metadata {
+            float: right;
+            line-height: $toolbar-thin-height;
+
+            .label {
+                color: $black;
+                font-weight: bold;
+
+                &:not(:first-child) {
+                    margin-left: 0.7em;
+                }
+            }
+
+            .content {
+                color: $light-black;
+                font-style: italic;
+            }
+        }
+
+        .i-box-buttons + .i-box-metadata {
+            margin-right: 1em;
+        }
     }
 
     .i-box-content {
         margin-top: 20px;
+        > .empty {
+            @extend %i-box-empty;
+        }
     }
 }
 
-.i-box .i-box-footer {
-    background: $light-gray;
-    box-shadow: inset 0px 15px 20px -20px $dark-gray;
-    margin: 10px -10px -10px;
-    padding: 10px;
+.i-box.no-padding {
+    padding: 0;
+
+    &.titled > .i-box-content {
+        margin-top: 0;
+    }
+
+    > .i-box-header {
+        margin: 0;
+        padding: 10px;
+    }
+
+    > .i-box-content {
+        > .empty {
+            padding: 10px;
+        }
+
+        > ul.group-list {
+            margin: 0;
+
+            > li {
+                margin: 0;
+                margin-right: 0;
+                margin-left: 0;
+                padding: 10px;
+            }
+        }
+    }
 }
 
 
@@ -119,6 +262,113 @@
             &:last-child {
                 margin-bottom: 0px;
             }
+        }
+    }
+
+    .i-box-sortable-placeholder {
+        @include border-all($gray, dashed);
+        background-color: $light-gray;
+        margin-bottom: $margin;
+    }
+}
+
+
+// ============================================================================
+// Boxed group lists
+// ============================================================================
+
+.i-box ul.group-list {
+    color: $light-black;
+    list-style: outside none none;
+    margin: 0 0 -10px 0;
+    padding: 0;
+
+    > li {
+        border-top: 1px solid lighten($gray, $color-variation);
+        display: block;
+        margin-left: -10px;
+        margin-right: -10px;
+        padding: 10px 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    &.content-after {
+        > li:last-child {
+            border-bottom: 1px solid lighten($gray, $color-variation);
+        }
+    }
+
+    &.no-content-before {
+        margin-top: -20px;
+
+        > li:first-child {
+            border-top-width: 0;
+        }
+    }
+
+    &.with-buttons {
+        line-height: 1.8em;
+
+        .i-button {
+            margin-top: 0;
+        }
+    }
+
+    .list-item-title {
+        font-weight: bold;
+    }
+
+    .list-item-info {
+        margin: 0 1em;
+
+        > span:not(:last-child) {
+            margin-right: 0.7em;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .content {
+            font-style: italic;
+        }
+    }
+
+    > li {
+        .ui-sortable-handle {
+            @extend %i-box-sortable-handle;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+            visibility: hidden;
+            width: 1em;
+
+            &:before {
+                margin-top: -0.5em;
+                position: absolute;
+                top: 50%;
+            }
+
+            &:after {
+                content: '.';
+                visibility: hidden;
+            }
+
+            &:active,
+            &:hover {
+                @include border-right(lighten($gray, $color-variation));
+            }
+        }
+
+        &:hover .ui-sortable-handle {
+            visibility: visible;
+        }
+
+        &.ui-sortable-helper {
+            @include border-vert(lighten($gray, $color-variation));
+            border-top-width: 1px !important;
         }
     }
 }

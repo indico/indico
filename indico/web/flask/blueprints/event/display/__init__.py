@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,4 @@ import indico.web.flask.blueprints.event.display.abstracts
 import indico.web.flask.blueprints.event.display.paperreviewing
 import indico.web.flask.blueprints.event.display.contributions
 import indico.web.flask.blueprints.event.display.schedule
-import indico.web.flask.blueprints.event.display.evaluation
-import indico.web.flask.blueprints.event.display.registration
-import indico.web.flask.blueprints.event.display.users
 import indico.web.flask.blueprints.event.display.misc

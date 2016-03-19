@@ -1,1 +1,0 @@
-<%include file="EvaluationDisplay.tpl"/>

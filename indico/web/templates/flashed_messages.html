@@ -1,8 +1,8 @@
 {% from 'message_box.html' import message_box %}
 {% with messages = get_flashed_messages(with_categories=True) %}
-    <div id="flashed-messages">
+    <div id="flashed-messages" class="flashed-messages">
         {%- for category, message in messages %}
-            {{ message_box(category, message) }}
+            {{ message_box(category, message, fixed_width=fixed_width|default(false)) }}
         {% endfor -%}
     </div>
 {% endwith %}

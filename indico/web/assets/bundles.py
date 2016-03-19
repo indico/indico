@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -112,7 +112,6 @@ indico_management = rjs_bundle(
     'indico_management',
     *namespace('js/indico/Management',
 
-               'ConfModifDisplay.js',
                'RoomBooking.js',
                'eventCreation.js',
                'Timetable.js',
@@ -142,7 +141,6 @@ indico_admin = rjs_bundle(
     *namespace('js/indico/Admin',
 
                'News.js',
-               'Scheduler.js',
                'Upcoming.js'))
 
 indico_timetable = rjs_bundle(
@@ -183,15 +181,19 @@ indico_jquery = rjs_bundle(
                'defaults.js',
                'global.js',
                'errors.js',
+               'ajaxcheckbox.js',
                'ajaxdialog.js',
                'clearableinput.js',
                'actioninput.js',
-               'fieldarea.js',
+               'multitextfield.js',
                'multiselect.js',
+               'principalfield.js',
                'realtimefilter.js',
                'scrollblocker.js',
                'timerange.js',
-               'tooltips.js'))
+               'tooltips.js',
+               'nullableselector.js',
+               'colorpicker.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
@@ -200,10 +202,13 @@ indico_badges_js = rjs_bundle('indico_badges', 'js/indico/Management/ConfModifBa
 indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='css/indico_badges_%(version)s.min.css')
 
+fonts_sass = Bundle('sass/partials/_fonts.scss',
+                    filters=('pyscss', 'cssmin'), output='css/indico_fonts_%(version)s.min.css')
+
 indico_regform = rjs_bundle(
     'indico_regform',
-    *namespace('js/indico/RegistrationForm',
-               'registrationform.js',
+    *namespace('js/indico/modules/registration/form',
+               'form.js',
                'section.js',
                'field.js',
                'sectiontoolbar.js',
@@ -220,9 +225,24 @@ angular = rjs_bundle(
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js')
 
+chartist_js = rjs_bundle('chartist_js',
+                         'js/lib/chartist.js/chartist.js')
+
+chartist_css = Bundle('css/lib/chartist.js/chartist.scss',
+                      'css/lib/chartist.js/settings/_chartist-settings.scss',
+                      filters=('pyscss', 'cssmin'), output='css/chartist_css_%(version)s.min.css')
+
 zero_clipboard_js = rjs_bundle('zero_clipboard_js',
                                'js/lib/zeroclipboard/ZeroClipboard.js',
                                'js/custom/zeroclipboard.js')
+
+dropzone_js = rjs_bundle('dropzone_js',
+                         'js/custom/dropzone.js',
+                         'js/lib/dropzone.js/dropzone.js')
+
+dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',
+                      'sass/custom/_dropzone.scss',
+                      filters=('pyscss', 'cssmin'), output='css/dropzone_css_%(version)s.min.css')
 
 selectize_js = rjs_bundle('selectize_js',
                           'js/lib/selectize.js/selectize.js')
@@ -238,6 +258,8 @@ jquery = rjs_bundle('jquery', *filter(None, [
     'js/jquery/jquery-ui.js',
     'js/lib/jquery.multiselect.js',
     'js/lib/jquery.multiselect.filter.js',
+    'js/lib/jquery.typeahead.js',
+    'js/lib/jquery.tablesorter.js',
     'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
     namespace('js/jquery',
 
@@ -255,7 +277,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jstorage.js',
               'jquery.placeholder.js')))
 
-utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js'))
+utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
 calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
 presentation = rjs_bundle(
@@ -300,10 +322,13 @@ presentation = rjs_bundle(
                'Ui/Widgets/WidgetMenu.js',
                'Ui/Widgets/WidgetGrid.js'))
 
+statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
+
 ie_compatibility = rjs_bundle('ie_compatibility', 'js/selectivizr.js')
 
 jed = rjs_bundle('jed', 'js/lib/jed.js')
-moment = rjs_bundle('moment', *namespace('js/moment', 'moment.js', 'locale/es.js', 'locale/fr.js'))
+moment = rjs_bundle('moment', *namespace('js/lib/moment.js', 'moment.js', 'locale/en-gb.js', 'locale/es.js',
+                    'locale/fr.js'))
 
 jqplot_js = rjs_bundle('jqplot',
                        *namespace('js/lib/jqplot',
@@ -359,8 +384,20 @@ base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jqu
                  indico_core, indico_legacy, indico_common)
 
 module_js = {
+    'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
+    'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
+    'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/category_statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
-    'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js')
+    'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js'),
+    'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
+    'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
+    'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
+    'registration': rjs_bundle('modules_registration',
+                               'js/indico/modules/registration/registration.js',
+                               'js/indico/modules/registration/invitations.js',
+                               'js/indico/modules/registration/reglists.js',
+                               *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
+                                          'sectiontoolbar.js', 'table.js'))
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",
@@ -376,17 +413,25 @@ def sass_module_bundle(module_name, depends=[]):
                   depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
 
 agreements_sass = sass_module_bundle('agreements')
+attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
-registrationform_sass = sass_module_bundle('registrationform')
+registration_sass = sass_module_bundle('registrationform')
+payment_sass = sass_module_bundle('payment')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
 admin_sass = sass_module_bundle('admin')
+bootstrap_sass = sass_module_bundle('bootstrap')
+
 eventservices_sass = sass_module_bundle('eventservices')
 event_display_sass = sass_module_bundle('event_display')
+event_management_sass = sass_module_bundle('event_management')
 overviews_sass = sass_module_bundle('overviews')
 vc_sass = sass_module_bundle('vc')
 news_sass = sass_module_bundle('news')
+users_sass = sass_module_bundle('users')
+auth_sass = sass_module_bundle('auth')
+surveys_sass = sass_module_bundle('surveys')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -412,13 +457,16 @@ def register_all_js(env):
     env.register('indico_badges_js', indico_badges_js)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
+    env.register('statistics_js', statistics_js)
     env.register('ie_compatibility', ie_compatibility)
     env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
     env.register('zero_clipboard_js', zero_clipboard_js)
+    env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
+    env.register('chartist_js', chartist_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
@@ -435,9 +483,9 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.qtip.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
+                   'lib/jquery.typeahead.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
-                   'jquery.qtip-custom.css',
                    'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
@@ -445,22 +493,32 @@ def register_all_css(env, main_css_file):
     env.register('base_css', base_css)
     env.register('indico_badges_css', indico_badges_css)
     env.register('jqplot_css', jqplot_css)
+    env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)
+    env.register('chartist_css', chartist_css)
 
     # SASS/SCSS
     env.register('agreements_sass', agreements_sass)
-    env.register('registrationform_sass', registrationform_sass)
+    env.register('attachments_sass', attachments_sass)
+    env.register('registration_sass', registration_sass)
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('admin_sass', admin_sass)
+    env.register('bootstrap_sass', bootstrap_sass)
     env.register('screen_sass', screen_sass)
     env.register('eventservices_sass', eventservices_sass)
     env.register('event_display_sass', event_display_sass)
+    env.register('event_management_sass', event_management_sass)
     env.register('overviews_sass', overviews_sass)
     env.register('vc_sass', vc_sass)
     env.register('news_sass', news_sass)
+    env.register('users_sass', users_sass)
+    env.register('auth_sass', auth_sass)
+    env.register('fonts_sass', fonts_sass)
+    env.register('payment_sass', payment_sass)
+    env.register('surveys_sass', surveys_sass)
 
 
 core_env = IndicoEnvironment()

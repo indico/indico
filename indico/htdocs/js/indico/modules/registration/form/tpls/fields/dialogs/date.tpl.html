@@ -1,0 +1,39 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Date format' | i18n }}
+    </label>
+
+    <span ng-if="field.displayFormats === undefined">
+        <select name="dateFormat" required
+            ng-model="formData.dateFormat"
+            ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
+            <option value="%d/%m/%Y %H:%M">DD/MM/YYYY hh:mm</option>
+            <option value="%d.%m.%Y %H:%M">DD.MM.YYYY hh:mm</option>
+            <option value="%m/%d/%Y %H:%M">MM/DD/YYYY hh:mm</option>
+            <option value="%m.%d.%Y %H:%M">MM.DD.YYYY hh:mm</option>
+            <option value="%Y/%m/%d %H:%M">YYYY/MM/DD hh:mm</option>
+            <option value="%Y.%m.%d %H:%M">YYYY.MM.DD hh:mm</option>
+            <option value="%d/%m/%Y">DD/MM/YYYY</option>
+            <option value="%d.%m.%Y">DD.MM.YYYY</option>
+            <option value="%m/%d/%Y">MM/DD/YYYY</option>
+            <option value="%m.%d.%Y">MM.DD.YYYY</option>
+            <option value="%Y/%m/%d">YYYY/MM/DD</option>
+            <option value="%Y.%m.%d">YYYY.MM.DD</option>
+            <option value="%m/%Y">MM/YYYY</option>
+            <option value="%m.%Y">MM.YYYY</option>
+            <option value="%Y">YYYY</option>
+        </select>
+    </span>
+
+    <span ng-if="field.displayFormats !== undefined">
+        <select name="dateFormat" required
+            ng-model="formData.dateFormat"
+            ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
+            <option ng-repeat="el in field.displayFormats"
+                ng-selected="el[0] == field.dateFormat"
+                value="{{ el[0] }}">
+                {{ el[1] }}
+            </option>
+        </select>
+    </span>
+</div>

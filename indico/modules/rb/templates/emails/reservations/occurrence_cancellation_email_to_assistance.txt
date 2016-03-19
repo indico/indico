@@ -1,0 +1,5 @@
+{% extends 'rb/emails/reservations/base_email_to_assistance.txt' %}
+
+{% block body -%}
+{{ session.user.full_name }} has cancelled the occurrence on {{ occurrence.start_dt | format_date(locale='en_GB') }} of the following meeting. Support is NOT needed anymore.
+{%- endblock %}

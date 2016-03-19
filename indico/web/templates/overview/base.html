@@ -1,4 +1,4 @@
-{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
 
 {# Implement this macro in child templates
     {% macro result_group_entries(items) %}
@@ -11,15 +11,15 @@
 #}
 
 <div class="fixed-width-page">
-    <div class="content-page-header">
+    <div class="page-content-header">
         <h1>{% block title %}{% endblock %}</h1>
     </div>
 
     <div class="i-box-group vert">
         <div class="i-box">
-            {{ form_header(method='get', action=action) }}
+            {{ form_header(form, method='get', action=action) }}
             {{ form_rows(form) }}
-            {% call form_footer() %}
+            {% call form_footer(form) %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
             {% endcall %}
         </div>

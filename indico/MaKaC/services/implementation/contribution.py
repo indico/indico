@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
-from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.search import make_participation_from_obj
 
 import MaKaC.conference as conference
 from MaKaC.services.implementation.base import TextModificationBase
@@ -29,9 +31,14 @@ from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.users import User
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.string import to_unicode
+from indico.util.user import principal_from_fossil
 
 
 class ContributionBase(object):
@@ -80,14 +87,6 @@ class ContributionModifBase(ProtectedModificationService, ContributionBase):
                 return
         ProtectedModificationService._checkProtection(self)
 
-class ContributionTextModificationBase(TextModificationBase, ContributionBase):
-    pass
-
-class ContributionHTMLModificationBase(HTMLModificationBase, ContributionBase):
-    pass
-
-class ContributionDateTimeModificationBase (DateTimeModificationBase, ContributionBase):
-    pass
 
 class ContributionAddSubContribution(ContributionModifBase):
     def _checkParams(self):
@@ -116,16 +115,7 @@ class ContributionAddSubContribution(ContributionModifBase):
             subcontrib.newSpeaker(presenter)
 
     def __addMaterials(self, subcontrib):
-        if self._materials:
-            for material in self._materials.keys():
-                newMaterial = conference.Material()
-                newMaterial.setTitle(material)
-                for resource in self._materials[material]:
-                    newLink = conference.Link()
-                    newLink.setURL(resource)
-                    newLink.setName(resource)
-                    newMaterial.addResource(newLink)
-                subcontrib.addMaterial(newMaterial)
+        subcontrib.attach_links(self._materials)
 
     def __addReportNumbers(self, subcontrib):
         if self._reportNumbers:
@@ -149,10 +139,10 @@ class ContributionAddSubContribution(ContributionModifBase):
         self.__addPresenters(sc)
 
         # log the event
-        logInfo = sc.getLogInfo()
-        logInfo["subject"] = "Created new subcontribution: %s"%sc.getTitle()
-        self._target.getConference().getLogHandler().logAction(logInfo,
-                                                       log.ModuleNames.TIMETABLE)
+        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                                         u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
+                                         session.user, data=sc.getLogInfo())
+
 
 class ContributionDeleteSubContribution(ContributionModifBase):
 
@@ -183,42 +173,28 @@ class ContributionProtectionUserList(ContributionModifBase):
         #will use IAvatarFossil or IGroupFossil
         return fossilize(self._contribution.getAllowedToAccessList())
 
+
 class ContributionProtectionAddUsers(ContributionModifBase):
 
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-
-        self._usersData = self._params['value']
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._contribution.grantAccess(userToAdd)
+        for principal in self._principals:
+            self._contribution.grantAccess(principal)
+        return fossilize(self._contribution.getAccessController().getAccessList())
 
 class ContributionProtectionRemoveUser(ContributionModifBase):
-
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
+        self._contribution.revokeAccess(self._principal)
 
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
-            self._contribution.revokeAccess(userToRemove)
 
 class ContributionGetChildrenProtected(ContributionModifBase):
 
@@ -294,15 +270,7 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
                     raise ServiceAccessError(_("The email address %s (belonging to a user you are adding) is already used by another author in the list of primary authors or co-authors. Author(s) not added.") % user["email"])
 
     def _newParticipant(self, a):
-        part = conference.ContributionParticipation()
-        part.setTitle(a.getTitle())
-        part.setFirstName(a.getName())
-        part.setFamilyName(a.getSurName())
-        part.setAffiliation(a.getOrganisation())
-        part.setEmail(a.getEmail())
-        part.setAddress(a.getAddress())
-        part.setPhone(a.getTelephone())
-        part.setFax(a.getFax())
+        part = make_participation_from_obj(a)
         if self._kindOfList == "prAuthor":
             self._contribution.addPrimaryAuthor(part)
         elif self._kindOfList == "coAuthor":
@@ -313,18 +281,14 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
 
     def _getAnswer(self):
         for user in self._userList:
-            if user["_type"] == "Avatar": # new speaker
-                ah = AvatarHolder()
-                av = ah.getById(user["id"])
-                if av is None:
-                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-                part = self._newParticipant(av)
-            elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
-                part = self._contribution.getAuthorById(user["id"])
-                self._contribution.addSpeaker(part)
+            if user["_type"] == "Avatar":  # new speaker
+                part = self._newParticipant(principal_from_fossil(user, allow_pending=True))
+            elif user["_type"] == "ContributionParticipation":  # adding existing author to speaker
+                author_index_author_id = "{familyName} {firstName} {email}".format(**user).lower()
+                author = self._conf.getAuthorIndex().getById(author_index_author_id)[0]
+                part = self._newParticipant(author)
             if self._submissionRights and part:
                 self._contribution.grantSubmission(part)
-
         if self._kindOfList == "prAuthor":
             return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
@@ -615,10 +579,14 @@ class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
                 raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another participant or the user is already added to the list. Participant(s) not added.") % user["email"])
 
     def _getAnswer(self):
-        ah = AvatarHolder()
         for user in self._userList:
             spk = conference.SubContribParticipation()
-            spk.setDataFromAvatar(ah.getById(user["id"]))
+            if user["_type"] == "Avatar":
+                spk.setDataFromAvatar(User.get(int(user['id'])).as_avatar)
+            elif user["_type"] == "ContributionParticipation":
+                author_index_author_id = "{} {} {}".format(user['familyName'], user['firstName'], user['email']).lower()
+                author = self._conf.getAuthorIndex().getById(author_index_author_id)[0]
+                spk = make_participation_from_obj(author, contrib_participation=spk)
             self._subContrib.newSpeaker(spk)
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 
@@ -707,7 +675,7 @@ class ContributionSubmittersBase(ContributionModifBase):
         result = []
         for submitter in self._contribution.getSubmitterList():
             submitterFossil = fossilize(submitter)
-            if isinstance(submitter, Avatar):
+            if isinstance(submitter, AvatarUserWrapper):
                 isSpeaker = False
                 if self._conf.getType() == "conference":
                     isPrAuthor = False
@@ -735,15 +703,12 @@ class ContributionAddExistingSubmitter(ContributionSubmittersBase):
 
     def _checkParams(self):
         ContributionSubmittersBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in self._pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
-        ah = PrincipalHolder()
-        for user in self._userList:
-            av = ah.getById(user["id"])
-            if av is None:
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-            self._contribution.grantSubmission(av)
+        for principal in self._principals:
+            self._contribution.grantSubmission(principal)
         return self._getSubmittersList()
 
 
@@ -759,13 +724,13 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
             # remove pending email, self._submitterId is an email address
             self._contribution.revokeSubmissionEmail(self._submitterId)
         else:
-            ah = PrincipalHolder()
-            av = ah.getById(self._submitterId)
-            if av is not None:
-                # remove submitter
-                self._contribution.revokeSubmission(av)
-            else:
+            try:
+                principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
+            except ValueError:
+                # WTF is this.. this used to be called if the user wasn't in avatarholder
                 self._removeUserFromSubmitterList(self._submitterId)
+            else:
+                self._contribution.revokeSubmission(principal)
         return self._getSubmittersList()
 
 
@@ -857,15 +822,12 @@ class ContributionAddExistingManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in self._pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            principal = ph.getById(user["id"])
-            if principal is None and user["_type"] == "Avatar":
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-            self._contribution.grantModification(ph.getById(user["id"]))
+        for principal in self._principals:
+            self._contribution.grantModification(principal)
         return self._getManagersList()
 
 
@@ -873,11 +835,10 @@ class ContributionRemoveManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._managerId = self._pm.extract("userId", pType=str, allowEmpty=False)
+        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        self._contribution.revokeModification(ph.getById(self._managerId))
+        self._contribution.revokeModification(self._principal)
         return self._getManagersList()
 
 

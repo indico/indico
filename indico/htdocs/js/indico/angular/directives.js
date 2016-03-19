@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -51,7 +51,7 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
                 ok: function() {
                     $scope.$apply($scope.validationStarted = true);
                     var resultOkCallback = $scope.okCallback({dialogScope: $scope});
-                    if(($scope.validate === true && resultOkCallback === true) || $scope.validate !== true) {
+                    if (($scope.validate === true && resultOkCallback === true) || $scope.validate !== true) {
                         $scope.actions.close();
                     }
                 }
@@ -134,6 +134,10 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
                 return scope.tabSelected === tab_id;
             };
 
+            scope.getDefaultFieldSetting = function(setting) {
+                return scope.$parent.getDefaultFieldSetting(setting);
+            };
+
             scope.$watch("show", function(val) {
                 if (scope.show === true) {
                     openDialog();
@@ -174,7 +178,7 @@ ndDirectives.directive("contenteditable", function() {
                     .replace(/^(( )*(<br>))*/, '')
                     .replace(/(( )*(<br>)( )*)*$/, '');
 
-                elem.html(sanitized);
+                elem.text(_.unescape(sanitized));
             };
 
             var updateHtml = function() {
@@ -182,7 +186,7 @@ ndDirectives.directive("contenteditable", function() {
                     elem.html(attrs.placeholder);
                     elem.addClass('empty');
                 } else {
-                    elem.html(_.unescape(ctrl.$viewValue));
+                    elem.text(_.unescape(ctrl.$viewValue));
                 }
             };
 
@@ -206,7 +210,7 @@ ndDirectives.directive("contenteditable", function() {
                     }
 
                     if (!scope.edition) {
-                        elem.text(elem.html());
+                        elem.text(elem.text());
                     }
 
                     scope.edition = true;
@@ -226,13 +230,8 @@ ndDirectives.directive("contenteditable", function() {
 
             // creation
             elem.actioninput({
-                focusAfter: false,
+                focusOnClear: false,
                 enterKeyEnabled: !scope.multiline,
-
-                // view -> model
-                callback: function() {
-                    actions.close();
-                },
 
                 // view -> model
                 actionCallback: function() {
@@ -243,8 +242,13 @@ ndDirectives.directive("contenteditable", function() {
                     actions.close();
                 },
 
+                // view -> model
+                onClear: function() {
+                    actions.close();
+                },
+
                 // angular -> jquery
-                onchange: function() {
+                onInput: function() {
                     elem.val(elem.html());
                 }
             });
@@ -466,5 +470,52 @@ ndDirectives.directive('ndInitFocus', function() {
         timer = setTimeout(function() {
             element.focus();
         }, 0);
+    };
+});
+
+function translateDateFormat(fmt) {
+    return fmt.split(' ')[0].replace(/%([dmY])/g, function(match, c) {
+        return {'d': 'dd', 'm': 'mm', 'Y': 'yy'}[c];
+    });
+}
+
+ndDirectives.directive('ndJqueryDatepicker', function() {
+    return {
+        require: 'ngModel',
+        restrict: 'A',
+        link: function(scope, element, attrs, ctrl) {
+            _.defer(function() {
+
+                scope.$watch('field.dateFormat', function() {
+                    var fmt = translateDateFormat(scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat'));
+                    element.datepicker('option', 'dateFormat', fmt);
+
+                    // if new format has no time, set it to null in the model
+                    if (scope.field.dateFormat && scope.field.dateFormat.indexOf(' ') == -1) {
+                        scope.dateTime.time = null;
+                    } else if (scope.dateTime && scope.dateTime.time === null) {
+                        scope.dateTime.time = '';
+                    }
+                });
+
+                var dateFormat = scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat');
+                element.datepicker({
+                    dateFormat: translateDateFormat(dateFormat),
+                    onSelect: function(date) {
+                        ctrl.$setViewValue(date);
+                        $(this).change();
+                        scope.$apply();
+                    }
+                });
+
+                element.on('change', function(event) {
+                    var dateValue = $(event.target).val();
+                    if (scope.field.isRequired || dateValue) {
+                        var momentJsFormat = translateDateFormat(dateFormat).replace('yy', 'yyyy').toUpperCase();
+                        ctrl.$setValidity('date', new moment(dateValue, momentJsFormat, true).isValid());
+                    }
+                });
+            });
+        }
     };
 });

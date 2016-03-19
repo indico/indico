@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -110,7 +110,7 @@ class RequestDefinitionBase(object):
     def can_be_managed(cls, user):
         """Checks whether the user is allowed to manage this request type
 
-        :param user: a :class:`Avatar`
+        :param user: a :class:`.User`
         """
         raise NotImplementedError
 

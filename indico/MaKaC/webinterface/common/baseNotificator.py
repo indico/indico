@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -39,12 +39,13 @@ class TplVar:
 class Notification:
 
     def __init__(self, subject="", body="", toList=[],
-                 fromAddr="", ccList=[], content_type="text/plain"):
+                 fromAddr="", ccList=[], bccList=[], content_type="text/plain"):
         self.setSubject(subject)
         self.setBody(body)
         self.setToList(toList)
         self.setFromAddr(fromAddr)
         self.setCCList(ccList)
+        self.setBCCList(bccList)
         self._contenttype = content_type
 
     def getContentType(self):
@@ -80,6 +81,14 @@ class Notification:
 
     def getCCList(self):
         return self._ccList
+
+    def setBCCList(self, newList):
+        self._bccList = []
+        for bcc in newList:
+            self._bccList.append(bcc)
+
+    def getBCCList(self):
+        return self._bccList
 
     def setFromAddr(self, newAddr):
         self._fromAddr = newAddr.strip()

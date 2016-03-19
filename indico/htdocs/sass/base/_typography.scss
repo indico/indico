@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,31 +16,35 @@
  */
 
 %font-family-body {
-    font-family: verdana, arial, serif;
+    font-family: "Liberation Sans", sans-serif;
 }
 
 %font-family-title {
-    font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 %font-family-title-light {
-    font-family: "Roboto Light", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+    font-family: "Roboto Light", sans-serif;
 }
 
 %font-family-description {
-    font-family: Georgia, Times, "Times New Roman", serif;
+    font-family: "Liberation Serif", serif;
 }
 
 %font-family-monospace {
-    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
+    font-family: "Liberation Mono", monospace;
 }
 
 %font-family-serif {
-    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
+    font-family: "Liberation Serif", serif;
 }
 
 %font-family-form {
-    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+    font-family: "Liberation Sans", sans-serif;
+}
+
+%font-family-logo {
+  font-family: "Maven Pro";
 }
 
 %font-size-body {
@@ -65,11 +69,11 @@ h2, h3, h4 {
 }
 
 h2 {
-    font-size: 1.5em;
+    font-size: 1.6em;
 }
 
 h3 {
-    font-size: 1.3em;
+    font-size: 1.2em;
 }
 
 sup, sub {
@@ -88,7 +92,7 @@ sub {
     margin-top: 0;
     font-size: 2em;
     font-weight: normal;
-    color: #B14300;
+    color: $orange;
 }
 
 .group-title {

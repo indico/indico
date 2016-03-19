@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.util.user import principal_from_fossil
 from MaKaC import user
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class UserModificationBase ( object ):
@@ -24,23 +25,11 @@ class UserModificationBase ( object ):
         It will store the Avatar object in self._targetUser
     """
 
-    def _checkParams( self ):
+    def _checkParams(self):
         if 'user' in self._params:
-            ph = user.PrincipalHolder()
-            self._targetUser = ph.getById(self._params['user'])
+            self._targetUser = user.AvatarHolder().getById(self._params['user'])
         else:
             self._targetUser = None
-
-## TODO: this class is never used....
-class UserEditBase ( object ):
-
-    def _checkParams(self):
-        if 'userData' in self._params:
-            pm = ParameterManager(self._params)
-            self._userData = pm.extract("userData", pType=dict, allowEmpty = True)
-        else:
-            raise ServiceError("ERR-E6", '"userData" parameter missing')
-
 
 
 class UserListModificationBase ( object):
@@ -67,19 +56,15 @@ class UserListModificationBase ( object):
         avatars = []
         newUsers = []
         editedAvatars = []
-        ph = user.PrincipalHolder()
 
         for userDict in userList:
             id = userDict['id']
-            if id.startswith('newUser'):
+            if str(id).startswith('newUser'):
                 newUsers.append(userDict)
-            elif id.startswith('edited'):
-                editedAvatars.append((ph.getById(id[6:]), userDict))
+            elif str(id).startswith('edited'):
+                editedAvatars.append((user.AvatarHolder().getById(id[6:]), userDict))
             else:
-                principal = ph.getById(id)
-                if principal is None:
-                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % userDict["email"])
-                avatars.append(ph.getById(id))
+                avatars.append(principal_from_fossil(userDict, allow_pending=True))
 
         return avatars, newUsers, editedAvatars
 

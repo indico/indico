@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -76,11 +76,6 @@ class XMLGen:
         self.openTag(name, ListAttrib, True)
         self.writeText(value, True)
         self.closeTag(name, True)
-
-    def writeComment(self, commentText):
-        self.xml.append("<!-- ")
-        self.writeText(commentText, True)
-        self.xml.append(" -->\r\n")
 
     def writeXML(self,text):
         #add already well-formated text

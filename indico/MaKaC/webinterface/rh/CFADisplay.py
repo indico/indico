@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -141,50 +141,46 @@ class _AbstractSubmissionNotification:
         tracks = []
         for track in self._abstract.getTrackListSorted():
             tracks.append("""%s""" % track.getTitle())
-        tw = TextWrapper()
         msg = [i18nformat("""_("Dear") %s,""") % self._abstract.getSubmitter().getStraightFullName()]
         msg.append("")
-        msg.append(tw.fill(_("The submission of your abstract has been successfully processed.")))
+        msg.append(_("The submission of your abstract has been successfully processed."))
         msg.append("")
-        tw.break_long_words = False
-        msg.append(tw.fill(i18nformat("""_("Abstract submitted"):\n<%s>.""") % urlHandlers.UHUserAbstracts.getURL(self._conf)))
+        msg.append(i18nformat("""_("Abstract submitted"):\n<%s>.""") % urlHandlers.UHUserAbstracts.getURL(self._conf))
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Status of your abstract"):\n<%s>.""") % urlHandlers.UHAbstractDisplay.getURL(self._abstract)))
+        msg.append(i18nformat("""_("Status of your abstract"):\n<%s>.""") % urlHandlers.UHAbstractDisplay.getURL(self._abstract))
         msg.append("")
-        tw.subsequent_indent = ""
-        msg.append(tw.fill(i18nformat("""_("See below a detailed summary of your submitted abstract"):""")))
+        msg.append(i18nformat("""_("See below a detailed summary of your submitted abstract"):"""))
         msg.append("")
-        tw.subsequent_indent = " "*3
-        msg.append(tw.fill(i18nformat("""_("Conference"): %s""") % self._conf.getTitle()))
+        msg.append(i18nformat("""_("Conference"): %s""") % self._conf.getTitle())
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Submitted by"): %s""") % self._abstract.getSubmitter().getFullName()))
+        msg.append(i18nformat("""_("Submitted by"): %s""") % self._abstract.getSubmitter().getFullName())
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Submitted on"): %s""") % self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")))
+        msg.append(i18nformat("""_("Submitted on"): %s""") % self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M"))
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Title"): %s""") % self._abstract.getTitle()))
+        msg.append(i18nformat("""_("Title"): %s""") % self._abstract.getTitle())
         msg.append("")
         for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
-            msg.append(tw.fill(f.getCaption()))
+            msg.append(f.getCaption())
             msg.append(str(self._abstract.getField(f.getId())))
             msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Primary Authors"):""")))
+        msg.append(i18nformat("""_("Primary Authors"):"""))
         msg += primary_authors
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Co-authors"):""")))
+        msg.append(i18nformat("""_("Co-authors"):"""))
         msg += co_authors
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Abstract presenters"):""")))
+        msg.append(i18nformat("""_("Abstract presenters"):"""))
         msg += speakers
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Track classification"):""")))
+        msg.append(i18nformat("""_("Track classification"):"""))
         msg += tracks
         msg.append("")
         ctype = i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
             ctype = self._abstract.getContribType().getName()
-        msg.append(tw.fill(i18nformat("""_("Presentation type"): %s""") % ctype))
+        msg.append(i18nformat("""_("Presentation type"): %s""") % ctype)
         msg.append("")
-        msg.append(tw.fill(i18nformat("""_("Comments"): %s""") % self._abstract.getComments()))
+        msg.append(i18nformat("""_("Comments"): %s""") % self._abstract.getComments())
         msg.append("")
         return "\n".join(msg)
 

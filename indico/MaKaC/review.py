@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,17 +18,14 @@ from copy import copy
 from pytz import timezone
 from indico.util.string import safe_upper, safe_slice
 from indico.util.i18n import i18nformat
-import ZODB
 from persistent import Persistent
 from persistent.list import PersistentList
 from BTrees.OOBTree import OOBTree, intersection, union
 from BTrees.IOBTree import IOBTree
 import BTrees.OIBTree as OIBTree
-from datetime import datetime, timedelta
-import MaKaC
+from datetime import datetime
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, NoReportError
-from MaKaC.accessControl import AdminList
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
@@ -42,14 +39,6 @@ from indico.util.i18n import N_
 from indico.util.text import wordsCounter
 
 import tempfile
-
-
-class AbstractSorter:
-    pass
-
-
-class AbstractFilter:
-    pass
 
 
 class _AbstractParticipationIndex(Persistent):
@@ -1016,7 +1005,6 @@ class AbstractMgr(Persistent):
             self._authorizedSubmitter = PersistentList()
         if not av in self._authorizedSubmitter:
             self._authorizedSubmitter.append(av)
-            av.linkTo(self, "abstractSubmitter")
 
     def removeAuthorizedSubmitter(self, av):
         try:
@@ -1026,7 +1014,6 @@ class AbstractMgr(Persistent):
             self._authorizedSubmitter = PersistentList()
         if av in self._authorizedSubmitter:
             self._authorizedSubmitter.remove(av)
-            av.unlinkTo(self, "abstractSubmitter")
 
     def getCFAStatus(self):
         return self._activated
@@ -2043,6 +2030,13 @@ class Abstract(Persistent):
         self._changeTracksImpl()
 
         return self._tracks.values()
+
+    def getAcceptedTrack(self):
+        status = self.getCurrentStatus()
+        if status is None:
+            return None
+        if isinstance(status, AbstractStatusAccepted):
+            return status.getTrack()
 
     def hasTrack( self, track ):
         self._changeTracksImpl()

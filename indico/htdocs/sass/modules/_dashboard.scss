@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,17 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.dashboard-tab {
-    margin-top: 20px;
-}
-
-.quick-access-pane {
-    width: 1000px;
-}
+@import "base/palette";
 
 .dashboard-col {
     display: table-cell;
-    width: 1%;
+    width: 50%;
+    vertical-align: top;
 }
 
 .dashboard-col:last-child {
@@ -44,7 +39,6 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     margin-bottom: 44px;
-    width: 490px;
 }
 
 .dashboard-box h3 {
@@ -111,19 +105,16 @@
     border-bottom: none;
 }
 
-.dashboard-box ol li > a:hover .event-title,
-.dashboard-box ol li > a:hover .category-name {
+.dashboard-box ol li > a:hover .event-title {
     text-decoration: underline;
 }
 
-.dashboard-box ol .event-title,
-.dashboard-box ol .category-name {
+.dashboard-box ol .event-title {
     vertical-align: middle;
 }
 
 .dashboard-box ol .event-date,
-.dashboard-box ol .event-category,
-.dashboard-box ol .category-path {
+.dashboard-box ol .event-category {
     color: #666;
     display: inline-block;
     font-weight: normal;
@@ -136,8 +127,7 @@
     width: 85px;
 }
 
-.dashboard-box ol .event-category,
-.dashboard-box ol .category-path {
+.dashboard-box ol .event-category {
     display: block;
     font-size: 11px;
 }
@@ -173,11 +163,7 @@
 }
 
 .dashboard-box .event-title.truncate-target {
-    max-width: 300px;
-}
-
-.dashboard-box .category-name.truncate-target {
-    max-width: 445px;
+    max-width: 200px;
 }
 
 #happeningCategories .event-title.truncate-target {
@@ -191,4 +177,30 @@
 
 .item-legend [class*=icon-].active {
     color: #777;
+}
+
+.your-details {
+    margin-bottom: 15px;
+
+    .avatar-image {
+        font-size: 130px;
+        color: $black;
+        margin-right: 34px;
+    }
+
+    .your-details-wrapper {
+        color: $black;
+        font-size: 1.2em;
+        line-height: 1.5;
+        max-width: 300px;
+
+        h3 {
+            margin-top: 0;
+        }
+
+        i {
+            color: $dark-gray;
+            margin-right: 10px;
+        }
+    }
 }

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,16 +19,18 @@ from __future__ import absolute_import
 import cPickle
 import uuid
 from datetime import datetime, timedelta
-from flask import request
+
+from flask import request, flash
 from flask.sessions import SessionInterface, SessionMixin
+from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
-from indico.core.db import DBMgr
-from MaKaC.common.cache import GenericCache
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.user import AvatarHolder
+from indico.core.config import Config
+from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
+from indico.util.i18n import _, set_best_lang
+from MaKaC.common.cache import GenericCache
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -54,28 +56,45 @@ class BaseSession(CallbackDict, SessionMixin):
 # - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
 # - When you store something like the avatar that involves a DB lookup, use cached_writable_property
 class IndicoSession(BaseSession):
-    @cached_writable_property('_avatar')
+    @cached_writable_property('_user')
     def user(self):
-        avatarId = self.get('_avatarId')
-        if not avatarId:
-            return None
-        return AvatarHolder().getById(avatarId)
+        user_id = self.get('_user_id')
+        user = User.get(user_id) if user_id is not None else None
+        if user and user.is_deleted:
+            merged_into_user = user.merged_into_user
+            user = None
+            # If the user is deleted and the request is likely to be seen by
+            # the user, we forcefully log him out and inform him about it.
+            if not request.is_xhr and request.blueprint != 'assets':
+                self.clear()
+                if merged_into_user:
+                    msg = _(u'Your profile has been merged into <strong>{}</strong>. '
+                            u'Please log in using that profile.')
+                    flash(Markup(msg).format(merged_into_user.full_name), 'warning')
+                else:
+                    flash(_(u'Your profile has been deleted.'), 'error')
+        return user
 
     @user.setter
-    def user(self, avatar):
-        if avatar is None:
-            self.pop('_avatarId', None)
+    def user(self, user):
+        if user is None:
+            self.pop('_user_id', None)
         else:
-            self['_avatarId'] = avatar.getId()
+            self['_user_id'] = user.id
+        self._refresh_sid = True
+
+    @property
+    def avatar(self):
+        return self.user.as_avatar if self.user else None
 
     @property
     def lang(self):
         if '_lang' in self:
+            # explicit language set in the session
             return self['_lang']
-        elif self.user:
-            return self.user.getLang()
         else:
-            return None
+            # guess language based on accept-languages or use default
+            return set_best_lang(check_session=False)
 
     @lang.setter
     def lang(self, lang):
@@ -83,9 +102,10 @@ class IndicoSession(BaseSession):
 
     @cached_property
     def csrf_token(self):
-        if not self.csrf_protected:
-            return ''
         if '_csrf_token' not in self:
+            if not self.csrf_protected:
+                # don't store a token in the session if we don't really need CSRF protection
+                return '00000000-0000-0000-0000-000000000000'
             self['_csrf_token'] = str(uuid.uuid4())
         return self['_csrf_token']
 
@@ -97,10 +117,9 @@ class IndicoSession(BaseSession):
     def timezone(self):
         if '_timezone' in self:
             return self['_timezone']
-        if '_avatarId' not in self:
+        if '_user_id' not in self:
             return 'LOCAL'
-        with DBMgr.getInstance().global_connection():
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        return Config.getInstance().getDefaultTimezone()
 
     @timezone.setter
     def timezone(self, tz):
@@ -138,7 +157,11 @@ class IndicoSessionInterface(SessionInterface):
         return session['_expires'] - datetime.now() < threshold
 
     def should_refresh_sid(self, app, session):
-        return self.get_cookie_secure(app) and not session.get('_secure')
+        if not session.new and self.get_cookie_secure(app) and not session.get('_secure'):
+            return True
+        if getattr(session, '_refresh_sid', False):
+            return True
+        return False
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)

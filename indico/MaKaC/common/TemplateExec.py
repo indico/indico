@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,12 +21,13 @@ import re
 import posixpath
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
-from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
 import xml.sax.saxutils
 
+from indico.modules.auth.util import url_for_login, url_for_logout
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
@@ -42,7 +43,7 @@ FILTER_IMPORTS = [
     'from indico.util.string import encode_if_unicode',
     'from indico.util.string import html_line_breaks as html_breaks',
     'from indico.util.string import remove_tags',
-    'from indico.util.string import render_markdown as m',
+    'from indico.util.string import render_markdown_utf8 as m',
     'from indico.util.i18n import _'
 ]
 
@@ -255,7 +256,7 @@ def beautify(obj, classNames={"UlClassName": "optionList",
         return wcomponents.WBeautifulHTMLList(obj, classNames, level + 1).getHTML()
     elif isinstance(obj, dict):
         return wcomponents.WBeautifulHTMLDict(obj, classNames, level + 1).getHTML()
-    elif isinstance(obj, Avatar):
+    elif isinstance(obj, AvatarUserWrapper):
         return obj.getStraightFullName()
     else:
         return str(obj)
@@ -349,7 +350,7 @@ def registerHelpers(objDict):
     if not 'urlHandlers' in objDict:
         objDict['urlHandlers'] = MaKaC.webinterface.urlHandlers
     if not 'Config' in objDict:
-        objDict['Config'] = MaKaC.common.Configuration.Config
+        objDict['Config'] = Config
     if not 'jsBoolean' in objDict:
         objDict['jsBoolean'] = jsBoolean
     if not 'jsonDescriptor' in objDict:
@@ -404,3 +405,5 @@ def registerHelpers(objDict):
     objDict['url_rule_to_js'] = url_rule_to_js
     objDict['render_template'] = render_template
     objDict['template_hook'] = mako_call_template_hook
+    objDict['url_for_login'] = url_for_login
+    objDict['url_for_logout'] = url_for_logout

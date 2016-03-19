@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,8 +27,8 @@ can be used to register additional commands/managers
 
 shell_context = _signals.signal('shell-context', """
 Called after adding stuff to the `indico shell` context.
-Receives the `add_to_context` keyword argument with a function
-which allows you to add custom items to the context.
+Receives the `add_to_context` and `add_to_context_multi` keyword args
+with functions which allow you to add custom items to the context.
 """)
 
 get_blueprints = _signals.signal('get-blueprints', """

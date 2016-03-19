@@ -1,0 +1,29 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Plugins{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% for category, plugins in categorized_plugins.iteritems() %}
+        <div class="i-plugins-list">
+            <h2>{{ category }}</h2>
+            <div class="i-badges-list left">
+                {% for plugin in plugins %}
+                    <a class="i-badge
+                    {%- if not plugin.configurable %} i-badge-disabled{% endif %}"
+                    {%- if plugin.configurable %} href="{{ url_for('.details', plugin=plugin.name) }}"
+                    {%- else %} title="{% trans %}This plugin has no configurable options{% endtrans %}"
+                    {%- endif %}>
+                        <div class="i-badge-legend">
+                            <span class="i-badge-legend-right">{{ plugin.version }}</span>
+                        </div>
+                        <div class="i-badge-content">
+                            <span class="i-badge-title">{{ plugin.title }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

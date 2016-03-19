@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -139,34 +139,6 @@ class AuthorFilterField( filters.FilterField ):
             key="%s %s"%(auth.getFamilyName(),auth.getFirstName())
             if key.lower().find(query)!=-1:
                 return True
-        return False
-
-
-class MaterialFilterField(filters.FilterField):
-    """
-    """
-    _id = "material"
-
-    def satisfies(self,contribution):
-        """
-        """
-        #all options selected
-        if len(self._values) == 4:
-            return True
-        from MaKaC.webinterface.materialFactories import PaperFactory
-        paper=contribution.getPaper()
-        if (PaperFactory().getId() in self._values) and paper is not None:
-            return True
-        from MaKaC.webinterface.materialFactories import SlidesFactory
-        slides=contribution.getSlides()
-        if (SlidesFactory().getId() in self._values) and slides is not None:
-            return True
-        if ("--other--" in self._values) and \
-                len(contribution.getAllMaterialList())>0:
-            return True
-        if ("--none--" in self._values) and \
-                len(contribution.getAllMaterialList())==0:
-            return True
         return False
 
 

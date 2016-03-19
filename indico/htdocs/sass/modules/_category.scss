@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,6 @@
  */
 
 @import 'base';
-@import 'compass';
 
 .confirmation-dialog .body ul.categ-list {
     padding-left: 13px;
@@ -48,7 +47,7 @@
 
 .category-title {
     font-size: 2em;
-    color: #B14300;
+    color: $orange;
     font-weight: normal;
     margin: auto;
     max-width: 850px;
@@ -76,6 +75,34 @@
     min-height: 0.3em;
     margin: 0 0 2em 0;
 }
+
+
+.category-statistics {
+    max-width: 1600px;
+    .i-box {
+        margin-left: 0.8em;
+        margin-right: 0.8em !important;
+        width: 45%;
+        &:first-child {
+            margin-left: 0;
+        }
+        .i-box-header {
+            text-align: left;
+        }
+        .i-box-content {
+            display: inline-block;
+
+            width: 96%;
+            height: 350px;
+            padding: 2% 2% 0 2%;
+        }
+    }
+    .i-badges-list > .i-badge {
+        width: 45%;
+    }
+}
+
+
 
 .category-sidebar {
     @include box-sizing(border-box);
@@ -129,6 +156,12 @@
         &.resource-list {
             font-size: 0.9em;
             li {
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
                 margin-bottom: 0.5em;
                 margin-left: 1.5em;
             }

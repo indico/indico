@@ -1,0 +1,5 @@
+{% extends 'rb/emails/reservations/base_email_to_assistance.txt' %}
+
+{% block body -%}
+{{ session.user.full_name }} has cancelled the following booking. Support is NOT needed anymore.
+{%- endblock %}

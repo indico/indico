@@ -14,12 +14,12 @@ If you are looking for someone and not finding that person, he or she
 might not have an Indico account. In that case,  you may want to tick
 the checkbox option to search for users in an external database (e.g.
 at CERN you will see something like *Search CERN user database*).
-Moreover, clicking on |image1| at the right of the name will add
+Moreover, clicking on the **star** at the right of the name will add
 the person to your favourites, which means you won't have to search for
 them next time; they will appear at the right of the search box instead,
 in the *Suggested users* area.
 
-|image2|
+|img-users|
 
 --------------
 
@@ -34,10 +34,9 @@ The searching criteria described above applies to groups; if you are not
 finding a group, you may want to tick the option to search in an
 external database.
 
-|image3|
+|img-groups|
 
 -----------------
 
-.. |image1| image:: UserGuidePics/markMainResource.png
-.. |image2| image:: UserGuidePics/searchUser.png
-.. |image3| image:: UserGuidePics/searchGroup.png
+.. |img-users| image:: UserGuidePics/search-user.png
+.. |img-groups| image:: UserGuidePics/search-group.png

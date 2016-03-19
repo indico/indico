@@ -1,0 +1,59 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+{% from 'events/registration/management/_invitation_list.html' import render_invitation_list %}
+
+{% block subtitle %}
+    {% trans title=regform.title -%}
+        Invitations for "{{ title }}"
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if not regform.limit_reached %}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-users"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Invite people{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans %}Invite people to register for your event.{% endtrans %}
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown">
+                        {% trans %}Invite{% endtrans %}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a class="js-invite-user" data-href="{{ url_for('.invite', regform) }}"
+                               data-title="{% trans %}Invite user to register{% endtrans %}">
+                                {% trans %}New user{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="js-invite-user" data-href="{{ url_for('.invite', regform, existing=True) }}"
+                               data-title="{% trans %}Invite user to register{% endtrans %}">
+                                {% trans %}Indico users{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div id="invitation-list">
+        {{ render_invitation_list(invitations) }}
+    </div>
+
+    <div class="toolbar right">
+        <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
+            {% trans %}Back{% endtrans %}
+        </a>
+    </div>
+
+    <script>
+        setupInvitationPage();
+    </script>
+{% endblock %}

@@ -1,0 +1,78 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+%indico-page {
+    header {
+        $separator-margin: 0.4rem;
+        margin-bottom: 2em;
+
+        h2, h3 {
+            display: inline-block;
+            margin-bottom: $separator-margin;
+            margin-top: 0;
+        }
+
+        h3 {
+            color: $light-black;
+            margin-left: 1em;
+        }
+
+        div.title {
+            border-bottom: 1px solid $separator-color;
+        }
+
+        div.description {
+            @extend %font-family-title-light;
+            color: $dark-gray;
+            font-size: 1.2em;
+            margin-top: $separator-margin;
+        }
+    }
+}
+
+.management-page {
+    @extend %indico-page;
+
+    div.page-content {
+        @extend .fixed-width;
+    }
+}
+
+.conference-page {
+    @extend %indico-page;
+
+    header h2 {
+        color: $orange;
+        font-size: 2em;
+        font-weight: normal;
+    }
+}
+
+.meeting-header {
+    max-width: 800px;
+    margin: 2em auto 0 auto;
+
+    h1 {
+        color: $dark-blue;
+    }
+}
+
+.meeting-page {
+    @extend %indico-page;
+    max-width: 800px;
+    margin: 2em auto 0 auto;
+}

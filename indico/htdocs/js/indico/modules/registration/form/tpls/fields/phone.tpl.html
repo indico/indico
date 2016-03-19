@@ -1,0 +1,14 @@
+<ng-form name="nestedForm">
+    <input type="text"
+        id="field-{{ section.id }}-{{ field.id }}"
+        name="{{ fieldName }}"
+        size="getDefaultFieldSetting('defaultPhoneSize')"
+        ng-model="userdata[fieldName]"
+        ng-required="field.isRequired"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+        ng-pattern="/^(\(\+\d*\)|\+)?\s*(\d(\s*|\-))+$/">
+</ng-form>
+
+<span class="inputDescription">
+    (+41) 123 45 6789
+</span>

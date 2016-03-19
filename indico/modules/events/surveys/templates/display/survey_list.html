@@ -1,0 +1,63 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title %}
+    {%- trans %}Surveys{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <table id="survey-list" class="i-table-widget">
+        <thead>
+            <tr>
+                <th>{% trans %}Survey{% endtrans %}</th>
+                <th>{% trans %}Available from{% endtrans %}</th>
+                <th>{% trans %}Deadline{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for survey in surveys %}
+                <tr>
+                    <td>
+                        {% if event.as_event.can_manage(session.user, 'surveys', allow_key=true) %}
+                            <a href="{{ url_for('.manage_survey', survey) }}">{{ survey.title }}</a>
+                        {% else %}
+                            {{ survey.title }}
+                        {% endif %}
+                    </td>
+                    <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
+                    <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
+                    <td class="survey-actions">
+                        {% if was_survey_submitted(survey) %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Survey already filled out{% endtrans %}">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
+                        {% elif not survey.is_active %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Survey is closed{% endtrans %}">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        {% trans %}No surveys available for this event{% endtrans %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if event.getType() != 'conference' %}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}

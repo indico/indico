@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -33,6 +33,7 @@ from ZODB.POSException import ConflictError
 
 # indico imports
 from MaKaC.common.mail import GenericMailer
+from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.date_time import nowutc
@@ -47,7 +48,6 @@ from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
 
 # indico legacy imports
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.logger import Logger
 
 
@@ -120,8 +120,7 @@ class HTTPAPIHook(object):
         self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)
         tzName = get_query_parameter(self._queryParams, ['tz'], None)
 
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._serverTZ = info.getTimezone()
+        self._serverTZ = Config.getInstance().getDefaultTimezone()
 
         if tzName is None:
             tzName = self._serverTZ

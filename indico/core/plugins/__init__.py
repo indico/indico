@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,7 +32,9 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
-from indico.core.models.settings import SettingsProxy, EventSettingsProxy
+from indico.core.settings import SettingsProxy
+from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _, NullDomain
 from indico.util.struct.enum import IndicoEnum
@@ -40,6 +42,7 @@ from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
+from indico.web.menu import SideMenuItem
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
@@ -49,7 +52,7 @@ class PluginCategory(unicode, IndicoEnum):
     synchronization = _('Synchronization')
     payment = _('Payment')
     importers = _('Importers')
-    videoconference = _('Video conference')
+    videoconference = _('Videoconference')
     other = _('Other')
 
 
@@ -78,12 +81,19 @@ class IndicoPlugin(Plugin):
     default_settings = {}
     #: A dictionary containing default values for event-specific settings
     default_event_settings = {}
+    #: A dictionary containing default values for user-specific settings
+    default_user_settings = {}
+    #: A set containing the names of settings which store ACLs
+    acl_settings = frozenset()
+    #: A set containing the names of event-specific settings which store ACLs
+    acl_event_settings = frozenset()
     #: If the plugin should link to a details/config page in the admin interface
     configurable = False
     #: The group category that the plugin belongs to
     category = None
-    #: If `settings` and `event_settings` should use strict mode, i.e. only allow keys in
-    #: `default_settings` or `default_event_settings`
+    #: If `settings`, `event_settings` and `user_settings` should use strict
+    #: mode, i.e. only allow keys in `default_settings`, `default_event_settings`
+    #: or `default_user_settings` (or the related `acl_settings` sets)
     strict_settings = False
 
     def init(self):
@@ -97,7 +107,6 @@ class IndicoPlugin(Plugin):
         assert self.configurable or not self.settings_form, 'Non-configurable plugin cannot have a settings form'
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.plugin.cli, self.add_cli_command)
-        self.connect(signals.plugin.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
         self._setup_assets()
@@ -164,10 +173,6 @@ class IndicoPlugin(Plugin):
 
     def add_cli_command(self, manager):
         """Add custom commands/submanagers to the manager of the `indico` cli tool."""
-        pass
-
-    def extend_shell_context(self, add_to_context):
-        """Add custom items to the `indico shell` context."""
         pass
 
     def register_assets(self):
@@ -267,7 +272,8 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings)
+            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings,
+                                 acls=cls.acl_settings)
 
     @cached_classproperty
     @classmethod
@@ -278,7 +284,18 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
-                                      cls.strict_settings)
+                                      cls.strict_settings, acls=cls.acl_event_settings)
+
+    @cached_classproperty
+    @classmethod
+    def user_settings(cls):
+        """:class:`UserSettingsProxy` for the plugin's user-specific settings"""
+        if cls.name is None:
+            raise RuntimeError('Plugin has not been loaded yet')
+        instance = cls.instance
+        with instance.plugin_context():  # in case the default settings come from a property
+            return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
+                                     cls.strict_settings)
 
 
 def include_plugin_js_assets(bundle_name):
@@ -352,6 +369,11 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
 
 class WPJinjaMixinPlugin(WPJinjaMixin):
     render_template_func = staticmethod(render_plugin_template)
+
+
+@signals.menu.items.connect_via('admin-sidemenu')
+def _extend_admin_menu(sender, **kwargs):
+    return SideMenuItem(u'plugins', _(u"Plugins"), url_for(u'plugins.index'), 80, icon=u'puzzle')
 
 
 plugin_engine = IndicoPluginEngine()

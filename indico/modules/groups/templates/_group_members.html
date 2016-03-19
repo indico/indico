@@ -1,0 +1,48 @@
+{% macro group_members(group) %}
+    {% set members = group.get_members()|sort(attribute='full_name') %}
+    {% if not members %}
+        <strong>{% trans %}There are no users in this group.{% endtrans %}</strong>
+    {% else %}
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Email{% endtrans %}</th>
+                    {% if group.is_local %}
+                        <th class="small-column">{% trans %}Actions{% endtrans %}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody id="group-members">
+                {% for user in members %}
+                    <tr>
+                        <td>{{ user.full_name }}</td>
+                        <td>{{ user.email }}</td>
+                        {% if group.is_local %}
+                            <td>
+                                <a class="icon-remove right js-delete-member" href="#"
+                                   data-href="{{ url_for('.group_delete_member', group, user) }}"></a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <script>
+            $('#group-members').on('click', '.js-delete-member', function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                $.ajax({
+                    url: $this.data('href'),
+                    method: 'DELETE',
+                    error: handleAjaxError,
+                    success: function() {
+                        $this.closest('tr').fadeOut(function() {
+                            $(this).remove();
+                        });
+                    }
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}

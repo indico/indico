@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,11 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-sidemenu = _signals.signal('sidemenu', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
-the event management side menu. The *sender* is the event object.
-""")
-
 clone = _signals.signal('clone', """
 Expected to return an instance of a ``EventCloner`` subclass implementing
 the cloning behavior. The *sender* is the event object.
@@ -37,4 +32,15 @@ returned by plugins, i.e. it is not guaranteed that the user ends up on a
 specific plugin's management page. The signal should return None if the current
 user (available via ``session.user``) cannot access the management area.
 The *sender* is the event object.
+""")
+
+image_created = _signals.signal('image-uploaded', """
+Called when a new image is created.  The *sender* object is the new ``ImageFile``.
+The user who uploaded the image is passed in the ``user`` kwarg.
+""")
+
+image_deleted = _signals.signal('image-deleted', """
+Called when an image is deleted.  The *sender* object is the ``ImageFile`` that is
+about to be deleted.  The user who uploaded the image is passed in the ``user``
+kwarg.
 """)

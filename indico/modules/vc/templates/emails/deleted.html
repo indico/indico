@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block subject -%}
+    [{{ plugin.friendly_name }}] Videoconference room deleted: {{ vc_room.name }}
+{%- endblock %}
+
+{% block header -%}
+<p>
+    The videoconferencing room "{{ vc_room.name }}" has been deleted by {{ user.full_name }}.
+</p>
+{%- endblock %}

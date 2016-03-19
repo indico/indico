@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -56,11 +56,6 @@ event_mgmt.add_url_rule('/session/<sessionId>/timetable/slot-calc', 'sessionModi
 event_mgmt.add_url_rule('/session/<sessionId>/comment/', 'sessionModifComm', sessionModif.RHSessionModifComm)
 event_mgmt.add_url_rule('/session/<sessionId>/comment/edit', 'sessionModifComm-edit',
                         sessionModif.RHSessionModifCommEdit, methods=('GET', 'POST'))
-
-# Material
-event_mgmt.add_url_rule('/session/<sessionId>/material/', 'sessionModification-materials', sessionModif.RHMaterials)
-event_mgmt.add_url_rule('/session/<sessionId>/material/add', 'sessionModification-materialsAdd',
-                        sessionModif.RHMaterialsAdd, methods=('POST',))
 
 # Protection
 event_mgmt.add_url_rule('/session/<sessionId>/access/', 'sessionModifAC', sessionModif.RHSessionModifAC)

@@ -1,0 +1,40 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
+
+{%- block content %}
+    {{ form_header(form, id='file-upload', classes=('full-width' if not existing_attachment else ''),
+                   action=action) }}
+    <input type="hidden" autofocus>
+    {% if existing_attachment %}
+        {{ form_row(form.file) }}
+    {% else %}
+        {{ form_row(form.files, skip_label=true) }}
+    {% endif %}
+    {{ form_rows(form, skip=('folder', 'protected', 'acl', 'files', 'file')) }}
+    {{ form_rows(form, fields=('folder', 'protected', 'acl')) }}
+    {{ protection_message | safe }}
+    {% call form_footer(attach_form) %}
+        <div class="dropzone-upload-btn">
+            {% if existing_attachment -%}
+                <input class="i-button big highlight js-dropzone-save" type="submit"
+                       value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+            {%- else -%}
+                <input class="i-button big highlight js-dropzone-upload" type="submit" disabled
+                   value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
+            {% endif %}
+            <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+        </div>
+    {% endcall %}
+    <script>
+        (function() {
+            'use strict';
+
+            $('#folder').nullableselector();
+            aclIfProtected($('#protected'), $('#acl'), $('.self-protection-message'), $('.inherited-protection-message'),
+                           $('#folder'));
+            messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
+                                     $('.self-protection-message'), $('.inherited-protection-message'),
+                                     $('.folder-protection-message'));
+        })();
+
+    </script>
+{%- endblock %}

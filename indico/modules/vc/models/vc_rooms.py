@@ -1,6 +1,5 @@
-
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,9 +25,9 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
+from indico.util.event import unify_event_args
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 
@@ -47,22 +46,22 @@ class VCRoom(db.Model):
     __tablename__ = 'vc_rooms'
     __table_args__ = {'schema': 'events'}
 
-    #: Video conference room ID
+    #: Videoconference room ID
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: Type of the video conference room
+    #: Type of the videoconference room
     type = db.Column(
         db.String,
         nullable=False
     )
-    #: Name of the video conference room
+    #: Name of the videoconference room
     name = db.Column(
         db.String,
         nullable=False
     )
-    #: Status of the video conference room
+    #: Status of the videoconference room
     status = db.Column(
         PyIntEnum(VCRoomStatus),
         nullable=False
@@ -70,25 +69,39 @@ class VCRoom(db.Model):
     #: ID of the creator
     created_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
         nullable=False,
         index=True
     )
-    #: Creation timestamp of the video conference room
+    #: Creation timestamp of the videoconference room
     created_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
     )
 
-    #: Modification timestamp of the video conference room
+    #: Modification timestamp of the videoconference room
     modified_dt = db.Column(
         UTCDateTime
     )
-    #: video conference plugin-specific data
+    #: videoconference plugin-specific data
     data = db.Column(
         JSON,
         nullable=False
     )
+
+    #: The user who created the videoconference room
+    created_by_user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'vc_rooms',
+            lazy='dynamic'
+        )
+    )
+
+    # relationship backrefs:
+    # - events (VCRoomEventAssociation.vc_room)
 
     @property
     def plugin(self):
@@ -98,15 +111,6 @@ class VCRoom(db.Model):
     @property
     def locator(self):
         return {'vc_room_id': self.id, 'service': self.type}
-
-    @property
-    def created_by_user(self):
-        """The Avatar who created the video conference room."""
-        return AvatarHolder().getById(str(self.created_by_id))
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = int(user.getId())
 
     @return_ascii
     def __repr__(self):
@@ -126,22 +130,17 @@ class VCRoomEventAssociation(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         autoincrement=False,
         nullable=False
     )
-    #: ID of the video conference room
+    #: ID of the videoconference room
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
         index=True,
         nullable=False
-    )
-    #: The associated :class:VCRoom
-    vc_room = db.relationship(
-        'VCRoom',
-        lazy=False,
-        backref=db.backref('events', cascade='all, delete-orphan')
     )
     #: Link type of the vc_room to a event/contribution/session
     link_type = db.Column(
@@ -159,10 +158,26 @@ class VCRoomEventAssociation(db.Model):
         nullable=False,
         default=False
     )
-    #: video conference plugin-specific data
+    #: videoconference plugin-specific data
     data = db.Column(
         JSON,
         nullable=False
+    )
+
+    #: The associated :class:VCRoom
+    vc_room = db.relationship(
+        'VCRoom',
+        lazy=False,
+        backref=db.backref('events', cascade='all, delete-orphan')
+    )
+    #: The associated Event
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'vc_room_associations',
+            lazy='dynamic'
+        )
     )
 
     @property
@@ -193,19 +208,19 @@ class VCRoomEventAssociation(db.Model):
         return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
 
     @classmethod
+    @unify_event_args
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
-        """Returns a Query that retrieves the video conference rooms for an event
+        """Returns a Query that retrieves the videoconference rooms for an event
 
-        :param event: an indico event (with a numeric ID)
+        :param event: an indico Event
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
         :param kwargs: extra kwargs to pass to ``find()``
         """
-        if not str(event.id).isdigit():
-            # legacy event -> no VC rooms
-            return cls.find(False)
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)
-        query = cls.find(event_id=int(event.id), **kwargs)
+        query = event.vc_room_associations
+        if kwargs:
+            query = query.filter_by(**kwargs)
         if not include_hidden:
             query = query.filter(cls.show)
         if not include_deleted:

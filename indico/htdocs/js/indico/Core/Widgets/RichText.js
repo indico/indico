@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,14 +19,6 @@ var executeOnload = false;
 var __globalEditorTable = {};
 var languages = {'en_GB' : 'en', 'fr_FR' : 'fr'};
 var userLanguage = 'en_GB';
-
-/*jsonRpc(Indico.Urls.JsonRpcService, "user.session.language.get",{}, function(result, error)
-        {
-            if (!error)
-                userLanguage = result;
-            else
-                userLanguage = 'en_GB';
-        });*/
 
 type("RichTextEditor", ["IWidget", "Accessor"],
      {
@@ -399,8 +391,13 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             height  : height - 75,
             //CKEDITOR Custom Config
             blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
+            keystrokes : [[CKEDITOR.CTRL + 75 /* CTRL + K */, 'link']],
             removeButtons      : '',
-            disableNativeSpellChecker: false
+            disableNativeSpellChecker: false,
+            font_names: ['Sans Serif/"Liberation Sans", sans-serif',
+                         'Serif/"Liberation Serif", serif',
+                         'Monospace/"Liberation Mono", monospace'].join(';'),
+            contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.FontSassBundle)
         };
         if (simple) {
             config.toolbar = [

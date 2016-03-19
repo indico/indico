@@ -1,0 +1,10 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}meeting-page{% endblock %}
+
+{% block page %}
+    <div class="meeting-header">
+        <h1><a href="{{ url_for('event.conferenceDisplay', event) }}">{{ event.title }}</a></span>
+    </div>
+    {{ super() }}
+{% endblock %}

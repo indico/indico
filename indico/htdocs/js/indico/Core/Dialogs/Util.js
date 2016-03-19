@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@ IndicoUI.Dialogs.Util = {
 
     error: function(err) {
         var dialog = null;
-        if (exists(err.type) && err.type === "noReport") {
+        if (err.type === 'noReport') {
             dialog = new NoReportErrorDialog(err);
         } else {
             dialog = new ErrorReportDialog(err);
@@ -52,15 +52,5 @@ IndicoUI.Dialogs.Util = {
         return function() {
             progress.hide();
         };
-    },
-
-    alert: function(title, message) {
-        var popup = new AlertPopup(title, message);
-        popup.open();
-    },
-
-    confirm: function(title, message, handler) {
-        var popup = new ConfirmPopup(title, message, handler);
-        popup.open();
     }
 };

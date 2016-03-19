@@ -1,0 +1,51 @@
+{% extends 'layout/full_page_base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans %}New authentication method{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% include 'flashed_messages.html' %}
+
+    <p>
+        {% trans provider=identity_info.provider_title -%}
+            You logged in using <strong>{{ provider }}</strong> for the first time.
+        {%- endtrans %}
+    </p>
+    <p>
+        {% if not identity_info.email_verified %}
+            {% trans name=user.full_name -%}
+                We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
+                with this account once you have verified that <strong>{{ emails }}</strong>
+                is actually your email address.
+            {%- endtrans %}
+        {% else %}
+            {% trans name=user.full_name -%}
+                We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
+                with this account once you click the button below.
+            {%- endtrans %}
+        {% endif %}
+    </p>
+
+    {% if must_choose_email %}
+        {{ form_header(form) }}
+        {{ form_rows(form) }}
+        {% call form_footer(form) %}
+            {{ self.buttons() }}
+        {% endcall %}
+    {% else %}
+        {{ form_header(form, i_form=false) }}
+            {% block buttons %}
+                <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
+                {% if identity_info.email_verified %}
+                    <input class="i-button big highlight" type="submit"
+                           value="{% trans %}Add this account and log in{% endtrans %}">
+                {% elif not email_sent %}
+                    <input class="i-button big highlight" type="submit"
+                           value="{% trans %}Send me a verification email{% endtrans %}">
+                {% endif %}
+            {% endblock %}
+        {{ form_footer(form, i_form=false) }}
+    {% endif %}
+{% endblock %}

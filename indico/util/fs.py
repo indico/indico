@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,23 +14,31 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os, errno
+import errno
+import os
+
+from indico.util.string import unicode_to_ascii, to_unicode
+from werkzeug.utils import secure_filename as _secure_filename
+
 
 def silentremove(filename):
     try:
         os.remove(filename)
-    except OSError, e: # this would be "except OSError as e:" in python 3.x
-        if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
-            raise # re-raise exception if a different error occured
+    except OSError as e:
+        if e.errno != errno.ENOENT:
+            raise
 
 
-def delete_recursively(target):
-    if os.path.isdir(target):
-        for path, dirs, files in os.walk(target, topdown=False):
-            for name in files:
-                os.remove(os.path.join(path, name))
-            for name in dirs:
-                os.rmdir(os.path.join(path, name))
-        os.rmdir(target)
-    elif os.path.exists(target):
-        os.remove(target)
+def secure_filename(filename, fallback):
+    """Returns a secure version of a filename.
+
+    This removes possibly dangerous characters and also converts the
+    filename to plain ASCII for maximum compatibility.
+
+    :param filename: A filename
+    :param fallback: The filename to use if there were no safe chars
+                     in the original filename.
+    """
+    if not filename:
+        return fallback
+    return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback

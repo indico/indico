@@ -1,0 +1,33 @@
+<tr class="i-table interactive log-kind-{{ entry.kind.name }} log-realm-{{ entry.realm.name }}"
+    data-type="{{ entry.type }}" data-realm="{{ entry.realm.name }}">
+    <td class="i-table log-icon">
+        <i class="log-realm"></i>
+        <i class="log-kind icon-circle-small"></i>
+    </td>
+    <td class="i-table log-module searchable" title="{{ entry.module }}">
+        {{ entry.module }}
+    </td>
+    <td class="i-table log-subject searchable" title="{{ entry.summary }}">
+        {{ entry.summary }}
+    </td>
+    <td class="i-table log-stamp text-superfluous">
+        {% if entry.user %}
+            {% trans user=entry.user.name, time=entry.logged_dt|format_time('medium') -%}
+                by <span class="text-normal searchable user-name">{{ user }}</span>
+                at <span class="text-normal">{{ time }}</span>
+            {%- endtrans %}
+        {% else %}
+            <span class="text-normal">
+                {{ entry.logged_dt|format_time('medium') }}
+            </span>
+        {% endif %}
+    </td>
+</tr>
+
+<tr class="i-table details-row">
+    <td class="i-table" colspan="4">
+        <table class="i-table no-margin">
+            {% block entry_detail_rows %}{% endblock %}
+        </table>
+    </td>
+</tr>

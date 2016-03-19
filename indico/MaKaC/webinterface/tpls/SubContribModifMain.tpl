@@ -37,7 +37,7 @@
         <td bgcolor="white" class="blacktext" colspan="2">
             <table width="100%">
                 <tr>
-                    <td style="width: 79%"><ul id="inPlaceSpeakers" class="UIPeopleList"></ul></td>
+                    <td style="width: 79%"><ul id="inPlaceSpeakers" class="user-list"></ul></td>
                     <td nowrap valign="top" style="width: 21%; text-align:right;">
                         <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                             <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") }</a>
@@ -63,6 +63,6 @@
 
 var speakerManager = new SubContributionPresenterListManager('${ confId }',
         {confId: '${ confId }', contribId: '${ contribId }', subContribId: '${ subContribId }'},
-        $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'), "presenter", ${presenters | n,j}, ${authors | n,j}, '${ eventType }');
+        $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'), "presenter", ${presenters | n,j}, ${suggested_authors | n,j}, '${ eventType }');
 
 </script>

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -100,19 +100,20 @@
 .infoline.material {
     padding: 5px;
 
-    ul {
+    > ul {
         margin: 0;
         padding: 0 3rem 0 3rem;
         list-style-type: none;
     }
 }
 
-.infoline.registration {
+.infoline.announcement {
     @include border-all($blue);
     background: $light-blue;
     clear: both;
     padding: 10px;
     width: 100%;
+    overflow: visible;
 
     .icon, .label {
         color: $blue;

@@ -2,6 +2,7 @@
        <div class="icon-locked icon-background inline-vcentered"></div>
        <div class="confirmation-dialog inline-vcentered">
            <form action="${postURL}" method="POST">
+              <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
               <div class="body">
                <div>${message}</div>
                </div>

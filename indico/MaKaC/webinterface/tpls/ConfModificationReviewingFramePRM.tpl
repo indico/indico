@@ -47,7 +47,7 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                                        setResult(true);
+                                        setResult(true, result);
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
@@ -74,7 +74,7 @@
                             );
                         };
 
-                        var uf = new UserListField('managersPRUserListDiv', 'userList',
+                        var uf = new UserListField('managersPRUserListDiv', 'user-list',
                                 ${ jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) },
                                 true,null,
                                 true, false, null, null,

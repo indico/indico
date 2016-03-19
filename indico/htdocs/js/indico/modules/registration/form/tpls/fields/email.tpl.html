@@ -1,0 +1,15 @@
+<ng-form name="nestedForm">
+    <input type="text"
+        id="field-{{ section.id }}-{{ field.id }}"
+        name="{{ fieldName }}"
+        size="{{ getDefaultFieldSetting('defaultTextFieldSize') }}"
+        ng-model="userdata[fieldName]"
+        ng-required="field.isRequired"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+        ng-pattern="/^.+@([^.@][^@]+)$/">
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
+    <div ng-show="emailInfoMessage" ng-bind-html-unsafe="emailInfoMessage" ng-class="{error: emailInfoError, warning: emailInfoWarning}"
+         class="email-info"></div>
+</ng-form>

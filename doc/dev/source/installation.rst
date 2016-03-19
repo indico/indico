@@ -313,11 +313,11 @@ From v1.2 on, the URLs will be shorter, alike ``http://my.indico.srv/event/2413/
 Post-install tasks
 ==================
 
-If you wish to use the scheduler daemon (replaces old ``taskDaemon``), then you should run:
+For background tasks you need to run the Celery scheduler daemon:
 
 .. code-block:: console
 
-    # sudo -u apache indico_scheduler start
+    # indico celery worker -B
 
 If you have changed your server host name for some reason  you may need to delete ``/opt/indico/tmp/vars.js.tpl.tmp``.
 

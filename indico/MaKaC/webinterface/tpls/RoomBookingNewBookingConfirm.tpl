@@ -69,6 +69,7 @@
 
 <form method="POST" id="bookingForm">
     <input type="hidden" name="step" value="3">
+    ${ form.csrf_token() }
     ${ form.start_dt(type='hidden') }
     ${ form.end_dt(type='hidden') }
     ${ form.repeat_frequency(style='display: none') }

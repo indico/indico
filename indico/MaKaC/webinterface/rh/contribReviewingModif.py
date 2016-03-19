@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -114,8 +114,7 @@ class RHAssignReferee(RHAssignRefereeBase):
             raise FormValuesError("No referee selected")
 
     def _process( self ):
-        ph = user.PrincipalHolder()
-        self._target.getReviewManager().setReferee( ph.getById(self._referee))
+        self._target.getReviewManager().setReferee(user.AvatarHolder().getById(self._referee))
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 class RHRemoveAssignReferee(RHAssignRefereeBase):
@@ -138,8 +137,7 @@ class RHAssignEditing(RHAssignEditorOrReviewerBase):
     def _process( self ):
         choice = self._target.getConference().getConfPaperReview().getChoice()
         if choice == 3 or choice == 4:
-            ph = user.PrincipalHolder()
-            self._target.getReviewManager().setEditor(ph.getById(self._editor))
+            self._target.getReviewManager().setEditor(user.AvatarHolder().getById(self._editor))
         else:
             raise MaKaCError("Reviewing mode does not allow editing")
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target) )
@@ -166,8 +164,7 @@ class RHAssignReviewing(RHAssignEditorOrReviewerBase):
     def _process( self ):
         choice = self._target.getConference().getConfPaperReview().getChoice()
         if choice == 2 or choice == 4:
-            ph = user.PrincipalHolder()
-            self._target.getReviewManager().addReviewer( ph.getById(self._reviewer))
+            self._target.getReviewManager().addReviewer(user.AvatarHolder().getById(self._reviewer))
             self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
         else:
             raise MaKaCError("Reviewing mode does not allow content reviewing")
@@ -181,10 +178,9 @@ class RHRemoveAssignReviewing(RHAssignEditorOrReviewerBase):
         if self._reviewer == None:
             raise FormValuesError("No reviewer selected")
 
-    def _process( self ):
-        ph = user.PrincipalHolder()
-        self._target.getReviewManager().removeReviewer(ph.getById(self._reviewer))
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
+    def _process(self):
+        self._target.getReviewManager().removeReviewer(user.AvatarHolder().getById(self._reviewer))
+        self._redirect(urlHandlers.UHContributionModifReviewing.getURL(self._target))
 
 
 #Judgement classes for editor

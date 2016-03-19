@@ -1,0 +1,12 @@
+{% from 'vc/list_vc_rooms.html' import render_vc_rooms_list  %}
+
+<h2 class="page-title">{% trans %}Videoconference Rooms{% endtrans %}</h2>
+<div>
+    {% if event_vc_rooms and vc_plugins_available %}
+        {{ render_vc_rooms_list(event, event_vc_rooms, linked_to) }}
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">{% trans %}There are no bookings associated with this event.{% endtrans %}</div>
+        </div>
+    {% endif %}
+</div>

@@ -13,7 +13,7 @@
 </table>
 <br>
 % if len(questions.keys()) == 0:
-    <span style="padding-left: 10px;">There are no assessments with answered questions yet.</span>
+    <span style="padding-left: 10px;">${_("There are no assessments with answered questions yet.")}</span>
 % endif
 % if ratingAverage:
     <span>The abstract's average rating is: <b>${ ratingAverage }</b></span>

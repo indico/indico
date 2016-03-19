@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -65,10 +65,10 @@ type("NewsItem", ["ServiceWidget"],
         },
 
         _saveResource: function() {
-            var params = {"id":this.id, "title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
+            var params = {"id": this.id, "title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
             var self = this;
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            if(self.content.clean())
+            if (self.content.clean())
                 jsonRpc(Indico.Urls.JsonRpcService, 'news.save', params,
                         function(response, error){
                             if (exists(error))
@@ -84,32 +84,31 @@ type("NewsItem", ["ServiceWidget"],
             this.title = response.title;
             this.type = response.type;
             this.text = response.text;
-           this.id = response.id;
+            this.id = response.id;
 
             this.chooser.set('display');
         },
 
         draw: function() {
             var self = this;
-
-            var titleField = Html.input('text',{'className':'newsEditTitle'},'Write a title');
+            var titleField = Html.input('text', {'className':'newsEditTitle'}, 'Write a title');
             var typeField = Widget.select(self.parentList.newsTypesList);
             typeField.set('general');
 
             this.titleField = titleField;
             this.typeField = typeField;
 
-            var saveButton = null;
+            var saveButton = Widget.button(command(function() {
+                if (self.id) {
+                    self._saveResource();
+                } else {
+                    self._createResource();
+                }
+            }, 'Save'));
+
             if (self.id) {
                 this.titleField.set(self.title);
                 this.typeField.set(self.type);
-                saveButton = Widget.button(command(function (){
-                    self._saveResource();
-                }, "Save"));
-            }else {
-                saveButton = Widget.button(command(function (){
-                    self._createResource();
-                }, "Save"));
             }
 
             var cancelButton = Widget.button(command(function (){

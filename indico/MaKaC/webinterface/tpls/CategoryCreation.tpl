@@ -78,7 +78,7 @@
     // ---- List of users allowed to view the event
 
     var allowedUsersList = new UserListField(
-            'allowedUserListDiv', 'allowedUserList',
+            'allowedUserListDiv', 'user-list',
             null, true, null,
             true, true, null, null,
             false, false, false, true,

@@ -1,0 +1,20 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
+
+{%- block content %}
+    {{ form_header(form)}}
+    {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: http://www.example.com/YourPDFFile.pdf'}) }}
+    {{ form_rows(form, fields=('title', 'description', 'folder', 'protected', 'acl')) }}
+    {{ protection_message | safe }}
+    {% call form_footer(attach_form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
+        <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    {% endcall %}
+    <script>
+        $('#folder').nullableselector();
+        aclIfProtected($('#protected'), $('#acl'), $('.self-protection-message'), $('.inherited-protection-message'),
+                       $('#folder'));
+        messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
+                                 $('.self-protection-message'), $('.inherited-protection-message'),
+                                 $('.folder-protection-message'));
+    </script>
+{%- endblock %}

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@
     float:right;
 }
 
-.i-data-list {
+dl.i-data-list {
     @extend %font-family-form;
     max-width: 800px;
     color: $light-black;
@@ -60,6 +60,10 @@
         display: inline-block;
         margin: 0 0 0.7em 0;
         padding: 0.3em 1em 0.3em 1em;
+
+        &:last-of-type {
+            margin-bottom: 0px;
+        }
     }
 
     dt {
@@ -71,5 +75,9 @@
     dd {
         width: 79%;
         vertical-align: top;
+    }
+
+    &.dt-select-disabled dt {
+        @include user-select(none);
     }
 }

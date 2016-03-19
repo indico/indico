@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -57,38 +57,11 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
     },
 
     _personName: function(user) {
-        var content = this.ListOfUsersManager.prototype._personName.call(this, user);
+        var data = this.ListOfUsersManager.prototype._personName.call(this, user);
         if (!user.showSubmitterCB) {
-            content += '<small class="roleSmall"> Submitter </small>';
+            data.roles = ['Submitter'];
         }
-        return content;
-    },
-
-    _drawUserList: function() {
-        var self = this;
-        var container = $(this.inPlaceListElem.dom).html('');
-
-        this.usersList.each(function(val, idx) {
-            var user = val;
-            var elemStyle = self.elementClass;
-            var row = $('<li/>').attr('class', elemStyle);
-            _(self._component_order).each(function(opt, idx){
-                if (self.userOptions[opt]) {
-                    var comp = self._components[opt].call(self, user, self.userOptions[opt]);
-                    row.append(comp);
-                }
-            });
-            var spanClass = 'authorMove';
-            if (self.kindOfUser == "chairperson") {
-                spanClass = 'author';
-            }
-            row.append($('<span class=' + spanClass + ' />').append(
-                self._personName(user)));
-            row.data('user', user);
-
-            container.append(row);
-        });
-        this._checkEmptyList();
+        return data;
     },
 
     canDrop: function(authorEmail) {
@@ -144,17 +117,13 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
-            var suggestedAuthors = true;
-            if (self.kindOfUser == 'speaker' && self.eventType == "conference") {
-                suggestedAuthors = self._getAuthorsList();
-            }
 
             menuItems["searchUser"] = {action: function() {
                 var privilegesDiv = Html.div({style:{marginTop: pixels(10)}});
                 var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
                 checkbox.dom.id = "presenter-grant-submission";
                 privilegesDiv.append(Html.span({},checkbox, "Grant all the selected users with submission rights"));
-                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true, {"presenter-grant-submission": function(){return $("#presenter-grant-submission")[0].checked;}}, privilegesDiv);
+                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, self.suggestedAuthors, false, true, {"presenter-grant-submission": function(){return $("#presenter-grant-submission")[0].checked;}}, privilegesDiv);
             }, display: $T('Add Indico User')};
             menuItems["addNew"] = {action: function() {
                 self._addNonExistingUser();
@@ -187,21 +156,17 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     }
                 }
         );
-    },
-
-    _getAuthorsList: function() {
-        return primaryAuthorManager.getUsersList().allItems().concat(coAuthorManager.getUsersList().allItems());
     }
-
 },
 
-    function(confId, methods, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList) {
+    function(confId, methods, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList, suggestedAuthors) {
         this.kindOfUser = kindOfUser;
         this.eventType = eventType;
+        this.suggestedAuthors = suggestedAuthors
         this.rightsToShow = {submission: true, management: false, coordination: false};
         this.nameOptions = {title: false, affiliation: true, email:false};
         if (kindOfUser == "chairperson") {
-            this.rightsToShow = {submission: true, management: false, coordination: false};
+            this.rightsToShow = {submission: true, management: true, coordination: false};
             this.nameOptions = {title: true, affiliation: false, email:false};
         }
         this.ListOfUsersManager(confId, methods, params, inPlaceListElem, userCaption, elementClass, false,

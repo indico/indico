@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,13 +22,13 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.webinterface.user import UserListModificationBase
 from indico.core.config import Config
-from MaKaC.common.utils import sortCategoryByTitle, validMail
-import MaKaC.user as user
+from MaKaC.common.utils import validMail
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
-from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import _
 
 
@@ -129,27 +129,8 @@ class RHCategoryPerformModification( RHCategModifBase ):
                 f.setFileName( self._fileName )
                 f.setFilePath( self._filePath )
                 self._target.setIcon( f )
-            if "tasksAllowed" in params :
-                if params["tasksAllowed"] == "allowed" :
-                    self._target.setTasksAllowed()
-                else :
-                    self._target.setTasksForbidden()
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
-
-class RHCategoryTaskOption( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryTasksOption
-
-    def _process( self ):
-
-        if self._target.tasksAllowed() :
-            self._target.setTasksForbidden()
-        else :
-            self._target.setTasksAllowed()
-
-        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
 
 
 class RHCategoryAC( RHCategModifBase ):
@@ -167,124 +148,6 @@ class RHCategoryTools( RHCategModifBase ):
         p = category.WPCategModifTools( self, self._target )
         return p.display()
 
-
-class RHCategoryTasks( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifTasks
-
-    def _process( self ):
-        p = category.WPCategModifTasks( self, self._target )
-        return p.display()
-
-class RHCategoryFiles( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifFiles
-
-    def _process( self ):
-        p = category.WPCategoryModifExistingMaterials( self, self._target )
-        return p.display()
-
-
-class RHAddMaterial(RHSubmitMaterialBase, RHCategModifBase):
-    _uh = urlHandlers.UHCategoryAddMaterial
-
-    def __init__(self):
-        RHCategModifBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHCategModifBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
-
-
-class RHCategoryTasksAction( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifTasksAction
-
-    def _process( self ):
-        params = self._getRequestParams()
-
-        if params.get("accessVisibility","") == _("PRIVATE") :
-            self._target.setTasksPrivate()
-        elif params.get("accessVisibility","") == _("PUBLIC") :
-            self._target.setTasksPublic()
-        else :
-            pass
-
-        if params.get("commentVisibility","") == _("PRIVATE") :
-            self._target.setTasksCommentPrivate()
-        elif params.get("commentVisibility","") == _("PUBLIC") :
-            self._target.setTasksCommentPublic()
-        else :
-            pass
-
-        if params.get("taskAccessAction","") == "Add":
-            chosen = params.get("accessChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksAccessPerson(person)
-        elif params.get("taskAccessAction","") == "New":
-            pass
-        elif params.get("taskAccessAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("access", []))
-            for c in chosen :
-                self._target.removeTasksAccessPerson(int(c))
-        else :
-            pass
-
-        if params.get("taskCommentAction","") == "Add":
-            chosen = params.get("commentChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksCommentator(person)
-        elif params.get("taskCommentAction","") == "New":
-            pass
-        elif params.get("taskCommentAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("commentator", []))
-            for c in chosen :
-                self._target.removeTasksCommentator(int(c))
-        else :
-            pass
-
-
-        if params.get("taskManagerAction","") == "Add":
-            chosen = params.get("managerChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksManager(person)
-        elif params.get("taskManagerAction","") == "New":
-            pass
-        elif params.get("taskManagerAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("manager", []))
-            for c in chosen :
-                self._target.removeTasksManager(int(c))
-        else :
-            pass
-
-
-        p = category.WPCategModifTasks( self, self._target )
-        return p.display()
-
-    def _findPerson(self, idString):
-        if idString is None or idString == "" :
-            return None
-        if idString[0] == "c" :
-            return self.getTasksCommentator(int(idString[1:]))
-        elif idString[0] == "a" :
-            return self._target.getTasksAccessPerson(int(idString[1:]))
-
-        index = idString.find("-")
-        eventId = idString[1:index]
-        personId = idString[index+1:]
-
-        if idString[0] == "h" :
-            return self._target.getConferenceById(eventId).getChairById(personId)
-        elif idString[0] == "m" :
-            return self._target.getConferenceById(eventId).getManagerList()[int(personId)]
-        elif idString[0] == "p" :
-            return self._target.getConferenceById(eventId).getParticipation().getParticipantById(personId)
-
-        return None
 
 class RHCategoryCreation( RHCategModifBase ):
     _uh = urlHandlers.UHCategoryCreation
@@ -327,7 +190,7 @@ class RHCategoryPerformCreation( RHCategModifBase ):
                 allowedUsers = self._getAllowedUsers(params)
                 if allowedUsers :
                     for person in allowedUsers :
-                        if isinstance(person, user.Avatar) or isinstance(person, user.Group):
+                        if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
                             nc.grantAccess(person)
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
@@ -371,7 +234,7 @@ class _ActionSortCategories:
 
     def perform(self):
         cl = self._rh._target.getSubCategoryList()
-        cl.sort(sortCategoryByTitle)
+        cl.sort(key=lambda c: c.getTitle().lower())
         for categ in cl:
             categ.setOrder(cl.index(categ))
 

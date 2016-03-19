@@ -19,7 +19,7 @@
 </div>
 
 <form id="blockingForm" method="post">
-    ${ form.principals() }
+    ${ form.csrf_token() }
     ${ form.blocked_rooms() }
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
         <tr>
@@ -64,7 +64,7 @@
                                 <tr>
                                     <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")} ${inlineContextHelp(_("These users/groups are allowed to book the selected rooms during the blocking. Note that you as the creator of the blocking are always allowed to book them."))}</span></td>
                                     <td bgcolor="white" width="100%">
-                                        <div id="allowedPrincipals"></div>
+                                        ${ form.principals() }
                                     </td>
                                 </tr>
                                 <tr><td>&nbsp;</td></tr>
@@ -128,10 +128,6 @@
             % endif
         });
 
-        var serializeACL = function() {
-            $('#principals').val(Json.write(principalField.getUsers()));
-        };
-
         var serializeRooms = function() {
             var roomGuids = [];
             enumerate(blockedRoomList.getAll(), function(value, key) {
@@ -141,25 +137,8 @@
             $('#blocked_rooms').val(Json.write(roomGuids));
         };
 
-        var principalField = new UserListField(
-            'ShortPeopleListDiv', 'PeopleList',
-            JSON.parse($('#principals').val()), true, null,
-            true, true, null, null,
-            false, false, false, true,
-            function(data, func) {
-                userListNothing(data, func);
-                serializeACL();
-            },
-            userListNothing,
-            function(data, func) {
-                userListNothing(data, func);
-                serializeACL();
-            }
-        );
-        serializeACL();
-        $E('allowedPrincipals').set(principalField.draw());
 
-        var blockedRoomList = new RoomListWidget('PeopleList', function(roomToRemove, setResult) {
+        var blockedRoomList = new RoomListWidget('user-list', function(roomToRemove, setResult) {
             setResult(true);
             blockedRoomList.set(roomToRemove, null);
             serializeRooms();

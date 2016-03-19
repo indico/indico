@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -135,7 +135,7 @@ class ContribTypeFilterField(filters.FilterField):
         elif not abstract.getContribType():
             return self._showNoValue
         else:
-            return abstract.getContribType().getId() in self._values
+            return abstract.getContribType().getId() in {value.getId() for value in self._values}
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():

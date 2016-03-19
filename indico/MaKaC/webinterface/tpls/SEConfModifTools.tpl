@@ -10,11 +10,6 @@
         </tr>
         <tr>
           <td>
-            <a href=${ alarmURL }><img src=${ alarmIconURL } alt="alarm" border="0" style="vertical-align:middle"></a> <b> ${ _("Alarms")}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>
             <a href="${ printPosterURL }"><img src="${ posterIconURL }" alt="${ _("print a poster")}" border="0" style="vertical-align:middle"></a> <b> ${ _("Print a poster")}</b>
           </td>
         </tr>

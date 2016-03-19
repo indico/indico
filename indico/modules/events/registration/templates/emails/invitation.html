@@ -1,0 +1,9 @@
+{% extends 'emails/base.html' %}
+
+{% block subject %}Invitation to register{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body -%}
+    {{ email_body | safe }}
+{%- endblock %}

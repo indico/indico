@@ -1,0 +1,24 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Verify your email{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {{ user.first_name }}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {%- trans name=user.full_name -%}
+            You tried to log in to your profile "{{ name }}" using a new authentication
+            method.  To finish the login process you need to verify that {{ email }} is indeed your
+            email address.  This is a one-time action. Afterwards, you will be able to log in using
+            the same authentication method without going through this step.
+
+            Please click the following link to finish the login process:
+        {%- endtrans %}
+
+        {{ url }}
+    {%- endfilter -%}
+{%- endblock %}

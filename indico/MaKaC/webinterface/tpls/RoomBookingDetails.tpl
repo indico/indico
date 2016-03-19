@@ -1,5 +1,6 @@
 <% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
 <% import itertools %>
+<% from indico.modules.rb.util import rb_is_admin %>
 
 <script type="text/javascript">
     var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };
@@ -137,10 +138,10 @@
   </div>
   <!-- Created -->
   <div id="iWillUseVideoConferencing" class="tip">
-    ${ _('Is user going to use video-conferencing equipment?') }<br />
+    ${ _('Is user going to use videoconferencing equipment?') }<br />
   </div>
   <div id="iNeedAVCSupport" class="tip">
-    ${ _('Has user requested support for video-conferencing equipment?') }<br />
+    ${ _('Has user requested support for videoconferencing equipment?') }<br />
   </div>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
@@ -194,7 +195,7 @@
                           ${ _('Interior') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="thumbnail">
-                          <a href="${ reservation.room.large_photo_url }" nofollow="lightbox">
+                          <a href="${ reservation.room.large_photo_url }" class="js-lightbox">
                             <img border="1px" src="${ reservation.room.small_photo_url }"/>
                           </a>
                         </td>
@@ -302,7 +303,7 @@
                           ${ _('By') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ reservation.created_by_user.getFullName() if reservation.created_by_user else '' }
+                          ${ reservation.created_by_user.full_name if reservation.created_by_user else '' }
                         </td>
                       </tr>
                       <tr>
@@ -383,6 +384,7 @@
                     </td>
                     <td>
                     <form id="submits" name="submits" action="" method="post">
+                      <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
                       <input type="hidden" id="reason" name="reason">
                       <div style="float:left; padding-top: 15px;">
                         % if not reservation.is_cancelled and not reservation.is_rejected:
@@ -407,7 +409,7 @@
                     </form>
                   </td>
                 </tr>
-                % if edit_logs and (reservation.created_by_user == user or reservation.room.is_owned_by(user) or user.isRBAdmin()):
+                % if edit_logs and (reservation.created_by_user == user or reservation.room.is_owned_by(user) or rb_is_admin(user)):
                   <tr><td>&nbsp;</td></tr>
                   <!-- BOOKING HISTORY -->
                   <tr>
@@ -519,7 +521,7 @@
                   </td>
                 </tr>
               % endif
-              % if (not reservation.is_accepted and (user.isRBAdmin() or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
+              % if (not reservation.is_accepted and (rb_is_admin(user) or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
                 <% conflicting_occurrences = reservation.get_conflicting_occurrences() %>
                 % if conflicting_occurrences:
                   <tr><td>&nbsp;</td></tr>

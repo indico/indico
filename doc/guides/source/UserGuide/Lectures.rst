@@ -70,43 +70,6 @@ You can then enter the name and description of the material.
 The material can be files or links. You also protect the material
 to control who has access to view it.
 
---------------
-
-.. _chat_room:
-
-Chat room
-~~~~~~~~~
-
-If the Indico administrators have enabled the chat room module, you can create
-chat rooms for your lecture.
-
-For more information, see :ref:`chat_guide`.
-
-|image166|
-
-
-
--------------
-
-.. _video_services:
-
-Video Services
-~~~~~~~~~~~~~~
-If the Indico administrators have enabled the Video Services functionality, you can have access to the *Video Services*
-option. The tabs in Video Services are:
-
-* Videoconferencing: Set up a videoconference
-* Recording request: Once you've set up the location of the lecture, you
-  can do a recording request. You will be presented to a form to complete
-  and you will need to ensure that all speakers
-  have given their permission to have their talks recorded.
-* Webcast request: You can do a webcast request. You need to complete a
-  form, select a room capable of webcasting and ensure that all speakers
-  give their permission to have their talks webcasted
-* Managers: Here you add video services managers and managers for individual
-  systems
-
-For more information, see :ref:`video_guide`.
 
 ------------
 
@@ -368,6 +331,4 @@ The Event style:
 .. |image162| image:: UserGuidePics/lectureEvaluation.png
 .. |image163| image:: UserGuidePics/lecturePoster.png
 .. |image164| image:: UserGuidePics/lectureLock.png
-.. |image165| image:: UserGuidePics/chatroom1.png
-.. |image166| image:: UserGuidePics/chatroom2.png
 .. |image167| image:: UserGuidePics/childrenProtectedLecturePopup.png

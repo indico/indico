@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -50,7 +50,7 @@ def prompt_email(prompt="Enter email: "):
         try:
             email = unicode(raw_input(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print
+            print()
             return None
         if is_valid_mail(email):
             return email
@@ -63,7 +63,7 @@ def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: "
         try:
             password = unicode(getpass(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print
+            print()
             return None
         # Empty, just prompt again
         if not password:
@@ -90,7 +90,12 @@ def terminal_size():
     return w, h
 
 
-def verbose_iterator(iterable, total, get_id, get_title):
+def clear_line():
+    """Clears the current line in the terminal"""
+    print('\r', ' ' * terminal_size()[0], '\r', end='', sep='')
+
+
+def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
     """Iterates large iterables verbosely
 
     :param iterable: An iterable
@@ -105,7 +110,7 @@ def verbose_iterator(iterable, total, get_id, get_title):
     )
 
     for i, item in enumerate(iterable, 1):
-        if i % 10 == 0 or i == total:
+        if i % print_every == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
             title = to_unicode(get_title(item).replace('\n', ' '))

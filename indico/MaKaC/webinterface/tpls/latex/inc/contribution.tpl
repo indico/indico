@@ -27,7 +27,7 @@
         \em
         \small
         \color{gray}
-        ${formatDate(contrib.getAdjustedStartDate(tz), format="full")} ${formatTime(contrib.getAdjustedStartDate(tz), format="short")} (${':'.join(str(contrib.getDuration()).split(':')[:2])})
+        ${formatDate(contrib.getAdjustedStartDate(tz), format="full")} ${formatTime(contrib.getAdjustedStartDate(tz), format="short", tz=tz)} (${':'.join(str(contrib.getDuration()).split(':')[:2])})
     }
 % endif
 

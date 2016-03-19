@@ -33,12 +33,6 @@
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Timezone")}</span></td>
-      <td bgcolor="white" width="50%">&nbsp;
-           <select name="timezone">${ timezone }</select>
-      </td>
-    </tr>
-    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Address")}</span></td>
       <td bgcolor="white" width="100%">
         <table width="100%">
@@ -58,10 +52,10 @@
         <table align="center">
         <tr>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("ok")}">
+            <input type="submit" class="btn" name="ok" value="${ _("ok")}">
           </td>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("cancel")}">
+            <input type="submit" class="btn" name="cancel" value="${ _("cancel")}">
           </td>
         </tr>
         </table>

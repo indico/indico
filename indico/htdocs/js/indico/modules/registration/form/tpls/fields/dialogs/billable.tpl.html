@@ -1,0 +1,22 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Billable' | i18n }}
+    </label>
+    <input type="checkbox" name="billable"
+        ng-model="formData.isBillable"
+        ng-checked="field.isBillable"/>
+</div>
+<div ng-if="formData.isBillable" class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Price' | i18n }}
+    </label>
+    <input type="number" name="price"
+        ng-model="formData.price"
+        ng-init="formData.price = formData.price || 0"
+        ng-class="{hasError: validationStarted && optionsForm.price.$invalid}"
+        min="0" size="20" required>
+    <i ng-if="field.inputType == 'number'"
+        class="info-helper"
+        title="{{ 'This price will be multiplied times the number entered by the user' | i18n }}">
+    </i>
+</div>

@@ -1,32 +1,61 @@
-from flask import render_template
+# This file is part of Indico.
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from flask import render_template
+from werkzeug.urls import url_parse
+
+from indico.core.auth import multipass
+from indico.modules.auth.util import url_for_login
+from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
-from indico.web.flask.util import url_rule_to_js
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
+from indico.web.assets import core_env
+from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
-from MaKaC.export import fileConverter
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 
 
 def generate_global_file(config):
     locations = Location.find_all() if config.getIsRoomBookingActive() else []
     location_names = {loc.name: loc.name for loc in locations}
     default_location = next((loc.name for loc in locations if loc.is_default), None)
-    ext_auths = [(auth.id, auth.name) for auth in AuthenticatorMgr().getList() if auth.id != 'Local']
+    ext_auths = [{
+        'name': auth.name,
+        'title': auth.title,
+        'supports_groups': auth.supports_groups
+    } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
     file_type_icons = dict((k.lower(), v[2]) for k, v in config.getFileTypes().iteritems())
-    material_types = dict((evt_type, [(m, m.title()) for m in MaterialFactoryRegistry._allowedMaterials[evt_type]])
-                          for evt_type in ['meeting', 'simple_event', 'conference', 'category'])
 
     indico_vars = {
         'FileTypeIcons': file_type_icons,
 
         'Urls': {
+            'BasePath': url_parse(config.getBaseURL()).path.rstrip('/'),
+            'JsonRpcService': url_for('api.jsonrpc'),
+            'ExportAPIBase': url_for('api.httpapi', prefix='export'),
+            'APIBase': url_for('api.httpapi', prefix='api'),
+
             'ImagesBase': config.getImagesBaseURL(),
             'SecureImagesBase': config.getImagesBaseSecureURL(),
 
-            'Login': urlHandlers.UHSignIn.getURL().js_router,
-            'Favourites': urlHandlers.UHUserBaskets.getURL(_ignore_static=True).js_router,
+            'Login': url_for_login(),
+            'Favorites': url_for('users.user_favorites'),
+            'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
+            'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),
 
             'ConferenceDisplay': urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router,
             'ContributionDisplay': urlHandlers.UHContributionDisplay.getURL(_ignore_static=True).js_router,
@@ -48,12 +77,9 @@ def generate_global_file(config):
             'FitSessionSlot': urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router,
 
             'UploadAction': {
-                'subcontribution': urlHandlers.UHSubContribModifAddMaterials.getURL(_ignore_static=True).js_router,
                 'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'session': urlHandlers.UHSessionModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'conference': urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'category': urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router
             },
+            'AttachmentManager': url_rule_to_js('attachments.management'),
 
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),
@@ -62,11 +88,35 @@ def generate_global_file(config):
             'ConfModifSchedule': urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router,
             'SubcontrModif': urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router,
             'AuthorDisplay': urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router,
-            'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router
+            'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router,
+
+            'APIKeyCreate': url_for('api.key_create'),
+            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
+            'FontSassBundle': core_env['fonts_sass'].urls(),
+
+            'RegistrationForm': {
+                'section': {
+                    'add': url_rule_to_angular('event_registration.add_section'),
+                    'modify': url_rule_to_angular('event_registration.modify_section'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_section'),
+                    'move': url_rule_to_angular('event_registration.move_section')
+                },
+                'field': {
+                    'add': url_rule_to_angular('event_registration.add_field'),
+                    'modify': url_rule_to_angular('event_registration.modify_field'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_field'),
+                    'move': url_rule_to_angular('event_registration.move_field')
+                },
+                'text': {
+                    'add': url_rule_to_angular('event_registration.add_text'),
+                    'modify': url_rule_to_angular('event_registration.modify_text'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_text'),
+                    'move': url_rule_to_angular('event_registration.move_text')
+                }
+            }
         },
 
         'Data': {
-            'MaterialTypes': material_types,
             'WeekDays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             'DefaultLocation': default_location,
             'Locations': location_names
@@ -89,11 +139,6 @@ def generate_global_file(config):
         'FileRestrictions': {
             'MaxUploadFilesTotalSize': config.getMaxUploadFilesTotalSize(),
             'MaxUploadFileSize': config.getMaxUploadFileSize()
-        },
-
-        'PDFConversion': {
-            'AvailablePDFConversions': fileConverter.CDSConvFileConverter.getAvailableConversions(),
-            'HasFileConverter': config.hasFileConverter()
         }
     }
 

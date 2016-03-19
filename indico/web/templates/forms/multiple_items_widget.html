@@ -1,132 +1,213 @@
-{% set value_json = field._value() | tojson %}
-<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
-<div id="{{ field.id }}-widget">
-    <table class="i-table-widget">
-        <thead data-tooltip-anchor>
-            <tr>
-                {% for _, title in field.fields -%}
-                    <th>{{ title }}</th>
-                {% endfor -%}
-                <th class="action-column">Action</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <a href="#" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</a>
-</div>
+{% extends 'forms/base_widget.html' %}
 
-<script>
-    (function() {
-        var columns = {{ field.fields | tojson }};
-        var widget = $('#{{ field.id }}-widget');
-        var widgetBody = widget.children('table').children('tbody');
-        var field = $('#{{ field.id }}');
-        var data = JSON.parse(field.val());
-        var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
-        var saveButton = $('<a>', {'class': 'action-icon icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
-        var editButton = $('<a>', {'class': 'action-icon icon-edit js-edit-row', 'href': '#', 'title': $T('Edit')});
-        var cancelButton = $('<a>', {'class': 'action-icon icon-close js-cancel-edit', 'href': '#', 'title': $T('Cancel')});
 
-        if (!data.length) {
-            createRow();
-        }
+{% block html %}
+    {% set value_json = field._value() | tojson %}
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+    <div id="{{ field.id }}-widget" class="multiple-items-widget">
+        <table class="i-table-widget">
+            <thead data-tooltip-anchor>
+                <tr>
+                    {% if field.sortable %}
+                        <th class="small-column"></th>
+                    {% endif %}
+                    {% for _, title in field.fields -%}
+                        <th>{{ title }}</th>
+                    {% endfor -%}
+                    <th class="action-column">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</button>
+    </div>
+{% endblock %}
 
-        data.forEach(function(item, i) {
-            createRow(item);
-        });
 
-        widget.on('click', '.js-remove-row', function(e) {
-            e.preventDefault();
-            removeRow($(this).closest('tr'));
-        }).on('click', '.js-save-row', function(e) {
-            e.preventDefault();
-            var row = $(this).closest('tr');
-            var item = {};
-            columns.forEach(function(col, i) {
-                item[col[0]] = row.find('input').eq(i).val();
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var uuidField = {{ field.uuid_field | tojson }};
+            var columns = {{ field.fields | tojson }};
+            var sortable = {{ field.sortable | tojson }};
+            var widget = $('#{{ field.id }}-widget');
+            var widgetBody = widget.children('table').children('tbody');
+            var field = $('#{{ field.id }}');
+            var data = JSON.parse(field.val());
+            var addButton = $('#{{ field.id }}-add-button');
+            var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
+            var saveButton = $('<a>', {'class': 'action-icon icon-floppy js-save-row', 'href': '#', 'title': $T('Save')});
+            var editButton = $('<a>', {'class': 'action-icon icon-edit js-edit-row', 'href': '#', 'title': $T('Edit')});
+            var cancelButton = $('<a>', {'class': 'action-icon icon-close js-cancel-edit', 'href': '#', 'title': $T('Cancel')});
+            var initialIndex;
+
+            if (!data.length) {
+                createRow();
+            }
+
+            data.forEach(function(item) {
+                createRow(item);
             });
-            if (row.data('hasItem')) {
-                data[row.index()] = item;
-            } else {
-                data.push(item);
-                row.data('hasItem', true);
+
+            if (sortable) {
+                fixWidths();
+
+                widget.find('tbody').sortable({
+                    axis: 'y',
+                    containment: 'parent',
+                    cursor: 'move',
+                    distance: 10,
+                    handle: '.sort-handle',
+                    items: '> tr',
+                    tolerance: 'pointer',
+                    forceHelperSize: true,
+                    forcePlaceholderSize: true,
+                    helper: function(e, item) {
+                        var originals = item.children();
+                        var helper = item.clone();
+                        helper.children().each(function(i) {
+                            $(this).width(originals.eq(i).width());
+                        });
+                        return helper;
+                    },
+                    start: function(e, ui) {
+                        initialIndex = ui.item.index();
+                    },
+                    update: function(e, ui) {
+                        _.move(data, initialIndex, ui.item.index());
+                        updateField();
+                    }
+                });
             }
-            updateField();
-            updateRow(row, false);
-        }).on('click', '.js-add-row', function(e) {
-            e.preventDefault();
-            createRow();
-        }).on('click', '.js-cancel-edit', function(e) {
-            e.preventDefault();
-            var row = $(this).closest('tr');
-            if (!row.data('hasItem')) {
-                removeRow(row);
-            } else {
-                updateRow(row, false);
-            }
-        }).on('click', '.js-edit-row', function(e) {
-            e.preventDefault();
-            var row = $(this).closest('tr');
-            updateRow(row, true);
-        }).on('keypress', 'input', function(e) {
-            if (e.keyCode == 13) {
+
+            widget.on('click', '.js-remove-row', function(e) {
                 e.preventDefault();
-                $(this).closest('tr').find('.js-save-row').trigger('click');
-            } else if(e.keyCode == 27) {
+                removeRow($(this).closest('tr'));
+            }).on('click', '.js-save-row', function(e) {
                 e.preventDefault();
-                $(this).closest('tr').find('.js-cancel-edit').trigger('click');
-            }
-        });
-
-        function makeColData(item, col, forceEditable) {
-            return (item && !forceEditable) ? {
-                text: item[col[0]]
-            } : {
-                html: $('<input>', {
-                    'type': 'text',
-                    'class': 'table-input',
-                    'value': item ? item[col[0]] : ''
-                    // can't set placeholder here due to the jquery.placeholder plugin
-                }).attr('placeholder', col[1])
-            };
-        }
-
-        function createRow(item) {
-            var row = $('<tr>');
-            row.data('hasItem', !!item);
-            columns.forEach(function(col) {
-                $('<td>', makeColData(item, col)).appendTo(row);
-            });
-            $('<td>', {
-                'html': item ? deleteButton.clone().add(editButton.clone()) : cancelButton.clone().add(saveButton.clone()),
-                'class': 'js-action-col'
-            }).appendTo(row);
-            widgetBody.append(row);
-            repositionTooltips();
-        }
-
-        function updateRow(row, editMode) {
-            row.children('td:not(.js-action-col)').each(function(i) {
-                $(this).replaceWith($('<td>', makeColData(data[row.index()], columns[i], editMode)));
-            });
-            if (editMode) {
-                row.children('.js-action-col').html(cancelButton.clone().add(saveButton.clone()));
-            } else {
-                row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
-            }
-        }
-
-        function removeRow(row) {
-            if (row.data('hasItem')) {
-                data.splice(row.index(), 1);
+                var row = $(this).closest('tr');
+                var item = {};
+                if (uuidField && row.data('uuid')) {
+                    item[uuidField] = row.data('uuid');
+                }
+                columns.forEach(function(col, i) {
+                    item[col[0]] = row.find('input').eq(i).val();
+                });
+                if (row.data('hasItem')) {
+                    data[row.index()] = item;
+                } else {
+                    data.push(item);
+                    row.data('hasItem', true);
+                }
                 updateField();
-            }
-            row.remove();
-            repositionTooltips();
-        }
+                updateRow(row, false);
+            }).on('click', '.js-add-row', function(e) {
+                e.preventDefault();
+                createRow();
+            }).on('click', '.js-cancel-edit', function(e) {
+                e.preventDefault();
+                var row = $(this).closest('tr');
+                if (!row.data('hasItem')) {
+                    removeRow(row);
+                } else {
+                    updateRow(row, false);
+                }
+            }).on('click', '.js-edit-row', function(e) {
+                e.preventDefault();
+                var row = $(this).closest('tr');
+                updateRow(row, true);
+            }).on('keypress', 'input', function(e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    $(this).closest('tr').find('.js-save-row').trigger('click');
+                } else if(e.keyCode == 27) {
+                    e.preventDefault();
+                    $(this).closest('tr').find('.js-cancel-edit').trigger('click');
+                }
+            });
 
-        function updateField() {
-            field.val(JSON.stringify(data));
-        }
-    })();
-</script>
+            function fixWidths() {
+                if (!sortable) {
+                    return;
+                }
+                widget.find('tbody > tr > td, tbody > tr, tbody').each(function() {
+                    // remove the fixed width to allow regular table sizing
+                    $(this).width('');
+                }).each(function() {
+                    // fix the iwdth to avoid ugly changes during sorting
+                    var $this = $(this);
+                    $this.width($this.width());
+                });
+            }
+
+            function rowsChanged() {
+                if (sortable) {
+                    widget.find('tbody.ui-sortable').sortable('refresh');
+                }
+                fixWidths();
+                addButton.prop('disabled', !!widget.find('.table-input').length);
+                repositionTooltips();
+            }
+
+            function makeColData(item, col, forceEditable) {
+                return (item && !forceEditable) ? {
+                    text: item[col[0]]
+                } : {
+                    html: $('<input>', {
+                        'type': 'text',
+                        'class': 'table-input',
+                        'value': item ? item[col[0]] : ''
+                        // can't set placeholder here due to the jquery.placeholder plugin
+                    }).attr('placeholder', col[1])
+                };
+            }
+
+            function createRow(item) {
+                var row = $('<tr>');
+                row.data('hasItem', !!item);
+                if (uuidField && item) {
+                    row.data('uuid', item[uuidField]);
+                }
+                if (sortable) {
+                    $('<td>', {'class': 'sort-handle'}).appendTo(row);
+                }
+                columns.forEach(function(col) {
+                    $('<td>', makeColData(item, col)).appendTo(row);
+                });
+                $('<td>', {
+                    'html': item ? deleteButton.clone().add(editButton.clone()) : cancelButton.clone().add(saveButton.clone()),
+                    'class': 'js-action-col'
+                }).appendTo(row);
+                widgetBody.append(row);
+                rowsChanged();
+            }
+
+            function updateRow(row, editMode) {
+                row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
+                    $(this).replaceWith($('<td>', makeColData(data[row.index()], columns[i], editMode)));
+                });
+                if (editMode) {
+                    row.children('.js-action-col').html(cancelButton.clone().add(saveButton.clone()));
+                } else {
+                    row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
+                }
+                rowsChanged();
+            }
+
+            function removeRow(row) {
+                if (row.data('hasItem')) {
+                    data.splice(row.index(), 1);
+                    updateField();
+                }
+                row.remove();
+                rowsChanged();
+            }
+
+            function updateField() {
+                field.val(JSON.stringify(data)).trigger('change');
+            }
+        })();
+    </script>
+{% endblock %}

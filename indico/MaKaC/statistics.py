@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,8 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import DBMgr
-
-from indico.util.date_time import nowutc
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.users import User
+from indico.util.date_time import now_utc
 
 
 class Statistics(object):
@@ -51,6 +53,11 @@ class CategoryStatistics(Statistics):
         dbi.commit()
 
     @classmethod
+    def _count_attachments(cls, obj):
+        return Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.linked_object == obj,
+                               is_deleted=False, _join=AttachmentFolder).count()
+
+    @classmethod
     def _processEvent(cls, dbi, event, statistics):
         nevents = 0
         year = event.getStartDate().year
@@ -60,7 +67,7 @@ class CategoryStatistics(Statistics):
             statistics["events"][year] = 1
         if len(event.getContributionList()) > 0:
             for cont in event.getContributionList():
-                if cont.getStartDate() != None:
+                if cont.getStartDate() is not None:
                     year = cont.getStartDate().year
                     if year in statistics["contributions"]:
                         statistics["contributions"][year] += 1
@@ -68,20 +75,12 @@ class CategoryStatistics(Statistics):
                         statistics["contributions"][year] = 1
                     if len(cont.getSubContributionList()) > 0:
                         for scont in cont.getSubContributionList():
-                            l = scont.getAllMaterialList()
-                            for m in l:
-                                statistics["resources"] += m.getNbResources()
-                    l = cont.getAllMaterialList()
-                    for m in l:
-                        statistics["resources"] += m.getNbResources()
+                            statistics["files"] += cls._count_attachments(scont)
+                    statistics["files"] += cls._count_attachments(cont)
         if len(event.getSessionList()) > 0:
             for sess in event.getSessionList():
-                l = sess.getAllMaterialList()
-                for m in l:
-                    statistics["resources"] += m.getNbResources()
-        l = event.getAllMaterialList()
-        for m in l:
-            statistics["resources"] += m.getNbResources()
+                statistics["files"] += cls._count_attachments(sess)
+        statistics["files"] += cls._count_attachments(event)
 
         # commit every 1000 events
         if nevents % 1000 == 999:
@@ -89,11 +88,10 @@ class CategoryStatistics(Statistics):
 
     @classmethod
     def _updateStatistics(cls, cat, dbi, level=0, logger=None):
-
         stats = cat.getStatistics()
         stats["events"] = {}
         stats["contributions"] = {}
-        stats["resources"] = 0
+        stats["files"] = 0
 
         if len(cat.getSubCategoryList()) > 0:
             for scat in cat.getSubCategoryList():
@@ -114,13 +112,14 @@ class CategoryStatistics(Statistics):
                         stats["contributions"][year] += scat._statistics["contributions"][year]
                     else:
                         stats["contributions"][year] = scat._statistics["contributions"][year]
-                stats["resources"] += scat._statistics["resources"]
+                stats["files"] += scat._statistics["files"]
 
         elif cat.conferences:
             for event in cat.conferences:
                 cls._processEvent(dbi, event, stats)
 
-        stats["updated"] = nowutc()
+        stats["updated"] = now_utc()
+        stats["users"] = User.query.count()
         cat._statistics = stats
         cat._p_changed = 1
 

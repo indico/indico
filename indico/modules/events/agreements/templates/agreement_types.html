@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Agreements{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div>
+        {% for definition in definitions %}
+            {% set active = definition.is_active(event) %}
+            <div class="action-box">
+                <div class="section">
+                    <div class="icon icon-agreement"></div>
+                    <div class="text">
+                        <div class="label">
+                            {{ definition.title }}
+                        </div>
+                        <div>
+                            {{ definition.description }}
+                        </div>
+                    </div>
+                    <div class="toolbar right">
+                        <a class="i-button highlight {%- if not active %} disabled{% endif %} icon-settings"
+                        {%- if active %}
+                            href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}"
+                        {% endif -%}
+                        {%- if not active %}
+                            title="{{ definition.disabled_reason }}"
+                        {% endif -%}>
+                            {%- trans %}Manage agreements{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

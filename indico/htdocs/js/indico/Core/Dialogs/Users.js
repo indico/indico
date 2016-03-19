@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,9 +16,7 @@
  */
 
 function userListNothing(data, func) {
-    each(data, function() {
-        func(true);
-    });
+    func(true, data);
 }
 
 function singleUserNothing(user, func) {
@@ -49,18 +47,56 @@ function userSort(user1, user2) {
     }
 }
 
-function updateFavList(favouriteList) {
-    IndicoGlobalVars['favorite-user-ids'] = {};
-    IndicoGlobalVars['favorite-user-list'] = [];
-    each(favouriteList, function(user) {
-        IndicoGlobalVars['favorite-user-ids'][user.id] = true;
-        IndicoGlobalVars['favorite-user-list'].push(user);
-    });
+function create_favorite_button(user_id) {
+    var integerRegex = /^[0-9]+$/;
+    if (!integerRegex.test(user_id)) {  // external user
+        return $('<span>');
+    }
+    var active = !!Indico.User.favorite_users[user_id],
+        span = $('<span class="favorite-user icon-star">')
+            .attr({
+                title: active ? $T('Remove from your list of favorite users') : $T('Add to your list of favorite users'),
+                'data-id': user_id
+            })
+            .on('click', function(e) {
+                e.stopPropagation();
+                $(document).trigger('favorites.' + ($(this).hasClass('active') ? 'remove-user' : 'add-user'), user_id);
+            });
+
+    if (active) {
+        span.addClass('active');
+    }
+
+    return span;
 }
+
+$(function() {
+    $(document).on('favorites.remove-user', function(e, user_id) {
+        $.ajax({
+            url: build_url(Indico.Urls.FavoriteUserRemove, {fav_user_id: user_id}),
+            method: 'DELETE',
+            error: handleAjaxError
+        }).done(function() {
+            $('.favorite-user[data-id=' + user_id + ']').removeClass('active');
+            delete Indico.User.favorite_users[user_id];
+        });
+    }).on('favorites.add-user', function(e, user_id) {
+        $.ajax({
+            url: Indico.Urls.FavoriteUserAdd,
+            method: 'POST',
+            dataType: 'json',
+            data: {user_id: [user_id]},
+            error: handleAjaxError
+        }).done(function(result) {
+            $('.favorite-user[data-id=' + user_id + ']').addClass('active');
+            Indico.User.favorite_users[user_id] = result.users[0];
+        });
+    });
+});
 
 /**
  * @param {String} style The class name of the <ul> element inside this FoundPeopleList
- *                       If left to null, it will be "UIPeopleList"
+ *                       If left to null, it will be "user-list"
  *
  * @param {Function} selectionObserver A function that will be called when the selection varies. The function will be called without arguments
  *                                     (it can use public methods of FoundPeopleList to get information).
@@ -74,20 +110,18 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         var peopleData = pair.get();
 
         if (peopleData.get('isGroup') || peopleData.get('_type') === 'group') {
-            return Html.span({}, peopleData.get("name"));
+            return Html.div("info", Html.span("name", peopleData.get("name")));
         } else {
-
-            var userName = Html.span({}, peopleData.get("familyName").toUpperCase(), ', ', peopleData.get("firstName"));
-            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), Util.truncate(peopleData.get("email"), 40));
+            var userName = Html.span("name", peopleData.get("firstName"), ' ', peopleData.get("familyName"));
+            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "email"}, Util.truncate(peopleData.get("email"), 40));
+            var affiliation = Html.$($('<span class="affiliation">').text(peopleData.get('affiliation')));
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
-                var favouritizeButton = new ToggleFavouriteButton(peopleData.getAll(), null, null, this.favouriteButtonObserver).draw();
-                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, favouritizeButton);
-                return [favouritizeButtonDiv, userName, userEmail];
+                var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
+                return [Html.div("info", userName, userEmail, affiliation), favouritizeButtonDiv];
             } else {
-                return [userName, userEmail];
+                return Html.div("info", userName, userEmail, affiliation);
             }
-
         }
     }
 },
@@ -96,9 +130,8 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
      * Constructor for FoundPeopleList
      */
     function(style, onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver) {
-
         if (!exists(style)) {
-            style = "UIPeopleList";
+            style = "user-list";
         }
 
         this.onlyOne = any(onlyOne,false);
@@ -107,7 +140,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
 
         /*this.lastTargetListItem = null;*/
 
-        this.SelectableListWidget(selectionObserver, this.onlyOne, style, "selectedUser", "unselectedUser"); //, this.__mouseoverObserver);
+        this.SelectableListWidget(selectionObserver, this.onlyOne, style, "selected", "unselected"); //, this.__mouseoverObserver);
     }
 );
 
@@ -147,17 +180,12 @@ type ("SimpleSearchPanel", ["IWidget"], {
     */
    _createAuthenticatorSearch: function() {
        var self = this;
-
-       if (empty(Indico.Settings.ExtAuthenticators)) {
+       if (empty(Indico.Settings.ExtAuthenticators) || !this.allowExternal) {
            return null;
        } else {
-           var authenticatorList = [];
-           each(Indico.Settings.ExtAuthenticators, function(auth) {
-               var searchExternalCB = Html.checkbox({});
-               $B(searchExternalCB, self.criteria.accessor('searchExternal-' + auth[0]));
-               authenticatorList.push(["Search " + auth[1], searchExternalCB]);
-           });
-           return authenticatorList;
+            var searchExternalCB = Html.checkbox({});
+            $B(searchExternalCB, self.criteria.accessor('search-ext'));
+            return [[$T("Users with no Indico account"), searchExternalCB]];
        }
    },
 
@@ -189,7 +217,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
            self._search();
        });
 
-       this.foundPeopleListDiv = Html.div("UISearchPeopleListDiv", this.foundPeopleList.draw());
+       this.foundPeopleListDiv = Html.div("user-search-results", this.foundPeopleList.draw());
 
        this.container = Html.div({}, this.searchForm.get(), this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
 
@@ -207,7 +235,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     /**
      * Constructor for SimpleSearchPanel
      */
-    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv) {
+    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal) {
 
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
@@ -215,7 +243,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.criteria = new WatchObject();
 
         this.foundPeopleList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
-        this.foundPeopleList.setMessage("Fill any of the upper fields and click search...");
+        this.foundPeopleList.setMessage($T("You can use the form above to search for users..."));
         this.extraDiv = any(extraDiv, Html.div({}));
 
         this.searchForm = null;
@@ -226,6 +254,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
         this.submissionRights = submissionRights;
         this.grantRights = grantRights;
+        this.allowExternal = allowExternal;
    }
 );
 
@@ -242,41 +271,25 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      * Form to fill in user search data
      */
     _createSearchForm: function() {
-        var self = this;
+        var self = this,
+            do_search = function() {
+                self._searchAction();
+                return false;
+            };
 
-        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"},id:'userSearchFocusField'}, function() {
-            self._searchAction();
-            return false;
-        });
+        this.fields = {
+            'surName': new EnterObserverTextBox("text", {style: {width: "100%"}, id:'userSearchFocusField'}, do_search),
+            'name': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'email': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'organisation': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'exactMatch': Html.checkbox({})
+        };
 
-        var firstName = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var email = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var organisation = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var exactMatch = Html.checkbox({});
-
-        $B(familyName, this.criteria.accessor('surName'));
-        $B(firstName, this.criteria.accessor('name'));
-        $B(organisation, this.criteria.accessor('organisation'));
-        $B(email, this.criteria.accessor('email'));
-        $B(exactMatch, this.criteria.accessor('exactMatch'));
-
-        var fieldList = [[$T("Family name"), familyName.draw()],
-                         [$T("First name"), firstName.draw()],
-                         [$T("E-mail"), email.draw()],
-                         [$T("Organisation"), organisation.draw()],
-                         [$T("Exact Match"), exactMatch]];
+        var fieldList = [[$T("Family name"), this.fields.surName.draw()],
+                         [$T("First name"), this.fields.name.draw()],
+                         [$T("E-mail"), this.fields.email.draw()],
+                         [$T("Organisation"), this.fields.organisation.draw()],
+                         [$T("Exact Match"), this.fields.exactMatch]];
 
         var authenticatorSearch = this._createAuthenticatorSearch();
         if (exists(authenticatorSearch)) {
@@ -294,6 +307,10 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
 
         self.searchButton.dom.disabled = true;
         this.foundPeopleList.setMessage(Html.div({style: {paddingTop: '20px'}}, progressIndicator(false, true)));
+
+        _.each(this.fields, function(widget, key) {
+            self.criteria.set(key, widget.get());
+        });
 
         indicoRequest(
             'search.users',
@@ -331,11 +348,12 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     /**
      * Constructor for UserSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
-        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal){
+        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal);
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
+        this.fields = {};
     }
 );
 
@@ -359,16 +377,13 @@ type ("GroupSearchPanel", ["SimpleSearchPanel"], {
             self._searchAction();
             return false;
         });
+        var exactMatch = Html.checkbox({});
 
         $B(groupName, this.criteria.accessor('group'));
+        $B(exactMatch, this.criteria.accessor('exactMatch'));
+        this.criteria.set('exactMatch', true);
 
-        var fieldList = [[$T("Group name"), groupName.draw()]];
-
-        var authenticatorSearch = this._createAuthenticatorSearch();
-        if (exists(authenticatorSearch)) {
-            fieldList = concat(fieldList, authenticatorSearch);
-        }
-
+        var fieldList = [[$T("Group name"), groupName.draw()], [$T("Exact Match"), exactMatch]];
         return IndicoUtil.createFormFromMap(fieldList, true);
     },
 
@@ -486,7 +501,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     /**
      * Constructor for UserAndGroupsSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal){
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
         this.parentSelectionObserver = selectionObserver;
@@ -495,7 +510,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 
         this.userPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("users", selectedList);
-        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
+        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal);
         this.groupPanel = new GroupSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("groups", selectedList);
         }, showToggleFavouriteButtons);
@@ -532,12 +547,12 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (this.suggestedUserList.isEmpty()) {
             var message = Html.span({}, $T("There are no suggested users for you at the moment. Why not add some "),
-                                        Html.a({href: build_url(Indico.Urls.Favourites)}, $T("favourites")),
+                                        Html.a({href: Indico.Urls.Favorites}, $T("favourites")),
                                         "?");
             this.suggestedUserList.setMessage(message);
         }
 
-        this.suggestedUserListDiv = Html.div("UISuggestedPeopleListDiv", this.suggestedUserList.draw());
+        this.suggestedUserListDiv = Html.div("suggested-users", this.suggestedUserList.draw());
 
         return this.IWidget.prototype.draw.call(this, Widget.block([this.titleDiv, this.suggestedUserListDiv]));
     }
@@ -568,10 +583,14 @@ type ("SuggestedUsersPanel", ["IWidget"], {
         }
 
         if (includeFavourites) {
-            each(IndicoGlobalVars['favorite-user-list'], function(user){
-                var id = user.id;
-                if (exists(IndicoGlobalVars['favorite-user-ids'][id]) && IndicoGlobalVars['favorite-user-ids'][id] && !self.suggestedUserList.get('existingAv' + id)) {
-                    self.suggestedUserList.set('existingAv' + id, $O(user));
+            var favorites = _.values(Indico.User.favorite_users).sort(function(a, b) {
+                var name1 = '{0} {1}'.format(a.firstName, a.familyName);
+                var name2 = '{0} {1}'.format(b.firstName, b.familyName);
+                return (name1 == name2) ? 0 : (name1 < name2) ? -1 : 1;
+            });
+            _.each(favorites, function(user){
+                if (!self.suggestedUserList.get('existingAv' + user.id)) {
+                    self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 }
             });
         }
@@ -605,27 +624,6 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     _preload: [
 
-        function(hook) {
-            var self = this;
-
-            if (exists(IndicoGlobalVars['favorite-user-list'])) {
-                hook.set(true);
-            } else {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-                indicoRequest('user.favorites.listUsers', {},
-                    function(result, error) {
-                        if (!error) {
-                            updateFavList(result);
-                            killProgress();
-                            hook.set(true);
-                        } else {
-                            killProgress();
-                            IndicoUI.Dialogs.Util.error(error);
-                        }
-                    }
-                );
-            }
-        }
     ],
 
     __buildSearchPanel: function(container) {
@@ -635,13 +633,13 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, this.submissionRights, this.grantRights, self.extraDiv);
+            }, this.submissionRights, this.grantRights, self.extraDiv, self.allowExternal);
         } else {
             this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList) {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, this.submissionRights, this.grantRights, self.extraDiv);
+            }, this.submissionRights, this.grantRights, self.extraDiv, self.allowExternal);
         }
         var returnedDom = this.searchPanel.draw();
         container.append(returnedDom);
@@ -786,7 +784,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              conferenceId, enableGroups,
              includeFavourites, suggestedUsers,
              onlyOne, showToggleFavouriteButtons,
-             submissionRights, chooseProcess, extraDiv) {
+             submissionRights, chooseProcess, extraDiv, allowExternal) {
 
         var self = this;
 
@@ -820,6 +818,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.open();
             });
         this.ExclusivePopupWithButtons(title, positive);
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
     }
 );
 
@@ -896,7 +895,7 @@ type("SingleUserField", ["IWidget"], {
 
         this.variableButtonsDiv.clear();
         if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
-            var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new ToggleFavouriteButton(user).draw());
+            var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new Html(create_favorite_button(this.user.get('id')).get(0)));
             this.variableButtonsDiv.append(favButtonDiv);
         }
 
@@ -962,7 +961,7 @@ type("SingleUserField", ["IWidget"], {
                                                            true, self.conferenceId, self.enableGroups,
                                                            self.includeFavourites, self.suggestedUsers,
                                                            true, true, false,
-                                                           chooseUserHandler);
+                                                           chooseUserHandler, null, self.allowExternal);
                 userChoosePopup.execute();
             });
 
@@ -984,7 +983,7 @@ type("SingleUserField", ["IWidget"], {
              includeFavourites, suggestedUsers,
              conferenceId, enableGroups,
              allowNew, allowDelete,
-             assignProcess, removeProcess) {
+             assignProcess, removeProcess, allowExternal) {
 
         var self = this;
 
@@ -1025,6 +1024,7 @@ type("SingleUserField", ["IWidget"], {
 
         // div that will have the remove and favouritize buttons
         this.buttonsDiv = Html.div({style:{display:"inline"}});
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
 
     }
 );
@@ -1101,6 +1101,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                         popup.open();
                         return;
                     }
+                    self.userData.set('name', '{0} {1}'.format(self.userData.get('firstName'), self.userData.get('familyName')))
                     self.action(self.userData, function() {
                     self.close();
                     });
@@ -1285,70 +1286,64 @@ type("UserListWidget", ["ListWidget"],
             var self = this;
             var userData = user.get();
 
-            var editButton = Widget.link(command(function() {
-                 var editPopup = new UserDataPopup(
-                     'Change user data',
-                     userData.clone(),
-                     function(newData, suicideHook) {
-                         if (editPopup.parameterManager.check()) {
-                             //  editProcess will be passed a WatchObject representing the user.
-                             self.editProcess(userData, function(result) {
-                                 if (result) {
-                                     userData.update(newData.getAll());
-                                     if (!startsWith('' + userData.get('id'), 'newUser')) {
-                                         userData.set('id', 'edited' + userData.get('id'));
-                                     }
-                                     self.userListField.inform();
-                                 }
-                             });
-                             suicideHook();
-                         }
-                     }
+            var edit_button = $('<i class="edit-user icon-edit">').click(function() {
+                var editPopup = new UserDataPopup(
+                    'Change user data',
+                    userData.clone(),
+                    function(newData, suicideHook) {
+                        if (editPopup.parameterManager.check()) {
+                            //  editProcess will be passed a WatchObject representing the user.
+                            self.editProcess(userData, function(result) {
+                                if (result) {
+                                    userData.update(newData.getAll());
+                                    if (!startsWith('' + userData.get('id'), 'newUser')) {
+                                        userData.set('id', 'edited' + userData.get('id'));
+                                    }
+                                    self.userListField.inform();
+                                }
+                            });
+                            suicideHook();
+                        }
+                    }
                  );
                  editPopup.open();
-            }, IndicoUI.Buttons.editButton()));
+            });
 
-            var removeButton = Widget.link(command(function() {
-                             // removeProcess will be passed a WatchObject representing the user.
-                             self.removeProcess(userData, function(result) {
-                                     if (result) {
-                                         self.set(user.key, null);
-                                         self.userListField.inform();
-                                     }
-                                 });
-                             }, IndicoUI.Buttons.removeButton()));
+            var remove_button = $('<i class="remove-user icon-close">').click(function() {
+                self.removeProcess(userData, function(result) {
+                    if (result) {
+                        self.set(user.key, null);
+                        self.userListField.inform();
+                    }
+                });
+            });
+
+            var buttonDiv = Html.div("actions", new Html(remove_button.get(0)));
 
             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-                var removeButtonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}}, removeButton);
-                var groupName = $B(Html.span(), userData.accessor('name'));
-                return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
+                var groupName = $B(Html.span("name"), userData.accessor('name'));
+                return [Html.span("info", groupName), buttonDiv];
             } else {
-                var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
-                if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
-                    var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
-                    buttonDiv.append(favouritizeButton);
+                if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                    buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
                 }
                 if (this.allowSetRights) {
                     buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));
                 }
                 if (this.allowEdit) {
-                    buttonDiv.append(editButton) ;
+                    buttonDiv.append(new Html(edit_button.get(0)));
                 }
-                buttonDiv.append(removeButton);
+                buttonDiv.append(new Html(remove_button.get(0)));
 
-                var userName = Html.span({},
-                        $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
-                        ', ',
-                        $B(Html.span(), userData.accessor('firstName')));
-
-                return Html.span({}, buttonDiv, userName);
+                var userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
+                return [userName, buttonDiv];
             }
          }
      },
 
      function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons, userListField) {
 
-         this.style = any(style, "UIPeopleList");
+         this.style = any(style, "user-list");
          this.allowSetRights = allowSetRights;
          this.allowEdit = allowEdit;
          this.editProcess = any(editProcess, singleUserNothing);
@@ -1478,7 +1473,7 @@ type("UserListField", ["IWidget"], {
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?" / Group":"")));
+            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
 
             var title = "";
             if (this.includeFavourites || exists(this.suggestedUsers)) {
@@ -1488,14 +1483,13 @@ type("UserListField", ["IWidget"], {
             }
 
             var peopleAddedHandler = function(peopleList){
-
                 // newProcess will be passed a list of WatchObjects representing the users.
-                self.newProcess(peopleList, function(value) {
+                self.newProcess(peopleList, function(value, results) {
                     if (value) {
-                        each(peopleList, function(person){
+                        each(results, function(person){
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
-                                key = person.id;
+                                key = person.identifier;
                             } else {
                                 key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
                             }
@@ -1516,7 +1510,8 @@ type("UserListField", ["IWidget"], {
 
             chooseUserButton.observeClick(function() {
                 var chooseUsersPopup = new ChooseUsersPopup(title, self.allowSearch, self.conferenceId, self.enableGroups,
-                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler);
+                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler,
+                        null, self.allowExternal);
                 chooseUsersPopup.execute();
             });
 
@@ -1610,18 +1605,20 @@ type("UserListField", ["IWidget"], {
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
              allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
-             newProcess, editProcess, removeProcess) {
+             newProcess, editProcess, removeProcess, allowExternal) {
 
         var self = this;
         this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
         self.newUserCounter = 0;
-        this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
+        this.userDivStyle = any(userDivStyle, "user-list");
         this.setUpParameters();
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
                 if (any(user._type, null) === 'Avatar') {
                     self.userList.set('existingAv' + user.id, $O(user));
+                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup'].indexOf(user._type)) {
+                    self.userList.set(user.identifier, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
                 }
@@ -1652,134 +1649,7 @@ type("UserListField", ["IWidget"], {
         this.allowNew = any(allowNew, true);
         this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
         this.newProcess = any(newProcess, userListNothing);
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
      }
 );
 
-
-/**
- * Buttons to add or remove a user to the list of the currently
- * logged in user's favourites.
- */
-type("ToggleFavouriteButton", ["InlineWidget"], {
-    draw: function() {
-        var self = this;
-
-        var imageRemove = Html.img({
-            src: imageSrc("star"),
-            alt: 'Remove from Favorites',
-            title: $T('Remove from your list of favorite users'),
-            style: this.imageStyle
-            });
-
-        var imageAdd = Html.img({
-            src: imageSrc("starGrey"),
-            alt: 'Add to Favorites',
-            title: $T('Add to your list of favorite users'),
-            style: this.imageStyle
-        });
-
-        var imageLoading = Html.img({
-            src: imageSrc("loading", 'gif'),
-            alt: 'Loading',
-            title: $T('Communicating with server'),
-            style: this.imageStyle
-        });
-
-        var starIcon = $B(Html.span(), this.stateWatchValue, function(state){
-            if (state) { // user is favourite
-                return imageRemove;
-            } else { // user is not favourite
-                return imageAdd;
-            }
-        });
-
-        var content = Html.span({}, starIcon);
-
-        imageRemove.observeClick(function(event){
-            content.set(imageLoading);
-            indicoRequest('user.favorites.removeUser',
-                {
-                    value: [{id:self.avatar.id}]
-                },
-                function(result,error){
-                    content.set(starIcon);
-                    if(!error) {
-                        IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = false;
-                        self.stateWatchValue.set(false);
-                        if (exists(self.observer)) {
-                            self.observer(self.avatar, false);
-                        }
-                    } else {
-                        self._error(error); //Implemented in InlineWidget
-                    }
-                });
-            stopPropagation(event);
-        });
-
-        imageAdd.observeClick(function(event){
-            content.set(imageLoading);
-            indicoRequest('user.favorites.addUsers',
-                    {
-                        value: [{id:self.avatar.id}]
-                    },
-                    function(result,error){
-                        content.set(starIcon);
-                        if(!error) {
-                            IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = true;
-                            if (exists(IndicoGlobalVars['favorite-user-list'])) {
-                                IndicoGlobalVars['favorite-user-list'].push(self.avatar);
-                                IndicoGlobalVars['favorite-user-list'].sort(userSort);
-                            }
-                            self.stateWatchValue.set(true);
-                            if (exists(self.observer)) {
-                                self.observer(self.avatar, true);
-                            }
-                        } else {
-                            self._error(error);  //Implemented in InlineWidget
-                        }
-                    });
-
-            stopPropagation(event);
-        });
-
-        return this.IWidget.prototype.draw.call(this, content);
-    }
-},
-    /**
-     * Constructor
-     */
-    function(avatar, customImgStyle, initialState, observer){
-        this.IWidget();
-
-        this.avatar = avatar;
-
-        customImgStyle = any(customImgStyle, {});
-        this.imageStyle = merge({verticalAlign:'middle', cursor:'pointer'});
-
-        this.observer = any(observer, null);
-
-        this.stateWatchValue = null;
-
-        if (!exists(IndicoGlobalVars['favorite-user-ids'])) {
-            IndicoGlobalVars['favorite-user-ids'] = {};
-            /*IndicoGlobalVars['favorite-user-list'] = [];*/
-        }
-        if (!exists(IndicoGlobalVars.userFavouritesWatchValues)) {
-            IndicoGlobalVars.userFavouritesWatchValues = {};
-        }
-
-        if(!exists(IndicoGlobalVars.userFavouritesWatchValues[avatar.id])) {
-            if(exists(IndicoGlobalVars['favorite-user-ids'][avatar.id])) {
-                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars['favorite-user-ids'][avatar.id] === true);
-            } else {
-                if (!exists(IndicoGlobalVars['favorite-user-ids']) && !exists(initialState)) {
-                    new AlertPopup($T("Warning"), $T("ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState")).open();
-                }
-                initialState = any(initialState, false);
-                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(initialState);
-            }
-        }
-
-        this.stateWatchValue = IndicoGlobalVars.userFavouritesWatchValues[avatar.id];
-    }
-);

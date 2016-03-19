@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,45 +21,36 @@ import MaKaC.webinterface.wcomponents as wcomponents
 class WPPaperReviewingDisplay(WPConferenceDefaultDisplayBase):
 
     ''' Display page of paper reviewing '''
+    menu_entry_name = 'paper_reviewing'
 
     def _getBody(self,params):
         wc = WPaperReviewingDisplay(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._paperReviewingOpt)
-
 
 class WPDownloadPRTemplate(WPConferenceDefaultDisplayBase):
 
     ''' Class for the page with the list of available templates '''
+    menu_entry_name = 'download_template'
 
     def _getBody(self,params):
         wc = WDownloadPRTemplate(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._downloadTemplateOpt)
-
 
 class WPUploadPaper(WPConferenceDefaultDisplayBase):
 
     ''' Class for the page to upload papers '''
+    menu_entry_name = 'paper_upload'
 
     def _getBody(self,params):
         wc = WUploadPaper(self._getAW(),self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._uploadPaperOpt)
-
 
 class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
-    _linkname = "paperreviewing"
+    _linkname = 'paper_reviewing'
 
     def __init__(self, conference):
         self._conf = conference
@@ -72,7 +63,7 @@ class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
 class WDownloadPRTemplate(WConfDisplayBodyBase):
 
-    _linkname = "downloadtemplate"
+    _linkname = 'download_template'
 
     def __init__(self, conference):
         self._conf = conference
@@ -89,7 +80,7 @@ class WDownloadPRTemplate(WConfDisplayBodyBase):
 
 class WUploadPaper(WConfDisplayBodyBase):
 
-    _linkname = "uploadpaper"
+    _linkname = 'paper_upload'
 
     def __init__(self, aw, conf):
         self._aw = aw

@@ -1,0 +1,31 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+
+{% block subtitle %}
+    Details for #{{registration.friendly_id}}:
+    {{ registration.full_name }} in "{{ registration.registration_form.title }}"
+{% endblock %}
+
+{% block content %}
+    {{ registration_details_html | safe }}
+
+    <div class="permalink-text">
+        <div>
+            {% trans -%}
+                Give this link to the user to manage their registration.<br>
+                Make sure to keep it private as anybody with this link will be able to manage it.
+            {%- endtrans %}
+        </div>
+        <input type="text" class="permalink" readonly
+               value="{{ url_for('.display_regform', registration.locator.uuid, _external=true) }}">
+    </div>
+
+    <div class="right">
+        <button data-href="{{ url_for('.edit_registration', registration) }}" data-method="GET"
+           class="i-button big highlight" {% if registration.is_cancelled %} disabled{% endif %}>
+            {%- trans %}Modify{% endtrans -%}
+        </button>
+        <a href="{{ url_for('.manage_reglist', registration.registration_form) }}" class="i-button big">
+            {%- trans %}Back{% endtrans -%}
+        </a>
+    </div>
+{% endblock %}

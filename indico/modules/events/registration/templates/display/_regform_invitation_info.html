@@ -1,0 +1,26 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_invitation_info(invitation) %}
+    {% call message_box('highlight') %}
+        {% if invitation.state.name == 'pending' %}
+            {% trans -%}
+                You have been invited to register for this event. If you do not wish to participate,
+                please inform the organizers by declining the invitation.
+            {%- endtrans %}
+            <br>
+            <div class="clearfix">
+                <button class="i-button highlight right"
+                        data-href="{{ url_for('.decline_invitation', invitation.locator.uuid) }}"
+                        data-method="POST"
+                        data-title="{% trans %}Decline Invitation{% endtrans %}"
+                        data-confirm="{% trans %}Do you really want to decline this invitation? If you change your mind you may still register for the event later.{% endtrans %}">
+                    {% trans %}Decline{% endtrans %}
+                </button>
+            </div>
+        {% else %}
+            {% trans -%}
+                You have declined the invitation, but you may still register for the event.
+            {%- endtrans %}
+        {% endif %}
+    {% endcall %}
+{% endmacro %}

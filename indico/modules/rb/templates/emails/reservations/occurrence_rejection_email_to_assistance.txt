@@ -1,0 +1,9 @@
+{% extends 'rb/emails/reservations/base_email_to_assistance.txt' %}
+
+{% block body -%}
+A booking has been REJECTED by the manager of the room '{{ reservation.room.full_name }}' for the {{ occurrence.start_dt | format_date(locale='en_GB') }}.
+Assistance for the meeting startup in NOT needed anymore.
+
+Rejection reason:
+{{ occurrence.rejection_reason }}
+{%- endblock %}

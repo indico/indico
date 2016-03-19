@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,19 +16,21 @@
 
 from __future__ import absolute_import
 
+import os
 from contextlib import contextmanager
 
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
 from flask.blueprints import BlueprintSetupState
+from flask.helpers import locked_cached_property
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
+from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
-from MaKaC.common import HelperMaKaCInfo
+from indico.core.config import Config
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
-from indico.core.db import DBMgr
 from indico.util.json import IndicoJSONEncoder
 
 
@@ -36,17 +38,17 @@ class IndicoRequest(Request):
     parameter_storage_class = ImmutableOrderedMultiDict
 
     @cached_property
-    def remote_addr(self):
-        """The remote address of the client."""
-        with DBMgr.getInstance().global_connection():
-            if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy():
-                if self.access_route:
-                    return self.access_route[0]
-        return super(IndicoRequest, self).remote_addr
-
-    @cached_property
     def id(self):
         return '{0:012x}'.format(id(self))
+
+    @cached_property
+    def relative_url(self):
+        """The request's path including its query string if applicable.
+
+        This basically `full_path` but without the ugly trailing
+        questionmark if there is no query string.
+        """
+        return self.full_path.rstrip(u'?')
 
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
@@ -59,6 +61,22 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     json_encoder = IndicoJSONEncoder
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+
+    @property
+    def session_cookie_name(self):
+        name = super(IndicoFlask, self).session_cookie_name
+        if not request.is_secure:
+            name += '_http'
+        return name
+
+    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        from MaKaC.webinterface.rh.base import RHSimple
+        # Endpoints from Flask-Multipass need to be wrapped in the RH
+        # logic to get the autocommit logic and error handling for code
+        # running inside the identity handler.
+        if endpoint is not None and endpoint.startswith('_flaskmultipass'):
+            view_func = RHSimple.wrap_function(view_func)
+        return super(IndicoFlask, self).add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
 
 
 class IndicoBlueprintSetupState(BlueprintSetupState):
@@ -82,12 +100,34 @@ class IndicoBlueprint(Blueprint):
     ignore the url_prefix of the blueprint.
 
     It also supports automatically creating rules in two versions - with and
-    without a prefix."""
+    without a prefix.
+
+    :param event_feature: If set, this blueprint will raise `NotFound`
+                          for all its endpoints unless the event referenced
+                          by the `confId` or `event_id` URL argument has
+                          the specified feature.
+    """
 
     def __init__(self, *args, **kwargs):
         self.__prefix = None
         self.__default_prefix = ''
+        self.__virtual_template_folder = kwargs.pop('virtual_template_folder', None)
+        event_feature = kwargs.pop('event_feature', None)
         super(IndicoBlueprint, self).__init__(*args, **kwargs)
+
+        if event_feature:
+            @self.before_request
+            def _check_event_feature():
+                from indico.modules.events.features.util import require_feature
+                event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+                if event_id is not None:
+                    require_feature(event_id, event_feature)
+
+    @locked_cached_property
+    def jinja_loader(self):
+        if self.template_folder is not None:
+            return IndicoFileSystemLoader(os.path.join(self.root_path, self.template_folder),
+                                          virtual_path=self.__virtual_template_folder)
 
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoBlueprintSetupState(self, app, options, first_registration)
@@ -111,3 +151,30 @@ class IndicoBlueprint(Blueprint):
         yield
         self.__prefix = None
         self.__default_prefix = ''
+
+
+class IndicoFileSystemLoader(FileSystemLoader):
+    """FileSystemLoader that makes namespacing easier.
+
+    The `virtual_path` kwarg lets you specify a path segment that's
+    handled as if all templates inside the loader's `searchpath` were
+    actually inside ``searchpath/virtual_path``.  That way you don't
+    have to create subdirectories in your template folder.
+    """
+
+    def __init__(self, searchpath, encoding='utf-8', virtual_path=None):
+        super(IndicoFileSystemLoader, self).__init__(searchpath, encoding)
+        self.virtual_path = virtual_path
+
+    def list_templates(self):
+        templates = super(IndicoFileSystemLoader, self).list_templates()
+        if self.virtual_path:
+            templates = [os.path.join(self.virtual_path, t) for t in templates]
+        return templates
+
+    def get_source(self, environment, template):
+        if self.virtual_path:
+            if not template.startswith(self.virtual_path):
+                raise TemplateNotFound(template)
+            template = template[len(self.virtual_path):]
+        return super(IndicoFileSystemLoader, self).get_source(environment, template)

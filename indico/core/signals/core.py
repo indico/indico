@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,6 +21,13 @@ _signals = Namespace()
 
 app_created = _signals.signal('app-created', """
 Called when the app has been created. The *sender* is the flask app.
+""")
+
+import_tasks = _signals.signal('import-tasks', """
+Called when Celery needs to import all tasks. Use this signal if you
+have modules containing task registered using one of the Celery
+decorators but don't import them anywhere.  The signal handler should
+only ``import`` these modules and do nothing else.
 """)
 
 after_process = _signals.signal('after-process', """
@@ -47,19 +54,43 @@ Expected to return `HeaderMenuEntry` objects which are then added to the
 Indico head menu.
 """)
 
-admin_sidemenu = _signals.signal('admin-sidemenu', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
-the admin side menu.
+get_storage_backends = _signals.signal('get-storage-backends', """
+Expected to return one or more Storage subclasses.
 """)
 
-user_preferences = _signals.signal('user-preferences', """
-Expected to return/yield one or more ``(title, content)`` tuples which are
-shown on the "User Preferences" page. The *sender* is the user for whom the
-preferences page is being shown which might not be the currently logged-in
-user!
+add_form_fields = _signals.signal('add-form-fields', """
+Lets you add extra fields to a form.  The *sender* is the form class
+and should always be specified when subscribing to this signal.
+
+The signal handler should return one or more ``'name', Field`` tuples.
+Each field will be added to the form as ``ext__<name>`` and is
+automatically excluded from the form's `data` property and its
+`populate_obj` method.
+
+To actually process the data, you can use e.g. the `form_validated`
+signal and then store it in `flask.g` until another signal informs
+you that the operation the user was performing has been successful.
 """)
 
-merge_users = _signals.signal('merge-users', """
-Called when two users are merged. The *sender* is the main user while the merged
-user (i.e. the one being deleted in the merge) is passed via the *merged* kwarg.
+form_validated = _signals.signal('form-validated', """
+Triggered when an IndicoForm was validated successfully.  The *sender*
+is the form object.
+
+This signal may return ``False`` to mark the form as invalid even
+though WTForms validation was successful.  In this case it is highly
+recommended to mark a field as erroneous or indicate the error in some
+other way.
+""")
+
+model_committed = _signals.signal('model-committed', """
+Triggered when an IndicoModel class was committed.  The *sender* is
+the model class, the model instance is passed as `obj` and the
+change type as a string (delete/insert/update) in the `change` kwarg.
+""")
+
+get_placeholders = _signals.signal('get-placeholders', """
+Expected to return one or more `Placeholder` objects.
+The *sender* is a string (or some other object) identifying the
+context.  The additional kwargs passed to this signal depend on
+the context.
 """)

@@ -1,0 +1,411 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base";
+@import "compass";
+@import "partials/icons";
+
+.static-sites {
+    width: 650px;
+    .i-table-widget {
+        border: 0;
+        // date
+        th:nth-child(2),
+        td:nth-child(2),
+        // download
+        th:nth-child(4),
+        td:nth-child(4) {
+            text-align: center;
+        }
+        // date
+        td:nth-child(2) {
+            color: $dark-gray;
+        }
+        // status
+        th:nth-child(3),
+        td:nth-child(3) {
+            text-align: center;
+            .i-label {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.reminders {
+    width: 650px;
+}
+
+
+// ============================================================================
+// Log tables
+// ============================================================================
+
+.log-table.i-table {
+    tr.log-realm-emails td.log-icon i.log-realm { @include icon-before('icon-mail'); }
+    tr.log-realm-event td.log-icon i.log-realm { @include icon-before('icon-time'); }
+    tr.log-realm-reviewing td.log-icon i.log-realm { @include icon-before('icon-user-reading'); }
+    tr.log-realm-participants td.log-icon i.log-realm { @include icon-before('icon-users'); }
+    tr.log-realm-management td.log-icon i.log-realm { @include icon-before('icon-medal'); }
+
+    tr.log-kind-positive td.log-icon i.log-kind { color: $green; }
+    tr.log-kind-negative td.log-icon i.log-kind { color: $red; }
+    tr.log-kind-change td.log-icon i.log-kind { color: $blue; }
+    tr.log-kind-other td.log-icon i.log-kind { display: none; }
+
+    td.log-icon {
+        color: $dark-gray;
+        font-size: 1.2em;
+        position: relative;
+        width: 30px;
+
+        i.log-kind {
+            color: $blue;
+            font-size: 0.7em;
+            position: absolute;
+            right: 3px;
+            top: 1px;
+        }
+    }
+
+
+    td.log-caption {
+        width: 175px;
+    }
+
+    td.log-module {
+        font-weight: bold;
+        width: 150px;
+    }
+
+    td.log-subject {
+        width: auto;
+    }
+
+    td.log-stamp {
+        text-align: right;
+        text-overflow: clip;
+        width: 230px;
+
+        span.user-name {
+           display: inline-block;
+           max-width: 120px;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           vertical-align: bottom;
+        }
+    }
+}
+
+%enabled-action {
+    @include icon-before('icon-eye');
+}
+
+%not-enabled-action {
+    @include icon-before('icon-eye-blocked');
+
+    color: $red !important;
+}
+
+#menu-entries > .menu-entries {
+    padding-top: 0;
+}
+
+.menu-entries {
+    width: 370px;
+    padding: 5px 10px 5px 5px;
+    margin-top: 0;
+
+    list-style: none;
+    > li {
+        margin-top: 5px;
+        &:first-child {
+            margin-top: 0;
+        }
+        > .menu-entry {
+            &.with-children > .i-label {
+                @include border-bottom-radius(0);
+            }
+            > .i-label {
+                width: 100%;
+                text-align: left;
+                font-weight: bold;
+                &.drag-handle {
+                    cursor: move;
+                }
+                > * {
+                    line-height: 1.2em;
+                    height: 1.2em;
+                    vertical-align: middle;
+                }
+                > .entry-internal_link,
+                > .entry-user_link,
+                > .entry-plugin_link {
+                    @include icon-before('icon-link');
+                }
+                > .entry-page {
+                    @include icon-before('icon-file');
+                }
+                > .entry-separator {
+                    @include icon-before('icon-arrows-vert');
+                }
+                /* menu title */
+                > .title {
+                    display: inline-block;
+                    overflow: hidden;
+
+                    max-width: 63%;
+
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+
+                    .position {
+                        margin-left: 0.2em;
+                        margin-right: 0.2em;
+                        color: $gray;
+                    }
+                }
+                > .actions {
+                    max-width: 33%;
+                    margin-right: -5px;
+                    visibility: hidden;
+                    a, a:active, a:focus {
+                        outline: none;
+                    }
+                    > * {
+                        padding: 0 2px;
+
+                        color: $dark-gray;
+                        &:hover {
+                            color: $blue;
+                        }
+                    }
+                    > .enabled {
+                        @extend %enabled-action;
+                        &:hover {
+                            @extend %not-enabled-action;
+                        }
+                    }
+                    > .not-enabled {
+                        @extend %not-enabled-action;
+                        &:hover {
+                            @extend %enabled-action;
+                        }
+                    }
+                    > .default {
+                        @include icon-before('icon-home');
+                        color: #46F936 !important;
+                    }
+                    > .not-default {
+                        @include icon-before('icon-home');
+                        display: none;
+                    }
+                    > .edit-entry {
+                        @include icon-before('icon-edit');
+                    }
+                    > .delete-entry {
+                        @include icon-before('icon-remove');
+                        &:hover {
+                            color: $red !important;
+                        }
+                    }
+                }
+                &.disabled {
+                    .position {
+                        color: $light-black;
+                    }
+                    > .actions > * {
+                        color: $light-black;
+                    }
+                }
+                &.highlight {
+                    .position {
+                        color: white;
+                    }
+                    > .actions > * {
+                        color: white;
+                        &:hover {
+                            color: $link;
+                        }
+                    }
+                }
+                &:hover > .actions {
+                    visibility: visible;
+                    > .not-default {
+                        display: inline !important;
+                    }
+                }
+            }
+        }
+        &.menu-entry-placeholder {
+            background: $light-gray;
+            border: 1px dashed $gray;
+            margin: 4px -5px -1px 5px;
+        }
+    }
+    > .ui-sortable-helper:first-child + .menu-entry-placeholder,
+    > .menu-entry-placeholder:first-child {
+        margin-top: 0;
+        margin-bottom: -2px;
+    }
+    &.empty,
+    &.hide-placeholder > li.menu-entry-placeholder {
+        display: none;
+    }
+    &.empty {
+        display: none;
+        height: 2.8em;
+        &.expand {
+            display: block;
+        }
+        &:before {
+            content: attr(data-empty-text);
+            color: $dark-gray;
+            font-style: italic;
+            line-height: 2.8em;
+            position: absolute;
+            padding-left: 20px;
+        }
+    }
+}
+
+// sub list of entries
+.menu-entry  {
+    > .menu-entries {
+        @include border-all(darken($pastel-gray, $light-color-variation));
+        @include border-bottom-radius();
+
+        width: 333px;
+        margin: 0 20px;
+        padding-right: 10px;
+        padding-left: 10px;
+
+        border-top: 0;
+        background-color: $pastel-gray;
+        > li > .menu-entry > .i-label {
+            font-weight: normal;
+            margin: 0;
+            > .title {
+                max-width: 59%;
+            }
+            > .actions {
+                max-width: 37%;
+            }
+        }
+        .menu-entry-placeholder {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+    }
+     > .highlight + .menu-entries {
+        @include border-all(darken($pastel-blue, $light-color-variation));
+        background-color: $light-blue;
+     }
+}
+
+.info-message-box > .message-text > i.icon-grid2 {
+    font-size: 0.7em;
+}
+
+
+// Image list
+.image-list {
+    list-style-type: none;
+    padding: 0;
+
+    li {
+        @include border-radius(2px);
+        position: relative;
+        display: inline-block;
+
+        margin: 5px;
+
+        width: 200px;
+        height: 200px;
+        box-shadow: 0 0 1px 2px rgba($gray, 0.4);
+
+        img {
+            @include border-radius(2px);
+            object-fit: cover;
+            width: 200px;
+            height: 200px;
+        }
+
+        .menu {
+            color: white;
+            text-align: right;
+            @include background-image(linear-gradient(to top, $black, rgba($black, 0)));
+            @include border-radius(0 0 2px 2px);
+            @include box-sizing(border-box);
+            padding: 0.5em 1em;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+        }
+    }
+}
+
+form#upload-images.full-width .dropzone {
+    width: 770px;
+
+    .select-files-btn, .dropzone-previews {
+        display: block;
+    }
+}
+
+.clipboard-dialog {
+
+    input[type="text"] {
+        @extend %font-family-monospace;
+        font-size: 1.2em;
+        border-radius: 0.2em;
+        width: 100%;
+        border: 1px solid $gray;
+        padding: 0.2em;
+    }
+
+    .dialog-message {
+        margin-bottom: 1em;
+    }
+}
+
+.logo-form, .css-form {
+    .form-label {
+        display: none !important;
+    }
+}
+
+// Event actions
+
+.confirm-delete-block {
+    > * {
+        vertical-align: middle;
+        font-size: 1.1em;
+    }
+
+    input[type="checkbox"] {
+        font-size: 2em;
+    }
+
+    label {
+        font-weight: normal;
+        margin-left: 0.5em;
+    }
+}

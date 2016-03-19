@@ -21,7 +21,7 @@
             <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
         </div>
         <h1 class="page-title">
-            ${"Contribution"}
+            ${_("Contribution")}
             % if Contribution.getType() is not None:
                 <span class="type">${Contribution.getType().getName()}</span>
             % endif
@@ -90,36 +90,11 @@
                             % endif
 
 
-                            <% materialList = Contribution.getAllViewableMaterialList() %>
                             <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
 
-                            % if materialList or canEditFiles:
-                                <div class="column ${'highlighted-area' if canEditFiles else ''}">
-                                    % if canEditFiles:
-                                        <div class="right">
-                                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                                        </div>
-                                    % endif
-                                    <h2>${_("Files")}</h2>
-                                    <ul>
-                                    % for material in materialList:
-
-                                        <li>
-                                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">
-                                                <h3>${material.getTitle()}</h3>
-                                            </a>
-                                            <ul>
-                                            % for resource in material.getResourceList():
-                                                <li class="icon-file">
-                                                    <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">
-                                                        ${getResourceName(resource)}
-                                                    </a>
-                                                </li>
-                                            % endfor
-                                            </ul>
-                                         </li>
-                                    % endfor
-                                    </ul>
+                            % if Contribution.attached_items or canEditFiles:
+                                <div class="column">
+                                    ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=Contribution, can_edit=canEditFiles) }
                                 </div>
                                 % endif
                             </div>
@@ -155,12 +130,8 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${Contribution.getOwner().getId()}', '${Contribution.getConference().getId()}',
-            '${Contribution.getSession().getId() if Contribution.getSession() else ""}','${Contribution.getId()}','',
-                ${jsonEncode(Contribution.getAccessController().isProtected())}, ${jsonEncode(Contribution.getMaterialRegistry().getMaterialList(Contribution.getConference()))}, ${'Indico.Urls.UploadAction.contribution'}, true);
-     });
+<script>
+    setupAttachmentTreeView();
 </script>
 <%block name="scripts">
 

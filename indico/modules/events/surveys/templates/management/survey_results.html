@@ -1,0 +1,107 @@
+{% extends 'events/surveys/management/_survey_base.html' %}
+
+{% block subtitle %}
+    {% trans title=survey.title %}Results for "{{ title }}"{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="survey-results" class="i-box-group vert">
+        {% for section in survey.sections if section.children %}
+            {% if section.display_as_section %}
+                <h4>{{ section.title }}</h4>
+            {% endif %}
+            {% for question in section.children if question.type.name == 'question' %}
+                <div class="i-box titled">
+                    <div class="i-box-header">
+                        <div class="i-box-title">
+                            {{ question.title }}
+                        </div>
+                        <div class="i-box-metadata">
+                            <span class="label">{% trans %}Answered:{% endtrans %}</span>
+                            <span class="content">{{ question.not_empty_answers|count }}</span>
+                        </div>
+                    </div>
+                    <div class="i-box-content">
+                        {% if question.not_empty_answers %}
+                            {% if question.field_type == 'text' %}
+                                {{ text_answer(question) }}
+                            {% elif question.field_type == 'number' %}
+                                {{ number_answer(question) }}
+                            {% elif question.field_type == 'single_choice' %}
+                                {{ single_choice_answer(question) }}
+                            {% elif question.field_type == 'bool' %}
+                                {{ single_choice_answer(question, short_labels=false) }}
+                            {% elif question.field_type == 'multiselect' %}
+                                {{ multiple_choice_answer(question) }}
+                            {% endif %}
+                        {% else %}
+                            <div class="empty">
+                                {% trans %}No answer has been recorded for this question.{% endtrans %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+{% macro text_answer(question) %}
+    {% for answer in question.get_summary() %}
+        <div class="text-answer">{{ answer }}</div>
+    {% endfor %}
+{% endmacro %}
+
+
+{% macro number_answer(question) %}
+    {% set summary = question.get_summary() %}
+    <div class="chart-answer">
+        <div class="chart-option-details">
+            <strong>{% trans %}Average:{% endtrans %}</strong> {{ '%0.2f'|format(summary.average) }}
+        </div>
+        <div class="chart-option-details">
+            <strong>{% trans %}Min:{% endtrans %}</strong> {{ summary.min }}
+        </div>
+        <div class="chart-option-details">
+            <strong>{% trans %}Max:{% endtrans %}</strong> {{ summary.max }}
+        </div>
+        <div class="chart-option-details">
+            <strong>{% trans %}Total:{% endtrans %}</strong> {{ summary.total }}
+        </div>
+    </div>
+    {{ _chart('bar', summary) }}
+{% endmacro %}
+
+
+{% macro single_choice_answer(question, short_labels=true) %}
+    {{ _choice_answer(question, 'pie', short_labels=short_labels) }}
+{% endmacro %}
+
+
+{% macro multiple_choice_answer(question) %}
+    {{ _choice_answer(question, 'bar', short_labels=true) }}
+{% endmacro %}
+
+
+{% macro _choice_answer(question, chart_type, short_labels=false) %}
+    {% set summary = question.get_summary() %}
+    <div class="chart-answer">
+        {% for label, value in summary.relative.iteritems() %}
+            <div class="chart-option-details">
+                <strong>{{ loop.index0|alpha_enum|upper }}. {{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
+            </div>
+        {% endfor %}
+    </div>
+    {{ _chart(chart_type, summary, short_labels=short_labels) }}
+{% endmacro %}
+
+
+{% macro _chart(chart_type, summary, short_labels=false) %}
+    <div class="chart-answer">
+        <div class="survey-{{ chart_type }}-chart"
+            data-labels="{{ (summary.labels if short_labels else summary.absolute.keys())|tojson|forceescape }}"
+            data-series-absolute="{{ summary.absolute.values() }}"
+            data-series-relative="{{ summary.relative.values() }}"></div>
+    </div>
+{% endmacro %}

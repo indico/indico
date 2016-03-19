@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ from __future__ import absolute_import
 import os
 import re
 import traceback
+import uuid
 
 from babel.numbers import format_currency, get_currency_name
 from flask import send_from_directory, request, _app_ctx_stack
@@ -27,60 +28,46 @@ from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
+from MaKaC.common import HelperMaKaCInfo
+from MaKaC.webinterface.pages.error import WErrorWSGI
+
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.core import signals
-from indico.util.i18n import gettext_context, ngettext_context, babel
+from indico.util.i18n import gettext_context, ngettext_context, babel, _
 from indico.core.logger import Logger
-from MaKaC.i18n import _
-from MaKaC.webinterface.pages.error import WErrorWSGI
 
+from indico.core.auth import multipass
+from indico.core.celery import celery
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
+from indico.modules.auth.providers import IndicoAuthProvider
+from indico.modules.auth.providers import IndicoIdentityProvider
+from indico.modules.auth.util import url_for_login, url_for_logout
+from indico.modules.oauth import oauth
+from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
+from indico.util.string import alpha_enum
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         call_template_hook)
+                                         subclassof, call_template_hook, groupby, strip_tags)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
-                                   IndicoConfigWrapper)
+                                   IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
-from indico.web.forms.jinja_helpers import is_single_line_field, render_field
-
-from indico.web.flask.blueprints.legacy import legacy
-from indico.web.flask.blueprints.rooms import rooms
-from indico.web.flask.blueprints.api import api
-from indico.web.flask.blueprints.misc import misc
-from indico.web.flask.blueprints.user import user
-from indico.web.flask.blueprints.oauth import oauth
-from indico.web.flask.blueprints.category import category
-from indico.web.flask.blueprints.category_management import category_mgmt
-from indico.web.flask.blueprints.event import event_display, event_creation, event_mgmt
-from indico.web.flask.blueprints.files import files
-from indico.web.flask.blueprints.admin import admin
-from indico.web.flask.blueprints.rooms_admin import rooms_admin
-
-from indico.core.plugins.blueprints import plugins_blueprint
-from indico.modules.events.agreements.blueprint import agreements_blueprint
-from indico.modules.payment.blueprint import payment_blueprint
-from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
-from indico.modules.events.registration.blueprint import event_registration_blueprint
-from indico.modules.events.requests.blueprint import requests_blueprint
-from indico.web.assets.blueprint import assets_blueprint
+from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
 
 
-BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
-              event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
-              event_registration_blueprint, requests_blueprint, agreements_blueprint, vc_blueprint, assets_blueprint)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
-                                                event_creation, event_mgmt, files, admin, rooms_admin))
-COMPAT_BLUEPRINTS += (vc_compat_blueprint,)
+#: Blueprint names for which legacy rules are auto-generated based on the endpoint name
+AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt',
+                          'misc', 'rooms', 'rooms_admin'}
 
 
 def fix_root_path(app):
@@ -99,20 +86,27 @@ def fix_root_path(app):
 def configure_app(app, set_path=False):
     cfg = Config.getInstance()
     app.config['DEBUG'] = cfg.getDebug()
+    app.config['SECRET_KEY'] = cfg.getSecretKey()
+    if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
+        raise ValueError('SecretKey must be set to a random secret of at least 16 characters. '
+                         'You can generate one using os.urandom(32) in Python shell.')
+    if cfg.getMaxUploadFilesTotalSize() > 0:
+        app.config['MAX_CONTENT_LENGTH'] = cfg.getMaxUploadFilesTotalSize() * 1024 * 1024
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
+    configure_multipass(app)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
         base = url_parse(cfg.getBaseURL())
+        app.config['PREFERRED_URL_SCHEME'] = base.scheme
         app.config['SERVER_NAME'] = base.netloc
         if base.path:
             app.config['APPLICATION_ROOT'] = base.path
-    app.config['WTF_CSRF_ENABLED'] = False  # for forms of room booking
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -125,6 +119,39 @@ def configure_app(app, set_path=False):
             app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
         else:
             raise ValueError('Invalid static file method: %s' % method)
+    if Config.getInstance().getUseProxy():
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
+def configure_multipass(app):
+    cfg = Config.getInstance()
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
+    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
+        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
+    if cfg.getLocalIdentities():
+        configure_multipass_local(app)
+    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
+                                                  'address'}
+    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
+    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+
+
+def configure_multipass_local(app):
+    app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
+        'type': IndicoAuthProvider,
+        'title': 'Indico',
+        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
+    }
+    app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
+        'type': IndicoIdentityProvider,
+        # We don't want any user info from this provider
+        'identity_info_keys': {}
+    }
+    app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
 
 
 def setup_jinja(app):
@@ -132,6 +159,8 @@ def setup_jinja(app):
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
+    # Useful (Python) builtins
+    app.add_template_global(dict)
     # Global functions
     app.add_template_global(url_for)
     app.add_template_global(url_for_plugin)
@@ -145,8 +174,13 @@ def setup_jinja(app):
     app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(render_field, '_render_field')
+    app.add_template_global(iter_form_fields, '_iter_form_fields')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)
+    app.add_template_global(url_for_login)
+    app.add_template_global(url_for_logout)
+    app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
+    app.add_template_global(icon_from_mimetype)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
@@ -154,16 +188,23 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
     # Filters (new ones returning unicode)
+    app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
     app.add_template_filter(underline)
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
     app.add_template_filter(natsort)
+    app.add_template_filter(groupby)
+    app.add_template_filter(any)
+    app.add_template_filter(strip_tags)
+    app.add_template_filter(alpha_enum)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
+    app.add_template_test(subclassof)  # only use this test if you really have to!
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
+    app.add_template_global(lambda: HelperMaKaCInfo.getMaKaCInfoInstance().getLang(), 'get_default_language')
     # webassets
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = core_env
@@ -175,7 +216,7 @@ ASSETS_REGISTERED = False
 def setup_assets():
     global ASSETS_REGISTERED
     if ASSETS_REGISTERED:
-        # Avoid errors when forking after creating an app (e.g. in scheduler tests)
+        # Avoid errors when forking after creating an app
         return
     ASSETS_REGISTERED = True
     register_all_js(core_env)
@@ -193,6 +234,7 @@ def configure_db(app):
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
         # DB options
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
         app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
         app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
         app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
@@ -203,7 +245,7 @@ def configure_db(app):
     import_all_models()
     db.init_app(app)
     if not app.config['TESTING']:
-        apply_db_loggers(app.debug)
+        apply_db_loggers(app)
 
     plugins_loaded.connect(lambda sender: configure_mappers(), app, weak=False)
     models_committed.connect(on_models_committed, app)
@@ -214,18 +256,19 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.after_request(inject_current_url)
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 
 
 def add_blueprints(app):
-    for blueprint in BLUEPRINTS:
+    blueprints, compat_blueprints = discover_blueprints()
+    for blueprint in blueprints:
         app.register_blueprint(blueprint)
-
-
-def add_compat_blueprints(app):
-    for blueprint in COMPAT_BLUEPRINTS:
-        app.register_blueprint(blueprint)
+    if app.config['INDICO_COMPAT_ROUTES']:
+        compat_blueprints |= {make_compat_blueprint(bp) for bp in blueprints if bp.name in AUTO_COMPAT_BLUEPRINTS}
+        for blueprint in compat_blueprints:
+            app.register_blueprint(blueprint)
 
 
 def add_plugin_blueprints(app):
@@ -241,6 +284,14 @@ def add_plugin_blueprints(app):
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
             app.register_blueprint(blueprint)
+
+
+def inject_current_url(response):
+    # Make the current URL available. This is useful e.g. in case of
+    # AJAX requests that were redirected due to url normalization if
+    # we need to know the actual URL
+    response.headers['X-Indico-URL'] = request.relative_url
+    return response
 
 
 def handle_404(exception):
@@ -285,8 +336,11 @@ def make_app(set_path=False, db_setup=True, testing=False):
     app.config['TESTING'] = testing
     fix_root_path(app)
     configure_app(app, set_path)
+    celery.init_app(app)
 
     babel.init_app(app)
+    multipass.init_app(app)
+    oauth.init_app(app)
     setup_jinja(app)
 
     with app.app_context():
@@ -298,9 +352,6 @@ def make_app(set_path=False, db_setup=True, testing=False):
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
-
-    if app.config['INDICO_COMPAT_ROUTES']:
-        add_compat_blueprints(app)
     Logger.init_app(app)
     plugin_engine.init_app(app, Logger.get('plugins'))
     if not plugin_engine.load_plugins(app):

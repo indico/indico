@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -46,6 +46,8 @@ class RHRoomBookingLocationMixin:
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         db.session.delete(self._location)
         flash(_(u'Location deleted'), 'success')
@@ -53,6 +55,8 @@ class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdmin
 
 
 class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         self._locationName = request.form.get('newLocationName').strip()
         if not self._locationName:
@@ -70,6 +74,8 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         self._location.set_default()
         flash(_(u'Default location changed'), 'success')
@@ -109,6 +115,8 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
@@ -124,6 +132,8 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
@@ -163,6 +173,8 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
 
@@ -174,6 +186,8 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'newEquipmentName')
 

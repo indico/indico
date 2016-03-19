@@ -1,0 +1,44 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="form-row typeahead-container" data-tooltip-anchor>
+        <div class="typeahead-field">
+            <input id="{{ field.id }}" autocomplete="off" class="typeahead" type="text" name="{{ field.name }}"
+                   {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%}>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var field = $('#{{ field.id }}');
+            var params = {
+                hint: true,
+                mustSelectItem: true,
+                minLength: {{ min_trigger_length }},
+                source: {
+                    data: {{ choices | tojson }}
+                }
+            };
+
+            {% if search_url %}
+                $.extend(true, params, {
+                    dynamic: true,
+                    source: {
+                        url: [{
+                            url: {{ search_url | tojson }},
+                            data: {
+                                q: {% raw %}'{{query}}'{% endraw %}
+                            }
+                        }]
+                    }
+                });
+            {% endif %}
+
+            field.typeahead($.extend(true, params, {{ options | tojson }}));
+        })();
+    </script>
+{% endblock %}

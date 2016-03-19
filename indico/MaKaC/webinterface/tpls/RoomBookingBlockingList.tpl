@@ -22,7 +22,7 @@
             <tbody>
             <tr class="blockingHover blockingPadding">
                 <td>${ formatDate(block.start_date) }&nbsp;&mdash;&nbsp;${ formatDate(block.end_date) }</td>
-                <td>${ block.created_by_user.getFullName() }</td>
+                <td>${ block.created_by_user.full_name }</td>
                 <td>${ len(block.blocked_rooms) } room${ (len(block.blocked_rooms) != 1 and 's' or '') }</td>
                 <td>${ block.reason }</td>
                 <td><a href="${ url_for('rooms.blocking_details', blocking_id=str(block.id)) }">Details</a> | <a href="#" class="blockingShowRooms">Show rooms</a></td>

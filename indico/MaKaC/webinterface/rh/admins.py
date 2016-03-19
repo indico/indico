@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,35 +16,15 @@
 
 from flask import session
 from persistent.dict import PersistentDict
+from werkzeug.exceptions import Forbidden
+
+from indico.util.i18n import _
 
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
 import MaKaC.common.info as info
-from MaKaC.errors import AdminError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
-from indico.util.i18n import _
-
-
-class RCAdmin(object):
-    @staticmethod
-    def hasRights(request = None, user = None):
-        """ Returns True if the user is a Server Admin
-            request: an RH or Service object
-            user: an Avatar object
-            If user is not None, the request object will be used to check the user's privileges.
-            Otherwise the user will be retrieved from the request object
-        """
-        if user is None:
-            if request is None:
-                return False
-            else:
-                user = request._getUser()
-
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        serverAdmins = minfo.getAdminList()
-        return serverAdmins.isAdmin(user)
 
 
 class RHAdminBase(RHProtected):
@@ -56,19 +36,17 @@ class RHAdminBase(RHProtected):
         RHProtected._checkProtection(self)
         if not session.user and not self._doProcess:
             return
-        self._al = HelperMaKaCInfo.getMaKaCInfoInstance().getAdminList()
-        if not session.user.isAdmin():
-            if not self._al.getList():  # XXX can we just fail here instead of pretending the user is an admin?!
-                return
-            raise AdminError("area")
+        if not session.user.is_admin:
+            raise Forbidden(_("Only Indico administrators may access this page."))
 
 
-class RHAdminArea( RHAdminBase ):
+class RHAdminArea(RHAdminBase):
     _uh = urlHandlers.UHAdminArea
 
-    def _process( self ):
-        p = admins.WPAdmins( self )
+    def _process(self):
+        p = admins.WPAdmins(self)
         return p.display()
+
 
 class RHUpdateNews( RHAdminBase ):
     _uh = urlHandlers.UHUpdateNews
@@ -96,11 +74,11 @@ class RHConfigUpcoming( RHAdminBase ):
         return p.display()
 
 
-class RHGeneralInfoModification( RHAdminBase ):
+class RHGeneralInfoModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoModification
 
-    def _process( self ):
-        p = admins.WPGenInfoModification( self )
+    def _process(self):
+        p = admins.WPGenInfoModification(self)
         return p.display()
 
 
@@ -112,50 +90,20 @@ class RHAdminSwitchNewsActive( RHAdminBase ):
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 
-class RHGeneralInfoPerformModification( RHAdminBase ):
+class RHGeneralInfoPerformModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoPerformModification
 
-    def _process( self ):
+    def _process(self):
         params = self._getRequestParams()
 
-        if params['action'] != 'cancel':
-            self._minfo.setTitle( params["title"] )
-            self._minfo.setOrganisation( params["organisation"] )
-            self._minfo.setCity( params["city"] )
-            self._minfo.setCountry( params["country"] )
-            self._minfo.setTimezone( params["timezone"] )
-            self._minfo.setLang( params["lang"] )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
+        if 'ok' in params:
+            self._minfo.setTitle(params["title"])
+            self._minfo.setOrganisation(params["organisation"])
+            self._minfo.setCity(params["city"])
+            self._minfo.setCountry(params["country"])
+            self._minfo.setLang(params["lang"])
+        self._redirect(urlHandlers.UHAdminArea.getURL())
 
-class RHUserMerge(RHAdminBase):
-
-    def _checkParams( self, params ):
-        ah = user.AvatarHolder()
-        self._params = params
-        RHAdminBase._checkParams( self, params )
-
-        self.prin = ah.getById(self._params.get("prinId", None))
-        self.toMerge = ah.getById(self._params.get("toMergeId", None))
-
-        self.merge = False
-        if self._params.get("merge", None):
-            self.merge = True
-            if self.prin is not None and self.toMerge is not None and self.prin == self.toMerge:
-                raise FormValuesError(_("One cannot merge a user with him/herself"))
-
-
-    def _process( self ):
-        if self.merge:
-            if self.prin and self.toMerge:
-                ah = user.AvatarHolder()
-                ah.mergeAvatar(self.prin, self.toMerge)
-                url = urlHandlers.UHUserMerge.getURL()
-                url.addParam("prinId", self.prin.getId())
-                self._redirect(url)
-                return _("[Done]")
-
-        p = admins.WPUserMerge( self, self.prin, self.toMerge )
-        return p.display()
 
 class RHStyles(RHAdminBase):
     _uh = urlHandlers.UHAdminsStyles
@@ -273,13 +221,9 @@ class RHSystemModify(RHAdminBase):
         RHAdminBase._checkParams( self, params )
         self._action = params.get("action", None)
         self._volume = params.get("volume", None)
-        self._proxy = False
-        if params.get("proxy", False):
-            self._proxy = True
 
     def _process( self ):
         if self._action == "ok":
-            self._minfo.setProxy(self._proxy)
             self._minfo.setArchivingVolume(self._volume)
             self._redirect(urlHandlers.UHAdminsSystem.getURL())
         elif self._action == "cancel":

@@ -1,0 +1,149 @@
+{% macro _render_errors(errors) -%}
+    <ul>
+        {%- for error in errors -%}
+            <li>{{ error }}</li>
+        {%- endfor -%}
+    </ul>
+{%- endmacro %}
+
+{% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false, i_form=true) -%}
+    <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="{% if i_form %}i-form {% endif %}{{ orientation }} {{ classes }}"{% if id %} id="{{ id }}"{% endif %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+        {% if form.csrf_enabled -%}
+            {{ form.csrf_token() }}
+        {% endif %}
+{%- endmacro %}
+
+{% macro form_row_static(label='', content=none, single_row=true, skip_label=false) -%}
+    <div class="form-group">
+        {% if not skip_label %}
+            <div class="form-label form-block {%- if single_row %} form-label-middle{% endif %}">
+                {% if label %}
+                    <label>{{ label }}</label>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="form-field form-block">
+            <div class="static-text">
+                {{ content or caller() }}
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro form_field(field, field_classes, widget_attrs={}, disabled=none) -%}
+    <div class="{{ field_classes }}"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
+        {{ _render_field(field, widget_attrs, disabled) }}
+        {% if field.widget.input_type == 'checkbox' %}
+            <div class="checkbox-label">{{ field.label() }}</div>
+        {% endif %}
+        {%- if caller -%}
+            {{ caller() }}
+        {%- endif -%}
+        {% if field.description %}
+            <div class="form-field-description">{{ field.description | safe }}</div>
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, disabled=none, placeholder=false) %}
+    {% set widget_attrs = widget_attrs|default({}) %}  {#- in case someone passed an Undefined object -#}
+    {% if field or not allow_missing %}
+        <div id="form-group-{{ field.id }}"
+             class="form-group {{ orientation }}
+                    {% if field.errors %}has-error{% endif %}
+                    {% if field.flags.initially_hidden %}weak-hidden{% endif %}">
+            {% if not skip_label %}
+                <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
+                            {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
+                    {%- if field.widget.input_type != 'checkbox' and (not field.widget.input_type or not placeholder) -%}
+                        {{ field.label() }}
+                    {%- endif -%}
+                    {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
+                </div>
+            {% endif %}
+            {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else widget_attrs.get('placeholder', ''))) %}
+            {%- if caller -%}
+                {% set caller_ = caller %}
+                {% call form_field(field, "form-field form-block", widget_attrs, disabled=disabled) -%}
+                    {{ caller_() }}
+                {%- endcall %}
+            {%- else -%}
+                {{ form_field(field, "form-field form-block", widget_attrs, disabled=disabled) }}
+            {%- endif -%}
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}, disable=(), placeholder=false) %}
+    {% for field in _iter_form_fields(form, fields=fields, skip=skip) %}
+        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation, skip_label=skip_labels,
+                    disabled=field.name in disable, placeholder=placeholder) }}
+    {% endfor %}
+{% endmacro %}
+
+{# `form` and `i_form` args are there in case we need them in the future #}
+{% macro form_footer(form, i_form=true) -%}
+    {% if caller %}
+        <div class="form-group form-group-footer">
+            <div class="form-label form-block"></div>
+            <div class="form-field form-block">
+                {{ caller() }}
+            </div>
+        </div>
+    {% endif %}
+    </form>
+{% endmacro %}
+
+{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true, collapsible=false, initially_collapsed=true) %}
+    {% if not render_as_fieldset %}
+        {#
+        This is sugar for cases where you sometimes want the fieldset
+        to show up as a fieldset and sometimes just want the contents.
+        The most common use case for this is a form which has either
+        a single fieldset or multiple fieldsets depending on the user's
+        privileges. In this case it often looks better not to show the
+        single fieldset as an actual fieldset.
+        Using `render_as_fieldset` keep the code using this macro clean
+        as it won't need extra conditions/macros/blocks to show the same
+        content either inside or outside this fieldset.
+        #}
+        {{ caller() }}
+    {% else %}
+        <fieldset{% if disabled %} disabled{% endif %} {% if collapsible %}class="collapsible {% if initially_collapsed %}initially-collapsed{% endif %} "{% endif %}>
+            <legend>
+                {{ legend }}
+                {% if collapsible -%}
+                    <div class="group right">
+                        <span class="{{ 'icon-next' if initially_collapsed else 'icon-expand' }}"></span>
+                    </div>
+                {%- endif %}
+            </legend>
+            <div class="fieldset-content">
+                {% if description %}
+                    <p class="description">{{ description }}</p>
+                {% endif %}
+                {{ caller() }}
+            </div>
+        </fieldset>
+    {% endif %}
+{% endmacro %}
+
+{# Renders a form with the most common default markup #}
+{% macro simple_form(form, submit=none, back=none, back_url=none, back_button=true, disabled_until_change=true,
+                     disabled_fields=(), form_header_kwargs={}) %}
+    {% set submit = submit or _('Save') %}
+    {% set back = back or _('Back') %}
+    {{ form_header(form, **form_header_kwargs) }}
+    {{ form_rows(form, disable=disabled_fields) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{{ submit }}"
+               {%- if disabled_until_change %} data-disabled-until-change{% endif %}>
+        {% if back_button %}
+            {% if back_url %}
+                <a href="{{ back_url }}" class="i-button big" data-button-back>{{ back }}</a>
+            {% else %}
+                <button type="button" class="i-button big" data-button-back>{{ back }}</button>
+            {% endif %}
+        {% endif %}
+    {% endcall %}
+{% endmacro %}

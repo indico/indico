@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,22 +15,26 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 import copy
 import inspect
+import itertools
 import time
 import os
-import profile as profiler
+import cProfile as profiler
 import pstats
 import sys
 import random
 import StringIO
+import warnings
 from datetime import datetime, timedelta
+from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
 
-import oauth2 as oauth
 import transaction
-from flask import request, session, g, current_app
+from flask import request, session, g, current_app, redirect
+from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
+from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
+from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -39,7 +43,7 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.common.utils import truncate
+from MaKaC.conference import Conference
 from MaKaC.errors import (
     AccessError,
     BadRefererError,
@@ -50,20 +54,25 @@ from MaKaC.errors import (
     NotLoggedError,
     NotFoundError)
 from MaKaC.webinterface.mail import GenericMailer
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.errors import get_error_description
 from indico.core.logger import Logger
-from indico.util import json
+from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
+from indico.util.locators import get_locator
 from indico.util.redis import RedisError
-from indico.web.flask.util import ResponseUtil
+from indico.util.string import truncate
+from indico.web.flask.util import ResponseUtil, url_for
+
+
+HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 
 
 class RequestHandlerBase():
@@ -128,7 +137,7 @@ class RequestHandlerBase():
         """Truncates params"""
         params = {}
         for key, value in self._reqParams.iteritems():
-            if key == 'password':
+            if key in {'password', 'confirm_password'}:
                 params[key] = '[password hidden, len=%d]' % len(value)
             elif isinstance(value, basestring):
                 params[key] = truncate(value, 1024)
@@ -172,8 +181,33 @@ class RH(RequestHandlerBase):
     _tohttps = False  # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
     _isMobile = True  # this value means that the generated web page can be mobile
+    CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
+    EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
 
-    HTTP_VERBS = frozenset(('GET', 'POST', 'PUT', 'DELETE'))
+    #: A dict specifying how the url should be normalized.
+    #: `args` is a dictionary mapping view args keys to callables
+    #: used to retrieve the expected value for those arguments if they
+    #: are present in the request's view args.
+    #: `locators` is a set of callables returning objects with locators.
+    #: `preserved_args` is a set of view arg names which will always
+    #: be copied from the current request if present.
+    #: The callables are always invoked with a single `self` argument
+    #: containing the RH instance.
+    #: Arguments specified in the `defaults` of any rule matching the
+    #: current endpoint are always excluded when checking if the args
+    #: match or when building a new URL.
+    #: If the view args built from the returned objects do not match
+    #: the request's view args, a redirect is issued automatically.
+    #: If the request is not using GET/HEAD, a 404 error is raised
+    #: instead of a redirect since such requests cannot be redirected
+    #: but executing them on the wrong URL may pose a security risk in
+    #: case and of the non-relevant URL segments is used for access
+    #: checks.
+    normalize_url_spec = {
+        'args': {},
+        'locators': set(),
+        'preserved_args': set()
+    }
 
     def __init__(self):
         self._responseUtil = ResponseUtil()
@@ -200,11 +234,11 @@ class RH(RequestHandlerBase):
         return self._isMobile
 
     def _setSessionUser(self):
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
 
     @property
     def csrf_token(self):
-        return session.csrf_token
+        return session.csrf_token if session.csrf_protected else ''
 
     def _getRequestParams(self):
         return self._reqParams
@@ -225,7 +259,11 @@ class RH(RequestHandlerBase):
             self._responseUtil.headers["Pragma"] = "no-cache"
 
     def _redirect(self, targetURL, status=303):
-        targetURL = str(targetURL)
+        if isinstance(targetURL, Response):
+            status = targetURL.status_code
+            targetURL = targetURL.headers['Location']
+        else:
+            targetURL = str(targetURL)
         if "\r" in targetURL or "\n" in targetURL:
             raise MaKaCError(_("http header CRLF injection detected"))
         self._responseUtil.redirect = (targetURL, status)
@@ -249,6 +287,72 @@ class RH(RequestHandlerBase):
 
     def _processError(self, e):
         raise
+
+    def normalize_url(self):
+        """Performs URL normalization.
+
+        This uses the :attr:`normalize_url_spec` to check if the URL
+        params are what they should be and redirects or fails depending
+        on the HTTP method used if it's not the case.
+
+        :return: ``None`` or a redirect response
+        """
+        if current_app.debug and self.normalize_url_spec is RH.normalize_url_spec:
+            # in case of ``class SomeRH(RH, MixinWithNormalization)``
+            # the default value from `RH` overwrites the normalization
+            # rule from ``MixinWithNormalization``.  this is never what
+            # the developer wants so we fail if it happens.  the proper
+            # solution is ``class SomeRH(MixinWithNormalization, RH)``
+            cls = next((x
+                        for x in inspect.getmro(self.__class__)
+                        if (x is not RH and x is not self.__class__ and hasattr(x, 'normalize_url_spec') and
+                            getattr(x, 'normalize_url_spec', None) is not RH.normalize_url_spec)),
+                       None)
+            if cls is not None:
+                raise Exception('Normalization rule of {} in {} is overwritten by base RH. Put mixins with class-level '
+                                'attributes on the left of the base class'.format(cls, self.__class__))
+        if not self.normalize_url_spec or not any(self.normalize_url_spec.itervalues()):
+            return
+        spec = {
+            'args': self.normalize_url_spec.get('args', {}),
+            'locators': self.normalize_url_spec.get('locators', set()),
+            'preserved_args': self.normalize_url_spec.get('preserved_args', set()),
+        }
+        # Initialize the new view args with preserved arguments (since those would be lost otherwise)
+        new_view_args = {k: v for k, v in request.view_args.iteritems() if k in spec['preserved_args']}
+        # Retrieve the expected values for all simple arguments (if they are currently present)
+        for key, getter in spec['args'].iteritems():
+            if key in request.view_args:
+                new_view_args[key] = getter(self)
+        # Retrieve the expected values from locators
+        for getter in spec['locators']:
+            value = getter(self)
+            if value is None:
+                raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
+            new_view_args.update(get_locator(value))
+        # Get all default values provided by the url map for the endpoint
+        defaults = set(itertools.chain.from_iterable(r.defaults
+                                                     for r in current_app.url_map.iter_rules(request.endpoint)
+                                                     if r.defaults))
+
+        def _convert(v):
+            # some legacy code has numeric ids in the locator data, but still takes
+            # string ids in the url rule (usually for confId)
+            return unicode(v) if isinstance(v, (int, long)) else v
+
+        provided = {k: _convert(v) for k, v in request.view_args.iteritems() if k not in defaults}
+        new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems()}
+        if new_view_args != provided:
+            if request.method in {'GET', 'HEAD'}:
+                try:
+                    return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+                except BuildError as e:
+                    if current_app.debug:
+                        raise
+                    Logger.get('requestHandler').warn('BuildError during normalization: %s', e)
+                    raise NotFound
+            else:
+                raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
     def _checkParams(self, params):
         """This method is called before _checkProtection and is a good place
@@ -276,11 +380,27 @@ class RH(RequestHandlerBase):
         """
         method = getattr(self, '_process_' + request.method, None)
         if method is None:
-            valid_methods = [m for m in self.HTTP_VERBS if hasattr(self, '_process_' + m)]
+            valid_methods = [m for m in HTTP_VERBS if hasattr(self, '_process_' + m)]
             raise MethodNotAllowed(valid_methods)
         return method()
 
     def _checkCSRF(self):
+        token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
+        if token is None:
+            # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
+            token = next((v for k, v in request.form.iteritems() if k.endswith('-csrf_token')), None)
+        if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
+            msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
+                    u"button, reload the page and try again.")
+            raise BadRequest(msg)
+        elif not self.CSRF_ENABLED and current_app.debug and request.method != 'GET':
+            # Warn if CSRF is not enabled for a RH in new code
+            module = self.__class__.__module__
+            if module.startswith('indico.modules.') or module.startswith('indico.core.'):
+                msg = (u'{} request sent to {} which has no CSRF checks. Set `CSRF_ENABLED = True` in the class to '
+                       u'enable them.').format(request.method, self.__class__.__name__)
+                warnings.warn(msg, RuntimeWarning)
+        # legacy csrf check (referer-based):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
         if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
             return
@@ -296,6 +416,12 @@ class RH(RequestHandlerBase):
         if base_secure and referer.startswith(base_secure):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
+
+    def _check_event_feature(self):
+        from indico.modules.events.features.util import require_feature
+        event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+        if event_id is not None:
+            require_feature(event_id, self.EVENT_FEATURE)
 
     @jsonify_error
     def _processGeneralError(self, e):
@@ -314,20 +440,23 @@ class RH(RequestHandlerBase):
             raise
         return errors.WPUnexpectedError(self).display()
 
-    @jsonify_error
-    def _processHostnameResolveError(self, e):
-        """Unexpected errors"""
-
-        return errors.WPHostnameResolveError(self).display()
-
     @jsonify_error(status=403)
     def _processForbidden(self, e):
+        if session.user is None and not request.is_xhr and not e.response:
+            return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
-        if e.description == Forbidden.description:
-            explanation = _("You are not allowed to access this page.")
-        else:
-            explanation = e.description
+        explanation = get_error_description(e)
         return WErrorWSGI((message, explanation)).getHTML()
+
+    @jsonify_error(status=400)
+    def _processBadRequest(self, e):
+        message = _("Bad Request")
+        return WErrorWSGI((message, e.description)).getHTML()
+
+    @jsonify_error(status=400)
+    def _processBadData(self, e):
+        message = _("Invalid or expired token")
+        return WErrorWSGI((message, e.message)).getHTML()
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
@@ -361,15 +490,6 @@ class RH(RequestHandlerBase):
         msg = _('Required argument missing: %s') % e.message
         return errors.WPFormValuesError(self, msg).display()
 
-    # TODO: check this method to integrate with jsonify error
-    def _processOAuthError(self, e):
-        res = json.dumps(e.fossilize())
-        header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-        self._responseUtil.headers.extend(header)
-        self._responseUtil.content_type = 'application/json'
-        self._responseUtil.status = e.code
-        return res
-
     @jsonify_error
     def _processConferenceClosedError(self, e):
         """Treats access to modification pages for conferences when they are closed."""
@@ -392,10 +512,7 @@ class RH(RequestHandlerBase):
     def _processNotFoundError(self, e):
         if isinstance(e, NotFound):
             message = _("Page not found")  # that's a bit nicer than "404: Not Found"
-            if e.description == NotFound.description:
-                explanation = _("The page you are looking for doesn't exist.")
-            else:
-                explanation = e.description
+            explanation = get_error_description(e)
         else:
             message = e.getMessage()
             explanation = e.getExplanation()
@@ -427,18 +544,10 @@ class RH(RequestHandlerBase):
 
     @jsonify_error
     def _processRestrictedHTML(self, e):
-
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
     @jsonify_error
-    def _processHtmlScriptError(self, e):
-        """ TODO """
-        return errors.WPHtmlScriptError(self, escape(str(e))).display()
-
-    @jsonify_error
     def _processHtmlForbiddenTag(self, e):
-        """ TODO """
-
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
     def _process_retry_setup(self):
@@ -456,7 +565,6 @@ class RH(RequestHandlerBase):
         # keep a link to the web session in the access wrapper
         # this is used for checking access/modification key existence
         # in the user session
-        self._aw.setIP(request.remote_addr)
         self._setSessionUser()
         if self._getAuth():
             if self._getUser():
@@ -491,6 +599,10 @@ class RH(RequestHandlerBase):
 
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
+
+        rv = self.normalize_url()
+        if rv is not None:
+            return '', rv
 
         self._checkProtection()
         func = getattr(self, '_checkProtection_' + request.method, None)
@@ -535,7 +647,7 @@ class RH(RequestHandlerBase):
                 Logger.get('redis').exception('Could not execute pipeline')
 
     def process(self, params):
-        if request.method not in self.HTTP_VERBS:
+        if request.method not in HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
 
@@ -554,11 +666,15 @@ class RH(RequestHandlerBase):
         if self._checkHttpsRedirect():
             return self._responseUtil.make_redirect()
 
+        if self.EVENT_FEATURE is not None:
+            self._check_event_feature()
+
         DBMgr.getInstance().startRequest()
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
             os.getpid(), request))
 
+        is_error_response = False
         try:
             for i, retry in enumerate(transaction.attempts(max_retries)):
                 with retry:
@@ -588,6 +704,9 @@ class RH(RequestHandlerBase):
         except Exception as e:
             transaction.abort()
             res = self._getMethodByExceptionName(e)(e)
+            if isinstance(e, HTTPException) and e.response is not None:
+                res = e.response
+            is_error_response = True
 
         totalTime = (datetime.now() - self._startTime)
         textLog.append('{} : Request ended'.format(totalTime))
@@ -610,8 +729,6 @@ class RH(RequestHandlerBase):
             f.write('{} : start request\n'.format(self._startTime))
             f.write('params:{}'.format(params))
             f.write('\n'.join(textLog))
-            f.write('\n')
-            f.write('retried : {}\n'.format(10-retry))
             f.write(s)
             f.write('--------------------------------\n\n')
             f.close()
@@ -620,6 +737,11 @@ class RH(RequestHandlerBase):
 
         if self._responseUtil.call:
             return self._responseUtil.make_call()
+
+        if is_error_response and isinstance(res, (current_app.response_class, Response)):
+            # if we went through error handling code, responseUtil._status has been changed
+            # so make_response() would fail
+            return res
 
         # In case of no process needed, we should return empty string to avoid erroneous output
         # specially with getVars breaking the JS files.
@@ -637,6 +759,8 @@ class RH(RequestHandlerBase):
             'Exception': 'UnexpectedError',
             'AccessControlError': 'AccessError'
         }.get(type(e).__name__, type(e).__name__)
+        if isinstance(e, BadData):  # we also want its subclasses
+            exception_name = 'BadData'
         return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
     def _deleteTempFiles(self):
@@ -648,18 +772,50 @@ class RH(RequestHandlerBase):
     relativeURL = None
 
 
+class RHSimple(RH):
+    """A simple RH that calls a function to build the response
+
+    The main purpose of this RH is to allow external library to
+    display something within the Indico layout (which requires a
+    RH / a ZODB connection in most cases).
+
+    The preferred way to use this class is by using the
+    `RHSimple.wrap_function` decorator.
+
+    :param func: A function returning HTML
+    """
+    def __init__(self, func):
+        RH.__init__(self)
+        self.func = func
+
+    def _process(self):
+        rv = self.func()
+        return rv
+
+    @classmethod
+    def wrap_function(cls, func):
+        """Decorates a function to run within the RH's framework"""
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return cls(partial(func, *args, **kwargs)).process({})
+
+        return wrapper
+
+
 class RHProtected(RH):
 
     def _getLoginURL(self):
-        return urlHandlers.UHSignIn.getURL(self.getRequestURL())
+        return url_for_login(request.relative_url)
 
     def _checkSessionUser(self):
         if self._getUser() is None:
             if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
-                self._redirect(self._getLoginURL())
+                # XXX: the next two lines are there in case something swallows our exception
                 self._doProcess = False
+                self._redirect(url_for_login(request.relative_url))
+                raise Forbidden
 
     def _checkProtection(self):
         self._checkSessionUser()
@@ -669,8 +825,8 @@ class RHDisplayBaseProtected(RHProtected):
 
     def _checkProtection(self):
         if not self._target.canAccess( self.getAW() ):
-            from MaKaC.conference import Link, LocalFile, Category
-            if isinstance(self._target,Link) or isinstance(self._target,LocalFile):
+            from MaKaC.conference import Resource, Category
+            if isinstance(self._target, Resource):
                 target = self._target.getOwner()
             else:
                 target = self._target
@@ -690,9 +846,14 @@ class RHDisplayBaseProtected(RHProtected):
 class RHModificationBaseProtected(RHProtected):
 
     _allowClosed = False
+    ROLE = None
 
     def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ):
+        if isinstance(self._target, Conference):
+            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE, allow_key=True)
+        else:
+            can_manage = self._target.canModify(session.avatar)
+        if not can_manage:
             if self._target.getModifKey() != "":
                 raise ModificationError()
             if self._getUser() is None:

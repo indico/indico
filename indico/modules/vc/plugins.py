@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.string import remove_accents
-from indico.util.user import retrieve_principals, retrieve_principal, principals_merge_users
+from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -35,9 +35,12 @@ PREFIX_RE = re.compile('^vc_')
 
 class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
-    #: the :class:`IndicoForm` to use for the video conference room form
+    strict_settings = True
+    default_settings = {'notification_emails': []}
+    acl_settings = {'acl', 'managers'}
+    #: the :class:`IndicoForm` to use for the videoconference room form
     vc_room_form = None
-    #: the :class:`IndicoForm` to use for the video conference room attach form
+    #: the :class:`IndicoForm` to use for the videoconference room attach form
     vc_room_attach_form = None
     #: the readable name of the VC plugin
     friendly_name = None
@@ -45,8 +48,8 @@ class VCPluginMixin(object):
     def init(self):
         super(VCPluginMixin, self).init()
         if not self.name.startswith('vc_'):
-            raise Exception('Video conference plugins must be named vc_*')
-        self.connect(signals.merge_users, self._merge_users)
+            raise Exception('Videoconference plugins must be named vc_*')
+        self.connect(signals.users.merged, self._merge_users)
 
     @property
     def service_name(self):
@@ -54,15 +57,15 @@ class VCPluginMixin(object):
 
     @property
     def logo_url(self):
-        raise NotImplementedError('VC Plugin must have a logo URL')
+        raise NotImplementedError('VC plugin must have a logo URL')
 
     @property
     def icon_url(self):
-        raise NotImplementedError('VC Plugin must have an icon URL')
+        raise NotImplementedError('VC plugin must have an icon URL')
 
     @classproperty
-    @classmethod
-    def category(self):
+    @staticmethod
+    def category():
         from indico.core.plugins import PluginCategory
         return PluginCategory.videoconference
 
@@ -85,21 +88,16 @@ class VCPluginMixin(object):
         }
 
     def get_notification_cc_list(self, action, vc_room, event):
-        owner = retrieve_principal(vc_room.data['owner'])
-        return {owner.getEmail()} if owner else set()
+        return set()
 
     def get_notification_bcc_list(self, action, vc_room, event):
-        return set(self.settings.get('notification_emails'))
+        return set(self.settings.get('notification_emails', set()))
 
     def render_form(self, **kwargs):
-        """Renders the video conference room form
+        """Renders the videoconference room form
         :param kwargs: arguments passed to the template
         """
         return render_template('vc/manage_event_create_room.html', **kwargs)
-
-    def render_custom_create_button(self, **kwargs):
-        tpl = get_overridable_template_name('create_button.html', self, 'vc/')
-        return render_template(tpl, plugin=self, **kwargs)
 
     def render_info_box(self, vc_room, event_vc_room, event, **kwargs):
         """Renders the information shown in the expandable box of a VC room row
@@ -114,6 +112,7 @@ class VCPluginMixin(object):
 
     def render_manage_event_info_box(self, vc_room, event_vc_room, event, **kwargs):
         """Renders the information shown in the expandable box on a VC room in the management area
+
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
         :param event: the event with the current VC room attached to it
@@ -125,26 +124,29 @@ class VCPluginMixin(object):
 
     def render_buttons(self, vc_room, event_vc_room, **kwargs):
         """Renders a list of plugin specific buttons (eg: Join URL, etc) in the management area
+
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:management_buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
-                                      event_vc_room=event_vc_room, **kwargs)
+        name = get_overridable_template_name('management_buttons.html', self, core_prefix='vc/')
+        return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room, **kwargs)
 
     def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
-            """Renders a list of plugin specific buttons (eg: Join URL, etc) in the event page
-            :param vc_room: the VC room object
-            :param event_vc_room: the association of an event and a VC room
-            :param kwargs: arguments passed to the template
-            """
-            return render_plugin_template('{}:event_buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
-                                          event_vc_room=event_vc_room, event=event_vc_room.event, **kwargs)
+        """Renders a list of plugin specific buttons (eg: Join URL, etc) in the event page
+
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :param kwargs: arguments passed to the template
+        """
+        name = get_overridable_template_name('event_buttons.html', self, core_prefix='vc/')
+        return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room,
+                               event=event_vc_room.event, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
-        """Creates the video conference room form
+        """Creates the videoconference room form
 
-        :param event: the event the video conference room is for
+        :param event: the event the videoconference room is for
         :param existing_vc_room: a vc_room from which to retrieve data for the form
         :param \*\*kwargs: extra data to pass to the form if an existing vc room is passed
         :return: an instance of an :class:`IndicoForm` subclass
@@ -202,27 +204,21 @@ class VCPluginMixin(object):
         if self.can_manage_vc(user):
             return True
 
-        acl = self.settings.get('acl')
-        if not acl:
+        if not self.settings.acls.get('acl'):  # everyone has access
             return True
-
-        principals = retrieve_principals(acl)
-        return any(principal.containsUser(user) for principal in principals)
+        return self.settings.acls.contains_user('acl', user)
 
     def can_manage_vc_room(self, user, room):
         """Checks if a user can manage a vc room"""
-        return (user.isAdmin() or
+        return (user.is_admin or
                 self.can_manage_vc(user) or
-                any(evt_assoc.event.canModify(user) for evt_assoc in room.events))
+                any(evt_assoc.event.as_event.can_manage(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""
-        if user.isAdmin():
+        if user.is_admin:
             return True
-        return any(principal.containsUser(user) for principal in retrieve_principals(self.settings.get('managers')))
+        return self.settings.acls.contains_user('managers', user)
 
-    def _merge_users(self, user, merged, **kwargs):
-        new_id = int(user.id)
-        old_id = int(merged.id)
-        for key in {'managers', 'acl'}:
-            self.settings.set(key, principals_merge_users(self.settings.get(key), new_id, old_id))
+    def _merge_users(self, target, source, **kwargs):
+        self.settings.acls.merge_users(target, source)

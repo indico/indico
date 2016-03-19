@@ -1,0 +1,69 @@
+{% extends 'oauth/apps_base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% set num_tokens = application.tokens.count() %}
+
+{% block subtitle %}
+    {{ application.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {%- trans %}Details{% endtrans -%}
+            </div>
+            <div class="i-box-buttons toolbar thin right">
+                <div class="group">
+                    <button class="i-button"
+                        data-href="{{ url_for('.app_revoke', application) }}" data-method="POST"
+                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_tokens }} user tokens?{% endtrans %}"
+                        {% if not num_tokens %}disabled{% endif %}>
+                        {%- trans %}Revoke user tokens{% endtrans -%}
+                    </button>
+                    <button class="i-button"
+                        data-href="{{ url_for('.app_reset', application) }}" data-method="POST"
+                        data-confirm="{% trans %}Are you sure you want to reset the client secret?{% endtrans %}">
+                        {%- trans %}Reset client secret{% endtrans -%}
+                    </button>
+                </div>
+                <div class="group">
+                    <button class="i-button icon-remove danger"
+                        data-href="{{ url_for('.app_delete', application) }}" data-method="POST"
+                        data-confirm="{% trans %}Are you sure you want to remove this application?{% endtrans %}">
+                        {%- trans -%}Delete{%- endtrans -%}
+                    </button>
+                </div>
+            </div>
+            <div class="i-box-metadata">
+                <span class="label">
+                    <i class="icon-user"></i>
+                    {% trans %}Users:{% endtrans %}
+                </span>
+                <span class="content">
+                    {{ num_tokens }}
+                </span>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <dl class="i-data-list dt-select-disabled">
+                {# Do not translate <dt> since they are the official terms in OAuth2 RFC #}
+                <dt>Client ID</dt>{#--#}
+                <dd><code>{{ application.client_id }}</code></dd>
+                <dt>Client Secret</dt>{#--#}
+                <dd><code>{{ application.client_secret }}</code></dd>
+                <dt>Authorize URL</dt>{#--#}
+                <dd><code>{{ url_for('.oauth_authorize', _external=true) }}</code></dd>
+                <dt>Access token URL</dt>{#--#}
+                <dd><code>{{ url_for('.oauth_token', _external=true) }}</code></dd>
+            </dl>
+            <hr>
+            {{ form_header(form) }}
+            {{ form_rows(form) }}
+            {% call form_footer(form) %}
+                <input class="i-button big highlight" type="submit" data-disabled-until-change
+                       value="{% trans %}Update application{% endtrans %}">
+                <a href="{{ url_for('.apps') }}" class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</a>
+            {% endcall %}
+        </div>
+    </div>
+{% endblock %}

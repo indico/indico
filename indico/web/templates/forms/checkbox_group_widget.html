@@ -1,6 +1,11 @@
-{% for subfield in field %}
-    <div class="i-checkbox">
-        {{ subfield() }}
-        {{ subfield.label }}
-    </div>
-{% endfor %}
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    {% for subfield in field %}
+        <div class="i-checkbox">
+            {{ subfield(**input_args) }}
+            {{ subfield.label }}
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,12 +18,13 @@ from indico.core.signals.event import _signals
 
 
 sidemenu = _signals.signal('sidemenu', """
-Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
+Expected to return ``MenuEntryData`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
 """)
 
 deleted = _signals.signal('deleted', """
 Called when an event is deleted. The *sender* is the event object.
+The `user` kwarg contains the user performing the deletion if available.
 """)
 
 data_changed = _signals.signal('data-changed', """
@@ -71,13 +72,12 @@ Called when an IP restriction is removed from an event. The `sender` is the even
 the `domain` is that domain that has been removed.
 """)
 
-session_slot_deleted = _signals.signal('session-slot-deleted', """
-Called when a session slot is deleted. The *sender* is the session slot.
+session_deleted = _signals.signal('session-deleted', """
+Called when a session slot is deleted. The *sender* is the session.
 """)
 
-material_downloaded = _signals.signal('material-downloaded', """
-Notifies a file being downloaded. The *sender* is the event and the downloaded
-file is passed in the *resource* kwarg.
+session_slot_deleted = _signals.signal('session-slot-deleted', """
+Called when a session slot is deleted. The *sender* is the session slot.
 """)
 
 timetable_buttons = _signals.signal('timetable-buttons', """
@@ -85,35 +85,19 @@ Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.
 """)
 
-registrant_changed = _signals.signal('registrant-changed', """
-Called when an event registrant is added or removed. The `sender` is the event,
-and the following kwargs are available:
-
-* `user` - the registrant's :class:`Avatar` (or ``None``)
-* `registrant` - the :class:`Registrant`
-* `action` - the action, i.e. ``'removed'`` or ``'added'``
-""")
-
-participant_changed = _signals.signal('participant-changed', """
-Called when an event participant is added or removed. The `sender` is the event,
-and the following kwargs are available:
-
-* `user` - the participant's :class:`Avatar` (or ``None``)
-* `participant` - the :class:`Participant`
-* `old_status` - the previous participation status
-* `action` - the action, i.e. ``'removed'`` or ``'added'``
-
-This signal is only triggered if the participation state actually changed, i.e. he's
-considered `added` if he was added/approved by a manager or if he accepted an invitation.
-The participant is considered `removed` if he's participating (added by a manager or accepted
-an invitation) and he's removed from the event or refuses/rejects participation.
-""")
-
 has_read_access = _signals.signal('has-read-access', """
 Called when resolving the read access permissions for an event. The `sender` is the event,
 and the following parameters are available:
 
-* `user` - the user that is trying to access the event (:class:`Avatar` or ``None``)
+* `user` - the user that is trying to access the event (:class:`.User` or ``None``)
 
-Should return `True` or `False`.
+Should return ``True`` or ``False``.
+""")
+
+get_log_renderers = _signals.signal('get-log-renderers', """
+Expected to return `EventLogRenderer` classes.
+""")
+
+get_feature_definitions = _signals.signal('get-feature-definitions', """
+Expected to return `EventFeature` subclasses.
 """)

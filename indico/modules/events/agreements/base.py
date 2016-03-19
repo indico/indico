@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@ from hashlib import sha1
 
 from flask import render_template
 
-from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.settings import EventSettingsProxy
 from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
@@ -33,13 +33,13 @@ class AgreementPersonInfo(object):
     def __init__(self, name=None, email=None, user=None, data=None):
         if user:
             if not name:
-                name = user.getStraightFullName()
+                name = user.full_name
             if not email:
-                email = user.getEmail()
+                email = user.email
         if not name:
             raise ValueError('name is missing')
         self.name = name
-        # Note: If you have persons with no email, you *MUST* have data that uniquely identifies such speakers
+        # Note: If you have persons with no email, you *MUST* have data that uniquely identifies such persons
         self.email = email or None
         self.user = user
         self.data = data
@@ -57,20 +57,6 @@ class AgreementPersonInfo(object):
         return sha1(identifier).hexdigest()
 
 
-class EmailPlaceholderBase(object):
-    """Base class for agreement email placeholders"""
-    required = False
-    description = None
-
-    @classmethod
-    def render(cls, agreement):
-        """Converts the placeholder to a string
-
-        :param agreement: the `Agreement` object the email is being sent for
-        """
-        raise NotImplementedError
-
-
 class AgreementDefinitionBase(object):
     """Base class for agreement definitions"""
 
@@ -86,8 +72,6 @@ class AgreementDefinitionBase(object):
     form_template_name = None
     #: template of the email body - emails/agreement_default_body.html by default
     email_body_template_name = None
-    #: dict containing custom email placeholders
-    email_placeholders = {}
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
     #: default settings for an event
@@ -108,7 +92,7 @@ class AgreementDefinitionBase(object):
     @classmethod
     def can_access_api(cls, user, event):
         """Checks if a user can list the agreements for an event"""
-        return event.canUserModify(user)
+        return event.can_manage(user)
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
@@ -129,15 +113,6 @@ class AgreementDefinitionBase(object):
         return get_template_module(template_path, event=event)
 
     @classmethod
-    def get_email_placeholders(cls):
-        """Returns all available email placeholders"""
-        from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
-        placeholders = {'person_name': PersonNamePlaceholder,
-                        'agreement_link': AgreementLinkPlaceholder}
-        placeholders.update(cls.email_placeholders or {})
-        return placeholders
-
-    @classmethod
     @memoize_request
     def get_people(cls, event):
         """Returns a dictionary of :class:`AgreementPersonInfo` required to sign agreements"""
@@ -150,7 +125,7 @@ class AgreementDefinitionBase(object):
     def get_people_not_notified(cls, event):
         """Returns a dictionary of :class:`AgreementPersonInfo` yet to be notified"""
         people = cls.get_people(event)
-        sent_agreements = {a.identifier for a in Agreement.find(event_id=event.getId(), type=cls.name)}
+        sent_agreements = {a.identifier for a in event.agreements.filter_by(type=cls.name)}
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
@@ -162,9 +137,7 @@ class AgreementDefinitionBase(object):
         """
         people = cls.get_people(event)
         identifiers = [p.identifier for p in people.itervalues()]
-        query = Agreement.find(Agreement.event_id == event.getId(),
-                               Agreement.type == cls.name,
-                               Agreement.identifier.in_(identifiers))
+        query = event.agreements.filter(Agreement.type == cls.name, Agreement.identifier.in_(identifiers))
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()
         everybody_signed = len(people) == (num_accepted + num_rejected)

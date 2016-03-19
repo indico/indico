@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -44,17 +44,24 @@
             text-align: center;
             top: 1px !important;
 
-            &.ui-state-disabled {
-                background: none !important;
-            }
-
-            &:hover:not(.ui-state-disabled) {
-                color: white;
-                background: $blue;
-            }
-
             &:before {
                 vertical-align: -30%;
+            }
+        }
+
+        &.ui-state-disabled {
+            .ui-datepicker-prev,
+            .ui-datepicker-next {
+                background: none !important;
+                cursor: default;
+            }
+        }
+
+        &:not(.ui-state-disabled) {
+            .ui-datepicker-prev:hover,
+            .ui-datepicker-next:hover {
+                color: white;
+                background: $blue;
             }
         }
 
@@ -92,6 +99,10 @@
             }
         }
 
+        &.ui-state-disabled .ui-datepicker-current-day a {
+            cursor: default;
+        }
+
         .ui-state-default {
             background: $light-blue;
         }
@@ -123,11 +134,15 @@
             margin-top: .2em;
             opacity: 1;
             outline: none;
+        }
 
-            &:hover {
-                background: $blue;
-                color: white;
-            }
+        &:not(.ui-state-disabled) button.ui-datepicker-current:hover {
+            background: $blue;
+            color: white;
+        }
+
+        &.ui-state-disabled button.ui-datepicker-current {
+            cursor: default;
         }
     }
 }

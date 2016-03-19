@@ -12,15 +12,13 @@
           <td width="35">
             <img src="${Config.getInstance().getBaseURL()}/images/meeting.png" width="32" height="32" alt="lecture"/>
           </td>
-          <td class="headerselected" align="right">
-            <span style="font-weight:bold;">
-                <span class="confTitle">
-                    ${conf.getTitle()}
-                </span>
-                <div style="float: right; height: 15px; width: 15px; padding-top: 7px; padding-left: 5px;">
-                    <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
-                </div>
+          <td class="headerselected">
+            <span class="confTitle" style="font-weight:bold;">
+                ${conf.getTitle()}
             </span>
+            <div style="float: right; height: 15px;">
+                <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
+            </div>
             % if conf.getReportNumberHolder().listReportNumbers():
                 <span style="font-size:x-small;">
                     % for reportNumber in conf.getReportNumberHolder().listReportNumbers():
@@ -88,39 +86,43 @@
         </tr>
         %endif
 
+        <%
+        from indico.modules.events.registration.util import get_unique_published_registrations
+        participants = get_unique_published_registrations(conf)
+        %>
         % if participants:
         <tr>
           <td valign="top" align="right" class="headerTitle">
             Participants:
           </td>
           <td class="headerInfo" style="font-style:italic;">
-            ${participants}
+            <ul class="participant-list">
+              % for participant in participants:
+                <li>${ participant.full_name }</li>
+              % endfor
+            </ul>
           </td>
         </tr>
         % endif
-        % if registrationOpen:
-        <tr>
-          <td valign="top" align="right" class="headerTitle">
-                ${_("Want to participate")}
-          </td>
-          <td style="font-size:x-small;font-style:italic;">
-            <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
-          </td>
-        </tr>
-        % endif
-        % if len(conf.getAllMaterialList()) > 0:
+        % if conf.attached_items:
          <tr>
-          <td valign="top" align="right" class="headerTitle">
-            Material:
-          </td>
-          <td>
-            % for material in conf.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                    <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
-                % endif
-            % endfor
+          <td valign="top" align="right" class="headerTitle icon-attachment inline-attachments-icon"></td>
+          <td class="material-list">
+            ${ render_template('attachments/mako_compat/attachments_inline.html', item=conf) }
           </td>
         </tr>
+        % endif
+        % if conf.note:
+            <tr>
+                <td valign="top" align="right" class="headerTitle">
+                    ${ _("Minutes") }:
+                </td>
+                <td>
+                    <a href="${ url_for('event_notes.view', conf) }">
+                        ${ _("Download") }
+                    </a>
+                </td>
+            </tr>
         % endif
         </table>
       </td>

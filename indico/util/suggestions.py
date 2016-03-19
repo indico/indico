@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,15 +15,15 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from collections import defaultdict, Counter
+from collections import defaultdict
 from datetime import date, timedelta
 from itertools import islice
-from operator import methodcaller, itemgetter
+from operator import methodcaller
 
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
+from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.util.redis import avatar_links
 
 
@@ -68,7 +68,8 @@ def _get_blocks(events, attended):
     return blocks
 
 
-def _get_category_score(avatar, categ, attended_events, debug=False):
+def _get_category_score(user, categ, attended_events, debug=False):
+    # avoid stale SQLAlchemy object
     if debug:
         print repr(categ)
     idx = IndexesHolder().getById('categoryDateAll')
@@ -87,7 +88,7 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
             first_event_date = b[0].getStartDate().replace(hour=0, minute=0)
 
     # Favorite categories get a higher base score
-    favorite = categ in avatar.getLinkTo('category', 'favorite')
+    favorite = categ in user.favorite_categories
     score = 1 if favorite else 0
     if debug:
         print '{0:+.3f} - initial'.format(score)
@@ -131,52 +132,15 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
     return score
 
 
-def get_category_scores(avatar, debug=False):
-    attendance_roles = set(['conference_participant', 'contribution_submission', 'abstract_submitter',
-                            'registration_registrant', 'evaluation_submitter'])
-    links = avatar_links.get_links(avatar)
+def get_category_scores(user, debug=False):
+    attendance_roles = {'contribution_submission', 'abstract_submitter', 'registration_registrant', 'survey_submitter'}
+    links = avatar_links.get_links(user)
+    for event_id in get_events_with_submitted_surveys(user):
+        links.setdefault(str(event_id), set()).add('survey_submitter')
     ch = ConferenceHolder()
     attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
     categ_events = defaultdict(list)
     for event in attended:
         categ_events[event.getOwner()].append(event)
-    return dict((categ, _get_category_score(avatar, categ, events, debug))
+    return dict((categ, _get_category_score(user, categ, events, debug))
                 for categ, events in categ_events.iteritems())
-
-
-def update_event_data(avatar, categ, data):
-    attendance_roles = set(['conference_participant', 'contribution_submission', 'abstract_submitter',
-                            'registration_registrant', 'evaluation_submitter'])
-    links = avatar_links.get_links(avatar)
-    ch = ConferenceHolder()
-    attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
-    attended = [e for e in attended if e.getOwner() == categ]
-    # Count common chairpersons and attendants
-    chair_count = data.setdefault('chair_count', Counter())
-    participant_count = data.setdefault('participant_count', Counter())
-    for event in attended:
-        for ch in event.getChairList():
-            chair_count[ch.getEmail()] += 1
-        for part in event.getParticipation().getParticipantList():
-            participant_count[part.getEmail()] += 1
-
-
-def _is_event_interesting(avatar, event, data):
-    interesting_chairs = set(map(itemgetter(0), data['chair_count'].most_common(3)))
-    interesting_participants = set(map(itemgetter(0), data['participant_count'].most_common(10)))
-    event_chairs = set(ch.getEmail() for ch in event.getChairList())
-    event_participants = set(part.getEmail() for part in event.getParticipation().getParticipantList())
-    if interesting_chairs & event_chairs:
-        return True
-    common_participants = interesting_participants & event_participants
-    return common_participants and len(common_participants) >= len(event_participants) * 0.25
-
-
-def iter_interesting_events(avatar, data):
-    idx = IndexesHolder().getById('categoryDateAll')
-    now_local = utc2server(nowutc(), False)
-    aw = AccessWrapper()
-    aw.setUser(avatar)
-    for event in _unique_events(idx.iterateObjectsIn('0', now_local, now_local + timedelta(weeks=24))):
-        if _is_event_interesting(avatar, event, data) and event.canAccess(aw):
-            yield event

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,8 +22,10 @@ from collections import defaultdict
 
 import pytz
 
-from MaKaC.user import Avatar
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.groups.legacy import GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class Conversion(object):
@@ -179,7 +181,9 @@ class Conversion(object):
     def reservationsList(cls, resvs):
         res = defaultdict(list)
         for resv in resvs:
-            occurrences = resv.occurrences.filter(ReservationOccurrence.is_valid)
+            occurrences = (resv.occurrences
+                           .filter(ReservationOccurrence.is_valid)
+                           .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY))
             res[resv.room.full_name] += [{'startDateTime': cls.datetime(occ.start_dt),
                                           'endDateTime': cls.datetime(occ.end_dt)}
                                          for occ in occurrences]
@@ -227,10 +231,20 @@ class Conversion(object):
         allowed_emails = []
         allowed_groups = []
         for allowed in obj.getRecursiveAllowedToAccessList():
-            if isinstance(allowed, Avatar):
+            if isinstance(allowed, AvatarUserWrapper):
                 allowed_emails.extend(allowed.getEmails())
-            else:
+            elif isinstance(allowed, EmailPrincipal):
+                allowed_emails.append(allowed.email)
+            elif isinstance(allowed, GroupWrapper):
                 allowed_groups.append(allowed.getId())
 
         return {'users': allowed_emails,
                 'groups': allowed_groups}
+
+    @classmethod
+    def addLegacyMinutes(cls, result, _obj=None):
+        from indico.modules.events.notes.util import build_note_legacy_api_data
+        data = build_note_legacy_api_data(_obj.note)
+        if data:
+            result.append(data)
+        return result

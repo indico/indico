@@ -378,4 +378,3 @@ function $E(source) {
 	}
 	return new Html(source);
 }
-

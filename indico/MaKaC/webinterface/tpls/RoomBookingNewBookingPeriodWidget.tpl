@@ -1,4 +1,5 @@
 <%page args="form=None, flexibility=False, can_override=False, min_date=None, date_changed=None, past_date=None"/>
+<% from datetime import datetime %>
 
 <!-- Slider -->
 <div id="timerange"></div>
@@ -70,61 +71,6 @@ ${ form.repeat_interval(type='hidden') }
 <script>
     $(document).ready(function() {
         'use strict';
-        var validEndDates = null;
-        var frequencies = {
-                '1' : RRule.DAILY,
-                '2' : RRule.WEEKLY,
-                '3' : RRule.MONTHLY
-            };
-
-        $('#timerange').timerange({
-            initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
-            initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
-            startTimeName: 'sTime',
-            endTimeName: 'eTime',
-            sliderWidth: '512px',
-            change: function() {
-                combineDatetime();
-                validateForm();
-            }
-        });
-
-        $('#sDatePlace, #eDatePlace').datepicker({
-            dateformat: 'dd/mm/yy',
-            % if not can_override:
-                minDate: ${ "'{}'".format(min_date.strftime('%d/%m/%Y')) if min_date else 0 },
-                maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
-            % endif
-            showButtonPanel: true,
-            changeMonth: true,
-            changeYear: true,
-            showOn: 'focus'
-        });
-
-        $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
-            if (validEndDates === null) {
-                return [true, '', ''];
-            }
-            return [validEndDates.indexOf(date.getTime()) !== -1, '', ''];
-        });
-
-        $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
-            disableInvalidDays();
-            $('#eDatePlace').datepicker('refresh');
-
-            selectEndDate();
-            commonOnSelect();
-        });
-
-        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
-        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
-
-        $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
-        $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
-
-        $('#repeatability input:radio[name=repeat_frequency]').change(function() {
-            checkFrequency();
-        });
 
         function checkFrequency() {
             var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
@@ -138,7 +84,7 @@ ${ form.repeat_interval(type='hidden') }
                 $('#eDatePlaceDiv').show();
                 $('#repeat_interval').val('1');
                 disableInvalidDays();
-                $('#eDatePlace').datepicker('refresh');
+                refreshDatePicker($('#eDatePlace'));
                 selectEndDate();
             }
 
@@ -211,7 +157,7 @@ ${ form.repeat_interval(type='hidden') }
             if (endDates !== null && endDates.length &&
                     (forceSetEndDate || endDates.indexOf(selectedEndDate.getTime()) === -1)) {
                 $('#eDatePlace').datepicker('setDate', getClosestDate(endDates, selectedEndDate));
-                $('#eDatePlace').datepicker('refresh');
+                refreshDatePicker($('#eDatePlace'));
             }
         }
 
@@ -254,7 +200,98 @@ ${ form.repeat_interval(type='hidden') }
             return dLo <= dHi ? new Date(dates[lo]) : new Date(dates[hi]);
         }
 
+        function refreshDatePicker($dpElem) {
+            var disabled = $dpElem.datepicker('isDisabled');
+            $dpElem.datepicker('refresh');
+            if (disabled) {
+                $dpElem.datepicker('disable');
+            }
+        }
+
+        var validEndDates = null;
+        var frequencies = {
+            '1' : RRule.DAILY,
+            '2' : RRule.WEEKLY,
+            '3' : RRule.MONTHLY
+        };
+
+        $('#timerange').timerange({
+            initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
+            initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
+            startTimeName: 'sTime',
+            endTimeName: 'eTime',
+            sliderWidth: '512px',
+            change: function() {
+                combineDatetime();
+                validateForm();
+            }
+        });
+
+        $('#sDatePlace, #eDatePlace').datepicker({
+            dateformat: 'dd/mm/yy',
+            % if not can_override:
+                maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
+            % endif
+            showButtonPanel: true,
+            changeMonth: true,
+            changeYear: true,
+            showOn: 'focus',
+            unifyNumRows: true
+        });
+
+        % if not can_override:
+            $('#sDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min(min_date, form.start_dt.data).strftime('%d/%m/%Y')) if min_date else 0 });
+            $('#eDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min_date.strftime('%d/%m/%Y')) if min_date else 0 });
+        % endif
+
+        $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+            if (validEndDates === null) {
+                return [true, '', ''];
+            }
+            return [validEndDates.indexOf(date.getTime()) !== -1, '', ''];
+        });
+
+        $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
+            disableInvalidDays();
+            refreshDatePicker($('#eDatePlace'));
+
+            selectEndDate();
+            commonOnSelect();
+        });
+        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
+
+        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
+
+        $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
+        $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
+
+        $('#repeatability input:radio[name=repeat_frequency]').change(function() {
+            checkFrequency();
+        });
+
         checkFrequency();
         checkHolidays();
+
+        % if not can_override:
+            % if form.start_dt.data < datetime.now():
+                $('#timerange').timerange('disable');
+                var startDate = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+                // Disable the datea in calendar as well as the calendar itself...
+                $('#sDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+                    return [moment(date).format('D/MM/YYYY') == startDate, '', ''];
+                });
+                $('#sDatePlace').datepicker('disable');
+            % endif
+            % if form.end_dt.data < datetime.now():
+                var endDate = moment($('#eDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+                // Disable the datea in calendar as well as the calendar itself...
+                $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+                    return [moment(date).format('D/MM/YYYY') == endDate, '', ''];
+                });
+                $('#eDatePlace').datepicker('disable');
+                $('#repeatability > input[name=repeat_frequency]').not(':checked').prop('disabled', true);
+            % endif
+        % endif
+
     });
 </script>

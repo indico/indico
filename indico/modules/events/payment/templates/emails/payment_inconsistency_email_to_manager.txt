@@ -1,0 +1,7 @@
+Dear manager of the event {{ event.title }},
+
+It appears that the payment of the registration with ID {{ registration.friendly_id }} has an incorrect
+amount of money (received {{ format_currency(amount, currency, locale='en_GB') }} while expecting {{ registration.render_price() }}.
+Please, check with the registrant to see if there was some misunderstanding.
+
+Regards.

@@ -13,7 +13,7 @@
         <table border="0" cellSpacing="0" cellPadding="0">
             <tr>
                 % if sideMenu:
-                <td style="vertical-align: top;">
+                <td style="vertical-align: top;" class="rb-menu-column">
                     ${ sideMenu }
                 </td>
                 % endif

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -140,10 +140,7 @@ class IResourceBasicFossil(IFossil):
         """ Resource Description """
 
 class IResourceMinimalFossil(IResourceBasicFossil):
-
-    def getProtectionURL(self):
-        """ Resource protection URL """
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s.getOwner()))
+    pass
 
 class ILinkMinimalFossil(IResourceMinimalFossil):
 
@@ -220,7 +217,6 @@ class ILocalFileAbstractMaterialFossil(IResourceBasicFossil, ILocalFileInfoFossi
     getURL.name = "url"
 
 
-
 class IMaterialMinimalFossil(IFossil):
 
     def getId(self):
@@ -239,10 +235,6 @@ class IMaterialMinimalFossil(IFossil):
 
     def getType(self):
         """ The type of material"""
-
-    def getProtectionURL(self):
-        """ Material protection URL """
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s))
 
 
 class IMaterialFossil(IMaterialMinimalFossil):
@@ -293,11 +285,6 @@ class ISessionBasicFossil(IFossil):
 
 
 class ISessionFossil(ISessionBasicFossil):
-
-    def getAllMaterialList(self):
-        """ Session List of all material """
-    getAllMaterialList.result = IMaterialFossil
-    getAllMaterialList.name = "material"
 
     def getNumSlots(self):
         """ Number of slots present in the session """

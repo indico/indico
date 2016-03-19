@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,13 +15,15 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import itertools
 import re
 from heapq import heappush
 
+import bleach
 from flask import current_app as app
 from jinja2 import environmentfilter
 from jinja2.ext import Extension
-from jinja2.filters import make_attrgetter
+from jinja2.filters import make_attrgetter, _GroupTuple
 from jinja2.lexer import Token
 from markupsafe import Markup
 
@@ -74,6 +76,18 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     return sorted(value, key=sort_func, reverse=reverse)
 
 
+@environmentfilter
+def groupby(environment, value, attribute, reverse=False):
+    """Like Jinja's builtin `groupby` filter, but allows reversed order."""
+    expr = make_attrgetter(environment, attribute)
+    return sorted(map(_GroupTuple, itertools.groupby(sorted(value, key=expr), expr)), reverse=reverse)
+
+
+def strip_tags(value):
+    """Strips provided text of html tags"""
+    return bleach.clean(value, tags=[], strip=True).strip()
+
+
 def instanceof(value, type_):
     """Checks if `value` is an instance of `type_`
 
@@ -81,6 +95,15 @@ def instanceof(value, type_):
     :param type_: a type
     """
     return isinstance(value, type_)
+
+
+def subclassof(value, type_):
+    """Checks if `value` is a subclass of `type_`
+
+    :param value: a type
+    :param type_: a type
+    """
+    return issubclass(value, type_)
 
 
 def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
@@ -168,7 +191,6 @@ def call_template_hook(*name, **kwargs):
         return [x[1] for x in values]
     else:
         return Markup(u'\n').join(x[1] for x in values) if values else u''
-
 
 
 class EnsureUnicodeExtension(Extension):

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,12 +20,13 @@ from itertools import groupby
 from operator import attrgetter
 
 from flask import session
+from sqlalchemy.orm import defaultload
 from werkzeug.datastructures import MultiDict
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import iterdays, format_time, overlaps
+from indico.util.date_time import iterdays, overlaps
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
@@ -61,10 +62,15 @@ class RoomBookingCalendarWidget(object):
         self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.full_name))
 
         if self.show_blockings:
-            self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
-                                                                'state': BlockedRoom.State.accepted,
-                                                                'start_date': self.start_dt.date(),
-                                                                'end_date': self.end_dt.date()})
+            # avoid loading user data we don't care about
+            user_strategy = defaultload('blocking').defaultload('created_by_user')
+            user_strategy.noload('*')
+            user_strategy.load_only('first_name', 'last_name')
+            self.blocked_rooms = (BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
+                                                                 'state': BlockedRoom.State.accepted,
+                                                                 'start_date': self.start_dt.date(),
+                                                                 'end_date': self.end_dt.date()})
+                                  .options(user_strategy))
         else:
             self.blocked_rooms = []
 
@@ -149,24 +155,24 @@ class RoomBookingCalendarWidget(object):
                 if blocking.can_be_overridden(session.user, explicit_only=True):
                     attrs['className'] = 'blocked_permitted'
                     attrs['tooltip'] = _('Blocked by {0}:\n{1}\n\n<b>You are permitted to override the blocking.</b>') \
-                        .format(blocking.created_by_user.getFullName(), blocking.reason)
+                        .format(blocking.created_by_user.full_name, blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.accepted:
                     if blocking.can_be_overridden(session.user, room=self.specific_room):
                         attrs['className'] = 'blocked_override'
                         attrs['tooltip'] = _(
                             'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
                             'and are thus permitted to override the blocking. Please use this '
-                            'privilege with care!</b>').format(blocking.created_by_user.getFullName(), blocking.reason)
+                            'privilege with care!</b>').format(blocking.created_by_user.full_name, blocking.reason)
                     else:
                         attrs['className'] = 'blocked'
-                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.getFullName(),
+                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.full_name,
                                                                             blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.pending:
                     attrs['className'] = 'preblocked'
                     attrs['tooltip'] = _(
                         'Blocking requested by {0}:\n{1}\n\n'
                         '<b>If this blocking is approved, any colliding bookings will be rejected!</b>') \
-                        .format(blocking.created_by_user.getFullName(), blocking.reason)
+                        .format(blocking.created_by_user.full_name, blocking.reason)
             days_data[str(day)] = attrs
 
         return days_data
@@ -323,7 +329,7 @@ class Bar(Serializer):
             return None
         return {
             'id': self.blocking.id,
-            'creator': self.blocking.created_by_user.getFullName(),
+            'creator': self.blocking.created_by_user.full_name,
             'reason': self.blocking.reason,
             'blocking_url': url_for('rooms.blocking_details', blocking_id=self.blocking.id)
         }

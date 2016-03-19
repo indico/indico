@@ -1,0 +1,11 @@
+{% extends 'events/registration/emails/registration_creation_to_managers.html' %}
+
+{% block subject_message -%}
+    Modified {% if registration.state.name == 'pending' %}pending{% endif %} registration
+{%- endblock %}
+
+{% block registration_header_text -%}
+    There was a modification for the registration {{ render_registration_info() }}.
+    {{ render_text_pending() }}
+    {{ render_text_manage() }}
+{%- endblock %}

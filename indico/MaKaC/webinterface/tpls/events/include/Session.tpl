@@ -7,7 +7,7 @@
 <li class="meetingSession">
     <span class="containerTitle confModifPadding">
         <a name="${session.getId()}"></a>
-        <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True, minutesHidden=not minutes"/>
         ${ template_hook('vc-actions', event=conf, item=item) }
 
         <span class="topLevelTime">
@@ -42,34 +42,24 @@
             </tr>
         % endif
 
-        % if len(session.getAllMaterialList()) > 0:
+        % if item.session.attached_items:
         <tr>
-            <td class="leftCol">${ _("Material")}:</td>
-            <td>
-            % for material in session.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                <%include file="Material.tpl" args="material=material, sessionId=session.getId()"/>
-                % endif
-            % endfor
+            <td class="leftCol icon-attachment inline-attachments-icon"></td>
+            <td class="material-list">
+                ${ render_template('attachments/mako_compat/attachments_inline.html', item=item.session) }
             </td>
         </tr>
         % endif
         </tbody>
     </table>
 
-    % if minutes:
-        <% minutesText = item.getSession().getMinutes().getText() if item.getSession().getMinutes() else None %>
-        % if minutesText:
-            <div class="minutesTable">
-                <h2>${_("Minutes")}</h2>
-                <span>${common.renderDescription(minutesText)}</span>
-            </div>
-        % endif
+    % if item.note:
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes, can_edit=item.canModify(user)) }
     % endif
 
     % if len(item.getSchedule().getEntries()) > 0:
     <ul class="meetingSubTimetable">
-        % for subitem in item.getSchedule().getEntries():
+        % for subitem in sorted(item.getSchedule().getEntries(), key=lambda x: (x.getStartDate(), x.getTitle())):
             <%
                 if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                     subitem = subitem.getOwner()

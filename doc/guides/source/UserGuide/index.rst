@@ -19,6 +19,8 @@ Contents:
    ./UsersGroups.rst
    ./Export.rst
    ./RoomBooking.rst
+   ./EventAgreements.rst
+   ./EventServices.rst
    ./Evaluation.rst
    ./Protection.rst
 

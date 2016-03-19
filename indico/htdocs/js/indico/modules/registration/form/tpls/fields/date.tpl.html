@@ -1,0 +1,39 @@
+<ng-form name="nestedForm">
+    <div>
+        <input
+            type="text"
+            id="field-{{ section.id }}-{{ field.id }}-date"
+            class="datepicker"
+            show-time="showTime(field.dateFormat)"
+            validation="validationStarted"
+            ng-required="{{ field.isRequired }}"
+            ng-model="dateTime.date"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+            nd-jquery-datepicker>
+
+        <input type="time"
+               id="field-{{ section.id }}-{{ field.id }}-time"
+               class="timepicker"
+               ng-pattern="/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/"
+               ng-if="field.hasTime"
+               ng-required="field.isRequired || !!dateTime.date"
+               ng-model="dateTime.time"
+               ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+               placeholder="HH:MM">
+    </div>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
+    <span ng-show="validationStarted && nestedForm.$error.date">
+        {{ "The date doesn't conform to the specified format " | i18n }}
+    </span>
+</ng-form>
+
+<span class="inputDescription">
+    <span ng-repeat="el in field.displayFormats" ng-show="el[0] == field.dateFormat">
+        {{ el[1] }}
+    </span>
+</span>
+
+<input type="hidden" name="{{ field.htmlName }}"
+       value="{{ dateTime.date && dateTime.time ? '{0} {1}'.format(dateTime.date, dateTime.time) : (dateTime.date || '') }}">

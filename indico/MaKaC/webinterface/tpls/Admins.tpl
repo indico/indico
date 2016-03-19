@@ -1,14 +1,14 @@
 
     <!-- CONTEXT HELP DIVS -->
-    <div id="tooltipPool" style="display: none">
+    <div id="tooltipPool" style="display: none;">
         <div id="features" class="tip">
-            ${ _("""Enabling "News Pages" will display "latest news" on the Indico home page and menu.""")}
+            ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu.""")}
         </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
 
-<div class="groupTitle">${ _("General System Information")}</div>
+<div class="groupTitle">${ _("General System Information") }</div>
 
 <table class="groupTable">
 <tr>
@@ -19,7 +19,7 @@
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${title}</td>
       <td rowspan="4" valign="top">
         <form action="${ GeneralInfoModifURL }" method="GET">
-        <input type="submit" class="btn" value="${ _("modify")}">
+            <input type="submit" class="btn" value="${ _("modify")}">
         </form>
       </td>
     </tr>
@@ -53,7 +53,14 @@
     </tr>
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Features")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">${features} ${contextHelp('features' )}</td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">
+        <table>
+          <tr>
+            <td>${features}</td>
+            <td valign="top">${contextHelp('features' )}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
     % if _app.debug:
         <tr>
@@ -72,11 +79,11 @@
         <td bgcolor="white" width="60%">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceAdministrators" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceAdministrators" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:60%; padding-top:5px;">
-                        <input type="button" onclick="adminListManager.addExistingUser();" value='${ _("Add administrator") }'></input>
+                        <button type="button" id="add-admin-button">${ _("Add administrator") }</button>
                     </td>
                     <td></td>
                 </tr>
@@ -86,10 +93,28 @@
 </table>
 
 <script>
+    $(function() {
+        var adminListManager = new ListOfUsersManager(null, {
+                'addExisting': 'admin.general.addExistingAdmin',
+                'remove'     : 'admin.general.removeAdmin'
+            }, {}, $E('inPlaceAdministrators'), "administrator", "item-user", false, {}, {
+                title      : false,
+                affiliation: false,
+                email      :true
+            }, {
+                remove  : true,
+                edit    : false,
+                favorite: true,
+                arrows  : false,
+                menu    : false }, ${ administrators | n,j}, null, null, null, false);
 
-var adminListManager = new ListOfUsersManager(null,
-        {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
-        {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
-        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
+        $('#add-admin-button').on('click', function() {
+            adminListManager.addExistingUser();
+        });
+
+    % if cephalopod_data['enabled']:
+        initCephalopodOnAdminPage(${ tracker_url|n,j }, ${ cephalopod_data|n,j }, ${ url_for('cephalopod.index')|n,j });
+    % endif
+    });
 
 </script>

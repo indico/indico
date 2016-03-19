@@ -61,7 +61,7 @@
         <td bgcolor="white" width="100%" class="blacktext" colspan="2">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceUsers" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceUsers" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
@@ -152,6 +152,9 @@ $(function() {
                     new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}).open();
                 });
             }
+        },
+        style: {
+            classes: 'add-field-qtip'
         }
     });
 
@@ -165,7 +168,7 @@ $(function() {
 
 var lateSubmissionAuthUsers = new ListOfUsersManager(null,
     {'addExisting': 'abstracts.lateSubmission.addExistingLateAuthUser', 'remove': 'abstracts.lateSubmission.removeLateAuthUser'},
-    {'confId': '${ confId }'}, $E('inPlaceUsers'), "user", "UIPerson", false, {}, {title: false, affiliation: false, email:true},
+    {'confId': '${ confId }'}, $E('inPlaceUsers'), "user", "item-user", false, {}, {title: false, affiliation: false, email:true},
     {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ lateAuthUsers | n,j});
 
 IndicoUI.executeOnLoad(function(){

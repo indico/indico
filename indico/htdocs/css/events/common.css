@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -69,7 +69,7 @@ ul.dayList {
 
 ul.meetingTimetable {
     list-style-type: none;
-    padding: 0 10px;
+    padding: 0 0 0 10px;
     margin: 0;
     height: 100%;
 }
@@ -126,7 +126,7 @@ ul.topLevelSCList {
     list-style-type: none;
 }
 
-ul.topLevelSCList li {
+ul.topLevelSCList > li {
     margin-top: 1em;
 }
 
@@ -148,7 +148,7 @@ ul.subEventLevelSCList {
     margin-left: 40px;
 }
 
-ul.subEventLevelSCList li {
+ul.subEventLevelSCList > li {
     padding: 0;
     margin: 1em 0;
     list-style-type: none;
@@ -624,7 +624,7 @@ table.sessionDetails td {
     padding-left: 0;
 }
 
-table.sessionDetails td.leftCol {
+table.sessionDetails > td.leftCol {
     padding-right: 10px;
     font-weight: normal;
     text-align: left;

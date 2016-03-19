@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,24 +22,24 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 
 
-def add_link(avatar, event, role, client=None):
+def add_link(user, event, role, client=None):
     if client is None:
         client = redis_write_client
-    scripts.avatar_event_links_add_link(avatar.getId(), event.getId(), event.getUnixStartDate(), role, client=client)
+    scripts.avatar_event_links_add_link(user.id, event.getId(), event.getUnixStartDate(), role, client=client)
 
 
-def del_link(avatar, event, role, client=None):
+def del_link(user, event, role, client=None):
     if client is None:
         client = redis_write_client
-    scripts.avatar_event_links_del_link(avatar.getId(), event.getId(), role, client=client)
+    scripts.avatar_event_links_del_link(user.id, event.getId(), role, client=client)
 
 
-def get_links(avatar, minDT=None, maxDT=None, client=None):
+def get_links(user, minDT=None, maxDT=None, client=None):
     if client is None:
         client = redis_client
     minTS = minDT if isinstance(minDT, int) else datetimeToUnixTimeInt(minDT) if minDT else ''
     maxTS = maxDT if isinstance(maxDT, int) else datetimeToUnixTimeInt(maxDT) if maxDT else ''
-    res = scripts.avatar_event_links_get_links(avatar.getId(), minTS, maxTS, client=client)
+    res = scripts.avatar_event_links_get_links(user.id, minTS, maxTS, client=client)
     if res is None:
         # Execution failed
         return OrderedDict()
@@ -49,13 +49,13 @@ def get_links(avatar, minDT=None, maxDT=None, client=None):
 def merge_avatars(destination, source, client=None):
     if client is None:
         client = redis_write_client
-    scripts.avatar_event_links_merge_avatars(destination.getId(), source.getId(), client=client)
+    scripts.avatar_event_links_merge_avatars(destination.id, source.id, client=client)
 
 
-def delete_avatar(avatar, client=None):
+def delete_avatar(user, client=None):
     if client is None:
         client = redis_write_client
-    scripts.avatar_event_links_delete_avatar(avatar.getId(), client=client)
+    scripts.avatar_event_links_delete_avatar(user.id, client=client)
 
 
 def update_event_time(event, client=None):
@@ -70,7 +70,7 @@ def delete_event(event, client=None):
     scripts.avatar_event_links_delete_event(event.getId(), client=client)
 
 
-def init_links(avatar, client=None, assumeEvents=False):
+def init_links(user, client=None, assumeEvents=False):
     """Initializes the links based on the existing linked_to data."""
 
     if client is None:
@@ -78,24 +78,26 @@ def init_links(avatar, client=None, assumeEvents=False):
 
     all_events = set()
     event_roles = defaultdict(set)
-    for key, roleDict in avatar.linkedTo.iteritems():
-        for role, items in roleDict.iteritems():
-            for item in items:
-                event = event_from_obj(item) if not assumeEvents else item
-                if event:
-                    all_events.add(event)
-                    event_roles[event].add(key + '_' + role)
+
+    for link in user.linked_objects.all():
+        obj = link.object
+        if obj is None:
+            continue
+        event = event_from_obj(obj) if not assumeEvents else obj
+        if event:
+            all_events.add(event)
+            event_roles[event].add('{}_{}'.format(link.type, link.role))
 
     # Add avatar to event avatar lists
     for event in all_events:
-        client.sadd('avatar-event-links/event_avatars:%s' % event.getId(), avatar.getId())
+        client.sadd('avatar-event-links/event_avatars:%s' % event.getId(), user.id)
     # Add events to avatar event list
     zdata = dict((e.getId(), e.getUnixStartDate()) for e in all_events)
     if zdata:
-        client.zadd('avatar-event-links/avatar_events:%s' % avatar.getId(), **zdata)
+        client.zadd('avatar-event-links/avatar_events:%s' % user.id, **zdata)
     # Add roles to avatar-event role lists
     for event, roles in event_roles.iteritems():
-        client.sadd('avatar-event-links/avatar_event_roles:%s:%s' % (avatar.getId(), event.getId()), *roles)
+        client.sadd('avatar-event-links/avatar_event_roles:%s:%s' % (user.id, event.getId()), *roles)
 
 
 def event_from_obj(obj):

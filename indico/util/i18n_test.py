@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -83,9 +83,11 @@ def test_straight_translation():
 
 
 @pytest.mark.usefixtures('mock_translations')
-def test_lazy_translation():
+def test_lazy_translation(monkeypatch):
+    monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: False)
     a = _(u'Fetch the cow')
     b = _(u'The wheels')
+    monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: True)
 
     assert isinstance(a, _LazyString)
     assert isinstance(b, _LazyString)

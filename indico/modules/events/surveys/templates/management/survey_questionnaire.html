@@ -1,0 +1,46 @@
+{% extends 'events/surveys/management/_survey_base.html' %}
+{% from 'events/surveys/management/_questionnaire_preview.html' import render_questionnaire_preview %}
+
+{% block subtitle %}
+    {% trans title=survey.title -%}
+        Questionnaire for "{{ title }}"
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="flashed-messages"></div>
+
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-list"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Sections{% endtrans %}
+                </div>
+                {% trans %}The questionnaire consists of one or more sections.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="#" data-href="{{ url_for('.add_section', survey) }}"
+                   class="i-button js-survey-item-dialog icon-plus"
+                   data-title="{% trans %}Add section{% endtrans %}">
+                    {% trans %}Add section{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="survey-questionnaire-preview" class="i-box-group vert" data-sort-url="{{ url_for('.sort_items', survey) }}">
+        {{ render_questionnaire_preview(survey, preview_form, field_types) }}
+    </div>
+
+    <div class="toolbar right">
+        <a href="{{ url_for('.manage_survey', survey) }}" class="i-button big">
+            {% trans %}Back{% endtrans %}
+        </a>
+    </div>
+
+    <script>
+        setupQuestionnaireWindows();
+        setupQuestionnaireSorter();
+    </script>
+{% endblock %}

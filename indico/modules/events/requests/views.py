@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,8 +25,7 @@ class WPRequestsJinjaMixin(WPJinjaMixin):
 
 
 class WPRequestsEventManagement(WPConferenceModifBase, WPRequestsJinjaMixin):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['requests'].setActive()
+    sidemenu_option = 'requests'
 
     def _getPageContent(self, params):
         return WPRequestsJinjaMixin._getPageContent(self, params)

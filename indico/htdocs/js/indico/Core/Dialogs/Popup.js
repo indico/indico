@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -917,7 +917,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             }
 
             if (contrib.presenters.length > 0) {
-                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, 'Presenter(s): '));
+                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, $T('Presenter(s): ')));
 
                 var i = 0;
                 each(contrib.presenters, function(p) {
@@ -931,12 +931,12 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             }
 
             if (contrib.room && contrib.room !== '') {
-                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
+                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, $T('Room:') + ' '), contrib.room);
                 infoDiv.append(room);
             }
 
             if (contrib.location && contrib.location !== '') {
-                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
+                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, $T('Location:') + ' '), contrib.location);
                 infoDiv.append(location);
             }
 
@@ -989,12 +989,17 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
             var row = $("<tr/>").css("color","#444444");
             var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"));
 
-            // If it is a LocalFile, rename it to File.
-            var type = "LocalFile" == element._type?$T("File"):element._type;
-            type = element.resources?$T("Material"):type;
+            var type = {
+                "AttachmentWrapper": $T.gettext("Attachment"),
+                "FolderWrapper": $T.gettext("Folder")
+            }[element._type] || element._type;
 
             row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(type));
-            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "File"], type)?element.name:element.title));
+            row.append($("<td/>").addClass(className).css({
+                'width': "50%",
+                'max-width': '200px',
+                'text-overflow': 'ellipsis',
+                'overflow': 'hidden'}).html(element.title));
             row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
             container.append(row);
         });

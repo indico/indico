@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,23 +20,28 @@
 @import "partials/boxes";
 @import "partials/buttons";
 @import "partials/core";
-@import "partials/main";
 @import "partials/dialogs";
 @import "partials/fonts";
 @import "partials/icons";
 @import "partials/infogrids";
 @import "partials/inputs";
 @import "partials/jquery-indico-clearableinput";
+@import "partials/jquery-indico-nullableselector";
+@import "partials/jquery-indico-colorpicker";
+@import "partials/labels";
 @import "partials/links";
 @import "partials/lists";
+@import "partials/main";
 @import "partials/messageboxes";
-@import "partials/progress";
+@import "partials/paddedboxes";
 @import "partials/payment";
 @import "partials/plugins";
-@import "partials/requests";
+@import "partials/progress";
 @import "partials/qtips";
+@import "partials/requests";
+@import "partials/rules";
 @import "partials/sidebars";
+@import "partials/switch";
 @import "partials/tables";
 @import "partials/toolbars";
 @import "partials/widgets";
-@import "partials/main";

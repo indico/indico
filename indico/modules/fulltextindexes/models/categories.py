@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,11 +22,12 @@ class IndexedCategory(db.Model):
 
     __tablename__ = 'category_index'
     __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
-                      {'schema': 'indico'})
+                      {'schema': 'categories'})
 
     id = db.Column(
-        db.String,
-        primary_key=True
+        db.Integer,
+        primary_key=True,
+        autoincrement=False
     )
 
     @property

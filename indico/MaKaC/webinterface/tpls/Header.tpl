@@ -67,14 +67,16 @@ urlMeeting.addParam("event_type","meeting")
         % endfor
 
         % if currentUser:
-            <a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a>
+            <a href="${ url_for('users.user_dashboard', user_id=None) }">${ _("My profile") }</a>
         % endif
 
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Help") }</a>
         <ul class="dropdown">
             <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
-            <li><a href="${ urlHandlers.UHAbout.getURL() }">${ _("About Indico") }</a></li>
-            <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+            % if show_contact:
+                <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+            % endif
+            <li><a href="http://indico-software.org">${ _("More about Indico") }</a></li>
         </ul>
     </div>
 </div>

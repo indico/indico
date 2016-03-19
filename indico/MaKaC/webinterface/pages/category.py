@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,21 +34,23 @@ from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import i18nformat
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
-from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
-from MaKaC.user import Group
+from indico.web.flask.util import url_for
+from indico.web.menu import render_sidemenu
 
 
 class WPCategoryBase (main.WPMainBase):
@@ -79,21 +81,6 @@ class WCategoryDisplay(WICalExportBase):
         self._wfReg = wfReg
         self._timezone = timezone(tz)
 
-    def _getMaterials(self):
-        l = []
-        for mat in sorted(self._target.getAllMaterialList()):
-            if mat.canView(self._aw):
-                l.append(mat)
-        return l
-
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() \
-                else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() \
-                else resource.getFileName()
-
     def getHTML(self, aw, params):
         self._aw = aw
         return wcomponents.WTemplated.getHTML(self, params)
@@ -109,9 +96,6 @@ class WCategoryDisplay(WICalExportBase):
         vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
         vars["isRootCategory"] = isRootCategory
         vars["timezone"] = self._timezone
-        vars["materials"] = self._getMaterials()
-        vars["getMaterialURL"] = lambda mat: urlHandlers.UHMaterialDisplay.getURL(mat)
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         subcats = self._target.subcategories
 
         confs = self._target.conferences
@@ -122,7 +106,7 @@ class WCategoryDisplay(WICalExportBase):
         elif confs:
             pastEvents = session.get('fetchPastEventsFrom', set())
             showPastEvents = (self._target.getId() in pastEvents or
-                             (self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()))
+                             (session.user and session.user.settings.get('show_past_events')))
             cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
@@ -132,9 +116,9 @@ class WCategoryDisplay(WICalExportBase):
 
         mgrs = []
         for mgr in self._target.getManagerList():
-            if isinstance(mgr, Avatar):
+            if isinstance(mgr, AvatarUserWrapper):
                 mgrs.append(("avatar", mgr.getAbrName()))
-            elif isinstance(mgr, Group) and mgr.groupType != "Default":
+            elif isinstance(mgr, GroupWrapper):
                 mgrs.append(("group", mgr.getName()))
 
         vars["managers"] = sorted(mgrs)
@@ -144,7 +128,6 @@ class WCategoryDisplay(WICalExportBase):
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
 
         vars["isLoggedIn"] = self._aw.getUser() is not None
-        vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite') if self._aw.getUser() else []
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["isNewsActive"] = minfo.isNewsActive()
@@ -169,9 +152,6 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         self._wfReg = wfReg
         tzUtil = DisplayTZ(self._getAW(), target)  # None,useServerTZ=1)
         self._locTZ = tzUtil.getDisplayTZ()
-
-    def getJSFiles(self):
-        return WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor')
 
     def _getHeadContent(self):
         # add RSS feed
@@ -967,67 +947,6 @@ class WPCategoryMap( WPCategoryDisplayBase ):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, type = "Map" )
 
-class WCategoryStatistics(wcomponents.WTemplated):
-
-    def __init__( self, target, wfReg, stats ):
-        self.__target = target
-        self._wfReg = wfReg
-        self._stats = stats
-
-    def getHTML( self, aw ):
-        self._aw = aw
-        return wcomponents.WTemplated.getHTML( self )
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self.__target.getName()
-        vars["img"] = self.__target.getIconURL()
-        vars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
-
-        if self._stats != None:
-            stats = []
-            # Number of events:
-            if self._stats["events"]:
-                wcsl=wcomponents.WCategoryStatisticsList( _("Number of events"), self._stats["events"] )
-                stats.append(wcsl.getHTML( self._aw ))
-                # Number of contributions:
-                if self._stats["contributions"] != {}:
-                    wcsl=wcomponents.WCategoryStatisticsList( _("Number of contributions"), self._stats["contributions"] )
-                    stats.append(wcsl.getHTML( self._aw ))
-                else:
-                    stats.append( i18nformat("""<b> _("Number of contributions"): 0</b>"""))
-                stats.append( i18nformat("""<b> _("Number of resources"): %s</b>""")%self._stats["resources"])
-                vars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
-            else:
-                stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the resources").</b>"""))
-                vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-            vars["contents"] = "<br><br>".join( stats )
-        else:
-            vars["contents"] = _("This category doesn't contain any event. No statistics are available.")
-            vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        return vars
-
-class WPCategoryStatistics( WPCategoryDisplayBase ):
-
-    def __init__( self, rh, target, wfReg, stats ):
-        WPCategoryDisplayBase.__init__( self, rh, target )
-        self._wfReg = wfReg
-        self._stats = stats
-
-    def _getTitle(self):
-        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")
-
-    def _getBody( self, params ):
-        wcs = WCategoryStatistics( self._target, self._wfReg, self._stats )
-        return wcs.getHTML( self._getAW() )
-
-    def _getNavigationDrawer(self):
-        #link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics")}]
-        pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
-
 
 #---------------------------------------------------------------------------
 
@@ -1075,8 +994,7 @@ class WConferenceCreation( wcomponents.WTemplated ):
             vars["sMinute_"][i] = vars.get("sMinute_%s"%i,"00")
             vars["dur_"][i] = vars.get("dur_%s"%i,"60")
         vars["nbDates"] = vars.get("nbDates",1)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        seltitle = minfo.getTimezone()
+        seltitle = Config.getInstance().getDefaultTimezone()
         if self._categ:
             seltitle= self._categ.getTimezone()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(seltitle)
@@ -1183,68 +1101,24 @@ class WPCategoryModifBase( WPCategoryBase ):
         pars = {"target": self._target , "isModif" : True}
         return wcomponents.WNavigationDrawer( pars, bgColor = "white" )
 
-    def _createSideMenu( self ):
-        self._sideMenu = wcomponents.ManagementSideMenu()
-
-        viewSection = wcomponents.SideMenuSection()
-
-        self._viewMenuItem = wcomponents.SideMenuItem(_("View category"),
-            urlHandlers.UHCategoryDisplay.getURL( self._target ))
-        viewSection.addItem( self._viewMenuItem)
-
-        self._sideMenu.addSection(viewSection)
-
-
-        mainSection = wcomponents.SideMenuSection()
-
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
-            urlHandlers.UHCategoryModification.getURL( self._target ))
-        mainSection.addItem( self._generalSettingsMenuItem)
-
-        self._filesMenuItem = wcomponents.SideMenuItem(_("Files"),
-            urlHandlers.UHCategModifFiles.getURL(self._target ))
-        mainSection.addItem( self._filesMenuItem)
-
-        self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
-            urlHandlers.UHCategModifAC.getURL( self._target ))
-        mainSection.addItem( self._ACMenuItem)
-
-        self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
-            urlHandlers.UHCategModifTools.getURL( self._target ))
-        mainSection.addItem( self._toolsMenuItem)
-
-        self._tasksMenuItem = wcomponents.SideMenuItem(_("Tasks"),
-            urlHandlers.UHCategModifTasks.getURL( self._target ))
-        mainSection.addItem( self._tasksMenuItem)
-        if not self._target.tasksAllowed() :
-            self._tasksMenuItem.setVisible(False)
-
-        self._sideMenu.addSection(mainSection)
-
     def _createTabCtrl( self ):
         pass
 
     def _setActiveTab( self ):
         pass
 
-    def _setActiveSideMenuItem( self ):
-        pass
-
-    def _getBody( self, params ):
-        self._createSideMenu()
-        self._setActiveSideMenuItem()
-
+    def _getBody(self, params):
         self._createTabCtrl()
         self._setActiveTab()
 
-        sideMenu = self._sideMenu.getHTML()
-
         frame = WCategoryModifFrame()
-        p = { "category": self._target,
-              "body": self._getPageContent( params ),
-              "sideMenu": self._sideMenu.getHTML() }
 
-        return frame.getHTML( p )
+        return frame.getHTML({
+            "category": self._target,
+            "body": self._getPageContent(params),
+            "sideMenu": render_sidemenu('category-management-sidemenu', active_item=self.sidemenu_option,
+                                        category=self._target, old_style=True)
+        })
 
     def _getTabContent( self, params ):
         return "nothing"
@@ -1266,9 +1140,7 @@ class WCategoryModifFrame(wcomponents.WTemplated):
         return vars
 
 class WPCategModifMain( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._generalSettingsMenuItem.setActive()
+    sidemenu_option = 'general'
 
 
 class WCategModifMain(wcomponents.WTemplated):
@@ -1310,13 +1182,9 @@ class WCategModifMain(wcomponents.WTemplated):
                 </table>""")%(Config.getInstance().getSystemIconURL("checkAll"), Config.getInstance().getSystemIconURL("uncheckAll"), "".join( temp ))
         return html
 
-    def __getConferenceItems( self, cl, modifURLGen, modifURLOpen ):
+    def __getConferenceItems(self, cl, modifURLGen):
         temp = []
         for conf in cl:
-            if conf.isClosed():
-                textopen = i18nformat(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") %  modifURLOpen(conf)
-            else:
-                textopen = ""
             temp.append("""
                 <tr>
                     <td width="3%%">
@@ -1324,8 +1192,8 @@ class WCategModifMain(wcomponents.WTemplated):
                     </td>
                     <td align="center" width="17%%">%s</td>
                     <td align="center" width="17%%">%s</td>
-                    <td width="100%%"><a href="%s">%s</a>%s</td>
-                </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle(), textopen))
+                    <td width="100%%"><a href="%s">%s</a></td>
+                </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle()))
         html = i18nformat("""<table align="left" width="100%%">
                 <tr>
                     <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll(document.contentForm.selectedConf)"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll(document.contentForm.selectedConf)"></td>
@@ -1356,7 +1224,7 @@ class WCategModifMain(wcomponents.WTemplated):
         if not self._categ.getSubCategoryList():
             vars['containsEvents'] = True
             vars["removeItemsURL"] = vars["actionConferencesURL"]
-            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
+            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"])
         else:
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
@@ -1378,38 +1246,6 @@ class WCategModifMain(wcomponents.WTemplated):
             cat = conference.CategoryManager().getById(categId)
             vars["defaultVisibility"] = cat.getName()
 
-###################################################################################################
-## TODO: this code belongs to the TASKS MODULE. We should fix it or remove it.
-        vars["enablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "enabledSection" )))
-        vars["disablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "disabledSection" )))
-        enabledText = _("Click to disable")
-        disabledText = _("Click to enable")
-
-        url = urlHandlers.UHCategoryTasksOption.getURL( self._categ )
-
-        comment = ""
-        if (self._categ.hasSubcategories()):
-            icon=vars["disablePic"]
-            textIcon = disabledText
-            comment = i18nformat("""<b>&nbsp;&nbsp;[ _("Category contains subcategories - this module cannot be enabled")]</b>""")
-            url = ""
-        elif self._categ.tasksAllowed():
-            icon=vars["enablePic"]
-            textIcon=enabledText
-            if len(self._categ.getTaskList()) > 0 :
-                comment = i18nformat("""<b>&nbsp;&nbsp;[_("Task list is not empty - this module cannot be disabled")]</b>""")
-                url = ""
-        else:
-            icon=vars["disablePic"]
-            textIcon=disabledText
-        tasksManagement = """
-        <tr>
-            <td>
-                <a href=%s><img src=%s alt="%s" class="imglink"></a>&nbsp;<a href=%s>%s</a>%s
-            </td>
-        </tr>"""%(url,icon,textIcon,url, _("Tasks List"),comment)
-        vars["tasksManagement"] = tasksManagement
-###################################################################################################
         return vars
 
 
@@ -1422,7 +1258,6 @@ class WPCategoryModification( WPCategModifMain ):
 "addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(self._target),
 "addConferenceURL": urlHandlers.UHConferenceCreation.getURL( self._target ), \
 "confModifyURLGen": urlHandlers.UHConferenceModification.getURL, \
-"confModifyURLOpen": urlHandlers.UHConferenceOpen.getURL, \
 "categModifyURLGen": urlHandlers.UHCategoryModification.getURL, \
 "actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(self._target),
 "actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL(self._target)}
@@ -1519,13 +1354,8 @@ class WCategoryCreation(wcomponents.WTemplated):
 
                 styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId, selected, styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        try:
-           default_tz = minfo.getTimezone()
-        except:
-           default_tz = 'UTC'
-
+        default_tz = Config.getInstance().getDefaultTimezone()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)
         vars["categTitle"] = self.__target.getTitle()
         if self.__target.isProtected():
@@ -1804,9 +1634,7 @@ class WCategModifAC(wcomponents.WTemplated):
         return vars
 
 class WPCategModifAC( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._ACMenuItem.setActive()
+    sidemenu_option = 'protection'
 
     def _getPageContent(self, params):
         wc = WCategModifAC(self._target)
@@ -1833,9 +1661,7 @@ class WCategModifTools(wcomponents.WTemplated):
 
 
 class WPCategModifTools( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._toolsMenuItem.setActive()
+    sidemenu_option = 'tools'
 
     def _getPageContent( self, params ):
         wc = WCategModifTools( self._target )
@@ -1849,175 +1675,3 @@ class WPCategoryDeletion( WPCategModifTools ):
     def _getPageContent( self, params ):
         wc = WCategoryDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHCategoryDeletion.getURL( self._target ) )
-
-#---------------------------------------------------------------------------------
-
-class WCategModifTasks(wcomponents.WTemplated):
-
-    def __init__( self, category ):
-        self._categ = category
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        if self._categ.tasksAllowed() :
-            vars["tasksAllowed"] = _("Adding tasks is allowed")
-        else :
-            vars["tasksAllowed"] = _("Adding tasks IS NOT allowed")
-        vars["id"] = self._categ.getId()
-        vars["taskAction"] = urlHandlers.UHCategModifTasksAction.getURL(self._categ)
-        vars["locator"] = ""
-
-        if self._categ.tasksPublic() :
-            vars["accessVisibility"] = _("PUBLIC")
-            oppVisibility = _("PRIVATE")
-        else :
-            vars["accessVisibility"] = _("PRIVATE")
-            oppVisibility = _("PUBLIC")
-        vars["changeAccessVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="accessVisibility" value="%s">)""")%oppVisibility
-
-        if not self._categ.tasksPublic() :
-            vars["commentVisibility"] = _("PRIVATE")
-            vars["changeCommentVisibility"] = """"""
-        else :
-            if self._categ.tasksCommentPublic() :
-                vars["commentVisibility"] = _("PUBLIC")
-                oppVisibility = _("PRIVATE")
-            else :
-                vars["commentVisibility"] = _("PRIVATE")
-                oppVisibility = _("PUBLIC")
-            vars["changeCommentVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="commentVisibility" value="%s">)""")%oppVisibility
-
-
-        vars["managerList"] = self._getPersonList("manager")
-        vars["commentList"] = self._getPersonList("commentator")
-        vars["accessList"] = self._getPersonList("access")
-
-        vars["accessOptions"] = self._getAccessOptions()
-        vars["commentOptions"] = self._getCommentOptions()
-        vars["managerOptions"] = self._getManagerOptions()
-
-
-        return vars
-
-    def _getAccessOptions(self, names=[]):
-        html = []
-        if len(names) == 0 :
-            html.append("""<option value=""> </option>""")
-        for event in self._categ.getConferenceList() :
-            index = 0
-            for chair in event.getChairList() :
-                text = """<option value="h%s-%s">%s</option>"""%(event.getId(),index,chair.getFullName())
-                index = index + 1
-                if not (chair.getFullName() in names) :
-                    html.append(text)
-                    names.append(chair.getFullName())
-            index = 0
-            for manager in event.getManagerList() :
-                text = """<option value="m%s-%s">%s</option>"""%(event.getId(),index,manager.getFullName())
-                index = index + 1
-                if not (manager.getFullName() in names) :
-                    html.append(text)
-                    names.append(manager.getFullName())
-            index = 0
-            for participant in event.getParticipation().getParticipantList():
-                text = """<option value="p%s-%s">%s</option>"""%(event.getId(),index,participant.getFullName())
-                index = index + 1
-                if not (participant.getFullName() in names) :
-                    html.append(text)
-                    names.append(participant.getFullName())
-        return """
-                """.join(html)
-
-    def _getCommentOptions(self, names=[]):
-        html = []
-        if len(names) == 0 :
-            html.append("""<option value=""> </option>""")
-        index = 0
-        for a in self._categ.getTasksAccessList() :
-            text = """<option value="a%s">%s</option>"""%(index,a.getFullName())
-            index = index + 1
-            if not (a.getFullName() in names) :
-                html.append(text)
-                names.append(a.getFullName())
-        list = """
-        """.join(html)
-
-        return list + """
-        """+self._getAccessOptions(names)
-
-    def _getManagerOptions(self):
-        html = []
-        names = []
-        html.append("""<option value=""> </option>""")
-        index = 0
-        for c in self._categ.getTasksCommentatorList() :
-            text = """<option value="c%s">%s</option>"""%(index,c.getFullName())
-            index = index + 1
-            if not (c.getFullName() in names) :
-                html.append(text)
-                names.append(c.getFullName())
-        list = """
-        """.join(html)
-
-        return list + """
-        """+self._getCommentOptions(names)
-
-
-    def _getPersonList(self, personType):
-        html = []
-        index = 0
-        if personType == "access" :
-            personList = self._categ.getTasksAccessList()
-        elif personType == "manager" :
-            personList = self._categ.getTasksManagerList()
-        elif personType == "comentator" :
-            personList = self._categ.getTasksCommentatorList()
-        else :
-            return ""
-
-        for a in personList :
-            line = """
-            <tr>
-                <td><input type="checkbox" name="%s" value="%s"></td>
-                <td>%s</td>
-            </tr>
-            """%(personType, index, a.getFullName())
-            index = index + 1
-            html.append(line)
-
-        list = """
-        """.join(html)
-        out = """
-       <table>
-           %s
-       </table>"""%list
-        return out
-
-class WPCategModifTasks( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._tasksMenuItem.setActive()
-
-    def _getPageContent( self, params ):
-        wc = WCategModifTasks( self._target )
-        pars = { \
-"deleteCategoryURL": urlHandlers.UHCategoryDeletion.getURL(self._target) }
-
-        return wc.getHTML( pars )
-
-class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
-
-    _userData = ['favorite-user-list', 'favorite-user-ids']
-
-    def getJSFiles(self):
-        return WPCategoryModifBase.getJSFiles(self) + \
-               self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
-
-    def _getPageContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
-        return wc.getHTML( pars )
-
-    def _setActiveSideMenuItem( self ):
-        self._filesMenuItem.setActive()
-

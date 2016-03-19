@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,13 +24,12 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import JSONField
-from MaKaC.user import AvatarHolder, GroupHolder
+from indico.web.forms.fields import JSONField, PrincipalListField
 
 
 class BlockingForm(IndicoForm):
     reason = TextAreaField(_(u'Reason'), [DataRequired()])
-    principals = JSONField(default=[])
+    principals = PrincipalListField(groups=True, serializable=False, allow_external=True)
     blocked_rooms = JSONField(default=[])
 
     def validate_blocked_rooms(self, field):
@@ -64,19 +63,6 @@ class BlockingForm(IndicoForm):
         if overlap:
             msg = 'Your blocking for {} is overlapping with another blocking.'.format(overlap.room.full_name)
             raise ValidationError(msg)
-
-    def validate_principals(self, field):
-        for item in field.data:
-            try:
-                type_ = item['_type']
-                id_ = item['id']
-            except Exception as e:
-                raise ValidationError('Invalid principal data: {}'.format(e))
-            if type_ not in ('Avatar', 'Group', 'LDAPGroup'):
-                raise ValidationError('Invalid principal data: type={}'.format(type_))
-            holder = AvatarHolder() if type_ == 'Avatar' else GroupHolder()
-            if not holder.getById(id_):
-                raise ValidationError('Invalid principal: {}:{}'.format(type_, id_))
 
 
 class CreateBlockingForm(BlockingForm):

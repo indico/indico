@@ -1,0 +1,5 @@
+{% if reservation.room.key_location %}
+
+How to find a key:
+{{ reservation.room.key_location | strip_tags }}
+{%- endif %}

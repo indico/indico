@@ -1,0 +1,22 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Verify your email{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {% trans %}user{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {%- trans -%}
+            You started the Indico profile creation process.  To continue, you need to verify
+            that {{ email }} is indeed your email address.
+
+            Please click the following link to continue the registration process:
+        {%- endtrans %}
+
+        {{ url }}
+    {%- endfilter -%}
+{%- endblock %}

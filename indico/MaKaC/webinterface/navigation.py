@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -39,9 +39,6 @@ class NavigationEntry:
             return cls._parent()
         return None
 
-class NEConferenceProgramme( NavigationEntry ):
-    _url = urlHandlers.UHConferenceProgram
-    _title = "Scientific Programme"
 
 class NEConferenceCFA( NavigationEntry ):
     _url = urlHandlers.UHConferenceCFA
@@ -129,75 +126,12 @@ class NEMeetingSessionDisplay(NavigationEntry):
     _url = urlHandlers.UHSessionDisplay
     _title = "Session details"
 
-class NEMeetingMaterialDisplay(NavigationEntry):
-    _url = urlHandlers.UHMaterialDisplay
-    _parent = {"session": NEMeetingSessionDisplay, \
-                           "contrib": NEContributionDisplay}
-    _title = "Material details"
-
-    def getParent(cls, target):
-        nextPage = None
-        if target is not None:
-            parent = target.getOwner()
-            if isinstance(parent, conference.Session):
-                nextPage = cls._parent["session"]()
-            elif isinstance(parent, conference.Contribution):
-                nextPage = cls._parent["contrib"]()
-        return nextPage
-    getParent = classmethod( getParent)
-
-
-
-class NEMaterialDisplay( NavigationEntry ):
-    _url = urlHandlers.UHMaterialDisplay
-    _parent = { "contrib": NEContributionDisplay, \
-                "session": NESessionDisplay }
-    _title = "Material details"
-
-    def getParent(cls, target):
-        nextPage = None
-        if target is not None:
-            parent = target.getOwner()
-            if isinstance(parent, conference.Contribution):
-                nextPage = cls._parent["contrib"]()
-            elif isinstance(parent, conference.Session):
-                nextPage = cls._parent["session"]()
-        return nextPage
-    getParent = classmethod( getParent)
 
 class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _url = urlHandlers.UHAbstractSubmissionConfirmation
     _parent = NEConferenceCFA
     _title = "Abstract submission confirmation"
 
-
-class NERegistrationForm( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationForm
-    _title = "Registration"
-
-class NERegistrationFormDisplay( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationFormDisplay
-    _parent = NERegistrationForm
-    _title = "Registration form display"
-
-class NERegistrationFormModify( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationFormModify
-    _parent = NERegistrationForm
-    _title = "Registration form modification"
-
-class NEEvaluationMainInformation( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationMainInformation
-    _title = "Evaluation"
-
-class NEEvaluationDisplay( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationDisplay
-    _parent = NEEvaluationMainInformation
-    _title = "Evaluation form display"
-
-class NEEvaluationDisplayModif( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationDisplayModif
-    _parent = NEEvaluationMainInformation
-    _title = "Evaluation form modification"
 
 class NEAuthorDisplay( NavigationEntry ):
     _url = urlHandlers.UHContribAuthorDisplay
@@ -208,11 +142,3 @@ class NETimeTableCustomizePDF( NavigationEntry ):
     _url = urlHandlers.UHConfTimeTableCustomizePDF
     _parent = NEConferenceTimeTable
     _title = "Customize PDF"
-
-class NEAbstractBookCustomise( NavigationEntry ):
-    _url = urlHandlers.UHConfTimeTableCustomizePDF
-    _title = "Customize Book of Abstracts"
-
-class NESubContributionDisplay(NavigationEntry):
-    _url = urlHandlers.UHSubContributionDisplay
-    _title = "SubContribution details"

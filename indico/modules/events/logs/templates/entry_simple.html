@@ -1,0 +1,21 @@
+{% extends 'events/logs/entry_base.html' %}
+
+{% block entry_detail_rows %}
+    {% for key, value in data if value not in ('', none) %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                {{ key }}
+            </td>
+            <td class="i-table value searchable">
+                {{ value }}
+            </td>
+        </tr>
+    {% else %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption"></td>
+            <td class="i-table value empty">
+                {% trans %}No data to display{% endtrans %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}

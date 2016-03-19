@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -55,3 +55,20 @@ $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
 $.extend($.colorbox.settings, {
     opacity: 0.6
 });
+
+
+$.ajaxSetup({
+    traditional: true,
+    beforeSend: function(xhr, settings) {
+        xhr._requestURL = settings.url;  // save the url in case we need it
+        if (!/^https?:.*/.test(settings.url)) {
+            // Add CSRF token to local requests
+            xhr.setRequestHeader('X-CSRF-Token', $('#csrf-token').attr('content'));
+        }
+    }
+});
+
+// Disabling autoDiscover, otherwise Dropzone will try to attach twice.
+if (window.Dropzone) {
+    Dropzone.autoDiscover = false;
+}

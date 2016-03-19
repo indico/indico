@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ import pprint
 import time
 import traceback
 
-from flask import current_app
+from flask import current_app, g, request_tearing_down, request_started, request, has_request_context
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
@@ -54,8 +54,14 @@ def _get_sql_line():
                 'items': stack[i:i+5]}
 
 
-def apply_db_loggers(debug=False):
-    if not debug or getattr(db, '_loggers_applied', False):
+def _fix_param(param):
+    if hasattr(param, 'iteritems'):
+        return {k: _fix_param(v) for k, v in param.iteritems()}
+    return '<binary>' if param.__class__.__name__ == 'Binary' else param
+
+
+def apply_db_loggers(app):
+    if not app.debug or getattr(db, '_loggers_applied', False):
         return
     db._loggers_applied = True
     from indico.core.logger import Logger
@@ -65,6 +71,13 @@ def apply_db_loggers(debug=False):
 
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        if not g.get('req_start_sent'):
+            g.req_start_sent = True
+            logger.debug('Request started', extra={'sql_log_type': 'start_request',
+                                                   'req_verb': request.method if has_request_context() else None,
+                                                   'req_path': request.path if has_request_context() else None,
+                                                   'req_url': request.url if has_request_context() else None})
+
         context._query_start_time = time.time()
         source_line = _get_sql_line()
         if source_line:
@@ -79,14 +92,47 @@ def apply_db_loggers(debug=False):
                 _prettify_sql(statement),
                 _prettify_params(parameters) if parameters else ''
             ).rstrip()
+        # psycopg2._psycopg.Binary objects are extremely weird and don't work in isinstance checks
+        if hasattr(parameters, 'iteritems'):
+            parameters = {k: _fix_param(v) for k, v in parameters.iteritems()}
+        else:
+            parameters = tuple(_fix_param(v) for v in parameters)
         logger.debug(log_msg,
                      extra={'sql_log_type': 'start',
+                            'req_path': request.path if has_request_context() else None,
                             'sql_source': source_line['items'] if source_line else None,
                             'sql_statement': statement,
+                            'sql_verb': statement.split()[0],
                             'sql_params': parameters})
 
     @listens_for(Engine, 'after_cursor_execute')
     def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         total = time.time() - context._query_start_time
+        source_line = _get_sql_line()
+        source = source_line['items'] if source_line else None
         logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
-                                                                            'sql_duration': total})
+                                                                            'req_path': (request.path
+                                                                                         if has_request_context()
+                                                                                         else None),
+                                                                            'sql_source': source,
+                                                                            'sql_duration': total,
+                                                                            'sql_verb': statement.split()[0]})
+        g.sql_query_count = g.get('sql_query_count', 0) + 1
+
+    @request_started.connect_via(app)
+    def on_request_started(sender, **kwargs):
+        g.req_start_ts = time.time()
+        g.req_start_sent = False
+
+    @request_tearing_down.connect_via(app)
+    def on_request_tearing_down(sender, **kwargs):
+        query_count = g.get('sql_query_count', 0)
+        if not query_count:
+            return
+        duration = (time.time() - g.req_start_ts) if 'req_start_ts' in g else 0
+        logger.debug('Request finished', extra={'sql_log_type': 'end_request',
+                                                'sql_query_count': query_count,
+                                                'req_verb': request.method if has_request_context() else None,
+                                                'req_url': request.url if has_request_context() else None,
+                                                'req_path': request.path if has_request_context() else None,
+                                                'req_duration': duration})

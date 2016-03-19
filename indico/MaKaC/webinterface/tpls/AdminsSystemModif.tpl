@@ -11,13 +11,6 @@
       <td colspan="2" class="groupTitle">${ _("Modify System General Information")}</td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Proxy")}</span></td>
-      <td bgcolor="white" width="100%">&nbsp;
-        <input type="checkbox" size="50" name="proxy" value="True" ${ ("", "checked")[minfo.useProxy()] }>
-        <small>${ _("Check it if users connect to a proxy to access Indico (load balancing)")}</small>
-      </td>
-    </tr>
-    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Archiving Volume")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
         <input type="text" size="50" name="volume" value="${ minfo.getArchivingVolume() }">

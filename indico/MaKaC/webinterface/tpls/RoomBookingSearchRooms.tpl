@@ -90,6 +90,7 @@ ${ contextHelp('chooseButtonHelp') }
 <!-- Search for rooms -->
 <div id="searchRooms">
     <form id="searchRoomsForm" method="post" action="">
+        ${ form.csrf_token() }
         ${ form.start_dt() }
         ${ form.end_dt() }
         <h2 class="group-title">

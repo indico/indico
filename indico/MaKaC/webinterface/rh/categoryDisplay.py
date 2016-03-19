@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,18 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 from cStringIO import StringIO
-
+import re
 from datetime import timedelta, datetime
 
-#################################
-# Fermi timezone awareness      #
-#################################
+from flask import session
 from pytz import timezone
-import re
+
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-#################################
-# Fermi timezone awareness(end) #
-#################################
 from MaKaC.common.url import ShortURLMapper
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
@@ -33,14 +28,11 @@ import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
-import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
-import MaKaC.statistics as statistics
 from indico.core import signals
 from indico.core.config import Config
-import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.webinterface.user import UserListModificationBase
@@ -48,8 +40,16 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.errors import IndicoError
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.layout import layout_settings
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from indico.web.flask.util import send_file, endpoint_for_url
-from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -84,15 +84,6 @@ class RHCategoryMap( RHCategDisplayBase ):
         p = category.WPCategoryMap( self, self._target )
         return p.display()
 
-class RHCategoryStatistics( RHCategDisplayBase ):
-    _uh = urlHandlers.UHCategoryStatistics
-
-    def _process( self ):
-        wfReg = webFactoryRegistry.WebFactoryRegistry()
-        stats = statistics.CategoryStatistics(self._target).getStatistics()
-        p = category.WPCategoryStatistics( self, self._target, wfReg, stats )
-        return p.display()
-
 
 class RHCategOverviewDisplay(RHCategDisplayBase):
 
@@ -122,15 +113,15 @@ class RHCategOverviewDisplay(RHCategDisplayBase):
         return p.display()
 
 
-class RHConferenceCreationBase( RHCategoryDisplay ):
-
-    def _checkProtection( self ):
+class RHConferenceCreationBase(RHCategoryDisplay):
+    def _checkProtection(self):
         self._checkSessionUser()
-        RHCategoryDisplay._checkProtection( self )
-        if not self._target.isConferenceCreationRestricted():
-            return
-        if not self._target.canCreateConference( self._getUser() ):
-            raise MaKaCError( _("You are not allowed to create conferences inside this category"))
+        if self._target is not None:
+            RHCategoryDisplay._checkProtection(self)
+            if not self._target.isConferenceCreationRestricted():
+                return
+            if not self._target.canCreateConference(self._getUser()):
+                raise MaKaCError(_("You are not allowed to create conferences inside this category"))
 
     def _checkParams( self, params, mustExist=1 ):
         RHCategoryDisplay._checkParams( self, params, mustExist )
@@ -150,10 +141,10 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
 class RHConferenceCreation(RHConferenceCreationBase):
     _uh = urlHandlers.UHConferenceCreation
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         try:
-            RHConferenceCreationBase._checkProtection( self )
-        except Exception:
+            RHConferenceCreationBase._checkProtection(self)
+        except (MaKaCError, IndicoError):
             self._target = None
 
     def _checkParams( self, params ):
@@ -207,20 +198,17 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
                 self.alertCreation(lectures)
                 lectures.sort(sortByStartDate)
                 # create links
-                for i in range(0,len(lectures)):
-                    lecture = lectures[i]
+                for i, source in enumerate(lectures, 1):
                     if len(lectures) > 1:
-                        lecture.setTitle("%s (%s/%s)" % (lecture.getTitle(),i+1,len(lectures)))
-                    for j in range(0,len(lectures)):
+                        source.setTitle("{} ({}/{})".format(source.getTitle(), i, len(lectures)))
+
+                    for j, target in enumerate(lectures, 1):
                         if j != i:
-                            mat = conference.Material()
-                            mat.setTitle("part%s"%(j+1))
-                            url = str(urlHandlers.UHConferenceDisplay.getURL(lectures[j]))
-                            link = conference.Link()
-                            link.setURL(url)
-                            link.setName(url)
-                            mat.addResource(link)
-                            lecture.addMaterial(mat)
+                            folder = AttachmentFolder(linked_object=source, title="part{}".format(j))
+                            link = Attachment(user=session.user, type=AttachmentType.link,
+                                              folder=folder, title="Part {}".format(j),
+                                              link_url=target.getURL())
+                            db.session.add(link)
                 c = lectures[0]
             self._redirect(urlHandlers.UHConferenceModification.getURL( c ) )
         else :
@@ -297,7 +285,8 @@ _Room_
 _Description_
 %s
 _Creator_
-%s (%s)"""%(conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(), conf.getCreator().getFullName(), conf.getCreator().getId())
+%s (%s)""" % (conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
+              conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
         if len(confs) == 1:
             text += """
 _Date_
@@ -345,7 +334,7 @@ class UtilPersons:
 
         if avatars:
             for selected in avatars:
-                if isinstance(selected, user.Avatar) :
+                if isinstance(selected, AvatarUserWrapper):
                     person = ConferenceChair()
                     person.setDataFromAvatar(selected)
                     UtilPersons._addChair(conf, person, grantManager, grantSubmission)
@@ -364,19 +353,18 @@ class UtilPersons:
 
                 UtilPersons._addChair(conf, person, grantManager, grantSubmission)
 
-
         if accessingAvatars:
             for person in accessingAvatars:
-                if isinstance(person, user.Avatar) or isinstance(person, user.Group):
+                if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
                     conf.grantAccess(person)
 
     @staticmethod
     def _addChair(conf, chair, grantManager, grantSubmission):
         conf.addChair(chair)
-        if grantManager:
-            conf.grantModification(chair)
-        if grantSubmission:
-            conf.getAccessController().grantSubmission(chair)
+        if grantManager and chair.getEmail():
+            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), full_access=True)
+        if grantSubmission and chair.getEmail():
+            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), add_roles={'submit'})
 
 class UtilsConference:
 
@@ -446,6 +434,7 @@ class UtilsConference:
                     'room': room.name if room else ''}
 
         if newLocation.strip() == "":
+            l = None
             c.setLocation( None )
         else:
             l = c.getLocation()
@@ -487,18 +476,24 @@ class UtilsConference:
 
         c.getSupportInfo().setEmail(emailstr)
         c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
-        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        theme = confData.get('defaultStyle', '')
         curType = c.getType()
-        newType = confData.get("eventType","")
+        newType = confData.get('eventType', '')
         if newType != "" and newType != curType:
             wr = webFactoryRegistry.WebFactoryRegistry()
             factory = wr.getFactoryById(newType)
             wr.registerFactory(c,factory)
-            dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c)
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
+            # type changed. always revert to the default theme
+            layout_settings.delete(c, 'timetable_theme')
+        elif not theme or theme == styleMgr.getDefaultStyleForEventType(newType):
+            # if it's the default theme or nothing was set (does this ever happen?!), we don't store it
+            layout_settings.delete(c, 'timetable_theme')
+        else:
+            # set the new theme
+            layout_settings.set(c, 'timetable_theme', theme)
 
     @staticmethod
     def validateShortURL(tag, target):

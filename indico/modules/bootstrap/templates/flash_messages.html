@@ -1,0 +1,36 @@
+{% macro bootstrap_success(name) %}
+    {%- trans profile_link=url_for('users.user_dashboard') , settings_link=url_for('admin.adminList') -%}
+        Indico is now ready and you are logged as {{ name }} with administrative rights!<br>
+        Don't forget to tweak <a href="{{ settings_link }}">Indico's settings</a> and update your
+        <a href="{{ profile_link }}">profile</a>.
+    {%- endtrans -%}
+{% endmacro %}
+
+{% macro community_success() %}
+    {%- trans link=url_for('cephalopod.index') -%}
+        Welcome to the Indico community, your server has been registered to the Community Hub!<br>
+        You can manage it <a href="{{ link }}">here</a>.
+    {%- endtrans -%}
+{% endmacro %}
+
+{% macro community_timeout() %}
+    {%- trans link=url_for('cephalopod.index') -%}
+        Registration to the Community Hub timed-out. Please try again in a while <a href="{{ link }}">here</a>.
+    {%- endtrans -%}
+{% endmacro %}
+
+{% macro community_error(err) %}
+    {%- trans error=err.message %}Failed to register to the Community Hub: {{ error }}.{% endtrans %}<br>
+    {%- trans link=url_for('cephalopod.index') -%}
+        See the logs for details and try again <a href="{{ link }}">here</a>.
+    {%- endtrans -%}
+{% endmacro %}
+
+{% macro community_exception(exc) %}
+    {%- trans error=exc.message -%}
+        A unexpected exception happened while registering the server to the Community Hub: {{ error }}.
+    {%- endtrans %}<br>
+    {%- trans link=url_for('cephalopod.index') -%}
+        See the logs for details and try again <a href="{{ link }}">here</a>.
+    {%- endtrans -%}
+{% endmacro %}

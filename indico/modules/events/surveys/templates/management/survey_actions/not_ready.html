@@ -1,0 +1,16 @@
+{% extends 'events/surveys/management/survey_actions/_base.html' %}
+
+{% block label %}
+    {% trans %}Survey not ready{% endtrans %}
+{% endblock %}
+
+{% block text %}
+    {% trans %}The questionnaire is not set up yet{% endtrans %}
+{% endblock %}
+
+{% block buttons %}
+    <a href="{{ url_for('.manage_questionnaire', survey) }}"
+       class="i-button highlight icon-clipboard">
+        {% trans %}Prepare questionnaire{% endtrans %}
+    </a>
+{% endblock %}

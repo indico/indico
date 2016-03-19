@@ -1,6 +1,7 @@
-<%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1, showOrder=True" />
+<%page args="item, parent, hideTime=False, allMaterial=False, inlineMinutes=False, order=1, showOrder=True" />
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="base" file="../Administrative.tpl"/>
 
 <tr>
     <td colspan="4"></td>
@@ -20,19 +21,13 @@
 
     </td>
     <td class="itemTopAlign itemLeftAlign itemTitle">
-        ${item.getTitle()}
-        <br/>
-        % if minutes:
-            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
-            % if minutesText:
-                ${common.renderDescription(minutesText)}
-            % endif
-        % endif
+        ${item.getTitle()}<br/>
         % if item.getDescription():
-           <br/>
            ${common.renderDescription(item.getDescription())}
         % endif
-
+        % if inlineMinutes and item.note:
+            ${common.renderDescription(item.note.html)}
+        % endif
     </td>
     <td class="itemTopAlign itemRightAlign">
         % if item.getSpeakerList() or item.getSpeakerText():
@@ -44,53 +39,46 @@
         <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
-            % for material in item.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                    % if material.getTitle()=='document' and item.getReportNumberHolder().listReportNumbers():
-                        <%
-                        materialDocuments = True
-                        %>
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">
+
+            % for folder in item.attached_items.get('folders', []):
+                % if folder.title == 'document' and  item.getReportNumberHolder().listReportNumbers():
+                    <% materialDocuments = True %>
+                    <a href="${url_for('attachments.list_folder', folder, redirect_if_single=True)}">
                         % for rn in item.getReportNumberHolder().listReportNumbers():
                              ${rn[1]}
                         % endfor
-                        </a><br/>
-                    % endif
+                    </a><br>
                 % endif
             % endfor
+
             % if not materialDocuments and item.getReportNumberHolder().listReportNumbers():
                 % for rn in item.getReportNumberHolder().listReportNumbers():
                     ${rn[1]}<br/>
                 % endfor
             % endif
-            % if len(item.getAllMaterialList()) > 0:
-                % for material in item.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        % if material.getTitle()!='document' or not item.getReportNumberHolder().listReportNumbers():
-                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
-                        % endif
-                    % endif
-                % endfor
+
+            % if item.attached_items:
+                ${base.render_materials(item, exclude_document=True)}
             % endif
         % else:
-            % if len(item.getAllMaterialList()) > 0:
-                % for material in item.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
-                    % endif
-                % endfor
+            % if item.attached_items:
+                ${base.render_materials(item)}
             % endif
+        % endif
+
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">${ _("Minutes") }</a>
         % endif
         </span>
     </td>
     <td class="itemTopAlign">
-        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
     </td>
 </tr>
 % if item.getSubContributionList():
     <% suborder = 1 %>
     % for subcont in item.getSubContributionList():
-        <%include file="SubContribution.tpl" args="item=subcont, allMaterial=allMaterial, minutes=minutes, order = order, suborder=suborder"/>
+        <%include file="SubContribution.tpl" args="item=subcont, allMaterial=allMaterial, inlineMinutes=inlineMinutes, order = order, suborder=suborder"/>
         <% suborder += 1 %>
     % endfor
 % endif

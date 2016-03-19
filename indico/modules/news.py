@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@ from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from indico.modules import ModuleHolder, Module
 from MaKaC.common.info import HelperMaKaCInfo
-from indico.util.i18n import L_
+from indico.util.i18n import _, L_
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, \
      isTimezoneAware, setAdjustedDate
 from MaKaC.common.fossilize import Fossilizable, fossilizes

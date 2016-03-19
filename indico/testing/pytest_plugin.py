@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 
 
 import logging
+import os
 import re
 import sys
 import tempfile
@@ -28,7 +29,7 @@ from indico.core.logger import Logger
 
 pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.database', 'indico.testing.fixtures.disallow',
                   'indico.testing.fixtures.user', 'indico.testing.fixtures.event', 'indico.testing.fixtures.smtp',
-                  'indico.testing.fixtures.util', 'indico.testing.fixtures.registration')
+                  'indico.testing.fixtures.util')
 
 
 def pytest_configure(config):
@@ -45,7 +46,10 @@ def pytest_configure(config):
         'UploadedFilesTempDir': config.indico_temp_dir.strpath,
         'XMLCacheDir': config.indico_temp_dir.strpath,
         'ArchiveDir': config.indico_temp_dir.strpath,
-        'Plugins': plugins
+        'StorageBackends': {'default': config.indico_temp_dir},
+        'AttachmentStorage': 'default',
+        'Plugins': plugins,
+        'SecretKey': os.urandom(16)
     })
     # Make sure we don't write any log files (or worse: send emails)
     Logger.reset()

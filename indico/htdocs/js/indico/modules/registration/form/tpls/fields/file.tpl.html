@@ -1,0 +1,22 @@
+<div ng-switch="!!userdata[fieldName]">
+    <div ng-switch-default>
+        <ng-form name="nestedForm">
+            <input type="file" nd-valid-file
+                id="field-{{ section.id }}-{{ field.id }}"
+                name="{{ fieldName }}"
+                ng-model="input"
+                ng-required="field.isRequired"
+                ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
+        </ng-form>
+    </div>
+    <div ng-switch-when="true">
+        <span class="file-link">
+            {{ userdata[fieldName] }}
+        </span>
+        <a href="" class="remove-file"
+            title="{{ 'Remove attachment' | i18n }}"
+            alt="{{ 'Remove attachment' | i18n }}"
+            ng-click="removeAttachment()"></a>
+    </div>
+    <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
+</div>

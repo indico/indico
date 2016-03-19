@@ -1,0 +1,106 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block title %}{% trans %}Merge users{% endtrans %}{% endblock %}
+
+{%- block content %}
+    {{ form_header(form, id='merge-form') }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" disabled value="{% trans %}Merge{% endtrans %}">
+    {% endcall %}
+
+    <script>
+    (function() {
+        var FIELDS = {id: 'ID', email: $T('E-mail'), affiliation: $T('Affiliation')};
+
+        function update_data(source, target) {
+            function _render_data(data) {
+                return $('<ul class="merge-info">').append(
+                    _.map(FIELDS, function(caption, field) {
+                        return $('<li>').append($('<span class="caption">').text(caption + ': '),
+                                                $('<span>').text(data[field]));
+                    }));
+            }
+
+            $('.form-field .merge-info').remove();
+            $('#source_user').closest('.form-field').prepend(_render_data(source));
+            $('#target_user').closest('.form-field').prepend(_render_data(target));
+        }
+
+        function check_users() {
+            var source = JSON.parse($('#source_user').val()),
+                target = JSON.parse($('#target_user').val()),
+                $form = $('#merge-form'),
+                $submit = $form.find('input[type=submit]');
+
+            if (!source.length || !target.length) {
+                $submit.prop('disabled', true);
+                return;
+            }
+
+            $.ajax({
+                method: 'GET',
+                url: {{ url_for('.users_merge_check') | tojson }},
+                data: {
+                    source: source[0].id,
+                    target: target[0].id
+                }
+            }).done(function(result) {
+                update_data(source[0], target[0]);
+
+                var allow_submit = true,
+                    warnings = false;
+
+                $('#flashed-messages').empty();
+
+                function showProblem(problem, isError) {
+                    $('#flashed-messages').append(
+                        $('<div>', {'class': (isError ? 'error' : 'warning') + '-message-box'}).append(
+                            $('<div>', {'class': 'message-text', text: problem})
+                        )
+                    );
+
+                    if(isError) {
+                        allow_submit = false;
+                    } else {
+                        warnings = true;
+                    }
+                }
+
+                $(result.warnings).each(function(_, problem) {
+                    showProblem(problem, false);
+                });
+                $(result.errors).each(function(_, problem) {
+                    showProblem(problem, true);
+                });
+
+                $submit.prop('disabled', !allow_submit);
+                $form.data('show-warning', warnings);
+            });
+        }
+
+        check_users();
+        $('#source_user, #target_user').on('change', check_users);
+
+        $('#merge-form').on('submit', function(e) {
+            var $form = $(this),
+                confirm_text = $T('Are you sure you want to merge those two users?'),
+                warnings = $form.data('show-warning');
+
+            if ($form.data('confirmed')) {
+                return;
+            }
+
+            e.preventDefault();
+
+            confirmPrompt(confirm_text + (warnings ? (' ' + $T('Please notice there are warning messages!')) : ''),
+                          $T('Confirm user merge')
+            ).done(function() {
+                $form.data('confirmed', true)
+                $form.submit();
+            });
+        });
+    })();
+    </script>
+{%- endblock %}

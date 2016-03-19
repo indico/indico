@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,9 +16,12 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
+from sqlalchemy.orm import lazyload, joinedload, noload
+from werkzeug.urls import url_parse
 
-from indico.core.models.settings import EventSetting
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.events.layout import layout_settings
+from indico.modules.events.features import event_settings as features_event_settings
+from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -31,26 +34,30 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     IConferenceEventInfoFossil, IConferenceFossil,\
     ISessionFossil, ISessionSlotFossil, IMaterialMinimalFossil,\
     IMaterialFossil, IConferenceParticipationFossil,\
-    IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
-    IResourceFossil, ILinkFossil, ILocalFileFossil,\
+    IResourceMinimalFossil, ILocalFileMinimalFossil,\
+    IResourceFossil, ILocalFileFossil,\
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
     ICategoryFossil, ILocalFileAbstractMaterialFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.locations import Location
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
+from indico.util.caching import memoize_request
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
+from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id, to_unicode
 from MaKaC.review import AbstractFieldContent
 
 
-import re, os
-import tempfile
+import re
+import os
 import copy
 import stat
 from datetime import datetime, timedelta
-from flask import session, request
+from flask import session, request, has_request_context
 
 from MaKaC.contributionReviewing import ReviewManager
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -73,39 +80,39 @@ from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
-from MaKaC.accessControl import AccessController, AdminList
+from MaKaC.accessControl import AccessController
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
-from MaKaC import registration
-from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.participant import Participation
-from MaKaC.common.log import LogHandler
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Updates
 from MaKaC.schedule import ScheduleToJson
-from MaKaC.webinterface import urlHandlers
 
 from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
-from indico.modules.scheduler import Client, tasks
 from indico.core import signals
-from indico.util.date_time import utc_timestamp, format_datetime
-from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.config import Config
-from indico.util.date_time import utc_timestamp
+from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.attachments.models.attachments import AttachmentType, Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.util import get_attached_items
+from indico.util.date_time import utc_timestamp, format_datetime, format_human_timedelta
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
-import indico.util.redis.avatar_links as avatar_links
+from indico.util.user import unify_user_args
+from indico.util.redis import avatar_links
+from indico.web.flask.util import url_for
 
 
 class CoreObject(Persistent):
@@ -132,6 +139,11 @@ class CoreObject(Persistent):
             return None
 
 
+@memoize_request
+def _get_room_mapping():
+    return {(r.location.name, r.name): r for r in Room.query.options(lazyload(Room.owner), joinedload(Room.location))}
+
+
 class Locatable:
     """
     Inherited by objects that imply a physical location:
@@ -153,9 +165,8 @@ class Locatable:
         if not location or not room:
             return None
 
-        return Room.find_first(Room.name == fix_broken_string(room, True),
-                               Location.name == fix_broken_string(location, True),
-                               _join=Room.location)
+        key = fix_broken_string(location, True), fix_broken_string(room, True)
+        return _get_room_mapping().get(key)
 
     def getLocationParent(self):
         """
@@ -302,10 +313,75 @@ class CommonObjectBase(CoreObject, Fossilizable):
         else:
             return True
 
+    @property
+    @memoize_request
+    def attached_items(self):
+        """
+        CAUTION: this won't return empty directories (used by interface), nor things the
+        current user can't see
+        """
+        if isinstance(self, (Contribution, Session, SubContribution, Conference, Category)):
+            return get_attached_items(self, include_empty=False, include_hidden=False, preload_event=True)
+        else:
+            raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
+
+    def attach_links(self, links, user=None):
+        """
+        Adds links from a mapping which is usually passed to the various
+        JSON-RPC endpoints when importing contributions from outside,
+        usually using the importer plugin.
+
+        :param links: A dict mapping folder names (empty for the
+                      default folder) to lists of URLs.
+        :param user: The user who initiated the action.  Defaults to
+                     the current session user.
+        """
+        if not isinstance(self, (Contribution, Session, SubContribution, Conference)):
+            raise ValueError("Object of type '{}' does not support attach_links".format(type(self)))
+        if not links:
+            return
+        for folder_title, urls in links.iteritems():
+            if not urls:
+                continue
+            folder = AttachmentFolder.get_or_create(self, folder_title or None)
+            db.session.add(folder)
+            for url in urls:
+                link = Attachment(user=session.user, type=AttachmentType.link, link_url=url,
+                                  title=url_parse(url).netloc, description=url)
+                folder.all_attachments.append(link)
+                db.session.flush()
+                signals.attachments.attachment_created.send(link, user=link.user, internal=True)
+
+    def remove_attachments(self):
+        """
+        Send 'deleted' signal to all attachments/folders
+        """
+        # TODO 2.0: do not delete them, only set is_deleted on parent
+        attachments = get_attached_items(self)
+        if attachments:
+            for folder in attachments['folders']:
+                folder.is_deleted = True
+                signals.attachments.folder_deleted.send(folder, user=session.user, internal=True)
+                for attachment in folder.attachments:
+                    attachment.is_deleted = True
+            for attachment in attachments['files']:
+                attachment.is_deleted = True
+                signals.attachments.attachment_deleted.send(attachment, user=session.user, internal=True)
+
 
 class CategoryManager(ObjectHolder):
     idxName = "categories"
     counterName = "CATEGORY"
+
+    def getById(self, id_, quiet=False):
+        orig_id = id_ = str(id_)
+        if is_legacy_id(id_):
+            mapping = LegacyCategoryMapping.find_first(legacy_category_id=id_)
+            id_ = str(mapping.category_id) if mapping is not None else None
+        category = self._getIdx().get(id_) if id_ is not None else None
+        if category is None and not quiet:
+            raise KeyError(id_ if id_ is not None else orig_id)
+        return category
 
     def add(self, category):
         ObjectHolder.add(self, category)
@@ -356,7 +432,6 @@ class Category(CommonObjectBase):
         self.name = ""
         self.description = ""
         self.subcategories = {}
-        self.materials = {}
         self.conferences = OOTreeSet()
         self._numConferences = 0
         self.owner = None
@@ -366,22 +441,10 @@ class Category(CommonObjectBase):
         self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
-        self._statistics = {"events": None, "contributions": None, "resources": None,
-                            "updated": None}
+        self._statistics = {"events": None, "contributions": None, "files": None,
+                            "users": None, "updated": None}
         self._icon = None
-        self.materials = {}
-        #self._materials = {}
-        #self.material ={}
-        self._tasksAllowed = False
-        self._tasks = {}
-        self._taskIdGenerator = 0
-        self._tasksPublic = True
-        self._tasksCommentPublic = True
-        self._tasksManagers = []
-        self._tasksCommentators = []
-        self._taskAccessList = []
         self._timezone = ""
-        self.__materialGenerator = Counter()
         self._notifyCreationList = ""
 
     def __cmp__(self, other):
@@ -397,6 +460,13 @@ class Category(CommonObjectBase):
     def __repr__(self):
         path = '/'.join(self.getCategoryPathTitles()[:-1])
         return '<Category({0}, {1}, {2})>'.format(self.getId(), self.getName(), path)
+
+    @property
+    def url(self):
+        if self.isRoot():
+            return url_for('misc.index')
+        else:
+            return url_for('category.categoryDisplay', self)
 
     def getAccessController(self):
         return self.__ac
@@ -419,420 +489,8 @@ class Category(CommonObjectBase):
     def getUniqueId(self):
         return "cat%s" % self.getId()
 
-    def setPaper(self, newPaper):
-        if self.getPaper() is not None:
-            raise MaKaCError(_("The paper for this conference has already been set"), _("Conference"))
-        self.paper = newPaper
-        self.paper.setOwner(self)
-        self.notifyModification()
-
-    def removePaper(self):
-        if self.paper is None:
-            return
-        self.paper.delete()
-        self.paper.setOwner(None)
-        self.paper = None
-        self.notifyModification()
-
-    def recoverPaper(self, p):
-        self.setPaper(p)
-        p.recover()
-
-    def getPaper(self):
-        try:
-            if self.paper:
-                pass
-        except AttributeError:
-            self.paper = None
-        return self.paper
-
-    def setSlides(self, newSlides):
-        if self.getSlides() is not None:
-            raise MaKaCError(_("The slides for this conference have already been set"), _("Conference"))
-        self.slides = newSlides
-        self.slides.setOwner(self)
-        self.notifyModification()
-
-    def removeSlides(self):
-        if self.slides is None:
-            return
-        self.slides.delete()
-        self.slides.setOwner(None)
-        self.slides = None
-        self.notifyModification()
-
-    def recoverSlides(self, s):
-        self.setSlides(s)
-        s.recover()
-
-    def getSlides(self):
-        try:
-            if self.slides:
-                pass
-        except AttributeError:
-            self.slides = None
-        return self.slides
-
-    def setVideo(self, newVideo):
-        if self.getVideo() is not None:
-            raise MaKaCError(_("The video for this conference has already been set"), _("Conference"))
-        self.video = newVideo
-        self.video.setOwner(self)
-        self.notifyModification()
-
-    def removeVideo(self):
-        if self.getVideo() is None:
-            return
-        self.video.delete()
-        self.video.setOwner(None)
-        self.video = None
-        self.notifyModification()
-
-    def recoverVideo(self, v):
-        self.setVideo(v)
-        v.recover()
-
-    def getVideo(self):
-        try:
-            if self.video:
-                pass
-        except AttributeError:
-            self.video = None
-        return self.video
-
-    def setPoster(self, newPoster):
-        if self.getPoster() is not None:
-            raise MaKaCError(_("the poster for this conference has already been set"), _("Conference"))
-        self.poster = newPoster
-        self.poster.setOwner(self)
-        self.notifyModification()
-
-    def removePoster(self):
-        if self.getPoster() is None:
-            return
-        self.poster.delete()
-        self.poster.setOwner(None)
-        self.poster = None
-        self.notifyModification()
-
-    def recoverPoster(self, p):
-        self.setPoster(p)
-        p.recover()
-
-    def getPoster(self):
-        try:
-            if self.poster:
-                pass
-        except AttributeError:
-            self.poster = None
-        return self.poster
-
-    def setMinutes(self, newMinutes):
-        if self.getMinutes() is not None:
-            raise MaKaCError(_("The Minutes for this conference has already been set"))
-        self.minutes = newMinutes
-        self.minutes.setOwner(self)
-        self.notifyModification()
-
-    def createMinutes(self):
-        if self.getMinutes() is not None:
-            raise MaKaCError(_("The minutes for this conference have already been created"), _("Conference"))
-        self.minutes = Minutes()
-        self.minutes.setOwner(self)
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes(self):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner(None)
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes()  # To ensure that the current minutes are put in
-                              # the trash can.
-        self.minutes = min
-        self.minutes.setOwner(self)
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes(self):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
-
-    def addMaterial(self, newMat):
-        try:
-            newMat.setId(str(self.__materialGenerator.newCount()))
-        except:
-            self.__materialGenerator = Counter()
-            newMat.setId(self.__materialGenerator.newCount())
-        newMat.setOwner(self)
-        self.materials[newMat.getId()] = newMat
-        self.notifyModification()
-
-    def removeMaterial(self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[mat.getId()]
-            self.notifyModification()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            return "done: %s" % mat.getId()
-        return "not done: %s" % mat.getId()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner(self)
-        self.materials[recMat.getId()] = recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import CategoryMFRegistry
-        return CategoryMFRegistry
-
-    def getMaterialById(self, matId):
-        if matId.lower() == 'paper':
-            return self.getPaper()
-        elif matId.lower() == 'slides':
-            return self.getSlides()
-        elif matId.lower() == 'video':
-            return self.getVideo()
-        elif matId.lower() == 'poster':
-            return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
-            return self.materials[matId]
-        return None
-
-    def getMaterialList(self):
-        try:
-            return self.materials.values()
-        except:
-            self.materials = {}
-            return self.materials.values()
-
-    def getAllMaterialList(self):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append(self.getPaper())
-        if self.getSlides():
-            l.append(self.getSlides())
-        if self.getVideo():
-            l.append(self.getVideo())
-        if self.getPoster():
-            l.append(self.getPoster())
-        if self.getMinutes():
-            l.append(self.getMinutes())
-        return l
-
-    def getTaskList(self):
-        try:
-            return self._tasks.values()
-        except:
-            self._tasks = {}
-            return self._tasks.values()
-
     def getTitle(self):
         return self.name
-
-    def getTasks(self):
-        try:
-            return self._tasks
-        except:
-            self._tasks = {}
-            return self._tasks
-
-    def getTask(self, taskId):
-        return self.getTasks().get(taskId, None)
-
-    def _getTasksAllowed(self):
-        try:
-            return self._tasksAllowed
-        except:
-            self._tasksAllowed = False
-            return self._tasksAllowed
-
-    def tasksAllowed(self):
-        if self.hasSubcategories():
-            return False
-        return self._getTasksAllowed()
-
-    def setTasksAllowed(self):
-        if self.hasSubcategories():
-            return False
-        self._getTasksAllowed()
-        self._tasksAllowed = True
-        self.notifyModification()
-        return True
-
-    def setTasksForbidden(self):
-        if len(self.getTaskList()) > 0:
-            return False
-        self._getTasksAllowed()
-        self._tasksAllowed = False
-        self.notifyModification()
-        return False
-
-    def _getNewTaskId(self):
-        try:
-            if self._taskIdGenerator:
-                pass
-        except:
-            self._taskIdGenerator = 0
-        self._taskIdGenerator = self._taskIdGenerator + 1
-        return self._taskIdGenerator
-
-    def newTask(self, user):
-        if user is None:
-            return None
-        newTask = task.Task(self, self._getNewTaskId(), user)
-        self.getTasks()["%s" % newTask.getId()] = newTask
-        self.notifyModification()
-        return newTask
-
-    def tasksPublic(self):
-        try:
-            return self._tasksPublic
-        except:
-            self._tasksPublic = True
-            return self._tasksPublic
-
-    def setTasksPublic(self):
-        self.tasksPublic()
-        self._tasksPublic = True
-
-    def setTasksPrivate(self):
-        self.tasksPublic()
-        self._tasksPublic = False
-
-    def tasksCommentPublic(self):
-        try:
-            return self._tasksCommentPublic
-        except:
-            self._tasksCommentPublic = True
-            return self._tasksCommentPublic
-
-    def setTasksCommentPublic(self):
-        self.tasksCommentPublic()
-        self._tasksCommentPublic = True
-
-    def setTasksCommentPrivate(self):
-        self.tasksCommentPublic()
-        self._tasksCommentPublic = False
-
-    def getTasksManagerList(self):
-        try:
-            return self._tasksManagers
-        except:
-            self._tasksManagers = []
-            self._p_changed = 1
-            return self._tasksManagers
-
-    def getTasksManager(self, index):
-        length = len(self.getTasksManagerList())
-        if index < 0 or index >= length:
-            return None
-        return self._tasksManagers[index]
-
-    def addTasksManager(self, user):
-        if user is None:
-            return False
-        self.getTasksManagerList().append(user)
-        self._p_changed = 1
-        return True
-
-    def removeTasksManager(self, index):
-        length = len(self.getTasksManagerList())
-        if index < 0 or index >= length:
-            return False
-        del self.getTasksManagerList()[index]
-        self._p_changed = 1
-        return True
-
-    def getTasksCommentatorList(self):
-        try:
-            return self._tasksCommentators
-        except:
-            self._tasksCommentators = []
-            self._p_changed = 1
-            return self._tasksCommentators
-
-    def getTasksCommentator(self, index):
-        length = len(self.getTasksCommentatorList())
-        if index < 0 or index >= length:
-            return None
-        return self._tasksCommentators[index]
-
-    def addTasksCommentator(self, user):
-        if user is None:
-            return False
-        self.getTasksCommentatorList().append(user)
-        self._p_changed = 1
-        return True
-
-    def removeTasksCommentator(self, index):
-        length = len(self.getTasksCommentatorList())
-        if index < 0 or index >= length:
-            return False
-        del self._tasksCommentators[index]
-        self._p_changed = 1
-        return True
-
-    def getTasksAccessList(self):
-        try:
-            return self._tasksAccessList
-        except:
-            self._tasksAccessList = []
-            self._p_changed = 1
-            return self._tasksAccessList
-
-    def getTasksAccessPerson(self, index):
-        length = len(self.getTasksAccessList())
-        if index < 0 or index >= length:
-            return None
-        return self._tasksAccessList[index]
-
-    def addTasksAccessPerson(self, user):
-        if user is None:
-            return False
-        self.getTasksAccessList().append(user)
-        self._p_changed = 1
-        return True
-
-    def removeTasksAccessPerson(self, index):
-        length = len(self.getTasksAccessList())
-        if index < 0 or index >= length:
-            return False
-        del self.getTasksAccessList()[index]
-        self._p_changed = 1
-        return True
 
     def hasSubcategories(self):
         return len(self.subcategories.values()) > 0
@@ -997,10 +655,10 @@ class Category(CommonObjectBase):
         self.getOwner()._removeSubCategory(self)
         CategoryManager().remove(self)
         for prin in self.__ac.getAccessList():
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "access")
         for prin in self.__ac.getModifierList():
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
@@ -1078,6 +736,7 @@ class Category(CommonObjectBase):
         if sc in self.getSubCategoryList():
             self._decNumConfs(sc.getNumConferences())
             del self.subcategories[sc.getId()]
+            self._p_changed = True
             sc.setOwner(None)
 
     def newSubCategory(self, protection):
@@ -1140,11 +799,10 @@ class Category(CommonObjectBase):
         catIdx.unindexConf(conf)
         conf.unindexConf()
 
-    def newConference(self, creator, id="", creationDate=None, modificationDate=None):
-        conf = Conference(creator, id, creationDate, modificationDate)
-        ConferenceHolder().add(conf)
+    def newConference(self, creator):
+        conf = Conference()
+        ConferenceHolder().add(conf, creator)
         self._addConference(conf)
-        conf.linkCreator()
 
         signals.event.created.send(conf, parent=self)
 
@@ -1328,12 +986,12 @@ class Category(CommonObjectBase):
 
     def grantModification(self, prin):
         self.__ac.grantModification(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
 
     def revokeModification(self, prin):
         self.__ac.revokeModification(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
     def canModify(self, aw_or_user):
@@ -1411,7 +1069,7 @@ class Category(CommonObjectBase):
             return True
         if not self.isProtected():
             # domain checking only triggered if the category is PUBLIC
-            return self.canIPAccess(aw.getIP()) or \
+            return self.canIPAccess(request.remote_addr) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
         return self.isAllowedToCreateConference(aw.getUser()) or \
@@ -1419,12 +1077,12 @@ class Category(CommonObjectBase):
 
     def grantAccess(self, prin):
         self.__ac.grantAccess(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess(self, prin):
         self.__ac.revokeAccess(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def isConferenceCreationRestricted(self):
@@ -1439,14 +1097,14 @@ class Category(CommonObjectBase):
     def grantConferenceCreation(self, prin):
         if prin not in self.__confCreators:
             self.__confCreators.append(prin)
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(self, "creator")
             self._p_changed = 1
 
     def revokeConferenceCreation(self, prin):
         if prin in self.__confCreators:
             self.__confCreators.remove(prin)
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "creator")
             self._p_changed = 1
 
@@ -1464,11 +1122,9 @@ class Category(CommonObjectBase):
 
         # Otherwise, if  it is a member of one of the groups in the list...
         for group in self.__confCreators:
-            if isinstance(group, MaKaC.user.Group):
+            if isinstance(group, GroupWrapper):
                 if group.containsUser(av):
                     return 1
-            else:
-                pass
         return 0
 
     def canCreateConference(self, av):
@@ -1551,6 +1207,7 @@ class CustomRoom(Persistent):
 
     def __init__(self):
         self.name = ""
+        self.fullName = None
 
     def setValues(self, data):
         self.setName(data.get("name", ""))
@@ -1579,10 +1236,11 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = Room.find_first(Room.name == fix_broken_string(self.name, True),
-                               Location.name == fix_broken_string(location, True),
-                               _join=Room.location)
-        self.fullName = room.full_name if room else None
+        key = fix_broken_string(location, True), fix_broken_string(self.name, True)
+        room = _get_room_mapping().get(key)
+        full_name = room.full_name if room else None
+        if getattr(self, 'fullName', None) != full_name:
+            self.fullName = full_name
 
     def setFullName(self, newFullName):
         self.fullName = newFullName
@@ -2033,17 +1691,7 @@ class Conference(CommonObjectBase, Locatable):
 
     fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
-    def __init__(self, creator, id="", creationDate = None, modificationDate = None):
-        """Class constructor. Initialise the class attributes to the default
-            values.
-           Params:
-            confData -- (Dict) Contains the data the conference object has to
-                be initialised to.
-        """
-        #IndexedObject.__init__(self)
-        if creator == None:
-            raise MaKaCError( _("A creator must be specified when creating a new Event"), _("Event"))
-        self.__creator = creator
+    def __init__(self, id=''):
         self.id = id
         self.title = ""
         self.description = ""
@@ -2083,20 +1731,9 @@ class Conference(CommonObjectBase, Locatable):
         self.slides = None
         self.video = None
         self.poster = None
-        self.minutes=None
         self.__schedule=None
         self.__owners = []
-        if creationDate:
-            self._creationDS = creationDate
-        else:
-            self._creationDS = nowutc() #creation timestamp
-        if modificationDate:
-            self._modificationDS = modificationDate
-        else:
-            self._modificationDS = nowutc() #modification timestamp
-
-        self.alarmList = {}
-        self.__alarmCounter = Counter()
+        self._modificationDS = self._creationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
@@ -2111,10 +1748,6 @@ class Conference(CommonObjectBase, Locatable):
         self._sessionCoordinatorRights = []
         self._submitterIdx=SubmitterIndex()
         self._boa=BOAConfig(self)
-        self._registrationForm = registration.RegistrationForm(self)
-        self._evaluationCounter = Counter()
-        self._evaluations = [Evaluation(self)]
-        self._registrants = {} #key=registrantId; value=Registrant
         self._bookings = {}
         self._registrantGenerator = Counter()
         self._accessKey=""
@@ -2123,8 +1756,6 @@ class Conference(CommonObjectBase, Locatable):
         self._visibility = 999
         self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
         self._sections = []
-        self._participation = Participation(self)
-        self._logHandler = LogHandler()
         self._reportNumberHolder=ReportNumberHolder(self)
         self._enableSessionSlots = False
         self._enableSessions = False
@@ -2142,13 +1773,59 @@ class Conference(CommonObjectBase, Locatable):
 
     @return_ascii
     def __repr__(self):
-        return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
+        return '<Conference({0}, {1}, {2})>'.format(self.getId(), self.getTitle(), self.getStartDate())
 
     @property
     def all_manager_emails(self):
-        """Returns the emails of all managers, including the creator"""
-        emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
-        return {e for e in emails if e}
+        """Returns the emails of all managers"""
+        # We ignore email principals here. They never signed up in indico anyway...
+        return {p.principal.email for p in self.as_event.acl_entries if p.type == PrincipalType.user}
+
+    @property
+    @memoize_request
+    def as_event(self):
+        """Returns the :class:`.Event` for this object
+
+        :rtype: indico.modules.events.models.events.Event
+        """
+        from indico.modules.events.models.events import Event
+        query = Event.find(id=int(self.id))
+        # this is pretty ugly, but the api sends queries in a loop and we can't
+        # really avoid this for now. so let's at least not query things we
+        # clearly don't need
+        if has_request_context() and request.blueprint == 'api':
+            acl_user_strategy = joinedload('acl_entries').defaultload('user')
+            # remote group membership checks will trigger a load on _all_emails
+            # but not all events use this so there's no need to eager-load them
+            acl_user_strategy.noload('_primary_email')
+            acl_user_strategy.noload('_affiliation')
+            query = query.options(acl_user_strategy)
+        return query.one()
+
+    @property
+    @memoize_request
+    def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_for_linked_object(self)
+
+    @property
+    @memoize_request
+    def scheduled_notes(self):
+        from indico.modules.events.notes.util import get_nested_notes
+        return set(get_nested_notes(self)) - {self.note}
+
+    @property
+    def tz(self):
+        from MaKaC.common.timezoneUtils import DisplayTZ
+        return DisplayTZ(conf=self).getDisplayTZ()
+
+    @unify_user_args
+    def log(self, *args, **kwargs):
+        self.as_event.log(*args, **kwargs)
+
+    @memoize_request
+    def has_feature(self, feature):
+        return self.as_event.has_feature(feature)
 
     @staticmethod
     def _cmpByDate(self, toCmp):
@@ -2234,19 +1911,9 @@ class Conference(CommonObjectBase, Locatable):
     def getRoomBookingList(self):
         """Returns list of bookings for this conference."""
         # In case anyone wonders why this method is still here: Various fossils expect/use it.
-        if not self.getId().isdigit():
-            return []
-        return Reservation.find_all(event_id=int(self.getId()))
+        return self.as_event.reservations.options(noload('created_by_user'), noload('booked_for_user')).all()
 
     # ========================================================================
-
-    def getParticipation(self):
-        try :
-            if self._participation :
-                pass
-        except AttributeError :
-            self._participation = Participation(self)
-        return self._participation
 
     def getType( self ):
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
@@ -2264,15 +1931,6 @@ class Conference(CommonObjectBase, Locatable):
         if type == "simple_event":
             type = "lecture"
         return type.capitalize()
-
-
-    def getLogHandler(self):
-        try :
-            if self._logHandler:
-                pass
-        except AttributeError :
-            self._logHandler = LogHandler()
-        return self._logHandler
 
 
     def getEnableSessionSlots(self):
@@ -2467,6 +2125,7 @@ class Conference(CommonObjectBase, Locatable):
         if not ct in self._contribTypes.values():
             return
         del self._contribTypes[ct.getId()]
+        self._p_changed = True
         for cont in self.getContributionList():
             if cont.getType() == ct:
                 cont.setType(None)
@@ -2550,7 +2209,7 @@ class Conference(CommonObjectBase, Locatable):
         """
         self.setModificationDate()
 
-        if raiseEvent:
+        if raiseEvent and self.id:
             signals.event.data_changed.send(self, attr=None, old=None, new=None)
 
         self.cleanCache()
@@ -2571,18 +2230,6 @@ class Conference(CommonObjectBase, Locatable):
     def getAdjustedCreationDate( self, tz ):
         """Returns the date in which the conference was created"""
         return self._creationDS.astimezone(timezone(tz))
-
-    def getCreator( self ):
-        return self.__creator
-
-    def setCreator( self, creator):
-        if self.__creator:
-            self.__creator.unlinkTo(self, "creator")
-        creator.linkTo(self, "creator")
-        self.__creator = creator
-
-    def linkCreator(self):
-        self.__creator.linkTo(self, "creator")
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
@@ -2660,9 +2307,7 @@ class Conference(CommonObjectBase, Locatable):
     def delete(self, user=None):
         """deletes the conference from the system.
         """
-        signals.event.deleted.send(self)
-
-        EventSetting.delete_event(self.id)
+        signals.event.deleted.send(self, user=user)
 
         self.notifyContributions()
 
@@ -2672,38 +2317,12 @@ class Conference(CommonObjectBase, Locatable):
         for owner in self.__owners:
             owner.removeConference(self, notify=False)
 
-        self.removeAllEvaluations()
-
-        for alarm in self.getAlarmList():
-            if not alarm.getEndedOn():
-                self.removeAlarm(alarm)
-
-        # Cancel the associated room bookings
-        if Config.getInstance().getIsRoomBookingActive() and self.getId().isdigit():
-            reservations = Reservation.find(Reservation.event_id == int(self.getId()),
-                                            ~Reservation.is_cancelled,
-                                            ~Reservation.is_rejected)
-            for resv in reservations:
-                resv.event_id = None
-                resv.cancel(user or session.user, u'Associated event was deleted')
-
-        # For each conference we have a list of managers. If we delete the conference but we don't delete
-        # the link in every manager to the conference then, when the manager goes to his "My profile" he
-        # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
-        for manager in self.getManagerList():
-            if isinstance(manager, MaKaC.user.Avatar):
-                manager.unlinkTo(self, "manager")
-
-        creator = self.getCreator()
-        creator.unlinkTo(self, "creator")
-
         # Remove all links in redis
         if redis_write_client:
             avatar_links.delete_event(self)
 
         # Remote short URL mappings
-        sum = ShortURLMapper()
-        sum.remove(self)
+        ShortURLMapper().remove(self)
 
         TrashCanManager().add(self)
 
@@ -2822,9 +2441,6 @@ class Conference(CommonObjectBase, Locatable):
         if index:
             self.indexConf()
 
-        # update the time for the alarms to be sent
-        self._updateAlarms()
-
         # Update redis link timestamp
         if redis_write_client:
             avatar_links.update_event_time(self)
@@ -2833,15 +2449,6 @@ class Conference(CommonObjectBase, Locatable):
         if notifyObservers:
             if oldSdate != sDate:
                 signals.event.data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
-
-    def _updateAlarms(self):
-        c = Client()
-        # are there any alarms? if so, update the relative ones
-        for alarm in self.getAlarmList():
-            tbef = alarm.getTimeBefore()
-            if tbef:
-                # only relative alarms
-                c.moveTask(alarm, self.getStartDate() - tbef)
 
     def verifyStartDate(self, sdate, check=1):
         if sdate>self.getEndDate():
@@ -3128,7 +2735,7 @@ class Conference(CommonObjectBase, Locatable):
         if isinstance(newChair,ConferenceChair):
             newChair.includeInConference(self,id)
         self._chairs.append(newChair)
-        if isinstance(newChair, MaKaC.user.Avatar):
+        if isinstance(newChair, AvatarUserWrapper):
             newChair.linkTo(self, "chair")
         self.notifyModification()
 
@@ -3145,7 +2752,7 @@ class Conference(CommonObjectBase, Locatable):
         if chair not in self._chairs:
             return
         self._chairs.remove(chair)
-        if isinstance(chair, MaKaC.user.Avatar):
+        if isinstance(chair, AvatarUserWrapper):
             chair.unlinkTo(self, "chair")
         chair.delete()
         self.notifyModification()
@@ -3249,7 +2856,7 @@ class Conference(CommonObjectBase, Locatable):
         """
         return str(self.__sessionGenerator.newCount())
 
-    def addSession(self,newSession, check = 2, id = None):
+    def addSession(self, new_session, check=2, session_id=None):
         """Adds a new session object to the conference taking care of assigning
             a new unique id to it
         """
@@ -3258,27 +2865,33 @@ class Conference(CommonObjectBase, Locatable):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        if self.hasSession(newSession):
+        if self.hasSession(new_session):
             return
-        if self.getSchedule().isOutside(newSession):
+        if self.getSchedule().isOutside(new_session):
             if check == 1:
-                 MaKaCError( _("Cannot add this session  (Start:%s - End:%s) Outside of the event's time table(Start:%s - End:%s)") % (newSession.getStartDate(),newSession.getEndDate(),self.getSchedule().getStartDate(), self.getSchedule().getEndDate()),"Event")
+                raise MaKaCError(_("Cannot add this session  (Start:%s - End:%s) "
+                                   "Outside of the event's time table(Start:%s - End:%s)").format(
+                    new_session.getStartDate(),
+                    new_session.getEndDate(),
+                    self.getSchedule().getStartDate(),
+                    self.getSchedule().getEndDate()),
+                    "Event")
             elif check == 2:
-              if self.getSchedule().getStartDate() > newSession.getStartDate():
-                 self.setStartDate(newSession.getStartDate())
-              if self.getSchedule().getEndDate() < newSession.getEndDate():
-                 self.setEndDate(newSession.getEndDate())
-        if id!=None:
-            sessionId = id
+                if self.getSchedule().getStartDate() > new_session.getStartDate():
+                    self.setStartDate(new_session.getStartDate())
+                if self.getSchedule().getEndDate() < new_session.getEndDate():
+                    self.setEndDate(new_session.getEndDate())
+        if session_id is not None:
+            session_id = session_id
             # Keep ID counter up to date
-            self.__sessionGenerator.newCount()
+            self.__sessionGenerator.sync(session_id)
         else:
-            sessionId=self.__generateNewSessionId()
-        self.sessions[sessionId]=newSession
-        newSession.includeInConference(self,sessionId)
-        #keep the session coordinator index updated
-        for sc in newSession.getCoordinatorList():
-            self.addSessionCoordinator(newSession,sc)
+            session_id = self.__generateNewSessionId()
+        self.sessions[session_id] = new_session
+        new_session.includeInConference(self, session_id)
+        # keep the session coordinator index updated
+        for sc in new_session.getCoordinatorList():
+            self.addSessionCoordinator(new_session, sc)
         self.notifyModification()
 
     def hasSession(self,session):
@@ -3296,7 +2909,10 @@ class Conference(CommonObjectBase, Locatable):
                 for contrib in session.getContributionList():
                     contrib.delete()
 
+            session.remove_attachments()
+
             del self.sessions[session.getId()]
+            self._p_changed = True
 
             session.delete()
             self.notifyModification()
@@ -3356,7 +2972,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__contribGenerator.sync(self.getAbstractMgr()._getOldAbstractCounter())
         return self.__contribGenerator._getCount()
 
-    def addContribution(self,newContrib,id=""):
+    def addContribution(self, newContrib, contrib_id=None):
         """Adds a new contribution object to the conference taking care of
             assigning a new unique id to it
         """
@@ -3364,12 +2980,13 @@ class Conference(CommonObjectBase, Locatable):
             return
         if isinstance(newContrib.getCurrentStatus(),ContribStatusWithdrawn):
             raise MaKaCError( _("Cannot add a contribution which has been withdrawn"), _("Event"))
-        if id is None or id=="":
+        if contrib_id is None or contrib_id == '':
             contribId=self._generateNewContributionId()
             while self.contributions.has_key(contribId):
                 contribId=self._generateNewContributionId()
         else:
-            contribId=str(id)
+            contribId = str(contrib_id)
+            self.__contribGenerator.sync(contribId)
             if self.contributions.has_key(contribId):
                 raise MaKaCError( _("Cannot add this contribution id:(%s) as it has already been used")%contribId, _("Event"))
         newContrib.includeInConference(self,contribId)
@@ -3400,6 +3017,7 @@ class Conference(CommonObjectBase, Locatable):
         for spk in contrib.getSpeakerList()[:]:
             contrib.removeSpeaker(spk)
         del self.contributions[ contrib.getId() ]
+        self._p_changed = True
         if callDelete:
             contrib.delete()
         #else:
@@ -3652,12 +3270,12 @@ class Conference(CommonObjectBase, Locatable):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
@@ -3709,21 +3327,17 @@ class Conference(CommonObjectBase, Locatable):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
-            return True
-
-        # Managers have always access
-        if self.canModify(aw):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
 
         if self.isProtected():
-            if self.isAllowedToAccess( aw.getUser() ):
+            if self.isAllowedToAccess(aw.getUser()):
                 return True
             else:
-                return self.canKeyAccess(aw)
+                return self.canKeyAccess(aw) or self.canModify(aw)
         else:
             # Domain control is triggered just for PUBLIC events
-            return self.canIPAccess(aw.getIP())
+            return self.canIPAccess(request.remote_addr) or self.canModify(aw)
 
     def canKeyAccess(self, aw, key=None):
         accessKey = self.getAccessKey()
@@ -3737,47 +3351,9 @@ class Conference(CommonObjectBase, Locatable):
             return False
         return session.get('modifKeys', {}).get(self.id) == modifKey
 
-    def grantModification( self, prin, sendEmail=True ):
-        email = None
-        if isinstance(prin, ConferenceChair):
-            email = prin.getEmail()
-        elif isinstance(prin, str):
-            email = prin
-        if email != None:
-            if email == "":
-                return
-            ah = AvatarHolder()
-            results=ah.match({"email":email}, exact=1)
-            #No registered user in Indico with that email
-            if len(results) == 0:
-                self.__ac.grantModificationEmail(email)
-                self.getConference().getPendingQueuesMgr().addPendingConfManager(prin, False)
-                if sendEmail and isinstance(prin, ConferenceChair):
-                    notif = pendingQueues._PendingConfManagerNotification( [prin] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
-            #The user is registered in Indico and is activated as well
-            elif len(results) == 1 and results[0] is not None and results[0].isActivated():
-                self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager")
-        else:
-            self.__ac.grantModification( prin )
-            if isinstance(prin, MaKaC.user.Avatar):
-                prin.linkTo(self, "manager")
-
-    def revokeModification( self, prin ):
-        self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
-            prin.unlinkTo(self, "manager")
-
-    def canUserModify( self, av ):
-        if av == None:
-            return False
-        if ( av == self.getCreator()) or self.getAccessController().canModify( av ):
-            return True
-        for owner in self.getOwnerList():
-            if owner.canUserModify( av ):
-                return True
-        return False
+    @unify_user_args
+    def canUserModify(self, user):
+        return self.as_event.can_manage(user)
 
     def canModify(self, aw_or_user):
         """Tells whether an access wrapper is allowed to modify the current
@@ -3786,40 +3362,20 @@ class Conference(CommonObjectBase, Locatable):
         """
         if hasattr(aw_or_user, 'getUser'):
             aw_or_user = aw_or_user.getUser()
-        return self.canUserModify(aw_or_user) or self.canKeyModify()
+        if isinstance(aw_or_user, AvatarUserWrapper):
+            aw_or_user = aw_or_user.user
+        return self.as_event.can_manage(aw_or_user, allow_key=True)
 
-    def getManagerList( self ):
-        return self.__ac.getModifierList()
-
-    def addToRegistrars(self, av):
-        self.getRegistrarList().append(av)
-        self.notifyModification()
-        if isinstance(av, MaKaC.user.Avatar):
-            av.linkTo(self, "registrar")
-
-    def removeFromRegistrars(self, av):
-        self.getRegistrarList().remove(av)
-        self.notifyModification()
-        if isinstance(av, MaKaC.user.Avatar):
-            av.unlinkTo(self, "registrar")
-
-    def isRegistrar(self, av):
-        if av == None:
-            return False
-        try:
-            return av in self.getRegistrarList()
-        except AttributeError:
-            return False
+    def getManagerList(self):
+        managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
+                          key=lambda x: (not x.is_group, x.name.lower()))
+        return [x.as_legacy for x in managers]
 
     def getRegistrarList(self):
-        try:
-            return self.__registrars
-        except AttributeError:
-            self.__registrars = []
-            return self.__registrars
-
-    def canManageRegistration(self, av):
-        return self.isRegistrar(av) or self.canUserModify(av)
+        registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
+                                                                                                     explicit=True)],
+                            key=lambda x: (not x.is_group, x.name.lower()))
+        return [x.as_legacy for x in registrars]
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
@@ -3829,298 +3385,6 @@ class Conference(CommonObjectBase, Locatable):
         newMat.setOwner( self )
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
-
-    def removeMaterial( self, mat ):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            self.notifyModification()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            self.notifyModification()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            self.notifyModification()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            self.notifyModification()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            self.notifyModification()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner(self)
-        self.materials[recMat.getId()] = recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import ConfMFRegistry
-        return ConfMFRegistry
-
-    def getMaterialById( self, matId ):
-        if matId.lower() == 'paper':
-            return self.getPaper()
-        elif matId.lower() == 'slides':
-            return self.getSlides()
-        elif matId.lower() == 'video':
-            return self.getVideo()
-        elif matId.lower() == 'poster':
-            return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
-            return self.materials[ matId ]
-        return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
-
-    def _getMaterialFiles(self, material):
-        """
-        Adaption of _getMaterialFiles in WPTPLConferenceDisplay for desired format, objects
-        seemed mutually exclusive hence use of similar logic here specific to Conference.
-        """
-        files = []
-        processed = []
-
-        for res in material.getResourceList():
-            try:
-                ftype = res.getFileType()
-                fname = res.getFileName()
-                furl = urlHandlers.UHFileAccess.getURL(res)
-
-                if fname in processed:
-                    fname = "%s - %s" % (fname, processed.count(fname))
-
-                processed.append(res.getFileName())
-            except:
-                # If we are here then the resource is a Link object.
-                fname, ftype, furl = str(res.getURL()), "link", str(res.getURL())
-            fdesc = res.getDescription()
-            files.append({'title': fname,
-                          'description': fdesc,
-                          'type': ftype,
-                          'url': furl})
-        return files
-
-    def getAllMaterialDict(self, child=None):
-        """
-        This method iterates through the children of the conference, creating
-        a dictionary which maps type to material link URLs.
-        """
-
-        child = self if child is None else child
-
-        node = {}
-        node['title'] = child.getTitle()
-
-        try:
-            node['type'] = child.getType()
-        except:
-            # If we land here, it's a session which doesn't have 'getType'
-            node['type'] = 'session'
-
-        node['children'] = []
-        node['material'] = []
-
-        if node['type'] in ['conference', 'meeting']:
-            for session in child.getSessionList():
-                node['children'].append(self.getAllMaterialDict(session))
-
-            for contrib in child.getContributionList():
-                node['children'].append(self.getAllMaterialDict(contrib))
-
-        for material in child.getAllMaterialList():
-            files = self._getMaterialFiles(material)
-
-            for f in files:
-                materialNode = {}
-                materialNode['type'] = 'material'
-                materialNode['title'] = material.getTitle()
-
-                if material.getTitle() != 'Minutes':
-                    materialNode['title'] += ' - ' + f['title']
-
-                materialNode['materialType'] = f['type']
-                materialNode['url'] = str(f['url'])
-
-                node['material'].append(materialNode)
-
-        return node
-
-    def setPaper( self, newPaper ):
-        if self.getPaper() != None:
-            raise MaKaCError( _("The paper for this conference has already been set"), _("Conference"))
-        self.paper=newPaper
-        self.paper.setOwner( self )
-        self.notifyModification()
-
-    def removePaper( self ):
-        if self.paper is None:
-            return
-        self.paper.delete()
-        self.paper.setOwner(None)
-        self.paper = None
-        self.notifyModification()
-
-    def recoverPaper(self, p):
-        self.setPaper(p)
-        p.recover()
-
-    def getPaper( self ):
-        try:
-            if self.paper:
-                pass
-        except AttributeError:
-            self.paper = None
-        return self.paper
-
-    def setSlides( self, newSlides ):
-        if self.getSlides() != None:
-            raise MaKaCError( _("The slides for this conference have already been set"), _("Conference"))
-        self.slides=newSlides
-        self.slides.setOwner( self )
-        self.notifyModification()
-
-    def removeSlides( self ):
-        if self.slides is None:
-            return
-        self.slides.delete()
-        self.slides.setOwner( None )
-        self.slides= None
-        self.notifyModification()
-
-    def recoverSlides(self, s):
-        self.setSlides(s)
-        s.recover()
-
-    def getSlides( self ):
-        try:
-            if self.slides:
-                pass
-        except AttributeError:
-            self.slides = None
-        return self.slides
-
-    def setVideo( self, newVideo ):
-        if self.getVideo() != None:
-            raise MaKaCError( _("The video for this conference has already been set"), _("Conference"))
-        self.video=newVideo
-        self.video.setOwner( self )
-        self.notifyModification()
-
-    def removeVideo( self ):
-        if self.getVideo() is None:
-            return
-        self.video.delete()
-        self.video.setOwner(None)
-        self.video = None
-        self.notifyModification()
-
-    def recoverVideo(self, v):
-        self.setVideo(v)
-        v.recover()
-
-    def getVideo( self ):
-        try:
-            if self.video:
-                pass
-        except AttributeError:
-            self.video = None
-        return self.video
-
-    def setPoster( self, newPoster ):
-        if self.getPoster() != None:
-            raise MaKaCError( _("the poster for this conference has already been set"), _("Conference"))
-        self.poster=newPoster
-        self.poster.setOwner( self )
-        self.notifyModification()
-
-    def removePoster( self ):
-        if self.getPoster() is None:
-            return
-        self.poster.delete()
-        self.poster.setOwner(None)
-        self.poster = None
-        self.notifyModification()
-
-    def recoverPoster(self, p):
-        self.setPoster(p)
-        p.recover()
-
-    def getPoster( self ):
-        try:
-            if self.poster:
-                pass
-        except AttributeError:
-            self.poster = None
-        return self.poster
-
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The Minutes for this conference has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this conference have already been created"), _("Conference"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
 
     def _setSchedule( self, sch=None ):
         self.__schedule=ConferenceSchedule(self)
@@ -4149,15 +3413,9 @@ class Conference(CommonObjectBase, Locatable):
             if isinstance(entry.getOwner(), SessionSlot) :
                 entry.getOwner().fit()
 
-    def getDisplayMgr(self):
-        """
-        Return the display manager for the conference
-        """
-        from MaKaC.webinterface import displayMgr
-        return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
-
-    def getDefaultStyle( self ):
-        return self.getDisplayMgr().getDefaultStyle()
+    def getDefaultStyle(self):
+        return (layout_settings.get(self, 'timetable_theme') or
+                HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getDefaultStyleForEventType(self.getType()))
 
     def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
@@ -4166,10 +3424,11 @@ class Conference(CommonObjectBase, Locatable):
         if managing is not None:
             creator = managing
         else:
-            creator = self.getCreator()
+            creator = self.as_event.creator
         conf = cat.newConference(creator)
-        if managing is not None :
-            conf.grantModification(managing)
+        if managing is not None:
+            with conf.as_event.logging_disabled:
+                conf.as_event.update_principal(managing.user, full_access=True)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -4190,10 +3449,6 @@ class Conference(CommonObjectBase, Locatable):
         for ch in self.getChairList():
             conf.addChair(ch.clone())
         ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
-        # Display Manager
-        from MaKaC.webinterface import displayMgr
-        selfDispMgr=displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
-        selfDispMgr.clone(conf)
         # Contribution Types' List (main detailes of the conference)
         for t in self.getContribTypeList() :
             conf.addContribType(t.clone(conf))
@@ -4223,55 +3478,25 @@ class Conference(CommonObjectBase, Locatable):
                 newSes = s.clone(timeDelta, conf, options, session_id=s.getId())
                 ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
                 conf.addSession(newSes)
-        # Materials' cloning
-        if options.get("materials",False) :
-            for m in self.getMaterialList() :
-                conf.addMaterial(m.clone(conf))
-            if self.getPaper() is not None:
-                conf.setPaper(self.getPaper().clone(conf))
-            if self.getSlides() is not None:
-                conf.setSlides(self.getSlides().clone(conf))
-            if self.getVideo() is not None:
-                conf.setVideo(self.getVideo().clone(conf))
-            if self.getPoster() is not None:
-                conf.setPoster(self.getPoster().clone(conf))
-            if self.getMinutes() is not None:
-                conf.setMinutes(self.getMinutes().clone(conf))
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
             conf.setModifKey(self.getModifKey())
         # Access Control cloning
-        if options.get("access",False) :
+        if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
-            for mgr in self.getManagerList() :
-                conf.grantModification(mgr)
-            for user in self.getAllowedToAccessList() :
+            for entry in self.as_event.acl_entries:
+                conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
+                                               full_access=entry.full_access, roles=entry.roles, quiet=True)
+            for user in self.getAllowedToAccessList():
                 conf.grantAccess(user)
             for right in self.getSessionCoordinatorRights():
                 conf.addSessionCoordinatorRight(right)
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
-        # conference's registration form
-        if options.get("registration",False) :
-            conf.setRegistrationForm(self.getRegistrationForm().clone(conf))
-
-        # conference's evaluation
-        if options.get("evaluation",False) :
-            #Modify this, if you have now many evaluations.
-            #You will have to clone every evaluations of this conference.
-            conf.setEvaluations([self.getEvaluation().clone(conf)])
-
-        #conference's abstracts
+        # Conference's abstracts
         if options.get("abstracts",False) :
             conf.abstractMgr = self.abstractMgr.clone(conf)
-        # conference's alerts
-        if options.get("alerts",False) :
-            for alarm in self.getAlarmList() :
-                # Indico does not clone absoulte alarms
-                if alarm._relative is not None:
-                    # .clone takes care of enqueuing it
-                    alarm.clone(conf)
         # Meetings' and conferences' contributions cloning
         if options.get("contributions",False) :
             sch = conf.getSchedule()
@@ -4289,66 +3514,17 @@ class Conference(CommonObjectBase, Locatable):
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
                         ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
-        # Participants' module settings and list cloning
-        if options.get("participants",False) :
-            self.getParticipation().clone(conf, options, eventManager)
         conf.notifyModification()
 
-        #we inform the plugins in case they want to add anything to the new conference
+        # Copy the list of enabled features
+        features_event_settings.set_multi(conf, features_event_settings.get_all(self))
+        feature_definitions = get_feature_definitions()
+        for feature in get_enabled_features(conf):
+            feature_definitions[feature].enabled(conf)
+
+        # Run the new modular cloning system
         EventCloner.clone_event(self, conf)
         return conf
-
-    def newAlarm(self, when, enqueue=True):
-
-        if type(when) == timedelta:
-            relative = when
-            dtStart = None
-        else:
-            relative = None
-            dtStart = when
-
-        confRelId = self._getNextAlarmId()
-        al = tasks.AlarmTask(self, confRelId,
-                             startDateTime=dtStart,
-                             relative=relative)
-
-        self.addAlarm(al, enqueue)
-        return al
-
-    def removeAlarm(self, alarm):
-        confRelId = alarm.getConfRelativeId()
-
-        if confRelId in self.alarmList:
-            del self.alarmList[confRelId]
-            self._p_changed = 1
-
-            tl = Client()
-            tl.dequeue(alarm)
-        else:
-            raise Exception("alarm not in list!")
-
-    def _getNextAlarmId(self):
-        return self.__alarmCounter.newCount()
-
-    def addAlarm(self, alarm, enqueue = True):
-        if enqueue:
-            tl = Client()
-            tl.enqueue(alarm)
-
-        self.alarmList[alarm.getConfRelativeId()] = alarm
-        self._p_changed = 1
-
-    def recoverAlarm(self, alarm):
-        self.addAlarm(alarm)
-        alarm.conf = self
-        alarm.recover()
-
-    def getAlarmList(self):
-        return self.alarmList.values()
-
-    def getAlarmById(self, id):
-        """For given id returns corresponding Alarm or None if not found."""
-        return self.alarmList.get(id, None)
 
     def getCoordinatedTracks( self, av ):
         """Returns a list with the tracks for which a user is coordinator.
@@ -4447,214 +3623,6 @@ class Conference(CommonObjectBase, Locatable):
         if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
             self.getSpeakerIndex().unindex(auth)
 
-    def getRegistrationForm(self):
-        try:
-            if self._registrationForm is None:
-                self._registrationForm = registration.RegistrationForm(self)
-        except AttributeError,e:
-            self._registrationForm = registration.RegistrationForm(self)
-        return self._registrationForm
-
-    def setRegistrationForm(self,rf):
-        self._registrationForm = rf
-        rf.setConference(self)
-
-    def removeRegistrationForm(self):
-        try:
-            self._registrationForm.delete()
-            self._registrationForm.setConference(None)
-            self._registrationForm = None
-        except AttributeError:
-            self._registrationForm = None
-
-    def recoverRegistrationForm(self, rf):
-        self.setRegistrationForm(rf)
-        rf.recover()
-
-    def getEvaluation(self, id=0):
-        ############################################################################
-        #For the moment only one evaluation per conference is used.                #
-        #In the future if there are more than one evaluation, modify this function.#
-        ############################################################################
-        """ Return the evaluation given by its ID or None if nothing found.
-            Params:
-                id -- id of the wanted evaluation
-        """
-        for evaluation in self.getEvaluations():
-            if str(evaluation.getId()) == str(id) :
-                return evaluation
-        if Config.getInstance().getDebug():
-            raise Exception(_("Error with id: expected '%s', found '%s'.")%(id, self.getEvaluations()[0].getId()))
-        else:
-            return self.getEvaluations()[0]
-
-    def getEvaluations(self):
-        if not hasattr(self, "_evaluations"):
-            self._evaluations = [Evaluation(self)]
-        return self._evaluations
-
-    def setEvaluations(self, evaluationsList):
-        self._evaluations = evaluationsList
-        for evaluation in self._evaluations:
-            evaluation.setConference(self)
-
-    def removeEvaluation(self, evaluation):
-        """remove the given evaluation from its evaluations."""
-        evaluations = self.getEvaluations()
-        if evaluations.count(evaluation)>0:
-            evaluations.remove(evaluation)
-        evaluation.removeReferences()
-        self.notifyModification()
-
-    def removeAllEvaluations(self):
-        for evaluation in self.getEvaluations():
-            evaluation.removeReferences()
-        self._evaluations = []
-        self.notifyModification()
-
-    def _getEvaluationCounter(self):
-        if not hasattr(self, "_evaluationCounter"):
-            self._evaluationCounter = Counter()
-        return self._evaluationCounter
-
-    ## Videoconference bookings related
-    def getBookings(self):
-        try:
-            if self._bookings:
-                pass
-        except AttributeError, e:
-            self._bookings = {}
-            self.notifyModification()
-        return self._bookings
-
-    def getBookingsList(self, sort = False):
-        bl = self.getBookings().values()
-        if sort:
-            bl.sort()
-        return bl
-
-    def _getBookingGenerator(self):
-        try:
-            return self._bookingGenerator
-        except AttributeError, e:
-            self._bookingGenerator = Counter()
-            return self._bookingGenerator
-
-    def getNewBookingId(self):
-        return str(self._getBookingGenerator().newCount())
-
-    def addBooking(self, bp):
-        if (bp.getId() == ""):
-            bp.setId(self.getNewBookingId())
-        self.getBookings()[bp.getId()] = bp
-        self.notifyModification()
-
-    def hasBooking(self,booking):
-        return booking.getConference()==self and \
-        self.getBookings().has_key(booking.getId())
-
-    def removeBooking(self, booking):
-        if self.hasBooking(booking):
-            deletion= booking.deleteBooking()
-            if deletion[0] != 1:
-                del self.getBookings()[booking.getId()]
-                self.notifyModification()
-        return deletion
-
-    def getBookingByType(self, type):
-        if self.getBookings().has_key(type):
-            return self.getBookings()[type]
-        return None
-
-    def getBookingById(self, id):
-        if self.getBookings().has_key(id):
-            return self.getBookings()[id]
-        return None
-
-    ## End of Videoconference bookings related
-
-    def getRegistrants(self):
-        try:
-            if self._registrants:
-                pass
-        except AttributeError, e:
-            self._registrants = {}
-            self.notifyModification()
-        return self._registrants
-
-    def getRegistrantsByEmail(self, email=None):
-        """
-        Returns the index of registrants by email OR a specific registrant if an email address
-        is passed as argument.
-        """
-        try:
-            if self._registrantsByEmail:
-                pass
-        except AttributeError, e:
-            self._registrantsByEmail = self._createRegistrantsByEmail()
-            self.notifyModification()
-        if email:
-            return self._registrantsByEmail.get(email)
-        return self._registrantsByEmail
-
-    def _createRegistrantsByEmail(self):
-        dicByEmail = {}
-        for r in self.getRegistrantsList():
-            dicByEmail[r.getEmail()] = r
-        return dicByEmail
-
-    def getRegistrantsList(self, sort = False):
-        rl = self.getRegistrants().values()
-        if sort:
-            rl.sort(registration.Registrant._cmpFamilyName)
-        return rl
-
-    def _getRegistrantGenerator(self):
-        try:
-            return self._registrantGenerator
-        except AttributeError, e:
-            self._registrantGenerator = Counter()
-            return self._registrantGenerator
-
-    def addRegistrant(self, rp, user):
-        rp.setId( str(self._getRegistrantGenerator().newCount()) )
-        rp.setOwner( self )
-        self.getRegistrants()[rp.getId()] = rp
-        signals.event.registrant_changed.send(self, user=user, registrant=rp, action='added')
-        self.notifyModification()
-
-    def updateRegistrantIndexByEmail(self, rp, newEmail):
-        oldEmail = rp.getEmail()
-        if oldEmail != newEmail:
-            if self.getRegistrantsByEmail().has_key(oldEmail):
-                del self.getRegistrantsByEmail()[oldEmail]
-            self.getRegistrantsByEmail()[newEmail] = rp
-            self.notifyModification()
-
-    def hasRegistrant(self,rp):
-        return rp.getConference()==self and \
-                self.getRegistrants().has_key(rp.getId())
-
-    def hasRegistrantByEmail(self, email):
-        # Return true if there is someone with the email of the param "email"
-        return self.getRegistrantsByEmail().has_key(email)
-
-    def removeRegistrant(self, id):
-        part = self.getRegistrants()[id]
-        self._registrationForm.notifyRegistrantRemoval(self.getRegistrants()[id])
-        del self.getRegistrantsByEmail()[self.getRegistrantById(id).getEmail()]
-        del self.getRegistrants()[id]
-        if part.getAvatar() is not None:
-            part.getAvatar().removeRegistrant(part)
-        signals.event.registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
-        TrashCanManager().add(part)
-        self.notifyModification()
-
-    def getRegistrantById(self, id):
-        if self.getRegistrants().has_key(id):
-            return self.getRegistrants()[id]
-        return None
-
     def _getPrimAuthIndex(self):
         try:
             if self._primAuthIdx:
@@ -4710,6 +3678,7 @@ class Conference(CommonObjectBase, Locatable):
         if self.sessions.has_key(session.getId()):
             session.addCoordinator(av)
             self._sessionCoordinators.index(av,session)
+            session._addCoordinatorEmail(av.getEmail())
 
     def removeSessionCoordinator( self, session, av ):
         """Removes a user as coordinator for a session.
@@ -4722,6 +3691,7 @@ class Conference(CommonObjectBase, Locatable):
         if self.sessions.has_key(session.getId()):
             session.removeCoordinator( av )
             self._sessionCoordinators.unindex(av,session)
+            session.removeCoordinatorEmail(av.getEmail())
 
     def _getSubmitterIdx(self):
         try:
@@ -4829,6 +3799,7 @@ class Conference(CommonObjectBase, Locatable):
     def setPosterTemplateManager(self, posterTemplateManager):
         self.__posterTemplateManager = posterTemplateManager
 
+
 class DefaultConference(Conference):
     """ 'default' conference, which stores the
      default templates for posters and badges
@@ -4837,14 +3808,11 @@ class DefaultConference(Conference):
     def indexConf(self):
         pass
 
+    def notifyModification(self, *args, **kwargs):
+        pass
+
     def __init__(self):
-        """ Default constructor
-        """
-        try:
-            Conference.__init__(self, AdminList.getInstance().getList()[0], "default")
-        except IndexError:
-            raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
-                                Please add at least 1 user to the admin list."""))
+        Conference.__init__(self, id='default')
 
 
 class ConferenceHolder( ObjectHolder ):
@@ -4855,125 +3823,36 @@ class ConferenceHolder( ObjectHolder ):
     idxName = "conferences"
     counterName = "CONFERENCE"
 
-    def _newId( self ):
-        id = ObjectHolder._newId( self )
-        return "%s"%id
+    def _newId(self):
+        raise RuntimeError('Tried to get new event id from zodb')
 
-    def getById( self, id, quiet=False ):
-        """returns an object from the index which id corresponds to the one
-            which is specified.
-        """
+    @unify_user_args
+    def add(self, conf, creator):
+        from indico.modules.events import Event
+        event = Event(creator=creator)
+        db.session.add(event)
+        db.session.flush()
+        conf.setId(event.id)
+        if conf.id in self._getIdx():
+            raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
+        ObjectHolder.add(self, conf)
+        with event.logging_disabled:
+            event.update_principal(creator, full_access=True)
+        db.session.flush()
 
-        if (id == "default"):
+    def getById(self, id, quiet=False):
+        if id == 'default':
             return CategoryManager().getDefaultConference()
 
-        if type(id) is int:
-            id = str(id)
-        if self._getIdx().has_key(str(id)):
-            return self._getIdx()[str(id)]
-        elif quiet:
-            return None
-        else:
+        id = str(id)
+        if is_legacy_id(id):
+            mapping = LegacyEventMapping.find_first(legacy_event_id=id)
+            id = str(mapping.event_id) if mapping is not None else None
+        event = self._getIdx().get(id) if id is not None else None
+        if event is None and not quiet:
             raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(id),
                                 title=_("Event not found"))
-
-
-class Observer(object):
-    """ Base class for Observer objects.
-        Inheriting classes should overload the following boolean class attributes:
-            _shouldBeTitleNotified
-            _shouldBeDateChangeNotified
-            _shouldBeLocationChangeNotified
-            _shouldBeDeletionNotified
-        And set them to True if they want to be notified of the corresponding event.
-        In that case, they also have to implement the corresponding methods:
-            _notifyTitleChange (for title notification)
-            _notifyEventDateChanges and _notifyTimezoneChange (for date / timezone notification)
-            _shouldBeLocationChangeNotified (for location notification)
-            _notifyDeletion (for deletion notification).
-        The interface for those methods is also specified in this class. If the corresponding
-        class attribute is set to False but the method is not implemented, an exception will be thrown.
-    """
-    _shouldBeTitleNotified = False
-    _shouldBeDateChangeNotified = False
-    _shouldBeLocationChangeNotified = False
-    _shouldBeDeletionNotified = False
-
-    def getObserverName(self):
-        name = "'Observer of class" + self.__class__.__name__
-        try:
-            conf = self.getOwner()
-            name = name + " of event " + conf.getId() + "'"
-        except AttributeError:
-            pass
-        return name
-
-    def notifyTitleChange(self, oldTitle, newTitle):
-        if self._shouldBeTitleNotified:
-            self._notifyTitleChange(oldTitle, newTitle)
-
-    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
-        if self._shouldBeDateChangeNotified:
-            self._notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
-
-    def notifyTimezoneChange(self, oldTimezone, newTimezone):
-        if self._shouldBeDateChangeNotified:
-            self._notifyTimezoneChange(oldTimezone, newTimezone)
-
-    def notifyLocationChange(self, newLocation):
-        if self._shouldBeLocationChangeNotified:
-            self._notifyLocationChange(newLocation)
-
-    def notifyDeletion(self):
-        if self._shouldBeDeletionNotified:
-            self._notifyDeletion()
-
-    def _notifyTitleChange(self, oldTitle, newTitle):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object's title has changed
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method _notifyTitleChange")
-
-    def _notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the start and / or end dates of the object it is attached to has changed.
-            If the observer finds any problems during whatever he needs to do as a consequence of
-            the event dates changing, he should write strings describing the problems
-            in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-
-    def _notifyTimezoneChange(self, oldTimezone, newTimezone):
-        """ To be implemented by inheriting classes.
-            Notifies the observer that the end date of the object it is attached to has changed.
-            This method has to return a list of strings describing problems encountered during
-            whatever the DateChangeObserver object does as a consequence of the notification.
-            If there are no problems, the DateChangeObserver should return an empty list.
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
-
-    def _notifyLocationChange(self):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the location of the object it is attached to has changed.
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyLocationChange")
-
-    def _notifyDeletion(self):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object it is attached to has been deleted
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyDeletion")
-
-class TitleChangeObserver(Observer):
-    """ Base class for objects who want to be notified of a Conference object being deleted.
-        Inheriting classes have to implement the notifyTitleChange method, and probably the __init__ method too.
-    """
-
-    def notifyTitleChange(self, oldTitle, newTitle):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object's title has changed
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTitleChange")
+        return event
 
 
 class SessionChair(ConferenceParticipation):
@@ -5207,7 +4086,6 @@ class Session(CommonObjectBase, Locatable):
         self.__ac=AccessController(self)
         self.materials={}
         self.__materialGenerator=Counter()
-        self.minutes=None
         self._comments = ""
         self.slots={}
         self.__slotGenerator=Counter()
@@ -5220,10 +4098,14 @@ class Session(CommonObjectBase, Locatable):
         self._textColorToLinks=False
         self._ttType=SlotSchTypeFactory.getDefaultId()
         self._closed = False
-        self._registrationSession = None
         self._creationDS = nowutc()
         self._modificationDS = nowutc()
         self._keywords = ""
+
+    @return_ascii
+    def __repr__(self):
+        event_id = self.conference.getId() if self.conference else None
+        return '<Session({}, {}, {})>'.format(self.getId(), self.getTitle(), event_id)
 
     def __cmp__(self, other):
         if type(self) is not type(other):
@@ -5235,6 +4117,12 @@ class Session(CommonObjectBase, Locatable):
         if self.getConference() == other.getConference():
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
+
+    @property
+    @memoize_request
+    def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_for_linked_object(self)
 
     def getVerboseType(self):
         return 'Session'
@@ -5298,8 +4186,8 @@ class Session(CommonObjectBase, Locatable):
         data["session code"] = self._code
         data["title"] = self.title
         data["description"] = self.description
-        data["start date"] = self.startDate
-        data["duration"] = self.duration
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         for p in self.places :
             data["place"] = p.getName()
         for r in self.rooms :
@@ -5320,20 +4208,6 @@ class Session(CommonObjectBase, Locatable):
     def cmpSessionByTitle(session1, session2):
         return cmp(session1.getTitle(), session2.getTitle())
     cmpSessionByTitle = staticmethod(cmpSessionByTitle)
-
-    def hasRegistrationSession(self):
-        return self.getRegistrationSession() is not None
-
-    def getRegistrationSession(self):
-        try:
-            if self._registrationSession:
-                pass
-        except AttributeError, e:
-            self._registrationSession = None
-        return self._registrationSession
-
-    def setRegistrationSession(self, rs):
-        self._registrationSession = rs
 
     def isClosed( self ):
         if self.getConference().isClosed():
@@ -5359,9 +4233,7 @@ class Session(CommonObjectBase, Locatable):
     def delete(self):
         while len(self.getConvenerList()) > 0:
             self.removeConvener(self.getConvenerList()[0])
-        while len(self.getMaterialList()) > 0:
-            self.removeMaterial(self.getMaterialList()[0])
-        self.removeMinutes()
+
         for c in self.getCoordinatorList()[:]:
             self.removeCoordinator(c)
         while len(self.contributions.values())>0:
@@ -5370,20 +4242,11 @@ class Session(CommonObjectBase, Locatable):
             self._removeSlot(self.slots.values()[0])
         if self.getConference() is not None:
             self.getConference().removeSession(self)
-            if self.hasRegistrationSession():
-                self.getConference().getRegistrationForm().getSessionsForm().removeSession(self.getId())
-                self.getRegistrationSession().setRegistrationForm(None)
-                TrashCanManager().add(self.getRegistrationSession())
             self.notify_protection_to_owner(self, delete=True)
             self.conference=None
             TrashCanManager().add(self)
 
     def recover(self, isCancelled):
-        if self.hasRegistrationSession():
-            if not isCancelled:
-                self.getRegistrationSession().setRegistrationForm(self.getConference().getRegistrationForm())
-                self.getConference().getRegistrationForm().getSessionsForm().addSession(self.getRegistrationSession())
-            TrashCanManager().remove(self.getRegistrationSession())
         TrashCanManager().remove(self)
 
     def getLocator( self ):
@@ -5451,6 +4314,7 @@ class Session(CommonObjectBase, Locatable):
 
     def _removeSlot(self,slot):
         del self.slots[slot.getId()]
+        self._p_changed = True
         self.getSchedule().removeEntry(slot.getSessionSchEntry())
         if self.getConference() is not None:
             self.getConference().getSchedule().removeEntry(slot.getConfSchEntry())
@@ -5460,6 +4324,9 @@ class Session(CommonObjectBase, Locatable):
         if self.slots.has_key(slot.getId()):
             if len(self.slots)==1 and not force:
                 raise MaKaCError( _("A session must have at least one slot"), _("Session"))
+            msg = u'Deleted session block: {}'.format(to_unicode(slot.getTitle() or slot.getSession().getTitle()))
+            self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                                     msg, session.user, data=slot.getLogInfo())
             self._removeSlot(slot)
             self.fit()
             self.notifyModification()
@@ -5476,7 +4343,7 @@ class Session(CommonObjectBase, Locatable):
 
     def getSortedSlotList(self):
         sl = self.getSlotList()
-        sl.sort(utils.sortSlotByDate)
+        sl.sort(key=lambda s: s.getStartDate())
         return sl
 
     def getMinSlotStartTime(self):
@@ -5650,7 +4517,7 @@ class Session(CommonObjectBase, Locatable):
 
     def clone(self, deltaTime, conf, options, session_id=None):
         ses = Session()
-        conf.addSession(ses, check=0, id=session_id)
+        conf.addSession(ses, check=0, session_id=session_id)
         ses.setTitle(self.getTitle())
         ses.setDescription(self.getDescription())
         startDate = self.getStartDate() + deltaTime
@@ -6004,7 +4871,7 @@ class Session(CommonObjectBase, Locatable):
     def addConvener(self,newConv):
         self._resetConveners()
         self._addConvener(newConv)
-        if isinstance(newConv, MaKaC.user.Avatar):
+        if isinstance(newConv, AvatarUserWrapper):
             conv.unlinkTo(self, "convener")
 
     def removeConvener(self,conv):
@@ -6018,7 +4885,7 @@ class Session(CommonObjectBase, Locatable):
         self.getConference().getPendingQueuesMgr().removePendingCoordinator(conv)
         #--
         self._conveners.remove(conv)
-        if isinstance(conv, MaKaC.user.Avatar):
+        if isinstance(conv, AvatarUserWrapper):
             conv.linkTo(self, "convener")
         conv.delete()
         self.notifyModification()
@@ -6049,13 +4916,13 @@ class Session(CommonObjectBase, Locatable):
     def appendConvenerText( self, newText ):
         self.setConvenerText( "%s, %s"%(self.getConvenerText(), newText.strip()) )
 
-    def addContribution(self, newContrib, id=None):
+    def addContribution(self, newContrib, contrib_id=None):
         """Registers the contribution passed as parameter within the session
             assigning it a unique id.
         """
         if self.hasContribution(newContrib):
             return
-        self.getConference().addContribution(newContrib,id)
+        self.getConference().addContribution(newContrib, contrib_id=contrib_id)
         self.contributions[newContrib.getId()]=newContrib
         newContrib.setSession(self)
 
@@ -6079,6 +4946,7 @@ class Session(CommonObjectBase, Locatable):
             sch=contrib.getSchEntry().getSchedule()
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
+        self._p_changed = True
 
         self.updateNonInheritingChildren(contrib, delete=True, propagate=False)
         for child in contrib.getAccessController().getNonInheritingChildren():
@@ -6144,12 +5012,12 @@ class Session(CommonObjectBase, Locatable):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
@@ -6175,7 +5043,7 @@ class Session(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -6184,7 +5052,7 @@ class Session(CommonObjectBase, Locatable):
             return True
 
         flag_allowed_to_access = self.isAllowedToAccess(aw.getUser())
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+        if not self.canIPAccess(request.remote_addr) and not self.canUserModify(aw.getUser()) and \
                 not flag_allowed_to_access:
             return False
         if not self.isProtected():
@@ -6207,15 +5075,15 @@ class Session(CommonObjectBase, Locatable):
                 modificationEmailGranted = self.__ac.grantModificationEmail(sb.getEmail())
                 if modificationEmailGranted and sendEmail:
                     notif = pendingQueues._PendingManagerNotification( [sb] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
+                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Session')
         else:
             self.__ac.grantModification( sb )
-            if isinstance(sb, MaKaC.user.Avatar):
+            if isinstance(sb, AvatarUserWrapper):
                 sb.linkTo(self, "manager")
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
     def canModify(self, aw_or_user):
@@ -6241,50 +5109,6 @@ class Session(CommonObjectBase, Locatable):
         newMat.setOwner( self )
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
-
-    def removeMaterial( self, mat ):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-            return "done: %s"%mat.getId()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            return "done: %s"%mat.getId()
-        return "not done: %s"%mat.getId()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner( self )
-        self.materials[ recMat.getId() ] = recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import SessionMFRegistry
-        return SessionMFRegistry
-
-    def getMaterialById( self, matId ):
-        if matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
-            return self.materials[ matId ]
-        return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getMinutes():
-            l.append( self.getMinutes() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
 
     def _setSchedule(self):
         self.__schedule=SessionSchedule(self)
@@ -6323,41 +5147,6 @@ class Session(CommonObjectBase, Locatable):
             self._comments=""
         return self._comments
 
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this session have already been created"), _("Session"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.minutes is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-
-        return self.minutes
-
     def _addCoordinator(self, av):
         if av is None or self._coordinators.has_key(av.getId()):
             return
@@ -6373,21 +5162,20 @@ class Session(CommonObjectBase, Locatable):
         return self._coordinatorsEmail
 
     def _addCoordinatorEmail(self, email):
-        if not email in self.getCoordinatorEmailList():
+        if email not in self.getCoordinatorEmailList():
             self.getCoordinatorEmailList().append(email)
 
     def removeCoordinatorEmail(self, email):
         if email in self.getCoordinatorEmailList():
-            if email in self.getCoordinatorEmailList():
-                self.getCoordinatorEmailList().remove(email)
-                self._p_changed = 1
+            self.getCoordinatorEmailList().remove(email)
+            self._p_changed = 1
 
     def addCoordinator( self, sb, sendEmail=True ):
         """Grants coordination privileges to user.
 
             Arguments:
                 sb -- It can be either:
-                        (MaKaC.user.Avatar) the user to which
+                        (AvatarUserWrapper) the user to which
                         coordination privileges must be granted.
                       or:
                         (MaKaC.conference.SessionChair) a non-existing which
@@ -6417,14 +5205,14 @@ class Session(CommonObjectBase, Locatable):
                 self.getConference().getPendingQueuesMgr().addPendingCoordinator(sb)
         else:
             self._addCoordinator(sb)
-            if isinstance(sb, MaKaC.user.Avatar):
+            if isinstance(sb, AvatarUserWrapper):
                 sb.linkTo(self, "coordinator")
 
     def removeCoordinator( self, av ):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges
+            av -- (AvatarUserWrapper) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -6436,7 +5224,8 @@ class Session(CommonObjectBase, Locatable):
         if av is None or not self._coordinators.has_key(av.getId()):
             return
         del self._coordinators[av.getId()]
-        if isinstance(av, MaKaC.user.Avatar):
+        self._p_changed = True
+        if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "coordinator")
         if self.getConference() is not None:
             self.getConference().removeSessionCoordinator(self,av)
@@ -6445,7 +5234,7 @@ class Session(CommonObjectBase, Locatable):
         """Tells whether the specified user is a coordinator of the session.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user to be checked
+            av -- (AvatarUserWrapper) user to be checked
 
            Return value: (boolean)
         """
@@ -6457,7 +5246,7 @@ class Session(CommonObjectBase, Locatable):
         if (av is not None) and self._coordinators.has_key(av.getId()):
             return True
         ret = False
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             for email in av.getEmails():
                 if email in self.getCoordinatorEmailList():
                     self.addCoordinator(av)
@@ -6485,7 +5274,7 @@ class Session(CommonObjectBase, Locatable):
 
         return self._coordinators.values()
 
-    def canCoordinate(self,aw, right=""):
+    def canCoordinate(self, aw_or_user, right=""):
         """Tells if a user has coordination privileges.
 
             Only session coordinators have coordination privileges over a
@@ -6498,9 +5287,11 @@ class Session(CommonObjectBase, Locatable):
 
             Return value: (boolean)
         """
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
         if right != "":
-            return self.isCoordinator(aw.getUser()) and self.getConference().hasSessionCoordinatorRight(right)
-        return self.isCoordinator(aw.getUser())
+            return self.isCoordinator(aw_or_user) and self.getConference().hasSessionCoordinatorRight(right)
+        return self.isCoordinator(aw_or_user)
 
 
     def getScheduleType(self):
@@ -6554,6 +5345,12 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         self._confSchEntry=LinkedTimeSchEntry(self)
         self._contributionDuration = None
 
+    @property
+    @memoize_request
+    def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_for_linked_object(self.session)
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -6562,8 +5359,8 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         data["id"] = self.id
         data["title"] = self.title
         data["session"] = self.session.getTitle()
-        data["start date"] = self.startDate
-        data["duration"] = self.duration
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         i = 0
         for p in self.places :
             data["place %s"%i] = p.getName()
@@ -7162,9 +5959,6 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             res=self.getSession().getTextColor()
         return res
 
-    def getAllMaterialList(self, sort=True):
-        return self.getSession().getAllMaterialList(sort=sort)
-
     def getRecursiveAllowedToAccessList(self):
         return self.getSession().getRecursiveAllowedToAccessList()
 
@@ -7619,7 +6413,6 @@ class Contribution(CommonObjectBase, Locatable):
         self.slides = None
         self.video = None
         self.poster = None
-        self.minutes = None
         self.reviewing = None
         self._authorGen = Counter()
         self._authors = OOBTree()
@@ -7650,7 +6443,13 @@ class Contribution(CommonObjectBase, Locatable):
     @return_ascii
     def __repr__(self):
         parent_id = self.parent.getId() if self.parent else None
-        return '<Contribution({}, {}, {})>'.format(self.getId(), self.getTitle(), parent_id)
+        return u'<Contribution({}, {}, {})>'.format(self.getId(), to_unicode(self.getTitle()), parent_id)
+
+    @property
+    @memoize_request
+    def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_for_linked_object(self)
 
     def getVerboseType(self):
         return 'Contribution'
@@ -7743,13 +6542,16 @@ class Contribution(CommonObjectBase, Locatable):
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             for f in afm.getFields():
                 id = f.getId()
-                data[id] = self.getField(id)
-        data["start date"] = "%s" % self.startDate
-        data["duration"] = "%s" % self.duration
+                field = self.getField(id)
+                field_value = str(field.value)
+                if field_value:
+                    data['Abstract field {}'.format(field.field._caption)] = field_value
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         if self._track is not None:
             data["track"] = self._track.getTitle()
         if self._type is not None:
-            data["type"] = self._type
+            data["type"] = self._type.getName()
         data["speaker text"] = self.speakerText
         if self.place is not None:
             data["place"] = self.place.getName()
@@ -7765,7 +6567,7 @@ class Contribution(CommonObjectBase, Locatable):
         for sp in self._speakers:
             data["speaker %s" % sp.getId()] = sp.getFullName()
         for s in self.getSubmitterList():
-            if isinstance(s, MaKaC.user.Avatar):
+            if isinstance(s, AvatarUserWrapper):
                 data["submitter"] = s.getFullName()
             else:
                 data["submitter"] = s.getName()
@@ -7885,7 +6687,7 @@ class Contribution(CommonObjectBase, Locatable):
 
     def clone(self, parent, options, deltaTime = 0):
         cont = Contribution()
-        parent.addContribution(cont)
+        parent.addContribution(cont, contrib_id=self.getId())
         cont.setTitle( self.getTitle() )
         cont.setDescription( self.getDescription() )
         for k, v in self.getFields().items():
@@ -7945,25 +6747,9 @@ class Contribution(CommonObjectBase, Locatable):
                 cont.newSpeaker(sp.clone())
             cont.setSpeakerText(self.getSpeakerText())
 
-        if options.get("materials", False) :
-            for m in self.getMaterialList() :
-                cont.addMaterial(m.clone(cont))
-            if self.getPaper() is not None:
-                cont.setPaper(self.getPaper().clone(cont))
-            if self.getSlides() is not None:
-                cont.setSlides(self.getSlides().clone(cont))
-            if self.getVideo() is not None:
-                cont.setVideo(self.getVideo().clone(cont))
-            if self.getPoster() is not None:
-                cont.setPoster(self.getPoster().clone(cont))
-            if self.getMinutes() is not None:
-                cont.setMinutes(self.getMinutes().clone(cont))
-            if self.getReviewing() is not None:
-                cont.setReviewing(self.getReviewing().clone(cont))
-
         if options.get("subcontribs", False) :
             for sc in self.getSubContributionList() :
-                cont.addSubContribution(sc.clone(cont, self, options))
+                cont.addSubContribution(sc.clone(cont, self, options), subcontrib_id=sc.getId())
         return cont
 
     def notifyModification( self, date = None, raiseEvent = True, cleanCache = True):
@@ -8033,13 +6819,8 @@ class Contribution(CommonObjectBase, Locatable):
             signals.event.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
-            for mat in self.getMaterialList():
-                self.removeMaterial(mat)
-            self.removePaper()
-            self.removeSlides()
-            self.removeVideo()
-            self.removePoster()
-            self.removeMinutes()
+
+            self.remove_attachments()
             self.removeReviewing()
 
             self.notify_protection_to_owner(self, delete=True)
@@ -8356,6 +7137,7 @@ class Contribution(CommonObjectBase, Locatable):
         if not self._authors.has_key( part.getId() ):
             return
         del self._authors[ part.getId() ]
+        self._p_changed = True
         if not self.isSpeaker(part):
             part.delete()
 
@@ -8870,13 +7652,13 @@ class Contribution(CommonObjectBase, Locatable):
 
     def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
         self.notifyModification(raiseEvent = False)
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
         self.notifyModification(raiseEvent = False)
 
@@ -8903,14 +7685,14 @@ class Contribution(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
         if self.canModify(aw):
             return True
 
-        if not self.canIPAccess(aw.getIP()) and not self.isAllowedToAccess( aw.getUser() ):
+        if not self.canIPAccess(request.remote_addr) and not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
             return True
@@ -8919,13 +7701,13 @@ class Contribution(CommonObjectBase, Locatable):
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
@@ -8954,77 +7736,8 @@ class Contribution(CommonObjectBase, Locatable):
         self.notifyModification()
 
     def removeMaterial(self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-        elif mat.getId().lower() == 'reviewing':
+        if mat.getId().lower() == 'reviewing':
             self.removeReviewing()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner( self )
-        self.materials[ recMat.getId() ] =  recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import ContribMFRegistry
-        return ContribMFRegistry
-
-    def getMaterialById( self, matId ):
-        if matId.lower() == 'paper':
-            return self.getPaper()
-        elif matId.lower() == 'slides':
-            return self.getSlides()
-        elif matId.lower() == 'video':
-            return self.getVideo()
-        elif matId.lower() == 'poster':
-            return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
-            return self.materials[ matId ]
-        return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
-
-    def getAllViewableMaterialList( self, aw=None ):
-        if not aw:
-            aw = ContextManager.get("currentAW", ContextManager.get("currentRH").getAW())
-        return [mat for mat in self.getAllMaterialList() if mat.canView(aw)]
-
 
     def newSubContribution(self):
         newSub = SubContribution()
@@ -9032,8 +7745,12 @@ class Contribution(CommonObjectBase, Locatable):
         signals.event.subcontribution_created.send(newSub, parent=self)
         return newSub
 
-    def addSubContribution( self, newSubCont ):
-        newSubCont.setId(str( self.__subContGenerator.newCount()) )
+    def addSubContribution(self, newSubCont, subcontrib_id=None):
+        if subcontrib_id is None:
+            newSubCont.setId(str(self.__subContGenerator.newCount()))
+        else:
+            newSubCont.setId(str(subcontrib_id))
+            self.__subContGenerator.sync(subcontrib_id)
         newSubCont.setOwner( self )
         self._subConts.append( newSubCont )
         self.notifyModification(cleanCache = False)
@@ -9081,145 +7798,6 @@ class Contribution(CommonObjectBase, Locatable):
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index+1, sb)
                 self.notifyModification(cleanCache = False)
-
-    def setPaper( self, newPaper ):
-        if self.getPaper() != None:
-            raise MaKaCError( _("The paper for this contribution has already been set"), _("Contribution"))
-        self.paper=newPaper
-        self.paper.setOwner( self )
-        self.notifyModification()
-
-    def removePaper( self ):
-        if self.paper is None:
-            return
-        self.paper.delete()
-        self.paper.setOwner(None)
-        self.paper = None
-        self.notifyModification()
-
-    def recoverPaper(self, p):
-        self.setPaper(p)
-        p.recover()
-
-    def getPaper( self ):
-        return self.paper
-
-    def setSlides( self, newSlides ):
-        if self.getSlides() != None:
-            raise MaKaCError( _("The slides for this contribution have already been set"), _("contribution"))
-        self.slides=newSlides
-        self.slides.setOwner( self )
-        self.notifyModification()
-
-    def removeSlides( self ):
-        if self.slides is None:
-            return
-        self.slides.delete()
-        self.slides.setOwner( None )
-        self.slides= None
-        self.notifyModification()
-
-    def recoverSlides(self, s):
-        self.setSlides(s)
-        s.recover()
-
-    def getSlides( self ):
-        return self.slides
-
-    def setVideo( self, newVideo ):
-        if self.getVideo() != None:
-            raise MaKaCError( _("the video for this contribution has already been set"))
-        self.video=newVideo
-        self.video.setOwner( self )
-        self.notifyModification()
-
-    def removeVideo( self ):
-        if self.getVideo() is None:
-            return
-        self.video.delete()
-        self.video.setOwner(None)
-        self.video = None
-        self.notifyModification()
-
-    def recoverVideo(self, v):
-        self.setVideo(v)
-        v.recover()
-
-    def getVideo( self ):
-        try:
-            if self.video:
-                pass
-        except AttributeError:
-            self.video = None
-        return self.video
-
-    def setPoster( self, newPoster ):
-        if self.getPoster() != None:
-            raise MaKaCError( _("the poster for this contribution has already been set"))
-        self.poster=newPoster
-        self.poster.setOwner( self )
-        self.notifyModification()
-
-    def removePoster( self ):
-        if self.getPoster() is None:
-            return
-        self.poster.delete()
-        self.poster.setOwner(None)
-        self.poster = None
-        self.notifyModification()
-
-    def recoverPoster(self, p):
-        self.setPoster(p)
-        p.recover()
-
-    def getPoster( self ):
-        try:
-            if self.poster:
-                pass
-        except AttributeError:
-            self.poster = None
-        return self.poster
-
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("the Minutes for this contribution has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this contribution have already been created"), _("Contribution"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
 
     def setReviewing( self, newReviewing ):
         if self.getReviewing() != None:
@@ -9352,7 +7930,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._submitters=[] #create the attribute
             self.notifyModification(raiseEvent = False)
         if no_groups:
-            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+            return [s for s in self._submitters if not isinstance(s, GroupWrapper)]
         else:
             return self._submitters
 
@@ -9361,7 +7939,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getSubmitterList().append(av)
         if self.getConference() is not None:
             self.getConference().addContribSubmitter(self,av)
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.linkTo(self, "submission")
         self.notifyModification(raiseEvent = False)
 
@@ -9399,7 +7977,7 @@ class Contribution(CommonObjectBase, Locatable):
                 submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
                 if submissionEmailGranted and sendEmail:
                     notif = pendingQueues._PendingSubmitterNotification( [sb] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
+                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Contribution')
                     if self.getConference():
                         self.getConference().addContribSubmitter(self,sb)
         else:
@@ -9410,7 +7988,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getSubmitterList().remove(av)
         if self.getConference():
             self.getConference().removeContribSubmitter(self, av)
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "submission")
         self.notifyModification(raiseEvent = False)
 
@@ -9555,7 +8133,7 @@ class AcceptedContribution(Contribution):
             self._submitters = []  # create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
         if no_groups:
-            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+            return [s for s in self._submitters if not isinstance(s, GroupWrapper)]
         else:
             return self._submitters
 
@@ -9966,6 +8544,12 @@ class SubContribution(CommonObjectBase, Locatable):
             event_id = None
         return '<SubContribution({}, {}, {}.{})>'.format(self.getId(), self.getTitle(), event_id, parent_id)
 
+    @property
+    @memoize_request
+    def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_for_linked_object(self)
+
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)
 
@@ -10017,21 +8601,6 @@ class SubContribution(CommonObjectBase, Locatable):
             for s in self.getSpeakerList() :
                 sCont.newSpeaker(s.clone())
             sCont.setSpeakerText(self.getSpeakerText())
-
-        if options.get("materials", False) :
-            for m in self.getMaterialList() :
-                sCont.addMaterial(m.clone(sCont))
-            if self.getPaper() is not None:
-                sCont.setPaper(self.getPaper().clone(sCont))
-            if self.getSlides() is not None:
-                sCont.setSlides(self.getSlides().clone(sCont))
-            if self.getVideo() is not None:
-                sCont.setVideo(self.getVideo().clone(sCont))
-            if self.getPoster() is not None:
-                sCont.setPoster(self.getPoster().clone(sCont))
-            if self.getMinutes() is not None:
-                sCont.setMinutes(self.getMinutes().clone(sCont))
-
 
         sCont.notifyModification()
         return sCont
@@ -10276,215 +8845,6 @@ class SubContribution(CommonObjectBase, Locatable):
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
-    def removeMaterial( self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            self.notifyModification()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            self.notifyModification()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            self.notifyModification()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            self.notifyModification()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            self.notifyModification()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner( self )
-        self.materials[ recMat.getId() ] =  recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import SubContributionMFRegistry
-        return SubContributionMFRegistry
-
-    def getMaterialById( self, matId ):
-        if matId.lower() == 'paper':
-            return self.getPaper()
-        elif matId.lower() == 'slides':
-            return self.getSlides()
-        elif matId.lower() == 'video':
-            return self.getVideo()
-        elif matId.lower() == 'poster':
-            return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
-            return self.materials[ matId ]
-        return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
-
-    def setPaper( self, newPaper ):
-        if self.getPaper() != None:
-            raise MaKaCError( _("The paper for this subcontribution has already been set"), _("Contribution"))
-        self.paper=newPaper
-        self.paper.setOwner( self )
-        self.notifyModification()
-
-    def removePaper( self ):
-        if self.getPaper() is None:
-            return
-        self.paper.delete()
-        self.paper.setOwner(None)
-        self.paper = None
-        self.notifyModification()
-
-    def recoverPaper(self, p):
-        self.setPaper(p)
-        p.recover()
-
-    def getPaper( self ):
-        return self.paper
-
-    def setSlides( self, newSlides ):
-        if self.getSlides() != None:
-            raise MaKaCError( _("The slides for this subcontribution have already been set"), _("Contribution"))
-        self.slides=newSlides
-        self.slides.setOwner( self )
-        self.notifyModification()
-
-    def removeSlides( self ):
-        if self.getSlides() is None:
-            return
-        self.slides.delete()
-        self.slides.setOwner( None )
-        self.slides = None
-        self.notifyModification()
-
-    def recoverSlides(self, s):
-        self.setSlides(s)
-        s.recover()
-
-    def getSlides( self ):
-        return self.slides
-
-    def setVideo( self, newVideo ):
-        if self.getVideo() != None:
-            raise MaKaCError( _("the video for this subcontribution has already been set"))
-        self.video=newVideo
-        self.video.setOwner( self )
-        self.notifyModification()
-
-    def removeVideo( self ):
-        if self.getVideo() is None:
-            return
-        self.video.delete()
-        self.video.setOwner(None)
-        self.video = None
-        self.notifyModification()
-
-    def recoverVideo(self, v):
-        self.setVideo(v)
-        v.recover()
-
-    def getVideo( self ):
-        try:
-            if self.video:
-                pass
-        except AttributeError:
-            self.video = None
-        return self.video
-
-    def setPoster( self, newPoster ):
-        if self.getPoster() != None:
-            raise MaKaCError( _("the poster for this subcontribution has already been set"))
-        self.poster=newPoster
-        self.poster.setOwner( self )
-        self.notifyModification()
-
-    def removePoster( self ):
-        if self.getPoster() is None:
-            return
-        self.poster.delete()
-        self.poster.setOwner(None)
-        self.poster = None
-        self.notifyModification()
-
-    def recoverPoster(self, p):
-        self.setPoster(p)
-        p.recover()
-
-    def getPoster( self ):
-        try:
-            if self.poster:
-                pass
-        except AttributeError:
-            self.poster = None
-        return self.poster
-
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("the Minutes for this subcontribution has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this subcontribution have already been created"), _("Sub Contribution"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
-
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
 
@@ -10493,13 +8853,7 @@ class SubContribution(CommonObjectBase, Locatable):
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
-        for mat in self.getMaterialList():
-            self.removeMaterial(mat)
-        self.removePaper()
-        self.removeSlides()
-        self.removeVideo()
-        self.removePoster()
-        self.removeMinutes()
+        self.remove_attachments()
         TrashCanManager().add(self)
 
         #self.unindex()
@@ -10675,7 +9029,6 @@ class Material(CommonObjectBase):
         return None
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10689,7 +9042,6 @@ class Material(CommonObjectBase):
         return self.title
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10775,7 +9127,7 @@ class Material(CommonObjectBase):
     def getResourceList(self, sort=True):
         list = self.__resources.values()
         if sort:
-            list.sort(utils.sortFilesByName)
+            list.sort(key=lambda f: f.getName().lower())
         return list
 
     def getNbResources(self ):
@@ -10840,7 +9192,6 @@ class Material(CommonObjectBase):
 
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10856,7 +9207,6 @@ class Material(CommonObjectBase):
         return self.__ac.isHidden()
 
     @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
                'MaKaC.conference.Paper',
                'MaKaC.conference.Slides',
                'MaKaC.conference.Video',
@@ -10868,7 +9218,6 @@ class Material(CommonObjectBase):
 
 
     @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
                'MaKaC.conference.Paper',
                'MaKaC.conference.Slides',
                'MaKaC.conference.Video',
@@ -10884,14 +9233,10 @@ class Material(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
-            prin.linkTo(self, "access")
         self._p_changed = 1
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
-            prin.unlinkTo(self, "access")
         self._p_changed = 1
 
     def canView( self, aw ):
@@ -10910,7 +9255,7 @@ class Material(CommonObjectBase):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -10919,7 +9264,7 @@ class Material(CommonObjectBase):
             return True
 
         canUserAccess = self.isAllowedToAccess(aw.getUser())
-        canIPAccess = self.canIPAccess(aw.getIP())
+        canIPAccess = self.canIPAccess(request.remote_addr)
         if not self.isProtected():
             return canUserAccess or canIPAccess
         else:
@@ -10941,13 +9286,13 @@ class Material(CommonObjectBase):
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
         self._p_changed = 1
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
 
@@ -11010,154 +9355,6 @@ class Reviewing(BuiltinMaterial):
         if isinstance(self.getOwner(), Review):
             return self.getOwner().getContribution()
         return Material.getContribution(self)
-
-class Paper(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "paper"
-
-    def setId( self, newId ):
-        return
-
-
-
-class Slides(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "slides"
-
-    def setId( self, newId ):
-        return
-
-
-
-class Video(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "video"
-
-    def setId( self, newId ):
-        return
-
-class Poster(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "poster"
-
-    def setId( self, newId ):
-        return
-
-class Minutes(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "minutes"
-        self.title = "Minutes"
-        self.file = None
-
-    def clone ( self, owner):
-        mat = Minutes()
-        mat.setTitle(self.getTitle())
-        mat.setDescription(self.getDescription())
-        mat.notifyModification()
-
-        mat.setId(self.getId())
-        mat.setOwner(owner)
-        mat.setType(self.getType())
-
-        mat.setProtection(self.getAccessController()._getAccessProtection())
-        mat.setAccessKey(self.getAccessKey())
-        lrep = self._getRepository()
-        flist = lrep.getFiles()
-        rlist = self.getResourceList()
-        for r in rlist :
-            if r.getId()=="minutes":
-                mat.setText(self.getText())
-            elif  isinstance(r,Link):
-                newlink = Link()
-                newlink.setOwner(mat)
-                newlink.setName(r.getName())
-                newlink.setDescription(r.getDescription())
-                newlink.setURL(r.getURL())
-                mat.addResource(newlink)
-            elif isinstance(r,LocalFile):
-                newfile = LocalFile()
-                newfile.setOwner(mat)
-                newfile.setName(r.getName())
-                newfile.setDescription(r.getDescription())
-                newfile.setFilePath(r.getFilePath())
-                newfile.setFileName(r.getFileName())
-                mat.addResource(newfile)
-            else :
-                raise Exception( _("Unexpected object type in Resource List : ")+str(type(r)))
-
-        mat.setMainResource(self.getMainResource())
-
-        return mat
-
-    def setId( self, newId ):
-        return
-
-    def setTitle( self, newTitle ):
-        self.title = newTitle.strip()
-        self.notifyModification()
-
-    def _setFile( self, forcedFileId = None ):
-        #XXX: unsafe; it must be changed by mkstemp when migrating to python 2.3
-        tmpFileName = tempfile.mktemp()
-        fh = open(tmpFileName, "w")
-        fh.write(" ")
-        fh.close()
-        self.file = LocalFile()
-        self.file.setId("minutes")
-        self.file.setName("minutes")
-        self.file.setFilePath(tmpFileName)
-        self.file.setFileName("minutes.txt")
-        self.file.setOwner(self)
-        self.file.archive(self._getRepository(), forcedFileId = forcedFileId)
-
-    def setText( self, text, forcedFileId = None ):
-        if self.file:
-            self.file.delete()
-        self._setFile(forcedFileId = forcedFileId)
-        self.file.replaceContent( text )
-        self.getOwner().notifyModification()
-
-    def getText( self ):
-        if not self.file:
-            return ""
-        return self.file.readBin()
-
-    def getResourceList(self, sort=True):
-        res = Material.getResourceList(self, sort=sort)
-        if self.file:
-            res.insert(0, self.file)
-        return res
-
-    def getResourceById( self, id ):
-        if id.strip() == "minutes":
-            return self.file
-        return Material.getResourceById( self, id )
-
-    def removeResource(self, res):
-        Material.removeResource(self, res)
-        if self.file is not None and res.getId().strip() == "minutes":
-            self.file = None
-            res.delete()
-            self.notifyModification()
-
-    def recoverResource(self, recRes):
-        if recRes.getId() == "minutes":
-            recRes.setOwner(self)
-            self.file = recRes
-            recRes.recover()
-            self.notifyModification()
-        else:
-            Material.recoverResource(self, recRes)
 
 
 class Resource(CommonObjectBase):
@@ -11339,13 +9536,9 @@ class Resource(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
-            prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
-            prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
@@ -11359,7 +9552,7 @@ class Resource(CommonObjectBase):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -11367,7 +9560,7 @@ class Resource(CommonObjectBase):
         if self.canModify(aw):
             return True
 
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+        if not self.canIPAccess(request.remote_addr) and not self.canUserModify(aw.getUser()) and \
                 not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
@@ -11463,37 +9656,6 @@ class Resource(CommonObjectBase):
             return 'converting'
         return None
 
-class Link(Resource):
-    """Specialises Resource class in order to represent web links. Objects of
-        this class will contain necessary information to include in a conference
-        object links to internet resources through a URL.
-       Params:
-        url -- (string) Contains the URL to the internet target resource.
-    """
-
-    fossilizes(ILinkMinimalFossil, ILinkFossil)
-
-    def __init__( self, resData = None ):
-        Resource.__init__( self, resData )
-        self.url = ""
-
-    def clone( self, conf ):
-        link = Resource.clone(self, conf)
-        link.setURL(self.getURL())
-        return link
-
-    @Updates ('MaKaC.conference.Link', 'url')
-    def setURL( self, newURL ):
-        self.url = newURL.strip()
-        self.notifyModification()
-
-    def getURL( self ):
-        return self.url
-
-    def getLocator(self):
-        locator = Resource.getLocator(self)
-        locator['fileExt'] = 'link'
-        return locator
 
 class LocalFile(Resource):
     """Specialises Resource class in order to represent files which can be
@@ -11536,15 +9698,11 @@ class LocalFile(Resource):
 
     def getLocator(self):
         locator = Resource.getLocator(self)
-        if self.fileName == 'minutes.txt' and isinstance(self._owner, Minutes):
-            # Hack to get a html extension when viewing minutes
-            locator['fileExt'] = 'html'
-        else:
-            try:
-                locator['fileExt'] = (self.fileType.lower() or
-                                      os.path.splitext(self.fileName)[1].lower().lstrip('.') or None)
-            except Exception:
-                locator['fileExt'] = 'bin'  # no extension => use a dummy
+        try:
+            locator['fileExt'] = (self.fileType.lower() or
+                                  os.path.splitext(self.fileName)[1].lower().lstrip('.') or None)
+        except Exception:
+            locator['fileExt'] = 'bin'  # no extension => use a dummy
         return locator
 
     def setFileName( self, newFileName, checkArchive=True ):
@@ -11620,11 +9778,6 @@ class LocalFile(Resource):
             raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
         return self.__repository.readFile( self.__archivedId  )
 
-    def replaceContent( self, newContent ):
-        if not self.isArchived():
-            raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
-        self.__repository.replaceContent( self.__archivedId, newContent )
-
     def archive( self, repository=None, forcedFileId = None ):
         if self.isArchived():
             raise Exception( _("File is already archived"))
@@ -11635,11 +9788,6 @@ class LocalFile(Resource):
         repository.storeFile( self, forcedFileId = forcedFileId)
         self.filePath = ""
         self.notifyModification()
-
-    def unArchive(self):
-    # Not used.
-        self.__repository = None
-        self.__archivedId = ""
 
     def recover(self):
         if not self.isArchived():
@@ -11772,6 +9920,7 @@ class Track(CoreObject):
             k = self._abstracts.keys()[0]
             abstract = self._abstracts[k]
             del self._abstracts[k]
+            self._p_changed = True
             abstract.removeTrack( self )
 
         # we must notify each contribution in the track about the deletion of the
@@ -11780,6 +9929,7 @@ class Track(CoreObject):
             k = self._contributions.keys()[0]
             contrib = self._contributions[k]
             del self._contributions[k]
+            self._p_changed = True
             contrib.removeTrack( self )
 
         # we must delete and unindex all the possible track coordinators
@@ -11884,6 +10034,7 @@ class Track(CoreObject):
         """
         if subTrack in self.subTracks.values():
             del self.subTracks[ subTrack.getId() ]
+            self._p_changed = True
             subTrack.setTrack( None )
             subTrack.delete()
             self.notifyModification()
@@ -11951,13 +10102,14 @@ class Track(CoreObject):
         """
         if self.hasAbstract( abstract ):
             del self._abstracts[ abstract.getId() ]
+            self._p_changed = True
             #abstract.removeTrack( self )
 
     def addCoordinator( self, av ):
         """Grants coordination privileges to user.
 
             Arguments:
-                av -- (MaKaC.user.Avatar) the user to which
+                av -- (AvatarUserWrapper) the user to which
                     coordination privileges must be granted.
         """
 
@@ -11978,7 +10130,7 @@ class Track(CoreObject):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges
+            av -- (AvatarUserWrapper) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -11998,7 +10150,7 @@ class Track(CoreObject):
         """Tells whether the specified user is a coordinator of the track.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user to be checke
+            av -- (AvatarUserWrapper) user to be checke
 
            Return value: (boolean)
         """
@@ -12064,6 +10216,7 @@ class Track(CoreObject):
         if not self._contributions.has_key( contrib.getId() ):
             return
         del self._contributions[ contrib.getId() ]
+        self._p_changed = True
         contrib.setTrack( None )
 
     def hasContribution( self, contrib ):

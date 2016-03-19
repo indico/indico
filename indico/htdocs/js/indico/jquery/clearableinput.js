@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,83 +18,74 @@
 (function($) {
     $.widget("indico.clearableinput", {
         options: {
-            onchange: function() {},
-            callback: function() {},
             alwaysClearable: false,
             clearClass: 'clearableinput',
+            clearOnEscape: true,
             emptyvalue: '',
-            focusAfter: true
+            focusOnClear: true,
+            focusOnStart: false,
+            onClear: function() {},
+            onInput: function() {}
         },
 
         _create: function() {
             var self = this;
-            var opt = self.options;
-            var input = self.element;
-
-            input.addClass('clearabletext');
 
             self.buttonBox = $('<span class="button-box"></span>');
-
             self.clearIcon = $('<a class="input-clear icon-close"></a>')
-                .css("line-height", input.css("height"))
+                .css('line-height', self.element.outerHeight() + 'px')
                 .click(function() {
                     self._clear();
                 });
 
-            input.wrap($('<div class="' + opt.clearClass + '"></div>'))
-                .on("input", function() {
-                    self._onInput();
+            self.element.addClass('clearabletext');
+            self.element.wrap($('<div>', {'class': self.options.clearClass}))
+                .on('input', function() {
+                    self._handleInput();
                 })
-                .on("keyup", function(e) {
-                    if (e.which == K.ESCAPE) {
-                        input.val('value');
-                        self._clear();
+                .on('keyup', function(e) {
+                    if (self.options.clearOnEscape) {
+                        if (e.which == K.ESCAPE) {
+                            self.element.val('value');
+                            self._clear();
+                        }
                     }
                     // TODO remove when support for IE9 is dropped
                     if (e.which == K.BACKSPACE || e.which == K.DELETE) {
-                        self._onInput();
+                        self._handleInput();
                     }
                 });
 
             self.buttonBox.append(self.clearIcon);
-            input.after(self.buttonBox);
+            self.element.after(self.buttonBox);
+            self._refreshClearIcon();
 
-            if (opt.focus) {
-                input.focus();
+            if (self.options.focusOnStart) {
+                self.element.focus();
             }
         },
 
         _clear: function() {
             var self = this;
-            var opt = self.options;
-            var input = self.element;
-
-            input.val(opt.emptyvalue).trigger("propertychange");
-            self._updateClearIcon();
-            opt.callback();
-
-            if (opt.focusAfter) {
-                input.focus();
+            self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
+            self._refreshClearIcon();
+            self.options.onClear();
+            if (self.options.focusOnClear) {
+                self.element.focus();
             } else {
-                input.blur();
+                self.element.blur();
             }
         },
 
-        _onInput: function() {
+        _handleInput: function() {
             var self = this;
-            var opt = self.options;
-            var input = self.element;
-
-            opt.onchange();
-            self._updateClearIcon();
+            self.options.onInput();
+            self._refreshClearIcon();
         },
 
-        _updateClearIcon: function() {
+        _refreshClearIcon: function() {
             var self = this;
-            var opt = self.options;
-            var input = self.element;
-
-            if (input.val() === opt.emptyvalue && !self.options.alwaysClearable) {
+            if (self.element.val() === self.options.emptyvalue && !self.options.alwaysClearable) {
                 self.clearIcon.css('visibility', 'hidden');
             } else {
                 self.clearIcon.css('visibility', 'visible');
@@ -103,14 +94,12 @@
 
         initSize: function(fontSize, lineHeight) {
             var self = this;
-
             if (self.size === undefined) {
                 self.size = {
                     fontSize: fontSize,
                     lineHeight: lineHeight
                 };
             }
-
             self.clearIcon.css('font-size', self.size.fontSize);
             self.clearIcon.css('line-height', self.size.lineHeight);
             self.element.css('min-height', self.size.lineHeight);
@@ -118,20 +107,17 @@
 
         setEmptyValue: function(value) {
             var self = this;
-
             self.options.emptyvalue = value;
         },
 
         setValue: function(value) {
             var self = this;
-
             self.element.val(value);
-            self._updateClearIcon();
+            self._refreshClearIcon();
         },
 
         setIconsVisibility: function(visibility) {
             var self = this;
-
             self.clearIcon.css('visibility', visibility);
         }
     });

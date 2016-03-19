@@ -1,0 +1,32 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows %}
+
+{% block subtitle %}
+    {% if regform %}
+        {% trans title=regform.title -%}Edit form "{{ title }}"{%- endtrans %}
+    {% else %}
+        {%- trans %}Create form{% endtrans -%}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% set back_url = url_for('.manage_regform', regform) if regform else url_for('.manage_regform_list', event) %}
+    {{ form_header(form) }}
+    {{ form_rows(form, skip=form._special_fields) }}
+    {% call form_fieldset(_('Price options')) %}
+        {{ form_rows(form, fields=form._price_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_('Notifications for registrants')) %}
+        {{ form_rows(form, fields=form._registrant_notification_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_('Notifications for managers')) %}
+        {{ form_rows(form, fields=form._manager_notification_fields) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change>
+        <a href="{{ back_url }}" class="i-button big" data-button-back>
+            {% trans %}Back{% endtrans %}
+        </a>
+    {% endcall %}
+{% endblock %}

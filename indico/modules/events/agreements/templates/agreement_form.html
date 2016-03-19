@@ -1,0 +1,125 @@
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_header, form_footer %}
+
+<h2 class="page-title">
+    {{ agreement.definition.title }}
+</h2>
+
+{% if agreement.accepted %}
+    {% call message_box('success') %}
+        {% trans dt=agreement.signed_dt|format_datetime -%}
+            Accepted on {{ dt }}
+        {%- endtrans %}
+    {% endcall %}
+{% elif agreement.rejected %}
+    {% call message_box('error') %}
+        {% trans dt=agreement.signed_dt|format_datetime -%}
+            Rejected on {{ dt }}
+        {%- endtrans %}
+    {% endcall %}
+{% endif %}
+
+{{ form_header(form, i_form=false) }}
+    <div class="agreement-form-sections">
+        <div class="i-box info-body">
+            <div class="info-section info-person">
+                <div>
+                    <i class="icon-user"></i>
+                </div>
+                <div class="info-person-text">
+                    <div class="info-person-name">
+                        {{ agreement.person_name }}
+                    </div>
+                    <div class="info-person-email">
+                        {{ agreement.person_email }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="titled-rule">
+                {% trans %}Event information{% endtrans %}
+            </div>
+            <div class="info-section info-event">
+                <div class="info-event-title">
+                    {{ agreement.event.getTitle() }}
+                </div>
+                <div class="info-event-details">
+                    <i class="icon-time"></i>
+                    {{ agreement.event.getStartDate() | format_datetime }}
+                </div>
+                {% if agreement.event.getLocation() %}
+                    <div class="info-event-details">
+                        <i class="icon-location"></i>
+                        {{ agreement.event.getLocation().getName() }}
+                    </div>
+                {% endif %}
+            </div>
+            {% block info_more %}{% endblock %}
+        </div>
+        <div class="i-box">
+            <div class="legal-body">
+                {% block legal_body %}{% endblock %}
+            </div>
+            {% if agreement.pending %}
+                <div class="i-box-footer">
+                    <div class="legal-confirmation">
+                        <div class="section">
+                            <div class="question">
+                                {{ form.agreed.label() }}
+                            </div>
+                            {{ form.agreed }}
+                        </div>
+                        <div id="section-reason" class="section hidden">
+                            <div class="question">
+                                {{ form.reason.label() }}:
+                                <span class="text-superfluous">
+                                    {% trans %}
+                                        (optional)
+                                    {% endtrans %}
+                                </span>
+                            </div>
+                            {{ form.reason }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if not agreement.pending %}
+            <div class="i-box no-actions-notice">
+                {% trans -%}
+                    The agreement is already signed and no further action can be taken on this page.
+                {%- endtrans %}
+            </div>
+        {% endif %}
+    </div>
+    {% if agreement.pending %}
+        <div class="toolbar">
+            <div class="group right">
+                <button id="agreement-submit" class="i-button big highlight" disabled>
+                    {% trans %}Submit{% endtrans %}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+{{ form_footer(form, i_form=false) }}
+
+<script>
+    $('.agreement-form-sections input:radio').on('change', function(e) {
+        $('#section-reason').toggleClass('hidden', e.target.value == '1');
+        $('#agreement-submit')
+            .prop('disabled', false)
+            .qtip('destroy', true)
+            .qtip({
+                content: {
+                    text: $T("You won't be able to change your decision later. If necessary, please contact the manager of the event."),
+                },
+                position: {
+                    viewport: false,
+                    my: 'right center',
+                    at: 'left center'
+                },
+                show: { ready: true },
+                hide: false
+            });
+    });
+</script>

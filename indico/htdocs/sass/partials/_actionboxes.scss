@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,13 @@
         > .toolbar {
             margin: 0;
             padding 0;
+            &.right {
+                padding-left: 0.5em;
+            }
+
+            a:not(.i-button) {
+                line-height: 2.2em;
+            }
         }
 
         + .section:before {
@@ -60,6 +67,24 @@
         font-size: 2rem;
         padding-right: 0.5rem;
         margin-bottom: -1em;
+    }
+
+    &.message-only {
+        > .section {
+            > .icon {
+                float: left;
+            }
+
+            > .text {
+                overflow: hidden;
+                width: auto;
+                display: inherit;
+            }
+        }
+    }
+
+    &.for-form {
+        width: 400px;
     }
 }
 
@@ -91,5 +116,25 @@
     &.highlight {
         @include action-box-colors($color: $light-black, $emphasis-color: $blue,
                                    $background-color: $light-blue, $border-color: $blue);
+    }
+
+    &.warning {
+        @include action-box-colors($color: $dark-gray, $emphasis-color: $yellow,
+                                   $background-color: $light-yellow, $border-color: $yellow);
+    }
+
+    &.danger {
+        @include action-box-colors($color: $light-black, $emphasis-color: $red,
+                                   $background-color: $light-red, $border-color: $red);
+    }
+
+    &.disabled {
+        @include action-box-colors($color: $light-black, $emphasis-color: $black,
+                                   $background-color: $pastel-gray, $border-color: $black);
+    }
+
+    &.accept {
+        @include action-box-colors($color: $light-black, $emphasis-color: $green,
+                                   $background-color: $light-green, $border-color: $green);
     }
 }

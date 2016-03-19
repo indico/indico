@@ -126,7 +126,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlacePrimaryAuthors" class="UIAuthorList" data-mode-copy="['inPlaceSpeakers']"></ul>
+                                                        <ul id="inPlacePrimaryAuthors" class="user-list" data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
@@ -148,7 +148,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="coAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlaceCoAuthors" class="UIAuthorList"  data-mode-copy="['inPlaceSpeakers']"></ul>
+                                                        <ul id="inPlaceCoAuthors" class="user-list"  data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
@@ -171,7 +171,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlaceSpeakers" class="UIAuthorList"  data-mode-copy="['inPlacePrimaryAuthors', 'inPlaceCoAuthors']"></ul>
+                                                        <ul id="inPlaceSpeakers" class="user-list"  data-mode-copy="['inPlacePrimaryAuthors', 'inPlaceCoAuthors']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
@@ -244,22 +244,22 @@ var methods = {'addNew': 'contribution.participants.addNewParticipant',
     //(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList)
     var primaryAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "prAuthor"}, $E('inPlacePrimaryAuthors'), $E('inPlacePrimaryAuthorsMenu'),
-        "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j});
+        "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j}, ${suggested_authors | n,j});
     $('#inPlacePrimaryAuthors').data('manager', primaryAuthorManager);
 
     var coAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "coAuthor"}, $E('inPlaceCoAuthors'), $E('inPlaceCoAuthorsMenu'),
-        "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j});
+        "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j}, ${suggested_authors | n,j});
     $('#inPlaceCoAuthors').data('manager', coAuthorManager);
 
 % endif:
     var speakerManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
-        "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j});
+        "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j}, ${suggested_authors | n,j});
     $('#inPlaceSpeakers').data('manager', speakerManager);
 
 //Drag and drop for the authors
-$('#sortspace').tablesorter({
+$('#sortspace').dragndrop({
 
     onDropFail: function() {
         var popup = new AlertPopup($T('Warning'), $T('You cannot move the user to this list because there is already an author with the same email address.'));

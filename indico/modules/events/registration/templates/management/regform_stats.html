@@ -1,0 +1,213 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+{% from '_statistics.html' import stats_badges, stats_box %}
+
+{% block subtitle %}
+    {% trans title=regform.title -%}
+        Stats for "{{ title }}"
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="i-box-group vert registrant-stats">
+        {%- for stats in regform_stats -%}
+            {%- if stats.type == 'overview' -%}
+                {{ render_overview(stats) }}
+            {%- elif stats.type == 'table' -%}
+                {% call stats_box(title=stats.title, subtitle=stats.subtitle,
+                                  label=regform.currency if stats.is_currency_shown else '',
+                                  label_tooltip=_('Currency: {}').format(
+                                      get_currency_name(regform.currency, locale=session.lang))) %}
+                    {{ render_table(stats.get_table()) }}
+                {%- endcall %}
+            {%- endif -%}
+        {%- endfor -%}
+    </div>
+    <script>
+        $(document).on('click', 'table.registrant-stats tr.header-row', function toggleSubRows(evt) {
+            $(this).nextUntil('tr.header-row, tr.single-row').toggle();
+            $(this).toggleClass('collapsed');
+        });
+    </script>
+
+{% endblock %}
+
+
+{% macro render_overview(stats) %}
+    {% set height = stats.countries|length * 24 + 28 %}
+    {% set badges = [(_("Registrations"),  stats.registrations|length),
+                     (_("Days left<br>to register"), stats.days_left),
+                     (_("Countries"), stats.num_countries)]%}
+    {% set taken, total, progress = stats.availability %}
+
+    {% call stats_box(title=stats.title, subtitle=stats.subtitle,
+                      label=stats.currency if stats.is_currency_shown else '') %}
+        {{ stats_badges(badges) }}
+        {%- if total > 0 -%}
+            <div class="stats-item">
+                <span>{% trans %}Availability{% endtrans %}</span>
+                <span>
+                    <span class="i-progress">
+                        <span class="i-progress-bar" data-progress={{ '{:%}'.format(progress) }}></span>
+                        <span class="i-progress-label">
+                            {%- if total == taken %}
+                                {%- trans %}event full{% endtrans -%}
+                            {%- else -%}
+                                {%- trans places=total-taken %}{{ places }} places available{% endtrans -%}
+                            {% endif -%}
+                        </span>
+                    </span>
+                </span>
+            </div>
+        {% endif %}
+        {% if stats.num_countries %}
+            <div class="stats-item">
+                <span>{% trans %}Registrants per country{% endtrans %}</span><span></span>
+            </div>
+            <div id="countriesPlot" style="width:500px; height:{{height}}px;"></div>
+            <script>
+                $(document).ready(function generateBasicStats() {
+                    var countries = {{ stats.countries|tojson }};
+                    var jqPlotOptions = {
+                        axes: {
+                            xaxis: {
+                                min: 0,
+                                padMax: 0,
+                            },
+                            yaxis: {
+                                pad: 8,
+                                renderer: $.jqplot.CategoryAxisRenderer,
+                                tickOptions: {
+                                    showGridline: false,
+                                    showLabel: true,
+                                    tickSpacing: 24
+                                }
+                            },
+                        },
+                        height: {{ height }},
+                        highlighter: {
+                            showMarker: false,
+                            showTooltip: false
+                        },
+                        seriesDefaults: {
+                            renderer: $.jqplot.BarRenderer,
+                            rendererOptions: {
+                                barDirection: 'horizontal',
+                                barWidth: 18,
+                                shadow: true,
+                                shadowDepth: 3,
+                                shadowOffset: 1
+                            },
+                            pointLabels: { show: true }
+                        },
+                    }
+                    var countriesPlot = $.jqplot('countriesPlot', [countries], processJqPlotOptions(jqPlotOptions));
+                });
+            </script>
+        {% endif %}
+    {% endcall %}
+{% endmacro %}
+
+{% macro render_table(table) -%}
+    <table class="registrant-stats">
+        {%- if table.head %}
+            <thead>
+                <tr>
+                {%- for head in table.head %}
+                    {% if head.type == 'str' -%}
+                        <th {%- if head.colspan > 1 %} colspan="{{ head.colspan }}"{% endif %}>{{ head.data }}</th>
+                    {%- endif -%}
+                {% endfor %}
+                </tr>
+            </thead>
+        {%- endif %}
+        {%- if table.rows %}
+            <tbody>
+                {%- for row_type, row in table.rows %}
+                    <tr class="{{ row_type }}">
+                        {%- for cell in row -%}
+                            {% if cell.type == 'currency' %}
+                                {{ _render_currency_cell(cell) }}
+                            {% elif cell.type == 'icon' %}
+                                {{ _render_icon_cell(cell) }}
+                            {% elif cell.type == 'progress' %}
+                                {{ _render_progress_cell(cell) }}
+                            {% elif cell.type == 'progress-stacked' %}
+                                {{ _render_progress_stacked_cell(cell) }}
+                            {% elif cell.type == 'str' %}
+                                {{ _render_str_cell(cell) }}
+                            {% elif cell.type == 'default' %}
+                                {{ _render_default_cell(cell) }}
+                            {% endif %}
+                        {%- endfor -%}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endif %}
+    </table>
+{%- endmacro %}
+
+
+{%- macro _render_currency_cell(cell) -%}
+    {%- call _generate_cell(cell) -%}
+        <span>{{ format_currency(cell.data, '', locale=session.lang) }}</span>
+    {%- endcall -%}
+{%- endmacro -%}
+
+
+{% macro _render_icon_cell(cell) -%}
+    {%- call _generate_cell(cell) -%}
+        <span><i class="icon-{{ cell.data }}"></i></span>
+    {%- endcall -%}
+{%- endmacro %}
+
+
+{% macro _render_progress_cell(cell) %}
+    {%- call _generate_cell(cell) %}
+        <span class="i-progress
+                     {%- if cell.data[1]|length < 10 %} i-progress-small
+                     {%- elif cell.data[1]|length > 14 %} i-progress-large
+                     {%- endif -%}">
+            <span class="i-progress-bar" data-progress="{{ '{:%}'.format(cell.data[0]) }}"></span>
+            <span class="i-progress-label">{{ cell.data[1] }}</span>
+        </span>
+    {% endcall -%}
+{% endmacro %}
+
+
+{% macro _render_progress_stacked_cell(cell) %}
+    {%- call _generate_cell(cell) %}
+        <span class="i-progress
+                     {%- if cell.data[1]|length < 10 %} i-progress-small
+                     {%- elif cell.data[1]|length > 14 %} i-progress-large
+                     {%- endif -%}">
+            {% for width in cell.data[0] -%}
+                <span class="i-progress-bar" data-progress="{{ '{:%}'.format(width) }}"></span>
+            {%- endfor %}
+            <span class="i-progress-label">{{ cell.data[1] }}</span>
+        </span>
+    {% endcall -%}
+{% endmacro %}
+
+
+{%- macro _render_str_cell(cell) -%}
+    {%- call _generate_cell(cell) -%}
+        <span>{{ cell.data }}</span>
+    {%- endcall -%}
+{%- endmacro -%}
+
+
+{%- macro _render_default_cell(cell) -%}
+    {%- call _generate_cell(cell) -%}
+        <span class="no-stats-data" style="display: block; text-align:center;">&mdash;</i></span>
+    {%- endcall -%}
+{%- endmacro -%}
+
+
+{% macro _generate_cell(cell) %}
+    <td
+        {%- if cell.colspan > 1 %} colspan="{{cell.colspan}}" {%- endif -%}
+        {%- if cell.qtip %} title="{{ cell.qtip }}" {%- endif -%}
+        {%- if cell.classes %} class="{{ ' '.join(cell.classes) }}" {%- endif -%}>
+    {{- caller() -}}
+    </td>
+{%- endmacro %}

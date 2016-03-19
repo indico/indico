@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -60,13 +60,18 @@ class SortingCriteria:
     """
     _availableFields = {}
 
-
-    def __init__( self, crit = []):
+    def __init__(self, crit=None):
         self._sortingField = None
-        if crit:
-            fieldKlass = self._availableFields.get( crit[0], None )
-            if fieldKlass:
-                self._sortingField = self._createField( fieldKlass )
+        self._sortingFields = []
+        if not crit:
+            return
+        for crit_name in crit:
+            cls = self._availableFields.get(crit_name, None)
+            if cls:
+                field = self._createField(cls)
+                self._sortingFields.append(field)
+        if self._sortingFields:
+            self._sortingField = self._sortingFields[0]
 
     def _createField( self, fieldKlass ):
         """
@@ -81,10 +86,14 @@ class SortingCriteria:
         """
         return self._sortingField
 
-    def compare( self, a1, a2 ):
-        """Performs the comparison between two abstracts.
-        """
-        return self._sortingField.compare( a1, a2 )
+    def compare(self, a1, a2):
+        """Performs the comparison of two objects."""
+        fields = getattr(self, '_sortingFields', [self._sortingField])
+        for field in fields:
+            rv = field.compare(a1, a2)
+            if rv != 0:
+                return rv
+        return 0
 
 
 class FilterField:

@@ -9,9 +9,30 @@ urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")
 
 containsCategories = len(categ.getSubCategoryList()) > 0
-from MaKaC.conference import Link
-from MaKaC.webinterface.general import strfFileSize
 %>
+
+<%def name="render_attachments(attachments)">
+    % for attachment in attachments:
+        <li class="icon-file">
+            % if attachment.type.name == 'link':
+            <a href="${attachment.download_url}" target="_blank" class="resource"
+               data-name="${attachment.title}">
+                ${attachment.title}
+            </a>
+            % else:
+            <a href="${attachment.download_url}" target="_blank" class="resource"
+               data-name="${attachment.file.filename}"
+               data-size="${attachment.file.size}"
+               data-date="${attachment.modified_dt}">
+                ${attachment.title}
+            </a>
+            % endif
+            % if attachment.is_protected:
+                <i class="icon-lock"></i>
+            % endif
+        </li>
+    % endfor
+</%def>
 
 <div class="category-container">
     <div class="category-header">
@@ -32,7 +53,7 @@ from MaKaC.webinterface.general import strfFileSize
                     <li><a href="${urlHandlers.UHCategoryOverview.getWeekOverviewUrl(categ)}">${_("Week's events")}</a></li>
                     <li><a href="${urlHandlers.UHCalendar.getURL([categ])}">${_("Calendar")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryMap.getURL(categ)}">${_("Category map")}</a></li>
-                    <li><a href="${urlHandlers.UHCategoryStatistics.getURL(categ)}">${_("Category statistics")}</a></li>
+                    <li><a href="${ url_for('categories.category-statistics', categ) }">${_("Category statistics")}</a></li>
                 </ul>
                 <a id="createEventLink" class="i-button icon-plus arrow" data-toggle="dropdown" title="${_("Create new event")}"></a>
                 <ul class="dropdown">
@@ -50,12 +71,14 @@ from MaKaC.webinterface.general import strfFileSize
             </div>
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group">
-                <a class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in favoriteCategs else ''}" href="#"></a>
+                <button type="button"
+                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in _session.user.favorite_categories else ''}"
+                        data-href="${ url_for('users.user_favorites_category_api', category_id=categ.id) }"></button>
             </div>
             % endif
         </div>
 
-        <h1 class="category-title ${"sidebar-padding" if isRootCategory or materials or managers or allowUserModif else ""}">
+        <h1 class="category-title ${"sidebar-padding" if isRootCategory or categ.attached_items or managers or allowUserModif else ""}">
         % if isRootCategory and containsCategories:
             ${ _("Main categories") }
         % elif isRootCategory:
@@ -66,7 +89,7 @@ from MaKaC.webinterface.general import strfFileSize
         </h1>
     </div>
 
-    % if isRootCategory or materials or managers or allowUserModif:
+    % if isRootCategory or categ.attached_items or managers or allowUserModif:
     <div class="category-sidebar">
         % if isRootCategory:
             % if isNewsActive:
@@ -89,54 +112,15 @@ from MaKaC.webinterface.general import strfFileSize
                 % endfor
                 </ul>
             % endif
-            % if materials or allowUserModif:
-                <div>
-                    % if allowUserModif:
-                        <div class="right">
-                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                        </div>
-                    % endif
-                    <h2 class="icon-material-download">${ _("Files") }</h2>
-                </div>
-                <ul>
-                % for material in materials:
-                    <li>
-                        <a class="material-show" data-hidden="true" title="${material.getDescription()}">
-                           <div class="left material-title-icon icon-next" ></div>
-                           <h3>${material.getTitle()}</h3>
-                        </a>
-                        <ul class="resource-list" style="display: none">
-                        % for resource in material.getResourceList():
-                            <li class="icon-file">
-                                % if isinstance(resource, Link):
-                                <a href="${resource.getURL()}" target="_blank" class="resource"
-                                   data-name="${getResourceName(resource)}">
-                                    ${getResourceName(resource)}
-                                </a>
-                                % else:
-                                <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" class="resource"
-                                   data-name="${getResourceName(resource)}"
-                                   data-size="${strfFileSize(resource.getSize())}"
-                                   data-date="${resource.getCreationDate().strftime("%d %b %Y %H:%M")}">
-                                    ${getResourceName(resource)}
-                                </a>
-                                % endif
-                                % if resource.isItselfProtected():
-                                    <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
-                                % endif
-                            </li>
-                        % endfor
-                        </ul>
-                     </li>
-                % endfor
-                </ul>
-            % endif
+            ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=categ, can_edit=allowUserModif) }
         % endif
     </div>
     % endif
 
+
     <div class="category-content-wrapper">
         <div class="category-content">
+            ${ render_template('flashed_messages.html') }
             <div class="category-info">
 
             % if isRootCategory:
@@ -220,18 +204,13 @@ $(document).ready(function(){
             $this.children(".material-title-icon").removeClass('icon-expand').addClass('icon-next');
         }
     });
+    setupAttachmentTreeView();
 });
 </script>
 
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
-            $("#manageMaterial").click(function(){
-                    IndicoUI.Dialogs.Material.editor('${categ.getId()}', null, null, null, null,
-                            ${jsonEncode(categ.getAccessController().isProtected())}, ${jsonEncode(categ.getMaterialRegistry().getMaterialList(categ))},
-                            ${'Indico.Urls.UploadAction.category'}, true);
-                 });
-
             $('.toolbar .i-button').qtip({
                 position: {
                     my: 'bottom center',
@@ -239,36 +218,32 @@ $(document).ready(function(){
                 }
             });
 
-            $('.i-button.fav-button').click(function() {
+            $('.i-button.fav-button').on('click', function() {
                 var $this = $(this);
-
-                if ($this.hasClass('disabled')) {
-                    return;
-                } else {
-                    $this.addClass('disabled');
-                    indicoRequest('category.favorites.' + ($this.hasClass("enabled") ? 'delCategory' : 'addCategory'), {
-                        categId: '${ categ.getId() }'
-                    }, function(result, error) {
-                        if(error) {
-                            $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
-                            IndicoUtil.errorReport(error);
-                        } else {
-                            $this.toggleClass('enabled');
-                            $this.removeClass('disabled');
-                        }
-                    });
-                }
+                var isFavorite = $this.hasClass('enabled');
+                $this.prop('disabled', true);
+                $.ajax({
+                    url: $this.data('href'),
+                    method: isFavorite ? 'DELETE' : 'PUT',
+                    error: handleAjaxError,
+                    success: function() {
+                        $this.toggleClass('enabled', !isFavorite);
+                    },
+                    complete: function() {
+                        $this.prop('disabled', false);
+                    }
+                });
             }).qtip({
                 hide: {
-                        fixed: true,
-                        delay: 500
-                    },
+                    fixed: true,
+                    delay: 500
+                },
                 content: {
                     text: function() {
                         if ($(this).hasClass('enabled')) {
                             return $T("Remove from your favorites");
                         } else {
-                            return format($T('<h3>Add to your favorites</h3><p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>'), [${str(urlHandlers.UHUserDashboard().getURL()) | n,j}]);
+                            return format($T('<h3>Add to your favorites</h3><p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>'), [${url_for('users.user_dashboard') | n,j}]);
                         }
                     }
                 }

@@ -1,0 +1,131 @@
+{% macro get_attachment_icon(attachment) -%}
+    {%- if attachment.type.name == 'link' -%}
+        icon-link
+    {%- else -%}
+        {{ icon_from_mimetype(attachment.file.content_type, 'icon-file-filled') }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro render_attachment(attachment, has_label=false, classes='') %}
+    <a class="attachment {{ get_attachment_icon(attachment) }} {% if attachment.is_protected %}is-protected{% endif %} {% if has_label %}has-label{% endif %} {%- if attachment.file.is_previewable %} js-preview-dialog{% endif %} {{ classes }}"
+       data-previewable="{% if attachment.file %}{{ attachment.file.is_previewable | tojson }}{% else %}false{% endif %}"
+       data-attachment-id="{{ attachment.id }}"
+       href="{{ attachment.download_url }}" target="_blank"
+       title="{{ attachment.description or attachment.title }}
+              {%- if attachment.is_protected %} ({% trans %}Protected{% endtrans %}){% endif %}">
+        {%- if not has_label -%}
+            <span class="title">{{ attachment.title }}</span>
+        {%- endif -%}
+    </a>
+{% endmacro %}
+
+{% macro _attachment_row(attachment, management=true) %}
+    <tr>
+        <td>
+            {{ render_attachment(attachment) }}
+            {%- if attachment.is_protected %}
+                <i class="icon-lock-center custom-protection"
+                   title="{% trans %}The access to this material is restricted, regardless of the protection scheme of
+                          the parent.{% endtrans %}"></i>
+            {% endif %}
+        </td>
+        {% if management -%}
+            <td class="actions">
+                <a class="icon-edit js-dialog-action"
+                   data-href="{{ url_for('.modify_attachment', attachment) }}"
+                   data-title="
+                    {%- if attachment.type.name == 'file' -%}
+                        {% trans name=attachment.title %}Edit file &quot;{{ name }}&quot;{% endtrans %}
+                    {% else %}
+                        {% trans name=attachment.title %}Edit link &quot;{{ name }}&quot;{% endtrans %}
+                    {% endif -%}"></a>
+                <a href="#" class="icon-remove js-delete"
+                   data-method="DELETE"
+                   data-href="{{ url_for('.delete_attachment', attachment) }}"
+                   data-title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
+                   data-confirm="{% trans name=attachment.title -%}
+                       Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                       This will remove the attachment permanently.
+                       {%- endtrans %}">
+                </a>
+            </td>
+            <td class="date">{{ attachment.modified_dt|format_datetime('short') }}</td>
+        {%- endif %}
+    </tr>
+{% endmacro %}
+
+{% macro _folder_row(folder, management=true) -%}
+    <tr class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
+        <td>
+            <span>{{ folder.title }}</span>
+            {%- if folder.is_protected %}
+                <i class="icon-lock-center custom-protection"
+                   title="{% trans %}The access to this folder is restricted, regardless of the protection scheme of
+                          the parent.{% endtrans %}"></i>
+            {% endif %}
+        </td>
+        {% if management -%}
+            <td class="actions">
+                <a class="icon-edit js-dialog-action"
+                           data-href="{{ url_for('.edit_folder', folder) }}"
+                           data-title="{% trans name=folder.title %}Edit folder: {{ name }}{% endtrans %}"></a>
+                <a href="#" class="icon-remove js-delete"
+                   data-method="DELETE"
+                   data-href="{{ url_for('.delete_folder', folder) }}"
+                   data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
+                   data-confirm="{% trans name=folder.title -%}
+                       Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                       This will remove the folder and its contents permanently.
+                   {%- endtrans %}">
+                </a>
+            </td>
+            <td class="date"></td>
+        {%- endif %}
+    </tr>
+    <tr class="sub-tree">
+        <td {%- if management %} colspan="3"{% endif %}>
+            {# Div to have a smooth slide up and down of the sub-tree #}
+            <div {%- if not folder.attachments %} style="display: none;"{% endif %}>
+                <table class="tree">
+                {{- _render_tree(folder.attachments, false, management=management) -}}
+                </table>
+            </div>
+        </td>
+    </tr>
+{%- endmacro %}
+
+{% macro _render_tree(nodes, is_folder, management=true) -%}
+    {%- for sub_node in nodes -%}
+        {% if is_folder %}
+            {{ _folder_row(sub_node, management=management) }}
+        {% else %}
+            {{ _attachment_row(sub_node, management=management) }}
+        {% endif %}
+    {%- else -%}
+        <tr class="empty">
+            <td {%- if management %} colspan="3"{% endif %}> {% trans %}empty folder{% endtrans %}</td>
+        </tr>
+    {%- endfor -%}
+{%- endmacro %}
+
+{% macro render_attachments(attachments, linked_object=None, management=true) -%}
+    {%- if attachments -%}
+        <table class="tree">
+            {%- if attachments.files -%}
+                {{ _render_tree(attachments.files, false, management=management) }}
+            {%- endif -%}
+            {%- if attachments.folders -%}
+                {{ _render_tree(attachments.folders, true, management=management) }}
+            {%- endif -%}
+        </table>
+    {%- else -%}
+        <span class="empty">{% trans %}There are no materials yet.{% endtrans %}</span>
+    {%- endif -%}
+    {% if management %}
+        <div class="i-box-footer text-right js-attachment-actions">
+            <a href="#" class="i-button icon-folder-plus js-dialog-action"
+               data-href="{{ url_for('.create_folder', linked_object) }}"
+               data-title="{% trans %}Create a new folder{% endtrans %}">{% trans %}New folder{% endtrans -%}</a>
+        </div>
+    {% endif %}
+{%- endmacro %}

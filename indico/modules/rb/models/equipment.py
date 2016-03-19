@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -86,6 +86,12 @@ class EquipmentType(db.Model):
             remote_side=[id]
         )
     )
+
+    # relationship backrefs:
+    # - location (Location.equipment_types)
+    # - parent (EquipmentType.children)
+    # - reservations (Reservation.used_equipment)
+    # - rooms (Room.available_equipment)
 
     @return_ascii
     def __repr__(self):

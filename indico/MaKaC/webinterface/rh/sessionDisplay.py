@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,8 +21,8 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from indico.core.config import Config
+from indico.modules.events.api import SessionHook
 from indico.web.flask.util import send_file
-from indico.web.http_api.hooks.event import SessionHook
 from indico.web.http_api.metadata.serializer import Serializer
 
 

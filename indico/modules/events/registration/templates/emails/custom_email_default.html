@@ -1,0 +1,29 @@
+{% extends 'emails/base.html' %}
+
+{% block header_recipient -%}
+    {first_name}
+{%- endblock %}
+
+{% block body %}
+    {% block body_text %}
+        We're contacting you because you registered for the event <strong>{event_title}</strong>.<br>
+        <br><br>
+
+        You can view your registration details on this page:<br>
+        {link}
+    {% endblock %}
+
+    {% if session %}
+        <br><br>
+        Best regards<br>
+        {{ session.user.full_name }}
+    {% endif %}
+{%- endblock %}
+
+{% block footer_title %}Registration{% endblock %}
+{% block footer %}
+    {# Show default footer if sent from command line #}
+    {% if not session.user %}
+        {{ super() }}
+    {% endif %}
+{% endblock %}

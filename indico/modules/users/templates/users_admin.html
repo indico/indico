@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block title %}{% trans %}Users{% endtrans %}{% endblock %}
+
+{%- block content %}
+    <div class="i-box-group vert">
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Manage users{% endtrans -%}
+                </div>
+                <div class="i-box-buttons toolbar right">
+                    <div class="group">
+                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">Merge users</a>
+                    </div>
+                </div>
+            </div>
+            <div class="i-box-content">
+                <div class="info-message-box">
+                    <div class="message-text">{% trans num_of_users=num_of_users %}There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted{% endtrans %}</div>
+                </div>
+                <h2>{% trans %}Search users{% endtrans %}</h2>
+                {{ form_header(form) }}
+                {{ form_rows(form) }}
+                {% call form_footer(form) %}
+                    <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
+                {% endcall %}
+                {% if search_results is not none %}
+                    {% if not search_results %}
+                        <h3>{% trans %}No users could be found.{% endtrans %}</h3>
+                    {% else %}
+                        <h3>
+                            {% trans count=search_results|count -%}
+                                There is one user matching your search criteria.
+                            {% pluralize %}
+                                There are {{ count }} users matching your search criteria.
+                            {%- endtrans %}
+                        </h3>
+                        <ul class="group-list">
+                            {% for user_entry in search_results -%}
+                                <li>
+                                    <span>
+                                        {%- if user_entry.profile_url -%}
+                                            <a href="{{ user_entry.profile_url }}">{{ user_entry.full_name }}</a>
+                                        {%- else -%}
+                                            {{ user_entry.full_name }}
+                                        {%- endif -%}
+                                    </span>
+                                    <span class="right">
+                                        {{ user_entry.email }}
+                                        {% if user_entry.affiliation -%}
+                                            ({{ user_entry.affiliation }})
+                                        {%- endif -%}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{%- endblock %}

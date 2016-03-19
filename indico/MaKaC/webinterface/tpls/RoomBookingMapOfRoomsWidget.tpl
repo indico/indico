@@ -199,7 +199,7 @@ var filters = [
     },
     % if not forVideoConference:
     {
-        label: "${ _('Video conference') }",
+        label: "${ _('Videoconference') }",
         filterType: "room",
         inputType: "boolean",
         defaultValue: false,
@@ -269,9 +269,10 @@ function initializeAvailabilityFields() {
         $('#repeatability').trigger('change');
     });
 
-    $('#repeatability').on('change', function() {
-        var single_day = $(this).val() == '(0, 0)';
-        $('#end_date').prop('disabled', single_day);
+    $('#repeatability').on('change', function(e) {
+        var is_available = $('#isAvailable').prop('checked');
+        var single_day = $(this).val() == '0|0';
+        $('#end_date').prop('disabled', !is_available || single_day);
         if (single_day) {
             $('#end_date').datepicker('setDate', $('#start_date').datepicker('getDate'));
         }

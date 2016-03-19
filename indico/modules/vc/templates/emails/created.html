@@ -1,0 +1,34 @@
+{% extends 'emails/base.html' %}
+
+{% block subject -%}
+    [{{ plugin.friendly_name }}] New videoconference room created: {{ vc_room.name }}
+{%- endblock %}
+
+{% block header -%}
+<p>
+    A videoconferencing room has just been created for the event "<a href="{{ event.getURL() }}">{{ event.title }}</a>".
+</p>
+
+<p>
+    You can manage it from:
+    <br>
+    <a href="{{ url_for('.manage_vc_rooms', event, _external=true) }}">
+        {{ url_for('.manage_vc_rooms', event, _external=true) }}
+    </a>
+</p>
+<br>
+<p>
+    <strong>Room information</strong>
+    <br>
+    <ul>
+        <li><strong>Name:</strong> {{ vc_room.name }}</li>
+        {% if vc_room_event.link_type.name != 'event' -%}
+          <li><strong>Linked to:</strong> {{ linked_to_title }}</li>
+        {%- endif %}
+        {% block plugin_specific_info %}{% endblock %}
+    </ul>
+</p>
+
+{% block custom_footer %}{% endblock %}
+
+{%- endblock %}

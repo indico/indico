@@ -1,0 +1,47 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}{% trans %}Payment{% endtrans %}{% endblock %}
+
+{%- block content %}
+    {% if not plugins %}
+        <div class="warning-message-box">
+            <div class="message-text">
+                {% trans -%}
+                    There are no payment plugins installed, so the payment module cannot be enabled for any event.
+                    To install a payment plugin, install the plugin's Python package and enable it in <code>indico.conf</code>.
+                {%- endtrans %}
+            </div>
+        </div>
+    {% endif %}
+
+    {{ form_header(form) }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+    {% endcall %}
+
+    {%- if plugins %}
+        <p>{% trans %}The following payment plugins are available:{% endtrans %}</p>
+        <div class="i-badges-list left i-badges-list-hover i-payments-list">
+            {%- for plugin in plugins %}
+                <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
+                    <div class="i-badge-legend">
+                        <span class="i-badge-legend-right">{{ plugin.version }}</span>
+                    </div>
+                    <div class="i-badge-content">
+                        <span class="i-badge-img">
+                            <img src="{{ plugin.logo_url }}">
+                        </span>
+                        <span class="i-badge-title">{{ plugin.title }}</span>
+                    </div>
+                </a>
+            {%- endfor %}
+        </div>
+        <script>
+            $('.js-plugin-details').ajaxDialog({
+                title: $T('Payment plugin settings')
+            });
+        </script>
+    {%- endif %}
+{%- endblock %}

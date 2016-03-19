@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,19 +17,20 @@
 from collections import defaultdict
 from datetime import date
 
-from flask import flash, request, session
+from flask import flash, request, session, redirect
+from sqlalchemy.orm import joinedload
 
-from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.notifications.blockings import notify_request
-from indico.util.i18n import _
 from indico.core.db import db
 from indico.core.errors import IndicoError
+from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
+from indico.modules.rb.notifications.blockings import notify_request
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.views.user.blockings import (WPRoomBookingBlockingList, WPRoomBookingBlockingDetails,
                                                     WPRoomBookingBlockingsForMyRooms, WPRoomBookingBlockingForm)
 
@@ -48,10 +49,9 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
     def _process(self):
         if self._form.validate_on_submit():
             self._save()
-            self._redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
-        else:
-            return WPRoomBookingBlockingForm(self, form=self._form, errors=self._form.error_list,
-                                             blocking=self._blocking).display()
+            return redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
+        return WPRoomBookingBlockingForm(self, form=self._form, errors=self._form.error_list,
+                                         blocking=self._blocking).display()
 
     def _process_blocked_rooms(self, blocked_rooms):
         rooms_by_owner = defaultdict(list)
@@ -84,8 +84,7 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         blocking.end_date = self._form.end_date.data
         blocking.created_by_user = session.user
         blocking.reason = self._form.reason.data
-        blocking.allowed = [BlockingPrincipal(entity_type=item['_type'], entity_id=item['id'])
-                            for item in self._form.principals.data]
+        blocking.allowed = self._form.principals.data
         blocking.blocked_rooms = [BlockedRoom(room_id=room_id) for room_id in self._form.blocked_rooms.data]
         db.session.add(blocking)
         db.session.flush()  # synchronizes relationships (e.g. BlockedRoom.room)
@@ -99,7 +98,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         if self._blocking is None:
             raise IndicoError('A blocking with this ID does not exist.')
         defaults = FormDefaults(self._blocking, attrs={'reason'},
-                                principals=[p.entity.fossilize() for p in self._blocking.allowed],
+                                principals=self._blocking.allowed,
                                 blocked_rooms=[br.room_id for br in self._blocking.blocked_rooms])
         self._form = BlockingForm(obj=defaults)
         self._form._blocking = self._blocking
@@ -108,16 +107,17 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
         if not self._doProcess:  # we are not logged in
             return
-        if not self._blocking.can_be_modified(self._getUser()):
+        if not self._blocking.can_be_modified(session.user):
             raise IndicoError(_("You are not authorized to modify this blocking."))
 
     def _save(self):
         blocking = self._blocking
         blocking.reason = self._form.reason.data
-        # Just overwrite the whole list
-        blocking.allowed = [BlockingPrincipal(entity_type=item['_type'], entity_id=item['id'])
-                            for item in self._form.principals.data]
-        # Blocked rooms need some more work as we can't just overwrite them
+        # Update the ACL. We don't use `=` here to prevent SQLAlchemy
+        # from deleting and re-adding unchanged entries.
+        blocking.allowed |= self._form.principals.data
+        blocking.allowed &= self._form.principals.data
+        # Add/remove blocked rooms if necessary
         old_blocked = {br.room_id for br in blocking.blocked_rooms}
         new_blocked = set(self._form.blocked_rooms.data)
         added_blocks = new_blocked - old_blocked
@@ -136,6 +136,8 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
 
 class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:
@@ -143,13 +145,13 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._block.can_be_deleted(self._getUser()):
+        if not self._block.can_be_deleted(session.user):
             raise IndicoError('You are not authorized to delete this blocking.')
 
     def _process(self):
         db.session.delete(self._block)
         flash(_(u'Blocking deleted'), 'success')
-        self._redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
+        return redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
 
 
 class RHRoomBookingBlockingList(RHRoomBookingBase):
@@ -162,14 +164,18 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
     def _process(self):
         criteria = []
         if self.only_mine:
-            criteria += [Blocking.created_by_id == self._getUser().getId()]
+            criteria += [Blocking.created_by_user == session.user]
         if self.timeframe == 'year':
             criteria += [Blocking.start_date <= date(date.today().year, 12, 31),
                          Blocking.end_date >= date(date.today().year, 1, 1)]
         elif self.timeframe == 'recent':
             criteria += [Blocking.end_date >= date.today()]
 
-        blockings = Blocking.find(*criteria, _eager_all='blocked_rooms.room').order_by(Blocking.start_date.desc()).all()
+        blockings = (Blocking
+                     .find(*criteria)
+                     .options(joinedload('blocked_rooms').joinedload('room'))
+                     .order_by(Blocking.start_date.desc())
+                     .all())
         return WPRoomBookingBlockingList(self, blockings=blockings).display()
 
 
@@ -180,7 +186,7 @@ class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
     def _process(self):
         state = BlockedRoom.State.get(self.state)
         my_blocks = defaultdict(list)
-        for room in session.user.get_rooms():
+        for room in Room.get_owned_by(session.user):
             roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()
             if roomBlocks:
                 my_blocks[room] += roomBlocks
