@@ -261,7 +261,7 @@ class CommonObjectBase(CoreObject, Fossilizable):
 
         return list(av_set)
 
-    def getRecursiveAllowedToAccessList(self, onlyManagers=False):
+    def getRecursiveAllowedToAccessList(self):
         """Returns a set of Avatar resp. Group objects for those people resp.
         e-groups allowed to access this object as well as all parent objects.
         """
@@ -299,7 +299,7 @@ class CommonObjectBase(CoreObject, Fossilizable):
             # Add list of avatars/groups allowed to access parents objects.
             owner = self.getOwner()
             if owner is not None:
-                owner_al = owner.getRecursiveAllowedToAccessList(onlyManagers=True)
+                owner_al = owner.getRecursiveAllowedToAccessList()
                 if owner_al is not None:
                     for av in owner_al:
                         av_set.add(av)
