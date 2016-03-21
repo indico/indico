@@ -35,7 +35,7 @@
             </div>
             <textarea id="location-address-{{ field.id }}"
                       placeholder="{% trans %}Address{% endtrans %}"></textarea>
-            {% if source and source.allow_location_inheritance -%}
+            {% if field.allow_location_inheritance -%}
                 <div class="location-inheritance-field">
                     <div class="checkbox-container">
                         <input id="location-inheritance-{{ field.id }}"
@@ -60,7 +60,7 @@
             var venueInput = $('#location-venue-{{ field.id }}');
             var roomInput = $('#location-room-{{ field.id }}');
             var address = $('#location-address-{{ field.id }}');
-            var locationInheritanceAllowed = {{ (source is not none and source.allow_location_inheritance) | tojson }};
+            var locationInheritanceAllowed = {{ field.allow_location_inheritance | tojson }};
             var usingDefault = $('#location-inheritance-{{ field.id }}');
             var venues = {{ venues | tojson }};
             var venueNames = {{ venues.data | map(attribute='name') | list | tojson }};

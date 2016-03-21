@@ -138,6 +138,7 @@ class IndicoLocationField(JSONField):
     widget = LocationWidget()
 
     def __init__(self, *args, **kwargs):
+        self.allow_location_inheritance = kwargs.pop('allow_location_inheritance', True)
         self.locations = Location.query.options(joinedload('rooms')).order_by(db.func.lower(Location.name)).all()
         super(IndicoLocationField, self).__init__(*args, **kwargs)
 
