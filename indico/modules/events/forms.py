@@ -77,7 +77,7 @@ class EventReferencesForm(IndicoForm):
 
 
 class EventLocationForm(IndicoForm):
-    location_data = IndicoLocationField(_('Location'))
+    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
 
 
 class EventPersonLinkForm(IndicoForm):
