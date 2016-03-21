@@ -282,6 +282,10 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def setLang(self, lang):
         self.user.settings.set('lang', to_unicode(lang))
 
+    @property
+    def as_new(self):
+        return self.user
+
     def __eq__(self, other):
         if not isinstance(other, (AvatarUserWrapper, User)):
             return False
