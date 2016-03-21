@@ -24,7 +24,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
-from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_contribution
 from indico.modules.events.timetable.views import WPDisplayTimetable, WPManageTimetable
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
@@ -57,6 +57,19 @@ class RHManageTimetable(RHManageTimetableBase):
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
         return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
                                                  timetable_data=timetable_data, timetable_layout=self.layout)
+
+
+class RHManageTimetableGetUnscheduledContributions(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.session = None
+        if 'session_id' in request.args:
+            self.session = Session.with_parent(self.event_new).filter_by(id=request.args.get('session_id'))
+
+    def _process(self):
+        target = self.session if self.session else self.event_new
+        contributions = Contribution.query.with_parent(target).filter_by(is_scheduled=False)
+        return jsonify(contributions=[serialize_contribution(x) for x in contributions])
 
 
 class RHTimetableREST(RHManageTimetableBase):

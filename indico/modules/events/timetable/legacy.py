@@ -216,3 +216,8 @@ class TimetableSerializer(object):
             if isinstance(person_link, SessionBlockPersonLink):
                 data['fullName'] = data['name']
         return data
+
+
+def serialize_contribution(contribution):
+    return {'id': contribution.id,
+            'title': contribution.title}

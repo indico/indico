@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.timetable.controllers import RHManageTimetable, RHTimetableREST, RHTimetable
+from indico.modules.events.timetable.controllers import (RHManageTimetable, RHTimetableREST, RHTimetable,
+                                                         RHManageTimetableGetUnscheduledContributions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -27,6 +28,9 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH',))
+
+# Timetable management operations
+_bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHManageTimetableGetUnscheduledContributions)
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
