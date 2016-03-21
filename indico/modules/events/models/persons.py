@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import noload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -147,6 +148,75 @@ class EventPerson(PersonMixin, db.Model):
         """Return EventPerson for a matching User in Event creating if needed"""
         person = event.persons.filter_by(user=user).first()
         return person or cls.create_from_user(user, event)
+
+    @classmethod
+    def link_user_by_email(cls, user):
+        """
+        Links all email-based persons matching the user's
+        email addresses with the user.
+
+        :param user: A User object.
+        """
+        from indico.modules.events.models.events import Event
+        query = (cls.query
+                 .options(noload('*'))
+                 .join(EventPerson.event_new)
+                 .filter(~Event.is_deleted,
+                         cls.email.in_(user.all_emails),
+                         cls.user_id.is_(None)))
+        for event_person in query:
+            existing = (cls.query
+                        .options(noload('*'))
+                        .filter_by(user_id=user.id, event_id=event_person.event_id)
+                        .one_or_none())
+            if existing is None:
+                event_person.user = user
+            else:
+                existing.merge_person_info(event_person)
+                db.session.delete(event_person)
+        db.session.flush()
+
+    def merge_person_info(self, other):
+        from indico.modules.events.contributions.models.persons import AuthorType
+        for column_name in {'_title', 'affiliation', 'address', 'phone', 'first_name', 'last_name'}:
+            value = getattr(self, column_name) or getattr(other, column_name)
+            setattr(self, column_name, value)
+
+        def _get_author_type(src_link, dest_link):
+            if AuthorType.primary in (src_link.author_type, dest_link.author_type):
+                return AuthorType.primary
+            elif src_link.author_type == AuthorType.none:
+                return dest_link.author_type
+            else:
+                return src_link.author_type
+
+        for event_link in other.event_links:
+            existing_event_link = self.event_links.filter_by(event_id=event_link.event_id).one_or_none()
+            if existing_event_link is None:
+                event_link.person = self
+            else:
+                db.session.delete(event_link)
+
+        for contribution_link in other.contribution_links:
+            existing_contribution_link = (self.contribution_links
+                                          .filter_by(contribution_id=contribution_link.contribution_id)
+                                          .one_or_none())
+            if existing_contribution_link is None:
+                contribution_link.person = self
+            else:
+                existing_contribution_link.is_speaker |= contribution_link.is_speaker
+                existing_contribution_link.author_type = _get_author_type(existing_contribution_link, contribution_link)
+                db.session.delete(contribution_link)
+
+        for subcontribution_link in other.subcontribution_links:
+            existing_subcontribution_link = (self.subcontribution_links
+                                             .filter_by(subcontribution_id=subcontribution_link.subcontribution_id)
+                                             .one_or_none())
+            if existing_subcontribution_link is None:
+                subcontribution_link.person = self
+            else:
+                db.session.delete(subcontribution_link)
+        db.session.flush()
 
     def has_role(self, role, obj):
         """Whether the person has a role in the ACL list of a given object"""
