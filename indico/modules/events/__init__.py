@@ -83,6 +83,13 @@ def _convert_email_principals(user, **kwargs):
                        "You have been granted manager/submission privileges for {} events.", num).format(num), 'info')
 
 
+@signals.users.registered.connect
+@signals.users.email_added.connect
+def _convert_email_person_links(user, **kwargs):
+    from indico.modules.events.models.persons import EventPerson
+    EventPerson.link_user_by_email(user)
+
+
 @signals.acl.entry_changed.connect_via(Event)
 def _notify_pending(sender, obj, principal, entry, is_new, quiet, **kwargs):
     if quiet or entry is None or not is_new or principal.principal_type != PrincipalType.email:
