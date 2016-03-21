@@ -81,6 +81,7 @@
         $lists.sortable({
             connectWith: $lists,
             placeholder: 'i-label sortable-item placeholder',
+            containment: $wrapper,
             forcePlaceholderSize: true
         });
 
