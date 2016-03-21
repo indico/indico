@@ -33,11 +33,3 @@ def _merge_users(target, source, **kwargs):
 def _get_attachment_cloner(sender, **kwargs):
     from indico.modules.events.notes.clone import NoteCloner
     return NoteCloner
-
-
-@signals.event.session_deleted.connect
-@signals.event.contribution_deleted.connect
-@signals.event.subcontribution_deleted.connect
-def _delete_note(obj, **kwargs):
-    if obj.note:
-        obj.note.is_deleted = True
