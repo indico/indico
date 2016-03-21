@@ -28,9 +28,11 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
-from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm
+from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm, MeetingSessionBlockForm
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.operations import create_session, update_session, delete_session
+from indico.modules.events.sessions.operations import (create_session, update_session, delete_session,
+                                                       update_session_block)
 from indico.modules.events.sessions.util import (get_colors, generate_spreadsheet_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
@@ -39,7 +41,8 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.forms.util import get_form_field_names
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 def _get_session_list_args(event):
@@ -180,3 +183,34 @@ class RHSessionProtection(RHManageSessionBase):
         coordinators = {x.principal for x in self.session.acl_entries if x.has_management_role(role='coordinate')}
         return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
                 'acl': acl}
+
+
+class RHManageSessionBlock(RHManageSessionBase):
+    """Manage a block of a session"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.session_block
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageSessionBase._checkParams(self, params)
+        self.session_block = SessionBlock.get_one(request.view_args['block_id'])
+
+    def _process(self):
+        form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event_new)
+        if form.validate_on_submit():
+            session_data = {k[8:]: v for k, v in form.data.iteritems() if k in form.session_fields}
+            block_data = {k[6:]: v for k, v in form.data.iteritems() if k in form.block_fields}
+            update_session(self.session, session_data)
+            update_session_block(self.session_block, block_data)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/forms/session_block_form.html', form=form, block=self.session_block)
+
+    def _get_form_defaults(self):
+        fields = get_form_field_names(MeetingSessionBlockForm)
+        defaults = {}
+        defaults.update((name, getattr(self.session, name[8:])) for name in fields if name.startswith('session_'))
+        defaults.update((name, getattr(self.session_block, name[6:])) for name in fields if name.startswith('block_'))
+        return defaults

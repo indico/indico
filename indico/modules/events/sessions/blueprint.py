@@ -22,7 +22,8 @@ from indico.modules.events.sessions.controllers.management.sessions import (RHSe
                                                                             RHModifySession, RHDeleteSessions,
                                                                             RHExportSessionsCSV, RHExportSessionsExcel,
                                                                             RHExportSessionsPDF, RHSessionREST,
-                                                                            RHSessionPersonList, RHSessionProtection)
+                                                                            RHSessionPersonList, RHSessionProtection,
+                                                                            RHManageSessionBlock)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -40,6 +41,8 @@ _bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', R
 _bp.add_url_rule('/manage/sessions/person-list/', 'person_list', RHSessionPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/protection', 'session_protection', RHSessionProtection,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/<int:session_id>/blocks/<int:block_id>', 'manage_session_block',
+                 RHManageSessionBlock, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/manage/sessions/coordinator-privs/', 'coordinator_privs_rest', RHSessionCoordinatorPrivs)
 _bp.add_url_rule('/manage/sessions/coordinator-privs/<priv>', 'coordinator_privs_rest', RHSessionCoordinatorPrivs,

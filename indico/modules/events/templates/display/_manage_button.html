@@ -2,15 +2,16 @@
 
 {% macro _render_note_editor(item) -%}
     <li>
-        <a href=""
-           class="notes-editor"
+        {% if item.has_note %}
+            {% set title = _('Edit minutes') %}
+        {% else %}
+            {% set title = _('Add minutes') %}
+        {% endif %}
+        <a href="#"
            data-href="{{ url_for('event_notes.edit', item) }}"
-           data-title="{% trans %}Edit minutes{% endtrans %}">
-            {% if item.has_note -%}
-                {% trans %}Edit minutes{% endtrans %}
-            {%- else -%}
-                {% trans %}Add minutes{% endtrans %}
-            {%- endif %}
+           data-title="{{ title }}"
+           data-note-editor>
+            {{- title -}}
         </a>
     </li>
 {%- endmacro %}
@@ -60,13 +61,14 @@
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="" data-locator="{{ item.locator | tojson | forceescape }}" class="session-basic-edit">
-                        {% trans %}Edit Session (basic){% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        {% trans %}Edit Session (full){% endtrans %}
+                    <a href="#"
+                       data-href="{{ url_for('sessions.manage_session_block', item) }}"
+                       data-title="{% trans title=item.full_title %}Edit session block '{{ title }}'{% endtrans %}"
+                       data-params="{{ item.locator | tojson | forceescape }}"
+                       data-dialog-classes="session-block-form"
+                       data-ajax-dialog
+                       data-reload-after>
+                        {% trans %}Edit session block{% endtrans %}
                     </a>
                 </li>
             {% endif %}
