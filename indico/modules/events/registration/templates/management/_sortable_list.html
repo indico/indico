@@ -1,7 +1,9 @@
-{% macro sortable_items(items, actions_macro) -%}
+{% macro sortable_items(items, actions_macro, draggable) -%}
     {% for item in items %}
         <li class="i-label sortable-item" data-item-id="{{ item.id }}">
-            <div class="handle"></div>
+            {% if draggable %}
+                <div class="handle"></div>
+            {% endif %}
             <div class="actions">
                 <div class="toggle-enabled"></div>
             </div>
@@ -17,15 +19,17 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, actions_macro=none, classes="") -%}
-    <div class="js-sortable-list-widget {{ classes }}">
+{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, actions_macro=none,
+                        classes="", draggable=true) -%}
+    <div class="js-sortable-list-widget {{ classes }}"
+         {% if not draggable %}data-disable-dragging{% endif %}>
         <div class="titled-rule">{{ enabled_title }}</div>
         <ul class="enabled">
-            {{ sortable_items(enabled_items, actions_macro) }}
+            {{ sortable_items(enabled_items, actions_macro, draggable) }}
         </ul>
         <div class="titled-rule">{{ disabled_title }}</div>
         <ul class="disabled">
-            {{ sortable_items(disabled_items, actions_macro) }}
+            {{ sortable_items(disabled_items, actions_macro, draggable) }}
         </ul>
     </div>
 {%- endmacro %}
