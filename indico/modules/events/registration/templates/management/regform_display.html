@@ -44,16 +44,14 @@
         </div>
     {% endif %}
 
-    <div class="action-box">
-        <div class="section">
-            <div class="text">
-                <div class="label">
-                    {% trans %}Merge registration forms{% endtrans %}
-                </div>
+    <div class="form-group">
+        <div class="form-label">
+            <label for="merge-forms">{% trans %}Merge forms{% endtrans %}</label>
+        </div>
+        <div class="form-field">
+            {{ switch(id='merge-forms', name='merge-forms', checked=merge_forms) }}
+            <div classs="form-field-description">
                 {% trans %}Show all the registrations together, regardless of which form they came from.{% endtrans %}
-            </div>
-            <div class="toolbar right">
-                {{ switch(id='merge-forms', name='merge-forms', checked=merge_forms) }}
             </div>
         </div>
     </div>
