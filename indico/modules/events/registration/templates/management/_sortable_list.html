@@ -23,13 +23,17 @@
                         classes="", draggable=true) -%}
     <div class="js-sortable-list-widget {{ classes }}"
          {% if not draggable %}data-disable-dragging{% endif %}>
-        <div class="titled-rule">{{ enabled_title }}</div>
-        <ul class="enabled">
-            {{ sortable_items(enabled_items, actions_macro, draggable) }}
-        </ul>
-        <div class="titled-rule">{{ disabled_title }}</div>
-        <ul class="disabled">
-            {{ sortable_items(disabled_items, actions_macro, draggable) }}
-        </ul>
+        <div>
+            <div class="titled-rule">{{ enabled_title }}</div>
+            <ul class="enabled">
+                {{ sortable_items(enabled_items, actions_macro, draggable) }}
+            </ul>
+        </div>
+        <div>
+            <div class="titled-rule">{{ disabled_title }}</div>
+            <ul class="disabled">
+                {{ sortable_items(disabled_items, actions_macro, draggable) }}
+            </ul>
+        </div>
     </div>
 {%- endmacro %}

@@ -126,6 +126,12 @@ $i-box-padding: 10px;
     @extend %i-box-cancel-vertical-padding;
 }
 
+/* Use the titled-rule as the top border of the i-box. Combine with .titled on the i-box. */
+%i-box-titled-rule-header {
+    @extend %i-box-cancel-horizontal-padding;
+    margin-top: -18px; // Pure magic number to align the rule with the i-box border
+}
+
 .i-box {
     @include border-radius();
     @include box-sizing(border-box);
@@ -180,9 +186,9 @@ $i-box-padding: 10px;
         margin-bottom: 5px;
     }
 
-    > .titled-rule:first-child {
-        @extend %i-box-cancel-horizontal-padding;
-        margin-top: -18px; // Pure magic number to align the rule with the i-box border
+    > .titled-rule:first-child,
+    > *:first-child > .titled-rule:first-child, {
+        @extend %i-box-titled-rule-header;
     }
 
     /* For i-box without headers where the first child is a .titled-rule */

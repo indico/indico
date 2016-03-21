@@ -91,7 +91,7 @@
         function toggleEnabled($li) {
             var $list = $li.closest('ul');
             var targetClass = $list.hasClass('enabled') ? '.disabled' : '.enabled';
-            var $destination = $list.siblings('ul' + targetClass);
+            var $destination = $list.closest('.js-sortable-list-widget').find('ul' + targetClass);
             $li.detach().appendTo($destination);
         }
 

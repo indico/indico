@@ -603,8 +603,32 @@ td.i-table i {
     }
 }
 
-.sortable-column-preview ul li.i-label {
-    display: inline-flex;
+
+.sortable-column-preview {
+    display: flex;
+    > div {
+        flex-grow: 1;
+
+        > .titled-rule {
+            @extend %i-box-titled-rule-header;
+        }
+
+        &:first-child ul {
+            margin-right: 0;
+        }
+
+        &:nth-child(2) {
+            border-left: 1px solid $gray;
+
+            ul {
+                margin-left: 0;
+            }
+        }
+    }
+
+    ul li.i-label {
+        display: flex;
+    }
 }
 
 .sortable-form-preview ul li.i-label {
