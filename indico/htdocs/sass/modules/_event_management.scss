@@ -531,16 +531,21 @@ td.i-table i {
     margin-bottom: 10px;
 
     ul {
-        min-height: 1em;
-        list-style-type: none;
+        @extend %i-box-cancel-horizontal-padding;
         padding: 0;
-        margin: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        min-height: 2em;
+        list-style-type: none;
 
         li {
+            margin: 0px;
+            padding: 10px;
             &.i-label {
-                margin: 5px;
                 cursor: move;
                 text-align: left;
+                border-color: transparent;
+                transition: color 0s, background-color 0.4s;
 
                 > .title {
                     flex-grow: 1;
@@ -550,15 +555,44 @@ td.i-table i {
                 .toggle-enabled {
                     cursor: pointer;
                 }
-            }
-        }
-    }
 
-    ul {
+                .handle:first-child {
+                    margin-left: 0;
+                }
+            }
+
+            .actions, .handle {
+                color: lighten($i-label-color, 30%);
+                transition: color 0.4s;
+            }
+
+            &:hover {
+                &.i-label {
+                    background-color: lighten($i-label-color, 50%);
+                    transition: color 0s, background-color 0s;
+                }
+
+                .actions, .handle {
+                    color: $i-label-color;
+                    transition: color 0s;
+                }
+            }
+
+            &.placeholder {
+                border: 1px $i-label-color dashed;
+            }
+
+        }
+
         &.enabled li .toggle-enabled {
             @include icon-before('icon-eye');
         }
+
         &.disabled li {
+            &:hover {
+                @extend .i-label.striped;
+            }
+
             .toggle-enabled {
                 @include icon-before('icon-eye-blocked');
             }
@@ -566,14 +600,6 @@ td.i-table i {
                 display: none;
             }
         }
-    }
-
-    .disabled .i-label {
-        @extend .i-label.striped;
-    }
-
-    .placeholder {
-        border-style: dashed;
     }
 }
 
