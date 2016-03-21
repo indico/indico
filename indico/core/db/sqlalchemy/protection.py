@@ -354,6 +354,33 @@ class ProtectionManagersMixin(ProtectionMixin):
                                        old_data=old_data, quiet=quiet)
         return entry
 
+    def get_manager_list(self, recursive=False):
+        from MaKaC.conference import Category
+        managers = {x.principal for x in self.acl_entries if x.has_management_role()}
+        if recursive and self.protection_parent:
+            # XXX: Remove this condition check when moving Category to new models
+            if isinstance(self.protection_parent, Category):
+                managers.update(x.as_new for x in self.protection_parent.getRecursiveManagerList())
+            else:
+                managers.update(self.protection_parent.get_manager_list(recursive=True))
+        return managers
+
+    def get_access_list(self):
+        from MaKaC.conference import Category
+        read_access_list = {x.principal for x in self.acl_entries if x.read_access}
+        if self.is_self_protected:
+            return read_access_list | self.get_manager_list(recursive=True)
+        elif self.is_inheriting and self.is_protected:
+            access_list = read_access_list | self.get_manager_list()
+            if self.protection_parent:
+                # XXX: Remove this condition check when moving Category to new models
+                if isinstance(self.protection_parent, Category):
+                    access_list.update(x.as_new for x in self.protection_parent.getRecursiveAllowedToAccessList())
+                else:
+                    access_list.update(self.protection_parent.get_access_list())
+            return access_list
+        return set()
+
 
 def _get_acl_data(obj, principal):
     """Helper function to get the necessary data for ACL modifications
