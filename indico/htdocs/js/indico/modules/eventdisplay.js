@@ -44,9 +44,8 @@
             return false;
         });
 
-        var selectors = ['.notes-editor', '.notes-compile',
-                         '.contribution-edit', '.subcontribution-edit'].join(', ');
-        $(selectors).on('click', function(e) {
+        var selectors = ['.notes-compile', '.contribution-edit', '.subcontribution-edit'].join(', ');
+        $('body').on('click', selectors, function(e) {
             e.preventDefault();
             openAjaxDialog($(this));
             return false;

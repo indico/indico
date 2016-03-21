@@ -1,0 +1,16 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+
+{%- block content %}
+    {{ form_header(form) }}
+    {% call form_fieldset(_("Session properties"), collapsible=true, initially_collapsed=false) %}
+        {{ form_rows(form, fields=form.session_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_("Block properties"), collapsible=true, initially_collapsed=false) %}
+        {{ form_rows(form, fields=form.block_fields) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change>
+        <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    {% endcall %}
+{% endblock %}
