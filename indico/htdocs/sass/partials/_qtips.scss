@@ -15,20 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+%qtip-light {
+    background-color: white;
+    color: $light-black;
+
+    a {
+        color: $link;
+    }
+}
+
 .qtip-default {
     @include border-radius();
     @include border-all($black);
-    font-size: 1em;
-}
-
-.qtip-default:not(.qbubble) {
     box-shadow: 1px 0px 0px 1px rgba(0, 0, 0, 0.2);
 
     color: $light-gray;
     background-color: $black;
+    font-size: 1em;
 
     .qtip-titlebar {
-        background-color: #F0F0F0;
+        background-color: #f0f0f0;
         border-bottom: solid 1px #888;
     }
 
@@ -37,115 +43,104 @@
     }
 
     a {
-        color: $pastel-blue !important;
+        color: $pastel-blue;
     }
-}
 
-.qtip-danger {
-    border-color: $red;
-    background-color: $red !important;
-}
-
-.qtip-warning {
-    border-color: $yellow;
-    background-color: $yellow !important;
-}
-
-.qtip-popup {
-    border: solid 1px #E2E2E2;
-    color: #454545;
-    background-color: white;
-    a {
-        color: $dark-blue !important;
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0.1em 0;
+        line-height: 1.5em;
     }
-}
 
-.qtip-balloon {
-    border: solid 1px #C0C0C0;
-    background-color: #FFED92;
-    width: 120px;
-}
+    &.qtip-danger {
+        border-color: $red;
+        background-color: $red;
+    }
 
-.qtip-timezone {
-    color: $black;
-    min-width: 320px;
+    &.qtip-warning {
+        border-color: $yellow;
+        background-color: $yellow;
+    }
+
+    &.qtip-popup {
+        @extend %qtip-light;
+        border: solid 1px #e2e2e2;
+        color: #454545;
+    }
+
+    &.qtip-balloon {
+        border: solid 1px #c0c0c0;
+        background-color: #ffed92;
+        width: 120px;
+    }
+
+    &.qtip-timezone {
+        color: $black;
+        min-width: 320px;
+    }
+
+    &.add-field-qtip {
+        @extend %qtip-light;
+        @extend %font-family-title;
+        @include border-all();
+        font-size: 0.8em;
+
+        .qtip-content {
+            text-align: center;
+        }
+
+        .qtip-titlebar {
+            @include border-bottom();
+            padding: 5px 0;
+        }
+
+        .qtip-title {
+            color: $light-black;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .i-big-button {
+            margin: 2px 0;
+
+            .caption {
+                font-size: 1.1em;
+            }
+        }
+    }
+
+    &.informational {
+        @extend %qtip-light;
+        @include box-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
+        @include border-all(#add9ed);
+        background-color: #edf3fd;
+        color: $light-black;
+
+        ul {
+            list-style-type: none;
+            padding-left: 2em;
+
+            li {
+                margin: 0.3em 0 0.3em 0;
+                line-height: 1.5em;
+            }
+
+            .mono {
+                padding: 0.2em;
+                background: #fff;
+            }
+        }
+    }
 }
 
 .qtip-hidden-content {
     display: none;
 }
 
-.qtip-content h3 {
-    font-size: 1.2em;
-    margin: 0.5em 0 0 0;
-}
-
-#qtip-add-field {
-    background: $light-gray;
-}
-
-.add-field-qtip {
-    @include border-all();
-    @extend %font-family-title;
-    font-size: 0.8em;
-
-    background: white;
-
-    .qtip-content {
-        text-align: center;
-    }
-
-    .qtip-titlebar {
-        @include border-bottom();
-        padding: 5px 0;
-    }
-
-    .qtip-title {
-        color: $light-black;
-        text-align: center;
-        font-size: 1.2em;
-    }
-
-    .ui-tooltip-content {
-        padding: 0px;
-    }
-
-    .ui-tooltip-titlebar {
-        border-bottom: none !important;
-        background: transparent;
-    }
-
-    .i-big-button {
-        margin: 2px 0;
-    }
-
-    .caption {
-        font-size: 1.1em;
-    }
-}
-
-.qtip.informational {
-   @include box-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
-   @include border-all(#ADD9ED);
-   background-color: #EDF3FD;
-   color: $light-black;
-
-   ul {
-      list-style-type: none;
-      padding-left: 2em;
-
-      li {
-         margin: 0.3em 0 0.3em 0;
-         line-height: 1.5em;
-      }
-
-      .mono {
-         padding: 0.2em;
-         background: #fff;
-      }
-   }
-}
-
+/* Used in roombooking to show qtip on button only if the recurrent booking has
+ * some of its instances overlapping other bookings and the user has not
+ * clicked "I understand" yet. */
 .qtip-disabled-wrapper {
     display: inline-block;
     position: relative;
@@ -156,14 +151,5 @@
         left: 0;
         height: 100%;
         width: 100%;
-    }
-}
-
-.qtip {
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-        margin: 0.1em 0;
-        line-height: 1.5em;
     }
 }

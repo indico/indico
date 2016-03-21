@@ -15,15 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.qbubble {
+@import "partials/_qtips";
+
+.qtip-default.qbubble {
+    @extend %qtip-light;
     @include border-radius();
     @include single-box-shadow();
     @include border-all();
     color: $light-black;
 
     .qtip-content {
-        color: $light-black;
-        background: white;
         padding: 5px;
     }
 
@@ -39,9 +40,9 @@
             background-color: $light-gray;
         }
     }
-}
 
-.qbubble .titled-rule {
-    margin-bottom: 5px;
-    margin-top: 5px;
+    .titled-rule {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
 }
