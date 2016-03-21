@@ -78,11 +78,17 @@ the `domain` is that domain that has been removed.
 """)
 
 session_deleted = _signals.signal('session-deleted', """
-Called when a session slot is deleted. The *sender* is the session.
+Called when a session is deleted. The *sender* is the session.
 """)
 
 session_slot_deleted = _signals.signal('session-slot-deleted', """
 Called when a session slot is deleted. The *sender* is the session slot.
+""")
+
+session_block_deleted = _signals.signal('session-block-deleted', """
+Called when a session block is deleted. The *sender* is the session block.
+This signal is called before the ``db.session.delete()`` on the block is
+executed.
 """)
 
 timetable_buttons = _signals.signal('timetable-buttons', """

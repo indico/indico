@@ -23,8 +23,7 @@ its parent category is passed in the `parent` kwarg.
 """)
 
 contribution_deleted = _signals.signal('contribution-deleted', """
-Called when a contribution is deleted. The *sender* is the contribution, the parent
-event is passed in the `parent` kwarg.
+Called when a contribution is deleted. The *sender* is the contribution.
 """)
 
 contribution_title_changed = _signals.signal('contribution-title-changed', """
