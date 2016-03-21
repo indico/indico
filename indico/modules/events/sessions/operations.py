@@ -65,3 +65,12 @@ def delete_session(event_session):
     _delete_session_timetable_entries(event_session)
     signals.event.session_deleted.send(event_session)
     logger.info('Session %s deleted by %s', event_session, session.user)
+
+
+def update_session_block(session_block, data):
+    """Update a session block with data passed in the `data` argument"""
+    session_block.populate_from_dict(data)
+    db.session.flush()
+    session_block.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+                                'Session block "{}" has been updated'.format(session_block.title), session.user)
+    logger.info('Session block %s modified by %s', session_block, session.user)

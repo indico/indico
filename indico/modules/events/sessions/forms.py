@@ -21,6 +21,7 @@ from datetime import timedelta
 from wtforms.fields import StringField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
 from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -66,3 +67,22 @@ class SessionProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('session')
         super(SessionProtectionForm, self).__init__(*args, **kwargs)
+
+
+class MeetingSessionBlockForm(IndicoForm):
+    session_title = StringField(_('Title'), [DataRequired()], description=_('Title of the session'))
+    block_title = StringField(_('Block title'), description=_('Title of the session block'))
+    block_person_links = SessionBlockPersonLinkListField(_('Conveners'))
+    block_location_data = IndicoLocationField(_('Location'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(MeetingSessionBlockForm, self).__init__(*args, **kwargs)
+
+    @property
+    def session_fields(self):
+        return [field_name for field_name in self._fields if field_name.startswith('session_')]
+
+    @property
+    def block_fields(self):
+        return [field_name for field_name in self._fields if field_name.startswith('block_') ]
