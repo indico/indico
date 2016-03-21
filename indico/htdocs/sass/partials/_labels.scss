@@ -17,6 +17,7 @@
 
 $i-label-horizontal-padding: 10px;
 $i-label-vertical-padding: 4px;
+$i-label-color: $light-black;
 
 %label {
     @include user-select(none);
@@ -24,7 +25,7 @@ $i-label-vertical-padding: 4px;
     @include border-all($gray);
     @include box-sizing(border-box);
     display: inline-block;
-    color: $light-black !important;
+    color: $i-label-color !important;
     outline: none;
     text-align: center;
     vertical-align: middle;
