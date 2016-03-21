@@ -254,11 +254,38 @@ class TicketsForm(IndicoForm):
 
 
 class ParticipantsDisplayForm(IndicoForm):
+    """Form to customize the display of the participant list."""
     json = JSONField()
 
-    def __init__(self, *args, **kwargs):
-        super(ParticipantsDisplayForm, self).__init__(*args, **kwargs)
+    def validate_json(self, field):
+        data = field.data
+        if 'merge_forms' not in data:
+            raise ValidationError('merge_forms is missing')
+        if 'participant_list_forms' not in data:
+            raise ValidationError('participant_list_forms is missing')
+        if not isinstance(data['participant_list_forms'], list):
+            raise ValidationError('participant_list_forms is not a list')
+        if not all(isinstance(form_id, int) for form_id in data['participant_list_forms']):
+            raise ValidationError('Invalid value in participant_list_forms')
+        if 'participant_list_columns' not in data:
+            raise ValidationError('participant_list_columns is missing')
+        if not isinstance(data['participant_list_columns'], list):
+            raise ValidationError('participant_list_columns is not a list')
+        if not all(isinstance(column_name, unicode) for column_name in data['participant_list_columns']):
+            raise ValidationError('Invalid value in participant_list_columns')
+        return True
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):
+    """Form to customize the columns for a particular registration form on the participant list."""
     json = JSONField()
+
+    def validate_json(self, field):
+        data = field.data
+        if 'columns' not in data:
+            raise ValidationError('"columns" is missing')
+        if not isinstance(data['columns'], list):
+            raise ValidationError('"columns" is not a list')
+        if not all(isinstance(column_id, int) for column_id in data['columns']):
+            raise ValidationError('"columns" contains an invalid value')
+        return True
