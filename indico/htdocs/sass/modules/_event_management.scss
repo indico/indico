@@ -566,7 +566,8 @@ td.i-table i {
                 transition: color 0.4s;
             }
 
-            &:hover {
+            &:hover,
+            &.ui-sortable-helper {
                 &.i-label {
                     background-color: lighten($i-label-color, 50%);
                     transition: color 0s, background-color 0s;
@@ -589,7 +590,7 @@ td.i-table i {
         }
 
         &.disabled li {
-            &:hover {
+            &:hover:not(.ui-sortable-helper) {
                 @extend .i-label.striped;
             }
 
