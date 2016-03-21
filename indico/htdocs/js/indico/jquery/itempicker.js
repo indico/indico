@@ -36,6 +36,9 @@
 
             this.element.qbubble({
                 prerender: true,
+                show: {
+                    ready: true
+                },
                 content: {
                     text: qbubbleContent
                 },
