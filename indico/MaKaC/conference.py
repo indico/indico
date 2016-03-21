@@ -2359,7 +2359,7 @@ class Conference(CommonObjectBase, Locatable):
             for sc in c.getSubContributionList():
                 signals.event.subcontribution_deleted.send(sc, parent=c)
 
-            signals.event.contribution_deleted.send(c, parent=self)
+            # signals.event.contribution_deleted.send(c, parent=self)
 
     def delete(self, user=None):
         """deletes the conference from the system.
@@ -6866,7 +6866,7 @@ class Contribution(CommonObjectBase, Locatable):
         oldParent = self.getConference()
 
         if oldParent != None:
-            signals.event.contribution_deleted.send(self, parent=oldParent)
+            # signals.event.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
 

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
@@ -106,6 +107,7 @@ def delete_contribution(contrib):
     contrib.is_deleted = True
     contrib.timetable_entry = None
     db.session.flush()
+    signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                           'Contribution "{}" has been deleted'.format(contrib.title), session.user)
