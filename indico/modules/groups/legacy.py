@@ -88,6 +88,10 @@ class GroupWrapper(Persistent, Fossilizable):
     def exists(self):
         return self.group.group is not None
 
+    @property
+    def as_new(self):
+        return self.group
+
     def __eq__(self, other):
         if not hasattr(other, 'group') or not isinstance(other.group, GroupProxy):
             return False
