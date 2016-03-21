@@ -62,14 +62,12 @@
                 Select which registration form will have its entries published in the participant list.
             {%- endtrans %}
         </p>
-        <ul id="publish-registrations">
-            {% for form in regforms %}
-                <li>
-                    <input data-item-id="{{form.id}}" type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}></input>
-                    {{form.title}}
-                </li>
-            {% endfor %}
-        </ul>
+        <div id="publish-registrations">
+            {{ sortable_lists(_("Shown registration forms"), enabled_forms|sort(attribute='title'),
+                              _("Hidden registration forms"), disabled_forms|sort(attribute='title'),
+                              classes="i-box titled sortable-form-preview",
+                              draggable=false) }}
+        </div>
         <p>
             {% trans -%}
                 By dragging the column titles, you can choose which fields to
@@ -80,7 +78,7 @@
         </p>
         {{ sortable_lists(_("Shown columns"), enabled_columns,
                           _("Hidden columns"), disabled_columns,
-                          classes="i-box titled sortable-column-preview") }}
+                          classes="i-box titled sortable-column-preview js-participant-list-columns") }}
     </div>
 
     <div id="registration-forms">
@@ -123,7 +121,7 @@
                     merge_forms: mergeForms
                 };
                 if (mergeForms) {
-                    $form.find('#publish-registrations input:checked').each(function() {
+                    $form.find('#publish-registrations ul.enabled li').each(function() {
                         data.participant_list_forms.push($(this).data('item-id'));
                     });
                 } else {
@@ -131,7 +129,7 @@
                         data.participant_list_forms.push($(this).data('item-id'));
                     });
                 }
-                $form.find('#participant-list-columns ul.enabled li').each(function() {
+                $form.find('.js-participant-list-columns ul.enabled li').each(function() {
                     data.participant_list_columns.push($(this).data('item-id'));
                 });
                 $form.find('#json').val(JSON.stringify(data));

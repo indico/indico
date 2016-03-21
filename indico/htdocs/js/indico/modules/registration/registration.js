@@ -77,13 +77,15 @@
          */
 
         // Render the lists sortable
-        var $lists = $wrapper.find('ul');
-        $lists.sortable({
-            connectWith: $lists,
-            placeholder: 'i-label sortable-item placeholder',
-            containment: $wrapper,
-            forcePlaceholderSize: true
-        });
+        if ($wrapper.data('disable-dragging') === undefined) {
+            var $lists = $wrapper.find('ul');
+            $lists.sortable({
+                connectWith: $lists,
+                placeholder: 'i-label sortable-item placeholder',
+                containment: $wrapper,
+                forcePlaceholderSize: true
+            });
+        }
 
         // Move an item from the enabled list to the disabled one (or vice versa).
         function toggleEnabled($li) {
