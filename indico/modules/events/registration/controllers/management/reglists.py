@@ -124,12 +124,16 @@ def _get_filters_from_request(regform):
 def _filter_registration(regform, query, filters):
     if not filters['fields'] and not filters['items']:
         return query
-
     field_types = {f.id: f.field_impl for f in regform.form_items
                    if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
+    field_filters = {field_id: data_list
+                     for field_id, data_list in filters['fields'].iteritems()
+                     if field_id in field_types}
+    if not field_filters and not filters['items']:
+        return query
     criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                         field_types[field_id].create_sql_filter(data_list))
-                for field_id, data_list in filters['fields'].iteritems()]
+                for field_id, data_list in field_filters.iteritems()]
 
     items_criteria = []
     if 'checked_in' in filters['items']:
@@ -142,7 +146,7 @@ def _filter_registration(regform, query, filters):
         states = [RegistrationState(int(state)) for state in filters['items']['state']]
         items_criteria.append(Registration.state.in_(states))
 
-    if filters['fields']:
+    if field_filters:
         subquery = (RegistrationData.query
                     .with_entities(db.func.count(RegistrationData.registration_id))
                     .join(RegistrationData.field_data)
@@ -150,7 +154,7 @@ def _filter_registration(regform, query, filters):
                     .filter(db.or_(*criteria))
                     .correlate(Registration)
                     .as_scalar())
-        query = query.filter(subquery == len(filters['fields']))
+        query = query.filter(subquery == len(field_filters))
     return query.filter(db.or_(*items_criteria))
 
 
