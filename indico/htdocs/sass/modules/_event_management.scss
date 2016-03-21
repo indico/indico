@@ -564,8 +564,13 @@ td.i-table i {
         &.enabled li .toggle-enabled {
             @include icon-before('icon-eye');
         }
-        &.disabled li .toggle-enabled {
-            @include icon-before('icon-eye-blocked');
+        &.disabled li {
+            .toggle-enabled {
+                @include icon-before('icon-eye-blocked');
+            }
+            .icon-settings {
+                display: none;
+            }
         }
     }
 
