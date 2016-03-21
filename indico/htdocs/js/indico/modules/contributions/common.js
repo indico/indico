@@ -41,93 +41,111 @@
     }
 
     function setupSessionPicker(createURL, timetableRESTURL) {
-        $('#contribution-list .session-item-picker').itempicker({
-            filterPlaceholder: $T.gettext('Filter sessions'),
-            containerClasses: 'session-item-container',
-            footerElements: [{
-                title: $T.gettext('Assign new session'),
-                onClick: function(itemPicker) {
-                    ajaxDialog({
-                        title: $T.gettext('Add new session'),
-                        url: createURL,
-                        onClose: function(data) {
-                            if (data) {
-                                $('.session-item-picker').itempicker('updateItemList', data.sessions);
-                                itemPicker.itempicker('selectItem', data.new_session_id);
+        $('#contribution-list').on('click', '.session-item-picker', function() {
+            $(this).itempicker({
+                filterPlaceholder: $T.gettext('Filter sessions'),
+                containerClasses: 'session-item-container',
+                footerElements: [{
+                    title: $T.gettext('Assign new session'),
+                    onClick: function(itemPicker) {
+                        ajaxDialog({
+                            title: $T.gettext('Add new session'),
+                            url: createURL,
+                            onClose: function(data) {
+                                if (data) {
+                                    $('.session-item-picker').each(function() {
+                                        var $this = $(this);
+                                        if ($this.data('indicoItempicker')) {
+                                            $this.itempicker('updateItemList', data.sessions);
+                                        } else {
+                                            $this.data('items', data.sessions);
+                                        }
+                                    });
+                                    itemPicker.itempicker('selectItem', data.new_session_id);
+                                }
                             }
+                        });
+                    }
+                }],
+                onSelect: function(newSession, oldSession) {
+                    var $this = $(this);
+                    var styleObject = $this[0].style;
+                    var postData =  {session_id: newSession ? newSession.id : null};
+
+                    return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
+                        var label = newSession ? newSession.title : $T.gettext('No session');
+                        $this.find('.label').text(label);
+
+                        if (!newSession) {
+                            styleObject.removeProperty('color');
+                            styleObject.removeProperty('background');
+                        } else {
+                            styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
+                            styleObject.setProperty('background', '#' + newSession.colors.background, 'important');
+                        }
+
+                        if (data.unscheduled) {
+                            var row = $this.closest('tr');
+                            var startDateCol = row.find('td.start-date');
+                            var oldLabelHtml = startDateCol.children().detach();
+
+                            startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
+                            showUndoWarning(
+                                $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
+                                $T.gettext("Undo successful! Timetable entry and session have been restored."),
+                                function() {
+                                    return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
+                                        oldLabelHtml.filter('.label').text(moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                                        startDateCol.html(oldLabelHtml);
+                                        $this.itempicker('selectItem', oldSession ? oldSession.id : null);
+                                    });
+                                }
+                            );
                         }
                     });
                 }
-            }],
-            onSelect: function(newSession, oldSession) {
-                var $this = $(this);
-                var styleObject = $this[0].style;
-                var postData =  {session_id: newSession ? newSession.id : null};
-
-                return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
-                    var label = newSession ? newSession.title : $T.gettext('No session');
-                    $this.find('.label').text(label);
-
-                    if (!newSession) {
-                        styleObject.removeProperty('color');
-                        styleObject.removeProperty('background');
-                    } else {
-                        styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
-                        styleObject.setProperty('background', '#' + newSession.colors.background, 'important');
-                    }
-
-                    if (data.unscheduled) {
-                        var row = $this.closest('tr');
-                        var startDateCol = row.find('td.start-date');
-                        var oldLabelHtml = startDateCol.children().detach();
-
-                        startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
-                        showUndoWarning(
-                            $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
-                            $T.gettext("Undo successful! Timetable entry and session have been restored."),
-                            function() {
-                                return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
-                                    oldLabelHtml.filter('.label').text(moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
-                                    startDateCol.html(oldLabelHtml);
-                                    $this.itempicker('selectItem', oldSession ? oldSession.id : null);
-                                });
-                            }
-                        );
-                    }
-                });
-            }
+            });
         });
     }
 
     function setupTrackPicker(createURL) {
-        $('#contribution-list .track-item-picker').itempicker({
-            filterPlaceholder: $T.gettext('Filter tracks'),
-            containerClasses: 'track-item-container',
-            uncheckedItemIcon: '',
-            footerElements: [{
-                title: $T.gettext('Add new track'),
-                onClick: function(trackItemPicker) {
-                    ajaxDialog({
-                        title: $T.gettext('Add new track'),
-                        url: createURL,
-                        onClose: function(data) {
-                            if (data) {
-                                $('.track-item-picker').itempicker('updateItemList', data.tracks);
-                                trackItemPicker.itempicker('selectItem', data.new_track_id);
+        $('#contribution-list').on('click', '.track-item-picker', function() {
+            $(this).itempicker({
+                filterPlaceholder: $T.gettext('Filter tracks'),
+                containerClasses: 'track-item-container',
+                uncheckedItemIcon: '',
+                footerElements: [{
+                    title: $T.gettext('Add new track'),
+                    onClick: function(trackItemPicker) {
+                        ajaxDialog({
+                            title: $T.gettext('Add new track'),
+                            url: createURL,
+                            onClose: function(data) {
+                                if (data) {
+                                    $('.track-item-picker').each(function() {
+                                        var $this = $(this);
+                                        if ($this.data('indicoItempicker')) {
+                                            $this.itempicker('updateItemList', data.tracks);
+                                        } else {
+                                            $this.data('items', data.tracks);
+                                        }
+                                    });
+                                    trackItemPicker.itempicker('selectItem', data.new_track_id);
+                                }
                             }
-                        }
+                        });
+                    }
+                }],
+                onSelect: function(newTrack) {
+                    var $this = $(this);
+                    var postData = {track_id: newTrack ? newTrack.id : null};
+
+                    return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                        var label = newTrack ? newTrack.title : $T.gettext('No track');
+                        $this.find('.label').text(label);
                     });
                 }
-            }],
-            onSelect: function(newTrack) {
-                var $this = $(this);
-                var postData = {track_id: newTrack ? newTrack.id : null};
-
-                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-                    var label = newTrack ? newTrack.title : $T.gettext('No track');
-                    $this.find('.label').text(label);
-                });
-            }
+            });
         });
     }
 
@@ -186,8 +204,6 @@
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
             applySearchFilters();
-            setupSessionPicker(options.createSessionURL);
-            setupTrackPicker(options.createTrackURL);
             setupStartDateQBubbles();
             setupDurationQBubbles();
         }).on('attachments:updated', function(evt) {
