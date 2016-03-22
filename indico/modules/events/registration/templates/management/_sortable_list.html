@@ -1,6 +1,6 @@
 {% macro sortable_items(items, actions_macro, draggable) -%}
     {% for item in items %}
-        <li class="i-label sortable-item" data-item-id="{{ item.id }}">
+        <li class="i-label sortable-item{% if draggable %} draggable{% endif %}" data-item-id="{{ item.id }}">
             {% if draggable %}
                 <div class="handle"></div>
             {% endif %}
