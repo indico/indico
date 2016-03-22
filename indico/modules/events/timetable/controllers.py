@@ -23,9 +23,11 @@ from werkzeug.exceptions import BadRequest
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
-from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_contribution
+from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
+                                                        schedule_contribution)
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_contribution, serialize_entry_update
 from indico.modules.events.timetable.views import WPDisplayTimetable, WPManageTimetable
+from indico.modules.events.timetable.util import find_earliest_gap
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.webinterface.rh.base import RH
@@ -70,6 +72,26 @@ class RHManageTimetableGetUnscheduledContributions(RHManageTimetableBase):
         target = self.session if self.session else self.event_new
         contributions = Contribution.query.with_parent(target).filter_by(is_scheduled=False)
         return jsonify(contributions=[serialize_contribution(x) for x in contributions])
+
+
+class RHManageTimetableScheduleContribution(RHManageTimetableBase):
+    def _process(self):
+        data = request.json
+        required_keys = {'contribution_ids', 'day'}
+        allowed_keys = required_keys
+        if data.viewkeys() > allowed_keys:
+            raise BadRequest('Invalid keys found')
+        elif required_keys > data.viewkeys():
+            raise BadRequest('Required keys missing')
+        entries = []
+        day = dateutil.parser.parse(data['day']).date()
+        query = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(data['contribution_ids']))
+        for contribution in query:
+            start_dt = find_earliest_gap(self.event_new, day, contribution.duration)
+            # TODO: handle scheduling not-fitting contributions
+            if start_dt:
+                entries.append(schedule_contribution(contribution, start_dt=start_dt))
+        return jsonify(entries=[serialize_entry_update(x) for x in entries])
 
 
 class RHTimetableREST(RHManageTimetableBase):
