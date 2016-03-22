@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from pytz import utc
+from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -11,7 +12,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.date_time import iterdays
+from indico.util.date_time import iterdays, overlaps
 
 
 def is_visible_from(event, categ):
@@ -58,6 +59,30 @@ def _query_blocks(event_ids, dates_overlap, detail_level='session'):
                               dates_overlap(TimetableEntry))
             .options(*options)
             .join(TimetableEntry).join(Session))
+
+
+def find_earliest_gap(event, day, duration):
+    """Find the earliest datetime fitting the duration in an event timetable.
+
+    Return the start datetime for the gap, if there is one, ``None`` otherwise.
+
+    :param event: The event holding the timetable.
+    :param day: The date in which to find the gap.
+    :param duration: The minimum ``timedelta`` necessary for the gap.
+    """
+    if not (event.start_dt.date() <= day <= event.end_dt.date()):
+        raise ValueError("Day is out of bounds.")
+    entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt, Date) == day)
+    start_dt = event.start_dt
+    end_dt = start_dt + duration
+    for entry in entries:
+        if not overlaps((start_dt, end_dt), (entry.start_dt, entry.end_dt), inclusive=True):
+            break
+        start_dt = entry.end_dt
+        end_dt = start_dt + duration
+    if end_dt > event.end_dt or end_dt.date() > day:
+        return None
+    return start_dt
 
 
 def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz=utc, from_categ=None):
