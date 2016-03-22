@@ -605,13 +605,27 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.getId = function(fieldName) {
                 if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
                     if (scope.field.defaultItem && scope.field.captions) {
-                        return scope.field.captions[scope.field.defaultItem] || '';
+                        return scope.field.defaultItem;
                     } else {
                         return '';
                     }
                 } else {
                     return _.keys(scope.userdata[fieldName])[0];
                 }
+            };
+
+            scope.getChoiceValue = function(fieldName) {
+                // if we have it it userdata we already have the ``{uuid: places}`` object
+                if (scope.userdata[fieldName]) {
+                    return scope.userdata[fieldName];
+                }
+                // otherwise create one
+                var val = {};
+                var key = scope.getId(fieldName);
+                if (key) {
+                    val[scope.getId(fieldName)] = 1;
+                }
+                return val;
             };
 
             scope.getSelectedItem = function(itemId) {
