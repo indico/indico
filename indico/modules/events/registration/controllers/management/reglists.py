@@ -35,7 +35,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.forms import EmailRegistrantsForm
+from indico.modules.events.registration.forms import EmailRegistrantsForm, CreateMultipleRegistrationsForm
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.notifications import notify_registration_state_update
@@ -284,6 +284,18 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=self._get_user_data(), management=True)
+
+
+class RHRegistrationCreateMultiple(RHManageRegFormBase):
+    """Create multiple registrations for Indico users (management area)"""
+
+    def _process(self):
+        form = CreateMultipleRegistrationsForm()
+
+        if form.validate_on_submit():
+            pass
+
+        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):

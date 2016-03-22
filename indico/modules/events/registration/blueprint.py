@@ -66,6 +66,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationEmailRegistrantsPreview,
                                                                                 RHRegistrationDelete,
                                                                                 RHRegistrationCreate,
+                                                                                RHRegistrationCreateMultiple,
                                                                                 RHRegistrationsExportPDFTable,
                                                                                 RHRegistrationsExportPDFBook,
                                                                                 RHRegistrationsExportCSV,
@@ -117,6 +118,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-ur
                  'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create', 'create_registration',
                  RHRegistrationCreate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create-multiple',
+                 'create_multiple_registrations', RHRegistrationCreateMultiple, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
                  RHRegistrationDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
