@@ -141,56 +141,55 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
      }
     );
 
-type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
-     {
-         _preload: [
-             function(hook) {
-                 var self = this;
-                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-                 var source = indicoSource(
-                     self.args.get('session')?'schedule.session.getUnscheduledContributions':
-                         'schedule.event.getUnscheduledContributions',
-                     self.args);
-                 source.state.observe(function(state) {
-                     if (state == SourceState.Loaded) {
-                         killProgress();
-                         self.existing = $L(source);
-                         self._processDialogState();
-                         hook.set(true);
-                     } else if (state == SourceState.Error) {
-                         killProgress();
-                         IndicoUtil.errorReport(source.error.get());
-                     }
-                 });
-             }
-         ],
+type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
+    _preload: [
+        function(hook) {
+            var self = this;
+            var args = {'confId': self.args.get('conference')};
+            if (self.args.get('session')) {
+                args.session_id = self.args.get('session');
+            }
+            $.ajax({
+                url: build_url(Indico.Urls.Timetable.contributions.notScheduled, args),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    self.existing = $L(data.contributions);
+                    self._processDialogState();
+                    hook.set(true);
+                }
+            });
+        }
+    ],
 
-         _processDialogState: function() {
-             var self = this;
+    _processDialogState: function() {
+        var self = this;
+        if (this.existing.length.get() === 0) {
+            var dialog = createObject(AddNewContributionDialog, self.newArgs);
+            dialog.execute();
+            this.open = function() {};
+        } else {
+            this.ExclusivePopupWithButtons($T("Add Contribution"), function() {
+                self.close();
+            });
+        }
+    },
 
-             if (this.existing.length.get() === 0) {
-
-                 // draw instead the creation dialog
-                 var dialog = createObject(
-                     AddNewContributionDialog,
-                     self.newArgs);
-
-                 dialog.execute();
-
-                 this.open = function() {};
-
-                 // exit, do not draw this dialog
-                 return;
-             } else {
-
-                 this.ExclusivePopupWithButtons($T("Add Contribution"),
-                                     function() {
-                                         self.close();
-                                     });
-
-             }
-
-         },
+    addExisting: function(contributionIds, date) {
+        var self = this;
+        $.ajax({
+            url: build_url(Indico.Urls.Timetable.contributions.schedule, {'confId': self.args.get('conference')}),
+            data: JSON.stringify({'contribution_ids': contributionIds, 'day': date}),
+            method: 'POST',
+            contentType: 'application/json',
+            complete: IndicoUI.Dialogs.Util.progress(),
+            error: handleAjaxError,
+            success: function(data) {
+                self.close();
+                self.successFunc(data);
+            }
+        });
+    },
 
          existingSelectionObserver: function(selectedList) {
              if (typeof this.saveButton == 'undefined') {
@@ -201,28 +200,6 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              } else {
                  this.saveButton.disabledButtonWithTooltip('enable');
              }
-         },
-
-         addExisting: function(contribs, date) {
-             var self = this;
-             var killProgress = IndicoUI.Dialogs.Util.progress();
-
-             var args = clone(this.args);
-             args.set("ids", contribs);
-             args.set("date", date);
-
-
-             indicoRequest(self.args.get('session')?'schedule.slot.scheduleContributions':
-                           'schedule.event.scheduleContributions', args, function(result, error){
-                               killProgress();
-                               if (error) {
-                                   IndicoUtil.errorReport(error);
-                               }
-                               else {
-                                   self.close();
-                                   self.successFunc(result);
-                               }
-                           });
          },
 
          _getButtons: function() {

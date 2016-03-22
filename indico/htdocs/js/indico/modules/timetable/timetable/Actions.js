@@ -439,7 +439,7 @@ type("TimetableManagementActions", [], {
             days,
             this.timetable,
             function(result) {
-                self._addEntries(result);
+                self._addEntries(result.entries);
             },
             this.eventInfo.isCFAEnabled,
             this.eventInfo.bookedRooms,

@@ -114,6 +114,13 @@ def generate_global_file(config):
                     'toggle': url_rule_to_angular('event_registration.toggle_text'),
                     'move': url_rule_to_angular('event_registration.move_text')
                 }
+            },
+
+            'Timetable': {
+                'contributions': {
+                    'notScheduled': url_rule_to_js('timetable.not_scheduled'),
+                    'schedule': url_rule_to_js('timetable.schedule')
+                }
             }
         },
 
