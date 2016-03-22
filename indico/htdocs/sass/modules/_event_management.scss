@@ -541,8 +541,12 @@ td.i-table i {
         li {
             margin: 0px;
             padding: 10px;
-            &.i-label {
+
+            &.draggable {
                 cursor: move;
+            }
+
+            &.i-label {
                 text-align: left;
                 border-color: transparent;
                 transition: color 0s, background-color 0.4s;
