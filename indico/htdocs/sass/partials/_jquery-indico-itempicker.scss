@@ -45,8 +45,8 @@
                 padding: 5px 5px;
                 cursor: pointer;
                 font-size: 1em;
-                display: inline-block;
-                width: 100%;
+                display: flex;
+                align-items: center;
 
                 &:hover {
                     background: $pastel-gray;
@@ -61,24 +61,18 @@
                 }
 
                 .active-item-icon {
-                    display: inline-block;
-                    vertical-align: middle;
                     margin: 0 4px;
                     visibility: hidden;
                 }
 
                 .item-icon {
-                    vertical-align: middle;
                     font-size: 1.2em;
-                    display: inline-block;
                 }
 
                 .item-title {
-                    width: 80%;
+                    flex-grow: 1;
                     margin: 0 2px;
-                    display: inline-block;
                     white-space: normal;
-                    vertical-align: middle;
                     color: $black;
                 }
             }
