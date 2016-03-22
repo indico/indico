@@ -68,27 +68,28 @@ def inject_meeting_body(event, **kwargs):
     view = request.args.get('view')
 
     children_strategy = joinedload('children')
-    children_strategy.joinedload('session_block').joinedload('*')
+    children_strategy.joinedload('session_block').joinedload('person_links')
     children_strategy.joinedload('break_')
 
-    children_contrib_strategy = children_strategy.joinedload('contribution')
-    children_contrib_strategy.joinedload('*'),
+    children_contrib_strategy = children_strategy.subqueryload('contribution')
+    children_contrib_strategy.joinedload('person_links')
     children_contrib_strategy.joinedload('subcontributions')
-    children_contrib_strategy.lazyload('attachment_folders')
+    children_contrib_strategy.joinedload('references')
+    children_contrib_strategy.joinedload('own_room')
 
     children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
-    children_subcontrib_strategy.joinedload('*')
-    children_subcontrib_strategy.lazyload('attachment_folders')
+    children_subcontrib_strategy.joinedload('person_links')
+    children_subcontrib_strategy.joinedload('references')
 
     contrib_strategy = joinedload('contribution')
-    contrib_strategy.joinedload('*')
     contrib_strategy.joinedload('subcontributions')
-    contrib_strategy.lazyload('attachment_folders')
+    contrib_strategy.joinedload('person_links')
 
     # try to minimize the number of DB queries
     options = [contrib_strategy,
                children_strategy,
-               joinedload('session_block').joinedload('*'),
+               joinedload('session_block').joinedload('person_links'),
+               joinedload('session_block').joinedload('own_room'),
                joinedload('break_')]
 
     entries = []
