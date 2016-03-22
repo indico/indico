@@ -53,6 +53,13 @@ def create_timetable_entry(event, data):
     return entry
 
 
+def schedule_contribution(contribution, start_dt):
+    data = {'contribution': contribution,
+            'type': TimetableEntryType.CONTRIBUTION,
+            'start_dt': start_dt}
+    return create_timetable_entry(contribution.event_new, data)
+
+
 def update_timetable_entry(entry, data):
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
