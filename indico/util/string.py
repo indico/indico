@@ -371,6 +371,8 @@ def text_to_repr(text, html=False, max_length=50):
                        truncated.  Use ``None`` to disable.
     :return: A string that contains no linebreaks or HTML tags.
     """
+    if text is None:
+        text = u''
     if html:
         text = bleach.clean(text, tags=[], strip=True)
     text = re.sub(ur'\s+', u' ', text)
