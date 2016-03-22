@@ -1,0 +1,12 @@
+{% from 'events/display/common/_legacy.html' import render_event_time %}
+
+<div class="event-info-header">
+    <div>
+        <div class="event-title">{{ event.title }}</div>
+        {{ render_event_time(event, timezone) }}
+    </div>
+</div>
+
+<div class="week-timetable-wrapper">
+    {{ template_hook('meeting-body', event=event) }}
+</div>
