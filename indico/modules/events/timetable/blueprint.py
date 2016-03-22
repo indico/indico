@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.timetable.controllers import (RHManageTimetable, RHTimetableREST, RHTimetable,
-                                                         RHManageTimetableGetUnscheduledContributions,
-                                                         RHManageTimetableScheduleContribution)
+from indico.modules.events.timetable.controllers.display import RHTimetable
+from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableGetUnscheduledContributions,
+                                                                RHLegacyTimetableScheduleContribution)
+from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -30,9 +31,9 @@ _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH',))
 
-# Timetable management operations
-_bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHManageTimetableGetUnscheduledContributions)
-_bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHManageTimetableScheduleContribution, methods=('POST',))
+# Timetable legacy operations
+_bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
+_bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
