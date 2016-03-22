@@ -314,6 +314,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
 
     @property
+    def end_dt(self):
+        return self.timetable_entry.start_dt + self.duration if self.is_scheduled else None
+
+    @property
     def speakers(self):
         return [person_link for person_link in self.person_links if person_link.is_speaker]
 
