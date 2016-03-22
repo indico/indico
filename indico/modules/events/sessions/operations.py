@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.sessions import logger
@@ -62,4 +63,5 @@ def delete_session(event_session):
     for contribution in event_session.contributions:
         contribution.session = None
     _delete_session_timetable_entries(event_session)
+    signals.event.session_deleted.send(event_session)
     logger.info('Session %s deleted by %s', event_session, session.user)
