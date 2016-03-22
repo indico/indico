@@ -7,7 +7,8 @@
     global.eventManageVCRooms = function() {
 
         $('.js-create-room:not([data-vc-system])').ajaxDialog({
-            title: $T('Video services')
+            title: $T('Video services'),
+            hidePageHeader: true
         });
 
         $('#btn-add-existing').ajaxDialog({
