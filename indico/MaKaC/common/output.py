@@ -101,7 +101,7 @@ class outputGenerator(object):
         self.webFactory = WebFactoryRegistry()
 
     def _getRecordCollection(self, obj):
-        if obj.hasAnyProtection():
+        if obj.is_protected:
             return "INDICOSEARCH.PRIVATE"
         else:
             return "INDICOSEARCH.PUBLIC"
@@ -993,176 +993,111 @@ class outputGenerator(object):
 
         self._generateAccessList(event, out, objId=uniqueId(event))
 
-    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
+    def contribToXMLMarc21(self, contrib, includeMaterial=1, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         #try to get a cache
         version = "MARC21_mat-%s"%(includeMaterial)
         obj = None
         if not overrideCache:
-            obj = self.cache.loadObject(version, cont)
+            obj = self.cache.loadObject(version, contrib)
         if obj:
             xml = obj.getContent()
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
-            self._contribToXMLMarc21(cont,includeMaterial, out=temp)
+            self._contrib_to_marc_xml_21(contrib, includeMaterial, out=temp)
             xml = temp.getXml()
             # save XML in cache
-            self.cache.cacheObject(version, xml, cont)
+            self.cache.cacheObject(version, xml, contrib)
         out.writeXML(xml)
 
-
-    def _contribToXMLMarc21(self,cont,includeMaterial=1, out=None):
+    def _contrib_to_marc_xml_21(self, contrib, include_material=1, out=None):
         if not out:
             out = self._XMLGen
 
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield", [["tag", "035"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", "INDICO.%s" % uniqueId(cont), [["code", "a"]])
+        out.writeTag("subfield", "INDICO.%s" % uniqueId(contrib), [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "035"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", uniqueId(cont), [["code", "a"]])
+        out.writeTag("subfield", uniqueId(contrib), [["code", "a"]])
         out.writeTag("subfield", "Indico", [["code", "9"]])
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "245"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", cont.getTitle(), [["code", "a"]])
+        out.writeTag("subfield", contrib.title, [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "300"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", cont.getDuration(), [["code", "a"]])
+        out.writeTag("subfield", contrib.duration, [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "111"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", uniqueId(cont.getConference()), [["code", "g"]])
+        out.writeTag("subfield", uniqueId(contrib.event_new), [["code", "g"]])
         out.closeTag("datafield")
 
-        edate = cont.getModificationDate()
-        modifDate = datetime(edate.year, edate.month, edate.day)
-
+        # TODO: Adapt modification date once in the model
         out.openTag("datafield", [["tag", "961"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", "%d-%s-%sT" % (modifDate.year, string.zfill(modifDate.month, 2),
-                     string.zfill(modifDate.day, 2)), [["code", "c"]])
+        out.writeTag("subfield", datetime.now().strftime('%Y-%m-%dT'), [["code", "c"]])
         out.closeTag("datafield")
 
-        for path in cont.getConference().getCategoriesPath():
+        for path in contrib.event_new.as_legacy.getCategoriesPath():
             out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
             out.writeTag("subfield", ":".join(path), [["code", "a"]])
             out.closeTag("datafield")
 
-        l = cont.getLocation()
-        if (l and l.getName() != "") or cont.getStartDate() is not None:
-            out.openTag("datafield", [["tag", "518"], ["ind1", " "], ["ind2", " "]])
-            if l:
-                if l.getName() != "":
-                    out.writeTag("subfield", l.getName(), [["code", "r"]])
-            if cont.getStartDate() is not None:
-                out.writeTag("subfield", "%d-%s-%sT%s:%s:00Z" % (cont.getStartDate().year,
-                             string.zfill(cont.getStartDate().month, 2), string.zfill(cont.getStartDate().day, 2),
-                             string.zfill(cont.getStartDate().hour, 2), string.zfill(cont.getStartDate().minute, 2)),
-                             [["code", "d"]])
-                out.writeTag("subfield", "%d-%s-%sT%s:%s:00Z" % (cont.getEndDate().year,
-                             string.zfill(cont.getEndDate().month, 2), string.zfill(cont.getEndDate().day, 2),
-                             string.zfill(cont.getEndDate().hour, 2), string.zfill(cont.getEndDate().minute, 2)),
-                             [["code", "h"]])
-            out.closeTag("datafield")
+        self._generate_contrib_location_and_time(contrib, out)
 
         out.openTag("datafield", [["tag", "520"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", cont.getDescription(), [["code", "a"]])
+        out.writeTag("subfield", contrib.description, [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "611"], ["ind1", "2"], ["ind2", "4"]])
-        out.writeTag("subfield", cont.getConference().getTitle(), [["code", "a"]])
+        out.writeTag("subfield", contrib.event_new.title, [["code", "a"]])
         out.closeTag("datafield")
 
+        self._generate_references(contrib, out)
 
-        if cont.getReportNumberHolder().listReportNumbers():
-            out.openTag("datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
-            for report in cont.getReportNumberHolder().listReportNumbers():
-                out.writeTag("subfield",report[1],[["code","a"]])
-            out.closeTag("datafield")
-
-        out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
-        keywords = cont.getKeywords()
-        keywords = keywords.replace("\r\n", "\n")
-        for keyword in keywords.split("\n"):
-            out.writeTag("subfield",keyword,[["code","a"]])
+        out.openTag("datafield", [["tag", "653"], ["ind1", "1"], ["ind2", " "]])
+        for keyword in contrib.keywords:
+            out.writeTag("subfield", keyword, [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
         out.writeTag("subfield","SzGeCERN",[["code","2"]])
-        if cont.getTrack():
-            out.writeTag("subfield",cont.getTrack().getTitle(),[["code","a"]])
+        if contrib.track:
+            out.writeTag("subfield", contrib.track.title, [["code", "a"]])
         out.closeTag("datafield")
 
-        # tag 700 Speaker name
-        aList = cont.getAuthorList()
-        sList = cont.getSpeakerList()
-        list = {}
-        auth = cont.getPrimaryAuthorList()
-        if auth:
-            auth = auth[0]
-            list[auth] = ["Primary Author"]
-        for user in aList:
-            if user in list:
-                if user != auth:
-                    list[user].append("Author")
-            else:
-                list[user] = ["Author"]
+        self._generate_contrib_people(contrib=contrib, out=out)
 
-        for user in sList:
-            if user in list:
-                list[user].append("Speaker")
-            else:
-                list[user] = ["Speaker"]
+        if include_material:
+            self.materialToXMLMarc21(contrib, out=out)
 
-        if auth:
-            user = auth
-            out.openTag("datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
-            fullName = auth.getFamilyName() + " " + auth.getFirstName()
-            out.writeTag("subfield",fullName,[["code","a"]])
-            for val in list[user]:
-                out.writeTag("subfield",val,[["code","e"]])
-            out.writeTag("subfield",auth.getAffiliation(),[["code","u"]])
-            out.closeTag("datafield")
-            del list[auth]
-
-        for user in list.keys():
-            out.openTag("datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
-            fullName = user.getFamilyName() + " " + user.getFirstName()
-            out.writeTag("subfield",fullName,[["code","a"]])
-            for val in list[user]:
-                out.writeTag("subfield",val,[["code","e"]])
-            out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
-            out.closeTag("datafield")
-
-        if includeMaterial:
-            self.materialToXMLMarc21(cont, out=out)
-
-        if cont.note:
-            self.noteToXMLMarc21(cont.note, out=out)
+        if contrib.note:
+            self.noteToXMLMarc21(contrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s"%uniqueId(cont.getConference()),[["code","b"]])
+        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib.event_new)), [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        confcont = "INDICO." + uniqueId(cont)
-        out.writeTag("subfield",confcont,[["code","a"]])
+        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib)), [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", self._getRecordCollection(cont), [["code","a"]])
+        out.writeTag("subfield", self._getRecordCollection(contrib), [["code","a"]])
         out.closeTag("datafield")
 
-        self._generateLinkField(urlHandlers.UHContributionDisplay,
-                                cont, "Contribution details", out)
-        self._generateLinkField(urlHandlers.UHConferenceDisplay,
-                                cont.getConference(), "Event details", out)
+        self._generate_link_field(url_for('contributions.display_contribution', contrib.event_new, contrib=contrib,
+                                          _external=True), 'Contribution details', out)
 
-        self._generateAccessList(cont, out, objId=uniqueId(cont))
+        self._generate_link_field(url_for('event.conferenceDisplay', confId=contrib.event_new.id, _external=True),
+                                  'Event details', out)
+
+        self._generateAccessList(contrib, out, objId=uniqueId(contrib))
     ####
     #fb
 
@@ -1177,6 +1112,55 @@ class outputGenerator(object):
             out.openTag('datafield', [['tag', '088'], ['ind1', ' '], ['ind2', ' ']])
             for reference in obj.references:
                 out.writeTag('subfield', reference.value, [['code', 'a']])
+            out.closeTag('datafield')
+
+    def _generate_contrib_location_and_time(self, contrib, out):
+        if contrib.venue_name or contrib.start_dt:
+            out.openTag('datafield', [['tag', '518'], ['ind1', ' '], ['ind2', ' ']])
+            if contrib.venue_name:
+                out.writeTag('subfield', contrib.venue_name, [['code', 'r']])
+            if contrib.start_dt is not None:
+                out.writeTag('subfield', contrib.start_dt.strftime('%Y-%m-%dT%H:%M:00Z'), [['code', 'd']])
+                out.writeTag('subfield', contrib.end_dt.strftime('%Y-%m-%dT%H:%M:00Z'), [['code', 'h']])
+            out.closeTag('datafield')
+
+    def _generate_contrib_people(self, contrib, out, subcontrib=None):
+        aList = list(contrib.primary_authors | contrib.secondary_authors)
+        sList = list(subcontrib.person_links) if subcontrib else list(contrib.speakers)
+        list_ = {}
+        auth = list(contrib.primary_authors)
+        if auth:
+            auth = auth[0]
+            list_[auth] = ['Primary Author']
+        for user in aList:
+            if user in list_:
+                if user != auth:
+                    list_[user].append('Author')
+            else:
+                list_[user] = ['Author']
+
+        for user in sList:
+            if user in list_:
+                list_[user].append('Speaker')
+            else:
+                list_[user] = ['Speaker']
+
+        if auth:
+            user = auth
+            out.openTag('datafield', [['tag', '100'], ['ind1', ' '], ['ind2', ' ']])
+            out.writeTag('subfield', '{} {}'.format(auth.last_name, auth.first_name), [['code', 'a']])
+            for val in list_[user]:
+                out.writeTag('subfield', val, [['code', 'e']])
+            out.writeTag('subfield', auth.affiliation, [['code', 'u']])
+            out.closeTag('datafield')
+            del list_[auth]
+
+        for user in list_.keys():
+            out.openTag('datafield', [['tag', '700'], ['ind1', ' '], ['ind2', ' ']])
+            out.writeTag('subfield', '{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
+            for val in list_[user]:
+                out.writeTag('subfield', val, [['code', 'e']])
+            out.writeTag('subfield', user.affiliation, [['code', 'u']])
             out.closeTag('datafield')
 
     def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, overrideCache=False):

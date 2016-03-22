@@ -21,6 +21,7 @@ from datetime import datetime
 from random import randint
 
 from indico.core.config import Config
+from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date, format_time
 
 from MaKaC import errors
@@ -309,20 +310,15 @@ def getHierarchicalId(obj):
     in an hierarchical manner
     """
 
-    from MaKaC import conference
-
-    ret = obj.getId()
-    if isinstance(obj,conference.Contribution):
-        ret="%s.%s"%(obj.getConference().getId(),ret)
-    elif isinstance(obj, conference.SubContribution):
-        ret="%s.%s.%s"%(obj.getConference().getId(), obj.getContribution().getId(), ret)
-    #elif isinstance(obj, conference.DeletedObject):
-    #    ret=obj.getId().replace(':','.')
-    elif isinstance(obj, conference.Session):
-        ret="%s.s%s"%(obj.getConference().getId(), ret)
-    elif isinstance(obj, conference.SessionSlot):
-        ret="%s.s%s.%s"%(obj.getConference().getId(), obj.getSession().getId(), ret)
-    return ret
+    if isinstance(obj, db.m.Contribution):
+        return '{}.{}'.format(obj.event_new.id, obj.id)
+    elif isinstance(obj, db.m.SubContribution):
+        return '{}.{}.{}'.format(obj.event_new.id, obj.contribution.id, obj.id)
+    elif isinstance(obj, db.m.Session):
+        return '{}.s{}'.format(obj.event_new.id, obj.id)
+    elif isinstance(obj, db.m.SessionBlock):
+        return '{}.s{}.{}'.format(obj.event_new.id, obj.session.id, obj.id)
+    return obj.id
 
 def resolveHierarchicalId(objId):
     """
