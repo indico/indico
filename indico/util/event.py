@@ -40,7 +40,7 @@ def uniqueId(obj):
     elif isinstance(obj, db.m.Contribution):
         return '{}.{}'.format(obj.event_id, obj.id)
     elif isinstance(obj, db.m.SubContribution):
-        return '{}.{}.{}'.format(obj.event_new.id, obj.getContribution().getId(), obj.id)
+        return '{}.{}.{}'.format(obj.event_new.id, obj.contribution.id, obj.id)
     elif isinstance(obj, db.m.Session):
         return '{}.s{}'.format(obj.event_id, obj.id)
     elif isinstance(obj, db.m.SessionBlock):
