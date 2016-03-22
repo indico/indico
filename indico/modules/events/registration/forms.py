@@ -306,3 +306,13 @@ class RegistrationManagersForm(IndicoForm):
 
     managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify registrations'))
+
+
+class CreateMultipleRegistrationsForm(IndicoForm):
+    """Form to create multiple registrations of Indico users at the same time."""
+
+    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
+    notify_users = BooleanField(_("Send e-mail notifications"),
+                                default=True,
+                                description=_("Notify the users about the registration."),
+                                widget=SwitchWidget())

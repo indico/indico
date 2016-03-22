@@ -46,6 +46,13 @@
                             {% trans %}Indico user{% endtrans %}
                         </a>
                     </li>
+                    <li>
+                        <a href="#" class="js-add-multiple-users"
+                           data-href="{{ url_for('.create_multiple_registrations', regform) }}"
+                           data-title="{% trans %}Register multiple Indico users{% endtrans %}">
+                            {% trans %}Multiple Indico users{% endtrans %}
+                        </a>
+                    </li>
                 </ul>
                 <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
                    data-href="{{ url_for('.delete_registrations', regform) }}"

@@ -191,6 +191,17 @@
         $('.js-add-user').on('click', function() {
             principal.principalfield('choose');
         });
+
+        $('.js-add-multiple-users').ajaxDialog({
+            dialogClasses: 'add-multiple-users-dialog',
+            onClose: function(data) {
+                if (data) {
+                    $('.report-content').html(data.registration_list);
+                    handleRowSelection();
+                    setupTableSorter();
+                }
+            }
+        });
     };
 
 
