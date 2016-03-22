@@ -1,0 +1,149 @@
+{% from 'events/display/indico/_common.html' import render_users %}
+
+{% macro _render_contribution(item, count) %}
+    <a class="week-anchor"
+       href="{{ url_for('event.contributionDisplay', confId=item.event_id, contribId=item.id) }}">
+        <span class="main">
+            <span class="title">{{ item.title }}</span>
+            {% set speakers = item.person_links|selectattr("is_speaker")|list %}
+            {% if speakers %}
+                - {{ render_users(speakers, span_class="compact-speakers", separator=' ', title=false) }}
+            {% endif %}
+        </span>
+    </a>
+{% endmacro %}
+
+{% macro _render_tooltip(entry, timezone) %}
+    <div class="tooltip hidden">
+        <strong>{{ entry.title }}</strong>
+        <br>
+        {% set speakers = entry.object.person_links|selectattr("is_speaker")|list %}
+        {% if entry.type.name == 'CONTRIBUTION' and speakers %}
+             {{ render_users(speakers, span_class="compact-speakers", separator=' ', title=false) }}<br>
+        {% endif %}
+        {{ entry.start_dt | format_time(timezone=timezone) }} -
+        {{ entry.end_dt | format_time(timezone=timezone) }}
+        {% if entry.room_name %}
+            Room: {{ entry.room_name }}<br>
+        {% endif %}
+        {% if entry.object.session %}
+            Session: {{ entry.object.session.title }}<br>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% for week in week_table %}
+    <div class="clearfix week-timetable {{ 'no-weekends' if not has_weekends else '' }}">
+        <ul>
+            {% for day, day_entries in week %}
+                {% if not loop.first %}
+                    <li class="spacer"></li>
+                {% endif %}
+                <li>
+                    <div class="row day-header">
+                        {{ day | format_date(format='full', timezone=timezone) }}
+                    </div>
+                    {% set hidden_count = [] %}
+                    {% for start_time, slot_entries in day_entries.viewitems() %}
+                        {% if not slot_entries %}
+                            {% if hidden_count[-1] %}
+                                {% set __ = hidden_count.append(hidden_count[-1] - 1) %}
+                            {% else %}
+                                <div class="row placeholder" data-slot="{{ start_time }}">
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            {% for entry, count in slot_entries %}
+                                {% set session = entry.object.session %}
+                                {% set __ = hidden_count.append(count) %}
+                                {% set classes = ['row', 'contrib' if entry.type.name == 'CONTRIBUTION' else 'break'] %}
+                                {% if session %}
+                                    {% set classes = classes + ['has-session'] %}
+                                {% endif %}
+
+                                {% set has_multi = false %}
+                                {% if loop.first %}
+                                    {% set extra_styles = ['height: %dpx'|format((18 + hidden_count[-1] * 19) if hidden_count[-1] else 18)] %}
+                                    {% if slot_entries|length > 1 %}
+                                        {% set has_multi = true %}
+                                        {% set classes = classes + ['has-multi', has_multi|string] %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set classes = classes + ['js-same-time'] %}
+                                    {% set extra_styles = ['display: none'] %}
+                                {% endif %}
+                                <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}"
+                                     data-slot="{{ start_time }}">
+                                    <span class="time">
+                                        {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
+                                        {% if hide_placeholders and show_end_times %}
+                                            <span class="end-time">
+                                                {{ entry.end_dt | format_time(timezone=timezone) }}
+                                            </span>
+                                        {% endif %}
+                                    </span>
+                                    {% if entry.type.name == 'CONTRIBUTION' %}
+                                        {{ _render_contribution(entry.object) }}
+                                    {% else %}
+                                        <span class="main">
+                                            <span class="title">{{ entry.object.title }}</span>
+                                        </span>
+                                    {% endif %}
+                                    {{ _render_tooltip(entry, timezone) }}
+                                    {% if session %}
+                                        <i class="icon-circle-small session-mark" title="Session: {{ session.title }}"
+                                           data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'
+                                           style="color: #{{ session.background_color }};">
+                                       </i>
+                                    {% endif %}
+                                    {% if has_multi %}
+                                        <i class="icon-expand more-contribs"
+                                           title="There are {{ slot_entries|length - 1 }} more contributions at this time. Click this icon to show them."
+                                           data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
+                                       </i>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
+
+<script>
+    $('.more-contribs').css('cursor', 'pointer').on('click', function() {
+        var row = $(this).closest('.row');
+        var additional = row.nextUntil(':not(.js-same-time)');
+        additional.toggle();
+        $(this).toggleClass('icon-expand icon-collapse');
+        if (additional.is(':visible')) {
+            $('.more-contribs').not(this).filter(function() {
+                return !!$(this).closest('.row').next('.js-same-time:visible').length;
+            }).trigger('click');
+        }
+        var sameSlotHeight = row.height() * (additional.filter(':visible').length + 1);
+        row.closest('li').siblings('li').find('.row').filter(function() {
+            return $(this).data('slot') == row.data('slot');
+        }).height(sameSlotHeight);
+    });
+
+    $('.week-timetable .row:has(.tooltip)').qtip({
+        content: {
+            text: function() {
+                return $('.tooltip', this).html();
+            }
+        },
+        show: {
+            solo: true
+        },
+        position: {
+            my: 'center right',
+            at: 'center left'
+        },
+        style: {
+            classes: 'informational'
+        }
+    });
+</script>

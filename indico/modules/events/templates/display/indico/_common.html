@@ -52,7 +52,7 @@
     {% for link in user_list -%}
         {%- if use_span -%}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
-                {% if link.title -%}
+                {% if link.title and title -%}
                     {{ link.title }}
                 {%- endif %}
                 <span itemprop="givenName">{{ link.first_name }}</span>

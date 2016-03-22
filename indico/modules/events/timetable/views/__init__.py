@@ -26,11 +26,15 @@ from sqlalchemy.orm import joinedload
 
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.web.flask.templating import template_hook
+from indico.modules.events.timetable.views.weeks import inject_week_timetable
+from indico.web.flask.templating import template_hook, register_template_hook
 
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+
+
+register_template_hook('week-meeting-body', inject_week_timetable)
 
 
 class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
