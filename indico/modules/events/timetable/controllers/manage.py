@@ -23,25 +23,12 @@ from werkzeug.exceptions import BadRequest
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
-                                                        schedule_contribution)
-from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_contribution, serialize_entry_update
-from indico.modules.events.timetable.views import WPDisplayTimetable, WPManageTimetable
-from indico.modules.events.timetable.util import find_earliest_gap
+from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.controllers import RHManageTimetableBase
+from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
+from indico.modules.events.timetable.views import WPManageTimetable
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-
-class RHManageTimetableBase(RHConferenceModifBase):
-    """Base class for all timetable management RHs"""
-
-    CSRF_ENABLED = True
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageTimetable(RHManageTimetableBase):
@@ -59,39 +46,6 @@ class RHManageTimetable(RHManageTimetableBase):
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
         return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
                                                  timetable_data=timetable_data, timetable_layout=self.layout)
-
-
-class RHManageTimetableGetUnscheduledContributions(RHManageTimetableBase):
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.session = None
-        if 'session_id' in request.args:
-            self.session = Session.with_parent(self.event_new).filter_by(id=request.args.get('session_id'))
-
-    def _process(self):
-        target = self.session if self.session else self.event_new
-        contributions = Contribution.query.with_parent(target).filter_by(is_scheduled=False)
-        return jsonify(contributions=[serialize_contribution(x) for x in contributions])
-
-
-class RHManageTimetableScheduleContribution(RHManageTimetableBase):
-    def _process(self):
-        data = request.json
-        required_keys = {'contribution_ids', 'day'}
-        allowed_keys = required_keys
-        if data.viewkeys() > allowed_keys:
-            raise BadRequest('Invalid keys found')
-        elif required_keys > data.viewkeys():
-            raise BadRequest('Required keys missing')
-        entries = []
-        day = dateutil.parser.parse(data['day']).date()
-        query = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(data['contribution_ids']))
-        for contribution in query:
-            start_dt = find_earliest_gap(self.event_new, day, contribution.duration)
-            # TODO: handle scheduling not-fitting contributions
-            if start_dt:
-                entries.append(schedule_contribution(contribution, start_dt=start_dt))
-        return jsonify(entries=[serialize_entry_update(x) for x in entries])
 
 
 class RHTimetableREST(RHManageTimetableBase):
@@ -159,18 +113,3 @@ class RHTimetableREST(RHManageTimetableBase):
         if updates:
             update_timetable_entry(self.timetable_entry, updates)
         return jsonify()
-
-
-class RHTimetable(RHConferenceBaseDisplay):
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self.layout = request.args.get('layout')
-        if not self.layout:
-            self.layout = request.args.get('ttLyt')
-
-    def _process(self):
-        event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
-        event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
-        return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
-                                                  timetable_data=timetable_data, timetable_layout=self.layout)
