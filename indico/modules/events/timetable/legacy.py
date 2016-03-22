@@ -221,3 +221,13 @@ class TimetableSerializer(object):
 def serialize_contribution(contribution):
     return {'id': contribution.id,
             'title': contribution.title}
+
+
+def serialize_entry_update(entry):
+    serializer = TimetableSerializer(management=True)
+    tzinfo = entry.event_new.tzinfo
+    return {'id': entry.id,
+            'day': entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d'),
+            'entry': serializer.serialize_contribution_entry(entry),
+            'slotEntry': None,
+            'autoOps': None}
