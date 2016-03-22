@@ -153,6 +153,12 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def location_parent(self):
         return self.contribution
 
+    def get_access_list(self):
+        return self.contribution.get_access_list()
+
+    def get_manager_list(self, recursive=False):
+        return self.contribution.get_manager_list(recursive=recursive)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
