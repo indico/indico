@@ -76,7 +76,7 @@ def find_earliest_gap(event, day, duration):
     start_dt = event.start_dt
     end_dt = start_dt + duration
     for entry in entries:
-        if not overlaps((start_dt, end_dt), (entry.start_dt, entry.end_dt), inclusive=True):
+        if not overlaps((start_dt, end_dt), (entry.start_dt, entry.end_dt)):
             break
         start_dt = entry.end_dt
         end_dt = start_dt + duration
