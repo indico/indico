@@ -2,7 +2,8 @@
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows, form_row_static %}
 
-{% set show_management = is_manager and req and not req.state.name == 'withdrawn' %}
+{% set has_req = req and not req.state.name == 'withdrawn' %}
+{% set show_management = is_manager and has_req %}
 
 {% block title %}{% trans %}Services{% endtrans %}{% endblock %}
 {% block subtitle %}{{ definition.title }}{% endblock %}
@@ -54,19 +55,18 @@
         {%- endif -%}
     {% endblock %}
 
-
     {% if show_management %}
         {% call form_fieldset(legend=_('Request details'), description=_('These are the details provided by the event manager.')) %}
-            {% if show_management %}
-                {% call form_row_static(_('Created by')) %}
-                    <a href="mailto:{{ req.created_by_user.email }}">{{ req.created_by_user.full_name }}</a>
-                    {% if req.created_by_user.phone %}
-                        (Phone: {{ req.created_by_user.phone }})
-                    {% endif %}
-                {% endcall %}
-                {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
-            {% endif %}
             {% block form %}
+                {% if has_req %}
+                    {% call form_row_static(_('Created by')) %}
+                        <a href="mailto:{{ req.created_by_user.email }}">{{ req.created_by_user.full_name }}</a>
+                        {% if req.created_by_user.phone %}
+                            (Phone: {{ req.created_by_user.phone }})
+                        {% endif %}
+                    {% endcall %}
+                    {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
+                {% endif %}
                 {{ form_rows(form) }}
             {% endblock %}
         {% endcall %}
