@@ -1,0 +1,36 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html -%}
+    <div id="{{ field.id }}" class="i-taglist-field i-form-field-fixed-width"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var field = $('#{{ field.id }}');
+            function setButtonsType() {
+                field.find('button.close').attr('type', 'button');
+            }
+
+            new Taggle('{{ field.id }}', {
+                allowDuplicates: false,
+                preserveCase: true,
+                saveOnBlur: true,
+                hiddenInputName: {{ field.name|tojson }},
+                placeholder: $T.gettext('Add new keyword'),
+                tags: {{ (field._value() or [])|tojson }},
+                onTagRemove: function() {
+                    field.trigger('change');
+                },
+                onTagAdd: function() {
+                    field.trigger('change');
+                    setButtonsType();
+                }
+            });
+
+            setButtonsType();
+        })();
+    </script>
+{%- endblock %}
