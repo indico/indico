@@ -33,14 +33,14 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.operations import (create_session, update_session, delete_session,
                                                        update_session_block)
-from indico.modules.events.sessions.util import (get_colors, generate_spreadsheet_from_sessions,
-                                                 generate_pdf_from_sessions)
+from indico.modules.events.sessions.util import generate_spreadsheet_from_sessions, generate_pdf_from_sessions
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.colors import get_colors
 from indico.web.forms.util import get_form_field_names
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 

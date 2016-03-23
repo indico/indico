@@ -22,9 +22,9 @@ from wtforms.fields import StringField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
-from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (IndicoPalettePickerField, TimeDeltaField, IndicoLocationField, PrincipalListField,
                                      IndicoProtectionField)
 from indico.web.forms.widgets import SwitchWidget
