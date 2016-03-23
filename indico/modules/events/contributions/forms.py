@@ -27,7 +27,7 @@ from indico.modules.events.contributions.models.references import ContributionRe
 from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
-                                     IndicoDateTimeField)
+                                     IndicoDateTimeField, IndicoTagListField)
 from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
 from indico.util.i18n import _
 
@@ -46,6 +46,7 @@ class ContributionForm(IndicoForm):
     person_link_data = ContributionPersonLinkListField(_("People"), allow_authors=True)
     location_data = IndicoLocationField(_("Location"),
                                         description=_("The physical location where the contribution takes place."))
+    keywords = IndicoTagListField(_('Keywords'))
     references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
                                  description=_("Manage external resources for this contribution"))
 
