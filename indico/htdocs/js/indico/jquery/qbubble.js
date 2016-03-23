@@ -19,6 +19,7 @@
     $.widget('indico.qbubble', {
         defaultQtipOptions: {
             overwrite: true,
+            suppress: false,
             position: {
                 my: 'top center',
                 at: 'bottom center',
