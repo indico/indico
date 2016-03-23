@@ -1,0 +1,116 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.i-taglist-field {
+    @include border-radius();
+    @include border-all();
+
+    height: auto;
+    min-height: 50px;
+    cursor: text;
+    padding: 5px;
+    position: relative;
+    background: #fff;
+    float: left;
+
+    ul.taggle_list {
+        padding: 0;
+        margin: 0;
+        float: left;
+        width: 100%;
+        list-style-type: none;
+
+        li {
+            float: left;
+            display: inline-block;
+            white-space: nowrap;
+            font-weight: 500;
+            margin-bottom: 5px;
+
+            &.taggle {
+                margin-right: 8px;
+                background: $pastel-blue;
+                padding: 5px 10px;
+                border-radius: 3px;
+                position: relative;
+                cursor: pointer;
+                transition: all .3s;
+
+                &:hover {
+                    padding: 5px 15px 5px 5px;
+                    transition: all .3s;
+
+                    > .close {
+                        display: block;
+                    }
+                }
+
+                .close {
+                    height: 10px;
+                    font-size: 1.1rem;
+                    position: absolute;
+                    top: 10px;
+                    right: 0;
+                    text-decoration: none;
+                    padding-left: 2px;
+                    line-height: 0.5;
+                    color: #ccc;
+                    color: rgba(0, 0, 0, 0.2);
+                    padding-bottom: 4px;
+                    display: none;
+                    border: 0;
+                    background: none;
+                    cursor: pointer;
+                }
+
+                .taggle_text {
+                    padding: 5px;
+                }
+            }
+
+            .taggle_input {
+                border: none;
+                outline: none;
+                background: none;
+                float: left;
+                width: 10px;
+                max-width: 100%;
+                margin-top: -5px;
+                padding: 8px 8px 8px 0 !important;
+                font-weight: 300;
+            }
+        }
+
+    }
+
+    .taggle_placeholder {
+        top: 12px;
+        left: 8px;
+        color: #ccc;
+        position: absolute;
+        transition: opacity, .25s;
+    }
+
+    .taggle_sizer {
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: -500px;
+        z-index: -1;
+        visibility: hidden;
+    }
+}
