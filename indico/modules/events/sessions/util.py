@@ -26,38 +26,12 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle
 from sqlalchemy.orm import joinedload, load_only, contains_eager, noload
 
-from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.i18n import _
 from indico.util.user import iter_acl
 from MaKaC.PDFinterface.base import PDFBase, Paragraph
-
-
-def get_colors():
-    return [
-        ColorTuple('#1D041F', '#EEE0EF'),
-        ColorTuple('#253F08', '#E3F2D3'),
-        ColorTuple('#1F1F02', '#FEFFBF'),
-        ColorTuple('#202020', '#DFE555'),
-        ColorTuple('#1F1D04', '#FFEC1F'),
-        ColorTuple('#0F264F', '#DFEBFF'),
-        ColorTuple('#EFF5FF', '#0D316F'),
-        ColorTuple('#F1FFEF', '#1A3F14'),
-        ColorTuple('#FFFFFF', '#5F171A'),
-        ColorTuple('#272F09', '#D9DFC3'),
-        ColorTuple('#FFEFFF', '#4F144E'),
-        ColorTuple('#FFEDDF', '#6F390D'),
-        ColorTuple('#021F03', '#8EC473'),
-        ColorTuple('#03070F', '#92B6DB'),
-        ColorTuple('#151515', '#DFDFDF'),
-        ColorTuple('#1F1100', '#ECC495'),
-        ColorTuple('#0F0202', '#B9CBCA'),
-        ColorTuple('#0D1E1F', '#C2ECEF'),
-        ColorTuple('#000000', '#D0C296'),
-        ColorTuple('#202020', '#EFEBC2')
-    ]
 
 
 def can_manage_sessions(user, event, role=None):
