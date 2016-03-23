@@ -19,6 +19,24 @@
     'use strict';
 
     global.setupEventDisplay = function setupEventDisplay() {
+        function openAjaxDialog($element) {
+            ajaxDialog({
+                title: $element.data('title'),
+                url: $element.data('href'),
+                confirmCloseUnsaved: true,
+                onClose: function(data, customData) {
+                    if (data || customData) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+
+        $(document).on('click', '[data-note-editor]', function(evt) {
+            evt.preventDefault();
+            openAjaxDialog($(this));
+        });
+
         $('.js-go-to-day').dropdown({
             always_listen: true
         }).find('li a').on('menu_select', function() {
@@ -30,17 +48,7 @@
                          '.contribution-edit', '.subcontribution-edit'].join(', ');
         $(selectors).on('click', function(e) {
             e.preventDefault();
-            var $this = $(this);
-            ajaxDialog({
-                title: $this.data('title'),
-                url: $this.data('href'),
-                confirmCloseUnsaved: true,
-                onClose: function(data, customData) {
-                    if (data || customData) {
-                        location.reload();
-                    }
-                }
-            });
+            openAjaxDialog($(this));
             return false;
         });
 
