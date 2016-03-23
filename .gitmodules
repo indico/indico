@@ -62,3 +62,6 @@
 [submodule "ext_modules/clipboard.js"]
 	path = ext_modules/clipboard.js
 	url = https://github.com/zenorocha/clipboard.js.git
+[submodule "ext_modules/taggle.js"]
+	path = ext_modules/taggle.js
+	url = https://github.com/okcoker/taggle.js.git
