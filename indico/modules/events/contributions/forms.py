@@ -22,7 +22,8 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.modules.events.contributions.fields import ContributionPersonLinkListField, SubContributionPersonLinkListField
+from indico.modules.events.contributions.fields import (ContributionPersonLinkListField,
+                                                        SubContributionPersonLinkListField)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
