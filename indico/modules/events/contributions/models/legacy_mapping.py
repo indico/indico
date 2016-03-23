@@ -44,7 +44,8 @@ class LegacyContributionMapping(db.Model):
     contribution_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contributions.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     event_new = db.relationship(
@@ -100,7 +101,8 @@ class LegacySubContributionMapping(db.Model):
     subcontribution_id = db.Column(
         db.Integer,
         db.ForeignKey('events.subcontributions.id', name='fk_legacy_subcontribution_id_map_subcontribution'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     event_new = db.relationship(

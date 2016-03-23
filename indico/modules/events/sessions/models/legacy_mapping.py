@@ -44,7 +44,8 @@ class LegacySessionMapping(db.Model):
     session_id = db.Column(
         db.Integer,
         db.ForeignKey('events.sessions.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     event_new = db.relationship(
@@ -98,7 +99,8 @@ class LegacySessionBlockMapping(db.Model):
     session_block_id = db.Column(
         db.Integer,
         db.ForeignKey('events.session_blocks.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     event_new = db.relationship(

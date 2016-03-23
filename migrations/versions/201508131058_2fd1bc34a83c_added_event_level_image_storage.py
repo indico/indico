@@ -31,7 +31,7 @@ def upgrade():
     op.create_table('legacy_image_id_map',
                     sa.Column('event_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
                     sa.Column('legacy_image_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
-                    sa.Column('image_id', sa.Integer(), nullable=False),
+                    sa.Column('image_id', sa.Integer(), nullable=False, index=True),
                     sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
                     sa.ForeignKeyConstraint(['image_id'], ['events.image_files.id']),
                     sa.PrimaryKeyConstraint('event_id', 'legacy_image_id'),
