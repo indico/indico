@@ -46,7 +46,8 @@ class LegacyImageMapping(db.Model):
     image_id = db.Column(
         db.Integer,
         db.ForeignKey('events.image_files.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     image = db.relationship(
@@ -91,7 +92,8 @@ class LegacyPageMapping(db.Model):
     page_id = db.Column(
         db.Integer,
         db.ForeignKey('events.pages.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     page = db.relationship(
