@@ -256,6 +256,8 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                        'css/lib/selectize.js/selectize.default.css',
                        filters='cssmin', output='css/selectize_css_%(version)s.min.css')
 
+taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
+
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -385,7 +387,7 @@ abstracts_js = rjs_bundle(
                'Markdown.Sanitizer.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common, clipboard_js)
+                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js)
 
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
@@ -481,6 +483,7 @@ def register_all_js(env):
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
     env.register('chartist_js', chartist_js)
+    env.register('taggle_js', taggle_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)

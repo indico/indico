@@ -429,6 +429,13 @@ def install_moment_js():
         local('cp locale/es.js {0}/locale/'.format(dest_dir))
 
 
+@recipe('taggle.js')
+def install_tagging_js():
+    with lcd(os.path.join(env.ext_dir, 'taggle.js')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {0}'.format(dest_js_dir))
+        local('cp src/taggle.js {0}'.format(dest_js_dir))
+
 # Tasks
 
 @task
