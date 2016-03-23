@@ -818,3 +818,7 @@ class IndicoProtectionField(IndicoEnumRadioField):
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
                              parent_type=parent_type, non_inheriting_objects=non_inheriting_objects)
         return Markup(rv)
+
+
+class IndicoTagListField(HiddenFieldList):
+    widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
