@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-import random
-
 from flask import request, jsonify
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
@@ -35,7 +33,7 @@ from indico.modules.events.sessions.operations import (create_session, update_se
                                                        update_session_block)
 from indico.modules.events.sessions.util import generate_spreadsheet_from_sessions, generate_pdf_from_sessions
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.events.util import update_object_principals
+from indico.modules.events.util import get_random_color, update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -70,15 +68,10 @@ class RHSessionsList(RHManageSessionsBase):
 class RHCreateSession(RHManageSessionsBase):
     """Create a session in the event"""
 
-    def _get_random_color(self):
-        used_colors = {s.colors for s in self.event_new.sessions}
-        unused_colors = set(get_colors()) - used_colors
-        return random.choice(tuple(unused_colors) or get_colors())
-
     def _process(self):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
-        form = SessionForm(obj=FormDefaults(colors=self._get_random_color(), location_data=inherited_location),
+        form = SessionForm(obj=FormDefaults(colors=get_random_color(self.event_new), location_data=inherited_location),
                            event=self.event_new)
         if form.validate_on_submit():
             new_session = create_session(self.event_new, form.data)

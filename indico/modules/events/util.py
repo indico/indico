@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import random
 from copy import deepcopy
 
 from flask import session, request, g
@@ -31,6 +32,8 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.timetable.models.breaks import Break
+from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
@@ -134,6 +137,13 @@ def get_events_with_linked_event_persons(user, from_dt=None, to_dt=None):
              .filter(EventPerson.event_links.any())
              .filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
     return {ep.event_id for ep in query}
+
+
+def get_random_color(event):
+    breaks = Break.query.filter(Break.timetable_entry.has(event_new=event))
+    used_colors = {s.colors for s in event.sessions} | {b.colors for b in breaks}
+    unused_colors = set(get_colors()) - used_colors
+    return random.choice(tuple(unused_colors) or get_colors())
 
 
 def notify_pending(acl_entry):
