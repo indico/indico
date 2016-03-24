@@ -1839,9 +1839,7 @@ class Conference(CommonObjectBase, Locatable):
 
     @property
     def all_manager_emails(self):
-        """Returns the emails of all managers"""
-        # We ignore email principals here. They never signed up in indico anyway...
-        return {p.principal.email for p in self.as_event.acl_entries if p.type == PrincipalType.user}
+        return self.as_event.all_manager_emails
 
     @property
     @memoize_request
