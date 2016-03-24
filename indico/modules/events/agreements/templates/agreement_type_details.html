@@ -255,7 +255,9 @@
                                 {% if agreement.accepted %}
                                     <i class="icon-checkmark"></i>
                                 {% else %}
-                                    <i class="icon-disable"></i>
+                                    <i class="icon-disable"
+                                       {% if agreement.reason %}title="{% trans reason=agreement.reason %}Rejection reason: {{ reason }}{% endtrans %}"{% endif %}
+                                    ></i>
                                 {% endif %}
                             </td>
                             <td class="person-name">
