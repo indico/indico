@@ -210,6 +210,7 @@ class RH(RequestHandlerBase):
     }
 
     def __init__(self):
+        self.commit = True
         self._responseUtil = ResponseUtil()
         self._requestStarted = False
         self._aw = AccessWrapper()  # Fill in the aw instance with the current information
@@ -690,7 +691,10 @@ class RH(RequestHandlerBase):
                         signals.after_process.send()
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
                             raise ConflictError
-                        transaction.commit()
+                        if self.commit:
+                            transaction.commit()
+                        else:
+                            transaction.abort()
                         DBMgr.getInstance().endRequest(commit=False)
                         break
                     except (ConflictError, POSKeyError):
