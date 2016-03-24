@@ -203,13 +203,14 @@
 
         function ajaxifyForms() {
             var killProgress = null;
+            popup.contentContainer.on('click', options.backSelector, function(e) {
+                e.preventDefault();
+                closeDialog();
+            });
             var forms = popup.contentContainer.find('form');
             showFormErrors(popup.resultContainer);
             initForms(forms);
-            forms.on('click', options.backSelector, function(e) {
-                e.preventDefault();
-                closeDialog();
-            }).each(function() {
+            forms.each(function() {
                 var $this = $(this);
                 $this.on('ajaxDialog:beforeSubmit', function() {
                     killProgress = IndicoUI.Dialogs.Util.progress();
