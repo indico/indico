@@ -80,7 +80,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     def _process(self):
         form = AgreementForm()
         if form.validate_on_submit() and self.agreement.pending:
-            reason = form.reason.data if form.agreed.data else None
+            reason = form.reason.data if not form.agreed.data else None
             func = self.agreement.accept if form.agreed.data else self.agreement.reject
             func(from_ip=request.remote_addr, reason=reason)
             if self.agreement.definition.event_settings.get(self._conf, 'manager_notifications_enabled'):

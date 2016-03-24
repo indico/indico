@@ -17,6 +17,7 @@ Name:  {{ agreement.person_name }}
 Email: {{ agreement.person_email }}
 
 {%- if agreement.reason %}
+
 {% filter underline %}Reason{% endfilter %}
 {{ agreement.reason }}
 {%- endif %}
