@@ -67,7 +67,7 @@
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
             var dialog = $this.data('ajax-dialog') !== undefined;
-            var reload = $this.data('reload-after') !== undefined;
+            var reload = $this.data('reload-after');
             if (!$.isPlainObject(params)) {
                 throw new Error('Invalid params. Must be valid JSON if set.');
             }
@@ -120,14 +120,16 @@
                         data: params,
                         title: $this.data('title'),
                         dialogClasses: $this.data('dialog-classes'),
-                        onClose: function(data) {
+                        onClose: function(data, customData) {
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
                                     handleHtmlUpdate(data, update, $this);
-                                } else if (reload) {
+                                } else if (reload !== undefined && reload !== 'customData') {
                                     location.reload();
                                 }
+                            } else if (reload === 'customData' && customData) {
+                                location.reload();
                             }
                         }
                     });
