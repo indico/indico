@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import noload, contains_eager, load_only
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -30,6 +31,8 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
+from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -151,6 +154,42 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     def session(self):
         """Convenience property so all event entities have it"""
         return self
+
+    @property
+    @memoize_request
+    def conveners(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
+
+        return (SessionBlockPersonLink.query
+                .join(SessionBlock)
+                .filter(SessionBlock.session_id == self.id)
+                .distinct(SessionBlockPersonLink.person_id)
+                .all())
+
+    @property
+    def start_dt(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        start_dt = (self.event_new.timetable_entries
+                    .with_entities(TimetableEntry.start_dt)
+                    .join('session_block')
+                    .filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK, SessionBlock.session == self)
+                    .first())
+        if start_dt:
+            return start_dt[0]
+
+    @property
+    def end_dt(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        block = (SessionBlock.query.with_parent(self)
+                 .join(TimetableEntry)
+                 .options(noload('*'))
+                 .options(load_only('id'))
+                 .options(contains_eager('timetable_entry').load_only('start_dt'))
+                 .order_by((TimetableEntry.start_dt + SessionBlock.duration).desc())
+                 .first())
+        if block:
+            return block.timetable_entry.end_dt
 
     @locator_property
     def locator(self):
