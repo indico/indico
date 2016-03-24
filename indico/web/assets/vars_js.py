@@ -117,6 +117,9 @@ def generate_global_file(config):
             },
 
             'Timetable': {
+                'breaks': {
+                    'add': url_rule_to_js('timetable.add_break')
+                },
                 'contributions': {
                     'notScheduled': url_rule_to_js('timetable.not_scheduled'),
                     'schedule': url_rule_to_js('timetable.schedule')

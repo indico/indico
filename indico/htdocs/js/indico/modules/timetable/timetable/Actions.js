@@ -501,27 +501,22 @@ type("TimetableManagementActions", [], {
     },
     addBreak: function() {
         var self = this;
-
         var params;
-
-        var days = this.timetable.getDays();
-
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
         } else {
             params = this._addParams('Break');
         }
-
-        var dialog = new AddBreakDialog(
-            this,
-            $O(params),
-            $O(params.roomInfo),
-            false,
-            days,
-            this.eventInfo.favoriteRooms,
-            this.eventInfo.bookedRooms);
-
-        dialog.execute();
+        ajaxDialog({
+            trigger: this,
+            url: build_url(Indico.Urls.Timetable.breaks.add, {'confId': params.conference, 'day': params.selectedDay}),
+            title: $T.gettext("Add break"),
+            onClose: function(data) {
+                if (data) {
+                    self.timetable._updateEntry(data.entry);
+                }
+            }
+        });
     },
 
     editBreak: function(eventData) {
