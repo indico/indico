@@ -24,6 +24,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 class SessionBlockPersonLinkListField(PersonLinkListFieldBase):
     person_link_cls = SessionBlockPersonLink
+    linked_object_attr = 'session_block'
     widget = JinjaWidget('events/sessions/forms/session_person_link_widget.html')
 
     def _serialize_person_link(self, principal, extra_data=None):

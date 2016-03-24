@@ -63,4 +63,5 @@ class RHManageEventPersonLinks(RHConferenceModifBase):
             update_event(self.event_new, form.data)
             tpl = get_template_module('events/management/_event_person_links.html')
             return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
+        self.commit = False
         return jsonify_form(form)

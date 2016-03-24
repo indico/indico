@@ -94,6 +94,7 @@ class SubContributionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.subcontrib = kwargs.pop('subcontrib', None)
         super(SubContributionForm, self).__init__(*args, **kwargs)
 
 

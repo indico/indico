@@ -172,6 +172,7 @@ class RHEditContribution(RHManageContributionBase):
             if tpl_components['hide_contrib']:
                 self.reporter.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
+        self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 
@@ -286,11 +287,12 @@ class RHEditSubContribution(RHManageSubContributionBase):
     """Edit the subcontribution"""
 
     def _process(self):
-        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event_new)
+        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event_new, subcontrib=self.subcontrib)
         if form.validate_on_submit():
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
+        self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 

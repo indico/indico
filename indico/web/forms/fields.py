@@ -22,6 +22,7 @@ from operator import attrgetter
 
 from flask import render_template
 from markupsafe import escape, Markup
+from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -395,8 +396,14 @@ class PersonLinkListFieldBase(EventPersonListField):
 
     #: class that inherits from `PersonLinkBase`
     person_link_cls = None
+    #: name of the attribute on the form containing the linked object
+    linked_object_attr = None
 
     widget = None
+
+    def __init__(self, *args, **kwargs):
+        super(PersonLinkListFieldBase, self).__init__(*args, **kwargs)
+        self.object = getattr(kwargs['_form'], self.linked_object_attr)
 
     @no_autoflush
     def _get_person_link(self, data, extra_data=None):
@@ -407,7 +414,13 @@ class PersonLinkListFieldBase(EventPersonListField):
                        'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
                        'phone': data.get('phone', '')}
         person_data.update(extra_data)
-        return self.person_link_cls(person=person, **person_data)
+        person_link = None
+        if self.object and inspect(person).persistent:
+            person_link = self.person_link_cls.find_first(person=person, object=self.object)
+        if not person_link:
+            person_link = self.person_link_cls(person=person)
+        person_link.populate_from_dict(person_data)
+        return person_link
 
     def _serialize_principal(self, principal):
         if not isinstance(principal, PersonLinkBase):

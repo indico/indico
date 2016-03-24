@@ -77,6 +77,7 @@ class MeetingSessionBlockForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.session_block = kwargs.pop('session_block', None)
         super(MeetingSessionBlockForm, self).__init__(*args, **kwargs)
 
     @property
@@ -85,4 +86,4 @@ class MeetingSessionBlockForm(IndicoForm):
 
     @property
     def block_fields(self):
-        return [field_name for field_name in self._fields if field_name.startswith('block_') ]
+        return [field_name for field_name in self._fields if field_name.startswith('block_')]
