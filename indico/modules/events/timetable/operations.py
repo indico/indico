@@ -22,6 +22,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.timetable import logger
+from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 
 from indico.util.date_time import format_datetime
@@ -40,6 +41,14 @@ def _get_object_info(entry):
     else:
         raise ValueError('No object associated with timetable entry')
     return object_type, object_title
+
+
+def create_break_entry(event, data):
+    break_ = Break()
+    entry_data = {'object': break_,
+                  'start_dt': data.pop('start_dt')}
+    break_.populate_from_dict(data)
+    return create_timetable_entry(event, entry_data)
 
 
 def create_timetable_entry(event, data):
