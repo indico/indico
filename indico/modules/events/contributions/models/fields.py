@@ -44,6 +44,10 @@ class ContributionField(db.Model):
         index=True,
         nullable=False
     )
+    legacy_id = db.Column(
+        db.String,
+        nullable=True
+    )
     position = db.Column(
         db.Integer,
         nullable=False,
