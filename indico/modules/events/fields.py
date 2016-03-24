@@ -71,6 +71,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     """A field to manage event's chairpersons"""
 
     person_link_cls = EventPersonLink
+    linked_object_attr = 'event'
     widget = JinjaWidget('events/forms/event_person_link_widget.html')
 
     def __init__(self, *args, **kwargs):

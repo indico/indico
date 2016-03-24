@@ -29,6 +29,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
     """A field to configure a list of contribution persons"""
 
     person_link_cls = ContributionPersonLink
+    linked_object_attr = 'contrib'
     widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')
 
     def __init__(self, *args, **kwargs):
@@ -75,4 +76,5 @@ class SubContributionPersonLinkListField(ContributionPersonLinkListField):
     """A field to configure a list of subcontribution persons"""
 
     person_link_cls = SubContributionPersonLink
+    linked_object_attr = 'subcontrib'
     widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')

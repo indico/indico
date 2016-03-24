@@ -199,13 +199,15 @@ class RHManageSessionBlock(RHManageSessionBase):
         self.session_block = SessionBlock.get_one(request.view_args['block_id'])
 
     def _process(self):
-        form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event_new)
+        form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event_new,
+                                       session_block=self.session_block)
         if form.validate_on_submit():
             session_data = {k[8:]: v for k, v in form.data.iteritems() if k in form.session_fields}
             block_data = {k[6:]: v for k, v in form.data.iteritems() if k in form.block_fields}
             update_session(self.session, session_data)
             update_session_block(self.session_block, block_data)
             return jsonify_data(flash=False)
+        self.commit = False
         return jsonify_template('events/forms/session_block_form.html', form=form, block=self.session_block)
 
     def _get_form_defaults(self):

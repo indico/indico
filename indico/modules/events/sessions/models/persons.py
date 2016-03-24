@@ -31,6 +31,7 @@ class SessionBlockPersonLink(PersonLinkBase):
     __auto_table_args = {'schema': 'events'}
     person_link_backref_name = 'session_block_links'
     person_link_unique_columns = ('session_block_id',)
+    object_relationship_name = 'session_block'
 
     session_block_id = db.Column(
         db.Integer,

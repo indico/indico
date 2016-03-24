@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -159,6 +160,8 @@ class PersonLinkBase(PersonMixin, db.Model):
     person_link_backref_name = None
     #: The columns which should be included in the unique constraint.
     person_link_unique_columns = None
+    #: The name of the relationship pointing to the object the person is linked to
+    object_relationship_name = None
 
     @strict_classproperty
     @classmethod
@@ -249,6 +252,10 @@ class PersonLinkBase(PersonMixin, db.Model):
     @property
     def email(self):
         return self.person.email
+
+    @hybrid_property
+    def object(self):
+        return getattr(self, self.object_relationship_name)
 
     first_name = override_attr('first_name', 'person')
     last_name = override_attr('last_name', 'person')
