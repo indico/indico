@@ -6,6 +6,11 @@
                 {% if self.subtitle() -%}
                     <h3>{% block subtitle %}{% endblock %}</h3>
                 {% endif %}
+                {% if self.page_actions() %}
+                    <div class="toolbar right">
+                        {% block page_actions %}{% endblock %}
+                    </div>
+                {% endif %}
             </div>
             {% if self.description() -%}
                 <div class="description">

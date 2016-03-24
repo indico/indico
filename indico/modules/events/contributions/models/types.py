@@ -20,6 +20,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
+from indico.util.locators import locator_property
 
 
 class ContributionType(db.Model):
@@ -67,3 +68,7 @@ class ContributionType(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.name)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, contrib_type_id=self.id)
