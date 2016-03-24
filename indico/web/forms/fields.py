@@ -331,11 +331,13 @@ class EventPersonListField(PrincipalListField):
     def _get_event_person(self, data):
         person_type = data.get('_type')
         if person_type is None:
-            user = User.find_first(~User.is_deleted, User.all_emails.contains(data['email'].lower()))
+            email = data['email'].lower()
+            user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
             if user:
                 return EventPerson.for_user(user, self.event)
-            person = EventPerson.find_first(email=data['email'].lower())
-            return person if person else self._create_event_person(data)
+            else:
+                person = self.event.persons.filter_by(email=email).first()
+                return person or self._create_event_person(data)
         elif person_type == 'Avatar':
             user = self._convert_principal(data)
             return EventPerson.for_user(user, self.event)
