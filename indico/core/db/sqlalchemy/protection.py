@@ -22,7 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.roles import get_available_roles
 from indico.util.i18n import _
 from indico.util.caching import memoize_request
@@ -204,6 +204,12 @@ class ProtectionMixin(object):
 
 
 class ProtectionManagersMixin(ProtectionMixin):
+    @property
+    def all_manager_emails(self):
+        """Return the emails of all managers"""
+        # We ignore email principals here. They never signed up in indico anyway...
+        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user}
+
     @memoize_request
     def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
         """Checks if the user can manage the object.
