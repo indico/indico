@@ -434,7 +434,7 @@ class TimetableMigration(object):
             return
         field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
                                   title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
-                                  field_data=field_data, position=position)
+                                  field_data=field_data, position=position, legacy_id=old_field.id)
         self.legacy_contribution_field_map[old_field._id] = field
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{green}Contribution field%{reset} {}').format(field.title))
