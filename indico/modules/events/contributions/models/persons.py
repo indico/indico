@@ -39,8 +39,8 @@ class ContributionPersonLink(PersonLinkBase):
     contribution_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contributions.id'),
-        primary_key=True,
-        index=True
+        index=True,
+        nullable=False
     )
     is_speaker = db.Column(
         db.Boolean,
@@ -64,7 +64,7 @@ class ContributionPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'contribution_id', 'person_id', is_speaker=False, author_type=AuthorType.none,
+        return format_repr(self, 'id', 'person_id', 'contribution_id', is_speaker=False, author_type=AuthorType.none,
                            _text=self.full_name)
 
 
@@ -84,8 +84,8 @@ class SubContributionPersonLink(PersonLinkBase):
     subcontribution_id = db.Column(
         db.Integer,
         db.ForeignKey('events.subcontributions.id'),
-        primary_key=True,
-        index=True
+        index=True,
+        nullable=False
     )
 
     # relationship backrefs:
@@ -93,4 +93,4 @@ class SubContributionPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'subcontribution_id', 'person_id', _text=self.full_name)
+        return format_repr(self, 'id', 'person_id', 'subcontribution_id', _text=self.full_name)

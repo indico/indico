@@ -170,12 +170,19 @@ class PersonLinkBase(PersonMixin, db.Model):
         return auto_table_args(cls, schema='events')
 
     @declared_attr
+    def id(cls):
+        return db.Column(
+            db.Integer,
+            primary_key=True
+        )
+
+    @declared_attr
     def person_id(cls):
         return db.Column(
             db.Integer,
             db.ForeignKey('events.persons.id'),
-            primary_key=True,
-            index=True
+            index=True,
+            nullable=False
         )
 
     @declared_attr
@@ -266,12 +273,13 @@ class EventPersonLink(PersonLinkBase):
     __auto_table_args = {'schema': 'events'}
     person_link_backref_name = 'event_links'
     person_link_unique_columns = ('event_id',)
+    object_relationship_name = 'event'
 
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
-        primary_key=True,
-        index=True
+        index=True,
+        nullable=False
     )
 
     # relationship backrefs:
@@ -285,4 +293,4 @@ class EventPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'event_id', 'person_id', _text=self.full_name)
+        return format_repr(self, 'id', 'person_id', 'event_id', _text=self.full_name)

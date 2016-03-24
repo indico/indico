@@ -35,8 +35,8 @@ class SessionBlockPersonLink(PersonLinkBase):
     session_block_id = db.Column(
         db.Integer,
         db.ForeignKey('events.session_blocks.id'),
-        primary_key=True,
-        index=True
+        index=True,
+        nullable=False
     )
 
     # relationship backrefs:
@@ -44,4 +44,4 @@ class SessionBlockPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'session_block_id', 'person_id', _text=self.full_name)
+        return format_repr(self, 'id', 'person_id', 'session_block_id', _text=self.full_name)
