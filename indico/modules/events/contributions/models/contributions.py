@@ -47,8 +47,20 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
 
+class CustomFieldsMixin(object):
+    """Methods to process custom field data."""
+
+    def set_custom_field(self, field_id, field_value):
+        fv = self.get_field_value(field_id, raw=True)
+        if not fv:
+            field_value_cls = type(self).field_values.prop.mapper.class_
+            fv = field_value_cls(contribution_field=self.event_new.get_contribution_field(field_id))
+            self.field_values.append(fv)
+        fv.data = field_value
+
+
 class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
-                   AttachedNotesMixin, PersonLinkDataMixin, db.Model):
+                   AttachedNotesMixin, PersonLinkDataMixin, CustomFieldsMixin, db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
                          db.Index(None, 'event_id', 'track_id'),
