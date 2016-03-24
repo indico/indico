@@ -225,9 +225,12 @@ def serialize_contribution(contribution):
 
 def serialize_entry_update(entry):
     serializer = TimetableSerializer(management=True)
+    serialization = {TimetableEntryType.BREAK: serializer.serialize_break_entry,
+                     TimetableEntryType.CONTRIBUTION: serializer.serialize_contribution_entry,
+                     TimetableEntryType.SESSION_BLOCK: serializer.serialize_session_block_entry}
     tzinfo = entry.event_new.tzinfo
     return {'id': entry.id,
             'day': entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d'),
-            'entry': serializer.serialize_contribution_entry(entry),
+            'entry': serialization[entry.type](entry),
             'slotEntry': None,
             'autoOps': None}

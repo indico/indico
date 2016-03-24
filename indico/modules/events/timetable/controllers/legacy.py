@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from collections import Counter
+
 import dateutil.parser
 from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
@@ -23,9 +25,34 @@ from werkzeug.exceptions import BadRequest
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
+from indico.modules.events.timetable.forms import BreakEntryForm
 from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update
-from indico.modules.events.timetable.operations import schedule_contribution
+from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.timetable.operations import create_break_entry, schedule_contribution
 from indico.modules.events.timetable.util import find_earliest_gap
+from indico.modules.events.util import get_random_color
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form
+
+
+class RHLegacyTimetableAddBreak(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.day = dateutil.parser.parse(request.args['day']).date()
+
+    def _process(self):
+        inherited_location = self.event_new.location_data
+        inherited_location['inheriting'] = True
+        breaks = Break.query.filter(Break.timetable_entry.has(event_new=self.event_new)).all()
+        common_colors = Counter(b.colors for b in breaks)
+        most_common = common_colors.most_common(1)
+        colors = most_common[0][0] if most_common else get_random_color(self.event_new)
+        defaults = FormDefaults(colors=colors, location_data=inherited_location)
+        form = BreakEntryForm(event=self.event_new, day=self.day, obj=defaults)
+        if form.validate_on_submit():
+            entry = create_break_entry(self.event_new, form.data)
+            return jsonify_data(entry=serialize_entry_update(entry), flash=False)
+        return jsonify_form(form)
 
 
 class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
