@@ -130,7 +130,6 @@
             };
 
             popup.postDraw = function() {
-                ajaxifyForms();
                 popup.canvas.on('ajaxDialog:setData', function(e, data) {
                     customData = data;
                 });
@@ -140,7 +139,9 @@
                 popup.canvas.on('ajaxDialog:reload', function() {
                     loadDialog();
                 });
+
                 injectJS(dialogData.js);
+                ajaxifyForms();
 
                 if (options.onOpen) {
                     options.onOpen(popup);
