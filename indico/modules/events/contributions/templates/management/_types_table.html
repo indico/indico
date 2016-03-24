@@ -1,0 +1,18 @@
+{% macro types_table_row(contrib_type) %}
+    <tr class="i-table">
+        <td class="i-table">{{ contrib_type.name }}</td>
+        <td class="i-table">{{ contrib_type.description }}</td>
+        <td class="i-table action-column">
+            <a class="js-edit-contribution-type icon-edit"
+               data-ajax-dialog
+               data-href="{{ url_for('.manage_type', contrib_type) }}"
+               data-title="{% trans %}Edit contribution type{% endtrans %}"></a>
+            <a class="js-delete-contribution-type icon-remove"
+               data-method="POST"
+               data-href="{{ url_for('.delete_type', contrib_type) }}"
+               data-confirm="{% trans %}Do you really want to delete this contribution type?{% endtrans %}"
+               data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
+      </td>
+    </tr>
+{% endmacro %}
+

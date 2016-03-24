@@ -114,3 +114,18 @@
 .qbubble-contrib-duration {
     max-width: 420px !important;
 }
+
+.manage-contribution-types {
+    table.i-table {
+        table-layout: auto;
+
+        th, td {
+            white-space: normal;
+        }
+
+        .action-column {
+            white-space: nowrap;
+            width: 1px;
+        }
+    }
+}

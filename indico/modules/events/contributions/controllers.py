@@ -20,17 +20,21 @@ from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest
 
+from indico.core.db import db
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
-                                                       ContributionStartDateForm, ContributionDurationForm)
+                                                       ContributionStartDateForm, ContributionDurationForm,
+                                                       ContributionTypeForm)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
                                                             delete_contribution, create_subcontribution,
                                                             update_subcontribution, delete_subcontribution)
 from indico.modules.events.contributions.util import (ContributionReporter, generate_spreadsheet_from_contributions,
-                                                      make_contribution_form)
+                                                      make_contribution_form, contribution_type_row)
 from indico.modules.events.contributions.views import WPManageContributions
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
@@ -385,3 +389,68 @@ class RHContributionsExportPDFBookSorted(RHManageContributionsActionsBase):
     def _process(self):
         pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone, sort_by='boardNo')
         return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHManageContributionTypes(RHManageContributionsBase):
+    """Dialog to manage the ContributionTypes of an event"""
+
+    def _process(self):
+        contrib_types = self.event_new.contribution_types.all()
+        return jsonify_template('events/contributions/management/types_dialog.html', event=self.event_new,
+                                contrib_types=contrib_types)
+
+
+class RHManageContributionTypeBase(RHManageContributionsBase):
+    """Manage a contribution type of an event"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.contrib_type
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageContributionsBase._checkParams(self, params)
+        self.contrib_type = ContributionType.get_one(request.view_args['contrib_type_id'])
+
+
+class RHEditContributionType(RHManageContributionTypeBase):
+    """Dialog to edit a ContributionType"""
+
+    def _process(self):
+        form = ContributionTypeForm(event=self.event_new, obj=self.contrib_type)
+        if form.validate_on_submit():
+            old_name = self.contrib_type.name
+            form.populate_obj(self.contrib_type)
+            db.session.flush()
+            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                               'Updated type: {}'.format(old_name), session.user)
+            return contribution_type_row(self.contrib_type)
+        return jsonify_form(form)
+
+
+class RHCreateContributionType(RHManageContributionsBase):
+    """Dialog to add a ContributionType"""
+
+    def _process(self):
+        form = ContributionTypeForm(event=self.event_new)
+        if form.validate_on_submit():
+            contrib_type = ContributionType()
+            form.populate_obj(contrib_type)
+            self.event_new.contribution_types.append(contrib_type)
+            db.session.flush()
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                               'Added type: {}'.format(contrib_type.name), session.user)
+            return contribution_type_row(contrib_type)
+        return jsonify_form(form)
+
+
+class RHDeleteContributionType(RHManageContributionTypeBase):
+    """Dialog to delete a ContributionType"""
+
+    def _process(self):
+        db.session.delete(self.contrib_type)
+        db.session.flush()
+        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+                           'Deleted type: {}'.format(self.contrib_type.name), session.user)
+        return jsonify_data(flash=False)

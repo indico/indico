@@ -6,6 +6,20 @@
     {% trans %}Contributions{% endtrans %}
 {% endblock %}
 
+{% block page_actions %}
+    {%- if event.type == 'conference' -%}
+        <div class="group">
+            <div class="i-button label icon-settings"></div>
+            <button class="i-button" data-ajax-dialog data-reload-after="customData"
+                    title="{% trans %}Manage contribution types{% endtrans %}"
+                    data-title="{% trans %}Manage contribution types{% endtrans %}"
+                    data-href="{{ url_for('.manage_types', event) }}">
+                {% trans %}Types{% endtrans %}
+            </button>
+        </div>
+    {%- endif -%}
+{% endblock %}
+
 {% block content %}
     <div class="report-section">
         <div class="toolbar">

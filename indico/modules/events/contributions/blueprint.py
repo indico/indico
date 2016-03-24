@@ -28,7 +28,9 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHContributionsMaterialPackage, RHContributionsExportCSV,
                                                              RHContributionsExportExcel, RHContributionsExportPDF,
                                                              RHContributionsExportPDFBook,
-                                                             RHContributionsExportPDFBookSorted)
+                                                             RHContributionsExportPDFBookSorted,
+                                                             RHManageContributionTypes, RHEditContributionType,
+                                                             RHCreateContributionType, RHDeleteContributionType)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -79,3 +81,12 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:s
                  'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>/edit',
                  'manage_edit_subcontrib', RHEditSubContribution, methods=('GET', 'POST'))
+
+# Contribution types
+_bp.add_url_rule('/manage/contributions/types/', 'manage_types', RHManageContributionTypes)
+_bp.add_url_rule('/manage/contributions/types/create', 'create_type', RHCreateContributionType,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>', 'manage_type', RHEditContributionType,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'delete_type',
+                 RHDeleteContributionType, methods=('POST',))

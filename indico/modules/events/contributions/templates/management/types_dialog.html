@@ -1,0 +1,101 @@
+{% from 'message_box.html' import message_box %}
+{% from 'events/contributions/management/_types_table.html' import types_table_row %}
+
+<div class="manage-contribution-types">
+    <div class="toolbar">
+        <button id="js-new-contribution-type" class="i-button icon-plus highlight" data-ajax-dialog
+                data-href="{{ url_for('.create_type', event) }}"
+                data-title="{% trans %}Add new contribution type{% endtrans %}">
+            {% trans %}New contribution type{% endtrans %}
+        </button>
+    </div>
+
+    {% if contrib_types %}
+        <table class="i-table">
+            <thead>
+                <th class="i-table">
+                    {% trans %}Name{% endtrans %}
+                </th>
+                <th class="i-table">
+                    {% trans %}Description{% endtrans %}
+                </th>
+                <th class="i-table action-column"></th>
+            </thead>
+            <tbody>
+                {% for contrib_type in contrib_types %}
+                    {{ types_table_row(contrib_type) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {%- call message_box('info') %}
+            {%- trans %}There are no contribution types yet.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+
+    <div class="toolbar">
+        <div class="group right">
+            <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        /* Set the customData to true indicating that the contribution list needs to be refreshed */
+        function dialogModified() {
+            $('.manage-contribution-types').trigger('ajaxDialog:setData', [true]);
+        }
+
+        $('.manage-contribution-types table').tablesorter({
+            sortList: [[0, 0]],
+            headers: {
+                2: {
+                    sorter: false
+                }
+            }
+        });
+
+        $('#js-new-contribution-type').on('ajaxDialog:closed', function(evt, data) {
+            evt.preventDefault();
+            if (data) {
+                var $lastRow = $('.manage-contribution-types table tr:last');
+                if ($lastRow.length) {
+                    $lastRow.after(data.html_row);
+                } else {
+                    $('.manage-contribution-types').trigger('ajaxDialog:reload');
+                }
+            }
+        });
+
+        $('.manage-contribution-types').on('ajaxDialog:closed', '.js-edit-contribution-type', function(evt, data) {
+            evt.preventDefault();
+            var $row = $(this).closest('tr');
+            if (data) {
+                $row.replaceWith(data.html_row);
+                dialogModified();
+            }
+        });
+
+        $('.manage-contribution-types').on('indico:confirmed', '.js-delete-contribution-type', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var $row = $this.closest('tr');
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $row.remove();
+                    dialogModified();
+                    if ($('.manage-contribution-types table tbody tr').length == 0) {
+                        $('.manage-contribution-types').trigger('ajaxDialog:reload');
+                    }
+                }
+            });
+        });
+    })();
+</script>

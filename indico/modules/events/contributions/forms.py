@@ -22,9 +22,11 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
+from indico.core.db import db
 from indico.modules.events.contributions.fields import (ContributionPersonLinkListField,
                                                         SubContributionPersonLinkListField)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
+from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
@@ -138,3 +140,22 @@ class ContributionDurationForm(IndicoForm):
             return
         if self.contrib.is_scheduled and self.contrib.start_dt + field.data > self.contrib.event_new.end_dt:
             raise ValidationError(_('With the current value, the contribution would exceed event end date'))
+
+
+class ContributionTypeForm(IndicoForm):
+    """Form to create or edit a ContributionType"""
+
+    name = StringField(_("Name"), [DataRequired()])
+    description = TextAreaField(_("Description"))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        self.contrib_type = kwargs.get('obj')
+        super(ContributionTypeForm, self).__init__(*args, **kwargs)
+
+    def validate_name(self, field):
+        query = self.event.contribution_types.filter(db.func.lower(ContributionType.name) == field.data.lower())
+        if self.contrib_type:
+            query = query.filter(ContributionType.id != self.contrib_type.id)
+        if query.count():
+            raise ValidationError(_("A contribution type with this name already exists"))
