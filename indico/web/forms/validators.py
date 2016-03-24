@@ -21,7 +21,7 @@ from datetime import timedelta
 
 from wtforms.validators import StopValidation, ValidationError, EqualTo
 
-from indico.util.date_time import as_utc, format_datetime, now_utc, format_human_timedelta
+from indico.util.date_time import as_utc, format_datetime, format_time, now_utc, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
@@ -225,6 +225,29 @@ class MaxDuration(object):
     def __call__(self, form, field):
         if field.data is not None and field.data > self.max_duration:
             raise ValidationError(_('Duration cannot exceed {}').format(format_human_timedelta(self.max_duration)))
+
+
+class TimeRange(object):
+    """Validate the time lies within boundaries."""
+
+    def __init__(self, earliest=None, latest=None):
+        assert earliest is not None or latest is not None, "At least one of `earliest` or `latest` must be specified."
+        if earliest is not None and latest is not None:
+            assert earliest <= latest, "`earliest` cannot be later than `latest`."
+        self.earliest = earliest
+        self.latest = latest
+
+    def __call__(self, form, field):
+        def _format_time(value):
+            return format_time(value) if value else None
+        if self.earliest and field.data < self.earliest or self.latest and field.data > self.latest:
+            if self.earliest is not None and self.latest is not None:
+                message = _("Must be between {earliest} and {latest}.")
+            elif self.latest is None:
+                message = _("Must be later than {earliest}.")
+            else:
+                message = _("Must be earlier than {latest}.")
+        raise ValidationError(message.format(earliest=_format_time(self.earliest), latest=_format_time(self.latest)))
 
 
 class WordCount(object):
