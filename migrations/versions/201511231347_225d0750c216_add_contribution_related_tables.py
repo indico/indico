@@ -359,6 +359,7 @@ def upgrade():
     # EventPersonLink
     op.create_table(
         'event_person_links',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('person_id', sa.Integer(), nullable=False, index=True),
         sa.Column('first_name', sa.String(), nullable=True),
@@ -370,13 +371,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.UniqueConstraint('person_id', 'event_id'),
-        sa.PrimaryKeyConstraint('event_id', 'person_id'),
+        sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
 
     # SessionBlockPersonLink
     op.create_table(
         'session_block_person_links',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('session_block_id', sa.Integer(), nullable=False, index=True),
         sa.Column('person_id', sa.Integer(), nullable=False, index=True),
         sa.Column('first_name', sa.String(), nullable=True),
@@ -388,13 +390,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
         sa.ForeignKeyConstraint(['session_block_id'], ['events.session_blocks.id']),
         sa.UniqueConstraint('person_id', 'session_block_id'),
-        sa.PrimaryKeyConstraint('session_block_id', 'person_id'),
+        sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
 
     # ContributionPersonLink
     op.create_table(
         'contribution_person_links',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('person_id', sa.Integer(), nullable=False, index=True),
         sa.Column('first_name', sa.String(), nullable=True),
@@ -408,13 +411,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
         sa.UniqueConstraint('person_id', 'contribution_id'),
-        sa.PrimaryKeyConstraint('contribution_id', 'person_id'),
+        sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
 
     # SubContributionPersonLink
     op.create_table(
         'subcontribution_person_links',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('subcontribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('person_id', sa.Integer(), nullable=False, index=True),
         sa.Column('first_name', sa.String(), nullable=True),
@@ -426,7 +430,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
         sa.ForeignKeyConstraint(['subcontribution_id'], ['events.subcontributions.id']),
         sa.UniqueConstraint('person_id', 'subcontribution_id'),
-        sa.PrimaryKeyConstraint('subcontribution_id', 'person_id'),
+        sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
 
