@@ -58,13 +58,20 @@ def _ensure_consistency(contrib):
     return False
 
 
-def create_contribution(event, data):
+def _set_custom_fields(contrib, custom_fields_data):
+    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
+        custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
+        contrib.set_custom_field(custom_field_id, custom_field_value)
+
+
+def create_contribution(event, contrib_data, custom_fields_data):
     contrib = Contribution(event_new=event)
-    start_dt = data.pop('start_date', None)
-    contrib.populate_from_dict(data)
+    start_dt = contrib_data.pop('start_date', None)
     if start_dt is not None:
         create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
                                        'contribution': contrib})
+    contrib.populate_from_dict(contrib_data)
+    _set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, session.user)
@@ -74,7 +81,7 @@ def create_contribution(event, data):
 
 
 @no_autoflush
-def update_contribution(contrib, data):
+def update_contribution(contrib, contrib_data, custom_fields_data):
     """Update a contribution
 
     :param contrib: The `Contribution` to update
@@ -88,11 +95,12 @@ def update_contribution(contrib, data):
     """
     rv = {'unscheduled': False, 'undo_unschedule': None}
     current_session_block = contrib.session_block
-    start_dt = data.pop('start_date', None)
+    start_dt = contrib_data.pop('start_date', None)
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
-    contrib.populate_from_dict(data)
-    if 'session' in data:
+    contrib.populate_from_dict(contrib_data)
+    _set_custom_fields(contrib, custom_fields_data)
+    if 'session' in contrib_data:
         timetable_entry = contrib.timetable_entry
         if timetable_entry is not None and _ensure_consistency(contrib):
             rv['unscheduled'] = True
