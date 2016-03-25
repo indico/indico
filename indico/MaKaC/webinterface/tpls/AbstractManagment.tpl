@@ -3,7 +3,9 @@
     <tr>
         <td align="center">
             <div style="padding: 10px; margin: 10px; border: 1px solid #DDD; font-size: 14px; color: #881122">
-                ${ _("You cannot modify this abstract because it has already been accepted. In order to change the information that is displayed in the Book of Abstracts and timetable you should edit the corresponding contribution (%s) directly.") % contribution}
+                ${ _("""You cannot modify this abstract because it has already been accepted. In order to change the
+                        information that is displayed in the Book of Abstracts and timetable you should edit
+                        <a href="%s">the corresponding contribution</a> directly.""") % url_for('contributions.manage_contributions', contribution.event_new, selected=contribution.friendly_id)}
             </div>
         </td>
     </tr>
@@ -39,7 +41,7 @@
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">${f.getCaption() | escape}</span></td>
                         <td bgcolor="white" valign="top">
                             <div class="md-preview-wrapper display">
-                                ${abstract.getField(f.getId()) | m}
+                                ${ abstract.getField(f.getId()) | m }
                             </div>
                         </td>
                     </tr>
@@ -155,13 +157,20 @@
                     <td bgcolor="white" valign="top" colspan="3"><pre>${ comments }</pre></td>
                 </tr>
                 ${ mergeFrom }
-                <tr>
-                    <td colspan="4" class="horizontalLine">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Contribution")}</span></td>
-                    <td bgcolor="white" valign="top" colspan="3">${ contribution }</td>
-                </tr>
+                % if contribution:
+                    <tr>
+                        <td colspan="4" class="horizontalLine">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Contribution")}</span></td>
+                        <td bgcolor="white" valign="top" colspan="3">
+                            <a href="${url_for('contributions.manage_contributions', contribution.event_new,
+                                               selected=contribution.friendly_id)}">
+                                ${contribution.friendly_id} - ${contribution.title}
+                            </a>
+                        </td>
+                    </tr>
+                % endif
                 <tr>
                     <td align="center" colspan="3" style="border-top: 2px solid #777777">
                         <table align="center" border="0">

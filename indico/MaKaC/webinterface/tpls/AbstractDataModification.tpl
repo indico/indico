@@ -297,8 +297,8 @@ function hasPresenter() {
 
 // limited and mandatory fields
 var limitedFieldManagerList = [];
-var limitedFieldList = ${ limitedFieldList };
-var mandatoryFieldList = ${ mandatoryFieldList };
+var limitedFieldList = ${ limitedFieldList | n,j };
+var mandatoryFieldList = ${ mandatoryFieldList | n,j };
 mandatoryFieldList.push("abstractTitle"); // append the title id which is in this template
 var pmMandatoryFields = new IndicoUtil.parameterManager();
 

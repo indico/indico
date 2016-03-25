@@ -76,7 +76,7 @@
         \sectionfont{\normalsize\rmfamily}
         \subsectionfont{\small\rmfamily}
         \small
-        ${ md_convert(str(contrib.description).decode('utf-8')).encode('utf-8') }
+        ${ md_convert(contrib.description) }
     }
 
     \vspace{1em}

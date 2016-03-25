@@ -117,6 +117,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     )
     abstract_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.abstracts.id'),
+        index=True,
         nullable=True
     )
     type_id = db.Column(
@@ -210,6 +212,15 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             'contribution',
             primaryjoin='SubContribution.contribution_id == Contribution.id',
             lazy=True
+        )
+    )
+    abstract = db.relationship(
+        'Abstract',
+        lazy=True,
+        backref=db.backref(
+            'contribution',
+            lazy=True,
+            uselist=False
         )
     )
     #: External references associated with this contribution
