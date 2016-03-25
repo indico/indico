@@ -253,6 +253,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     )
 
     # relationship backrefs:
+    # - abstracts (Abstract.event_new)
     # - agreements (Agreement.event_new)
     # - all_attachment_folders (AttachmentFolder.event_new)
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)

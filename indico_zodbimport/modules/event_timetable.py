@@ -33,6 +33,8 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import update_session_options
+from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
@@ -119,6 +121,7 @@ class TimetableMigration(object):
         self._migrate_contribution_fields()
         self._migrate_sessions()
         self._migrate_contributions()
+        self._migrate_abstracts()
         self._migrate_timetable()
 
     def _convert_principal(self, old_principal):
@@ -406,6 +409,15 @@ class TimetableMigration(object):
             pos += 1
             self._migrate_contribution_field(field, pos)
 
+        content_field = afm._fields['content']
+        from indico.module.events.abstracts.settings import abstracts_settings
+        abstracts_settings.set('description_settings', self.event, {
+            'active': content_field._active,
+            'required': content_field._isMandatory,
+            'max_words': content_field._maxLength if content_field._limitation == 'words' else None,
+            'max_chars': content_field._maxLength if content_field._limitation == 'chars' else None
+        })
+
     def _migrate_contribution_field(self, old_field, position):
         field_type = old_field.__class__.__name__
         if field_type in ('AbstractTextAreaField', 'AbstractInputField', 'AbstractField'):
@@ -465,6 +477,10 @@ class TimetableMigration(object):
         if contribs:
             self.event._last_friendly_contribution_id = max(c.friendly_id for c in contribs)
 
+    def _migrate_abstracts(self):
+        for old_abstract in self.old_event.abstractMgr._abstracts.itervalues():
+            self._migrate_abstract(old_abstract)
+
     def _migrate_contribution(self, old_contrib, friendly_id):
         ac = old_contrib._Contribution__ac
         description = old_contrib._fields.get('content', '')
@@ -506,6 +522,25 @@ class TimetableMigration(object):
         contrib._last_friendly_subcontribution_id = len(contrib.subcontributions)
         return contrib
 
+    def _migrate_abstract(self, old_abstract):
+        description = old_abstract._fields.get('content', '')
+        description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
+        old_contribution = getattr(old_abstract, '_contribution', None)
+
+        abstract = Abstract(event_new=self.event, legacy_id=old_abstract._id,
+                            description=description)
+
+        if old_contribution:
+            legacy = LegacyContributionMapping.find_one(legacy_contribution_id=old_contribution.id,
+                                                        event_new=self.event)
+            abstract.contribution = legacy.contribution
+
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('%{cyan}Abstract%{reset} {}').format(abstract.legacy_id))
+        # contribution/abstract fields
+        abstract.field_values = list(self._migrate_abstract_field_values(old_abstract))
+        return abstract
+
     def _migrate_contribution_field_values(self, old_contrib):
         fields = dict(old_contrib._fields)
         fields.pop('content', None)
@@ -531,13 +566,44 @@ class TimetableMigration(object):
                                                                                                  new_value.data))
                 yield new_value
 
+    def _migrate_abstract_field_values(self, old_abstract):
+        fields = dict(old_abstract._fields)
+        fields.pop('content', None)
+        for field_id, field_content in fields.iteritems():
+            value = convert_to_unicode(getattr(field_content, 'value', field_content))
+            if not value:
+                continue
+            try:
+                new_field = self.legacy_contribution_field_map[field_id]
+            except KeyError:
+                self.importer.print_warning(cformat('%{yellow!}Contribution field "{}" does not exist')
+                                            .format(field_id),
+                                            event_id=self.event.id)
+                continue
+            new_value = self._process_abstract_field_value(field_id, value, new_field)
+            if new_value:
+                if not self.importer.quiet:
+                    self.importer.print_info(cformat('%{green} - [field]%{reset} {}: {}').format(new_field.title,
+                                                                                                 new_value.data))
+                yield new_value
+
     def _process_contribution_field_value(self, old_field_id, old_value, new_field):
         if new_field.field_type == 'text':
             data = convert_to_unicode(old_value)
             return ContributionFieldValue(contribution_field=new_field, data=data)
         elif new_field.field_type == 'single_choice':
-            data = self.legacy_field_option_id_map[old_field_id, int(old_value)]
+            data = self.legacy_field_option_id_map[old_field_id, old_value]
             return ContributionFieldValue(contribution_field=new_field, data=data)
+        else:
+            raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
+
+    def _process_abstract_field_value(self, old_field_id, old_value, new_field):
+        if new_field.field_type == 'text':
+            data = convert_to_unicode(old_value)
+            return AbstractFieldValue(contribution_field=new_field, data=data)
+        elif new_field.field_type == 'single_choice':
+            data = self.legacy_field_option_id_map[old_field_id, int(old_value)]
+            return AbstractFieldValue(contribution_field=new_field, data=data)
         else:
             raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
 

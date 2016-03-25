@@ -35,6 +35,9 @@ from MaKaC.fossils.abstracts import IAbstractFieldFossil
 from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
 from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
 from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
+
+from indico.modules.events.abstracts.legacy import (AbstractFieldManagerAdapter, AbstractLegacyMixin,
+                                                    AbstractManagerLegacyMixin)
 from indico.util.i18n import N_
 from indico.util.text import wordsCounter
 
@@ -742,26 +745,10 @@ class AbstractFieldsMgr(Persistent):
             afm._addField(f.clone())
         return afm
 
-    def getFieldGenerator(self):
-        try:
-            if self.__fieldGenerator:
-                pass
-        except AttributeError, e:
-            self.__fieldGenerator = Counter()
-        return self.__fieldGenerator
-
     def _notifyModification(self):
         self._p_changed = 1
 
-    def _initFields(self):
-        d = []
-        params = {"type": "textarea", "id": "content", "caption": N_("Content"), "isMandatory": True}
-        d.append(AbstractField.makefield(params))
-        params = {"type": "textarea", "id": "summary", "caption": N_("Summary")}
-        d.append(AbstractField.makefield(params))
-        return d
-
-    def hasField(self, id):
+    def hasField(self, field_id):
         for f in self._fields:
             if f.getId() == id:
                 return True
@@ -812,9 +799,6 @@ class AbstractFieldsMgr(Persistent):
                 return f
         return None
 
-    def _addField(self, field):
-        self._fields.append(field)
-
     def setField(self, params):
         if self.hasField(params["id"]):
             self.getFieldById(params["id"]).setValues(params)
@@ -853,7 +837,7 @@ class AbstractFieldsMgr(Persistent):
             self._notifyModification()
 
 
-class AbstractMgr(Persistent):
+class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
 
     def __init__(self, owner):
         self._owner = owner
@@ -941,11 +925,7 @@ class AbstractMgr(Persistent):
         self._showAttachedFilesContribList = showshowAttachedFilesContribList
 
     def getAbstractFieldsMgr(self):
-        try:
-            return self._abstractFieldsMgr
-        except:
-            self._abstractFieldsMgr = AbstractFieldsMgr()
-            return self._abstractFieldsMgr
+        return AbstractFieldManagerAdapter(self._owner.as_event)
 
     def clone(self, conference):
         amgr = AbstractMgr(conference)
@@ -1121,6 +1101,7 @@ class AbstractMgr(Persistent):
         id = self._generateNewAbstractId()
         a = Abstract(self, id, av, **data)
         self._abstracts[id] = a
+        self._new_abstract(a, data)
         for auth in a.getPrimaryAuthorList():
             self.indexAuthor(auth)
         return a
@@ -1159,6 +1140,7 @@ class AbstractMgr(Persistent):
                             abs.setCurrentStatus(AbstractStatusSubmitted(abs))
             #unindex participations!!!
             self.unregisterParticipation(abstract.getSubmitter())
+            self._remove_abstract(abstract)
             del self._abstracts[abstract.getId()]
             abstract.delete()
 
@@ -1507,13 +1489,12 @@ class Comment(Persistent):
             len(conf.getConference().getCoordinatedTracks(user)) > 0)
 
 
-class Abstract(Persistent):
+class Abstract(AbstractLegacyMixin, Persistent):
 
     def __init__(self, owner, id, submitter, **abstractData):
         self._setOwner( owner )
         self._setId( id )
         self._title = ""
-        self._fields = {}
         self._authorGen = Counter()
         self._authors = OOBTree()
         self._primaryAuthors = PersistentList()
@@ -1789,32 +1770,6 @@ class Abstract(Persistent):
     @property
     def title(self):
         return self._title
-
-    def getFields(self):
-        return self._fields
-
-    def removeField(self, field):
-        if self.getFields().has_key(field):
-            del self.getFields()[field]
-            self._notifyModification()
-
-    def setField(self, fid, v):
-        if isinstance(v, AbstractFieldContent):
-            v = v.value
-        try:
-            self.getFields()[fid].value = v
-            self._notifyModification()
-        except:
-            afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
-            f = next(f for f in afm.getFields() if f.getId() == fid)
-            if f is not None:
-                self.getFields()[fid] = AbstractFieldContent(f, v)
-
-    def getField(self, field):
-        if self.getFields().has_key(field):
-            return self.getFields()[field]
-        else:
-            return ""
 
     def getSubmissionDate( self ):
         try:
@@ -2476,21 +2431,6 @@ class Abstract(Persistent):
             if track in r.getProposedTrackList():
                 res.append( r )
         return res
-
-    def getContribution( self ):
-        try:
-            if self._contribution:
-                pass
-        except AttributeError:
-            self._contribution = None
-        status = self.getCurrentStatus()
-        if isinstance(status,AbstractStatusAccepted) and \
-                                            self._contribution is None:
-            self._contribution=status.getContribution()
-        return self._contribution
-
-    def _setContribution(self,contrib):
-        self._contribution = contrib
 
     def getIntCommentList(self):
         try:

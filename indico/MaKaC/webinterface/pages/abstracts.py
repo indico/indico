@@ -35,7 +35,6 @@ from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
-from MaKaC.review import AbstractTextField
 from MaKaC.common.TemplateExec import render
 
 from indico.util.string import render_markdown, natural_sort_key
@@ -399,7 +398,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         for f in abfm.getFields():
             id = f.getId()
             if f.isActive():
-                if isinstance(f, AbstractTextField):
+                if f.getType() in ('textarea', 'input'):
                     maxLength = int(f.getMaxLength())
                     limitation = f.getLimitation()
                     if maxLength > 0:  # it means there is a limit for the field in words or in characters
@@ -698,16 +697,6 @@ class WAbstractManagment(wcomponents.WTemplated):
                 prog.append("""<li>%s</li>""" % (self.htmlText(track.getTitle())))
         return "<ul>%s</ul>" % "".join(prog)
 
-    def _getContributionHTML(self):
-        res = ""
-        contrib = self._abstract.getContribution()
-        if contrib:
-            url = urlHandlers.UHContributionModification.getURL(contrib)
-            title = self.htmlText(contrib.getTitle())
-            id = self.htmlText(contrib.getId())
-            res = """<a href=%s>%s - %s</a>""" % (quoteattr(str(url)), id, title)
-        return res
-
     def _getMergeFromHTML(self):
         abstracts = self._abstract.getMergeFromList()
         if not abstracts:
@@ -791,7 +780,7 @@ class WAbstractManagment(wcomponents.WTemplated):
         vars["abstractListURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
         vars["viewTrackDetailsURL"] = quoteattr(str(urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract)))
         vars["comments"] = self._abstract.getComments()
-        vars["contribution"] = self._getContributionHTML()
+        vars["contribution"] = self._abstract.as_new.contribution
         vars["abstractPDF"] = urlHandlers.UHAbstractConfManagerDisplayPDF.getURL(self._abstract)
         vars["printIconURL"] = Config.getInstance().getSystemIconURL("pdf")
         vars["abstractXML"] = urlHandlers.UHAbstractToXML.getURL(self._abstract)
