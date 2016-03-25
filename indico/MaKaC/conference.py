@@ -51,7 +51,6 @@ from indico.modules.groups.legacy import GroupWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id, to_unicode
-from MaKaC.review import AbstractFieldContent
 
 
 import re
@@ -6528,52 +6527,6 @@ class Contribution(CommonObjectBase, Locatable):
         else:
             self._keywords = keywords
         self.notifyModification(cleanCache=False)
-
-    def getFields(self, valueonly=False):
-        try:
-            if self._fields:
-                pass
-        except AttributeError:
-            self._fields = {}
-        if not valueonly:
-            return self._fields
-        else:
-            return dict((k, v.value if isinstance(v, AbstractFieldContent) else v) for k, v in self._fields.iteritems())
-
-    def removeField(self, field):
-        if field in self.getFields():
-            del self.getFields()[field]
-            self.notifyModification()
-
-    def setField(self, fid, v):
-        if isinstance(v, AbstractFieldContent):
-            v = v.value
-        try:
-            self.getFields()[fid].value = v
-
-        # `AttritbuteError` may happen if the field is not yet an AbstractFieldContent
-        # (lazy migration)
-        # `KeyError` means that the attribute doesn't exist in the contrib, in which
-        # case it should be created anyway
-        except (AttributeError, KeyError):
-            afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
-            for f in afm.getFields():
-                if f.getId() == fid:
-                    self.getFields()[fid] = AbstractFieldContent(f, v)
-                    break
-        self.notifyModification()
-
-    def getField(self, field):
-        if field in self.getFields():
-            value = self.getFields()[field]
-            if type(value) is list:
-                return "".join(value)
-            elif value is None:
-                return ""
-            else:
-                return value
-        else:
-            return ""
 
     def getLogInfo(self):
         data = {}

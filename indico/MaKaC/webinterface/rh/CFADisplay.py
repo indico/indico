@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+from flask import flash, request
 
 from textwrap import TextWrapper
 
@@ -222,6 +222,9 @@ class RHAbstractSubmission( RHAbstractModificationAction ):
             pars = self._abstractData.toDict()
             pars["action"] = self._action
             pars["attachments"] = []
+
+            for error in errors:
+                flash(error, 'error')
             return p.display( **pars )
         #Then, we create the abstract object and set its data to the one
         #   received

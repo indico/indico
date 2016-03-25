@@ -32,7 +32,6 @@ import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML
 import MaKaC.common.utils
 import MaKaC.review as review
-from MaKaC.review import AbstractTextField
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
@@ -1791,7 +1790,7 @@ class WConfModifCFA(wcomponents.WTemplated):
             else:
                 mandatoryText = _("optional")
             maxCharText = ""
-            if isinstance(af, AbstractTextField):
+            if af.getType() in ('textarea', 'input'):
                 maxCharText = " - "
                 if int(af.getMaxLength()) != 0:
                     maxCharText += _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())

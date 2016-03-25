@@ -18,7 +18,6 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAuthorFossil
 from MaKaC.webinterface.general import normaliseListParam
 from indico.core.config import Config
-from MaKaC.review import AbstractFieldContent
 
 BYTES_1MB = 1024 * 1024
 
