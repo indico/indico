@@ -22,6 +22,16 @@
                    data-qtip-position="right">
                     {% trans %}Contribution types{% endtrans %}</a>
             </li>
+            <li>
+                <a href="#"
+                   title="{% trans %}Manage custom fields{% endtrans %}"
+                   data-ajax-dialog
+                   data-reload-after="customData"
+                   data-title="{% trans %}Manage custom fields{% endtrans %}"
+                   data-href="{{ url_for('.manage_fields', event) }}"
+                   data-qtip-position="right">
+                    {% trans %}Custom fields{% endtrans %}</a>
+            </li>
         </ul>
     {%- endif -%}
 {% endblock %}
