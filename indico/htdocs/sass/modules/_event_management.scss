@@ -20,6 +20,8 @@
 @import "partials/icons";
 
 .action-menu {
+    flex-shrink: 0;
+
     .toolbar {
         margin-bottom: 0px;
         padding-bottom: 0px;
