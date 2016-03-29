@@ -41,16 +41,16 @@
             </div>
             <div class="info-section info-event">
                 <div class="info-event-title">
-                    {{ agreement.event.getTitle() }}
+                    {{ agreement.event_new.title }}
                 </div>
                 <div class="info-event-details">
                     <i class="icon-time"></i>
-                    {{ agreement.event.getStartDate() | format_datetime }}
+                    {{ agreement.event_new.start_dt | format_datetime }}
                 </div>
-                {% if agreement.event.getLocation() %}
+                {% if agreement.event_new.venue_name %}
                     <div class="info-event-details">
                         <i class="icon-location"></i>
-                        {{ agreement.event.getLocation().getName() }}
+                        {{ agreement.event_new.venue_name }}
                     </div>
                 {% endif %}
             </div>
@@ -111,7 +111,7 @@
             .qtip('destroy', true)
             .qtip({
                 content: {
-                    text: $T("You won't be able to change your decision later. If necessary, please contact the manager of the event."),
+                    text: $T.gettext("You won't be able to change your decision later. If necessary, please contact the manager of the event.")
                 },
                 position: {
                     viewport: false,

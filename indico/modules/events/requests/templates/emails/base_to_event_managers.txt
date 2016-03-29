@@ -1,7 +1,7 @@
 {% extends 'emails/base.txt' %}
 
 {%- block subject -%}
-    [{{ req.definition.title }}] {% block request_subject %}{% endblock %} for {{ event.getTitle() }}
+    [{{ req.definition.title }}] {% block request_subject %}{% endblock %} for {{ event.title }}
 {%- endblock -%}
 
 {% block header_recipient %}event managers{% endblock %}
@@ -10,7 +10,7 @@
     {%- filter dedent -%}
         {% block request_message %}{% endblock %}
 
-        Event: {{ event.getTitle() }}
+        Event: {{ event.title }}
         Requested by: {{ req.created_by_user.full_name }}
         Details: {{ url_for('requests.event_requests_details', req, _external=True) }}
         {%- if self.request_details() %}

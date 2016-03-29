@@ -181,15 +181,6 @@ class Agreement(db.Model):
         return get_agreement_definitions().get(self.type)
 
     @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
-
-    @property
     def locator(self):
         return {'confId': self.event_id,
                 'id': self.id}

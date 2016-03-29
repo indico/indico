@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 from itertools import islice
 from operator import attrgetter
 
+from indico.modules.events import Event
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from MaKaC.conference import ConferenceHolder
 
 
 @HTTPAPIHook.register
@@ -40,25 +40,24 @@ class AgreementExportHook(HTTPAPIHook):
             self._definition = get_agreement_definitions()[type_]
         except KeyError:
             raise HTTPAPIError('No such agreement type', 404)
-        self._event = ConferenceHolder().getById(self._pathParams['event_id'], True)
-        if self._event is None:
+        self.event = Event.get(self._pathParams['event_id'], is_deleted=False)
+        if self.event is None:
             raise HTTPAPIError('No such event', 404)
 
     def _hasAccess(self, aw):
-        return self._definition.can_access_api(aw.getUser().user, self._event.as_event)
+        return self._definition.can_access_api(aw.getUser().user, self.event)
 
     def export_agreements(self, aw):
-        event = self._event.as_event
-        sent_agreements = {a.identifier: a for a in event.agreements.filter_by(type=self._definition.name)}
-        for person in islice(sorted(self._definition.get_people(event).itervalues(),
+        sent_agreements = {a.identifier: a for a in self.event.agreements.filter_by(type=self._definition.name)}
+        for person in islice(sorted(self._definition.get_people(self.event).itervalues(),
                                     key=attrgetter('name', 'identifier')),
                              self._offset, self._offset + self._limit):
             agreement = sent_agreements.get(person.identifier)
             data = {
-                'event_id': event.id,
+                'event_id': self.event.id,
                 'identifier': person.identifier,
                 'sent': agreement is not None,
                 'accepted': None if (not agreement or agreement.pending) else agreement.accepted,
             }
-            self._definition.extend_api_data(event, person, agreement, data)
+            self._definition.extend_api_data(self.event, person, agreement, data)
             yield data

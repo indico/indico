@@ -132,15 +132,6 @@ class Request(db.Model):
     )
 
     @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
-
-    @property
     def definition(self):
         return get_request_definitions().get(self.type)
 

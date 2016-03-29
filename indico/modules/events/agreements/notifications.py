@@ -50,4 +50,4 @@ def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, fro
 @email_sender
 def notify_new_signature_to_manager(agreement):
     template = get_template_module('events/agreements/emails/new_signature_email_to_manager.txt', agreement=agreement)
-    return make_email(agreement.event.all_manager_emails, template=template)
+    return make_email(agreement.event_new.all_manager_emails, template=template)

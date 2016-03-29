@@ -83,7 +83,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             reason = form.reason.data if not form.agreed.data else None
             func = self.agreement.accept if form.agreed.data else self.agreement.reject
             func(from_ip=request.remote_addr, reason=reason)
-            if self.agreement.definition.event_settings.get(self._conf, 'manager_notifications_enabled'):
+            if self.agreement.definition.event_settings.get(self.event_new, 'manager_notifications_enabled'):
                 notify_new_signature_to_manager(self.agreement)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
@@ -110,7 +110,7 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
             raise NotFound("Agreement type '{}' does not exist".format(definition_name))
         if not self.definition.is_active(self.event_new):
             flash(_("The '{}' agreement is not used in this event.").format(self.definition.title), 'error')
-            return redirect(url_for('.event_agreements', self._conf))
+            return redirect(url_for('.event_agreements', self.event_new))
 
     def _process(self):
         people = self.definition.get_people(self.event_new)
@@ -127,7 +127,7 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
 
     def _process(self):
         enabled = request.form['enabled'] == '1'
-        self.definition.event_settings.set(self._conf, 'manager_notifications_enabled', enabled)
+        self.definition.event_settings.set(self.event_new, 'manager_notifications_enabled', enabled)
         return jsonify(success=True, enabled=enabled)
 
 
@@ -228,7 +228,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
         RHAgreementManagerDetails._checkParams(self, params)
         if 'id' in request.view_args:
             self.agreement = Agreement.get_one(request.view_args['id'])
-            if self._conf != self.agreement.event:
+            if self.event_new != self.agreement.event_new:
                 raise NotFound
             if not self.agreement.pending:
                 raise NoReportError(_("The agreement is already signed"))
