@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.timetable import logger
@@ -46,6 +47,7 @@ def create_timetable_entry(event, data):
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
+    signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, session.user)
     entry.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
                         "Entry for {} '{}' created".format(object_type, object_title), session.user,
@@ -64,6 +66,7 @@ def update_timetable_entry(entry, data):
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
+    signals.event.timetable_entry_updated.send(entry)
     logger.info('Timetable entry %s updated by %s', entry, session.user)
     entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                         "Entry for {} '{}' modified".format(object_type, object_title), session.user,
@@ -72,6 +75,7 @@ def update_timetable_entry(entry, data):
 
 def delete_timetable_entry(entry, log=True):
     object_type, object_title = _get_object_info(entry)
+    signals.event.timetable_entry_deleted.send(entry)
     entry.object = None
     db.session.flush()
     if log:

@@ -66,6 +66,7 @@ def create_contribution(event, data):
         create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
                                        'contribution': contrib})
     db.session.flush()
+    signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
                           'Contribution "{}" has been created'.format(contrib.title), session.user)
@@ -100,6 +101,7 @@ def update_contribution(contrib, data):
                                      'session_block_id': current_session_block.id if current_session_block else None,
                                      'force': True}
     db.session.flush()
+    signals.event.contribution_updated.send(contrib)
     logger.info('Contribution %s updated by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                           'Contribution "{}" has been updated'.format(contrib.title), session.user)
@@ -122,6 +124,7 @@ def create_subcontribution(contrib, data):
     subcontrib.populate_from_dict(data)
     contrib.subcontributions.append(subcontrib)
     db.session.flush()
+    signals.event.subcontribution_created.send(subcontrib)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
     subcontrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Subcontributions',
                              'Subcontribution "{}" has been created'.format(subcontrib.title), session.user)
@@ -131,6 +134,7 @@ def create_subcontribution(contrib, data):
 def update_subcontribution(subcontrib, data):
     subcontrib.populate_from_dict(data)
     db.session.flush()
+    signals.event.subcontribution_updated.send(subcontrib)
     logger.info('Subcontribution %s updated by %s', subcontrib, session.user)
     subcontrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Subcontributions',
                              'Subcontribution "{}" has been updated'.format(subcontrib.title), session.user)
@@ -139,6 +143,7 @@ def update_subcontribution(subcontrib, data):
 def delete_subcontribution(subcontrib):
     subcontrib.is_deleted = True
     db.session.flush()
+    signals.event.subcontribution_deleted.send(subcontrib)
     logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
     subcontrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
                              'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user)
