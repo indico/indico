@@ -8,9 +8,9 @@
         <ul class="dropdown">
             {% for form_type in custom_field_types %}
                 <li>
-                    <a data-ajax-dialog
+                    <a data-ajax-dialog class="js-action-button"
                        data-href="{{ url_for('.create_field', event, field_type=form_type.name) }}"
-                       data-title="{% trans %}Add custom field {% endtrans %}">
+                       data-title="{% trans %}Add custom field{% endtrans %}">
                         {{ form_type.friendly_name }}
                     </a>
                 </li>
@@ -20,7 +20,17 @@
 
     {% if custom_fields %}
         {% for custom_field in custom_fields %}
-            <div>{{ custom_field }}</div>
+            <div>
+                {{ custom_field }}
+                <a class="icon-edit" data-ajax-dialog js-action-button
+                   data-href="{{ url_for('.manage_field', event, custom_field) }}"
+                   data-title="{% trans %}Edit custom field{% endtrans %}"></a>
+                <a class="js-delete-contribution-field icon-remove"
+                   data-method="POST"
+                   data-href="{{ url_for('.delete_field', event, custom_field) }}"
+                   data-confirm="{% trans %}Do you really want to delete this field? Data stored in this field for each contributions will be lost.{% endtrans %}"
+                   data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
+            </div>
         {% endfor %}
     {% else %}
         {%- call message_box('info') %}
@@ -39,6 +49,28 @@
     (function() {
         'use strict';
 
-        $('.manage-contribution-fields').dropdown();
+        var $dialog = $('.manage-contribution-fields');
+
+        $dialog.dropdown();
+
+        $dialog.on('indico:confirmed', '.js-delete-contribution-field', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $dialog.trigger('ajaxDialog:reload');
+                }
+            });
+        });
+
+        $dialog.on('ajaxDialog:closed', '.js-action-button', function(evt, data) {
+            if (data) {
+                $dialog.trigger('ajaxDialog:reload');
+            }
+        });
     })()
 </script>

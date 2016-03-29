@@ -117,6 +117,10 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'de
 _bp.add_url_rule('/manage/contributions/fields/', 'manage_fields', RHManageContributionFields)
 _bp.add_url_rule('/manage/contributions/fields/create/<field_type>', 'create_field', RHCreateContributionField,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/fields/<int:contrib_field_id>', 'manage_field', RHEditContributionField,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/fields/<int:contrib_field_id>/delete', 'delete_field',
+                 RHDeleteContributionField, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)

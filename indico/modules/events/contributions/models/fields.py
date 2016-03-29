@@ -20,6 +20,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -110,6 +111,10 @@ class ContributionField(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'field_type', is_required=False, is_active=True, _text=self.title)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, contrib_field_id=self.id)
 
 
 class ContributionFieldValueBase(db.Model):
