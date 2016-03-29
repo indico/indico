@@ -328,8 +328,12 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
 
-    def get_field_value(self, field_id):
-        return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
+    def get_field_value(self, field_id, raw=False):
+        fv = next((v for v in self.field_values if v.contribution_field_id == field_id), None)
+        if raw:
+            return fv
+        else:
+            return fv.friendly_data if fv else ''
 
 
 @listens_for(mapper, 'after_configured', once=True)
