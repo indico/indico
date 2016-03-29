@@ -505,7 +505,7 @@ class RHCreateContributionField(RHManageContributionsBase):
             self.event_new.contribution_fields.append(contrib_field)
             db.session.flush()
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                               'Added field: {}'.format(contrib_field.title), session.user,)
+                               'Added field: {}'.format(contrib_field.title), session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
@@ -515,24 +515,36 @@ class RHManageContributionFieldBase(RHManageContributionBase):
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.contrib_type
+            lambda self: self.contrib_field
         }
     }
 
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
-        # TODO get contribution field
+        self.contrib_field = ContributionField.get_one(request.view_args['contrib_field_id'])
 
 
 class RHEditContributionField(RHManageContributionFieldBase):
     """Dialog to edit a custom field"""
 
     def _process(self):
-        return
+        field_class = get_contrib_field_types()[self.contrib_field.field_type]
+        form = field_class.create_config_form(obj=FormDefaults(self.contrib_field, **self.contrib_field.field_data))
+        if form.validate_on_submit():
+            old_title = self.contrib_field.title
+            self.contrib_field.field.update_object(form.data)
+            db.session.flush()
+            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                               'Modified field: {}'.format(old_title), session.user)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
 
 
 class RHDeleteContributionField(RHManageContributionFieldBase):
     """Dialog to delete a custom contribution field"""
 
     def _process(self):
-        return
+        db.session.delete(self.contrib_field)
+        db.session.flush()
+        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+                           'Deleted field: {}'.format(self.contrib_field.title), session.user)
