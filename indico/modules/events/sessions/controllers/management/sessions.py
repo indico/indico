@@ -61,7 +61,10 @@ class RHSessionsList(RHManageSessionsBase):
     """Display list of all sessions within the event"""
 
     def _process(self):
+        selected_entry = request.args.get('selected')
+        selected_entry = int(selected_entry) if selected_entry else None
         return WPManageSessions.render_template('management/session_list.html', self._conf,
+                                                selected_entry=selected_entry,
                                                 event=self.event_new, **_get_session_list_args(self.event_new))
 
 

@@ -131,8 +131,10 @@ class RHContributions(RHManageContributionsBase):
         if self.reporter.static_link_used:
             return redirect(self.reporter.get_report_url())
         contrib_report_args = self.reporter.get_contrib_report_kwargs()
+        selected_entry = request.args.get('selected')
+        selected_entry = int(selected_entry) if selected_entry else None
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
-                                                     **contrib_report_args)
+                                                     selected_entry=selected_entry, **contrib_report_args)
 
 
 class RHContributionsReportCustomize(RHManageContributionsBase):
