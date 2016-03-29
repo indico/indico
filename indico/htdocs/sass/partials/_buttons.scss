@@ -205,6 +205,12 @@
             vertical-align: -10%;
         }
     }
+
+    &.inconspicuous {
+        box-shadow: none !important;
+        background: transparent !important;
+        border: none;
+    }
 }
 
 a.i-big-button {

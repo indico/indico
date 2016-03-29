@@ -8,15 +8,21 @@
 
 {% block page_actions %}
     {%- if event.type == 'conference' -%}
-        <div class="group">
-            <div class="i-button label icon-settings"></div>
-            <button class="i-button" data-ajax-dialog data-reload-after="customData"
-                    title="{% trans %}Manage contribution types{% endtrans %}"
-                    data-title="{% trans %}Manage contribution types{% endtrans %}"
-                    data-href="{{ url_for('.manage_types', event) }}">
-                {% trans %}Types{% endtrans %}
-            </button>
-        </div>
+        <a id="contributions-settings-dropdown"
+           class="i-button inconspicuous icon-settings arrow js-dropdown"
+           data-toggle="dropdown"></a>
+        <ul class="dropdown">
+            <li>
+                <a href="#"
+                   title="{% trans %}Manage contribution types{% endtrans %}"
+                   data-ajax-dialog
+                   data-reload-after="customData"
+                   data-title="{% trans %}Manage contribution types{% endtrans %}"
+                   data-href="{{ url_for('.manage_types', event) }}"
+                   data-qtip-position="right">
+                    {% trans %}Contribution types{% endtrans %}</a>
+            </li>
+        </ul>
     {%- endif -%}
 {% endblock %}
 

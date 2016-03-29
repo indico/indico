@@ -15,6 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+%title-border {
+    border-bottom: 1px solid $separator-color;
+}
+
 %indico-page {
     header {
         $separator-margin: 0.4rem;
@@ -22,17 +26,18 @@
 
         h2, h3 {
             display: inline-block;
-            margin-bottom: $separator-margin;
             margin-top: 0;
+            margin-bottom: 0;
         }
 
         h3 {
             color: $light-black;
+            margin-top: $separator-margin;
             margin-left: 1em;
         }
 
-        div.title {
-            border-bottom: 1px solid $separator-color;
+        > div.title {
+            @extend %title-border;
         }
 
         div.description {
@@ -40,6 +45,16 @@
             color: $dark-gray;
             font-size: 1.2em;
             margin-top: $separator-margin;
+        }
+
+        .title-with-actions {
+            @extend %title-border;
+            display: flex;
+            padding-bottom: $separator-margin;
+
+            > .actions .i-button{
+                margin-top: 3px;
+            }
         }
     }
 }
