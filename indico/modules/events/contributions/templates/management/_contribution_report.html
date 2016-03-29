@@ -76,7 +76,9 @@
                                         <a href="#" class="contrib-start-date icon-calendar"
                                            data-href="{{ url_for('.manage_start_date', contrib) }}">
                                         </a>
-                                        <span class="label">{{ contrib.start_dt|format_datetime('short') }}</span>
+                                        <span class="label">
+                                            {{ contrib.start_dt|format_datetime('short', timezone=event.timezone) }}
+                                        </span>
                                     {%- else -%}
                                         <em>
                                             {% trans %}Not scheduled{% endtrans %}
