@@ -38,7 +38,8 @@ def _ensure_consistency(contrib):
     session, and that session block must match the session block of
     the contribution.
 
-    :return: A dict containing the data needed to
+    :return: A bool indicating whether the contribution has been
+             unscheduled to preserve consistency.
     """
     entry = contrib.timetable_entry
     if entry is None:
@@ -53,6 +54,7 @@ def _ensure_consistency(contrib):
         if parent.session_block.session != contrib.session or parent.session_block != contrib.session_block:
             contrib.timetable_entry = None
             return True
+    return False
 
 
 def create_contribution(event, data):
