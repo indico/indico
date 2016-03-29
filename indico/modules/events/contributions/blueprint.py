@@ -47,7 +47,11 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHManageContributionTypes,
                                                                         RHEditContributionType,
                                                                         RHCreateContributionType,
-                                                                        RHDeleteContributionType)
+                                                                        RHDeleteContributionType,
+                                                                        RHManageContributionFields,
+                                                                        RHCreateContributionField,
+                                                                        RHEditContributionField,
+                                                                        RHDeleteContributionField)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -108,6 +112,11 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>', 'manage_ty
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'delete_type',
                  RHDeleteContributionType, methods=('POST',))
+
+# Custom contribution fields
+_bp.add_url_rule('/manage/contributions/fields/', 'manage_fields', RHManageContributionFields)
+_bp.add_url_rule('/manage/contributions/fields/create/<field_type>', 'create_field', RHCreateContributionField,
+                 methods=('GET', 'POST'))
 
 # Display
 _bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)
