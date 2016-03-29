@@ -208,7 +208,7 @@ class ProtectionManagersMixin(ProtectionMixin):
     def all_manager_emails(self):
         """Return the emails of all managers"""
         # We ignore email principals here. They never signed up in indico anyway...
-        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user}
+        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user and p.has_management_role()}
 
     @memoize_request
     def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
