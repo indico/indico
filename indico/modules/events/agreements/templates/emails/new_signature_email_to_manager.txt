@@ -10,7 +10,7 @@
 
 {% block body -%}
 A new agreement has been {{ state }} for the event:
-{{ agreement.event.getTitle() }}
+{{ agreement.event_new.title }}
 
 {% filter underline %}Person Info{% endfilter %}
 Name:  {{ agreement.person_name }}

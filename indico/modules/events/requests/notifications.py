@@ -46,7 +46,7 @@ def notify_request_managers(req, template, **context):
     :param template: the template for the notification
     :param context: data passed to the template
     """
-    event = req.event
+    event = req.event_new
     from_addr = Config.getInstance().getSupportEmail()
     request_manager_emails = _get_request_manager_emails(req)
     if not request_manager_emails:
@@ -65,7 +65,7 @@ def notify_event_managers(req, template, **context):
     :param template: the template for the notification
     :param context: data passed to the template
     """
-    event = req.event
+    event = req.event_new
     from_addr = Config.getInstance().getSupportEmail()
     context['event'] = event
     context['req'] = req

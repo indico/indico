@@ -1,9 +1,5 @@
 {% extends 'emails/base.txt' %}
 
-{% set request_created_by = req.created_by_user %}
-{% set event_created_by = event.as_event.creator %}
-
-
 {% macro user_details(user) -%}
     Name:     {{ user.full_name }}
     Email:    {{ user.email }}
@@ -14,13 +10,13 @@
 
 
 {% macro event_details(event) -%}
-    Name:     {{ event.getTitle() }}
-    {% if event.getStartDate().date() == event.getEndDate().date() -%}
-    Date:     {{ event.getStartDate() | format_date }}, {{ event.getStartDate() | format_time }}
+    Name:     {{ event.title }}
+    {% if event.start_dt.date() == event.end_dt.date() -%}
+    Date:     {{ event.start_dt | format_date }}, {{ event.start_dt | format_time }}
     {%- else -%}
-    Dates:    {{ event.getStartDate() | format_date }}, {{ event.getStartDate() | format_time }} - {{ event.getEndDate() | format_date }}, {{ event.getEndDate() | format_time }}
+    Dates:    {{ event.start_dt | format_date }}, {{ event.start_dt | format_time }} - {{ event.end_dt | format_date }}, {{ event.end_dt | format_time }}
     {%- endif %}
-    Location: {% if event.getLocation() %}{{ event.getLocation().getName() }}: {% endif %}{% if event.getRoom() %}{{ event.getRoom().getName() }}{% endif %}
+    Location: {% if event.venue_name %}{{ event.venue_name }}: {% endif %}{{ event.room_name }}
     Details:  {{ url_for('event.conferenceDisplay', event, _external=True) }}
 {%- endmacro %}
 
@@ -39,11 +35,11 @@
         {{ url_for('requests.event_requests_details', req, _external=True) }}
 
         {% filter underline %}Requested by{% endfilter %}
-        {{ user_details(request_created_by) }}
-        {%- if request_created_by != event_created_by %}
+        {{ user_details(req.created_by_user) }}
+        {%- if req.created_by_user != event.creator %}
 
             {% filter underline %}Event created by{% endfilter %}
-            {{ user_details(event_created_by) }}
+            {{ user_details(event.creator) }}
         {%- endif %}
 
         {% filter underline %}Event details{% endfilter %}
