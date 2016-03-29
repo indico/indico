@@ -18,12 +18,15 @@ from indico.core.signals.event import _signals
 
 
 contribution_created = _signals.signal('contribution-created', """
-Called when a new contribution is created. The `sender` is the new contribution,
-its parent category is passed in the `parent` kwarg.
+Called when a new contribution is created. The `sender` is the new contribution.
 """)
 
 contribution_deleted = _signals.signal('contribution-deleted', """
 Called when a contribution is deleted. The *sender* is the contribution.
+""")
+
+contribution_updated = _signals.signal('contribution-updated', """
+Called when a contribution is modified. The *sender* is the contribution.
 """)
 
 contribution_title_changed = _signals.signal('contribution-title-changed', """
@@ -31,6 +34,7 @@ Called when the title of a contribution is changed. The `sender` is the contribu
 the old/new titles are passed in the `old` and `new` kwargs.
 """)
 
+# deprecated
 contribution_data_changed = _signals.signal('contribution-data-changed', """
 Called when some data of the contribution changed. The `sender` is the contribution.
 """)
@@ -41,13 +45,15 @@ Called when the protection mode of the contribution changed. The `sender` is the
 """)
 
 subcontribution_created = _signals.signal('subcontribution-created', """
-Called when a new subcontribution is created. The `sender` is the new subcontribution,
-its parent category is passed in the `parent` kwarg.
+Called when a new subcontribution is created. The `sender` is the new subcontribution.
 """)
 
 subcontribution_deleted = _signals.signal('subcontribution-deleted', """
-Called when a subcontribution is deleted. The *sender* is the subcontribution, the parent
-contribution is passed in the `parent` kwarg.
+Called when a subcontribution is deleted. The *sender* is the subcontribution.
+""")
+
+subcontribution_updated = _signals.signal('subcontribution-updated', """
+Called when a subcontribution is modified. The *sender* is the subcontribution.
 """)
 
 subcontribution_title_changed = _signals.signal('subcontribution-title-changed', """
@@ -55,6 +61,7 @@ Called when the title of a subcontribution is changed. The `sender` is the subco
 the old/new titles are passed in the `old` and `new` kwargs.
 """)
 
+# deprecated
 subcontribution_data_changed = _signals.signal('subcontribution-data-changed', """
 Called when some data of the subcontribution changed. The `sender` is the subcontribution.
 """)

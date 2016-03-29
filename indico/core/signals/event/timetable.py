@@ -14,12 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from blinker import Namespace
+from indico.core.signals.event import _signals
 
-_signals = Namespace()
 
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.notes import *
-from indico.core.signals.event.registration import *
-from indico.core.signals.event.timetable import *
+timetable_entry_created = _signals.signal('timetable-entry-created', """
+Called when a new timetable entry is created. The `sender` is the new entry.
+""")
+
+timetable_entry_updated = _signals.signal('timetable-entry-updated', """
+Called when a timetable entry is updated. The `sender` is the entry.
+""")
+
+timetable_entry_deleted = _signals.signal('timetable-entry-deleted', """
+Called when a timetable entry is deleted. The `sender` is the entry.
+This signal is triggered right before the entry deletion is performed.
+""")

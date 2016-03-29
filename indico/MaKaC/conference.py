@@ -2351,13 +2351,12 @@ class Conference(CommonObjectBase, Locatable):
         return [self.getOwnerList()[0].getCategoryPath()]
 
     def notifyContributions(self):
-
-        for c in self.getContributionList():
-            # take care of subcontributions
-            for sc in c.getSubContributionList():
-                signals.event.subcontribution_deleted.send(sc, parent=c)
-
-            # signals.event.contribution_deleted.send(c, parent=self)
+        pass
+        # for c in self.getContributionList():
+        #     # take care of subcontributions
+        #     for sc in c.getSubContributionList():
+        #         signals.event.subcontribution_deleted.send(sc, parent=c)
+        #     signals.event.contribution_deleted.send(c, parent=self)
 
     def delete(self, user=None):
         """deletes the conference from the system.
@@ -3050,7 +3049,7 @@ class Conference(CommonObjectBase, Locatable):
         for sub in newContrib.getSubmitterList():
             self.addContribSubmitter(newContrib,sub)
 
-        signals.event.contribution_created.send(newContrib, parent=self)
+        # signals.event.contribution_created.send(newContrib, parent=self)
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -7789,7 +7788,7 @@ class Contribution(CommonObjectBase, Locatable):
     def newSubContribution(self):
         newSub = SubContribution()
         self.addSubContribution(newSub)
-        signals.event.subcontribution_created.send(newSub, parent=self)
+        # signals.event.subcontribution_created.send(newSub, parent=self)
         return newSub
 
     def addSubContribution(self, newSubCont, subcontrib_id=None):
@@ -8895,7 +8894,7 @@ class SubContribution(CommonObjectBase, Locatable):
         return self.getOwner().getSchedule()
 
     def delete(self):
-        signals.event.subcontribution_deleted.send(self, parent=self.getOwner())
+        # signals.event.subcontribution_deleted.send(self, parent=self.getOwner())
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
