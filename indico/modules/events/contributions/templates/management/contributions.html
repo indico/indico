@@ -154,5 +154,9 @@
             createTrackURL: {{ url_for('tracks.create_track', event) | tojson }},
             timetableRESTURL: {{ url_for('timetable.timetable_rest', event, _method='POST') | tojson }}
         });
+        {% if selected_entry %}
+            $('#search-input').val('#{{ selected_entry }}');
+            applySearchFilters();
+        {% endif %}
     </script>
 {% endblock %}
