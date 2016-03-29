@@ -127,4 +127,5 @@ class LegacySubContributionMapping(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'event_id', 'legacy_contribution_id', 'legacy_subcontribution_id', 'contribution_id')
+        return format_repr(self, 'event_id', 'legacy_contribution_id', 'legacy_subcontribution_id',
+                           'subcontribution_id')
