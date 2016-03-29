@@ -26,7 +26,8 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
+from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
+                                                        delete_timetable_entry)
 
 
 def _ensure_consistency(contrib):
@@ -46,13 +47,13 @@ def _ensure_consistency(contrib):
         return False
     if entry.parent_id is None and (contrib.session is not None or contrib.session_block is not None):
         # Top-level entry but we have a session/block set
-        contrib.timetable_entry = None
+        delete_timetable_entry(entry, log=False)
         return True
     elif entry.parent_id is not None:
         parent = entry.parent
         # Nested entry but no or a different session/block set
         if parent.session_block.session != contrib.session or parent.session_block != contrib.session_block:
-            contrib.timetable_entry = None
+            delete_timetable_entry(entry, log=False)
             return True
     return False
 
@@ -60,10 +61,10 @@ def _ensure_consistency(contrib):
 def create_contribution(event, data):
     contrib = Contribution(event_new=event)
     start_dt = data.pop('start_date', None)
+    contrib.populate_from_dict(data)
     if start_dt is not None:
         create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
                                        'contribution': contrib})
-    contrib.populate_from_dict(data)
     db.session.flush()
     logger.info('Contribution %s created by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
@@ -107,7 +108,8 @@ def update_contribution(contrib, data):
 
 def delete_contribution(contrib):
     contrib.is_deleted = True
-    contrib.timetable_entry = None
+    if contrib.timetable_entry is not None:
+        delete_timetable_entry(contrib.timetable_entry, log=False)
     db.session.flush()
     signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
