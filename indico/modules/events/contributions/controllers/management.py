@@ -16,16 +16,20 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
+from indico.modules.events.contributions import get_contrib_field_types
 from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
                                                        ContributionStartDateForm, ContributionDurationForm,
                                                        ContributionTypeForm)
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
@@ -469,3 +473,66 @@ class RHDeleteContributionType(RHManageContributionTypeBase):
         self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                            'Deleted type: {}'.format(self.contrib_type.name), session.user)
         return jsonify_data(flash=False)
+
+
+class RHManageContributionFields(RHManageContributionsBase):
+    """Dialog to manage the custom contribution fields of an event"""
+
+    def _process(self):
+        custom_fields = self.event_new.contribution_fields
+        custom_field_types = sorted(get_contrib_field_types().values(), key=attrgetter('friendly_name'))
+        return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event_new,
+                                custom_fields=custom_fields, custom_field_types=custom_field_types)
+
+
+class RHCreateContributionField(RHManageContributionsBase):
+    """Dialog to create a new custom field"""
+
+    def _checkParams(self, params):
+        RHManageContributionsBase._checkParams(self, params)
+        field_types = get_contrib_field_types()
+        try:
+            self.field_cls = field_types[request.view_args['field_type']]
+        except KeyError:
+            raise NotFound
+
+    def _process(self):
+        form = self.field_cls.create_config_form()
+        if form.validate_on_submit():
+            contrib_field = ContributionField()
+            field = self.field_cls(contrib_field)
+            field.update_object(form.data)
+            self.event_new.contribution_fields.append(contrib_field)
+            db.session.flush()
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                               'Added field: {}'.format(contrib_field.title), session.user,)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHManageContributionFieldBase(RHManageContributionBase):
+    """Manage a custom contribution field of an event"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.contrib_type
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageContributionsBase._checkParams(self, params)
+        # TODO get contribution field
+
+
+class RHEditContributionField(RHManageContributionFieldBase):
+    """Dialog to edit a custom field"""
+
+    def _process(self):
+        return
+
+
+class RHDeleteContributionField(RHManageContributionFieldBase):
+    """Dialog to delete a custom contribution field"""
+
+    def _process(self):
+        return

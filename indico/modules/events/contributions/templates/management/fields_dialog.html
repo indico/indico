@@ -1,0 +1,44 @@
+{% from 'message_box.html' import message_box %}
+
+<div class="manage-contribution-fields">
+    <div class="toolbar">
+        <button class="i-button arrow icon-plus highlight" data-toggle="dropdown">
+            {% trans %}New contribution field{% endtrans %}
+        </button>
+        <ul class="dropdown">
+            {% for form_type in custom_field_types %}
+                <li>
+                    <a data-ajax-dialog
+                       data-href="{{ url_for('.create_field', event, field_type=form_type.name) }}"
+                       data-title="{% trans %}Add custom field {% endtrans %}">
+                        {{ form_type.friendly_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if custom_fields %}
+        {% for custom_field in custom_fields %}
+            <div>{{ custom_field }}</div>
+        {% endfor %}
+    {% else %}
+        {%- call message_box('info') %}
+            {%- trans %}There are no custom contribution fields yet.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+
+    <div class="toolbar">
+        <div class="group right">
+            <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        $('.manage-contribution-fields').dropdown();
+    })()
+</script>
