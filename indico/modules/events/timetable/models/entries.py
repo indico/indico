@@ -173,13 +173,14 @@ class TimetableEntry(db.Model):
         from indico.modules.events.contributions import Contribution
         from indico.modules.events.sessions.models.blocks import SessionBlock
         from indico.modules.events.timetable.models.breaks import Break
+        self.session_block = self.contribution = self.break_ = None
         if isinstance(value, SessionBlock):
             self.session_block = value
         elif isinstance(value, Contribution):
             self.contribution = value
         elif isinstance(value, Break):
             self.break_ = value
-        else:
+        elif value is not None:
             raise TypeError('Unexpected object: {}'.format(value))
 
     @property

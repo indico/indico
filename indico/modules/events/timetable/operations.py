@@ -68,3 +68,14 @@ def update_timetable_entry(entry, data):
     entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                         "Entry for {} '{}' modified".format(object_type, object_title), session.user,
                         data={'Time': format_datetime(entry.start_dt)})
+
+
+def delete_timetable_entry(entry, log=True):
+    object_type, object_title = _get_object_info(entry)
+    entry.object = None
+    db.session.flush()
+    if log:
+        logger.info('Timetable entry %s deleted by %s', entry, session.user)
+        entry.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
+                            "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
+                            data={'Time': format_datetime(entry.start_dt)})
