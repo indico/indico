@@ -86,4 +86,4 @@ def test_find_earliest_gap_valid_day(dummy_event_new, event_start_dt, event_end_
         with pytest.raises(ValueError):
             find_earliest_gap(dummy_event_new, **data)
     else:
-        find_earliest_gap(dummy_event_new, **data)
+        assert find_earliest_gap(dummy_event_new, **data).date() == day
