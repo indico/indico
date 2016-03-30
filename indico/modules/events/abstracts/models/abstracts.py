@@ -89,3 +89,8 @@ class Abstract(DescriptionMixin, db.Model):
 
     def get_field_value(self, field_id):
         return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
+
+    @property
+    def as_legacy(self):
+        amgr = self.event_new.as_legacy.getAbstractMgr()
+        return amgr.getAbstractById(str(self.legacy_id))

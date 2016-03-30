@@ -66,6 +66,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
                          db.Index(None, 'event_id', 'track_id'),
                          db.Index(None, 'event_id', 'abstract_id'),
+                         db.Index('ix_uq_abstract_id', 'abstract_id', unique=True,
+                                  postgresql_where=db.text('NOT is_deleted')),
                          db.CheckConstraint("session_block_id IS NULL OR session_id IS NOT NULL",
                                             'session_block_if_session'),
                          db.ForeignKeyConstraint(['session_block_id', 'session_id'],
@@ -219,6 +221,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         lazy=True,
         backref=db.backref(
             'contribution',
+            primaryjoin='(Contribution.abstract_id == Abstract.id) & ~Contribution.is_deleted',
             lazy=True,
             uselist=False
         )
@@ -349,7 +352,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return False
 
     def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection"""
+        """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
     def get_field_value(self, field_id, raw=False):
