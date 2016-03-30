@@ -12,7 +12,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.date_time import iterdays, overlaps
+from indico.util.date_time import get_day_start, iterdays, overlaps
 
 
 def is_visible_from(event, categ):
@@ -73,7 +73,7 @@ def find_earliest_gap(event, day, duration):
     if not (event.start_dt.date() <= day <= event.end_dt.date()):
         raise ValueError("Day is out of bounds.")
     entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt, Date) == day)
-    start_dt = event.start_dt
+    start_dt = event.start_dt if event.start_dt.date() == day else get_day_start(day, tzinfo=event.tzinfo)
     end_dt = start_dt + duration
     for entry in entries:
         if not overlaps((start_dt, end_dt), (entry.start_dt, entry.end_dt)):
