@@ -63,6 +63,8 @@ class ContributionType(db.Model):
     )
 
     # relationship backrefs:
+    # - abstracts (Abstract.type)
+    # - accepted_as_abstracts (Abstract.accepted_type)
     # - contributions (Contribution.type)
 
     @return_ascii
