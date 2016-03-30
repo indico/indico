@@ -24,6 +24,8 @@ from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.info import HelperMaKaCInfo
+from indico.web.flask.util import url_for
+
 
 class ConfTitleTplVar(TplVar):
     _name="conference_title"
@@ -87,9 +89,9 @@ class AbsSessionTplVar(TplVar):
     def getValue(cls,abstract):
         status=abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            session = abstract.getContribution().getSession()
+            session = abstract.as_new.contribution.session
             if session is not None:
-                return session.getTitle()
+                return session.title
         return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
@@ -149,8 +151,8 @@ class ContribURLTplVar(TplVar):
     def getValue(cls,abstract):
         status=abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            contrib = abstract.getContribution()
-            return str(urlHandlers.UHContributionDisplay.getURL(contrib))
+            contrib = abstract.as_new.contribution
+            return str(url_for('contributions.display_contribution', contrib))
     getValue=classmethod(getValue)
 
 
@@ -268,4 +270,3 @@ class EmailNotificator(Notificator):
             tpl.setFromAddr(tpl.getConference().getSupportInfo().getEmail(returnNoReply=True))
 
         GenericMailer.send(self.apply(abstract,tpl))
-

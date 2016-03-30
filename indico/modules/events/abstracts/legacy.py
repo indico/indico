@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import timedelta
+
 from indico.core.db import db
 from indico.core import signals
 from indico.modules.events.abstracts.models.abstracts import Abstract
@@ -23,6 +25,13 @@ from indico.modules.events.contributions.models.fields import ContributionField
 from indico.util.i18n import _
 from indico.util.string import encode_utf8
 from indico.util.text import wordsCounter
+from indico.modules.events.contributions.operations import create_contribution
+from indico.modules.events.models.persons import EventPerson
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.contributions.models.fields import ContributionFieldValue
+from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
+from indico.modules.users.models.users import User, UserTitle
+from indico.util.string import to_unicode
 
 
 FIELD_TYPE_MAP = {
@@ -43,6 +52,67 @@ def _contribution_deleted(contrib, parent=None):
                 abstract.as_legacy.addTrack(status.getTrack())
             abstract.as_legacy.setCurrentStatus(AbstractStatusSubmitted(abstract.as_legacy))
             abstract.contribution = None
+
+
+def person_from_data(person_data, event):
+    user = User.find_first(~User.is_deleted, User.all_emails.contains(person_data['email'].lower()))
+    if user:
+        return EventPerson.for_user(user, event)
+
+    person = EventPerson.find_first(email=person_data['email'].lower())
+    if not person:
+        person = EventPerson(event_new=event, **person_data)
+    return person
+
+
+@no_autoflush
+def contribution_from_abstract(abstract, session):
+    from MaKaC.review import AbstractStatusAccepted
+
+    event = abstract.as_new.event_new
+    duration = session.default_contribution_duration if session else timedelta(minutes=15)
+    links = []
+
+    for auth in abstract.getAuthorList():
+        author_type = AuthorType.primary if abstract.isPrimaryAuthor(auth) else AuthorType.secondary
+        person_data = {
+            'title': UserTitle.from_legacy(to_unicode(auth.getTitle())),
+            'email': to_unicode(auth.getEmail()),
+            'address': to_unicode(auth.getAddress()),
+            'affiliation': to_unicode(auth.getAffiliation()),
+            'first_name': to_unicode(auth.getFirstName()),
+            'last_name': to_unicode(auth.getSurName()),
+            'phone': to_unicode(auth.getTelephone())
+        }
+
+        person = person_from_data(person_data, event)
+        person_data.pop('email')
+        links.append(ContributionPersonLink(author_type=author_type, person=person,
+                                            is_speaker=abstract.isSpeaker(auth), **person_data))
+
+    contrib = create_contribution(event, {'title': abstract.getTitle(), 'duration': duration,
+                                          'person_link_data': {link: True for link in links}})
+    contrib.abstract = abstract.as_new
+
+    contrib.description = abstract.as_new.description
+    for field_val in abstract.as_new.field_values:
+        new_val = ContributionFieldValue(contribution_field=field_val.contribution_field, data=field_val.data)
+        contrib.field_values.append(new_val)
+
+    # if this is an accepted abstract, set track and type if present
+    status = abstract.getCurrentStatus()
+    if isinstance(status, AbstractStatusAccepted):
+        track = abstract.as_new.accepted_track
+        contrib_type = abstract.as_new.accepted_type
+        if track:
+            contrib.track_id = int(track.getId())
+        if contrib_type:
+            contrib.type = contrib_type
+
+    if session:
+        contrib.session = session
+
+    return contrib
 
 
 class AbstractFieldWrapper(object):
@@ -389,10 +459,11 @@ class AbstractFieldContentWrapper(object):
             return self.field_val.data != other
         return True
 
+    @encode_utf8
     def __str__(self):
         if self.field.field_type == 'single_choice':
-            return str(AbstractSelectionFieldWrapper(self.field).getOption(self.value))
-        return str(self.value)
+            return unicode(AbstractSelectionFieldWrapper(self.field).getOption(self.value))
+        return unicode(self.value or '')
 
 
 class AbstractManagerLegacyMixin(object):
