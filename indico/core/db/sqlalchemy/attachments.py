@@ -41,7 +41,8 @@ class AttachedItemsMixin(object):
 
     @declared_attr
     def attachment_count(cls):
-        from indico.modules.attachments import AttachmentFolder, Attachment
+        from indico.modules.attachments.models.attachments import Attachment
+        from indico.modules.attachments.models.folders import AttachmentFolder
         query = (db.select([db.func.count(Attachment.id)])
                  .select_from(db.join(Attachment, AttachmentFolder, Attachment.folder_id == AttachmentFolder.id))
                  .where(db.and_(
