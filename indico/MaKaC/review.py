@@ -14,34 +14,35 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import tempfile
 from copy import copy
-from pytz import timezone
-from indico.util.string import safe_upper, safe_slice
-from indico.util.i18n import i18nformat
+from datetime import datetime
+
+import BTrees.OIBTree as OIBTree
+from BTrees.IOBTree import IOBTree
+from BTrees.OOBTree import OOBTree, intersection, union
 from persistent import Persistent
 from persistent.list import PersistentList
-from BTrees.OOBTree import OOBTree, intersection, union
-from BTrees.IOBTree import IOBTree
-import BTrees.OIBTree as OIBTree
-from datetime import datetime
-from MaKaC.common.Counter import Counter
-from MaKaC.errors import MaKaCError, NoReportError
-from MaKaC.trashCan import TrashCanManager
-from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.i18n import _
-from indico.core.config import Config
-from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.fossils.abstracts import IAbstractFieldFossil
-from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
-from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
-from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
+from pytz import timezone
 
-from indico.modules.events.abstracts.legacy import (AbstractFieldManagerAdapter, AbstractLegacyMixin,
+from indico.core.config import Config
+from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
+                                                    AbstractFieldManagerAdapter,
+                                                    AbstractLegacyMixin,
                                                     AbstractManagerLegacyMixin)
-from indico.util.i18n import N_
+from indico.util.string import safe_slice, safe_upper
 from indico.util.text import wordsCounter
 
-import tempfile
+from MaKaC.common.Counter import Counter
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.errors import MaKaCError, NoReportError
+from MaKaC.fossils.abstracts import (IAbstractFieldFossil,
+                                     IAbstractSelectionFieldFossil,
+                                     IAbstractTextFieldFossil,
+                                     ISelectionFieldOptionFossil)
+from MaKaC.i18n import _
+from MaKaC.trashCan import TrashCanManager
 
 
 class _AbstractParticipationIndex(Persistent):
@@ -2145,23 +2146,13 @@ class Abstract(AbstractLegacyMixin, Persistent):
         """
         """
         self.getCurrentStatus().accept(responsible, destTrack, type, comments)
-        #add the abstract to the track for which it has been accepted so it
-        #   is visible for it.
+        # add the abstract to the track for which it has been accepted so it
+        # is visible for it.
         if destTrack is not None:
             destTrack.addAbstract(self)
-        #once the abstract is accepted a new contribution under the destination
-        #   track must be created
-        # ATTENTION: This import is placed here explicitely for solving
-        #   problems with circular imports
-        from MaKaC.conference import AcceptedContribution
-        contrib = AcceptedContribution(self)
-        if session:
-            contrib.setSession(session)
-            contrib.setDuration(dur=session.getContribDuration())
-        else:
-            contrib.setDuration()
-        self.getCurrentStatus().setContribution(contrib)
-        self._setContribution(contrib)
+
+        contrib = contribution_from_abstract(self, session)
+        self.as_new.contribution = contrib
 
     def reject(self, responsible, comments=""):
         """
@@ -3053,17 +3044,6 @@ class AbstractStatusAccepted( AbstractStatus ):
             self._contribType = None
         return self._contribType
 
-    def setContribution( self, newContrib ):
-        self._contrib = newContrib
-
-    def getContribution( self ):
-        try:
-            if self._contrib:
-                pass
-        except AttributeError:
-            self._contrib = None
-        return self._contrib
-
     def update( self ):
         return
 
@@ -3092,18 +3072,6 @@ class AbstractStatusAccepted( AbstractStatus ):
 
     def mergeInto(self,responsible,targetAbs,comments=""):
         raise MaKaCError( _("Cannot merge an abstract which is already accepted"))
-
-    def withdraw(self,resp,comments=""):
-        """
-        """
-        contrib=self.getContribution()
-        #this import is made here and not at the top of the file in order to
-        #   avoid recursive import troubles
-        from MaKaC.conference import ContribStatusWithdrawn
-        if contrib is not None and \
-                not isinstance(contrib.getCurrentStatus(),ContribStatusWithdrawn):
-            contrib.withdraw(resp, i18nformat(""" _("abstract withdrawn"): %s""")%comments)
-        AbstractStatus.withdraw(self,resp,comments)
 
 
 class AbstractStatusRejected( AbstractStatus ):

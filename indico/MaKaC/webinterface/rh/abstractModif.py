@@ -33,6 +33,7 @@ from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.base import LatexRunner
+from indico.modules.events.contributions.operations import delete_contribution
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -212,14 +213,14 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
     def _process( self ):
         if self._accept:
             cType=self._conf.getContribTypeById(self._typeId)
-            st=review.AbstractStatusAccepted(self._target,None,self._track,cType)
+            st = review.AbstractStatusAccepted(self._target, None, '')
             wrapper=_AbstractWrapper(st)
             tpl=self._target.getOwner().getNotifTplForAbstract(wrapper)
             if self._doNotify and not self._warningShown and tpl is None:
                 p=abstracts.WPModAcceptConfirmation(self,self._target)
                 return p.display(track=self._trackId,comments=self._comments,type=self._typeId,session=self._sessionId)
             else:
-                self._target.accept(self._getUser(),self._track,cType,self._comments,self._session)
+                self._target.accept(self._getUser(), self._track, cType, self._comments, self._session)
                 if self._doNotify:
                     n=EmailNotificator()
                     self._target.notify(n,self._getUser())
@@ -465,9 +466,7 @@ class RHWithdraw(RHAbstractModifBase):
 class RHBackToSubmitted(RHAbstractModifBase):
 
     def _removeAssociatedContribution(self):
-        contribution = self._abstract.getContribution()
-        contribution.getOwner().getSchedule().removeEntry(contribution.getSchEntry())
-        contribution.delete()
+        delete_contribution(self._abstract.as_new.contribution)
 
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
@@ -656,8 +655,3 @@ class RHTools(RHAbstractModifBase):
     def _process( self ):
         p = abstracts.WPModTools(self,self._target)
         return p.display()
-
-
-
-
-
