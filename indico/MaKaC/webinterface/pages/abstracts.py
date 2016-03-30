@@ -202,7 +202,7 @@ class WUserAbstracts(WConfDisplayBodyBase):
         if isinstance(status, review.AbstractStatusAccepted):
             statusLabel = _("Accepted")
             if status.getType() is not None and status.getType() != "":
-                return "%s as %s" % (statusLabel, status.getType().getName())
+                return "%s as %s" % (statusLabel, status.getType().name)
         elif isinstance(status, review.AbstractStatusRejected):
             return _("Rejected")
         elif isinstance(status, review.AbstractStatusWithdrawn):
@@ -691,7 +691,7 @@ class WAbstractManagment(wcomponents.WTemplated):
             else:
                 st = ""
                 color = ""
-            if st != "":
+            if st:
                 prog.append("""<li>%s <font size="-1" %s> %s </font></li>""" % (self.htmlText(track.getTitle()), color, st))
             else:
                 prog.append("""<li>%s</li>""" % (self.htmlText(track.getTitle())))
@@ -746,7 +746,7 @@ class WAbstractManagment(wcomponents.WTemplated):
         vars["tracks"] = self._getTracksHTML()
         vars["type"] = ""
         if self._abstract.getContribType() is not None:
-            vars["type"] = self._abstract.getContribType().getName()
+            vars["type"] = self._abstract.getContribType().name
         vars["submitDate"] = self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")
         vars["modificationDate"] = self._abstract.getModificationDate().strftime("%d %B %Y %H:%M")
         vars["disable"] = ""
@@ -850,17 +850,16 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
 
-    def _getTypeItemsHTML( self ):
-        items = [ i18nformat("""<option value="not_defined">--_("not defined")--</option>""")]
+    def _getTypeItemsHTML(self):
+        items = [i18nformat("""<option value="not_defined">--_("not defined")--</option>""")]
         status = self._abstract.getCurrentStatus()
         isPropToAcc = isinstance(status, review.AbstractStatusProposedToAccept)
-        for type in self._conf.getContribTypeList():
-            title,default = type.getName(), ""
-            if isPropToAcc and status.getType() == type:
-                title = "[*] %s"%title
+        for ctype in self._conf.as_event.contribution_types:
+            title, default = ctype.name, ""
+            if isPropToAcc and status.getType() == ctype:
+                title = "[*] %s" % title
                 default = " selected"
-            items.append( """<option value=%s%s>%s</option>"""%(\
-                        quoteattr(type.getId()), default, self.htmlText(title)))
+            items.append("""<option value="%s" %s>%s</option>""" % (ctype.id, default, self.htmlText(title)))
         return items
 
     def _getTrackItemsHTML( self ):

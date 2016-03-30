@@ -1223,7 +1223,7 @@ class RHAbstractList(RHConfModifCFABase):
         """
 
         sessionData["track"] = sessionData["acc_track"] = [track.getId() for track in self._conf.getTrackList()]
-        sessionData["type"] = sessionData["acc_type"] = [ct.getId() for ct in self._conf.getContribTypeList()]
+        sessionData["type"] = sessionData["acc_type"] = [str(ct.id) for ct in self._conf.as_event.contribution_types]
         abstractStatusList = AbstractStatusList.getInstance()
         sessionData["status"] = map(lambda status: abstractStatusList.getId( status ), abstractStatusList.getStatusList())
         sessionData['authSearch'] = ""

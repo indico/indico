@@ -956,13 +956,14 @@ class WConfModifMainData(wcomponents.WTemplated):
         if self._conf.getSupportInfo().hasEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
         typeList = []
-        for type in self._conf.getContribTypeList():
+        for ctype in self._conf.getContribTypeList():
+             # TODO: This will all go away soon
             typeList.append("""<input type="checkbox" name="types" value="%s"><a href="%s">%s</a><br>
 <table><tr><td width="30"></td><td><font><pre>%s</pre></font></td></tr></table>"""%( \
-                type.getId(), \
-                str(urlHandlers.UHConfEditContribType.getURL(type)), \
-                type.getName(), \
-                type.getDescription()))
+                ctype.id, \
+                '', \
+                ctype.name, \
+                ctype.description))
         vars["typeList"] = "".join(typeList)
         #------------------------------------------------------
         vars["eventType"] = self._conf.getType()
@@ -2113,11 +2114,11 @@ class WAbstracts( wcomponents.WTemplated ):
         if field is not None and field.getShowNoValue():
             checked = " checked"
         l = [ i18nformat("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
-        for contribType in self._conf.getContribTypeList():
+        for contribType in self._conf.as_event.contribution_types:
             checked = ""
-            if field is not None and contribType.getId() in field.getValues():
+            if field is not None and str(contribType.id) in field.getValues():
                 checked = " checked"
-            l.append( """<input type="checkbox" name="type" value=%s%s> %s"""%(quoteattr(contribType.getId()), checked, self.htmlText(contribType.getName())) )
+            l.append( """<input type="checkbox" name="type" value="%s" %s> %s"""%(contribType.id, checked, self.htmlText(contribType.name)) )
         return l
 
     def _getAccTrackFilterItemList( self ):
@@ -2128,7 +2129,7 @@ class WAbstracts( wcomponents.WTemplated ):
         l = [ i18nformat("""<input type="checkbox" name="accTrackShowNoValue"%s> --_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked = ""
-            if field is not None and t.getId() in field.getValues():
+            if field is not None and str(t.getId()) in field.getValues():
                 checked=" checked"
             l.append("""<input type="checkbox" name="acc_track" value=%s%s> (%s) %s"""%(quoteattr(t.getId()),checked,self.htmlText(t.getCode()),self.htmlText(t.getTitle())))
         return l
@@ -2139,11 +2140,11 @@ class WAbstracts( wcomponents.WTemplated ):
         if field is not None and field.getShowNoValue():
             checked = " checked"
         l = [ i18nformat("""<input type="checkbox" name="accTypeShowNoValue"%s> --_("not specified")--""")%checked]
-        for contribType in self._conf.getContribTypeList():
+        for contribType in self._conf.as_event.contribution_types:
             checked = ""
-            if field is not None and contribType.getId() in field.getValues():
+            if field is not None and str(contribType.id) in field.getValues():
                 checked = " checked"
-            l.append( """<input type="checkbox" name="acc_type" value=%s%s> %s"""%(quoteattr(contribType.getId()),checked,self.htmlText(contribType.getName())))
+            l.append( """<input type="checkbox" name="acc_type" value="%s" %s> %s""" % (contribType.id, checked, self.htmlText(contribType.name)))
         return l
 
     def _getStatusFilterItemList( self ):

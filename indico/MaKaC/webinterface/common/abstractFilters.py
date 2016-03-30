@@ -130,16 +130,16 @@ class ContribTypeFilterField(filters.FilterField):
     _id = "type"
 
     def satisfies( self, abstract ):
-        if len(self._conf.getContribTypeList()) == len(self._values):
+        if self._conf.as_event.contribution_types.count() == len(self._values):
             return True
-        elif not abstract.getContribType():
+        elif not abstract.as_new.type:
             return self._showNoValue
         else:
-            return abstract.getContribType().getId() in {v.getId() if hasattr(v, 'getId') else v for v in self._values}
+            return str(abstract.as_new.type_id) in self._values
 
     def needsToBeApplied(self):
-        for ct in self._conf.getContribTypeList():
-            if ct.getId() not in self._values:
+        for ct in self._conf.as_event.contribution_types:
+            if str(ct.id) not in self._values:
                 return True
         return not self._showNoValue
 
@@ -150,15 +150,15 @@ class AccContribTypeFilterField(filters.FilterField):
     _id = "acc_type"
 
     def satisfies(self,abstract):
-        if len(self._conf.getContribTypeList()) == len(self._values):
+        if self._conf.as_event.contribution_types.count() == len(self._values):
             return True
         else:
-            s=abstract.getCurrentStatus()
-            if s.__class__ in [review.AbstractStatusAccepted,\
-                                review.AbstractStatusProposedToAccept]:
-                if s.getType() is None or s.getType()=="":
+            s = abstract.getCurrentStatus()
+            if isinstance(s, (review.AbstractStatusAccepted,
+                              review.AbstractStatusProposedToAccept)):
+                if not abstract.as_new.accepted_type:
                     return self._showNoValue
-                return s.getType().getId() in self._values
+                return str(abstract.as_new.accepted_type_id) in self._values
             else:
                 return self._showNoValue
 
