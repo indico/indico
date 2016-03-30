@@ -1,5 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
-{% from 'events/registration/management/_sortable_list.html' import sortable_lists %}
+{% from '_sortable_list.html' import sortable_lists %}
 
 {{ form_header(form, id="js-registration-form-columns") }}
 {{ form_rows(form) }}
@@ -7,7 +7,7 @@
 <div id="participant-list-form-columns">
     {{ sortable_lists(_("Shown columns"), enabled_columns,
                       _("Hidden columns"), disabled_columns,
-                      classes="i-box titled sortable-column-preview") }}
+                      classes="i-box titled two-columns") }}
 </div>
 <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
 <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
@@ -18,7 +18,7 @@
     (function () {
         'use strict';
 
-        setupRegistrationSortableLists($('#participant-list-form-columns .js-sortable-list-widget'));
+        setupSortableList($('#participant-list-form-columns .js-sortable-list-widget'));
 
         function updateHiddenField() {
             var data = {'columns': []};

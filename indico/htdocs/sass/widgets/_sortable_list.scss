@@ -1,0 +1,130 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base";
+@import "compass";
+@import "partials/icons";
+@import "partials/_boxes";
+@import "partials/_labels";
+
+.sortable-list {
+    margin-bottom: 10px;
+
+    ul {
+        @extend %i-box-cancel-horizontal-padding;
+        padding: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        min-height: 2em;
+        list-style-type: none;
+
+        li {
+            margin: 0px;
+            padding: 10px;
+            display: flex;
+
+            &.draggable {
+                cursor: move;
+            }
+
+            &.i-label {
+                text-align: left;
+                border-color: transparent;
+                transition: color 0s, background-color 0.4s;
+
+                > .title {
+                    flex-grow: 1;
+                    margin: 0 0.5em;
+                }
+
+                .toggle-enabled {
+                    cursor: pointer;
+                }
+
+                .handle:first-child {
+                    margin-left: 0;
+                }
+            }
+
+            .actions, .handle {
+                color: lighten($i-label-color, 30%);
+                transition: color 0.4s;
+            }
+
+            &:hover,
+            &.ui-sortable-helper {
+                &.i-label {
+                    background-color: lighten($i-label-color, 50%);
+                    transition: color 0s, background-color 0s;
+                }
+
+                .actions, .handle {
+                    color: $i-label-color;
+                    transition: color 0s;
+                }
+            }
+
+            &.placeholder {
+                border: 1px $i-label-color dashed;
+            }
+
+        }
+
+        &.enabled li .toggle-enabled {
+            @include icon-before('icon-eye');
+        }
+
+        &.disabled li {
+            &:hover:not(.ui-sortable-helper) {
+                @extend .i-label.striped;
+                background-color: lighten($i-label-color, 50%);
+            }
+
+            .toggle-enabled {
+                @include icon-before('icon-eye-blocked');
+            }
+
+            .icon-settings {
+                display: none;
+            }
+        }
+    }
+
+   &.two-columns {
+       display: flex;
+
+       > div {
+           flex-grow: 1;
+
+           > .titled-rule {
+               @extend %i-box-titled-rule-header;
+           }
+
+           &:first-child ul {
+               margin-right: 0;
+           }
+
+           &:nth-child(2) {
+               border-left: 1px solid $gray;
+
+               ul {
+                   margin-left: 0;
+               }
+           }
+       }
+   }
+}
