@@ -51,7 +51,8 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHManageContributionFields,
                                                                         RHCreateContributionField,
                                                                         RHEditContributionField,
-                                                                        RHDeleteContributionField)
+                                                                        RHDeleteContributionField,
+                                                                        RHSortContributionFields)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -121,6 +122,7 @@ _bp.add_url_rule('/manage/contributions/fields/<int:contrib_field_id>', 'manage_
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/fields/<int:contrib_field_id>/delete', 'delete_field',
                  RHDeleteContributionField, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/fields/sort', 'sort_fields', RHSortContributionFields, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)
