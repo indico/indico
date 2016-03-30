@@ -2911,11 +2911,14 @@ class Conference(CommonObjectBase, Locatable):
         self.addSession(session, check, session.getId())
         session.recover(isCancelled)
 
-    def getSessionById( self, sessionId ):
+    def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
         """
-        return self.sessions.get(sessionId,None)
+        from indico.modules.events.sessions.models.sessions import Session as Session_
+        if not sessionId.isdigit():
+            return None
+        return Session_.find_first(event_id=self.as_event.id, friendly_id=int(sessionId), is_deleted=False)
 
     def getRoomList(self):
         roomList =[]

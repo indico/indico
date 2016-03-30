@@ -50,6 +50,10 @@ class UserTitle(TitledIntEnum):
     dr = 4
     prof = 5
 
+    @classmethod
+    def from_legacy(cls, text):
+        return {unicode(x.title): x for x in cls}.get(text)
+
 
 class PersonMixin(object):
     """Add convenience properties and methods to person classes.
