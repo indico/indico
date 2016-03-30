@@ -290,6 +290,9 @@ class TimetableMigration(object):
                                  address=most_common(persons, key=attrgetter('address')),
                                  phone=most_common(persons, key=attrgetter('phone')))
             self.event_person_map[email] = person
+            if person.user:
+                for user_email in person.user.all_emails:
+                    self.event_person_map[user_email] = person
             if not self.importer.quiet:
                 msg = cformat('%{magenta!}Event Person%{reset} {}({})').format(person.full_name, person.email)
                 self.importer.print_info(msg)
