@@ -21,6 +21,9 @@ def upgrade():
                     sa.Column('legacy_id', sa.Integer(), nullable=False),
                     sa.Column('event_id', sa.Integer(), nullable=False),
                     sa.Column('description', sa.Text(), nullable=False),
+                    sa.Column('accepted_track_id', sa.Integer(), nullable=True),
+                    sa.Column('accepted_type_id', sa.Integer(), nullable=True),
+                    sa.Column('type_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['event_id'],
                                             [u'events.events.id'],
                                             name=op.f('fk_abstracts_event_id_events')),
@@ -39,6 +42,26 @@ def upgrade():
                         name=op.f('fk_abstract_field_values_contribution_field_id_contribution_fields')),
                     sa.PrimaryKeyConstraint('abstract_id', 'contribution_field_id',
                                             name=op.f('pk_abstract_field_values')),
+                    schema='events')
+
+    op.create_index(op.f('ix_abstracts_accepted_type_id'),
+                    'abstracts', ['accepted_type_id'],
+                    unique=False,
+                    schema='events')
+    op.create_index(op.f('ix_abstracts_type_id'),
+                    'abstracts', ['type_id'],
+                    unique=False,
+                    schema='events')
+    op.create_index(op.f('ix_contributions_abstract_id'),
+                    'contributions',
+                    ['abstract_id'],
+                    unique=False,
+                    schema='events')
+    op.create_index('ix_uq_abstract_id',
+                    'contributions',
+                    ['abstract_id'],
+                    postgresql_where=sa.text('NOT is_deleted'),
+                    unique=True,
                     schema='events')
     op.create_index(op.f('ix_abstract_field_values_abstract_id'),
                     'abstract_field_values',
@@ -68,5 +91,10 @@ def downgrade():
                   table_name='abstract_field_values',
                   schema='events')
     op.drop_index(op.f('ix_abstract_field_values_abstract_id'), table_name='abstract_field_values', schema='events')
+    op.drop_index('ix_uq_abstract_id', table_name='contributions', schema='events')
+    op.drop_index(op.f('ix_contributions_abstract_id'), table_name='contributions', schema='events')
+    op.drop_index(op.f('ix_abstracts_type_id'), table_name='abstracts', schema='events')
+    op.drop_index(op.f('ix_abstracts_accepted_type_id'), table_name='abstracts', schema='events')
+
     op.drop_table('abstract_field_values', schema='events')
     op.drop_table('abstracts', schema='events')

@@ -52,6 +52,22 @@ class Abstract(DescriptionMixin, db.Model):
         index=True,
         nullable=False
     )
+    type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contribution_types.id'),
+        nullable=True,
+        index=True
+    )
+    accepted_track_id = db.Column(
+        db.Integer,
+        nullable=True
+    )
+    accepted_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contribution_types.id'),
+        nullable=True,
+        index=True
+    )
     event_new = db.relationship(
         'Event',
         lazy=True,
@@ -71,7 +87,24 @@ class Abstract(DescriptionMixin, db.Model):
             lazy=True
         )
     )
-
+    type = db.relationship(
+        'ContributionType',
+        lazy=True,
+        foreign_keys=[type_id],
+        backref=db.backref(
+            'abstracts',
+            lazy=True
+        )
+    )
+    accepted_type = db.relationship(
+        'ContributionType',
+        lazy=True,
+        foreign_keys=[accepted_type_id],
+        backref=db.backref(
+            'accepted_as_abstracts',
+            lazy=True
+        )
+    )
     # relationship backrefs:
     # - contribution (Contribution.abstract)
 
@@ -94,3 +127,11 @@ class Abstract(DescriptionMixin, db.Model):
     def as_legacy(self):
         amgr = self.event_new.as_legacy.getAbstractMgr()
         return amgr.getAbstractById(str(self.legacy_id))
+
+    @property
+    def track(self):
+        return self.event_new.as_legacy.getTrackById(str(self.track_id))
+
+    @property
+    def accepted_track(self):
+        return self.event_new.as_legacy.getTrackById(str(self.accepted_track_id))

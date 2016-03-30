@@ -1581,6 +1581,8 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
         # overall abstract status (accepted / rejected)
         abs._currentStatus = self._currentStatus.clone(abs)
+        abs.as_new.accepted_track_id = self.as_new.track.id
+        abs.as_new.accepted_type = self.as_new.type
 
         for ta in self.getTrackAcceptanceList() :
             for newtrack in conference.getTrackList():
@@ -2876,17 +2878,20 @@ class AbstractStatus( Persistent ):
     def getDate( self ):
         return self._date
 
-    def accept(self,responsible,destTrack,type,comments=""):
+    def accept(self, responsible, destTrack, type_, comments=""):
         """
         """
-        s = AbstractStatusAccepted(self.getAbstract(),responsible,destTrack,type,comments)
-        self.getAbstract().setCurrentStatus( s )
+        abstract = self.getAbstract()
+        s = AbstractStatusAccepted(abstract, responsible, comments)
+        abstract.as_new.accepted_track_id = destTrack.id
+        abstract.as_new.accepted_type = type_
+        self.getAbstract().setCurrentStatus(s)
 
     def reject( self, responsible, comments = "" ):
         """
         """
-        s = AbstractStatusRejected( self.getAbstract(), responsible, comments )
-        self.getAbstract().setCurrentStatus( s )
+        s = AbstractStatusRejected(self.getAbstract(), responsible, comments)
+        self.getAbstract().setCurrentStatus(s)
 
     def _getStatusClass( self ):
         """
@@ -3001,17 +3006,13 @@ class AbstractStatusSubmitted( AbstractStatus ):
 class AbstractStatusAccepted( AbstractStatus ):
     """
     """
-    def __init__(self,abstract,responsible,destTrack,type,comments=""):
-        AbstractStatus.__init__( self, abstract )
-        self._setResponsible( responsible )
-        self._setTrack( destTrack )
-        self._setComments( comments )
-        self._setType( type )
-        self._contrib = None
+    def __init__(self, abstract, responsible, comments=""):
+        AbstractStatus.__init__(self, abstract)
+        self._setResponsible(responsible)
+        self._setComments(comments)
 
-    def clone(self,abstract):
-        asa = AbstractStatusAccepted(abstract,self.getResponsible(), self.getTrack(), self.getType(), self.getComments())
-        return asa
+    def clone(self, abstract):
+        return AbstractStatusAccepted(abstract, self.getResponsible(), self.getComments())
 
     def _setResponsible( self, res ):
         self._responsible = res
@@ -3254,25 +3255,29 @@ class AbstractStatusWithdrawn(AbstractStatus):
     def proposeToReject( self ):
         raise MaKaCError(  _("Cannot propose for rejection an abstract which is withdrawn"))
 
-    def recover( self ):
+    def recover(self):
+        abstract = self.getAbstract()
+        contrib = abstract.as_new.contribution
+
         if self.getPrevStatus() is None:
             # reset all the judgments
             self._clearTrackAcceptances()
             self._clearTrackRejections()
             self._clearTrackReallocations()
             # setting the status
-            contrib=self.getAbstract().getContribution()
             if contrib is None:
-                s = AbstractStatusSubmitted( self.getAbstract() )
+                s = AbstractStatusSubmitted(abstract)
             else:
-                s = AbstractStatusAccepted(self.getAbstract(),self.getResponsible(),contrib.getTrack(),contrib.getType(),"")
+                s = AbstractStatusAccepted(abstract, self.getResponsible(), "")
         else:
-            contrib=self.getAbstract().getContribution()
             if contrib is not None and not isinstance(self.getPrevStatus(), AbstractStatusAccepted):
-                s = AbstractStatusAccepted(self.getAbstract(),self.getResponsible(),contrib.getTrack(),contrib.getType(),"")
+                s = AbstractStatusAccepted(abstract, self.getResponsible(), "")
             else:
-                s=self.getPrevStatus()
-        self.getAbstract().setCurrentStatus( s )
+                s = self.getPrevStatus()
+        abstract.setCurrentStatus(s)
+        abstract.as_new.accepted_track_id = int(contrib.track.getId())
+        abstract.as_new.accepted_type = contrib.type
+
 
     def markAsDuplicated(self,responsible,originalAbs,comments=""):
         raise MaKaCError( _("Cannot mark as duplicated an abstract which is withdrawn"))
@@ -3864,7 +3869,7 @@ class NotifTplCondAccepted(NotifTplCondition):
         return False
 
     def satisfies(self,abs):
-        if not isinstance(abs.getCurrentStatus(),AbstractStatusAccepted):
+        if not isinstance(abs.getCurrentStatus(), AbstractStatusAccepted):
             return False
         else:
             return self._satifiesContribType(abs) and self._satifiesTrack(abs)
