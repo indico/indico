@@ -736,110 +736,6 @@ class AbstractFieldContent(Persistent):
             return str(self.value)
 
 
-class AbstractFieldsMgr(Persistent):
-
-    def __init__(self):
-        self._fields = self._initFields()
-        self.__fieldGenerator = Counter()
-
-    def clone(self):
-        afm = AbstractFieldsMgr()
-        for f in self.getFields():
-            afm._addField(f.clone())
-        return afm
-
-    def _notifyModification(self):
-        self._p_changed = 1
-
-    def hasField(self, field_id):
-        for f in self._fields:
-            if f.getId() == id:
-                return True
-        return False
-
-    def getFields(self):
-        if not self.hasField("content"):
-            params = {"type": "textarea", "id": "content", "caption": _("Content"), "isMandatory": True}
-            ac = AbstractField.makefield(params)
-            self._fields.insert(0, ac)
-        return self._fields
-
-    def getActiveFields(self):
-        fl = []
-        for f in self.getFields():
-            if f.isActive():
-                fl.append(f)
-        return fl
-
-    def hasActiveField(self, id):
-        return self.hasField(id) and self.getFieldById(id).isActive()
-
-    def hasAnyActiveField(self):
-        for f in self._fields:
-            if f.isActive():
-                return True
-        return False
-
-    def enableField(self, id):
-        if self.hasField(id):
-            self.getFieldById(id).setActive(True)
-            self._notifyModification()
-
-    def disableField(self, id):
-        if self.hasField(id):
-            self.getFieldById(id).setActive(False)
-            self._notifyModification()
-
-    def getFieldKeys(self):
-        keys = []
-        for f in self._fields:
-            keys.append(f.getId())
-        return keys
-
-    def getFieldById(self, id):
-        for f in self._fields:
-            if f.getId() == id:
-                return f
-        return None
-
-    def setField(self, params):
-        if self.hasField(params["id"]):
-            self.getFieldById(params["id"]).setValues(params)
-        else:
-            params["id"] = str(self.getFieldGenerator().newCount())
-            absf = AbstractField.makefield(params)
-            self._fields.append(absf)
-        self._notifyModification()
-        return params["id"]
-
-    def removeField(self, id):
-        if self.hasField(id):
-            self._fields.remove(self.getFieldById(id))
-            self._notifyModification()
-
-    def moveAbsFieldUp(self, id):
-        if self.hasField(id):
-            f = self.getFieldById(id)
-            idx = self._fields.index(f)
-            self._fields.remove(f)
-            if idx == 0:
-                self._fields.append(f)
-            else:
-                self._fields.insert(idx-1, f)
-            self._notifyModification()
-
-    def moveAbsFieldDown(self, id):
-        if self.hasField(id):
-            f = self.getFieldById(id)
-            idx = self._fields.index(f)
-            self._fields.remove(f)
-            if idx == len(self._fields):
-                self._fields.insert(0, f)
-            else:
-                self._fields.insert(idx+1, f)
-            self._notifyModification()
-
-
 class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
 
     def __init__(self, owner):
@@ -858,7 +754,6 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
         self._authorizedSubmitter = PersistentList()
         self._primAuthIdx = _PrimAuthIdx(self)
         self._authEmailIdx = _AuthEmailIdx(self)
-        self._abstractFieldsMgr = AbstractFieldsMgr()
         self._submissionNotification = SubmissionNotification()
         self._multipleTracks = True
         self._tracksMandatory = False
@@ -932,7 +827,6 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
 
     def clone(self, conference):
         amgr = AbstractMgr(conference)
-        amgr._abstractFieldsMgr = self.getAbstractFieldsMgr().clone()
         amgr.setAnnouncement(self.getAnnouncement())
 
         timeDifference = conference.getStartDate() - self.getOwner().getStartDate()
