@@ -403,15 +403,21 @@ class TimetableMigration(object):
         except AttributeError:
             return
         pos = 0
+
+        content_field = None
         for field in afm._fields:
             if field._id == 'content':
-                continue
-            pos += 1
-            self._migrate_contribution_field(field, pos)
+                content_field = field
+            else:
+                pos += 1
+                self._migrate_contribution_field(field, pos)
 
-        content_field = afm._fields['content']
-        from indico.module.events.abstracts.settings import abstracts_settings
-        abstracts_settings.set('description_settings', self.event, {
+        if not content_field:
+            self.importer.print_warning(
+                cformat('%{yellow!}Event has no content field!%{reset}'), event_id=self.event.id)
+            return
+        from indico.modules.events.abstracts.settings import abstracts_settings
+        abstracts_settings.set(self.event, 'description_settings', {
             'active': content_field._active,
             'required': content_field._isMandatory,
             'max_words': content_field._maxLength if content_field._limitation == 'words' else None,
@@ -446,7 +452,7 @@ class TimetableMigration(object):
             return
         field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
                                   title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
-                                  field_data=field_data, position=position, legacy_id=old_field.id)
+                                  field_data=field_data, position=position, legacy_id=old_field._id)
         self.legacy_contribution_field_map[old_field._id] = field
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{green}Contribution field%{reset} {}').format(field.title))
@@ -523,17 +529,43 @@ class TimetableMigration(object):
         return contrib
 
     def _migrate_abstract(self, old_abstract):
-        description = old_abstract._fields.get('content', '')
+        description = getattr(old_abstract, '_fields', {}).get('content', '')
         description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
         old_contribution = getattr(old_abstract, '_contribution', None)
+        type_ = old_abstract._contribTypes[0]
+        try:
+            type_id = self.legacy_contribution_type_map[type_].id if type_ else None
+        except KeyError:
+            self.importer.print_warning(cformat('%{yellow!}Abstract {} - invalid contrib type {}, setting to None')
+                                        .format(old_abstract._id, convert_to_unicode(type_._name)),
+                                        event_id=self.event.id)
+            type_id = None
 
-        abstract = Abstract(event_new=self.event, legacy_id=old_abstract._id,
-                            description=description)
+        accepted_type_id = None
+        accepted_track_id = None
 
         if old_contribution:
-            legacy = LegacyContributionMapping.find_one(legacy_contribution_id=old_contribution.id,
-                                                        event_new=self.event)
-            abstract.contribution = legacy.contribution
+            assert old_contribution.__class__.__name__ == 'AcceptedContribution'
+            if old_abstract._currentStatus.__class__.__name__ == 'AbstractStatusAccepted':
+                old_contrib_type = old_abstract._currentStatus._contribType
+                try:
+                    accepted_type_id = (self.legacy_contribution_type_map[old_contrib_type].id
+                                        if old_contrib_type else None)
+                except KeyError:
+                    self.importer.print_warning(
+                        cformat('%{yellow!}Contribution {} - invalid contrib type {}, setting to None')
+                        .format(old_contribution._id, convert_to_unicode(old_contrib_type._name)),
+                        event_id=self.event.id)
+
+                accepted_track = old_abstract._currentStatus._track
+                accepted_track_id = int(accepted_track.id) if accepted_track else None
+
+        abstract = Abstract(event_new=self.event, legacy_id=old_abstract._id,
+                            description=description, type_id=type_id, accepted_track_id=accepted_track_id,
+                            accepted_type_id=accepted_type_id)
+
+        if old_contribution:
+            abstract.contribution = self.legacy_contribution_map[old_contribution]
 
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Abstract%{reset} {}').format(abstract.legacy_id))
@@ -559,7 +591,7 @@ class TimetableMigration(object):
                                             .format(field_id),
                                             event_id=self.event.id)
                 continue
-            new_value = self._process_contribution_field_value(field_id, value, new_field)
+            new_value = self._process_contribution_field_value(field_id, value, new_field, ContributionFieldValue)
             if new_value:
                 if not self.importer.quiet:
                     self.importer.print_info(cformat('%{green} - [field]%{reset} {}: {}').format(new_field.title,
@@ -567,7 +599,7 @@ class TimetableMigration(object):
                 yield new_value
 
     def _migrate_abstract_field_values(self, old_abstract):
-        fields = dict(old_abstract._fields)
+        fields = dict(getattr(old_abstract, '_fields', {}))
         fields.pop('content', None)
         for field_id, field_content in fields.iteritems():
             value = convert_to_unicode(getattr(field_content, 'value', field_content))
@@ -580,30 +612,20 @@ class TimetableMigration(object):
                                             .format(field_id),
                                             event_id=self.event.id)
                 continue
-            new_value = self._process_abstract_field_value(field_id, value, new_field)
+            new_value = self._process_contribution_field_value(field_id, value, new_field, AbstractFieldValue)
             if new_value:
                 if not self.importer.quiet:
                     self.importer.print_info(cformat('%{green} - [field]%{reset} {}: {}').format(new_field.title,
                                                                                                  new_value.data))
                 yield new_value
 
-    def _process_contribution_field_value(self, old_field_id, old_value, new_field):
+    def _process_contribution_field_value(self, old_field_id, old_value, new_field, field_class):
         if new_field.field_type == 'text':
             data = convert_to_unicode(old_value)
-            return ContributionFieldValue(contribution_field=new_field, data=data)
-        elif new_field.field_type == 'single_choice':
-            data = self.legacy_field_option_id_map[old_field_id, old_value]
-            return ContributionFieldValue(contribution_field=new_field, data=data)
-        else:
-            raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
-
-    def _process_abstract_field_value(self, old_field_id, old_value, new_field):
-        if new_field.field_type == 'text':
-            data = convert_to_unicode(old_value)
-            return AbstractFieldValue(contribution_field=new_field, data=data)
+            return field_class(contribution_field=new_field, data=data)
         elif new_field.field_type == 'single_choice':
             data = self.legacy_field_option_id_map[old_field_id, int(old_value)]
-            return AbstractFieldValue(contribution_field=new_field, data=data)
+            return field_class(contribution_field=new_field, data=data)
         else:
             raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
 
