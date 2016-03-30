@@ -198,7 +198,8 @@ indico_jquery = rjs_bundle(
                'nullableselector.js',
                'colorpicker.js',
                'palettepicker.js',
-               'itempicker.js'))
+               'itempicker.js',
+               'sortablelist.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 

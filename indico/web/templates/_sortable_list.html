@@ -1,12 +1,14 @@
-{% macro sortable_items(items, actions_macro, draggable) -%}
+{% macro sortable_items(items, actions_macro, draggable, toggle_enabled) -%}
     {% for item in items %}
         <li class="i-label sortable-item{% if draggable %} draggable{% endif %}" data-item-id="{{ item.id }}">
             {% if draggable %}
                 <div class="handle"></div>
             {% endif %}
-            <div class="actions">
-                <div class="toggle-enabled"></div>
-            </div>
+            {% if toggle_enabled %}
+                <div class="actions">
+                    <div class="toggle-enabled"></div>
+                </div>
+            {% endif %}
             <div class="title">{{ item.title }}</div>
             <div class="actions">
                 <div class="move-prev"></div>
@@ -19,20 +21,34 @@
     {% endfor %}
 {%- endmacro %}
 
+{% macro sortable_list(items, actions_macro=none, classes="", draggable=true, title=none) -%}
+<div class="sortable-list js-sortable-list-widget {{ classes }}"
+         {% if not draggable %}data-disable-dragging{% endif %}>
+        <div>
+            {% if title %}
+                <div class="titled-rule">{{ title }}</div>
+            {% endif %}
+            <ul class="enabled">
+                {{ sortable_items(items, actions_macro, draggable) }}
+            </ul>
+        </div>
+    </div>
+{%- endmacro %}
+
 {% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, actions_macro=none,
                         classes="", draggable=true) -%}
-    <div class="js-sortable-list-widget {{ classes }}"
+    <div class="sortable-list js-sortable-list-widget {{ classes }}"
          {% if not draggable %}data-disable-dragging{% endif %}>
         <div>
             <div class="titled-rule">{{ enabled_title }}</div>
             <ul class="enabled">
-                {{ sortable_items(enabled_items, actions_macro, draggable) }}
+                {{ sortable_items(enabled_items, actions_macro, draggable, true) }}
             </ul>
         </div>
         <div>
             <div class="titled-rule">{{ disabled_title }}</div>
             <ul class="disabled">
-                {{ sortable_items(disabled_items, actions_macro, draggable) }}
+                {{ sortable_items(disabled_items, actions_macro, draggable, true) }}
             </ul>
         </div>
     </div>

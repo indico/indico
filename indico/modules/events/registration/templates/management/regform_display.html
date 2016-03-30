@@ -2,7 +2,7 @@
 {% from '_switch.html' import switch %}
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
-{% from 'events/registration/management/_sortable_list.html' import sortable_lists %}
+{% from '_sortable_list.html' import sortable_lists %}
 
 {% block title %}
     {%- trans %}Participants display{% endtrans -%}
@@ -65,7 +65,7 @@
         <div id="publish-registrations">
             {{ sortable_lists(_("Shown registration forms"), enabled_forms|sort(attribute='title'),
                               _("Hidden registration forms"), disabled_forms|sort(attribute='title'),
-                              classes="i-box titled sortable-form-preview",
+                              classes="i-box titled",
                               draggable=false) }}
         </div>
         <p>
@@ -78,7 +78,7 @@
         </p>
         {{ sortable_lists(_("Shown columns"), enabled_columns,
                           _("Hidden columns"), disabled_columns,
-                          classes="i-box titled sortable-column-preview js-participant-list-columns") }}
+                          classes="i-box titled two-columns js-participant-list-columns") }}
     </div>
 
     <div id="registration-forms">
@@ -90,7 +90,7 @@
         {{ sortable_lists(_("Shown registration forms"), enabled_forms,
                           _("Hidden registration forms"), disabled_forms,
                           actions_macro=form_actions_macro,
-                          classes="i-box titled sortable-form-preview") }}
+                          classes="i-box titled") }}
     </div>
 
     <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
@@ -103,6 +103,12 @@
     <script>
         (function () {
             'use strict';
+
+            $(document).ready(function() {
+                $('.js-sortable-list-widget').each(function() {
+                    setupSortableList($(this));
+                });
+            });
 
             function update() {
                 var mergeForms = $('#merge-forms').prop('checked');
