@@ -277,14 +277,16 @@ $(document).ready(function() {
                         $(this).fadeIn(300);
                     }
                 },
-                hide: {
-                    event: 'unfocus',
-                    fixed: true,
-                    target: $button,
-                    effect: function() {
+                events: {
+                    hide: function() {
                         $(this).fadeOut(300);
                         $button.removeClass('open');
                     }
+                },
+                hide: {
+                    event: 'unfocus',
+                    fixed: true,
+                    target: $button
                 }
             });
         }
