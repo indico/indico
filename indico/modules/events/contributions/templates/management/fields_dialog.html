@@ -1,4 +1,5 @@
 {% from 'message_box.html' import message_box %}
+{% from '_sortable_list.html' import sortable_list %}
 
 <div class="manage-contribution-fields">
     <div class="toolbar">
@@ -19,19 +20,16 @@
     </div>
 
     {% if custom_fields %}
-        {% for custom_field in custom_fields %}
-            <div>
-                {{ custom_field }}
-                <a class="icon-edit" data-ajax-dialog js-action-button
-                   data-href="{{ url_for('.manage_field', event, custom_field) }}"
-                   data-title="{% trans %}Edit custom field{% endtrans %}"></a>
-                <a class="js-delete-contribution-field icon-remove"
-                   data-method="POST"
-                   data-href="{{ url_for('.delete_field', event, custom_field) }}"
-                   data-confirm="{% trans %}Do you really want to delete this field? Data stored in this field for each contributions will be lost.{% endtrans %}"
-                   data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
-            </div>
-        {% endfor %}
+        {% call(custom_field) sortable_list(custom_fields) %}
+            <a class="icon-edit js-action-button" data-ajax-dialog
+               data-href="{{ url_for('.manage_field', event, custom_field) }}"
+               data-title="{% trans %}Edit custom field{% endtrans %}"></a>
+            <a class="js-delete-contribution-field icon-remove"
+               data-method="POST"
+               data-href="{{ url_for('.delete_field', event, custom_field) }}"
+               data-confirm="{% trans %}Do you really want to delete this field? Data stored in this field will be lost.{% endtrans %}"
+               data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
+        {% endcall %}
     {% else %}
         {%- call message_box('info') %}
             {%- trans %}There are no custom contribution fields yet.{% endtrans %}
@@ -71,6 +69,23 @@
             if (data) {
                 $dialog.trigger('ajaxDialog:reload');
             }
+        });
+
+        var $fieldList = $('.manage-contribution-fields .js-sortable-list-widget');
+        setupSortableList($fieldList);
+        $fieldList.on('sortupdate', function(evt, ui) {
+            var ids = $fieldList.find('li').map(function(index, item) {
+                return $(item).data('item-id');
+            });
+            ids = $.makeArray(ids);
+            $.ajax({
+                url: {{ url_for('.sort_fields', event)|tojson }},
+                method: 'POST',
+                data: {
+                    field_ids: ids
+                },
+                error: handleAjaxError
+            });
         });
     })()
 </script>

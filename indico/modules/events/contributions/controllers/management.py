@@ -479,10 +479,27 @@ class RHManageContributionFields(RHManageContributionsBase):
     """Dialog to manage the custom contribution fields of an event"""
 
     def _process(self):
-        custom_fields = self.event_new.contribution_fields
+        custom_fields = self.event_new.contribution_fields.order_by(ContributionField.position)
         custom_field_types = sorted(get_contrib_field_types().values(), key=attrgetter('friendly_name'))
         return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event_new,
                                 custom_fields=custom_fields, custom_field_types=custom_field_types)
+
+
+class RHSortContributionFields(RHManageContributionsBase):
+    """Sort the custom contribution fields of an event"""
+
+    def _process(self):
+        field_by_id = {field.id: field for field in self.event_new.contribution_fields}
+        field_ids = map(int, request.form.getlist('field_ids'))
+        for index, field_id in enumerate(field_ids, 0):
+            field_by_id[field_id].position = index
+            del field_by_id[field_id]
+        for index, field in enumerate(sorted(field_by_id.values(), key=attrgetter('position')), len(field_ids)):
+            field.position = index
+        db.session.flush()
+        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                           'Custom fields have been reordered', session.user)
+        return jsonify_data(flash=False)
 
 
 class RHCreateContributionField(RHManageContributionsBase):
