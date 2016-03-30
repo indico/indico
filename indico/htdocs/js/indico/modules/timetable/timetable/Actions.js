@@ -497,7 +497,7 @@ type("TimetableManagementActions", [], {
             this.eventInfo.bookedRooms,
             true);
 
-        dialog.execute();
+        dialog.draw();
     },
     addBreak: function() {
         var self = this;

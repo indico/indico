@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.timetable.controllers.display import RHTimetable
-from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddBreak,
+from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddContribution,
+                                                                RHLegacyTimetableAddBreak,
                                                                 RHLegacyTimetableGetUnscheduledContributions,
                                                                 RHLegacyTimetableScheduleContribution)
 from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST
@@ -37,6 +38,8 @@ _bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTim
 _bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/add-break',
                  'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/timetable/add-contribution',
+                 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

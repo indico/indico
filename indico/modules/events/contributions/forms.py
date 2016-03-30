@@ -55,9 +55,10 @@ class ContributionForm(IndicoForm):
         self.event = kwargs.pop('event')
         self.contrib = kwargs.pop('contrib', None)
         self.timezone = self.event.timezone
+        to_schedule = kwargs.pop('to_schedule', False)
         super(ContributionForm, self).__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
-        if self.contrib is None or not self.contrib.is_scheduled:
+        if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
             del self.start_date
 
     def validate_duration(self, field):
