@@ -23,6 +23,7 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 from wtforms_components import TimeField
 
+from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.timetable.util import find_earliest_gap
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
@@ -46,7 +47,8 @@ class BreakEntryForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.day = kwargs.pop('day')
-        self.time.kwargs['default'] = find_earliest_gap(self.event, self.day, duration=timedelta(minutes=20)).time()
+        duration = self.duration.kwargs['default']
+        self.time.kwargs['default'] = find_earliest_gap(self.event, self.day, duration=duration).time()
         super(BreakEntryForm, self).__init__(*args, **kwargs)
 
     @property
@@ -73,3 +75,12 @@ class BreakEntryForm(IndicoForm):
         if (self.day == self.event.start_dt.astimezone(tzinfo).date()
                 and field.data < self.event.start_dt.astimezone(tzinfo).time()):
             raise ValidationError(_("The break can't be scheduled earlier than the event start time."))
+
+
+class ContributionEntryForm(ContributionForm):
+    def __init__(self, *args, **kwargs):
+        kwargs['to_schedule'] = True
+        duration = self.duration.kwargs['default']
+        self.day = kwargs.pop('day')
+        kwargs['start_date'] = find_earliest_gap(kwargs['event'], day=self.day, duration=duration)
+        super(ContributionEntryForm, self).__init__(*args, **kwargs)

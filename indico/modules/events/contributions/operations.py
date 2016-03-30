@@ -65,12 +65,12 @@ def _set_custom_fields(contrib, custom_fields_data):
 
 
 def create_contribution(event, contrib_data, custom_fields_data):
-    contrib = Contribution(event_new=event)
     start_dt = contrib_data.pop('start_date', None)
+    contrib = Contribution(event_new=event)
+    contrib.populate_from_dict(contrib_data)
     if start_dt is not None:
         create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
                                        'contribution': contrib})
-    contrib.populate_from_dict(contrib_data)
     _set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
     signals.event.contribution_created.send(contrib)
