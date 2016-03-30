@@ -25,7 +25,8 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
-from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
+from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
+                                                        delete_timetable_entry)
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.timetable.util import serialize_event_info
 from indico.modules.events.util import track_time_changes
@@ -112,3 +113,7 @@ class RHTimetableREST(RHManageTimetableBase):
             with track_time_changes():
                 update_timetable_entry(self.timetable_entry, updates)
         return jsonify()
+
+    def _process_DELETE(self):
+        """Delete a timetable entry"""
+        delete_timetable_entry(self.timetable_entry)
