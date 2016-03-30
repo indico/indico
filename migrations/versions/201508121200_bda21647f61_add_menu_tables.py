@@ -30,7 +30,7 @@ def upgrade():
         'legacy_page_id_map',
         sa.Column('event_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
         sa.Column('legacy_page_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
-        sa.Column('page_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('page_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['page_id'], ['events.pages.id']),
         sa.PrimaryKeyConstraint('event_id', 'legacy_page_id'),
