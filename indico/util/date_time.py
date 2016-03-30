@@ -326,16 +326,14 @@ def get_datetime_from_request(prefix='', default=None, source=None):
     return datetime.combine(parsed_date, parsed_time)
 
 
-def get_day_start(day):
-    tzinfo = None
+def get_day_start(day, tzinfo=None):
     if isinstance(day, datetime):
         tzinfo = day.tzinfo
         day = day.date()
     return datetime.combine(day, dt_time(0, tzinfo=tzinfo))
 
 
-def get_day_end(day):
-    tzinfo = None
+def get_day_end(day, tzinfo=None):
     if isinstance(day, datetime):
         tzinfo = day.tzinfo
         day = day.date()
