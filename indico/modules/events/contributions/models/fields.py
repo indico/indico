@@ -94,6 +94,7 @@ class ContributionField(db.Model):
     )
 
     # relationship backrefs:
+    # - abstract_values (AbstractFieldValue.contribution_field)
     # - contribution_values (ContributionFieldValue.contribution_field)
 
     @property
