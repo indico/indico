@@ -16,7 +16,7 @@
 
 import re
 
-from sqlalchemy import over, func
+from sqlalchemy import over, func, inspect
 from sqlalchemy.sql import update
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'])')
@@ -95,3 +95,38 @@ def increment_and_get(col, filter_):
         rv = s.execute(update(col.class_).where(filter_).values({col: col + 1}).returning(col)).fetchone()[0]
         s.commit()
     return rv
+
+
+def get_related_object(obj, relationship, criteria):
+    """Get an object from a one-to-many relationship.
+
+    If the relationship is already loaded, the criteria are evaluated
+    in Python; otherwise a query is sent to the database to get just
+    the specified object.
+
+    For maximum compatibility between the two loading methods, values
+    consisting of only digits are compared as numbers even if they are
+    provided as strings since this is how it works when sending a query.
+
+    :param obj: A model instance that has a relationship
+    :param relationship: The name of said relationship
+    :param criteria: A dict used to filter the objects from the
+                     relationship.
+    :return: A single object from the relationship or ``None`` if no
+             such object could be found.
+    """
+    def _compare(a, b):
+        if isinstance(a, basestring) and a.isdigit():
+            a = int(a)
+        if isinstance(b, basestring) and b.isdigit():
+            b = int(b)
+        return a == b
+
+    # if the relationship is loaded evaluate the criteria in python
+    if relationship not in inspect(obj).unloaded:
+        return next((x for x in getattr(obj, relationship)
+                     if all(_compare(getattr(x, k), v) for k, v in criteria.iteritems())),
+                    None)
+    # otherwise query that specific object
+    cls = getattr(type(obj), relationship).prop.mapper.class_
+    return cls.query.with_parent(obj, relationship).filter_by(**criteria).first()
