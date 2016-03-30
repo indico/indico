@@ -128,6 +128,9 @@ def generate_global_file(config):
                 },
                 'sessions': {
                     'add': url_rule_to_js('timetable.add_session')
+                },
+                'entries': {
+                    'delete': url_rule_to_js('timetable.timetable_rest')
                 }
             }
         },
