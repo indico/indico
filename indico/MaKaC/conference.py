@@ -2122,74 +2122,14 @@ class Conference(CommonObjectBase, Locatable):
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
-    def __generateNewContribTypeId( self ):
-        """Returns a new unique identifier for the current conference sessions
-        """
-        try:
-            return str(self.___contribTypeGenerator.newCount())
-        except:
-            self.___contribTypeGenerator = Counter()
-            return str(self.___contribTypeGenerator.newCount())
-
-    def addContribType(self, ct):
-        try:
-            if self._contribTypes:
-                pass
-        except:
-            self._contribTypes = {}
-        if ct in self._contribTypes.values():
-            return
-        id = ct.getId()
-        if id == "":
-            id = self.__generateNewContribTypeId()
-            ct.setId(id)
-        self._contribTypes[id] = ct
-        self.notifyModification()
-
-    def newContribType(self, name, description):
-        ct = ContributionType(name, description, self)
-        self.addContribType(ct)
-        return ct
-
     def getContribTypeList(self):
-        try:
-            return self._contribTypes.values()
-        except:
-            self._contribTypes = {}
-            self.notifyModification()
-            return self._contribTypes.values()
+        return self.as_event.contribution_types.all()
 
-    def getContribTypeById(self, id):
-        try:
-            if self._contribTypes:
-                pass
-        except:
-            self._contribTypes = {}
-            self.notifyModification()
-        if id in self._contribTypes.keys():
-            return self._contribTypes[id]
-        return None
-
-    def removeContribType(self, ct):
-        try:
-            if self._contribTypes:
-                pass
-        except:
-            self._contribTypes = {}
-        if not ct in self._contribTypes.values():
-            return
-        del self._contribTypes[ct.getId()]
-        self._p_changed = True
-        for cont in self.getContributionList():
-            if cont.getType() == ct:
-                cont.setType(None)
-        ct.delete()
-        self.notifyModification()
-
-    def recoverContribType(self, ct):
-        ct.setConference(self)
-        self.addContribType(ct)
-        ct.recover()
+    def getContribTypeById(self, tid):
+        if not tid.isdigit():
+            return None
+        from indico.modules.events.contributions.models.types import ContributionType
+        return self.as_event.contribution_types.filter(ContributionType.id == int(tid)).first()
 
     def _getRepository( self ):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
@@ -3499,9 +3439,7 @@ class Conference(CommonObjectBase, Locatable):
         for ch in self.getChairList():
             conf.addChair(ch.clone())
         ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
-        # Contribution Types' List (main detailes of the conference)
-        for t in self.getContribTypeList() :
-            conf.addContribType(t.clone(conf))
+
         if options.get("sessions", False):
             for entry in self.getSchedule().getEntries():
                 if isinstance(entry,BreakTimeSchEntry):

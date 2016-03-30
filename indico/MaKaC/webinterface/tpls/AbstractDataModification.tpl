@@ -56,9 +56,9 @@
                                             % endif
                                             % for contribType in types:
                                                 % if typeSelected == None:
-                                                    <option value=${ contribType.getId() }>${ contribType.getName() }</option>
+                                                    <option value=${ contribType.id }>${ contribType.name }</option>
                                                 % else:
-                                                    <option value=${ contribType.getId() } ${ "selected" if contribType.getId() == typeSelected.getId() else "" }>${ contribType.getName() }</option>
+                                                    <option value=${ contribType.id } ${ "selected" if contribType.id == typeSelected.id else "" }>${ contribType.name }</option>
                                                 % endif
                                             % endfor
                                         </select>
