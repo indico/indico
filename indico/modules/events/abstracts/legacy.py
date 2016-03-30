@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import db
+from indico.core import signals
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -23,11 +24,25 @@ from indico.util.i18n import _
 from indico.util.string import encode_utf8
 from indico.util.text import wordsCounter
 
+
 FIELD_TYPE_MAP = {
     'input': 'text',
     'textarea': 'text',
     'selection': 'single_choice'
 }
+
+
+@signals.event.contributions.contribution_deleted.connect
+def _contribution_deleted(contrib, parent=None):
+    from MaKaC.review import AbstractStatusAccepted, AbstractStatusSubmitted
+    abstract = contrib.abstract
+    if abstract:
+        status = abstract.as_legacy.getCurrentStatus()
+        if isinstance(status, AbstractStatusAccepted):
+            if status.getTrack() is not None:
+                abstract.as_legacy.addTrack(status.getTrack())
+            abstract.as_legacy.setCurrentStatus(AbstractStatusSubmitted(abstract.as_legacy))
+            abstract.contribution = None
 
 
 class AbstractFieldWrapper(object):
