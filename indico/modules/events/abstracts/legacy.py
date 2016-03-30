@@ -354,6 +354,9 @@ class AbstractLegacyMixin(object):
         field_val = self._get_field_value(field_id)
         field_val.data = val
 
+    def getContribType(self):
+        return self.as_new.type
+
 
 class AbstractFieldContentWrapper(object):
     """Emulates legacy ``AbstractFieldContent`` object."""

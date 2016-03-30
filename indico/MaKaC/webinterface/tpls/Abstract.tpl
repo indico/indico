@@ -47,7 +47,7 @@ from indico.util.i18n import i18nformat
         <td class="CRLabstractDataCell">${"<br>".join(tracks) or "&nbsp;"}</td>
     % endif
     % if "Type" in display:
-        <td class="CRLabstractDataCell">${self_.htmlText(abstract.getContribType().getName()) if abstract.getContribType() else _("None")}</td>
+        <td class="CRLabstractDataCell">${self_.htmlText(abstract.getContribType().name) if abstract.getContribType() else _("None")}</td>
     % endif
     % if "Status" in display:
         <% status=AbstractStatusList.getInstance().getCode(s.__class__ ) %>

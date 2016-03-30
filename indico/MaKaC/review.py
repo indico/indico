@@ -1944,10 +1944,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         self._contribTypes[0] = contribType
         self._notifyModification()
 
-    def getContribType( self ):
-        return self._contribTypes[0]
-
-
     def _addTrack( self, track ):
         """Adds the specified track to the suggested track list. Any
             verification must be done by the caller.
