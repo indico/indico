@@ -70,9 +70,9 @@ def find_earliest_gap(event, day, duration):
     :param day: The date in which to find the gap.
     :param duration: The minimum ``timedelta`` necessary for the gap.
     """
-    if not (event.start_dt.date() <= day <= event.end_dt.date()):
+    if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
         raise ValueError("Day is out of bounds.")
-    entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt, Date) == day)
+    entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day)
     start_dt = event.start_dt if event.start_dt.date() == day else get_day_start(day, tzinfo=event.tzinfo)
     end_dt = start_dt + duration
     for entry in entries:
@@ -80,7 +80,7 @@ def find_earliest_gap(event, day, duration):
             break
         start_dt = entry.end_dt
         end_dt = start_dt + duration
-    if end_dt > event.end_dt or end_dt.date() > day:
+    if end_dt > event.end_dt or end_dt.astimezone(event.tzinfo).date() > day:
         return None
     return start_dt
 
