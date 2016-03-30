@@ -230,3 +230,8 @@ def get_css_url(event, force_theme=None, for_preview=False):
         return url_for('event_layout.css_display', event, slug=event.stylesheet_metadata['hash'])
     elif layout_settings.get(event, 'theme'):
         return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), layout_settings.get(event, 'theme'))
+
+
+def is_menu_entry_enabled(entry_name, event):
+    """Check whether the MenuEntry is enabled"""
+    return get_menu_entry_by_name(entry_name, event).is_enabled
