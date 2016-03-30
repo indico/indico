@@ -63,6 +63,8 @@
             .actions, .handle {
                 color: lighten($i-label-color, 30%);
                 transition: color 0.4s;
+                flex-shrink: 0;
+                align-self: center;
             }
 
             &:hover,
