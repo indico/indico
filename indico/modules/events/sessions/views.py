@@ -38,6 +38,9 @@ class WPDisplayMySessionsConference(WPJinjaMixin, WPConferenceDefaultDisplayBase
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
+
     def getCSSFiles(self):
         return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls() +
-                self._asset_env['event_display_sass'].urls())
+                self._asset_env['event_display_sass'].urls() + self._asset_env['timetable_sass'].urls())

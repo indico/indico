@@ -25,10 +25,13 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_sessions_for_user, serialize_session_for_ical
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_session
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
+from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import DisplayTZ
+from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -66,9 +69,15 @@ class RHDisplaySession(RHDisplaySessionBase):
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions')
         session_contribs = [c for c in self.session.contributions if not c.is_deleted]
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
+        timetable_data = TimetableSerializer().serialize_session(self.session)
+        event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
+        event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        event_info['sessions'] = {sess.id: serialize_session(sess) for sess in self.event_new.sessions}
         return WPDisplayMySessionsConference.render_template('display/session_display.html', self._conf,
                                                              sess=self.session, event=self.event_new,
                                                              session_contribs=session_contribs, timezone=tz,
+                                                             timetable_data=timetable_data, event_info=event_info,
+                                                             timetable_layout=None,
                                                              **ical_params)
 
 
