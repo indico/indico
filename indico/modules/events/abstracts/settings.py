@@ -19,9 +19,9 @@ from indico.modules.events.settings import EventSettingsProxy
 
 abstracts_settings = EventSettingsProxy('abstracts', {
     'description_settings': {
-        'active': True,
-        'required': True,
-        'max_chars': None,
+        'is_active': True,
+        'is_required': True,
+        'max_length': None,
         'max_words': None
     }
 }, preload=True)

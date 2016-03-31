@@ -168,14 +168,15 @@ class AbstractTextFieldWrapper(AbstractFieldWrapper):
         return self.field.field_data.get('max_words', 0)
 
     @property
-    def max_chars(self):
-        return self.field.field_data.get('max_chars', 0)
+    def max_length(self):
+        return self.field.field_data.get('max_length', 0)
 
     def getLimitation(self):
         return 'chars' if self.max_words is None else 'words'
 
     def getMaxLength(self):
-        return self.max_words if self.max_chars is None else self.max_chars
+        max_length = self.max_words if self.max_length is None else self.max_length
+        return max_length or 0
 
     def getValues(self):
         data = super(AbstractTextFieldWrapper, self).getValues()
@@ -191,9 +192,9 @@ class AbstractTextFieldWrapper(AbstractFieldWrapper):
         if self.max_words and wordsCounter(str(content)) > self.max_words:
             errors.append(_("The field '{}' cannot be more than {} words long").format(
                 self.field.title, self.max_words))
-        elif self.max_chars and len(content) > self.max_chars:
+        elif self.max_length and len(content) > self.max_length:
             errors.append(_("The field '{}' cannot be more than {} characters long").format(
-                self.field.title, self.max_chars))
+                self.field.title, self.max_length))
 
         return errors
 
@@ -214,7 +215,7 @@ class AbstractDescriptionFieldProxy(object):
 
     @property
     def is_active(self):
-        return abstracts_settings.get(self.event, 'description_settings')['active']
+        return abstracts_settings.get(self.event, 'description_settings')['is_active']
 
     @property
     def field_type(self):
@@ -224,14 +225,14 @@ class AbstractDescriptionFieldProxy(object):
     def field_data(self):
         settings = abstracts_settings.get(self.event, 'description_settings')
         return {
-            'max_words': settings['max_words'],
-            'max_chars': settings['max_chars'],
+            'max_words': settings.get('max_words', 0),
+            'max_length': settings.get('max_length', 0),
             'multiline': True
         }
 
     @property
     def is_required(self):
-        return abstracts_settings.get(self.event, 'description_settings')['required']
+        return abstracts_settings.get(self.event, 'description_settings')['is_required']
 
 
 class AbstractSelectionFieldWrapper(AbstractFieldWrapper):
