@@ -487,6 +487,9 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
                               data=data or {})
         self.log_entries.append(entry)
 
+    def get_contribution_field(self, field_id):
+        return next((v for v in self.contribution_fields if v.id == field_id), '')
+
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it

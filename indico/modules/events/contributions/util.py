@@ -193,3 +193,24 @@ def generate_spreadsheet_from_contributions(contributions):
             contrib_data['Materials'] = ', '.join(attachments)
         rows.append(contrib_data)
     return headers, rows
+
+
+def make_contribution_form(event):
+    """Extends the contribution WTForm to add the extra fields.
+
+    Each extra field will use a field named ``custom_ID``.
+
+    :param event: The `Event` for which to create the contribution form.
+    :return: A `ContributionForm` subclass.
+    """
+    from indico.modules.events.contributions.forms import ContributionForm
+
+    form_class = type(b'_ContributionForm', (ContributionForm,), {})
+    for custom_field in event.contribution_fields:
+        field_impl = custom_field.field
+        if field_impl is None:
+            # field definition is not available anymore
+            continue
+        name = 'custom_{}'.format(custom_field.id)
+        setattr(form_class, name, field_impl.create_wtf_field())
+    return form_class

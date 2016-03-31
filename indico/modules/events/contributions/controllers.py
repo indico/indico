@@ -21,15 +21,15 @@ from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
-from indico.modules.events.contributions.forms import (ContributionForm, ContributionProtectionForm,
-                                                       SubContributionForm, ContributionStartDateForm,
-                                                       ContributionDurationForm)
+from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
+                                                       ContributionStartDateForm, ContributionDurationForm)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
                                                             delete_contribution, create_subcontribution,
                                                             update_subcontribution, delete_subcontribution)
-from indico.modules.events.contributions.util import ContributionReporter, generate_spreadsheet_from_contributions
+from indico.modules.events.contributions.util import (ContributionReporter, generate_spreadsheet_from_contributions,
+                                                      make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions import Session
@@ -51,6 +51,12 @@ def _render_subcontribution_list(contrib):
     tpl = get_template_module('events/contributions/management/_subcontribution_list.html')
     subcontribs = SubContribution.query.with_parent(contrib).options(undefer('attachment_count')).all()
     return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
+
+
+def _get_field_values(form_data):
+    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
+    return fields, custom_fields
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -150,9 +156,10 @@ class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
-        form = ContributionForm(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
+        contrib_form_class = make_contribution_form(self.event_new)
+        form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
-            contrib = create_contribution(self.event_new, form.data)
+            contrib = create_contribution(self.event_new, *_get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.reporter.render_contrib_report(contrib)
             if tpl_components['hide_contrib']:
@@ -163,10 +170,13 @@ class RHCreateContribution(RHManageContributionsBase):
 
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
-        form = ContributionForm(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt), event=self.event_new,
-                                contrib=self.contrib)
+        contrib_form_class = make_contribution_form(self.event_new)
+        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.contrib.field_values}
+        form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
+                                                   **custom_field_values),
+                                  event=self.event_new, contrib=self.contrib)
         if form.validate_on_submit():
-            update_contribution(self.contrib, form.data)
+            update_contribution(self.contrib, *_get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.reporter.render_contrib_report(self.contrib)
             if tpl_components['hide_contrib']:
