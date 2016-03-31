@@ -1512,7 +1512,9 @@ class RHAbstractManagmentMultiple( RHConferenceModifBase ):
         abstractsWithMissingTemplate = []
         for abstract in self._abstracts:
             if statusKlass == review.AbstractStatusAccepted:
-                status=statusKlass(abstract,None,self._track,cType)
+                status = statusKlass(abstract, None)
+                abstract.as_new.track_id = self._track.id if self._track else None
+                abstract.as_new.accepted_type = cType
             elif statusKlass == review.AbstractStatusRejected:
                 status=statusKlass(abstract,None, None)
             else: # In case we pass an improper Status
@@ -1860,7 +1862,7 @@ class RHContributionList(RHContributionListBase):
         """
 
         sessionData.clear()
-        sessionData["type"] = map(lambda ctype: ctype.getId(), self._conf.getContribTypeList())
+        sessionData["type"] = map(lambda ctype: ctype.id, self._conf.getContribTypeList())
         sessionData["track"] = map(lambda track: track.getId(), self._conf.getTrackList())
         sessionData["session"] = map(lambda ses: ses.getId(), self._conf.getSessionList())
         sessionData["status"] = map(lambda status: ContribStatusList.getId(status), ContribStatusList.getList())

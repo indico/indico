@@ -146,7 +146,8 @@ class AbstractData(object):
                                         telephone=authData.getPhone())
             if authData.isSpeaker():
                 abstract.addSpeaker(auth)
-        abstract.setContribType(self.type)
+
+        abstract.as_new.type = self.type
         tracks = []
         for trackId in self.tracks:
             tracks.append(conf.getTrackById(trackId))

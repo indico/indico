@@ -1073,19 +1073,6 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
     def setAnnouncement(self, newAnnouncement):
         self._announcement = newAnnouncement.strip()
 
-##    def addContribType(self, type):
-##        type = type.strip()
-##        if type == "":
-##            raise MaKaCError("Cannot add an empty contribution type")
-##        self._contribTypes.append(type)
-##
-##    def removeContribType(self, type):
-##        if type in self._contribTypes:
-##            self._contribTypes.remove(type)
-##
-##    def getContribTypeList(self):
-##        return self._contribTypes
-
     def _generateNewAbstractId(self):
         """Returns a new unique identifier for the current conference
             contributions
@@ -1566,14 +1553,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
                     abs.addSpeaker(sp.clone())
 
         abs.setSubmitter(self.getSubmitter().getAvatar())
-
-        if self.getContribType() is not None :
-            for ct in conference.getContribTypeList() :
-                if self.getContribType().getName() == ct.getName() :
-                    abs.setContribType(ct)
-                    break
-        else :
-            abs.setContribType(None)
+        abs.as_new.type  = self.as_new.type
 
         # the track, to which the abstract belongs to
         # legacy list implementation
@@ -1584,7 +1564,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
         # overall abstract status (accepted / rejected)
         abs._currentStatus = self._currentStatus.clone(abs)
-        abs.as_new.accepted_track_id = self.as_new.track.id
+        abs.as_new.accepted_track_id = self.as_new.track.id if self.as_new.track else None
         abs.as_new.accepted_type = self.as_new.type
 
         for ta in self.getTrackAcceptanceList() :
@@ -1944,10 +1924,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
     def isSpeaker( self, part ):
         return part in self._speakers
-
-    def setContribType( self, contribType ):
-        self._contribTypes[0] = contribType
-        self._notifyModification()
 
     def _addTrack( self, track ):
         """Adds the specified track to the suggested track list. Any
@@ -2872,7 +2848,7 @@ class AbstractStatus( Persistent ):
         """
         abstract = self.getAbstract()
         s = AbstractStatusAccepted(abstract, responsible, comments)
-        abstract.as_new.accepted_track_id = destTrack.id
+        abstract.as_new.accepted_track_id = destTrack.id if destTrack else None
         abstract.as_new.accepted_type = type_
         self.getAbstract().setCurrentStatus(s)
 
@@ -3230,7 +3206,7 @@ class AbstractStatusWithdrawn(AbstractStatus):
             else:
                 s = self.getPrevStatus()
         abstract.setCurrentStatus(s)
-        abstract.as_new.accepted_track_id = int(contrib.track.getId())
+        abstract.as_new.accepted_track_id = int(contrib.track.id) if contrib.track else None
         abstract.as_new.accepted_type = contrib.type
 
 
@@ -3778,8 +3754,8 @@ class NotifTplCondAccepted(NotifTplCondition):
         for newtrack in conference.getTrackList() :
             if newtrack.getTitle() == self.getTrack().getTitle() :
                 ntca.setTrack(newtrack)
-        for newtype in conference.getContribTypeList() :
-             if newtype.getName() == self.getContribType() :
+        for newtype in conference.as_event.contribution_types:
+             if newtype.name == self.getContribType():
                 ntca.setContribType(newtype)
 
         return ntca
