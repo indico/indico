@@ -189,7 +189,7 @@ class RHAddSurveySection(RHManageSurveyBase):
                 message = _('Standalone section added')
             flash(message, 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
@@ -208,7 +208,7 @@ class RHEditSurveySection(RHManageSurveySectionBase):
             flash(message, 'success')
             logger.info('Survey section %s modified by %s', self.section, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHDeleteSurveySection(RHManageSurveySectionBase):
@@ -235,7 +235,7 @@ class RHAddSurveyText(RHManageSurveySectionBase):
             add_survey_text(self.section, form.data)
             flash(_('Text item added'), 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHEditSurveyText(RHManageSurveyTextBase):
@@ -249,7 +249,7 @@ class RHEditSurveyText(RHManageSurveyTextBase):
             flash(_('Text item updated'), 'success')
             logger.info('Survey text item %s modified by %s', self.text, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHDeleteSurveyText(RHManageSurveyTextBase):
@@ -289,7 +289,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
             question = add_survey_question(self.section, field_cls, form.data)
             flash(_('Question "{title}" added').format(title=question.title), 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
@@ -304,7 +304,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
             flash(_('Question "{title}" updated').format(title=old_title), 'success')
             logger.info('Survey question %s modified by %s', self.question, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
 class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
