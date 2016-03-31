@@ -15,11 +15,28 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytz
-from sqlalchemy import types
+from sqlalchemy import types, func
 
 
 class UTCDateTime(types.TypeDecorator):
     impl = types.DateTime
+
+    class Comparator(types.DateTime.Comparator):
+        def astimezone(self, tz):
+            """Convert the datetime to a specific timezone.
+
+            This is useful if you want e.g. to cast to Date afterwards
+            but need a specific timezone instead of UTC.
+
+            When accessing the value returned by this method in Python
+            it will be a naive datetime object in the specified time
+            zone.
+
+            :param tz: A timezone name or tzinfo object.
+            """
+            tz = getattr(tz, 'zone', tz)
+            return func.timezone(tz, func.timezone('UTC', self.expr))
+    comparator_factory = Comparator
 
     def process_bind_param(self, value, engine):
         if value is not None:
