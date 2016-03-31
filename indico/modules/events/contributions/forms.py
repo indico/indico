@@ -39,6 +39,7 @@ class ContributionForm(IndicoForm):
     start_date = IndicoDateTimeField(_("Start date"), [DataRequired(),
                                                        DateTimeRange(earliest=lambda form, field: form.event.start_dt,
                                                                      latest=lambda form, field: form.event.end_dt)],
+                                     allow_clear=False,
                                      description=_("Start date of the contribution"))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
