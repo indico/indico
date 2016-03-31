@@ -143,7 +143,7 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
     idx = ch._getIdx()
     iterator = idx.iteritems()
     if verbose:
-        iterator = verbose_iterator(iterator, len(idx.keys()), itemgetter(0), lambda x: x[1].getTitle())
+        iterator = verbose_iterator(iterator, len(idx.keys()), itemgetter(0), lambda x: '')
 
     for id_, conf in iterator:
         yield 'event', conf
