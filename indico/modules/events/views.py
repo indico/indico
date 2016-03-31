@@ -18,7 +18,18 @@ from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 
 class WPReferenceTypes(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'events/'
+
+
+class WPEventDisplay(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['event_display_sass'].urls()
