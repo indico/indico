@@ -117,3 +117,16 @@ class RHTimetableREST(RHManageTimetableBase):
     def _process_DELETE(self):
         """Delete a timetable entry"""
         delete_timetable_entry(self.timetable_entry)
+
+
+class RHTimetableBalloon(RHManageTimetableBase):
+    """Create the appropriate timetable entry balloon depending on the entry type."""
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.timetable_entry = (self.event_new.timetable_entries
+                                .filter_by(id=request.view_args['timetable_entry_id'])
+                                .first_or_404())
+
+    def _process(self):
+        html = None
+        return jsonify(html=html)

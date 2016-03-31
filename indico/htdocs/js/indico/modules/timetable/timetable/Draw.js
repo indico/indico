@@ -46,10 +46,7 @@ type("TimetableBlockBase", [],
              self.popupActive = true;
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
-
-             this.popup = self._drawPopup();
-
-             this.popup.open(cursor.x, cursor.y);
+             self._drawPopup();
          },
 
          closePopup: function() {
@@ -580,17 +577,50 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
          _drawPopup: function() {
 
              var self = this;
-             return new TimetableBlockPopupManagement(
-                 this.timetable,
-                 this,
-                 this.eventData,
-                 this.div,
-                 function() {
-                         self.div.dom.style.cursor = 'pointer';
-                         self.popupActive = false;
-                         return self.popupAllowClose;
-                     },
-                 this.managementActions);
+             var timetableBlock = self.div.dom;
+             var params = {
+                'confId': self.eventData.conferenceId[0],
+                'timetable_entry_id': self.eventData.scheduleEntryId
+             };
+             var balloonId = '#qtip-' + self.eventData.scheduleEntryId.toString();
+
+             $(timetableBlock).qbubble({
+                content: {
+                    text: function(event, api) {
+                        $.ajax({
+                            url: build_url(Indico.Urls.Timetable.entries.balloon, params)
+                        })
+                        .then(function(content) {
+                            // Set the tooltip content upon successful retrieval
+                            api.set('content.text', content.html);
+                        }, function(xhr, status, error) {
+                            // Upon failure set the tooltip content to error
+                            api.set('content.text', status + ': ' + error);
+                        });
+
+                        return 'Loading...'; // Set some initial text
+                    }
+                },
+                show: {
+                    event: 'click',
+                    ready : true
+                },
+                hide: {
+                    event: 'unfocus',
+                    fixed: true
+                },
+                position: {
+                    at: 'top center',
+                    my: 'bottom center',
+                    target: 'mouse',
+                    adjust: {
+                        mouse: false
+                    }
+                },
+                style: {
+                    classes: 'balloon-qtip'
+                },
+             });
          },
 
          _getRightSideDecorators: function()
