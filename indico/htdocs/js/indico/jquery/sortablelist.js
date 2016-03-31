@@ -13,6 +13,7 @@
                 connectWith: $lists,
                 placeholder: 'i-label sortable-item placeholder',
                 containment: $wrapper,
+                tolerance: 'pointer',
                 forcePlaceholderSize: true
             });
         }
