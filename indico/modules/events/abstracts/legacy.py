@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core import signals
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.judgements import Judgement
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.util.i18n import _
@@ -405,6 +406,17 @@ class AbstractLegacyMixin(object):
     def as_new(self):
         return Abstract.find_one(event_new=self.event, legacy_id=self._id)
 
+    @no_autoflush
+    def _add_judgement(self, legacy_judgement):
+        judgement = Judgement(track_id=legacy_judgement._track.id, judge=legacy_judgement._responsible.user,
+                              accepted_type=getattr(legacy_judgement, '_contribType', None))
+        self.as_new.judgements.append(judgement)
+        return judgement
+
+    def _del_judgement(self, legacy_judgement):
+        db.session.delete(legacy_judgement.as_new)
+        db.session.flush()
+
     def getFields(self):
         data = {val.contribution_field.legacy_id: AbstractFieldContentWrapper(val)
                 for val in self.as_new.field_values}
@@ -475,3 +487,19 @@ class AbstractManagerLegacyMixin(object):
 
     def _remove_abstract(self, legacy_abstract):
         db.session.delete(legacy_abstract.as_new)
+
+class AbstractStatusAcceptedLegacyMixin(object):
+
+    def getType(self):
+        return self._abstract.as_new.accepted_type
+
+
+class AbstractJudgementLegacyMixin(object):
+
+    @property
+    def as_new(self):
+        return Judgement.find_one(
+            track_id=self._track.id, judge=self._responsible.user, abstract_id=self._abstract.as_new.id)
+
+    def getContribType(self):
+        return self.as_new.accepted_type
