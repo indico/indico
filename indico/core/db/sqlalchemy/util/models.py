@@ -328,7 +328,8 @@ def override_attr(attr_name, parent_name, fget=None):
 
     def _set(self, value):
         parent = getattr(self, parent_name)
-        if not parent or value != getattr(parent, attr_name):
+        own_value = getattr(self, own_attr_name)
+        if not parent or own_value is not None or value != getattr(parent, attr_name):
             setattr(self, own_attr_name, value)
 
     def _expr(cls):
