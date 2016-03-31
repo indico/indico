@@ -1,0 +1,71 @@
+{% from 'attachments/_management_info_column.html' import render_attachment_info %}
+
+<div class="balloon">
+    <div class="title-container">
+        <div class="title">{{ contrib.title }}</div>
+        <div class="group right entry-action-buttons">
+            <a class="icon-edit i-button-icon js-dialog-action push-balloon-back js-edit"
+               title="{% trans %}Edit contribution{% endtrans %}"
+               data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"></a>
+            <a class="icon-shield i-button-icon push-balloon-back"
+               title="{% trans %}Manage contribution protection{% endtrans %}"
+               data-href="{{ url_for('contributions.manage_contrib_protection', contrib) }}"
+               data-title="{% trans %}Manage contribution protection{% endtrans %}"
+               data-ajax-dialog></a>
+            <a href="#" class="icon-remove i-button-icon push-balloon-back"
+               title="{% trans %}Delete timetable entry{% endtrans %}"
+               data-title="{% trans title=contrib.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
+               data-confirm="{% trans title=contrib.title %}Are you sure you want to delete timetable entry '{{ title }}'?{% endtrans %}"></a>
+        </div>
+    </div>
+    <div class="description">{{ contrib.description }}</div>
+    <dl class="i-data-list">
+        <dt>
+            <a class="icon-time i-button-icon js-edit-time push-balloon-back"
+               title="{% trans %}Change time{% endtrans %}">
+            </a>
+        </dt>
+        <dd>
+            <div class="duration">
+                <a class="js-edit-time push-balloon-back"
+                   title="{% trans %}Change time{% endtrans %}">
+                    {{- contrib.start_dt | format_time(timezone=contrib.event_new.timezone) }} -
+                    {{ contrib.end_dt | format_time(timezone=contrib.event_new.timezone) -}}
+                </a>
+            </div>
+        </dd>
+        <dt><i class='icon-location'></i></dt>
+        <dd>
+            <div>{{ contrib.room_name }} ({{ contrib.venue_name }})</div>
+            {% if contrib.address %}
+                <div class="address">{{ contrib.address }}</div>
+            {% endif %}
+        </dd>
+    </dl>
+    <span class="hr"></span>
+    <dl class="i-data-list thirty-seventy">
+        <dt>{% trans count=contrib.speaker_names|count %}Presenter{% pluralize %}Presenters{% endtrans %}</dt>
+        <dd>
+            {% for speaker in contrib.speakers | sort(attribute='full_name') -%}
+                <div>{{ speaker.full_name }}</div>
+            {%- endfor %}
+        </dd>
+        <dt>{% trans %}Material{% endtrans %}</dt>
+        <dd>{{ render_attachment_info(contrib) }}</dd>
+    </dl>
+    <span class="hr"></span>
+    <div class="attribute">
+        <div class="attribute-title">
+            {%- trans %}Subcontributions{% endtrans %}
+            <span class="badge">{{ contrib.subcontribution_count }}</span>
+        </div>
+        <div class="group right entry-action-buttons">
+            <a class="attribute-settings icon-settings push-balloon-back"
+               title="{% trans %}Manage subcontributions{% endtrans %}"
+               data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
+               data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
+               data-ajax-dialog></a>
+        </div>
+    </div>
+
+</div>

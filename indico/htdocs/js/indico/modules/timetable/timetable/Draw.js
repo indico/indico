@@ -585,6 +585,7 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
              var balloonId = '#qtip-' + self.eventData.scheduleEntryId.toString();
 
              $(timetableBlock).qbubble({
+                id: self.eventData.scheduleEntryId.toString(),
                 content: {
                     text: function(event, api) {
                         $.ajax({
@@ -593,12 +594,18 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                         .then(function(content) {
                             // Set the tooltip content upon successful retrieval
                             api.set('content.text', content.html);
+                            var $content = api.elements.content;
+
+                            $content.find('.push-balloon-back').each(function() {
+                                $(this).on('click', function() {
+                                    $(balloonId).addClass('push-back');
+                                });
+                            });
                         }, function(xhr, status, error) {
-                            // Upon failure set the tooltip content to error
                             api.set('content.text', status + ': ' + error);
                         });
 
-                        return 'Loading...'; // Set some initial text
+                        return 'Loading...';
                     }
                 },
                 show: {
@@ -608,6 +615,13 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                 hide: {
                     event: 'unfocus',
                     fixed: true
+                },
+                events: {
+                    hide: function(event, api) {
+                        if(event.originalEvent.type == 'mouseleave') {
+                            try { event.preventDefault(); } catch(e) {}
+                        }
+                    }
                 },
                 position: {
                     at: 'top center',
