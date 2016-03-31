@@ -28,8 +28,10 @@ from pytz import timezone
 from indico.core.config import Config
 from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
                                                     AbstractFieldManagerAdapter,
+                                                    AbstractJudgementLegacyMixin,
                                                     AbstractLegacyMixin,
-                                                    AbstractManagerLegacyMixin)
+                                                    AbstractManagerLegacyMixin,
+                                                    AbstractStatusAcceptedLegacyMixin)
 from indico.util.string import safe_slice, safe_upper
 from indico.util.text import wordsCounter
 
@@ -2267,6 +2269,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
         for x in toDelete:
             self.getTrackJudgementsHistorical()[track.getId()].remove(x)
+            self._del_judgement(x)
 
 
     def proposeToAccept( self, responsible, track, contribType, comment="", answers=[] ):
@@ -2282,7 +2285,8 @@ class Abstract(AbstractLegacyMixin, Persistent):
         # check if there is a previous judgement of this author in for this abstract in this track
         self._removePreviousJud(responsible, track)
         # Create the new judgement
-        jud = AbstractAcceptance( track, responsible, contribType, answers )
+        jud = AbstractAcceptance(self, track, responsible, contribType, answers)
+        self._add_judgement(jud)
         jud.setComment( comment )
         self._addTrackAcceptance( jud )
         # Update the rating of the abstract
@@ -2303,7 +2307,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         # check if there is a previous judgement of this author in for this abstract in this track
         self._removePreviousJud(responsible, track)
         # Create the new judgement
-        jud = AbstractRejection( track, responsible, answers )
+        jud = AbstractRejection(self, track, responsible, answers)
         jud.setComment( comment )
         self._addTrackRejection( jud )
         # Update the rating of the abstract
@@ -2321,7 +2325,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         # check if there is a previous judgement of this author in for this abstract in this track
         self._removePreviousJud(responsible, track)
         #We keep the track judgement
-        jud = AbstractReallocation( track, responsible, propTracks, answers )
+        jud = AbstractReallocation(self, track, responsible, propTracks, answers)
         jud.setComment( comment )
         self._addTrackReallocation( jud )
         #We add the proposed tracks to the abstract
@@ -2486,12 +2490,12 @@ class Abstract(AbstractLegacyMixin, Persistent):
         self._removePreviousJud(responsible, track)
 
         if track is not None:
-            jud = AbstractMarkedAsDuplicated( track, responsible, originalAbstract, answers )
+            jud = AbstractMarkedAsDuplicated(self, track, responsible, originalAbstract, answers)
             jud.setComment( comments )
             self._addTrackJudgementToHistorical(jud)
         else:
             for t in self.getTrackList():
-                jud = AbstractMarkedAsDuplicated( t, responsible, originalAbstract, answers )
+                jud = AbstractMarkedAsDuplicated(self, t, responsible, originalAbstract, answers)
                 jud.setComment( comments )
                 self._addTrackJudgementToHistorical(jud)
         # Update the rating of the abstract
@@ -2512,12 +2516,12 @@ class Abstract(AbstractLegacyMixin, Persistent):
         self._removePreviousJud(responsible, track)
 
         if track is not None:
-            jud = AbstractUnMarkedAsDuplicated(track, responsible, answers )
+            jud = AbstractUnMarkedAsDuplicated(self, track, responsible, answers)
             jud.setComment( comments )
             self._addTrackJudgementToHistorical(jud)
         else:
             for t in self.getTrackList():
-                jud = AbstractUnMarkedAsDuplicated( t, responsible, answers )
+                jud = AbstractUnMarkedAsDuplicated(self, t, responsible, answers )
                 jud.setComment( comments )
                 self._addTrackJudgementToHistorical(jud)
         # Update the rating of the abstract
@@ -2666,7 +2670,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         return self.getAttachments().get(id, None)
 
 
-class AbstractJudgement( Persistent ):
+class AbstractJudgement(AbstractJudgementLegacyMixin, Persistent):
     """This class represents each of the judgements made by a track about a
         certain abstract. Each track for which an abstract is proposed can
         make a judgement proposing the abstract to be accepted or rejected.
@@ -2677,10 +2681,10 @@ class AbstractJudgement( Persistent ):
         it was done and the user who did it will be kept.
     """
 
-    def __init__( self, track, responsible, answers ):
+    def __init__( self, abstract, track, responsible, answers ):
+        self._abstract = abstract
         self._track = track
         self._setResponsible( responsible )
-        self._date = nowutc()
         self._comment = ""
         self._answers = answers
         self._judValue = self.calculateJudgementAverage() # judgement average value
@@ -2694,10 +2698,10 @@ class AbstractJudgement( Persistent ):
         return self._responsible
 
     def getDate( self ):
-        return self._date
+        return self.as_new.creation_dt
 
     def setDate(self, date):
-        self._date = date
+        self.as_new.creation_dt = date
 
     def getTrack( self ):
         return self._track
@@ -2771,37 +2775,30 @@ class AbstractJudgement( Persistent ):
 
 class AbstractAcceptance( AbstractJudgement ):
 
-    def __init__( self, track, responsible, contribType, answers ):
-        AbstractJudgement.__init__( self, track, responsible, answers )
+    def __init__(self, abstract, track, responsible, contribType, answers):
+        AbstractJudgement.__init__(self, abstract, track, responsible, answers)
         self._contribType = contribType
 
     def clone(self,track):
-        aa = AbstractAcceptance(track,self.getResponsible(), self.getContribType(), self.getAnswers())
+        aa = AbstractAcceptance(self._abstract, track, self.getResponsible(), self.getContribType(), self.getAnswers())
         return aa
-
-    def getContribType( self ):
-        try:
-            if self._contribType:
-                pass
-        except AttributeError, e:
-            self._contribType = None
-        return self._contribType
 
 
 class AbstractRejection( AbstractJudgement ):
 
     def clone(self, track):
-        arj = AbstractRejection(track,self.getResponsible(), self.getAnswers())
+        arj = AbstractRejection(self._abstract, track, self.getResponsible(), self.getAnswers())
         return arj
 
 class AbstractReallocation( AbstractJudgement ):
 
-    def __init__( self, track, responsible, propTracks, answers ):
-        AbstractJudgement.__init__( self, track, responsible, answers )
+    def __init__(self, abstract, track, responsible, propTracks, answers):
+        AbstractJudgement.__init__(self, abstract, track, responsible, answers)
         self._proposedTracks = PersistentList( propTracks )
 
     def clone(self, track):
-        arl = AbstractReallocation(track, self.getResponsible(), self.getProposedTrackList(), self.getAnswers())
+        arl = AbstractReallocation(self._abstract, track, self.getResponsible(), self.getProposedTrackList(),
+                                   self.getAnswers())
         return arl
 
     def getProposedTrackList( self ):
@@ -2809,21 +2806,22 @@ class AbstractReallocation( AbstractJudgement ):
 
 class AbstractInConflict( AbstractJudgement ):
 
-    def __init__( self, track ):
-        AbstractJudgement.__init__( self, track, None, '' )
+    def __init__(self, abstract, track):
+        AbstractJudgement.__init__(self, abstract, track, None, '')
 
     def clone(self, track):
-        aic = AbstractInConflict(track, None, '')
+        aic = AbstractInConflict(self._abstract, track, None, '')
         return aic
 
 class AbstractMarkedAsDuplicated( AbstractJudgement ):
 
-    def __init__( self, track, responsible, originalAbst, answers ):
-        AbstractJudgement.__init__( self, track, responsible, answers )
-        self._originalAbst=originalAbst
+    def __init__(self, abstract, track, responsible, originalAbst, answers):
+        AbstractJudgement.__init__(self, abstract, track, responsible, answers)
+        self._originalAbst = originalAbst
 
-    def clone(self,track):
-        amad = AbstractMarkedAsDuplicated(track,self.getResponsible(), self.getOriginalAbstract(), self.getAnswers())
+    def clone(self, track):
+        amad = AbstractMarkedAsDuplicated(self._abstract, track, self.getResponsible(), self.getOriginalAbstract(),
+                                          self.getAnswers())
         return amad
 
     def getOriginalAbstract(self):
@@ -2832,8 +2830,8 @@ class AbstractMarkedAsDuplicated( AbstractJudgement ):
 
 class AbstractUnMarkedAsDuplicated( AbstractJudgement ):
 
-    def clone(self,track):
-        auad = AbstractUnMarkedAsDuplicated(track,self.getResponsible())
+    def clone(self, track):
+        auad = AbstractUnMarkedAsDuplicated(self._abstract, track,self.getResponsible())
         return auad
 
 
@@ -2994,7 +2992,7 @@ class AbstractStatusSubmitted( AbstractStatus ):
         AbstractStatus.update( self )
 
 
-class AbstractStatusAccepted( AbstractStatus ):
+class AbstractStatusAccepted(AbstractStatusAcceptedLegacyMixin, AbstractStatus):
     """
     """
     def __init__(self, abstract, responsible, comments=""):
@@ -3032,17 +3030,6 @@ class AbstractStatusAccepted( AbstractStatus ):
         except AttributeError:
             self._track = None
         return self._track
-
-    def _setType( self, type ):
-        self._contribType = type
-
-    def getType( self ):
-        try:
-            if self._contribType:
-                pass
-        except AttributeError:
-            self._contribType = None
-        return self._contribType
 
     def update( self ):
         return

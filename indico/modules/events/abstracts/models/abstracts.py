@@ -107,6 +107,7 @@ class Abstract(DescriptionMixin, db.Model):
     )
     # relationship backrefs:
     # - contribution (Contribution.abstract)
+    # - judgements (Judgement.abstract)
 
     @locator_property
     def locator(self):
@@ -115,10 +116,6 @@ class Abstract(DescriptionMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', legacy_id=self.legacy_id)
-
-    def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection."""
-        return get_non_inheriting_objects(self)
 
     def get_field_value(self, field_id):
         return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')

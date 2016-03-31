@@ -323,6 +323,7 @@ class User(PersonMixin, db.Model):
     # - in_event_settings_acls (EventSettingPrincipal.user)
     # - in_session_acls (SessionPrincipal.user)
     # - in_settings_acls (SettingPrincipal.user)
+    # - judgements (Judgement.judge)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
     # - oauth_tokens (OAuthToken.user)

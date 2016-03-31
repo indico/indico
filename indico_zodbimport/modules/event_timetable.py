@@ -22,6 +22,7 @@ import traceback
 from collections import defaultdict
 from math import ceil
 from operator import attrgetter, itemgetter
+from pytz import utc
 from uuid import uuid4
 
 import click
@@ -35,6 +36,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.judgements import Judgement
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
@@ -571,7 +573,38 @@ class TimetableMigration(object):
             self.importer.print_info(cformat('%{cyan}Abstract%{reset} {}').format(abstract.legacy_id))
         # contribution/abstract fields
         abstract.field_values = list(self._migrate_abstract_field_values(old_abstract))
+        abstract.judgements = list(self._migrate_abstract_judgements(old_abstract))
         return abstract
+
+    def _migrate_abstract_judgements(self, old_abstract):
+        if not hasattr(old_abstract, '_trackJudgementsHistorical'):
+            self.importer.print_warning(
+                cformat('%{blue!}Abstract {} {yellow}has no judgement history!%{reset}').format(old_abstract._id),
+                event_id=self.event.id)
+            return
+        for track_id, judgements in old_abstract._trackJudgementsHistorical.iteritems():
+            seen_judges = set()
+            for old_judgement in judgements:
+                judge = old_judgement._responsible.user if old_judgement._responsible else None
+                if not judge:
+                    self.importer.print_warning(
+                        cformat('%{blue!}Abstract {} {yellow}has an empty judge ({})!%{reset}').format(
+                            old_abstract._id, old_judgement), event_id=self.event.id)
+                    continue
+                elif judge in seen_judges:
+                    self.importer.print_warning(
+                        cformat("%{blue!}Abstract {}: {yellow}judge '{}' seen more than once ({})!%{reset}")
+                        .format(old_abstract._id, judge, old_judgement), event_id=self.event.id)
+                    continue
+
+                dt = old_judgement._date
+                new_judgement = Judgement(creation_dt=(dt if dt.tzinfo else utc.localize(dt)),
+                                          track_id=old_judgement._track.id, judge=judge)
+
+                seen_judges.add(judge)
+                if old_judgement.__class__.__name__ == 'AbstractAcceptance' and old_judgement._contribType:
+                    new_judgement.accepted_type = self.legacy_contribution_type_map[old_judgement._contribType]
+                yield new_judgement
 
     def _migrate_contribution_field_values(self, old_contrib):
         fields = dict(old_contrib._fields)
