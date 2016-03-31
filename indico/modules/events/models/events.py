@@ -341,6 +341,14 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return self.as_legacy.getOwner()
 
     @property
+    def start_dt_local(self):
+        return self.start_dt.astimezone(self.tzinfo)
+
+    @property
+    def end_dt_local(self):
+        return self.end_dt.astimezone(self.tzinfo)
+
+    @property
     def type(self):
         event_type = self.as_legacy.getType()
         if event_type == 'simple_event':
