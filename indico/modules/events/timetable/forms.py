@@ -48,7 +48,8 @@ class BreakEntryForm(IndicoForm):
         self.event = kwargs.pop('event')
         self.day = kwargs.pop('day')
         duration = self.duration.kwargs['default']
-        self.time.kwargs['default'] = find_earliest_gap(self.event, self.day, duration=duration).time()
+        start_dt = find_earliest_gap(self.event, self.day, duration=duration)
+        kwargs['time'] = start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
         super(BreakEntryForm, self).__init__(*args, **kwargs)
 
     @property
