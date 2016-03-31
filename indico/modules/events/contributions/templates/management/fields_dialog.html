@@ -19,8 +19,19 @@
         </ul>
     </div>
 
+    {% set abstract_content_item = {'title': _("Abstracts content")} %}
+    {% call(item) sortable_list([abstract_content_item], draggable=false, invisible_handle=true,
+                                id='contributions-fixed-fields') %}
+        <a class="icon-edit js-action-button" data-ajax-dialog
+           data-href="{{ url_for('.manage_description_field', event) }}"
+           data-title="{% trans %}Abstracts content{% endtrans %}"</a>
+        <a class="js-delete-contribution-field icon-remove disabled"
+           title="{% trans %}This field cannot be deleted{% endtrans %}"
+           data-qtip-position="right"></a>
+    {% endcall %}
+
     {% if custom_fields %}
-        {% call(custom_field) sortable_list(custom_fields) %}
+        {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields") %}
             <a class="icon-edit js-action-button" data-ajax-dialog
                data-href="{{ url_for('.manage_field', event, custom_field) }}"
                data-title="{% trans %}Edit custom field{% endtrans %}"></a>
@@ -71,7 +82,7 @@
             }
         });
 
-        var $fieldList = $('.manage-contribution-fields .js-sortable-list-widget');
+        var $fieldList = $('#contributions-custom-fields');
         setupSortableList($fieldList);
         $fieldList.on('sortupdate', function(evt, ui) {
             var ids = $fieldList.find('li').map(function(index, item) {
