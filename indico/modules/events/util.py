@@ -18,10 +18,14 @@ from __future__ import unicode_literals
 
 import random
 from copy import deepcopy
+from mimetypes import guess_extension
+from os import path
+from tempfile import NamedTemporaryFile
 
 from flask import session, request, g
 from sqlalchemy.orm import load_only, noload
 
+from indico.core.config import Config
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
 from indico.modules.api import settings as api_settings
@@ -343,3 +347,13 @@ def get_base_ical_parameters(user, event, detail):
             'persistent_user_enabled': persistent_user_enabled, 'api_active': api_key is not None,
             'api_key_user_agreement': tpl.get_ical_api_key_msg(), 'api_persistent_user_agreement': persistent_agreement,
             'user_logged': user is not None, 'request_urls': request_urls}
+
+
+def create_event_logo_tmp_file(event):
+    """Creates a temporary file with the event's logo"""
+    logo_meta = event.logo_metadata
+    logo_extension = guess_extension(logo_meta['content_type']) or path.splitext(logo_meta['filename'])[1]
+    temp_file = NamedTemporaryFile(delete=False, dir=Config.getInstance().getTempDir(), suffix=logo_extension)
+    temp_file.write(event.logo)
+    temp_file.flush()
+    return temp_file
