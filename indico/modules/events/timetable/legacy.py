@@ -25,6 +25,7 @@ from indico.modules.events.contributions.models.persons import ContributionPerso
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
+from indico.web.flask.util import url_for
 
 
 class TimetableSerializer(object):
@@ -232,3 +233,40 @@ def serialize_entry_update(entry):
             'entry': serialization[entry.type](entry),
             'slotEntry': None,
             'autoOps': None}
+
+
+def serialize_session(sess):
+    """Return data for a single session"""
+    from indico.modules.events.util import serialize_person_link
+
+    def _serialize_date(dt):
+        tzinfo = sess.event_new.tzinfo
+        return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
+                'time': dt.astimezone(tzinfo).strftime('%H:%M:%S'),
+                'tz': str(tzinfo)}
+
+    data = {
+        '_type': 'Session',
+        'address': sess.address,
+        'color': '#' + sess.colors.background,
+        'description': sess.description,
+        'endDate': _serialize_date(sess.end_dt),
+        'id': sess.id,
+        'isPoster': sess.is_poster,
+        'location': sess.venue_name,
+        'numSlots': len(sess.blocks),
+        'protectionURL': '',
+        'room': sess.room_name,
+        'roomFullname': sess.room_name,
+        'sessionConveners': [],
+        'startDate': _serialize_date(sess.start_dt),
+        'textColor': '#' + sess.colors.text,
+        'title': sess.title,
+        'url': url_for('sessions.display_session', sess)
+    }
+
+    for convener in sess.all_conveners:
+        convener_data = serialize_person_link(convener)
+        data['sessionConveners'].append(convener_data)
+
+    return data
