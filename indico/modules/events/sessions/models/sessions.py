@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
+from itertools import chain
 from operator import attrgetter
 
 from sqlalchemy.ext.declarative import declared_attr
@@ -170,6 +171,10 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     def end_dt(self):
         sorted_blocks = sorted(self.blocks, key=attrgetter('timetable_entry.end_dt'), reverse=True)
         return sorted_blocks[0].timetable_entry.end_dt if sorted_blocks else None
+
+    @property
+    def all_conveners(self):
+        return set(chain(*[block.person_links for block in self.blocks]))
 
     @locator_property
     def locator(self):
