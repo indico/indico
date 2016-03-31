@@ -68,13 +68,11 @@ class BreakEntryForm(IndicoForm):
         if end_dt > self.event.end_dt:
             raise ValidationError(_("With current time and duration the break ends after the event."))
         tzinfo = self.event.tzinfo
-        if end_dt.astimezone(tzinfo).date() > self.event.end_dt.astimezone(tzinfo).date():
+        if end_dt.astimezone(tzinfo).date() > self.event.end_dt_local.date():
             raise ValidationError(_("With current time and duration the break can't fit on this day."))
 
     def validate_time(self, field):
-        tzinfo = self.event.tzinfo
-        if (self.day == self.event.start_dt.astimezone(tzinfo).date()
-                and field.data < self.event.start_dt.astimezone(tzinfo).time()):
+        if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
             raise ValidationError(_("The break can't be scheduled earlier than the event start time."))
 
 

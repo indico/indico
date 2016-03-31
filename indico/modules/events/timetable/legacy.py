@@ -33,9 +33,7 @@ class TimetableSerializer(object):
 
     def serialize_timetable(self, event, days=None, hide_weekends=False):
         timetable = {}
-        start_dt = event.start_dt.astimezone(event.tzinfo)
-        end_dt = event.end_dt.astimezone(event.tzinfo)
-        for day in iterdays(start_dt, end_dt, skip_weekends=hide_weekends, day_whitelist=days):
+        for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
             date_str = day.strftime('%Y%m%d')
             timetable[date_str] = {}
         query_options = (defaultload('contribution').subqueryload('person_links'),
