@@ -49,6 +49,7 @@ class EventPerson(PersonMixin, db.Model):
 
     __tablename__ = 'persons'
     __table_args__ = (db.UniqueConstraint('event_id', 'user_id'),
+                      db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       db.Index(None, 'event_id', 'email', unique=True, postgresql_where=db.text("email != ''")),
                       {'schema': 'events'})
 
@@ -80,6 +81,7 @@ class EventPerson(PersonMixin, db.Model):
     email = db.Column(
         db.String,
         nullable=False,
+        index=True,
         default=''
     )
     # the title of the user - you usually want the `title` property!

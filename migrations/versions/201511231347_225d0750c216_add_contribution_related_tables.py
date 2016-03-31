@@ -343,7 +343,7 @@ def upgrade():
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),
-        sa.Column('email', sa.String(), nullable=False),
+        sa.Column('email', sa.String(), nullable=False, index=True),
         sa.Column('title', PyIntEnum(UserTitle), nullable=False),
         sa.Column('affiliation', sa.String(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
@@ -351,6 +351,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.UniqueConstraint('event_id', 'user_id'),
+        sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
         sa.Index(None, 'event_id', 'email', unique=True, postgresql_where=sa.text("email != ''")),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
