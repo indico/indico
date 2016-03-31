@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
@@ -129,4 +129,7 @@ class RHTimetableBalloon(RHManageTimetableBase):
 
     def _process(self):
         html = None
+        if self.timetable_entry.contribution:
+            html = render_template('events/timetable/display/balloons/contribution.html',
+                                   contrib=self.timetable_entry.contribution)
         return jsonify(html=html)

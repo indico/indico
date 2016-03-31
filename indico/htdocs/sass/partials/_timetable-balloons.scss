@@ -21,4 +21,97 @@
     .qtip-content {
         padding: 10px !important;
     }
+
+    .title-container {
+        margin-bottom: 10px;
+
+        .title {
+            font-size: 1.3em;
+            line-height: 1;
+            display: inline-block;
+            width: 73%;
+        }
+
+        .settings {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5em;
+            line-height: 1;
+
+            &:hover {
+                color: $black;
+            }
+
+            &:before {
+                font-size: 1em;
+            }
+        }
+
+    }
+
+    .entry-action-buttons a {
+        color: $dark-gray !important;
+
+        &:hover {
+            color: $light-black !important;
+        }
+    }
+
+    .description {
+        font-style: italic;
+        color: $dark-gray;
+    }
+
+    .address {
+        color: $dark-gray;
+    }
+
+    .duration {
+        display: inline-block;
+    }
+
+    .i-data-list {
+        max-width: 300px;
+        margin: 10px 0;
+
+        dt, dd {
+            margin: 0;
+            padding: 0;
+        }
+
+        dt {
+            text-align: left;
+            width: 10%;
+        }
+
+        dd {
+            width: 88%;
+        }
+
+        &.thirty-seventy {
+            dt {
+                width: 30%;
+            }
+
+            dd {
+                width: 68%;
+            }
+        }
+    }
+
+    .attribute-title {
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    span.hr {
+        width: 100%;
+        display: block;
+        margin: 10px 0;
+        border-bottom: 1px solid $pastel-gray;
+    }
+}
+
+.push-back {
+    z-index: 0 !important;
 }
