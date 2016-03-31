@@ -63,13 +63,13 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 from MaKaC.i18n import _
 from MaKaC.common import utils
 
-from indico.core.db import db
 from indico.core.config import Config
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
-from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta, as_utc
+from indico.util.i18n import i18nformat
 from indico.util.string import html_color_to_rgb
 
 
@@ -376,9 +376,9 @@ class ContribToPDF(PDFLaTeXBase):
             'fields': [f for f in event.contribution_fields if f.is_active]
         })
 
-        logo = event.as_legacy.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
+        if event.logo:
+            self.temp_file = create_event_logo_tmp_file(event)
+            self._args['logo_img'] = self.temp_file.name
 
 
 class ContribsToPDF(PDFLaTeXBase):
@@ -400,9 +400,9 @@ class ContribsToPDF(PDFLaTeXBase):
             'tz': tz or event.timezone
         })
 
-        logo = conf.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
+        if event.logo:
+            self.temp_file = create_event_logo_tmp_file(event)
+            self._args['logo_img'] = self.temp_file.name
 
 
 class ContributionBook(PDFLaTeXBase):
@@ -417,8 +417,9 @@ class ContributionBook(PDFLaTeXBase):
         super(ContributionBook, self).__init__()
         self._conf = conf
 
-        tz = tz or conf.getTimezone()
-        contribs = self._sort_contribs(contribs or conf.as_event.contributions, sort_by, aw)
+        event = conf.as_event
+        tz = tz or event.timezone
+        contribs = self._sort_contribs(contribs or event.contributions, sort_by, aw)
         affiliation_contribs = {}
         corresp_authors = {}
 
@@ -441,17 +442,17 @@ class ContributionBook(PDFLaTeXBase):
             'corresp_authors': corresp_authors,
             'contribs': contribs,
             'conf': conf,
-            'tz': tz or conf.getTimezone(),
+            'tz': tz or event.timezone,
             'url': conf.getURL(),
-            'fields': [f for f in conf.as_event.contribution_fields if f.is_active],
+            'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
             'aw': aw,
             'boa_text': conf.getBOAConfig().getText()
         })
 
-        logo = conf.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
+        if event.logo:
+            self.temp_file = create_event_logo_tmp_file(event)
+            self._args['logo_img'] = self.temp_file.name
 
 
 class AbstractBook(ContributionBook):
