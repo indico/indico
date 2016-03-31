@@ -45,7 +45,7 @@ class ContributionForm(IndicoForm):
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
     type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
-    person_link_data = ContributionPersonLinkListField(_("People"), allow_authors=True)
+    person_link_data = ContributionPersonLinkListField(_("People"))
     location_data = IndicoLocationField(_("Location"),
                                         description=_("The physical location where the contribution takes place."))
     keywords = IndicoTagListField(_('Keywords'))
