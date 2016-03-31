@@ -423,12 +423,19 @@ class TimetableMigration(object):
                 cformat('%{yellow!}Event has no content field!%{reset}'), event_id=self.event.id)
             return
 
+        def _positive_or_none(value):
+            try:
+                value = int(value)
+            except (TypeError, ValueError):
+                return None
+            return value if value > 0 else None
+
         limitation = getattr(content_field, '_limitation', 'chars')
         abstracts_settings.set(self.event, 'description_settings', {
-            'active': content_field._active,
-            'required': bool(content_field._isMandatory),
-            'max_words': content_field._maxLength if limitation == 'words' else None,
-            'max_chars': content_field._maxLength if limitation == 'chars' else None
+            'is_active': content_field._active,
+            'is_required': bool(content_field._isMandatory),
+            'max_words': _positive_or_none(content_field._maxLength) if limitation == 'words' else None,
+            'max_length': _positive_or_none(content_field._maxLength) if limitation == 'chars' else None
         })
 
     def _migrate_contribution_field(self, old_field, position):
