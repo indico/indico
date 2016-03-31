@@ -97,6 +97,8 @@ class TimetableSerializer(object):
         contribution = entry.contribution
         data = {}
         data.update(self._get_entry_data(entry))
+        if contribution.session:
+            data.update(self._get_color_data(contribution.session))
         data.update(self._get_location_data(contribution))
         data.update({'entryType': 'Contribution',
                      'contributionId': contribution.id,
@@ -133,6 +135,27 @@ class TimetableSerializer(object):
                      'sessionCode': block.session.code if block else None,
                      'sessionSlotId': block.id if block else None,
                      'title': break_.title})
+        return data
+
+    def serialize_session(self, sess):
+        data = {}
+        if sess.is_poster:
+            return data
+        tzinfo = sess.event_new.tzinfo
+        start_dt = sess.start_dt.astimezone(tzinfo)
+        end_dt = sess.end_dt.astimezone(tzinfo)
+        for day in iterdays(start_dt, end_dt):
+            data[day.strftime('%Y%m%d')] = {}
+        for block in sess.blocks:
+            tt_entry = block.timetable_entry
+            if not tt_entry:
+                continue
+            for child_entry in tt_entry.children:
+                if not child_entry.can_view(session.user):
+                    continue
+                date_key = child_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
+                entry_key = self._get_entry_key(tt_entry) + 'l{}'.format(child_entry.id)
+                data[date_key][entry_key] = self.serialize_timetable_entry(child_entry)
         return data
 
     def _get_attachment_data(self, obj):
