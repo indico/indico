@@ -1,6 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{{ form_header(form, id='survey-question-form') }}
+{{ form_header(form) }}
 {{ form_rows(form, fields=form._common_fields) }}
 {{ form_rows(form, skip=form._common_fields) }}
 {% call form_footer(form) %}
