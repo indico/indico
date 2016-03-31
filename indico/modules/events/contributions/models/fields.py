@@ -83,6 +83,7 @@ class ContributionField(db.Model):
         lazy=True,
         backref=db.backref(
             'contribution_fields',
+            order_by=position,
             cascade='all, delete-orphan',
             lazy='dynamic'
         )

@@ -63,8 +63,9 @@ class ContributionForm(IndicoForm):
         if start_date_field and start_date_field.data and start_date_field.data + field.data > self.event.end_dt:
             raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
-    def get_custom_field_names(self):
-        return tuple([field_name for field_name in self._fields.iterkeys() if field_name.startswith('custom_')])
+    @property
+    def custom_field_names(self):
+        return tuple([field_name for field_name in self._fields if field_name.startswith('custom_')])
 
 
 class ContributionProtectionForm(IndicoForm):
