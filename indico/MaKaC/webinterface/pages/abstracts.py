@@ -423,7 +423,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         else:
             vars["trackListType"] = "radio"
         vars["tracksSelected"] = vars.get("tracksSelectedList", [])  # list of track ids that had been selected
-        vars["types"] = self._conf.getContribTypeList()
+        vars["types"] = self._conf.as_event.contribution_types.all()
         vars["typeSelected"] = vars.get("type", None)
         vars["comments"] = str(vars.get("comments", ""))
         fieldDict = {}
@@ -598,7 +598,7 @@ class WAbstractManagment(wcomponents.WTemplated):
             if status.getTrack():
                 trackTitle = " for %s" % self.htmlText(status.getTrack().getTitle())
             if status.getType():
-                contribTitle = " as %s" % self.htmlText(status.getType().getName())
+                contribTitle = " as %s" % self.htmlText(status.getType().name)
             html = i18nformat("""%s%s%s<br><font size="-1">%s _("on") %s</font>""") % (
                 html,
                 trackTitle,
@@ -674,8 +674,8 @@ class WAbstractManagment(wcomponents.WTemplated):
             if jud.__class__ == review.AbstractAcceptance:
                 cTypeCaption = ""
                 if jud.getContribType() is not None:
-                    cTypeCaption = jud.getContribType().getName()
-                st = i18nformat(""" - _("Proposed to accept")""")
+                    cTypeCaption = jud.getContribType().name
+                st = i18nformat(""" - _("Proposed to accept") """)
                 if cTypeCaption:
                     st += self.htmlText(cTypeCaption)
                 color = """ color="#009933" """
@@ -929,7 +929,7 @@ class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
         vars["abstractsQuantity"] = len(self._abstracts)
         vars["tracks"] = self._conf.getTrackList()
         vars["sessions"] = self._conf.getSessionList()
-        vars["types"] = self._conf.getContribTypeList()
+        vars["types"] = self._conf.as_event.contribution_types.all()
         vars["listOfAbstracts"] = []
         acceptURL = urlHandlers.UHAbstractManagmentAcceptMultiple.getURL(self._conf)
         IDs = []
@@ -1182,10 +1182,8 @@ class WConfModAbstractPropToAcc(wcomponents.WTemplated):
 
     def _getContribTypesHTML(self):
         res=["""<option value="">--none--</option>"""]
-        for cType in self._abstract.getConference().getContribTypeList():
-            id=quoteattr(str(cType.getId()))
-            caption=self.htmlText(cType.getName())
-            res.append("""<option value=%s>%s</option>"""%(id,caption))
+        for cType in self._abstract.as_new.event_new.contribution_types:
+            res.append('<option value="{}">{}</option>'.format(cType.id, self.htmlText(cType.name)))
         return res
 
     def getVars(self):
@@ -1320,7 +1318,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                 if status.__class__ == review.AbstractAcceptance:
                     contribType = ""
                     if status.getContribType() is not None:
-                        contribType = "(%s)"%status.getContribType().getName()
+                        contribType = "(%s)" % status.getContribType().name
                     st = _("Proposed to accept %s")%(self.htmlText(contribType))
                     color = "#D2FFE9"
                     modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")

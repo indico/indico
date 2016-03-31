@@ -2226,7 +2226,7 @@ class WAbstracts( wcomponents.WTemplated ):
     def _getAccType(self, abstract):
         status = abstract.getCurrentStatus()
         if isinstance(status,(review.AbstractStatusAccepted, review.AbstractStatusProposedToAccept)) and status.getType() is not None:
-            return self.htmlText(status.getType().getName())
+            return self.htmlText(status.getType().name)
         return ""
 
     def _getAccTrack(self, abstract):
@@ -2509,9 +2509,9 @@ class WConfModifContribList(wcomponents.WTemplated):
         res=[ i18nformat("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for t in self._conf.getContribTypeList():
             checked=""
-            if t.getId() in self._filterCrit.getField("type").getValues():
+            if str(t.id) in self._filterCrit.getField("type").getValues():
                 checked=" checked"
-            res.append("""<input type="checkbox" name="types" value=%s%s> %s"""%(quoteattr(str(t.getId())),checked,self.htmlText(t.getName())))
+            res.append("""<input type="checkbox" name="types" value=%s%s> %s"""%(quoteattr(str(t.id)),checked,self.htmlText(t.name)))
         return res
 
     def _getSessionItemsHTML(self):
