@@ -1,9 +1,9 @@
-{% macro sortable_items(items, draggable, toggle_enabled) -%}
+{% macro sortable_items(items, draggable, toggle_enabled, invisible_handle=false) -%}
     {# Caller is called with an item and must render the action buttons. #}
     {% for item in items %}
         <li class="i-label sortable-item{% if draggable %} draggable{% endif %}" data-item-id="{{ item.id }}">
-            {% if draggable %}
-                <div class="handle"></div>
+            {% if draggable or invisible_handle %}
+                <div class="handle{% if invisible_handle %} invisible{% endif %}"></div>
             {% endif %}
             {% if toggle_enabled %}
                 <div class="actions">
@@ -22,17 +22,18 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro sortable_list(items, classes="", draggable=true, title=none) -%}
+{% macro sortable_list(items, classes="", draggable=true, title=none, id=none, invisible_handle=false) -%}
     {# Caller is called with an item and must render the action buttons. #}
     {% set _caller = caller %}
     <div class="sortable-list js-sortable-list-widget {{ classes }}"
+         {% if id %}id="{{ id }}"{% endif %}
          {% if not draggable %}data-disable-dragging{% endif %}>
         <div>
             {% if title %}
                 <div class="titled-rule">{{ title }}</div>
             {% endif %}
             <ul class="enabled">
-                {% call(item) sortable_items(items, draggable) %}
+                {% call(item) sortable_items(items, draggable, false, invisible_handle) %}
                     {{ _caller(item) if _caller else '' }}
                 {% endcall %}
             </ul>
@@ -40,15 +41,17 @@
     </div>
 {%- endmacro %}
 
-{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, classes="", draggable=true) -%}
+{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, classes="", draggable=true,
+                        id=none, invisible_handle=false) -%}
     {# Caller is called with an item and must render the action buttons. #}
     {% set _caller = caller %}
     <div class="sortable-list js-sortable-list-widget {{ classes }}"
+         {% if id %}id="{{ id }}"{% endif %}
          {% if not draggable %}data-disable-dragging{% endif %}>
         <div>
             <div class="titled-rule">{{ enabled_title }}</div>
             <ul class="enabled">
-                {% call(item) sortable_items(enabled_items, draggable, true) %}
+                {% call(item) sortable_items(enabled_items, draggable, true, invisible_handle) %}
                         {{ _caller(item) if _caller else '' }}
                 {% endcall %}
             </ul>
@@ -56,7 +59,7 @@
         <div>
             <div class="titled-rule">{{ disabled_title }}</div>
             <ul class="disabled">
-                {% call(item) sortable_items(disabled_items, draggable, true) %}
+                {% call(item) sortable_items(disabled_items, draggable, true, invisible_handle) %}
                         {{ _caller(item) if _caller else '' }}
                 {% endcall %}
             </ul>

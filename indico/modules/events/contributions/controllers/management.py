@@ -20,10 +20,13 @@ from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
+from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
+from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
+from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import get_contrib_field_types
 from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
                                                        ContributionStartDateForm, ContributionDurationForm,
@@ -565,3 +568,15 @@ class RHDeleteContributionField(RHManageContributionFieldBase):
         db.session.flush()
         self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                            'Deleted field: {}'.format(self.contrib_field.title), session.user)
+
+
+class RHManageDescriptionField(RHManageContributionsBase):
+    """Manage the description field used by the abstracts"""
+
+    def _process(self):
+        description_settings = abstracts_settings.get(self.event_new, 'description_settings')
+        form = AbstractContentSettingsForm(obj=FormDefaults(description_settings))
+        if form.validate_on_submit():
+            abstracts_settings.set(self.event_new, 'description_settings', form.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)

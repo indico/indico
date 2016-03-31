@@ -54,6 +54,11 @@
     color: #4C6A83;
 }
 
+.ui-widget-content a.disabled {
+    color: #c3c3c3;
+    cursor: default;
+}
+
 .ui-state-active a {
     color: #555555 !important;
 }
