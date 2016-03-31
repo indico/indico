@@ -54,8 +54,8 @@ function showAbstracts()
                     <td>
                         <select name="type">
                             <option value="not_defined">--${ _("not defined") }--</option>
-                            % for type in self_._conf.getContribTypeList():
-                                <option value=${ type.getId() } >${ type.getName() }</option>
+                            % for type in self_._conf.as_event.contribution_types:
+                                <option value=${ type.id } >${ type.name }</option>
                             % endfor
                         </select>
                     </td>

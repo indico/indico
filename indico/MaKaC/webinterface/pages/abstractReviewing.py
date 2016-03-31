@@ -182,7 +182,7 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         vars["CCAddrs"] = quoteattr(str(",".join(vars.get("ccList", []))))
         vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
         vars["availableConditions"] = NotifTplConditionsFactory.getConditionList()
-        vars["contribTypeList"] = self._conf.getContribTypeList()
+        vars["contribTypeList"] = self._conf.as_event.contribution_types.all()
         vars["trackList"] = self._conf.getTrackList()
         return vars
 
@@ -514,7 +514,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         vars["remConditionsURL"] = quoteattr(str(urlHandlers.UHConfModNotifTplConditionRem.getURL(self._notifTpl)))
         vars["newConditionURL"] = quoteattr(str(urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)))
         vars["modifDataURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
-        vars["contribTypeList"] = self._conf.getContribTypeList()
+        vars["contribTypeList"] = self._conf.as_event.contribution_types.all()
         vars["trackList"] = self._conf.getTrackList()
 
         return vars

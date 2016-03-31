@@ -163,8 +163,8 @@ class AccContribTypeFilterField(filters.FilterField):
                 return self._showNoValue
 
     def needsToBeApplied(self):
-        for ct in self._conf.getContribTypeList():
-            if ct.getId() not in self._values:
+        for ct in self._conf.as_event.contribution_types:
+            if str(ct.id) not in self._values:
                 return True
         return not self._showNoValue
 

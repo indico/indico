@@ -102,7 +102,7 @@
                         <option value="--any--">${ _("--any--") }</option>
                         <option value="--none--">${ _("--none--") }</option>
                         % for ct in contribTypeList:
-                            <option value=${ quoteattr(ct.getId()) }> ${ ct.getName() } </option>
+                            <option value="${ ct.id }"> ${ ct.name } </option>
                         % endfor
                     </select>
                 </td>

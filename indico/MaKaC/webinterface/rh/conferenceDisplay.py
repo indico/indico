@@ -437,8 +437,8 @@ class RHContributionList( RHConferenceBaseDisplay ):
         filter = {"hide_withdrawn": True}
         ltypes = ltracks = lsessions = []
         if not filterUsed:
-            for type in conf.getContribTypeList():
-                ltypes.append( type.getId() )
+            for ctype in conf.as_event.contribution_types:
+                ltypes.append( ctype.id )
             for track in conf.getTrackList():
                 ltracks.append( track.getId() )
             for session in conf.getSessionList():
@@ -459,7 +459,7 @@ class RHContributionList( RHConferenceBaseDisplay ):
 
         typeShowNoValue, trackShowNoValue, sessionShowNoValue = True, True, True
         if filterUsed:
-            if self._conf.getContribTypeList():
+            if self._conf.as_event.contribution_types:
                 typeShowNoValue =  params.has_key("typeShowNoValue")
             if self._conf.getTrackList():
                 trackShowNoValue =  params.has_key("trackShowNoValue")

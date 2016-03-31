@@ -51,12 +51,12 @@
         </%block>
 
         <%block name="filterType">
-            % if len(conf.getContribTypeList()) > 0:
+            % if conf.as_event.contribution_types.count() > 0:
                 <select id="contribTypeSelector" name="contribTypeSelector" multiple="multiple">
                     <option value="-1" ${'selected="selected"' if not filterCriteria or filterCriteria.getField("type").getShowNoValue() else ""}>--${_("not specified")}--</option>
-                    % for type in conf.getContribTypeList():
-                        <option value="${type.getId()}" ${'selected="selected"' if not filterCriteria or (type.getId() in filterCriteria.getField("type").getValues()) else ""}>
-                            ${type.getName()}
+                    % for type in conf.as_event.contribution_types:
+                        <option value="${type.id}" ${'selected="selected"' if not filterCriteria or (str(type.id) in filterCriteria.getField("type").getValues()) else ""}>
+                            ${type.name}
                         </option>
                     % endfor
                 </select>

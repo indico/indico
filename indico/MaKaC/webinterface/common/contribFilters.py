@@ -27,7 +27,7 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getContribTypeList()) == len(self._values) and contribution.getType():
+        if self._conf.as_event.contribution_types.count() == len(self._values) and contribution.getType():
             return True
         elif contribution.getType() is None:
             return self._showNoValue
@@ -414,6 +414,3 @@ class SortingCriteria( filters.SortingCriteria ):
                         SpeakerSF.getId():SpeakerSF, \
                         BoardNumberSF.getId():BoardNumberSF, \
                         TitleSF.getId():TitleSF}
-
-
-
