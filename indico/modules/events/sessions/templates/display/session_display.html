@@ -2,6 +2,7 @@
 
 {% from 'attachments/_attachments.html' import render_attachments %}
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
+{% from 'events/timetable/_timetable.html' import render_timetable %}
 
 {% block title -%}
     {% trans title=sess.title %}{{ title }}{% endtrans %}
@@ -63,7 +64,7 @@
                     <div class="text">
                         <h2>{% trans %}Conveners{% endtrans %}</h2>
                         {% for block in sess.blocks -%}
-                            <span><strong>{{ block.title }}</strong></span>
+                            <strong>{{ block.full_title }}</strong>
                             <ul>
                                 {% for convener in block.person_links -%}
                                     <li class="icon-user">
@@ -80,38 +81,64 @@
             </div>
         {%- endif %}
 
-        {% if session_contribs %}
-            <h2>{% trans %}Session contributions{% endtrans %}</h2>
-            <div id="session-contrib-list" class="contribution-list">
-                {{ render_contribution_list(event, timezone, session_contribs, false) }}
-            </div>
-            <div class="i-box titled no-padding">
-                <div class="i-box-header">
-                    <div class="i-box-title icon-attachment">
-                        {% trans %}Materials{% endtrans %}
-                    </div>
-                    <div class="i-box-buttons toolbar right">
-                        <div class="group">
-                            {% if sess.can_manage_attachments(session.user) -%}
-                                <a href="#" class="i-button icon-edit"
-                                   data-locator="{{ sess.locator|tojson|forceescape }}"
-                                   data-attachment-editor></a>
-                            {%- endif %}
-                        </div>
-                    </div>
+        <div id="attachments" class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title icon-attachment">
+                    {% trans %}Materials{% endtrans %}
                 </div>
-                <div class="i-box-content">
-                    <div class="attachments-box">
-                        {{ render_attachments(sess.attached_items, management=false) }}
+                <div class="i-box-buttons toolbar right">
+                    <div class="group">
+                        {% if sess.can_manage_attachments(session.user) -%}
+                            <a href="#" class="i-button icon-edit"
+                               data-locator="{{ sess.locator|tojson|forceescape }}"
+                               data-attachment-editor></a>
+                        {%- endif %}
                     </div>
                 </div>
             </div>
-        {% endif %}
+            <div class="i-box-content">
+                <div class="attachments-box">
+                    {{ render_attachments(sess.attached_items, management=false) }}
+                </div>
+            </div>
+        </div>
 
-        {# TODO: Add session timetable here #}
+        <div style="margin: 10px 0;">
+            {% if session_contribs %}
+                <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
+                    {% trans %}Contribution list{% endtrans %}
+                </a>
+            {% endif %}
+            {% if not sess.is_poster %}
+                <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
+                    {% trans %}Timetable{% endtrans %}
+                </a>
+            {% endif %}
+        </div>
 
+        <div class="js-container">
+            {% if session_contribs %}
+                <div id="session-contrib-list" class="contribution-list js-view">
+                    {{ render_contribution_list(event, timezone, session_contribs, false) }}
+                </div>
+            {% endif %}
+
+            {% if not sess.is_poster -%}
+                <div id="session-timetable" class="js-view">
+                    {{ render_timetable(timetable_data, event_info, timetable_layout) }}
+                </div>
+            {%- endif %}
+        </div>
     </div>
     <script>
         setupAttachmentTreeView();
+        $('.js-switch-view').on('click', function(evt) {
+            evt.preventDefault();
+
+            $('.js-switch-view').removeClass('highlight');
+            $('.js-container .js-view').hide();
+            $(this).addClass('highlight');
+            $('#' + $(this).data('show')).show();
+        }).trigger('click');
     </script>
 {%- endblock %}
