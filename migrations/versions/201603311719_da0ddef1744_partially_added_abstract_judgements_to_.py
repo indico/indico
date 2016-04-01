@@ -24,7 +24,7 @@ def upgrade():
                     sa.Column('user_id', sa.Integer(), nullable=False),
                     sa.Column('accepted_type_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['abstract_id'],
-                                            [u'events.abstracts.id'],
+                                            [u'event_abstracts.abstracts.id'],
                                             name=op.f('fk_judgements_abstract_id_abstracts')),
                     sa.ForeignKeyConstraint(['accepted_type_id'],
                                             [u'events.contribution_types.id'],

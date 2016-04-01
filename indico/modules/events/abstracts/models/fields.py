@@ -30,7 +30,7 @@ class AbstractFieldValue(ContributionFieldValueBase):
 
     abstract_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.abstracts.id'),
+        db.ForeignKey('event_abstracts.abstracts.id'),
         index=True,
         nullable=False,
         primary_key=True
