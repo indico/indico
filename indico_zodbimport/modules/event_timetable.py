@@ -35,7 +35,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
-from indico.modules.events.abstracts.models.judgemnts import Judgment
+from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
@@ -410,7 +410,9 @@ class TimetableMigration(object):
 
         content_field = None
         for field in afm._fields:
-            if field._id == 'content':
+            # it may happen that there is a second 'content' field (old version schemas)
+            # in that case, let's use the first one as description and keep the second one as a field
+            if field._id == 'content' and not content_field:
                 content_field = field
             else:
                 pos += 1
@@ -420,11 +422,13 @@ class TimetableMigration(object):
             self.importer.print_warning(
                 cformat('%{yellow!}Event has no content field!%{reset}'), event_id=self.event.id)
             return
+
+        limitation = getattr(content_field, '_limitation', 'chars')
         abstracts_settings.set(self.event, 'description_settings', {
             'active': content_field._active,
             'required': bool(content_field._isMandatory),
-            'max_words': content_field._maxLength if content_field._limitation == 'words' else None,
-            'max_chars': content_field._maxLength if content_field._limitation == 'chars' else None
+            'max_words': content_field._maxLength if limitation == 'words' else None,
+            'max_chars': content_field._maxLength if limitation == 'chars' else None
         })
 
     def _migrate_contribution_field(self, old_field, position):
@@ -432,9 +436,10 @@ class TimetableMigration(object):
         if field_type in ('AbstractTextAreaField', 'AbstractInputField', 'AbstractField'):
             multiline = field_type == 'AbstractTextAreaField' or (field_type == 'AbstractField' and
                                                                   getattr(old_field, '_type', 'textarea') == 'textarea')
+            limitation = getattr(old_field, '_limitation', 'chars')
             field_data = {
-                'max_length': int(old_field._maxLength) if getattr(old_field, '_limitation', None) == 'chars' else None,
-                'max_words': int(old_field._maxLength) if getattr(old_field, '_limitation', None) == 'words' else None,
+                'max_length': int(old_field._maxLength) if limitation == 'chars' else None,
+                'max_words': int(old_field._maxLength) if limitation == 'words' else None,
                 'multiline': multiline
             }
             field_type = 'text'
@@ -452,6 +457,11 @@ class TimetableMigration(object):
             field_type = 'single_choice'
         else:
             self.importer.print_error('Unrecognized field type {}'.format(field_type), event_id=self.event.id)
+            return
+        if old_field._id in self.legacy_contribution_field_map:
+            self.importer.print_warning(
+                cformat("%{yellow!}There is already a field with legacy_id '{}')!%{reset}").format(old_field._id),
+                event_id=self.event.id)
             return
         field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
                                   title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
@@ -540,7 +550,8 @@ class TimetableMigration(object):
             type_id = self.legacy_contribution_type_map[type_].id if type_ else None
         except KeyError:
             self.importer.print_warning(cformat('%{yellow!}Abstract {} - invalid contrib type {}, setting to None')
-                                        .format(old_abstract._id, convert_to_unicode(type_._name)),
+                                        .format(old_abstract._id,
+                                                convert_to_unicode(getattr(type_, '_name', str(type_)))),
                                         event_id=self.event.id)
             type_id = None
 
@@ -557,7 +568,7 @@ class TimetableMigration(object):
                 except KeyError:
                     self.importer.print_warning(
                         cformat('%{yellow!}Contribution {} - invalid contrib type {}, setting to None')
-                        .format(old_contribution._id, convert_to_unicode(old_contrib_type._name)),
+                        .format(old_contribution.id, convert_to_unicode(old_contrib_type._name)),
                         event_id=self.event.id)
 
                 accepted_track = old_abstract._currentStatus._track
@@ -567,7 +578,7 @@ class TimetableMigration(object):
                             description=description, type_id=type_id, accepted_track_id=accepted_track_id,
                             accepted_type_id=accepted_type_id)
 
-        if old_contribution:
+        if old_contribution and old_contribution.id:
             abstract.contribution = self.legacy_contribution_map[old_contribution]
 
         if not self.importer.quiet:
@@ -580,16 +591,23 @@ class TimetableMigration(object):
     def _migrate_abstract_judgments(self, old_abstract):
         if not hasattr(old_abstract, '_trackJudgementsHistorical'):
             self.importer.print_warning(
-                cformat('%{blue!}Abstract {} {yellow}has no judgment history!%{reset}').format(old_abstract._id),
+                cformat('%{blue!}Abstract {} {yellow}had no judgment history!%{reset}').format(old_abstract._id),
                 event_id=self.event.id)
             return
-        for track_id, judgments in old_abstract._trackJudgementsHistorical.iteritems():
+
+        history = old_abstract._trackJudgementsHistorical
+        if not hasattr(history, 'iteritems'):
+            self.importer.print_warning('Abstract {} had corrupt judgment history ({}).'.format(old_abstract._id,
+                                                                                                history),
+                                        event_id=self.event.id)
+            return
+        for track_id, judgments in history.iteritems():
             seen_judges = set()
             for old_judgment in judgments:
                 judge = old_judgment._responsible.user if old_judgment._responsible else None
                 if not judge:
                     self.importer.print_warning(
-                        cformat('%{blue!}Abstract {} {yellow}has an empty judge ({})!%{reset}').format(
+                        cformat('%{blue!}Abstract {} {yellow}had an empty judge ({})!%{reset}').format(
                             old_abstract._id, old_judgment), event_id=self.event.id)
                     continue
                 elif judge in seen_judges:
@@ -603,7 +621,14 @@ class TimetableMigration(object):
 
                 seen_judges.add(judge)
                 if old_judgment.__class__.__name__ == 'AbstractAcceptance' and old_judgment._contribType:
-                    new_judgment.accepted_type = self.legacy_contribution_type_map[old_judgment._contribType]
+                    contrib_type = old_judgment._contribType
+                    try:
+                        new_judgment.accepted_type = self.legacy_contribution_type_map[contrib_type]
+                    except KeyError:
+                        self.importer.print_warning(
+                            cformat("%{blue!}Abstract {}: {yellow}contribution type '{}' unknown!%{reset}")
+                            .format(old_abstract._id, getattr(contrib_type, '_name', contrib_type)),
+                            event_id=self.event.id)
                 yield new_judgment
 
     def _migrate_contribution_field_values(self, old_contrib):
@@ -917,7 +942,7 @@ class EventTimetableImporter(Importer):
     def has_data(self):
         if self.parallel and self.parallel[1] == 0 and ReferenceType.has_rows():
             return True
-        models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
+        models = (TimetableEntry, Break, Session, SessionBlock, Contribution, Abstract, Judgment)
         return any(x.has_rows() for x in models)
 
     def _load_data(self):
