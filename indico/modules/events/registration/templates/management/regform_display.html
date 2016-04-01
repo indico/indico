@@ -14,14 +14,6 @@
     {%- endtrans %}
 {% endblock %}
 
-{% macro form_actions_macro(form) -%}
-    <a class="icon-settings js-settings-dialog"
-        data-href="{{ url_for('.manage_regform_display', event, form) }}"
-        data-title="{% trans title=form.title %}Customize columns for {{title}}{% endtrans %}"
-        title="{% trans %}Choose which columns of this form are displayed{% endtrans %}"
-        data-qtip-position="right"></a>
-{%- endmacro %}
-
 {% block content %}
     {{ form_header(form, id='js-participant-display-form') }}
     {{ form_rows(form) }}
@@ -87,10 +79,15 @@
                 By dragging the form titles, you can choose which to display and reorder them.
             {%- endtrans %}
         </p>
-        {{ sortable_lists(_("Shown registration forms"), enabled_forms,
-                          _("Hidden registration forms"), disabled_forms,
-                          actions_macro=form_actions_macro,
-                          classes="i-box titled") }}
+        {% call(form) sortable_lists(_("Shown registration forms"), enabled_forms,
+                                     _("Hidden registration forms"), disabled_forms,
+                                     classes="i-box titled") %}
+            <a class="icon-settings js-settings-dialog"
+               data-href="{{ url_for('.manage_regform_display', event, form) }}"
+               data-title="{% trans title=form.title %}Customize columns for {{title}}{% endtrans %}"
+               title="{% trans %}Choose which columns of this form are displayed{% endtrans %}"
+               data-qtip-position="right"></a>
+        {% endcall %}
     </div>
 
     <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
