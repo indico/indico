@@ -22,7 +22,6 @@ import traceback
 from collections import defaultdict
 from math import ceil
 from operator import attrgetter, itemgetter
-from pytz import utc
 from uuid import uuid4
 
 import click
@@ -37,6 +36,7 @@ from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgements import Judgement
+from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
@@ -62,8 +62,10 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.models.users import UserTitle
 from indico.util.console import cformat, verbose_iterator
+from indico.util.date_time import as_utc
 from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
 from indico.util.struct.iterables import committing_iterator
+
 from MaKaC.conference import _get_room_mapping
 
 from indico_zodbimport import Importer, convert_to_unicode
@@ -418,10 +420,9 @@ class TimetableMigration(object):
             self.importer.print_warning(
                 cformat('%{yellow!}Event has no content field!%{reset}'), event_id=self.event.id)
             return
-        from indico.modules.events.abstracts.settings import abstracts_settings
         abstracts_settings.set(self.event, 'description_settings', {
             'active': content_field._active,
-            'required': content_field._isMandatory,
+            'required': bool(content_field._isMandatory),
             'max_words': content_field._maxLength if content_field._limitation == 'words' else None,
             'max_chars': content_field._maxLength if content_field._limitation == 'chars' else None
         })
@@ -597,8 +598,7 @@ class TimetableMigration(object):
                         .format(old_abstract._id, judge, old_judgement), event_id=self.event.id)
                     continue
 
-                dt = old_judgement._date
-                new_judgement = Judgement(creation_dt=(dt if dt.tzinfo else utc.localize(dt)),
+                new_judgement = Judgement(creation_dt=as_utc(old_judgement._date),
                                           track_id=old_judgement._track.id, judge=judge)
 
                 seen_judges.add(judge)

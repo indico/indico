@@ -125,7 +125,7 @@ class ContributionFieldValueBase(db.Model):
     def contribution_field_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('events.contribution_fields.id'),
+            db.ForeignKey('events.contribution_fields.id', name='fk_{}_contribution_field'.format(cls.__tablename__)),
             primary_key=True,
             index=True
         )

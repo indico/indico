@@ -16,24 +16,22 @@
 
 from datetime import timedelta
 
-from indico.core.db import db
 from indico.core import signals
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgements import Judgement
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
-from indico.util.i18n import _
-from indico.util.string import encode_utf8
-from indico.util.text import wordsCounter
 from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.persons import EventPerson
-from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.contributions.models.fields import ContributionFieldValue
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.users.models.users import User, UserTitle
-from indico.util.string import to_unicode
-
+from indico.util.caching import memoize_request
+from indico.util.i18n import _
+from indico.util.string import encode_utf8, to_unicode
+from indico.util.text import wordsCounter
 
 FIELD_TYPE_MAP = {
     'input': 'text',
@@ -67,11 +65,11 @@ def person_from_data(person_data, event):
 
 
 @no_autoflush
-def contribution_from_abstract(abstract, session):
+def contribution_from_abstract(abstract, sess):
     from MaKaC.review import AbstractStatusAccepted
 
     event = abstract.as_new.event_new
-    duration = session.default_contribution_duration if session else timedelta(minutes=15)
+    duration = sess.default_contribution_duration if sess else timedelta(minutes=15)
     links = []
 
     for auth in abstract.getAuthorList():
@@ -91,14 +89,13 @@ def contribution_from_abstract(abstract, session):
         links.append(ContributionPersonLink(author_type=author_type, person=person,
                                             is_speaker=abstract.isSpeaker(auth), **person_data))
 
+    custom_fields_data = [{field_val.contribution_field.id: field_val.data} for
+                          field_val in abstract.as_new.field_values]
     contrib = create_contribution(event, {'title': abstract.getTitle(), 'duration': duration,
-                                          'person_link_data': {link: True for link in links}})
+                                          'person_link_data': {link: True for link in links}},
+                                  custom_fields_data=custom_fields_data)
     contrib.abstract = abstract.as_new
-
     contrib.description = abstract.as_new.description
-    for field_val in abstract.as_new.field_values:
-        new_val = ContributionFieldValue(contribution_field=field_val.contribution_field, data=field_val.data)
-        contrib.field_values.append(new_val)
 
     # if this is an accepted abstract, set track and type if present
     status = abstract.getCurrentStatus()
@@ -110,8 +107,8 @@ def contribution_from_abstract(abstract, session):
         if contrib_type:
             contrib.type = contrib_type
 
-    if session:
-        contrib.session = session
+    if sess:
+        contrib.session = sess
 
     return contrib
 
@@ -259,7 +256,7 @@ class AbstractSelectionFieldWrapper(AbstractFieldWrapper):
 
         if content:
             if next((op for op in self.getOptions() if op.getId() == content), None) is None:
-                errors.append(_("The option with ID '{}' in the field {} doesn't exit").format(
+                errors.append(_("The option with ID '{}' in the field {} doesn't exist").format(
                     content, self.field.title))
 
         return errors
@@ -319,20 +316,19 @@ class AbstractFieldManagerAdapter(object):
         if field_id == 'content':
             return True
 
-        legacy = self.event.contribution_fields.filter(ContributionField.legacy_id == field_id)
-        if legacy:
+        legacy = self.event.contribution_fields.filter_by(legacy_id=field_id)
+        if legacy.count():
             return True
         else:
-            return AbstractFieldWrapper.wrap(
-                self.event.contribution_fields.filter(ContributionField.id == int(field_id)).count()) > 0
+            return self.event.contribution_fields.filter_by(id=int(field_id)).count() > 0
 
     def getFieldById(self, field_id):
         if field_id == 'content':
             field = self.description_field
         else:
-            field = self.event.contribution_fields.filter(ContributionField.legacy_id == field_id).first()
+            field = self.event.contribution_fields.filter_by(legacy_id=field_id).first()
             if not field:
-                field = self.event.contribution_fields.filter(ContributionField.id == int(field_id)).first()
+                field = self.event.contribution_fields.filter_by(id=int(field_id)).first()
         return AbstractFieldWrapper.wrap(field) if field else None
 
     def getFields(self):
@@ -391,18 +387,20 @@ class AbstractLegacyMixin(object):
         if field_id == 'content':
             return AbstractDescriptionValue(self.as_new)
         else:
-            field = ContributionField.find_first(legacy_id=field_id, event_new=self.event)
-            fval = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
+            field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
+            fval = self.event.abstract_fields.filter_by(contribution_field=field, abstract=self.as_new).first()
             if fval:
                 return fval
             else:
                 return AbstractFieldValue(contribution_field=field, abstract=self.as_new, data={})
 
     @property
+    @memoize_request
     def event(self):
         return self._owner._owner.as_event
 
     @property
+    @memoize_request
     def as_new(self):
         return Abstract.find_one(event_new=self.event, legacy_id=self._id)
 

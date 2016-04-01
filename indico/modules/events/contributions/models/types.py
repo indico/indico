@@ -63,10 +63,10 @@ class ContributionType(db.Model):
     )
 
     # relationship backrefs:
+    # - abstract_judgements (Judgement.accepted_type)
     # - abstracts (Abstract.type)
     # - accepted_as_abstracts (Abstract.accepted_type)
     # - contributions (Contribution.type)
-    # - judgements (Judgement.accepted_type)
 
     @return_ascii
     def __repr__(self):
