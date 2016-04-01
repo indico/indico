@@ -79,7 +79,7 @@ class Judgement(db.Model):
         'User',
         lazy=False,
         backref=db.backref(
-            'judgements',
+            'abstract_judgements',
             lazy='dynamic'
         )
     )
@@ -87,7 +87,7 @@ class Judgement(db.Model):
         'ContributionType',
         lazy=False,
         backref=db.backref(
-            'judgements',
+            'abstract_judgements',
             lazy='dynamic'
         )
     )
@@ -98,8 +98,8 @@ class Judgement(db.Model):
 
     @property
     def as_legacy(self):
-        return next(judgement for judgement in self.abstract.as_legacy.getJudgementHistoryByTrack(str(self.track_id))
-                    if judgement.getResponsible().as_new == self.judge)
+        return next((judgement for judgement in self.abstract.as_legacy.getJudgementHistoryByTrack(str(self.track_id))
+                    if judgement.getResponsible().as_new == self.judge), None)
 
     @property
     def track(self):

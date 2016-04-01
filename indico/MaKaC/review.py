@@ -1145,7 +1145,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
                     abs.addSpeaker(sp.clone())
 
         abs.setSubmitter(self.getSubmitter().getAvatar())
-        abs.as_new.type  = self.as_new.type
+        abs.as_new.type = self.as_new.type
 
         # the track, to which the abstract belongs to
         # legacy list implementation

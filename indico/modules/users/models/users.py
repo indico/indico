@@ -52,7 +52,7 @@ class UserTitle(TitledIntEnum):
 
     @classmethod
     def from_legacy(cls, text):
-        return {unicode(x.title): x for x in cls}.get(text)
+        return next((x for x in cls if unicode(x.title) == text), None)
 
 
 class PersonMixin(object):
@@ -305,6 +305,7 @@ class User(PersonMixin, db.Model):
 
     # relationship backrefs:
     # - _all_settings (UserSetting.user)
+    # - abstract_judgements (Judgement.judge)
     # - agreements (Agreement.user)
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
@@ -323,7 +324,6 @@ class User(PersonMixin, db.Model):
     # - in_event_settings_acls (EventSettingPrincipal.user)
     # - in_session_acls (SessionPrincipal.user)
     # - in_settings_acls (SettingPrincipal.user)
-    # - judgements (Judgement.judge)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
     # - oauth_tokens (OAuthToken.user)
