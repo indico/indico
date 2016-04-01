@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from datetime import time
 
 from flask import session
+import jsonschema
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
 from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
@@ -258,22 +259,24 @@ class ParticipantsDisplayForm(IndicoForm):
     json = JSONField()
 
     def validate_json(self, field):
-        data = field.data
-        if 'merge_forms' not in data:
-            raise ValidationError('merge_forms is missing')
-        if 'participant_list_forms' not in data:
-            raise ValidationError('participant_list_forms is missing')
-        if not isinstance(data['participant_list_forms'], list):
-            raise ValidationError('participant_list_forms is not a list')
-        if not all(isinstance(form_id, int) for form_id in data['participant_list_forms']):
-            raise ValidationError('Invalid value in participant_list_forms')
-        if 'participant_list_columns' not in data:
-            raise ValidationError('participant_list_columns is missing')
-        if not isinstance(data['participant_list_columns'], list):
-            raise ValidationError('participant_list_columns is not a list')
-        if not all(isinstance(column_name, unicode) for column_name in data['participant_list_columns']):
-            raise ValidationError('Invalid value in participant_list_columns')
-        return True
+        schema = {
+            'type': 'object',
+            'properties': {
+                'merge_forms': {'type': 'boolean'},
+                'participant_list_forms': {
+                    'type': 'array',
+                    'items': {'type': 'integer'}
+                },
+                'participant_list_columns': {
+                    'type': 'array',
+                    'items': {'type': 'string'}
+                }
+            }
+        }
+        try:
+            jsonschema.validate(field.data, schema)
+        except jsonschema.ValidationError as exc:
+            raise ValidationError(exc.message)
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):
@@ -281,11 +284,16 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
     json = JSONField()
 
     def validate_json(self, field):
-        data = field.data
-        if 'columns' not in data:
-            raise ValidationError('"columns" is missing')
-        if not isinstance(data['columns'], list):
-            raise ValidationError('"columns" is not a list')
-        if not all(isinstance(column_id, int) for column_id in data['columns']):
-            raise ValidationError('"columns" contains an invalid value')
-        return True
+        schema = {
+            'type': 'object',
+            'properties': {
+                'columns': {
+                    'type': 'array',
+                    'items': {'type': 'integer'}
+                }
+            }
+        }
+        try:
+            jsonschema.validate(field.data, schema)
+        except jsonschema.ValidationError as exc:
+            raise ValidationError(exc.message)
