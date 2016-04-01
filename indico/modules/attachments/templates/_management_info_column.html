@@ -5,18 +5,19 @@
                title="{% trans %}Manage materials{% endtrans %}"
                data-title="{% trans title=obj.title %}Manage materials for '{{ title }}'{% endtrans %}"
                data-locator="{{ obj.locator|tojson|forceescape }}"
-               data-attachment-editor></a>
-            {% if not obj.attachment_count %}
-                <em>{% trans %}None{% endtrans %}</em>
-            {% else %}
-                <span class="label">
-                    {% trans count=obj.attachment_count -%}
-                        {{ count }} file
-                    {%- pluralize -%}
-                        {{ count }} files
-                    {%- endtrans %}
-                </span>
-            {% endif %}
+               data-attachment-editor>
+                {% if not obj.attachment_count %}
+                    <em>{% trans %}None{% endtrans %}</em>
+                {% else %}
+                    <span class="label">
+                        {% trans count=obj.attachment_count -%}
+                            {{ count }} file
+                        {%- pluralize -%}
+                            {{ count }} files
+                        {%- endtrans %}
+                    </span>
+                {% endif %}
+            </a>
         </span>
     </td>
 {%- endmacro %}
