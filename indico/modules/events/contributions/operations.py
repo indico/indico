@@ -64,14 +64,15 @@ def _set_custom_fields(contrib, custom_fields_data):
         contrib.set_custom_field(custom_field_id, custom_field_value)
 
 
-def create_contribution(event, contrib_data, custom_fields_data):
+def create_contribution(event, contrib_data, custom_fields_data=None):
     start_dt = contrib_data.pop('start_date', None)
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(contrib_data)
     if start_dt is not None:
         create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
                                        'contribution': contrib})
-    _set_custom_fields(contrib, custom_fields_data)
+    if custom_fields_data:
+        _set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, session.user)
@@ -81,11 +82,13 @@ def create_contribution(event, contrib_data, custom_fields_data):
 
 
 @no_autoflush
-def update_contribution(contrib, contrib_data, custom_fields_data):
+def update_contribution(contrib, contrib_data, custom_fields_data=None):
     """Update a contribution
 
     :param contrib: The `Contribution` to update
-    :param data: A dict containing the data to update
+    :param contrib_data: A dict containing the data to update
+    :param custom_fields_data: A dict containing the data for custom
+                               fields.
     :return: A dictionary containing information related to the
              update.  `unscheduled` will be true if the modification
              resulted in the contribution being unscheduled.  In this
@@ -99,7 +102,8 @@ def update_contribution(contrib, contrib_data, custom_fields_data):
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
     contrib.populate_from_dict(contrib_data)
-    _set_custom_fields(contrib, custom_fields_data)
+    if custom_fields_data:
+        _set_custom_fields(contrib, custom_fields_data)
     if 'session' in contrib_data:
         timetable_entry = contrib.timetable_entry
         if timetable_entry is not None and _ensure_consistency(contrib):
