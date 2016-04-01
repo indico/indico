@@ -25,7 +25,7 @@ from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.controllers import RHManageTimetableBase
+from indico.modules.events.timetable.controllers import RHManageTimetableBase, RHManageTimetableEntryBase
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
 from indico.modules.events.timetable.views import WPManageTimetable
@@ -49,16 +49,8 @@ class RHManageTimetable(RHManageTimetableBase):
                                                  timetable_data=timetable_data, timetable_layout=self.layout)
 
 
-class RHTimetableREST(RHManageTimetableBase):
+class RHTimetableREST(RHManageTimetableEntryBase):
     """RESTful timetable actions"""
-
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = None
-        if 'timetable_entry_id' in request.view_args:
-            self.timetable_entry = (self.event_new.timetable_entries
-                                    .filter_by(id=request.view_args['timetable_entry_id'])
-                                    .first_or_404())
 
     def _get_contribution_updates(self, data):
         updates = {'parent': None}
