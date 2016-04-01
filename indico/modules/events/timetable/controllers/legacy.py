@@ -76,13 +76,16 @@ class RHLegacyTimetableAddContribution(RHManageTimetableBase):
 class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.session = None
-        if 'session_id' in request.args:
-            self.session = Session.query.with_parent(self.event_new).filter_by(id=request.args.get('session_id')).one()
+        try:
+            # no need to validate whether it's in the event; we just
+            # use it to filter the event's contribution list
+            self.session_id = int(request.args['session_id'])
+        except KeyError:
+            self.session_id = None
 
     def _process(self):
-        target = self.session if self.session else self.event_new
-        contributions = Contribution.query.with_parent(target).filter_by(is_scheduled=False)
+        contributions = Contribution.query.with_parent(self.event_new).filter_by(is_scheduled=False)
+        contributions = [c for c in contributions if c.session_id == self.session_id]
         return jsonify(contributions=[serialize_contribution(x) for x in contributions])
 
 
