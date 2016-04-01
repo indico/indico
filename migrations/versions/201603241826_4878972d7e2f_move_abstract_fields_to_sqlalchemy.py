@@ -8,6 +8,7 @@ Create Date: 2016-03-24 18:26:58.290527
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 
 # revision identifiers, used by Alembic.
@@ -16,6 +17,8 @@ down_revision = '38ed666dda98'
 
 
 def upgrade():
+    op.execute(CreateSchema('event_abstracts'))
+
     # Create new tables in 'event_abstracts' schema
     op.create_table('abstracts',
                     sa.Column('id', sa.Integer(), nullable=False),
@@ -35,7 +38,7 @@ def upgrade():
                     sa.Column('abstract_id', sa.Integer(), nullable=False),
                     sa.Column('contribution_field_id', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(['abstract_id'],
-                                            [u'events.abstracts.id'],
+                                            [u'event_abstracts.abstracts.id'],
                                             name=op.f('fk_abstract_field_values_abstract_id_abstracts')),
                     sa.ForeignKeyConstraint(
                         ['contribution_field_id'],
@@ -118,3 +121,5 @@ def downgrade():
 
     op.drop_table('abstract_field_values', schema='event_abstracts')
     op.drop_table('abstracts', schema='event_abstracts')
+
+    op.execute(DropSchema('event_abstracts'))
