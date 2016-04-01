@@ -27,9 +27,8 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
 from indico.modules.events.timetable.views import WPManageTimetable
+from indico.modules.events.timetable.util import serialize_event_info
 from indico.modules.events.util import track_time_changes
-from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 
 class RHManageTimetable(RHManageTimetableBase):
@@ -42,8 +41,7 @@ class RHManageTimetable(RHManageTimetableBase):
             self.layout = request.args.get('ttLyt', None)
 
     def _process(self):
-        event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
-        event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
         return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
                                                  timetable_data=timetable_data, timetable_layout=self.layout)

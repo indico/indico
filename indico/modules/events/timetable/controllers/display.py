@@ -20,8 +20,7 @@ from flask import request
 
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable
-from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IConferenceEventInfoFossil
+from indico.modules.events.timetable.util import serialize_event_info
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -33,8 +32,7 @@ class RHTimetable(RHConferenceBaseDisplay):
             self.layout = request.args.get('ttLyt')
 
     def _process(self):
-        event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
-        event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
         return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
                                                   timetable_data=timetable_data, timetable_layout=self.layout)

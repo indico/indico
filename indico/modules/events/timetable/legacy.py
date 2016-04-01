@@ -26,6 +26,8 @@ from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 
 class TimetableSerializer(object):
@@ -256,6 +258,14 @@ def serialize_entry_update(entry):
             'entry': serialization[entry.type](entry),
             'slotEntry': None,
             'autoOps': None}
+
+
+def serialize_event_info(event):
+    conf = event.as_legacy
+    event_info = fossilize(conf, IConferenceEventInfoFossil, tz=conf.tz)
+    event_info['isCFAEnabled'] = conf.getAbstractMgr().isActive()
+    event_info['sessions'] = {sess.id: serialize_session(sess) for sess in event.sessions}
+    return event_info
 
 
 def serialize_session(sess):

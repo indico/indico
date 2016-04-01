@@ -13,10 +13,9 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.legacy import serialize_event_info
 from indico.util.date_time import get_day_start, iterdays, overlaps
 from indico.web.flask.templating import get_template_module
-from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 
 def is_visible_from(event, categ):
@@ -186,10 +185,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 
 
 def render_session_timetable(session, timetable_layout=None, management=False):
-    conf = session.event_new.as_legacy
     timetable_data = TimetableSerializer().serialize_session_timetable(session)
-    event_info = fossilize(conf, IConferenceEventInfoFossil, tz=session.event_new.timezone)
-    event_info['isCFAEnabled'] = conf.getAbstractMgr().isActive()
-    event_info['sessions'] = {sess.id: serialize_session(sess) for sess in session.event_new.sessions}
+    event_info = serialize_event_info(session.event_new)
     tpl = get_template_module('events/timetable/_timetable.html')
     return tpl.render_timetable(timetable_data, event_info, timetable_layout=timetable_layout, management=management)
