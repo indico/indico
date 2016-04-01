@@ -72,8 +72,6 @@ def generate_global_file(config):
             'SessionProtection': urlHandlers.UHSessionModifAC.getURL(_ignore_static=True).js_router,
             'ContributionProtection': urlHandlers.UHContribModifAC.getURL(_ignore_static=True).js_router,
 
-            'Reschedule': urlHandlers.UHConfModifReschedule.getURL(_ignore_static=True).js_router,
-            'SlotCalc': urlHandlers.UHSessionModSlotCalc.getURL(_ignore_static=True).js_router,
             'FitSessionSlot': urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router,
 
             'UploadAction': {
@@ -117,6 +115,7 @@ def generate_global_file(config):
             },
 
             'Timetable': {
+                'reschedule': url_rule_to_js('timetable.reschedule'),
                 'breaks': {
                     'add': url_rule_to_js('timetable.add_break')
                 },

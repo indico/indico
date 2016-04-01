@@ -2838,8 +2838,7 @@ class RHReschedule(RHConferenceModifBase):
     def _process(self):
         if not self._cancel:
             if not self._ok:
-                p = conferences.WPConfModifReschedule(self, self._conf, self._targetDay)
-                return p.display()
+                return ''
             else:
                 t = timedelta(hours=int(self._hour), minutes=int(self._minute))
         if self._sessionId:

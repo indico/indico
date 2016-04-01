@@ -3887,28 +3887,6 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
                 })
 
 
-class WConfModifReschedule(wcomponents.WTemplated):
-
-    def __init__(self, targetDay):
-        self._targetDay = targetDay
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["targetDay"]=quoteattr(str(self._targetDay))
-        return vars
-
-class WPConfModifReschedule(WPConferenceModifBase):
-
-    def __init__(self, rh, conf, targetDay):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._targetDay=targetDay
-
-    def _getPageContent( self, params):
-        wc=WConfModifReschedule(self._targetDay)
-        p={"postURL":quoteattr(str(urlHandlers.UHConfModifReschedule.getURL(self._conf)))}
-        return wc.getHTML(p)
-
-
 # ============================================================================
 # === Badges related =========================================================
 # ============================================================================

@@ -22,7 +22,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableAddSession,
                                                                 RHLegacyTimetableAddSessionBlock,
                                                                 RHLegacyTimetableGetUnscheduledContributions,
-                                                                RHLegacyTimetableScheduleContribution)
+                                                                RHLegacyTimetableScheduleContribution,
+                                                                RHLegacyTimetableReschedule)
 from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -40,6 +41,7 @@ _bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTim
 _bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution,
                  methods=('POST',))
+_bp.add_url_rule('/manage/timetable/reschedule', 'reschedule', RHLegacyTimetableReschedule, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/add-break',
                  'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-contribution',
