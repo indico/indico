@@ -562,25 +562,19 @@ type("TimetableManagementActions", [], {
 
     addSession: function() {
         var self = this;
-
         var params = this._addParams('Session');
-
-        //Get the days in which the conference is being held
-        var days = this.timetable.getDays();
-
-        IndicoUI.Dialogs.addSession(
-            this.methods[params.type].add,
-            this.methods[params.parentType].dayEndDate,
-            params,
-            params.roomInfo,
-            $O(params.roomInfo),
-            params.selectedDay,
-            this.eventInfo.favoriteRooms,
-            days,
-            function(result) { self.timetable._updateEntry(result, result.id); },
-            this.eventInfo.bookedRooms,
-            this.timetable);
+        ajaxDialog({
+            trigger: this,
+            url: build_url(Indico.Urls.Timetable.sessions.add, {'confId': params.conference}),
+            title: $T.gettext("Add session"),
+            onClose: function(data) {
+                if (data) {
+                    // TODO: Update list of sessions, otherwise refresh page
+                }
+            }
+        });
     },
+
     addSessionSlot: function(session) {
         var self = this;
 
