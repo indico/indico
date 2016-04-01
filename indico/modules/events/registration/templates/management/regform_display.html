@@ -127,17 +127,17 @@
                     merge_forms: mergeForms
                 };
                 if (mergeForms) {
-                    $form.find('#publish-registrations ul.enabled li').each(function() {
-                        data.participant_list_forms.push($(this).data('item-id'));
-                    });
+                    data.participant_list_forms = $form.find('#publish-registrations ul.enabled li').map(function() {
+                        return $(this).data('item-id');
+                    }).toArray();
                 } else {
-                    $form.find('#registration-forms ul.enabled li').each(function() {
-                        data.participant_list_forms.push($(this).data('item-id'));
-                    });
+                    data.participant_list_forms = $form.find('#registration-forms ul.enabled li').map(function() {
+                        return $(this).data('item-id');
+                    }).toArray();
                 }
-                $form.find('.js-participant-list-columns ul.enabled li').each(function() {
-                    data.participant_list_columns.push($(this).data('item-id'));
-                });
+                data.participant_list_columns = $form.find('.js-participant-list-columns ul.enabled li').map(function() {
+                    return $(this).data('item-id');
+                }).toArray();
                 $form.find('#json').val(JSON.stringify(data));
             });
 
