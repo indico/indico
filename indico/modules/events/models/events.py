@@ -31,7 +31,8 @@ from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
+from indico.core.db.sqlalchemy.util.queries import (preprocess_ts_string, escape_like, db_dates_overlap,
+                                                    get_related_object)
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
@@ -455,6 +456,16 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
+
+    def get_session(self, id_=None, friendly_id=None):
+        """Get a session of the event"""
+        if friendly_id is None and id_ is not None:
+            criteria = {'id': id_}
+        elif id_ is None and friendly_id is not None:
+            criteria = {'friendly_id': friendly_id}
+        else:
+            raise ValueError('Exactly one kind of id must be specified')
+        return get_related_object(self, 'sessions', criteria)
 
     @memoize_request
     def has_feature(self, feature):
