@@ -1,7 +1,7 @@
 """Add CHECK for category columns
 
 Revision ID: ae00a6a1edd
-Revises: 38ed666dda98
+Revises: da0ddef1744
 Create Date: 2016-02-04 10:36:57.350102
 """
 

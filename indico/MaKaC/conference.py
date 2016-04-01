@@ -2128,8 +2128,7 @@ class Conference(CommonObjectBase, Locatable):
     def getContribTypeById(self, tid):
         if not tid.isdigit():
             return None
-        from indico.modules.events.contributions.models.types import ContributionType
-        return self.as_event.contribution_types.filter(ContributionType.id == int(tid)).first()
+        return self.as_event.contribution_types.filter_by(id=int(tid)).first()
 
     def _getRepository( self ):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
@@ -2915,10 +2914,9 @@ class Conference(CommonObjectBase, Locatable):
         """Returns the session from the conference list corresponding to the
             unique session id specified
         """
-        from indico.modules.events.sessions.models.sessions import Session as Session_
         if not sessionId.isdigit():
             return None
-        return Session_.find_first(event_id=self.as_event.id, friendly_id=int(sessionId), is_deleted=False)
+        return self.as_event.get_session(friendly_id=sessionId)
 
     def getRoomList(self):
         roomList =[]
