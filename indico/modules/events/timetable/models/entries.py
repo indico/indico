@@ -24,6 +24,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.i18n import _
@@ -195,6 +196,10 @@ class TimetableEntry(db.Model):
         if self.start_dt is None or self.duration is None:
             return None
         return self.start_dt + self.duration
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, timetable_entry_id=self.id)
 
     @return_ascii
     def __repr__(self):
