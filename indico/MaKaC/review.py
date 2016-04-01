@@ -28,7 +28,7 @@ from pytz import timezone
 from indico.core.config import Config
 from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
                                                     AbstractFieldManagerAdapter,
-                                                    AbstractJudgementLegacyMixin,
+                                                    AbstractJudgmentLegacyMixin,
                                                     AbstractLegacyMixin,
                                                     AbstractManagerLegacyMixin,
                                                     AbstractStatusAcceptedLegacyMixin)
@@ -1837,7 +1837,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
         for x in toDelete:
             self.getTrackJudgementsHistorical()[track.getId()].remove(x)
-            self._del_judgement(x)
+            self._del_judgment(x)
 
 
     def proposeToAccept( self, responsible, track, contribType, comment="", answers=[] ):
@@ -1854,7 +1854,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         self._removePreviousJud(responsible, track)
         # Create the new judgement
         jud = AbstractAcceptance(self, track, responsible, contribType, answers)
-        self._add_judgement(jud)
+        self._add_judgment(jud)
         jud.setComment( comment )
         self._addTrackAcceptance( jud )
         # Update the rating of the abstract
@@ -2238,7 +2238,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         return self.getAttachments().get(id, None)
 
 
-class AbstractJudgement(AbstractJudgementLegacyMixin, Persistent):
+class AbstractJudgement(AbstractJudgmentLegacyMixin, Persistent):
     """This class represents each of the judgements made by a track about a
         certain abstract. Each track for which an abstract is proposed can
         make a judgement proposing the abstract to be accepted or rejected.

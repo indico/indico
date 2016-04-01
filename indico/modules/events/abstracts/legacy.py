@@ -21,7 +21,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
-from indico.modules.events.abstracts.models.judgements import Judgement
+from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.operations import create_contribution
@@ -58,7 +58,7 @@ def person_from_data(person_data, event):
     if user:
         return EventPerson.for_user(user, event)
 
-    person = EventPerson.find_first(email=person_data['email'].lower())
+    person = EventPerson.find_first(event_new=event, email=person_data['email'].lower())
     if not person:
         person = EventPerson(event_new=event, **person_data)
     return person
@@ -255,7 +255,7 @@ class AbstractSelectionFieldWrapper(AbstractFieldWrapper):
         errors = super(AbstractSelectionFieldWrapper, self).check(content)
 
         if content:
-            if next((op for op in self.getOptions() if op.getId() == content), None) is None:
+            if not any(op for op in self.getOptions() if op.getId() == content):
                 errors.append(_("The option with ID '{}' in the field {} doesn't exist").format(
                     content, self.field.title))
 
@@ -405,14 +405,14 @@ class AbstractLegacyMixin(object):
         return Abstract.find_one(event_new=self.event, legacy_id=self._id)
 
     @no_autoflush
-    def _add_judgement(self, legacy_judgement):
-        judgement = Judgement(track_id=legacy_judgement._track.id, judge=legacy_judgement._responsible.user,
-                              accepted_type=getattr(legacy_judgement, '_contribType', None))
-        self.as_new.judgements.append(judgement)
-        return judgement
+    def _add_judgment(self, legacy_judgment):
+        judgment = Judgment(track_id=legacy_judgment._track.id, judge=legacy_judgment._responsible.user,
+                            accepted_type=getattr(legacy_judgment, '_contribType', None))
+        self.as_new.judgments.append(judgment)
+        return judgment
 
-    def _del_judgement(self, legacy_judgement):
-        db.session.delete(legacy_judgement.as_new)
+    def _del_judgment(self, legacy_judgment):
+        db.session.delete(legacy_judgment.as_new)
         db.session.flush()
 
     def getFields(self):
@@ -463,11 +463,7 @@ class AbstractFieldContentWrapper(object):
         return len(self.field_val.data)
 
     def __ne__(self, other):
-        if isinstance(other, AbstractFieldContentWrapper) and self.field.id == other.field.id:
-            return self.field_val.data != other.data
-        elif not isinstance(other, AbstractFieldContentWrapper):
-            return self.field_val.data != other
-        return True
+        return not (self == other)
 
     @encode_utf8
     def __str__(self):
@@ -486,17 +482,16 @@ class AbstractManagerLegacyMixin(object):
     def _remove_abstract(self, legacy_abstract):
         db.session.delete(legacy_abstract.as_new)
 
-class AbstractStatusAcceptedLegacyMixin(object):
 
+class AbstractStatusAcceptedLegacyMixin(object):
     def getType(self):
         return self._abstract.as_new.accepted_type
 
 
-class AbstractJudgementLegacyMixin(object):
-
+class AbstractJudgmentLegacyMixin(object):
     @property
     def as_new(self):
-        return Judgement.find_one(
+        return Judgment.find_one(
             track_id=self._track.id, judge=self._responsible.user, abstract_id=self._abstract.as_new.id)
 
     def getContribType(self):

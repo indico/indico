@@ -24,16 +24,11 @@ from indico.util.date_time import now_utc
 from indico.util.string import format_repr, return_ascii
 
 
-class Judgement(db.Model):
-    """Represents an abstract that can be associated to a Contribution."""
+class Judgment(db.Model):
+    """Represents an abstract judgment, emitted by a judge"""
 
-    __tablename__ = 'judgements'
-    __auto_table_args = (db.Index(None, 'abstract_id', 'track_id', 'user_id', unique=True),
-                         {'schema': 'event_abstracts'})
-
-    @declared_attr
-    def __table_args__(cls):
-        return auto_table_args(cls)
+    __tablename__ = 'judgments'
+    __table_args__ = {'schema': 'event_abstracts'}
 
     id = db.Column(
         db.Integer,
@@ -55,7 +50,7 @@ class Judgement(db.Model):
         db.Integer,
         nullable=False
     )
-    user_id = db.Column(
+    judge_user_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
         nullable=False,
@@ -71,7 +66,7 @@ class Judgement(db.Model):
         'Abstract',
         lazy=False,
         backref=db.backref(
-            'judgements',
+            'judgments',
             lazy='dynamic'
         )
     )
@@ -79,7 +74,7 @@ class Judgement(db.Model):
         'User',
         lazy=False,
         backref=db.backref(
-            'abstract_judgements',
+            'abstract_judgments',
             lazy='dynamic'
         )
     )
@@ -87,7 +82,7 @@ class Judgement(db.Model):
         'ContributionType',
         lazy=False,
         backref=db.backref(
-            'abstract_judgements',
+            'abstract_judgments',
             lazy='dynamic'
         )
     )
@@ -98,8 +93,8 @@ class Judgement(db.Model):
 
     @property
     def as_legacy(self):
-        return next((judgement for judgement in self.abstract.as_legacy.getJudgementHistoryByTrack(str(self.track_id))
-                    if judgement.getResponsible().as_new == self.judge), None)
+        return next((judgment for judgment in self.abstract.as_legacy.getJudgementHistoryByTrack(str(self.track_id))
+                    if judgment.getResponsible().as_new == self.judge), None)
 
     @property
     def track(self):
