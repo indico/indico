@@ -58,6 +58,27 @@ class TimetableSerializer(object):
                 timetable[date_str][key] = data
         return timetable
 
+    def serialize_session_timetable(self, session_):
+        data = {}
+        if session_.is_poster:
+            return data
+        tzinfo = session_.event_new.tzinfo
+        start_dt = session_.start_dt.astimezone(tzinfo)
+        end_dt = session_.end_dt.astimezone(tzinfo)
+        for day in iterdays(start_dt, end_dt):
+            data[day.strftime('%Y%m%d')] = {}
+        for block in session_.blocks:
+            tt_entry = block.timetable_entry
+            if not tt_entry:
+                continue
+            for child_entry in tt_entry.children:
+                if not child_entry.can_view(session.user):
+                    continue
+                date_key = child_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
+                entry_key = self._get_entry_key(tt_entry) + 'l{}'.format(child_entry.id)
+                data[date_key][entry_key] = self.serialize_timetable_entry(child_entry)
+        return data
+
     def serialize_timetable_entry(self, entry):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
             return self.serialize_session_block_entry(entry)
@@ -135,27 +156,6 @@ class TimetableSerializer(object):
                      'sessionCode': block.session.code if block else None,
                      'sessionSlotId': block.id if block else None,
                      'title': break_.title})
-        return data
-
-    def serialize_session(self, sess):
-        data = {}
-        if sess.is_poster:
-            return data
-        tzinfo = sess.event_new.tzinfo
-        start_dt = sess.start_dt.astimezone(tzinfo)
-        end_dt = sess.end_dt.astimezone(tzinfo)
-        for day in iterdays(start_dt, end_dt):
-            data[day.strftime('%Y%m%d')] = {}
-        for block in sess.blocks:
-            tt_entry = block.timetable_entry
-            if not tt_entry:
-                continue
-            for child_entry in tt_entry.children:
-                if not child_entry.can_view(session.user):
-                    continue
-                date_key = child_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
-                entry_key = self._get_entry_key(tt_entry) + 'l{}'.format(child_entry.id)
-                data[date_key][entry_key] = self.serialize_timetable_entry(child_entry)
         return data
 
     def _get_attachment_data(self, obj):
