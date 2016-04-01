@@ -133,10 +133,19 @@
 .conference-page {
     @extend %indico-page;
 
+    .title {
+        width: 70%;
+    }
+
+    .actions {
+        width: 30%;
+    }
+
     header h2 {
         color: $orange;
         font-size: 2em;
         font-weight: normal;
+        padding-right: 5px;
     }
 }
 
