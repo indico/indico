@@ -116,11 +116,17 @@
 }
 
 .manage-contribution-types {
+    max-width: 600px;
+
     table.i-table {
         table-layout: auto;
 
         th, td {
             white-space: normal;
+
+            &.name-column {
+                white-space: nowrap;
+            }
         }
 
         .action-column {
