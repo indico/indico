@@ -2,7 +2,6 @@
 
 {% from 'attachments/_attachments.html' import render_attachments %}
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
-{% from 'events/timetable/_timetable.html' import render_timetable %}
 
 {% block title -%}
     {% trans title=sess.title %}{{ title }}{% endtrans %}
@@ -125,7 +124,7 @@
 
             {% if not sess.is_poster -%}
                 <div id="session-timetable" class="js-view">
-                    {{ render_timetable(timetable_data, event_info, timetable_layout) }}
+                    {{ template_hook('session-timetable', session=sess, timetable_layout=none) }}
                 </div>
             {%- endif %}
         </div>

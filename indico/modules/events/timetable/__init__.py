@@ -21,6 +21,7 @@ from flask import session
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -40,3 +41,9 @@ def _extend_event_management_menu(sender, event, **kwargs):
 def _get_timetable_cloner(sender, **kwargs):
     from indico.modules.events.timetable.clone import TimetableCloner
     return TimetableCloner
+
+
+@template_hook('session-timetable')
+def _render_session_timetable(session, **kwargs):
+    from indico.modules.events.timetable.util import render_session_timetable
+    return render_session_timetable(session, **kwargs)
