@@ -121,3 +121,13 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
     _entry_type = TimetableEntryType.SESSION_BLOCK
     _default_duration = timedelta(minutes=60)
     _display_fields = ('title', 'time', 'duration', 'person_links', 'location_data')
+
+
+class BaseEntryForm(EntryFormMixin, IndicoForm):
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs['event']
+        self.day = kwargs.pop('day')
+        self.item = kwargs.pop('item')
+        super(EntryFormMixin, self).__init__(*args, **kwargs)
+        self.time.description = _("Time when the {} will be scheduled.").format(self.item.title.lower())
+        self.duration.description = _("The duration of the {}").format(self.item.title.lower())

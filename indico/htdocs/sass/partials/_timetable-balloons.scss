@@ -17,6 +17,7 @@
 
 .balloon-qtip {
     max-width: 300px;
+    min-width: 300px;
 
     .qtip-content {
         padding: 10px !important;
@@ -109,6 +110,21 @@
         display: block;
         margin: 10px 0;
         border-bottom: 1px solid $pastel-gray;
+    }
+}
+
+.balloon-time-qtip{
+    max-width: 410px;
+    min-width: 410px;
+
+    .i-form {
+        input {
+           width: 6em !important;
+        }
+
+        .form-field-description {
+            width: auto !important;
+        }
     }
 }
 
