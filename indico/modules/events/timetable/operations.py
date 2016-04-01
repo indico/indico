@@ -55,8 +55,7 @@ def create_break_entry(event, data, session_block=None):
 def update_break_entry(break_, data):
     start_dt = data.pop('start_dt', None)
     if start_dt is not None:
-        with track_time_changes():
-            update_timetable_entry(break_.timetable_entry, {'start_dt': start_dt})
+        update_timetable_entry(break_.timetable_entry, {'start_dt': start_dt})
     break_.populate_from_dict(data)
 
 

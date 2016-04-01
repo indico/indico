@@ -24,7 +24,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableGetUnscheduledContributions,
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableReschedule,
-                                                                RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry)
+                                                                RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
+                                                                RHLegacyTimetableEditEntryTime)
 from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST, RHTimetableBalloon
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -52,8 +53,10 @@ _bp.add_url_rule('/manage/timetable/add-break',
                  'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-contribution',
                  'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit', 'edit_entry', RHLegacyTimetableEditEntry,
+_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/time', 'edit_entry_time',
+                 RHLegacyTimetableEditEntryTime, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-session-block',
                  'add_session_block', RHLegacyTimetableAddSessionBlock, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))

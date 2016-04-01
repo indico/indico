@@ -596,6 +596,25 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                             // Set the tooltip content upon successful retrieval
                             api.set('content.text', content.html);
                             var $content = api.elements.content;
+                            $duration = $content.find('.js-edit-time');
+                            $duration.ajaxqbubble({
+                                url: build_url(Indico.Urls.Timetable.entries.editTime, params),
+                                qBubbleOptions: {
+                                    style: {
+                                        classes: 'balloon-time-qtip'
+                                    },
+                                    position: {
+                                        at: 'top center',
+                                        my: 'bottom center',
+                                        target: $(timetableBlock)
+                                    }
+                                },
+                                onClose: function(data) {
+                                    if (data.entries) {
+                                        self.managementActions._addEntries(data.entries)
+                                    }
+                                }
+                            });
 
                             $content.find('.push-balloon-back').each(function() {
                                 $(this).on('click', function() {
