@@ -273,7 +273,7 @@ def serialize_session(sess):
         'address': sess.address,
         'color': '#' + sess.colors.background,
         'description': sess.description,
-        'endDate': _serialize_date(sess.end_dt),
+        'endDate': _serialize_date(sess.end_dt) if sess.end_dt else '',
         'id': sess.id,
         'isPoster': sess.is_poster,
         'location': sess.venue_name,
@@ -282,7 +282,7 @@ def serialize_session(sess):
         'room': sess.room_name,
         'roomFullname': sess.room_name,
         'sessionConveners': [],
-        'startDate': _serialize_date(sess.start_dt),
+        'startDate': _serialize_date(sess.start_dt) if sess.start_dt else '',
         'textColor': '#' + sess.colors.text,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
