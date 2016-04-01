@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import Counter
+from datetime import timedelta
 
 import dateutil.parser
 from flask import request, jsonify
@@ -32,8 +33,9 @@ from indico.modules.events.timetable.legacy import serialize_contribution, seria
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution)
+from indico.modules.events.timetable.reschedule import Reschedule, RescheduleMode
 from indico.modules.events.timetable.util import find_earliest_gap
-from indico.modules.events.util import get_random_color
+from indico.modules.events.util import get_random_color, track_time_changes
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -151,3 +153,39 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
 
     def _schedule(self, contrib, start_dt):
         return schedule_contribution(contrib, start_dt, session_block=self.session_block)
+
+
+class RHLegacyTimetableReschedule(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        schema = {
+            'type': 'object',
+            'properties': {
+                'mode': {'type': 'string', 'enum': ['none', 'time', 'duration']},
+                'day': {'type': 'string', 'format': 'date'},
+                'gap': {'type': 'integer', 'minimum': 0},
+                'fit_blocks': {'type': 'boolean'},
+                'session_block': {'type': 'integer'},
+                'session': {'type': 'integer'}
+            },
+            'required': ['mode', 'day', 'gap', 'fit_blocks']
+        }
+        self.validate_json(schema)
+        self.day = dateutil.parser.parse(request.json['day']).date()
+        self.session_block = self.session = None
+        if request.json.get('session_block') is not None:
+            self.session_block = self.event_new.get_session_block(request.json['session_block'], scheduled_only=True)
+            if self.session_block is None:
+                raise NotFound
+        elif request.json.get('session') is not None:
+            self.session = self.event_new.get_session(request.json['session'])
+            if self.session is None:
+                raise NotFound
+
+    def _process(self):
+        reschedule = Reschedule(self.event_new, RescheduleMode[request.json['mode']], self.day,
+                                session=self.session, session_block=self.session_block,
+                                fit_blocks=request.json['fit_blocks'], gap=timedelta(minutes=request.json['gap']))
+        with track_time_changes():
+            reschedule.run()
+        return jsonify_data(flash=False)

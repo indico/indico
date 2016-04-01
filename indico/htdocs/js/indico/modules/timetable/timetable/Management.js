@@ -710,17 +710,17 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         actionChoose.append(actionChooseTbody);
 
         startTimeRescheduleRB.observeClick(function(){
-            if(self.rescheduleAction == "startingTime") {
+            if(self.rescheduleAction == "time") {
                 if (self.fitInnerAction == "noFit") {
                     self.rescheduleButton.disabledButtonWithTooltip('disable');
                 }
-                self.rescheduleAction = "noAction";
+                self.rescheduleAction = "none";
                 startTimeRescheduleTr.dom.className = "";
                 startTimeRescheduleRB.dom.checked = false;
             }
             else {
                 self.rescheduleButton.disabledButtonWithTooltip('enable');
-                self.rescheduleAction = "startingTime";
+                self.rescheduleAction = "time";
                 startTimeRescheduleTr.dom.className = "selectedAction";
                 durationRescheduleTr.dom.className = "";
             }
@@ -730,7 +730,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                 if (self.fitInnerAction == "noFit") {
                     self.rescheduleButton.disabledButtonWithTooltip('disable');
                 }
-                self.rescheduleAction = "noAction";
+                self.rescheduleAction = "none";
                 durationRescheduleTr.dom.className = "";
                 durationRescheduleRB.dom.checked = false;
             }
@@ -754,7 +754,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         // Step 2: choose interval between entries
         var intervalTitle = Html.div("rescheduleTitle", $T("Step 2: Choose time gap between entries"));
 
-        this.minuteInput = Html.input("text", {style:{width:"3em", textAlign:"right", marginTop: pixels(5), marginBottom: pixels(5)}}, "00");
+        this.minuteInput = Html.input("text", {style:{width:"3em", textAlign:"right", marginTop: pixels(5), marginBottom: pixels(5)}}, "0");
         var timeInputLabel = Html.span({style:{marginLeft: pixels(5)}}, "(minutes)");
         var intervalInputDiv = Html.div({style:{textAlign:"center"}}, this.minuteInput, timeInputLabel);
 
@@ -849,7 +849,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
             this.fitInnerAction = "doFit";
         }
         else {
-            if (this.rescheduleAction == "noAction") {
+            if (this.rescheduleAction == "none") {
                 this.rescheduleButton.disabledButtonWithTooltip('disable');
             }
             this.fitInnerAction = "noFit";
@@ -888,66 +888,43 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         if (this.parameterManager.check()) {
 
             var confirmHandler = function(confirm) {
-
-                if (confirm) {
-
-                    if (self.isTopLevelTimetable) {
-                        // We are in a top level management timetable
-
-                        var postParams = {confId: self.tt.eventInfo.id};
-                        if (exists(self.tt.contextInfo.timetableSession)) {
-                            postParams['sessionId'] = self.tt.contextInfo.timetableSession.id;
-                        }
-
-                        IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
-
-                        Util.postRequest(build_url(Indico.Urls.Reschedule, postParams),
-                                null,
-                                {
-                                    OK: "ok",
-                                    action: self.rescheduleAction,
-                                    hour: "0",
-                                    minute: self.minuteInput.get(),
-                                    targetDay: self.tt.currentDay,
-                                    fit: self.fitInnerAction
-                                });
-
-                    } else if (self.isIntervalTimetable) {
-
-                        // We are in an interval management timetable
-
-                        IndicoUI.Dialogs.Util.progress($T("Rescheduling interval... "));
-
-                        var inSessionTimetable = "no";
-                        if (exists(self.tt.parentTimetable.isSessionTimetable) && self.tt.parentTimetable.isSessionTimetable === true) {
-                            inSessionTimetable = "yes";
-                        }
-
-                        Util.postRequest(build_url(Indico.Urls.SlotCalc, {
-                            confId: self.tt.eventInfo.id,
-                            sessionId: self.tt.contextInfo.sessionId,
-                            slotId: self.tt.contextInfo.sessionSlotId
-                        }), null, {
-                                    OK: "ok",
-                                    action: self.rescheduleAction,
-                                    hour: "0",
-                                    minute: self.minuteInput.get(),
-                                    currentDay: self.tt.currentDay,
-                                    inSessionTimetable: inSessionTimetable
-                        });
-                    }
+                if (!confirm) {
+                    return;
                 }
+                var data = {
+                    mode: self.rescheduleAction,
+                    gap: +self.minuteInput.get(),
+                    day: self.tt.currentDay,
+                    fit_blocks: self.fitInnerAction == 'doFit'
+                };
+                if (self.isIntervalTimetable) {
+                    data.session_block = self.tt.contextInfo.sessionSlotId;
+                } else if (self.isTopLevelTimetable && exists(self.tt.contextInfo.timetableSession)) {
+                    data.session = self.tt.contextInfo.timetableSession.id;
+                }
+
+                $.ajax({
+                    url: build_url(Indico.Urls.Timetable.reschedule, {confId: self.tt.eventInfo.id}),
+                    method: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    complete: IndicoUI.Dialogs.Util.progress($T.gettext("Rescheduling...")),
+                    error: handleAjaxError,
+                    success: function() {
+                        location.reload();
+                    }
+                });
             };
 
             var confirmText = Html.div({},
                 Html.div({}, $T("Are you sure you want to reschedule entries " +
                 (this.isTopLevelTimetable ? "on " + this.__getCurrentDayText() : "of the interval " + this.__getIntervalTitle()) + "?")),
                 Html.div({}, this.fitInnerAction === "doFit" ? $T("The entries that are part of a session will") : "",
-                             this.fitInnerAction === "doFit" ? ( this.rescheduleAction === "noAction" ? "" : $T(" first") ) : "",
+                             this.fitInnerAction === "doFit" ? ( this.rescheduleAction === "none" ? "" : $T(" first") ) : "",
                              this.fitInnerAction === "doFit" ? $T(" be fitted to their content.") : ""),
-                this.rescheduleAction === "noAction" ? Html.div({}, "") : Html.div({}, (this.fitInnerAction === "doFit" ? $T("Then, all entries ") : $T("All entries ")),
+                this.rescheduleAction === "none" ? Html.div({}, "") : Html.div({}, (this.fitInnerAction === "doFit" ? $T("Then, all entries ") : $T("All entries ")),
                         $T(" will have their "),
-                        this.rescheduleAction === "startingTime" ? $T("starting times") : $T("duration"),
+                        this.rescheduleAction === "time" ? $T("starting times") : $T("duration"),
                         $T(" changed.")),
                 Html.br(),
                 Html.div("rescheduleWarning", "This change cannot be undone.")
@@ -999,7 +976,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         this.isTopLevelTimetable = exists(this.tt.TopLevelManagementTimeTable);
         this.isIntervalTimetable = exists(this.tt.IntervalManagementTimeTable);
 
-        this.rescheduleAction = "noAction";
+        this.rescheduleAction = "none";
         this.timeInput = null;
         this.fitInnerAction = "noFit";
         this.rescheduleButton = null;

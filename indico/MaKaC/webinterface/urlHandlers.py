@@ -984,10 +984,6 @@ class UHSessionModifSchedule(URLHandler):
     _endpoint = 'event_mgmt.sessionModifSchedule'
 
 
-class UHSessionModSlotCalc(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifSchedule-slotCalc'
-
-
 class UHSessionModifAC(URLHandler):
     _endpoint = 'event_mgmt.sessionModifAC'
 
@@ -1257,10 +1253,6 @@ class UHSessionModContribList(URLHandler):
 
 class UHSessionModContribListEditContrib(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-editContrib'
-
-
-class UHConfModifReschedule(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule-reschedule'
 
 
 class UHContributionList(URLHandler):

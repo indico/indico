@@ -21,8 +21,6 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 # Timetable
 event_mgmt.add_url_rule('/timetable-old/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable-old/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
-                        methods=('POST',))
 event_mgmt.add_url_rule('/timetable-old/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
                         methods=('GET', 'POST'))
 
