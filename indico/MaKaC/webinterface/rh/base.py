@@ -29,6 +29,7 @@ from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
 
+import jsonschema
 import transaction
 from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
@@ -227,6 +228,20 @@ class RH(RequestHandlerBase):
                                 # needed
 
     # Methods =============================================================
+
+    def validate_json(self, schema, json=None):
+        """Validates the request's JSON payload using a JSON schema.
+
+        :param schema: The JSON schema used for validation.
+        :param json: The JSON object (defaults to ``request.json``)
+        :raises BadRequest: if the JSON validation failed
+        """
+        if json is None:
+            json = request.json
+        try:
+            jsonschema.validate(json, schema)
+        except jsonschema.ValidationError as e:
+            raise BadRequest('Invalid JSON payload: {}'.format(e.message))
 
     def getTarget(self):
         return self._target
