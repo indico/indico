@@ -111,7 +111,7 @@ class ReviewingPacker:
 
     def pack(self, fileHandler=None):
         for contribution in self._conf.getContributionList():
-            reviewingStatus = contribution.getReviewManager().getLastReview().getRefereeJudgement().getJudgement()
+            reviewingStatus = self._conf.getReviewManager(contribution).getLastReview().getRefereeJudgement().getJudgement()
             if reviewingStatus == "Accept":
                 dirName = "%s" % self._normalisePathItem(contribution.getTitle().strip())
                 self._packContribution(contribution, dirName, fileHandler)
@@ -121,7 +121,7 @@ class ReviewingPacker:
 
     def _packContribution(self, contribution, dirName="", fileHandler=None):
 
-        for mat in contribution.getReviewManager().getLastReview().getMaterials():
+        for mat in self._conf.getReviewManager(contribution).getLastReview().getMaterials():
             for res in mat.getResourceList():
                 self._items += 1
                 fileHandler.add("%s" % (os.path.join(self._confDirName,

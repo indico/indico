@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from BTrees.IOBTree import IOBTree
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.mail import GenericMailer
@@ -28,12 +29,14 @@ from MaKaC.common.Counter import Counter
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
+from indico.modules.events.paper_reviewing.legacy import ConferencePaperReviewLegacyMixin
+
 ###############################################
 # Conference-wide classes
 ###############################################
 
 
-class ConferencePaperReview(Persistent):
+class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
     """
     This class manages the parameters of the paper reviewing.
     """
@@ -52,18 +55,14 @@ class ConferencePaperReview(Persistent):
         """ Constructor.
             conference must be a Conference object (not an id).
         """
-
         self._conference = conference
+        self._contribution_index = IOBTree()
 
         #lists of users with reviewing roles
         self._reviewersList = []
         self._editorsList = []
         self._refereesList = []
         self._paperReviewManagersList = []
-
-        self._refereeContribution = {} #key: user, value: list of contributions where user is referee
-        self._editorContribution = {} #key: user, value: list of contributions where user is editor
-        self._reviewerContribution = {} #key: user, value: list of contributions where user is reviewer
 
         self.setChoice(self.NO_REVIEWING) #initial reviewing mode: no reviewing
 
@@ -109,11 +108,13 @@ class ConferencePaperReview(Persistent):
         self.addStatus("To be corrected", False)
         self.addStatus("Reject", False)
 
-
     def getConference(self):
         """ Returns the parent conference of the ConferencePaperReview object
         """
         return self._conference
+
+    def getReviewManager(self, contribution):
+        return self._contribution_index[contribution.friendly_id]
 
     def setStartSubmissionDate(self, startSubmissionDate):
         self._startSubmissionDate= datetime(startSubmissionDate.year,startSubmissionDate.month,startSubmissionDate.day,23,59,59)
@@ -612,40 +613,6 @@ class ConferencePaperReview(Persistent):
         """
         return self._refereesList
 
-    def addRefereeContribution(self, referee, contribution):
-        """ Adds the contribution to the list of contributions for a given referee.
-            referee has to be an Avatar object.
-        """
-        if self._refereeContribution.has_key(referee):
-            self._refereeContribution[referee].append(contribution)
-            self._refereeContribution[referee].sort(key= lambda c: int(c.getId()))
-        else:
-            self._refereeContribution[referee] = [contribution]
-        self.notifyModification()
-
-    def removeRefereeContribution(self, referee, contribution):
-        """ Removes the contribution from the list of contributions of this referee
-            referee has to be an Avatar object.
-        """
-        if self._refereeContribution.has_key(referee):
-            self._refereeContribution[referee].remove(contribution)
-        self.notifyModification()
-
-    def isRefereeContribution(self, referee, contribution):
-        """ Returns if a user is referee for a given contribution
-            referee has to be an Avatar object.
-        """
-        return self._refereeContribution.has_key(referee) and contribution in self._refereeContribution[referee]
-
-    def getJudgedContributions(self, referee):
-        """ Returns the list of contributions for a given referee
-            referee has to be an Avatar object.
-        """
-        if self._refereeContribution.has_key(referee):
-            return self._refereeContribution[referee]
-        else:
-            return []
-
     #editor methods
     def addEditor(self, newEditor):
         """ Adds a new editor to the conference.
@@ -698,40 +665,6 @@ class ConferencePaperReview(Persistent):
         """
         return self._editorsList
 
-    def addEditorContribution(self, editor, contribution):
-        """ Adds the contribution to the list of contributions for a given editor.
-            editor has to be an Avatar object.
-        """
-        if self._editorContribution.has_key(editor):
-            self._editorContribution[editor].append(contribution)
-            self._editorContribution[editor].sort(key= lambda c: int(c.getId()))
-        else:
-            self._editorContribution[editor] = [contribution]
-        self.notifyModification()
-
-    def removeEditorContribution(self, editor, contribution):
-        """ Removes the contribution from the list of contributions of this editor
-            editor has to be an Avatar object.
-        """
-        if self._editorContribution.has_key(editor):
-            self._editorContribution[editor].remove(contribution)
-        self.notifyModification()
-
-    def isEditorContribution(self, editor, contribution):
-        """ Returns if a user is editor for a given contribution
-            editor has to be an Avatar object.
-        """
-        return self._editorContribution.has_key(editor) and contribution in self._editorContribution[editor]
-
-    def getEditedContributions(self, editor):
-        """ Returns the list of contributions for a given editor
-            editor has to be an Avatar object.
-        """
-        if self._editorContribution.has_key(editor):
-            return self._editorContribution[editor]
-        else:
-            return []
-
     #reviewer methods
     def addReviewer(self, newReviewer):
         """ Adds a new reviewer to the conference.
@@ -783,40 +716,6 @@ class ConferencePaperReview(Persistent):
         """ Returns the list of reviewers as a list of users.
         """
         return self._reviewersList
-
-    def addReviewerContribution(self, reviewer, contribution):
-        """ Adds the contribution to the list of contributions for a given reviewer.
-            reviewer has to be an Avatar object.
-        """
-        if self._reviewerContribution.has_key(reviewer):
-            self._reviewerContribution[reviewer].append(contribution)
-            self._reviewerContribution[reviewer].sort(key= lambda c: int(c.getId()))
-        else:
-            self._reviewerContribution[reviewer] = [contribution]
-        self.notifyModification()
-
-    def removeReviewerContribution(self, reviewer, contribution):
-        """ Removes the contribution from the list of contributions of this reviewer
-            reviewer has to be an Avatar object.
-        """
-        if self._reviewerContribution.has_key(reviewer):
-            self._reviewerContribution[reviewer].remove(contribution)
-        self.notifyModification()
-
-    def isReviewerContribution(self, reviewer, contribution):
-        """ Returns if a user is reviewer for a given contribution
-            reviewer has to be an Avatar object.
-        """
-        return self._reviewerContribution.has_key(reviewer) and contribution in self._reviewerContribution[reviewer]
-
-    def getReviewedContributions(self, reviewer):
-        """ Returns the list of contributions for a given reviewer
-            reviewer has to be an Avatar object.
-        """
-        if self._reviewerContribution.has_key(reviewer):
-            return self._reviewerContribution[reviewer]
-        else:
-            return []
 
     #paper review manager methods
     def addPaperReviewManager(self, newPaperReviewManager):

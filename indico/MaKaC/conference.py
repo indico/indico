@@ -3071,6 +3071,9 @@ class Conference(CommonObjectBase, Locatable):
         else:
             return len(self.contributions)
 
+    def getReviewManager(self, contrib):
+        return self.getConferencePaperReview().getReviewManager()
+
     def hasSomethingOnWeekend(self, day):
         """Checks if the event has a session or contribution on the weekend indicated by `day`.
 
@@ -9016,7 +9019,7 @@ class Material(CommonObjectBase):
             else: #conference has reviewing
                 #if self.id in reviewableMaterials: #material is reviewable
                 if isinstance(self, Reviewing): #material is reviewable
-                    lastReview = self.owner.getReviewManager().getLastReview()
+                    lastReview = conference.getReviewManager(self.owner).getLastReview()
                     if lastReview.isAuthorSubmitted(): #author has submitted
                         refereeJudgement = lastReview.getRefereeJudgement()
                         if refereeJudgement.isSubmitted(): #referee has submitted judgement

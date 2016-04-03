@@ -156,7 +156,7 @@ class RefereeFilterField( filters.FilterField ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
 
     def satisfies( self, contribution ):
-        rm = contribution.getReviewManager()
+        rm = self._conf.getReviewManager(contribution)
         if rm.hasReferee():
             user = self._values[0]
             if user == "any" or rm.isReferee(user):
@@ -180,7 +180,7 @@ class EditorFilterField( filters.FilterField ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
 
     def satisfies( self, contribution ):
-        rm = contribution.getReviewManager()
+        rm = self._conf.getReviewManager(contribution)
         if rm.hasEditor():
             user = self._values[0]
             if user == "any" or rm.isEditor(user):
@@ -204,7 +204,7 @@ class ReviewerFilterField( filters.FilterField ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
 
     def satisfies( self, contribution ):
-        rm = contribution.getReviewManager()
+        rm = self._conf.getReviewManager(contribution)
         if rm.hasReviewers():
             user = self._values[0]
             if user == "any" or rm.isReviewer(user):
@@ -229,7 +229,7 @@ class ReviewingFilterField( filters.FilterField ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
 
     def satisfies( self, contribution ):
-        rm = contribution.getReviewManager()
+        rm = self._conf.getReviewManager(contribution)
         if rm.isReferee(self._values[0].get("referee", "")):
             if (self._values[0].get("editor", "") == "any" and rm.hasEditor()) \
                 or (self._values[0].get("reviewer", "") == "any" and rm.hasReviewers()):
@@ -260,7 +260,7 @@ class MaterialSubmittedFilterField( filters.FilterField ):
     _id = "materialsubmitted"
 
     def satisfies( self, contribution ):
-        review = contribution.getReviewManager().getLastReview()
+        review = self._conf.getReviewManager(contribution)
         if self._values[0] and review.isAuthorSubmitted():
             return True
         elif review.isAuthorSubmitted():
