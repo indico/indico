@@ -58,10 +58,11 @@ class WContributionReviewing(wcomponents.WTemplated):
 
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
+        review_manager = self._conf.getReviewManager(self.__target)
 
         conferenceChoice = self._conf.getConfPaperReview().getChoice()
         conferenceChoiceStr = self._conf.getConfPaperReview().getReviewingMode()
-        reviewManager = self.__target.getReviewManager()
+        reviewManager = review_manager
         canAssignReferee = self._conf.getConfPaperReview().isPaperReviewManager(self._aw.getUser()) or self._conf.canModify(self._aw)
 
         vars["Conference"] = self._conf
@@ -75,8 +76,8 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars["AvailableReviewers"] =  [r for r in  self._conf.getConference().getConfPaperReview().getReviewersList() \
                                        if r not in reviewManager.getReviewersList()]
         vars["CanEditDueDates"] = canAssignReferee
-        vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
-        vars["Review"] = self.__target.getReviewManager().getLastReview()
+        vars["IsReferee"] = review_manager.isReferee(self._rh._getUser())
+        vars["Review"] = review_manager.getLastReview()
         vars["TrackList"] = self._conf.getTrackList()
 
         return vars
@@ -149,17 +150,17 @@ class WContributionReviewingJudgements(WContributionReviewingBase):
 
         conferenceChoice = self._conf.getConfPaperReview().getChoice()
         conferenceChoiceStr = self._conf.getConfPaperReview().getReviewingMode()
-        reviewManager = self.__target.getReviewManager()
+        review_manager = self._conf.getReviewManager(self.__target)
         vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
         vars["ConferenceChoiceStr"] = conferenceChoiceStr
-        vars["FinalJudge"] = reviewManager.getLastReview().getRefereeJudgement().getJudgement()
-        vars["Editing"] = reviewManager.getLastReview().getEditorJudgement()
-        vars["AdviceList"] = reviewManager.getLastReview().getSubmittedReviewerJudgement()
-        vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
-        vars["Review"] = self.__target.getReviewManager().getLastReview()
+        vars["FinalJudge"] = review_manager.getLastReview().getRefereeJudgement().getJudgement()
+        vars["Editing"] = review_manager.getLastReview().getEditorJudgement()
+        vars["AdviceList"] = review_manager.getLastReview().getSubmittedReviewerJudgement()
+        vars["IsReferee"] = review_manager.isReferee(self._rh._getUser())
+        vars["Review"] = review_manager.getLastReview()
         vars["TrackList"] = self._conf.getTrackList()
         vars["getStatusClass"] = lambda judgement: self._getStatusClass(judgement)
         vars["getStatusText"] = lambda judgement: self._getStatusText(judgement)
@@ -188,12 +189,13 @@ class WJudgeEditing(wcomponents.WTemplated):
 
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
+        review_manager = self._conf.getReviewManager(self._contrib)
 
         vars["Contribution"] = self._contrib
         vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
         vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
-        vars["Editing"] = self._contrib.getReviewManager().getLastReview().getEditorJudgement()
-        vars["Review"] = self._contrib.getReviewManager().getLastReview()
+        vars["Editing"] = review_manager.getLastReview().getEditorJudgement()
+        vars["Review"] = review_manager.getLastReview()
 
         return vars
 
@@ -225,12 +227,13 @@ class WGiveAdvice(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
+        review_manager = self._conf.getReviewManager(self._contrib)
 
         vars["Contribution"] = self._contrib
         vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
         vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
-        vars["Advice"] = self._contrib.getReviewManager().getLastReview().getAdviceFrom(self.__reviewer)
-        vars["Review"] = self._contrib.getReviewManager().getLastReview()
+        vars["Advice"] = review_manager.getLastReview().getAdviceFrom(self.__reviewer)
+        vars["Review"] = review_manager.getLastReview()
 
         return vars
 
@@ -258,7 +261,7 @@ class WContributionReviewingHistory(WContributionReviewingBase):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["ConferenceChoice"] = self._conf.getConfPaperReview().getChoice()
-        vars["Versioning"] = self._contribution.getReviewManager().getSortedVerioning()
+        vars["Versioning"] = self._conf.getReviewManager(self._contribution).getSortedVerioning()
         vars["getStatusClass"] = lambda judgement: self._getStatusClass(judgement)
         vars["getStatusText"] = lambda judgement: self._getStatusText(judgement)
 

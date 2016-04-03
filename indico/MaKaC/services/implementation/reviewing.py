@@ -108,7 +108,7 @@ class ConferenceReviewingAssignStaffBasePRMReferee(ConferenceReviewingAssignStaf
         elif RCReferee.hasRights(self):
             isRefereeOfAllContributions = True
             for contribution in self._contributions:
-                if not contribution.getReviewManager().isReferee(self.getAW().getUser()):
+                if not self._conf.getReviewManager(contribution).isReferee(self.getAW().getUser()):
                     isRefereeOfAllContributions = False
                     break
             hasRights = isRefereeOfAllContributions
@@ -164,7 +164,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingPRMBase):
         date = self._setParam()
         if self._apply:
             for contrib in self._conf.getContributionList():
-                lastReview = contrib.getReviewManager().getLastReview()
+                lastReview = self._conf.getReviewManager(contrib)
                 if self._dueDateToChange == "Referee":
                     lastReview.setRefereeDueDate(date)
                 elif self._dueDateToChange == "Editor":
@@ -476,7 +476,7 @@ class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
             raise ServiceError("ERR-REV6a",_("user id not set"))
 
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if not rm.isReferee(self._targetUser):
                 if rm.hasReferee():
                     rm.removeReferee()
@@ -488,7 +488,7 @@ class ConferenceReviewingRemoveReferee(ConferenceReviewingAssignStaffBasePRM):
     """
     def _getAnswer(self):
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasReferee():
                 rm.removeReferee()
         return True
@@ -504,7 +504,7 @@ class ConferenceReviewingAssignEditor(ConferenceReviewingAssignStaffBasePRMRefer
             raise ServiceError("ERR-REV6b",_("user id not set"))
 
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasReferee() or self._confPaperReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 if not rm.isEditor(self._targetUser):
                     if rm.hasEditor():
@@ -519,7 +519,7 @@ class ConferenceReviewingRemoveEditor(ConferenceReviewingAssignStaffBasePRMRefer
     """
     def _getAnswer(self):
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasEditor():
                 rm.removeEditor()
         return True
@@ -535,7 +535,7 @@ class ConferenceReviewingAddReviewer(ConferenceReviewingAssignStaffBasePRMRefere
             raise ServiceError("ERR-REV6c",_("user id not set"))
 
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasReferee():
                 if not rm.isReviewer(self._targetUser):
                     rm.addReviewer(self._targetUser)
@@ -551,7 +551,7 @@ class ConferenceReviewingRemoveReviewer(ConferenceReviewingAssignStaffBasePRMRef
             raise ServiceError("ERR-REV6d",_("user id not set"))
 
         for contribution in self._contributions:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             rm.removeReviewer(self._targetUser)
         return True
 
@@ -561,7 +561,7 @@ class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePR
     """
     def _getAnswer(self):
         for contribution in self._contributions:
-            contribution.getReviewManager().removeAllReviewers()
+            self._conf.getReviewManager(contribution).removeAllReviewers()
         return True
 
 
@@ -633,7 +633,7 @@ class ConferenceReviewingRemoveTeamReferee(ConferenceReviewingPRMBase, UserModif
     def _getAnswer(self):
         judgedContribs = self._confPaperReview.getJudgedContributions(self._targetUser)[:]
         for contribution in judgedContribs:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasReferee():
                 rm.removeReferee()
         self._confPaperReview.removeReferee(self._targetUser)
@@ -671,7 +671,7 @@ class ConferenceReviewingRemoveTeamEditor(ConferenceReviewingPRMBase, UserModifi
     def _getAnswer(self):
         editedContribs = self._confPaperReview.getEditedContributions(self._targetUser)[:]
         for contribution in editedContribs:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             if rm.hasEditor():
                 rm.removeEditor()
         self._confPaperReview.removeEditor(self._targetUser)
@@ -713,7 +713,7 @@ class ConferenceReviewingRemoveTeamReviewer(ConferenceReviewingPRMBase, UserModi
 
         reviewedContribs = self._confPaperReview.getReviewedContributions(self._targetUser)[:]
         for contribution in reviewedContribs:
-            rm = contribution.getReviewManager()
+            rm = self._conf.getReviewManager(contribution)
             rm.removeReviewer(self._targetUser)
         self._confPaperReview.removeReviewer(self._targetUser)
 
@@ -746,7 +746,7 @@ class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
 
 
     def getJudgementObject(self):
-        lastReview = self._target.getReviewManager().getLastReview()
+        lastReview = self._conf.getReviewManager(self._target).getLastReview()
         if self._current == 'refereeJudgement':
             return lastReview.getRefereeJudgement()
         elif self._current == 'editorJudgement':
@@ -776,7 +776,7 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
 
 
     def _setParam(self):
-        lastReview = self._target.getReviewManager().getLastReview()
+        lastReview = self._conf.getReviewManager(self._target).getLastReview()
         if self._dueDateToChange == "Referee":
             lastReview.setRefereeDueDate(self._pTime)
         elif self._dueDateToChange == "Editor":
@@ -787,7 +787,7 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
             raise ServiceError("ERR-REV3c",_("Kind of deadline to change not set"))
 
     def _handleGet(self):
-        lastReview = self._target.getReviewManager().getLastReview()
+        lastReview = self._conf.getReviewManager(self._target).getLastReview()
         if self._dueDateToChange == "Referee":
             date = lastReview.getAdjustedRefereeDueDate()
         elif self._dueDateToChange == "Editor":
@@ -872,7 +872,7 @@ class ContributionReviewingSubmitPaper(ContributionReviewingBase):
     def _getAnswer( self ):
         if len(self._target.getReviewing().getResourceList()) == 0:
             raise NoReportError(_("You need to attach a paper before submitting a revision."))
-        self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
+        self._conf.getReviewManager(self._target).getLastReview().setAuthorSubmitted(True)
         return True
 
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
