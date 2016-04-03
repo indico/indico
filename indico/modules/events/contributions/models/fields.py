@@ -32,7 +32,8 @@ def _get_next_position(context):
 
 class ContributionField(db.Model):
     __tablename__ = 'contribution_fields'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (db.Index(None, 'event_id', 'legacy_id', unique=True),
+                      {'schema': 'events'})
 
     id = db.Column(
         db.Integer,

@@ -48,6 +48,7 @@ def upgrade():
                           'contributions', 'abstracts',
                           ['abstract_id'], ['id'],
                           source_schema='events', referent_schema='event_abstracts')
+    op.create_index(None, 'contribution_fields', ['event_id', 'legacy_id'], unique=True, schema='events')
 
     # indices for 'events' schema
     op.create_index(None, 'contributions', ['abstract_id'], postgresql_where=sa.text('NOT is_deleted'), unique=True,
@@ -58,9 +59,9 @@ def upgrade():
 def downgrade():
     op.drop_index(op.f('ix_contributions_abstract_id'), table_name='contributions', schema='events')
     op.drop_index('ix_uq_abstract_id', table_name='contributions', schema='events')
-
     op.drop_constraint('fk_contributions_abstract_id_abstracts', 'contributions', schema='events')
 
+    op.drop_index('ix_uq_event_id_legacy_id', table_name='contribution_fields', schema='events')
     op.drop_column('contribution_fields', 'legacy_id', schema='events')
 
     op.drop_table('abstract_field_values', schema='event_abstracts')
