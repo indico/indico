@@ -118,5 +118,5 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/author/<int:person_id>', 'disp
                  RHContributionAuthor)
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf', RHContributionExportToPDF)
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics', RHContributionExportToICAL)
-_bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'subcontribution_display',
+_bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  RHSubcontributionDisplay)
