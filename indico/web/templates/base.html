@@ -9,7 +9,7 @@
         var ScriptRoot = {{ indico_config.ScriptBaseURL | tojson }};
     </script>
 
-    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=(session.lang or get_default_language)) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {% assets 'base_js' -%}
