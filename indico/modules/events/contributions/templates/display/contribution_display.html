@@ -188,7 +188,7 @@
                             {% for subcontrib in contribution.subcontributions -%}
                                 <li>
                                     <span>
-                                        <a href="{{ url_for('.subcontribution_display', subcontrib) }}">
+                                        <a href="{{ url_for('.display_subcontribution', subcontrib) }}">
                                             {{ subcontrib.title }}
                                         </a>
                                     </span>
