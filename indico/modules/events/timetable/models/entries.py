@@ -25,11 +25,13 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
+from indico.util.i18n import _
 
 
-class TimetableEntryType(int, IndicoEnum):
-    # entries are uppercase since `break` a keyword...
+class TimetableEntryType(TitledIntEnum):
+    __titles__ = [None, _("Session Block"), _("Contribution"), _("Break")]
+    # entries are uppercase since `break` is a keyword...
     SESSION_BLOCK = 1
     CONTRIBUTION = 2
     BREAK = 3
