@@ -189,7 +189,7 @@ class TimetableEntry(db.Model):
 
     @property
     def end_dt(self):
-        if self.duration is None:
+        if self.start_dt is None or self.duration is None:
             return None
         return self.start_dt + self.duration
 
