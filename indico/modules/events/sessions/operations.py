@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.sessions import logger
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 
 
 def create_session(event, data):
@@ -34,6 +35,17 @@ def create_session(event, data):
               'Session "{}" has been created'.format(event_session.title), session.user)
     logger.info('Session %s created by %s', event_session, session.user)
     return event_session
+
+
+def create_session_block(session_, data):
+    block = SessionBlock(session=session_)
+    block.populate_from_dict(data)
+    db.session.flush()
+    session_.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+                           'Session block "{}" for session "{}" has been created'
+                           .format(block.title, session_.title), session.user)
+    logger.info("Session block %s created by %s", block, session.user)
+    return block
 
 
 def update_session(event_session, data):
