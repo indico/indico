@@ -20,7 +20,6 @@ from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
-from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
