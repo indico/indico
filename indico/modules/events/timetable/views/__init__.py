@@ -24,9 +24,11 @@ from flask import render_template, request, session
 from pytz import timezone
 from sqlalchemy.orm import joinedload
 
+from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import template_hook, register_template_hook
 
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -40,6 +42,10 @@ register_template_hook('week-meeting-body', inject_week_timetable)
 class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/timetable/'
     sidemenu_option = 'timetable'
+
+    def __init__(self, rh, conference, **kwargs):
+        custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
+        WPConferenceModifBase.__init__(self, rh, conference, custom_links=custom_links, **kwargs)
 
     def getJSFiles(self):
         return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls() +
