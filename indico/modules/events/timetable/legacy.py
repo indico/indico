@@ -256,7 +256,7 @@ def serialize_entry_update(entry):
     return {'id': entry.id,
             'day': entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d'),
             'entry': serialization[entry.type](entry),
-            'slotEntry': None,
+            'slotEntry': serializer.serialize_session_block_entry(entry.parent) if entry.parent else None,
             'autoOps': None}
 
 

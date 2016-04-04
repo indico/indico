@@ -38,6 +38,8 @@ _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest',
 # Timetable legacy operations
 _bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
 _bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
+_bp.add_url_rule('/manage/timetable/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution,
+                 methods=('POST',))
 _bp.add_url_rule('/manage/timetable/add-break',
                  'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-contribution',
