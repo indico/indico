@@ -572,6 +572,7 @@ type("TimetableBlockDisplayMixin",[],
 
      });
 
+
 type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
      {
          _drawPopup: function() {
@@ -606,6 +607,18 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                                 self.managementActions.deleteEntry(self.eventData);
                             });
 
+                            $content.find('.js-edit').on('click', function() {
+                                ajaxDialog({
+                                    trigger: this,
+                                    url: build_url(Indico.Urls.Timetable.entries.edit, params),
+                                    title: $(this).data('title'),
+                                    onClose: function(data) {
+                                        if (data && data.entries) {
+                                            self.managementActions._addEntries(data.entries)
+                                        }
+                                    }
+                                });
+                            });
                         }, function(xhr, status, error) {
                             api.set('content.text', status + ': ' + error);
                         });

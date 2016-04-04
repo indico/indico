@@ -113,7 +113,7 @@ class ContributionEntryForm(EntryFormMixin, ContributionForm):
                               description=_("The duration of the contribution."))
 
     def __init__(self, *args, **kwargs):
-        kwargs['to_schedule'] = True
+        kwargs['to_schedule'] = kwargs.get('to_schedule', True)
         super(ContributionEntryForm, self).__init__(*args, **kwargs)
 
 

@@ -24,7 +24,8 @@ from flask import request, jsonify
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.contributions.operations import create_contribution
+from indico.modules.events.contributions.controllers.management import _get_field_values
+from indico.modules.events.contributions.operations import create_contribution, update_contribution
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
@@ -101,6 +102,28 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         self.commit = False
         return jsonify_form(form, fields=form._display_fields, disabled_until_change=False)
+
+
+class RHLegacyTimetableEditEntry(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.timetable_entry = (self.event_new.timetable_entries
+                                .filter_by(id=request.view_args['timetable_entry_id'])
+                                .first_or_404())
+
+    def _process(self):
+        if self.timetable_entry.contribution:
+            contrib = self.timetable_entry.contribution
+            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+            form = ContributionEntryForm(obj=FormDefaults(contrib, time=tt_entry_dt.time()),
+                                         event=self.event_new, contrib=contrib, to_schedule=False,
+                                         day=tt_entry_dt.date())
+            if form.validate_on_submit():
+                with track_time_changes():
+                    update_contribution(contrib, *_get_field_values(form.data))
+                return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
+        self.commit = False
+        return jsonify_form(form)
 
 
 class RHLegacyTimetableAddSession(RHCreateSession):

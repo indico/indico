@@ -131,6 +131,7 @@ def generate_global_file(config):
                 },
                 'entries': {
                     'delete': url_rule_to_js('timetable.timetable_rest'),
+                    'edit': url_rule_to_js('timetable.edit_entry'),
                     'balloon': url_rule_to_js('timetable.balloon')
                 }
             }

@@ -246,7 +246,7 @@ def serialize_entry_update(entry):
                      TimetableEntryType.CONTRIBUTION: serializer.serialize_contribution_entry,
                      TimetableEntryType.SESSION_BLOCK: serializer.serialize_session_block_entry}
     tzinfo = entry.event_new.tzinfo
-    return {'id': entry.id,
+    return {'id': serializer._get_entry_key(entry),
             'day': entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d'),
             'entry': serialization[entry.type](entry),
             'slotEntry': serializer.serialize_session_block_entry(entry.parent) if entry.parent else None,
