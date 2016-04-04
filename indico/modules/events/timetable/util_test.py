@@ -25,12 +25,12 @@ pytest_plugins = ('indico.modules.events.contributions.testing.fixtures',
                   'indico.modules.events.timetable.testing.fixtures')
 
 
-@pytest.mark.parametrize(('event_duration_minutes', 'duration', 'fits'), (
-    (60, 20, True),
-    (20, 20, True),
-    (10, 20, False),
+@pytest.mark.parametrize(('event_duration_minutes', 'fits'), (
+    (60, True),
+    (20, True),
+    (10, False),
 ))
-def test_find_earliest_gap_no_entries(dummy_event_new, event_duration_minutes, duration, fits):
+def test_find_earliest_gap_no_entries(dummy_event_new, event_duration_minutes, fits):
     dummy_event_new.end_dt = dummy_event_new.start_dt + timedelta(minutes=event_duration_minutes)
     day = dummy_event_new.start_dt.date()
     start_dt = find_earliest_gap(dummy_event_new, day=day, duration=timedelta(minutes=20))
