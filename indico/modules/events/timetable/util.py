@@ -13,7 +13,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.legacy import serialize_event_info
 from indico.util.date_time import get_day_end, iterdays
 from indico.web.flask.templating import get_template_module
@@ -231,3 +231,11 @@ def render_session_timetable(session, timetable_layout=None, management=False):
     event_info = serialize_event_info(session.event_new)
     tpl = get_template_module('events/timetable/_timetable.html')
     return tpl.render_timetable(timetable_data, event_info, timetable_layout=timetable_layout, management=management)
+
+
+def get_session_block_entries(event, day):
+    """Returns a list of event top-level session blocks for the given `day`"""
+    return (event.timetable_entries
+            .filter(db.cast(TimetableEntry.start_dt.astimezone(event.tzinfo), db.Date) == day.date(),
+                    TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
+            .all())
