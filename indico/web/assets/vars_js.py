@@ -125,6 +125,9 @@ def generate_global_file(config):
                     'notScheduled': url_rule_to_js('timetable.not_scheduled'),
                     'schedule': url_rule_to_js('timetable.schedule')
                 },
+                'sessionBlocks': {
+                    'add': url_rule_to_js('timetable.add_session_block')
+                },
                 'sessions': {
                     'add': url_rule_to_js('sessions.create_session')
                 }

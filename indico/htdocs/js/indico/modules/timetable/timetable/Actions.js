@@ -388,7 +388,6 @@ type("TimetableManagementActions", [], {
     _addToSessionParams: function(session, type) {
         var params = this._addParams(type);
 
-        params.startDate = Util.formatDateTime(session.startDate, IndicoDateTimeFormats.Server);
         if(type != 'SessionSlot') {
             // If it's not for a session slot, we take the location from the session
             params.roomInfo = {
@@ -577,44 +576,22 @@ type("TimetableManagementActions", [], {
 
     addSessionSlot: function(session) {
         var self = this;
-
         var params = this._addToSessionParams(session, 'SessionSlot');
-        params.parentType = 'Session';
-
-        //Get the days in which the conference is being held
-        var days = this.timetable.getDays();
-
-        //We need the session title for the edition inline widget
-        params['title'] = session.title;
-
-        IndicoUI.Dialogs.addSessionSlot(
-            this.methods[params.type].add,
-            this.isSessionTimetable?this.methods.Session.dayEndDate:this.methods.Event.dayEndDate,
-            params,
-            {'location': session.location, 'room': session.room, 'address': session.address},
-            $O(params.roomInfo),
-            params.startDate,
-            params.selectedDay,
-            this.eventInfo.favoriteRooms,
-            days,
-            function(result) {
-                var aux = result.entry.entries;
-                self.timetable._updateEntry(result, result.id);
-                /* update the inner timetable!
-                 * You need to create the aux before doing the updateEntry because otherwise the subentries
-                 * in the session won't have the correct value
-                 */
-                self.timetable.data[result.day][result.id].entries = aux;
-                /* since the session title can be changed from this dialog, we need to set the
-                 * title of all the blocks contained in the timetable that belong to the same
-                 * session.
-                 */
-                self.timetable._updateSessionData(result.session.id, ['title'], [result.session.title])
-            },
-            false,
-            this.eventInfo.bookedRooms,
-            this.timetable
-        );
+        var args = {
+            'confId': params.conference,
+            'session': params.session,
+            'day': params.selectedDay
+        };
+        ajaxDialog({
+            trigger: this,
+            url: build_url(Indico.Urls.Timetable.sessionBlocks.add, args),
+            title: $T.gettext("Add session block"),
+            onClose: function(data) {
+                if (data) {
+                    self.timetable._updateEntry(data.entry);
+                }
+            }
+        });
     },
 
     editSessionSlot: function(eventData) {

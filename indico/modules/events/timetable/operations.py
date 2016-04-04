@@ -21,10 +21,10 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.sessions.operations import create_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-
 from indico.util.date_time import format_datetime
 
 
@@ -49,6 +49,13 @@ def create_break_entry(event, data):
                   'start_dt': data.pop('start_dt')}
     break_.populate_from_dict(data)
     return create_timetable_entry(event, entry_data)
+
+
+def create_session_block_entry(session_, data):
+    start_dt = data.pop('start_dt')
+    block = create_session_block(session_=session_, data=data)
+    entry_data = {'object': block, 'start_dt': start_dt}
+    return create_timetable_entry(session_.event_new, entry_data)
 
 
 def create_timetable_entry(event, data):
