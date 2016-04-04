@@ -129,7 +129,7 @@ def generate_global_file(config):
                     'add': url_rule_to_js('timetable.add_session_block')
                 },
                 'sessions': {
-                    'add': url_rule_to_js('sessions.create_session')
+                    'add': url_rule_to_js('timetable.add_session')
                 }
             }
         },

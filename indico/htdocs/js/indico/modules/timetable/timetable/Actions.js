@@ -568,7 +568,7 @@ type("TimetableManagementActions", [], {
             title: $T.gettext("Add session"),
             onClose: function(data) {
                 if (data) {
-                    // TODO: Update list of sessions, otherwise refresh page
+                    self.timetable.eventInfo.sessions[data.session.id] = data.session;
                 }
             }
         });
