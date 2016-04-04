@@ -27,6 +27,7 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
+from indico.util.event import unify_event_args
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
@@ -232,6 +233,7 @@ def get_css_url(event, force_theme=None, for_preview=False):
         return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), layout_settings.get(event, 'theme'))
 
 
+@unify_event_args(legacy=True)
 def is_menu_entry_enabled(entry_name, event):
     """Check whether the MenuEntry is enabled"""
     return get_menu_entry_by_name(entry_name, event).is_enabled
