@@ -55,7 +55,7 @@ class RHLegacyTimetableAddBreak(RHManageTimetableBase):
         if form.validate_on_submit():
             entry = create_break_entry(self.event_new, form.data)
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
-        return jsonify_form(form)
+        return jsonify_form(form, fields=form._display_fields)
 
 
 class RHLegacyTimetableAddContribution(RHManageTimetableBase):
@@ -90,7 +90,7 @@ class RHLegacyTimetableAddSessionBlock(RHManageTimetableBase):
             entry = create_session_block_entry(self.session, form.data)
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         self.commit = False
-        return jsonify_form(form)
+        return jsonify_form(form, fields=form._display_fields)
 
 
 class RHLegacyTimetableAddSession(RHCreateSession):

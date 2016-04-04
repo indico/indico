@@ -25,37 +25,39 @@ from wtforms_components import TimeField
 
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import find_earliest_gap
-from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import TimeDeltaField, IndicoPalettePickerField, IndicoLocationField
 from indico.web.forms.validators import MaxDuration
 from indico.util.i18n import _
 
 
-class BreakEntryForm(IndicoForm):
-    title = StringField(_("Title"), [DataRequired()])
-    description = TextAreaField(_("Description"), description=_("Text describing the break."))
-    time = TimeField(_("Time"), description=_("Time when the break will be scheduled."))
+class EntryFormMixin(object):
+    _entry_type = None
+    _default_duration = None
+    _display_fields = None
+
+    time = TimeField(_("Time"), [DataRequired()])
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              default=timedelta(minutes=20), units=('minutes', 'hours'),
-                              description=_("The duration of the break"))
-    location_data = IndicoLocationField(_("Location"),
-                                        description=_("The physical location where the break takes place."))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors(),
-                                      description=_('Specify text and background colours for the break.'))
+                              units=('minutes', 'hours'))
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+        self.event = kwargs['event']
         self.day = kwargs.pop('day')
-        duration = self.duration.kwargs['default']
-        start_dt = find_earliest_gap(self.event, self.day, duration=duration)
-        kwargs['time'] = start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
-        super(BreakEntryForm, self).__init__(*args, **kwargs)
+        kwargs['time'] = self._get_default_time()
+        defaults = kwargs.get('obj') or FormDefaults()
+        if 'duration' not in defaults:
+            defaults.duration = self._default_duration
+            kwargs['obj'] = defaults
+        super(EntryFormMixin, self).__init__(*args, **kwargs)
+        self.time.description = _("Time when the {} will be scheduled.").format(self._entry_type.title.lower())
+        self.duration.description = _("The duration of the break").format(self._entry_type.title.lower())
 
     @property
     def data(self):
-        data = super(BreakEntryForm, self).data
+        data = super(EntryFormMixin, self).data
         del data['time']
         return data
 
@@ -67,13 +69,34 @@ class BreakEntryForm(IndicoForm):
     def validate_duration(self, field):
         end_dt = self.start_dt.data + field.data
         if end_dt > self.event.end_dt:
-            raise ValidationError(_("Break exceeds event end time. Adjust start time or duration."))
+            raise ValidationError(_("{} exceeds event end time. Adjust start time or duration.")
+                                  .format(self._entry_type.title.capitalize()))
         if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
-            raise ValidationError(_("Break exceeds current day. Adjust start time or duration."))
+            raise ValidationError(_("{} exceeds current day. Adjust start time or duration.")
+                                  .format(self._entry_type.title.capitalize()))
 
     def validate_time(self, field):
         if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
-            raise ValidationError(_("Break can't be scheduled earlier than the event start time."))
+            raise ValidationError(_("{} can't be scheduled earlier than the event start time.")
+                                  .format(self._entry_type.title.capitalize()))
+
+    def _get_default_time(self):
+        start_dt = find_earliest_gap(self.event, self.day, duration=self._default_duration)
+        return start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
+
+
+class BreakEntryForm(EntryFormMixin, IndicoForm):
+    _entry_type = TimetableEntryType.BREAK
+    _default_duration = timedelta(minutes=20)
+    _display_fields = ('title', 'description', 'time', 'duration', 'location_data', 'colors')
+
+    title = StringField(_("Title"), [DataRequired()])
+    description = TextAreaField(_("Description"), description=_("Text describing the break."))
+    location_data = IndicoLocationField(_("Location"),
+                                        description=_("The physical location where the break takes place."))
+    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors(),
+                                      description=_('Specify text and background colours for the break.'))
+
 
 
 class ContributionEntryForm(ContributionForm):
@@ -85,38 +108,7 @@ class ContributionEntryForm(ContributionForm):
         super(ContributionEntryForm, self).__init__(*args, **kwargs)
 
 
-class SessionBlockEntryForm(SessionBlockForm):
-    time = TimeField(_("Time"), description=_("Time when the session block will be scheduled."))
-    duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              default=timedelta(minutes=60), units=('minutes', 'hours'),
-                              description=_("The duration of the session block"))
-
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        self.day = kwargs.pop('day')
-        duration = self.duration.kwargs['default']
-        start_dt = find_earliest_gap(self.event, self.day, duration=duration)
-        kwargs['time'] = start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
-        super(SessionBlockEntryForm, self).__init__(*args, **kwargs)
-
-    @property
-    def data(self):
-        data = super(SessionBlockEntryForm, self).data
-        del data['time']
-        return data
-
-    @generated_data
-    def start_dt(self):
-        dt = datetime.combine(self.day, self.time.data)
-        return self.event.tzinfo.localize(dt).astimezone(utc)
-
-    def validate_duration(self, field):
-        end_dt = self.start_dt.data + field.data
-        if end_dt > self.event.end_dt:
-            raise ValidationError(_("Session block exceeds event end time. Adjust start time or duration."))
-        if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
-            raise ValidationError(_("Session block exceeds current day. Adjust start time or duration."))
-
-    def validate_time(self, field):
-        if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
-            raise ValidationError(_("The session block can't be scheduled earlier than the event start time."))
+class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
+    _entry_type = TimetableEntryType.SESSION_BLOCK
+    _default_duration = timedelta(minutes=60)
+    _display_fields = ('title', 'time', 'duration', 'person_links', 'location_data')
