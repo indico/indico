@@ -26,10 +26,11 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
-from indico.modules.events.timetable.forms import BreakEntryForm, ContributionEntryForm
+from indico.modules.events.timetable.forms import BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm
 from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.operations import create_break_entry, schedule_contribution
+from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
+                                                        schedule_contribution)
 from indico.modules.events.timetable.util import find_earliest_gap
 from indico.modules.events.util import get_random_color
 from indico.web.forms.base import FormDefaults
@@ -69,6 +70,24 @@ class RHLegacyTimetableAddContribution(RHManageTimetableBase):
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
+        self.commit = False
+        return jsonify_form(form)
+
+
+class RHLegacyTimetableAddSessionBlock(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.day = dateutil.parser.parse(request.args['day']).date()
+        self.session = Session.find_one(id=request.args['session'], event_new=self.event_new, is_deleted=False)
+
+    def _process(self):
+        inherited_location = self.event_new.location_data
+        inherited_location['inheriting'] = True
+        defaults = FormDefaults(location_data=inherited_location)
+        form = SessionBlockEntryForm(event=self.event_new, day=self.day, obj=defaults)
+        if form.validate_on_submit():
+            entry = create_session_block_entry(self.session, form.data)
+            return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         self.commit = False
         return jsonify_form(form)
 
