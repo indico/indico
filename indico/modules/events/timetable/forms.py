@@ -36,7 +36,7 @@ from indico.util.i18n import _
 class BreakEntryForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"), description=_("Text describing the break."))
-    time = TimeField(_("Time"), description=_("Time where the break will be scheduled."))
+    time = TimeField(_("Time"), description=_("Time when the break will be scheduled."))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_("The duration of the break"))
@@ -67,14 +67,13 @@ class BreakEntryForm(IndicoForm):
     def validate_duration(self, field):
         end_dt = self.start_dt.data + field.data
         if end_dt > self.event.end_dt:
-            raise ValidationError(_("With current time and duration the break ends after the event."))
-        tzinfo = self.event.tzinfo
-        if end_dt.astimezone(tzinfo).date() > self.event.end_dt_local.date():
-            raise ValidationError(_("With current time and duration the break can't fit on this day."))
+            raise ValidationError(_("Break exceeds event end time. Adjust start time or duration."))
+        if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
+            raise ValidationError(_("Break exceeds current day. Adjust start time or duration."))
 
     def validate_time(self, field):
         if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
-            raise ValidationError(_("The break can't be scheduled earlier than the event start time."))
+            raise ValidationError(_("Break can't be scheduled earlier than the event start time."))
 
 
 class ContributionEntryForm(ContributionForm):
@@ -87,7 +86,7 @@ class ContributionEntryForm(ContributionForm):
 
 
 class SessionBlockEntryForm(SessionBlockForm):
-    time = TimeField(_("Time"), description=_("Time where the session block will be scheduled."))
+    time = TimeField(_("Time"), description=_("Time when the session block will be scheduled."))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=60), units=('minutes', 'hours'),
                               description=_("The duration of the session block"))
@@ -114,10 +113,9 @@ class SessionBlockEntryForm(SessionBlockForm):
     def validate_duration(self, field):
         end_dt = self.start_dt.data + field.data
         if end_dt > self.event.end_dt:
-            raise ValidationError(_("With current time and duration the session block ends after the event."))
-        tzinfo = self.event.tzinfo
-        if end_dt.astimezone(tzinfo).date() > self.event.end_dt_local.date():
-            raise ValidationError(_("With current time and duration the session block can't fit on this day."))
+            raise ValidationError(_("Session block exceeds event end time. Adjust start time or duration."))
+        if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
+            raise ValidationError(_("Session block exceeds current day. Adjust start time or duration."))
 
     def validate_time(self, field):
         if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
