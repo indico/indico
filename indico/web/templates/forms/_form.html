@@ -132,12 +132,12 @@
 {% endmacro %}
 
 {# Renders a form with the most common default markup #}
-{% macro simple_form(form, submit=none, back=none, back_url=none, back_button=true, disabled_until_change=true,
-                     disabled_fields=(), form_header_kwargs={}, skip_labels=false) %}
+{% macro simple_form(form, fields=none, submit=none, back=none, back_url=none, back_button=true,
+                     disabled_until_change=true, disabled_fields=(), form_header_kwargs={}, skip_labels=false) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
     {{ form_header(form, **form_header_kwargs) }}
-    {{ form_rows(form, disable=disabled_fields, skip_labels=skip_labels) }}
+    {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{{ submit }}"
                {%- if disabled_until_change %} data-disabled-until-change{% endif %}>
