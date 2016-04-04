@@ -41,7 +41,7 @@ def _pop_injected_js():
     return js
 
 
-def jsonify_form(form, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
+def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
                  disabled_fields=(), form_header_kwargs=None, skip_labels=False):
     """Returns a json response containing a rendered WTForm.
 
@@ -50,6 +50,7 @@ def jsonify_form(form, submit=None, back=None, back_url=None, back_button=True, 
     calling this macro.
 
     :param form: A WTForms `Form` instance
+    :param fields: A list of fields to be displayed on the form
     :param submit: The title of the submit button
     :param back: The title of the back button
     :param back_url: The URL the back button redirects to
@@ -68,7 +69,7 @@ def jsonify_form(form, submit=None, back=None, back_url=None, back_button=True, 
     if form_header_kwargs is None:
         form_header_kwargs = {}
     tpl = get_template_module('forms/_form.html')
-    html = tpl.simple_form(form, submit=submit, back=back, back_url=back_url, back_button=back_button,
+    html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
                            form_header_kwargs=form_header_kwargs, skip_labels=skip_labels)
     return jsonify(html=html, js=_pop_injected_js())
