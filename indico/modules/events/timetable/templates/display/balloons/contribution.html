@@ -12,7 +12,7 @@
                data-href="{{ url_for('contributions.manage_contrib_protection', contrib) }}"
                data-title="{% trans %}Manage contribution protection{% endtrans %}"
                data-ajax-dialog></a>
-            <a href="#" class="icon-remove i-button-icon push-balloon-back"
+            <a href="#" class="icon-remove i-button-icon push-balloon-back js-delete"
                title="{% trans %}Delete timetable entry{% endtrans %}"
                data-title="{% trans title=contrib.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
                data-confirm="{% trans title=contrib.title %}Are you sure you want to delete timetable entry '{{ title }}'?{% endtrans %}"></a>
