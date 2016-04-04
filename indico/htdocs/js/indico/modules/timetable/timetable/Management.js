@@ -177,9 +177,16 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     addExisting: function(contributionIds, date) {
         var self = this;
+        var urlArgs = {'confId': self.args.get('conference')};
+        if (this.args.get('slot')) {
+            urlArgs.block_id = this.args.get('slot');
+        }
         $.ajax({
-            url: build_url(Indico.Urls.Timetable.contributions.schedule, {'confId': self.args.get('conference')}),
-            data: JSON.stringify({'contribution_ids': contributionIds, 'day': date}),
+            url: build_url(Indico.Urls.Timetable.contributions.schedule, urlArgs),
+            data: JSON.stringify({
+                'contribution_ids': contributionIds,
+                'day': date
+            }),
             method: 'POST',
             contentType: 'application/json',
             complete: IndicoUI.Dialogs.Util.progress(),

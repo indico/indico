@@ -58,8 +58,8 @@ def create_session_block_entry(session_, data):
     return create_timetable_entry(session_.event_new, entry_data)
 
 
-def create_timetable_entry(event, data):
-    entry = TimetableEntry(event_new=event)
+def create_timetable_entry(event, data, parent=None):
+    entry = TimetableEntry(event_new=event, parent=parent)
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
@@ -71,11 +71,15 @@ def create_timetable_entry(event, data):
     return entry
 
 
-def schedule_contribution(contribution, start_dt):
+def schedule_contribution(contribution, start_dt, session_block=None):
     data = {'contribution': contribution,
             'type': TimetableEntryType.CONTRIBUTION,
             'start_dt': start_dt}
-    return create_timetable_entry(contribution.event_new, data)
+    parent = None
+    if session_block:
+        contribution.session_block = session_block
+        parent = session_block.timetable_entry
+    return create_timetable_entry(contribution.event_new, data, parent=parent)
 
 
 def update_timetable_entry(entry, data):

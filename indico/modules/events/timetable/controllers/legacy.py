@@ -20,7 +20,7 @@ from collections import Counter
 
 import dateutil.parser
 from flask import request, jsonify
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution
@@ -116,10 +116,18 @@ class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
 
 
 class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.session_block = None
+        if 'block_id' in request.view_args:
+            self.session_block = self.event_new.get_session_block(request.view_args['block_id'])
+            if self.session_block is None:
+                raise NotFound
+
     def _process(self):
         data = request.json
         required_keys = {'contribution_ids', 'day'}
-        allowed_keys = required_keys
+        allowed_keys = required_keys | {'session_block_id'}
         if data.viewkeys() > allowed_keys:
             raise BadRequest('Invalid keys found')
         elif required_keys > data.viewkeys():
@@ -128,8 +136,11 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         day = dateutil.parser.parse(data['day']).date()
         query = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(data['contribution_ids']))
         for contribution in query:
-            start_dt = find_earliest_gap(self.event_new, day, contribution.duration)
+            start_dt = find_earliest_gap(self.event_new, day, contribution.duration, session_block=self.session_block)
             # TODO: handle scheduling not-fitting contributions
             if start_dt:
-                entries.append(schedule_contribution(contribution, start_dt=start_dt))
+                entries.append(self._schedule(contribution, start_dt))
         return jsonify(entries=[serialize_entry_update(x) for x in entries])
+
+    def _schedule(self, contrib, start_dt):
+        return schedule_contribution(contrib, start_dt, session_block=self.session_block)
