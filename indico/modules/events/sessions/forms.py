@@ -69,6 +69,16 @@ class SessionProtectionForm(IndicoForm):
         super(SessionProtectionForm, self).__init__(*args, **kwargs)
 
 
+class SessionBlockForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()], description=_('Title of the session block'))
+    person_links = SessionBlockPersonLinkListField(_('Conveners'))
+    location_data = IndicoLocationField(_('Location'))
+
+    def __init__(self, *args, **kwargs):
+        self.session_block = kwargs.pop('session_block', None)
+        super(SessionBlockForm, self).__init__(*args, **kwargs)
+
+
 class MeetingSessionBlockForm(IndicoForm):
     session_title = StringField(_('Title'), [DataRequired()], description=_('Title of the session'))
     block_title = StringField(_('Block title'), description=_('Title of the session block'))
