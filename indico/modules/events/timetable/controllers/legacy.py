@@ -24,10 +24,11 @@ from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution
+from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.forms import BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm
-from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update
+from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update, serialize_session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution)
@@ -90,6 +91,11 @@ class RHLegacyTimetableAddSessionBlock(RHManageTimetableBase):
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         self.commit = False
         return jsonify_form(form)
+
+
+class RHLegacyTimetableAddSession(RHCreateSession):
+    def _get_response(self, new_session):
+        return jsonify_data(session=serialize_session(new_session))
 
 
 class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):

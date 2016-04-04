@@ -68,6 +68,11 @@ class RHSessionsList(RHManageSessionsBase):
 class RHCreateSession(RHManageSessionsBase):
     """Create a session in the event"""
 
+    def _get_response(self, new_session):
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event_new.sessions]
+        return jsonify_data(sessions=sessions, new_session_id=new_session.id,
+                            html=_render_session_list(self.event_new))
+
     def _process(self):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
@@ -75,9 +80,7 @@ class RHCreateSession(RHManageSessionsBase):
                            event=self.event_new)
         if form.validate_on_submit():
             new_session = create_session(self.event_new, form.data)
-            sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event_new.sessions]
-            return jsonify_data(sessions=sessions, new_session_id=new_session.id,
-                                html=_render_session_list(self.event_new))
+            return self._get_response(new_session)
         return jsonify_form(form)
 
 
