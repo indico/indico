@@ -242,6 +242,10 @@ def _set_start_dt(target, value, oldvalue, *unused):
     from indico.modules.events.util import register_time_change
     if oldvalue is not None and value != oldvalue and target.object is not None:
         register_time_change(target)
+    if oldvalue is not None and target.type == TimetableEntryType.SESSION_BLOCK:
+        diff = value - oldvalue
+        for child in target.children:
+            child.start_dt += diff
 
 
 populate_one_to_one_backrefs(TimetableEntry, 'session_block', 'contribution', 'break_')
