@@ -601,6 +601,11 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                                     $(balloonId).addClass('push-back');
                                 });
                             });
+
+                            $content.find('.js-delete').on('click', function() {
+                                self.managementActions.deleteEntry(self.eventData);
+                            });
+
                         }, function(xhr, status, error) {
                             api.set('content.text', status + ': ' + error);
                         });
