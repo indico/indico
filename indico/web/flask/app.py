@@ -33,7 +33,6 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
 import indico.util.date_time as date_time_util
@@ -204,7 +203,6 @@ def setup_jinja(app):
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
-    app.add_template_global(lambda: HelperMaKaCInfo.getMaKaCInfoInstance().getLang(), 'get_default_language')
     # webassets
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = core_env
