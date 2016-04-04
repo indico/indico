@@ -38,7 +38,7 @@ from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
-from indico.modules.events.util import update_object_principals
+from indico.modules.events.util import update_object_principals, track_time_changes
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -180,7 +180,8 @@ class RHEditContribution(RHManageContributionBase):
                                                    **custom_field_values),
                                   event=self.event_new, contrib=self.contrib)
         if form.validate_on_submit():
-            update_contribution(self.contrib, *_get_field_values(form.data))
+            with track_time_changes():
+                update_contribution(self.contrib, *_get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.reporter.render_contrib_report(self.contrib)
             if tpl_components['hide_contrib']:
@@ -330,7 +331,8 @@ class RHContributionUpdateStartDate(RHManageContributionBase):
     def _process(self):
         form = ContributionStartDateForm(obj=FormDefaults(start_dt=self.contrib.start_dt), contrib=self.contrib)
         if form.validate_on_submit():
-            update_timetable_entry(self.contrib.timetable_entry, {'start_dt': form.start_dt.data})
+            with track_time_changes():
+                update_timetable_entry(self.contrib.timetable_entry, {'start_dt': form.start_dt.data})
             return jsonify_data(new_value=format_datetime(self.contrib.start_dt, 'short'))
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
@@ -339,7 +341,8 @@ class RHContributionUpdateDuration(RHManageContributionBase):
     def _process(self):
         form = ContributionDurationForm(obj=FormDefaults(self.contrib), contrib=self.contrib)
         if form.validate_on_submit():
-            update_contribution(self.contrib, {'duration': form.duration.data})
+            with track_time_changes():
+                update_contribution(self.contrib, {'duration': form.duration.data})
             return jsonify_data(new_value=format_human_timedelta(self.contrib.duration))
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 

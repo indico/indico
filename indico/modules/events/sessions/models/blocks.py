@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -145,3 +146,10 @@ class SessionBlock(LocationMixin, db.Model):
 
 
 SessionBlock.register_location_events()
+
+
+@listens_for(SessionBlock.duration, 'set')
+def _set_duration(target, value, oldvalue, *unused):
+    from indico.modules.events.util import register_time_change
+    if oldvalue is not None and value != oldvalue and target.timetable_entry is not None:
+        register_time_change(target.timetable_entry)

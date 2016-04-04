@@ -237,4 +237,11 @@ def _set_break(target, value, *unused):
     target.type = TimetableEntryType.BREAK
 
 
+@listens_for(TimetableEntry.start_dt, 'set')
+def _set_start_dt(target, value, oldvalue, *unused):
+    from indico.modules.events.util import register_time_change
+    if oldvalue is not None and value != oldvalue and target.object is not None:
+        register_time_change(target)
+
+
 populate_one_to_one_backrefs(TimetableEntry, 'session_block', 'contribution', 'break_')

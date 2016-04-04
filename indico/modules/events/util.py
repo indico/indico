@@ -17,14 +17,19 @@
 from __future__ import unicode_literals
 
 import random
+import warnings
+from collections import defaultdict
+from contextlib import contextmanager
 from copy import deepcopy
 from mimetypes import guess_extension
 from os import path
 from tempfile import NamedTemporaryFile
 
-from flask import session, request, g
+from flask import session, request, g, current_app
+from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
@@ -357,3 +362,53 @@ def create_event_logo_tmp_file(event):
     temp_file.write(event.logo)
     temp_file.flush()
     return temp_file
+
+
+@contextmanager
+def track_time_changes():
+    """Track time changes of event objects.
+
+    This provides a list of changes while the context manager was
+    active and also triggers `times_changed` signals.
+    """
+    if 'old_times' in g:
+        raise RuntimeError('time change tracking may not be nested')
+    g.old_times = defaultdict(dict)
+    changes = defaultdict(dict)
+    try:
+        yield changes
+    finally:
+        old_times = g.pop('old_times')
+        for entry, info in old_times.iteritems():
+            if entry.start_dt != info['start_dt']:
+                changes[entry.object]['start_dt'] = (info['start_dt'], entry.start_dt)
+            if entry.duration != info['duration']:
+                changes[entry.object]['duration'] = (info['duration'], entry.duration)
+            if entry.end_dt != info['end_dt']:
+                changes[entry.object]['end_dt'] = (info['end_dt'], entry.end_dt)
+        for obj, obj_changes in changes.iteritems():
+            signals.event.times_changed.send(type(obj), entry=obj.timetable_entry, obj=obj, changes=obj_changes)
+
+
+def register_time_change(entry):
+    """Register a time-related change for a timetable entry
+
+    This is an internal helper function used in the models to record
+    changes of the start time or duration.  The changes are exposed
+    through the `track_time_changes` contextmanager function.
+    """
+    # if it's a new object it's not a change so we just ignore it
+    if not inspect(entry).persistent:
+        return
+    try:
+        old_times = g.old_times
+    except AttributeError:
+        msg = 'Time change of {} was not tracked; changes to scheduled object'.format(entry)
+        if current_app.config.get('REPL'):
+            warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
+            return
+        else:
+            raise RuntimeError(msg)
+    for field in ('start_dt', 'duration', 'end_dt'):
+        if old_times[entry].get(field) is None:
+            old_times[entry][field] = getattr(entry, field)
