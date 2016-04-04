@@ -41,7 +41,7 @@ class TimetableSerializer(object):
             timetable[date_str] = {}
         query_options = (defaultload('contribution').subqueryload('person_links'),
                          defaultload('session_block').subqueryload('person_links'))
-        query = (event.timetable_entries
+        query = (TimetableEntry.query.with_parent(event)
                  .options(*query_options)
                  .order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK))
         for entry in query:
