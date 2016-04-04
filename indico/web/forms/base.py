@@ -238,6 +238,9 @@ class FormDefaults(object):
         else:
             raise AttributeError(item)
 
+    def __contains__(self, item):
+        return hasattr(self, item)
+
 
 class SyncedInputsMixin(object):
     """Mixin for a form having inputs using the ``SyncedInputWidget``.
