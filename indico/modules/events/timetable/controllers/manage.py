@@ -27,6 +27,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
 from indico.modules.events.timetable.views import WPManageTimetable
+from indico.modules.events.util import track_time_changes
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
@@ -111,5 +112,6 @@ class RHTimetableREST(RHManageTimetableBase):
         if 'start_dt' in data:
             updates['start_dt'] = dateutil.parser.parse(data['start_dt'])
         if updates:
-            update_timetable_entry(self.timetable_entry, updates)
+            with track_time_changes():
+                update_timetable_entry(self.timetable_entry, updates)
         return jsonify()

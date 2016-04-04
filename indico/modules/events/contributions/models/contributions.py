@@ -366,6 +366,12 @@ def _mapper_configured():
             if target.session is not None:
                 target.session_block = value.parent.session_block
 
+    @listens_for(Contribution.duration, 'set')
+    def _set_duration(target, value, oldvalue, *unused):
+        from indico.modules.events.util import register_time_change
+        if oldvalue is not None and value != oldvalue and target.timetable_entry is not None:
+            register_time_change(target.timetable_entry)
+
 
 @listens_for(Contribution.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):

@@ -29,3 +29,13 @@ timetable_entry_deleted = _signals.signal('timetable-entry-deleted', """
 Called when a timetable entry is deleted. The `sender` is the entry.
 This signal is triggered right before the entry deletion is performed.
 """)
+
+times_changed = _signals.signal('times-changed', """
+Called when the times of a scheduled object (contribution, break or
+session block) change, either by a change in duration or start time.
+The `sender` is the type of the object; the timetable entry is passed
+as `entry` and the object is passed as `obj`.  Information about the
+changes are passed as `changes` which is a dict containing old/new
+tuples for `start_dt`, `duration` and `end_dt`.  If an attribute did
+not change, it is not included in the dict.
+""")
