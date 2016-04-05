@@ -1,3 +1,5 @@
+{% from 'events/display/indico/_common.html' import render_location, render_users %}
+
 {% macro render_displayed_entries_fragment(displayed_num, total_num) -%}
     <span id="filtering-state" class="i-button label icon-list"
           title="{% trans %}Displaying {{displayed_num}} out of {{total_num}} contributions{% endtrans %}">
@@ -13,48 +15,44 @@
                     <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
                 </span>
             </div>
-            {% if contrib.description -%}
-                <div class="info">
-                    <span class="label">{% trans %}Description{% endtrans %}</span>
-                    <span class="value">{{ contrib.description }}</span>
-                </div>
-            {%- endif %}
-            {% if contrib.track -%}
-                <div class="info" data-searchable="{{ contrib.track.title|lower }}">
-                    <span class="label">{% trans %}Track:{% endtrans %}</span>
-                    <span class="value">{{ contrib.track.title }}</span>
-                </div>
-            {%- endif %}
-            {% if contrib.type -%}
-                <div class="info" data-searchable="{{ contrib.type.name|lower }}">
-                    <span class="label">{% trans %}Type:{% endtrans %}</span>
-                    <span class="value">{{ contrib.type.name }}</span>
-                </div>
-            {%- endif %}
-            {% if contrib.session and with_session_info -%}
-                <div class="info" data-searchable="{{ contrib.session.title|lower }}">
-                    <span class="label">{% trans %}Session:{% endtrans %}</span>
-                    <span class="value">
-                        <a href="{{ url_for('sessions.display_session', contrib.session) }}">{{ contrib.session.title }}</a>
+            <div class="">
+                {% if contrib.track -%}
+                    <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
+                        {{ contrib.track.title }}
+                    </div>
+                {%- endif %}
+                {% if contrib.type -%}
+                    <div class="contrib-type small" data-searchable="{{ contrib.type.name|lower }}">
+                        {{ contrib.type.name }}
+                    </div>
+                {%- endif %}
+                {% if contrib.session and with_session_info -%}
+                    <div class="contrib-session small" data-searchable="{{ contrib.session.title|lower }}"
+                         style="{{ contrib.session.colors.css }}">
+                        <a href="{{ url_for('sessions.display_session', contrib.session) }}"
+                           style="color: #{{ contrib.session.colors.text }}">{{ contrib.session.title }}</a>
                         <span class="session-bg-color" style="background: #{{ contrib.session.colors.background }};"></span>
-                    </span>
+                    </div>
+                {%- endif %}
+            </div>
+
+            {% if contrib.description -%}
+                <div class="description">
+                    {{ contrib.description|truncate(400) }}
                 </div>
             {%- endif %}
             {% if contrib.speakers -%}
-                <div class="info contrib-speakers">
-                    <span class="label">{% trans %}Presented by{% endtrans %}</span>
-                    <span class="value">
-                        <strong>{{- contrib.speakers|map(attribute='full_name')|join(', ') -}}</strong>
-                        {% if contrib.timetable_entry -%}
-                            {% trans start_dt = contrib.timetable_entry.start_dt|format_date(format='full', timezone=timezone),
-                                     start_time = contrib.timetable_entry.start_dt|format_time(format='medium', timezone=timezone) %}
-                                on <strong>{{ start_dt }}</strong>
-                                at <strong>{{ start_time }}</strong>
-                            {% endtrans %}
-                        {%- endif %}
-                    </span>
+                <div class="speaker-list icon-user">
+                    {{ render_users(contrib.speakers|sort(attribute='full_name'),
+                                    span_class='speaker-item-inline') }}
                 </div>
             {%- endif %}
+            {% if contrib.timetable_entry -%}
+                <div class="contrib-time icon-time">
+                    {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
+                </div>
+            {%- endif %}
+
         </div>
     {%- endfor %}
 {% endmacro %}
