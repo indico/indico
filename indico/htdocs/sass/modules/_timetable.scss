@@ -34,6 +34,32 @@
 
 @import 'base';
 @import 'compass';
+@import 'partials';
+
+
+@mixin base-list-properties() {
+    overflow: auto;
+    list-style-type: none;
+    padding: 0;
+
+
+    li.item {
+        &:hover {
+            background: $light-blue;
+        }
+
+        padding: 5px;
+        cursor: pointer;
+
+        &.selected {
+            background: $indico-blue;
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid $separator-color;
+        }
+    }
+}
 
 #wholeLegend {
     margin: 60px 0 0 0;
@@ -128,5 +154,64 @@
         &:hover {
             color: $gray;
         }
+    }
+}
+
+#move-timetable-entry-dialog {
+    .days {
+        float: left;
+
+        ul.days-list {
+            @include base-list-properties();
+        }
+
+        width: 130px;
+        padding: 0 5px;
+        display: inline-block;
+        max-height: 200px;
+        overflow-y: auto;
+        border-right: 1px solid $separator-color;
+    }
+
+    .blocks {
+        width: 400px;
+
+        ul.blocks-list {
+            @include base-list-properties();
+
+            li.item {
+                &.disabled {
+                    @extend %tilted-strips-bg;
+
+                    cursor: auto;
+                }
+
+                .title {
+                    display: inline-block;
+                    width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .start-dt {
+                    font-size: 10px;
+                    color: $dark-gray;
+                    vertical-align: super;
+                }
+
+                .color {
+                    float: right;
+                    height: 15px;
+                    width: 15px;
+                    display: inline-block;
+                }
+            }
+        }
+
+        overflow-y: auto;
+        display: inline-block;
+        padding: 0 15px;
+        max-height: 200px;
     }
 }

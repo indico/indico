@@ -30,17 +30,20 @@ from indico.modules.events.sessions.controllers.management.sessions import RHCre
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.operations import update_session_block, update_session
-from indico.modules.events.timetable.controllers import RHManageTimetableBase
+from indico.modules.events.timetable.controllers import RHManageTimetableBase, RHManageTimetableEntryBase
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm)
-from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update, serialize_session
+from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
+                                                    TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
-                                                        update_break_entry, update_timetable_entry)
+                                                        update_break_entry, update_timetable_entry,
+                                                        move_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
-from indico.modules.events.timetable.util import find_next_start_dt
+from indico.modules.events.timetable.util import find_next_start_dt, get_session_block_entries
 from indico.modules.events.util import get_random_color, track_time_changes
+from indico.util.date_time import iterdays, as_utc
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -288,3 +291,40 @@ class RHLegacyTimetableFitBlock(RHManageTimetableBase):
         with track_time_changes():
             fit_session_block_entry(self.session_block.timetable_entry)
         return jsonify_data(flash=False)
+
+
+class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
+    """Moves a TimetableEntry into a Session or top-level timetable"""
+
+    def _process_POST(self):
+        current_day = dateutil.parser.parse(request.form.get('day')).date()
+        return jsonify_template('events/timetable/move_entry.html', event=self.event_new,
+                                top_level_entries=self._get_session_timetable_entries(),
+                                current_day=current_day, timetable_entry=self.timetable_entry,
+                                parent_entry=self.timetable_entry.parent)
+
+    def _process_PATCH(self):
+        self.serializer = TimetableSerializer(True)
+        with track_time_changes():
+            entry_data = self._move_entry(request.json)
+        rv = dict(serialize_entry_update(self.timetable_entry), **entry_data)
+        return jsonify_data(flash=False, entry=rv)
+
+    def _move_entry(self, data):
+        rv = {}
+        if data.get('parent_id'):
+            rv['old'] = self.serializer.serialize_timetable_entry(self.timetable_entry)
+            parent_timetable_entry = self.event_new.timetable_entries.filter_by(id=data['parent_id']).one()
+            move_timetable_entry(self.timetable_entry, parent=parent_timetable_entry)
+            rv['session'] = rv['slotEntry'] = self.serializer.serialize_session_block_entry(parent_timetable_entry)
+        elif data.get('day'):
+            rv['old'] = self.serializer.serialize_timetable_entry(self.timetable_entry)
+            new_date = as_utc(dateutil.parser.parse(data['day']))
+            move_timetable_entry(self.timetable_entry, day=new_date)
+        return rv
+
+    def _get_session_timetable_entries(self):
+        entries = {}
+        for day in iterdays(self.event_new.start_dt, self.event_new.end_dt):
+            entries[day.date()] = get_session_block_entries(self.event_new, day)
+        return entries

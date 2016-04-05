@@ -236,46 +236,32 @@ type("TimetableManagementActions", [], {
 
     /* Takes care of moving a contribution/timeblock to another session/timetable.
      * This goes for both "drag and drop" as well as the regular "MoveEntry Dialog clicking"*/
-    moveToSession: function(eventData, value, undo, newTime) {
+    moveToSession: function(eventData, data, undo, newTime) {
         var self = this;
 
         // if nothing has been selected yet
-        if (value === null || value === undefined) {
+        if (!data) {
             return false;
         }
 
-        // Displays a "loading ..." div at the righthand bottom side
-        var killProgress = IndicoUI.Dialogs.Util.ttStatusInfo($T("saving..."));
-        var dfr = $.Deferred();
-
-        indicoRequest(this.methods[this.isSessionTimetable ? 'SessionEntry' : 'Event'].moveEntry, {
-            value : value,
-            conference : eventData.conferenceId,
-            scheduleEntryId : eventData.scheduleEntryId,
-            sessionId : eventData.sessionId,
-            sessionSlotId : eventData.sessionSlotId,
-            newTime: newTime
-        }, function(result, error) {
-
-            if (!undo) {
-                killProgress();
-            }
-
-            if (error) {
-                IndicoUtil.errorReport(error);
-                dfr.reject(error);
-                self.timetable.timetableDrawer.redraw();
-            } else {
+        return $.ajax({
+            url: build_url(Indico.Urls.Timetable.entry.move, {confId: eventData.conferenceId[0],
+                                                              timetable_entry_id: eventData.scheduleEntryId}),
+            method: 'PATCH',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json',
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress(),
+            success: function(data) {
                 if (undo) {
                     self.timetable.enableUndo(undo, {'eventData': eventData,
                                                      'entry': result.entry}, null);
                 }
-                // change json and repaint timetable
-                self.timetable._updateMovedEntry(result, result.old.id).done(function() {
-                    dfr.resolve()
-                });
-            }});
-        return dfr.promise();
+
+                self.timetable._updateMovedEntry(data.entry, data.entry.old.id);
+            }
+        });
     },
 
     editRoomLocation: function(room, location, eventData) {
@@ -637,17 +623,6 @@ type("TimetableManagementActions", [], {
             this.timetable
         );
     },
-
-
-    moveEntry: function(eventData) {
-        var moveEntryDiag = new MoveEntryDialog(
-            this,
-            this.timetable,
-            eventData,
-            this.timetable.currentDay);
-        moveEntryDiag.open();
-    },
-
 
     /*
      * Moves entries up or down, according to the "arrows"

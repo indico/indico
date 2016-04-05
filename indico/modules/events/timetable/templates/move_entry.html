@@ -1,0 +1,75 @@
+<div class="action-box highlight">
+    <div class="section">
+        <div class="text">
+            {% if parent_entry %}
+                {% trans title=parent_entry.session_block.full_title,
+                         entry_title=timetable_entry.object.title %}
+                    This entry <strong>({{ entry_title }})</strong> is currently located inside <strong>{{ title }}</strong><br>
+                    Please select the place where you want to move it to.
+                {% endtrans %}
+            {% else %}
+                {% trans entry_title=timetable_entry.object.title %}
+                    This entry <strong>({{ entry_title }})</strong> is currently at the <strong>top-level timetable</strong><br>
+                    Please select the place where you want to move it to.
+                {% endtrans %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div id="move-timetable-entry-dialog">
+    <div class="days">
+        <ul class="days-list">
+            {% for day, entries in top_level_entries.iteritems()|sort %}
+                <li class="item {% if day == current_day %}selected{% endif %}"
+                    data-day="{{ day }}">{{ day|format_date }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="blocks">
+        {% for day, tt_entries in top_level_entries.iteritems() %}
+            <ul class="blocks-list" data-show-for="{{ day }}">
+                <li class="item {% if parent_entry is none and day == current_day %}disabled{% endif %}">
+                    {% trans %}Top level timetable{% endtrans %}
+                </li>
+                {% for tt_entry in tt_entries %}
+                    {% set block = tt_entry.session_block %}
+                    <li class="item {% if tt_entry == parent_entry %}disabled{% endif %}"
+                        data-entry-id="{{ tt_entry.id }}">
+                        <span class="title">
+                            {{ block.full_title }}
+                        </span>
+                        <span class="start-dt">
+                            ({{ tt_entry.start_dt|format_time(timezone=event.timezone) }} -
+                             {{ tt_entry.end_dt|format_time(timezone=event.timezone) }})
+                        </span>
+                        <span class="color" style="background: #{{ block.session.colors.background }}"></span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+
+    <input id="move-entry-data" type="hidden">
+</div>
+
+<script>
+    $('.days [data-day]').on('click', function() {
+        var $this = $(this);
+
+        $('[data-show-for]').hide();
+        $('[data-show-for="{0}"]'.format($this.data('day'))).show();
+        $('.days [data-day]').removeClass('selected');
+        $this.addClass('selected');
+    });
+
+    $('.blocks ul.blocks-list li').on('click', function() {
+        var $this = $(this);
+
+        if (!$this.hasClass('disabled')) {
+            var data = {'parent_id': $this.data('entry-id'), 'day': $this.closest('ul').data('show-for')};
+            $this.trigger('ajaxDialog:close', [data]);
+        }
+    });
+
+    $('#move-timetable-entry-dialog .days li.selected').trigger('click');
+</script>
