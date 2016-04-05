@@ -21,6 +21,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper
+from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -369,7 +370,9 @@ def _mapper_configured():
     @listens_for(Contribution.duration, 'set')
     def _set_duration(target, value, oldvalue, *unused):
         from indico.modules.events.util import register_time_change
-        if oldvalue is not None and value != oldvalue and target.timetable_entry is not None:
+        if oldvalue in (NEVER_SET, NO_VALUE):
+            return
+        if value != oldvalue and target.timetable_entry is not None:
             register_time_change(target.timetable_entry)
 
 
