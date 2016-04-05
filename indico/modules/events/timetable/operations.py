@@ -16,11 +16,14 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session
 
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.sessions.operations import update_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -126,3 +129,42 @@ def fit_session_block_entry(entry, log=True):
         entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                             "Session block fitted to contents", session.user,
                             data={'Session block': entry.session_block.full_title})
+
+
+def move_timetable_entry(entry, parent=None, day=None):
+    """Move the `entry` to another session or top-level timetable
+
+    :param entry: `TimetableEntry` to be moved
+    :param parent: If specified then the entry will be set as a child
+                         of parent
+    :param day: If specified then the entry will be moved to the
+                        top-level timetable on this day
+    """
+    if bool(parent) + bool(day) != 1:
+        raise TypeError("Wrong number of arguments")
+
+    from indico.modules.events.contributions.operations import update_contribution
+
+    updates = {}
+    contrib_update_data = {}
+    if day:
+        new_start_dt = entry.start_dt.replace(day=day.day, month=day.month)
+        updates['start_dt'] = new_start_dt
+        updates['parent'] = None
+        contrib_update_data = {'session_id': None, 'session_block_id': None}
+    elif parent:
+        children = sorted(parent.children, key=attrgetter('end_dt'), reverse=True)
+        if children:
+            new_start_dt = children[0].end_dt
+        else:
+            new_start_dt = parent.start_dt
+        updates['parent'] = parent
+        updates['start_dt'] = new_start_dt
+        contrib_update_data = {'session': parent.session_block.session, 'session_block': parent.session_block}
+
+    update_timetable_entry(entry, updates)
+    if entry.type == TimetableEntryType.CONTRIBUTION:
+        update_contribution(entry.object, contrib_update_data)
+    if parent and entry.end_dt > parent.end_dt:
+        duration = parent.object.duration + (entry.end_dt - parent.end_dt)
+        update_session_block(parent.object, {'duration': duration})
