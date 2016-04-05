@@ -39,7 +39,7 @@ from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps
 from indico.util.decorators import classproperty, strict_classproperty
-from indico.util.string import return_ascii, format_repr, text_to_repr
+from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
 from indico.web.flask.util import url_for
 
 
@@ -57,6 +57,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     inheriting_have_acl = True
     location_backref_name = 'events'
     allow_location_inheritance = False
+    description_wrapper = RichMarkup
     __logging_disabled = False
 
     ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'
