@@ -19,7 +19,6 @@ from itertools import ifilter
 from sqlalchemy.orm import lazyload, joinedload, noload
 from werkzeug.urls import url_parse
 
-from indico.modules.events.layout import layout_settings
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
@@ -2958,118 +2957,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def genNewAbstractId(self):
         return str(self.__contribGenerator.newCount())
-
-    def syncContribCounter(self):
-        self.__contribGenerator.sync(self.getAbstractMgr()._getOldAbstractCounter())
-        return self.__contribGenerator._getCount()
-
-    def addContribution(self, newContrib, contrib_id=None):
-        """Adds a new contribution object to the conference taking care of
-            assigning a new unique id to it
-        """
-        if self.hasContribution(newContrib):
-            return
-        if isinstance(newContrib.getCurrentStatus(),ContribStatusWithdrawn):
-            raise MaKaCError( _("Cannot add a contribution which has been withdrawn"), _("Event"))
-        if contrib_id is None or contrib_id == '':
-            contribId=self._generateNewContributionId()
-            while self.contributions.has_key(contribId):
-                contribId=self._generateNewContributionId()
-        else:
-            contribId = str(contrib_id)
-            self.__contribGenerator.sync(contribId)
-            if self.contributions.has_key(contribId):
-                raise MaKaCError( _("Cannot add this contribution id:(%s) as it has already been used")%contribId, _("Event"))
-        newContrib.includeInConference(self,contribId)
-        self.contributions[contribId]=newContrib
-        for auth in newContrib.getAuthorList():
-            self.indexAuthor(auth)
-        for spk in newContrib.getSpeakerList():
-            self.indexSpeaker(spk)
-        for sub in newContrib.getSubmitterList():
-            self.addContribSubmitter(newContrib,sub)
-
-        # signals.event.contribution_created.send(newContrib, parent=self)
-        self.notifyModification()
-
-    def hasContribution(self,contrib):
-        return contrib.getConference()==self and \
-                self.contributions.has_key(contrib.getId())
-
-    def removeContribution( self, contrib, callDelete=True ):
-        if not self.contributions.has_key( contrib.getId() ):
-            return
-        for sub in contrib.getSubmitterList()[:]:
-            self.removeContribSubmitter(contrib,sub)
-        for auth in contrib.getPrimaryAuthorList()[:]:
-            contrib.removePrimaryAuthor(auth)
-        for auth in contrib.getCoAuthorList()[:]:
-            contrib.removeCoAuthor(auth)
-        for spk in contrib.getSpeakerList()[:]:
-            contrib.removeSpeaker(spk)
-        del self.contributions[ contrib.getId() ]
-        self._p_changed = True
-        if callDelete:
-            contrib.delete()
-        #else:
-        #    contrib.unindex()
-        self.notifyModification()
-
-    def recoverContribution(self, contrib):
-        self.addContribution(contrib, contrib.getId())
-        contrib.recover()
-
-    # Note: this kind of factories should never be used as they only allow to
-    #   create a single type of contributions
-    def newContribution( self, id=None ):
-        """Creates and returns a new contribution object already added to the
-            conference list (all its data is set to the default)
-        """
-        c = Contribution()
-        self.addContribution( c, id )
-        return c
-
-    def getOwnContributionById( self, id ):
-        """Returns the contribution from the conference list corresponding to
-            the unique contribution id specified
-        """
-        if self.contributions.has_key( id ):
-            return self.contributions[ id ]
-        return None
-
-    def getContributionById( self, id ):
-        """Returns the contribution  corresponding to the id specified
-        """
-        return self.contributions.get(str(id).strip(),None)
-
-    def getContributionList(self):
-        """Returns a list of the conference contribution objects
-        """
-        return self.contributions.values()
-
-    def iterContributions(self):
-        return self.contributions.itervalues()
-
-    def getContributionListWithoutSessions(self):
-        """Returns a list of the conference contribution objects which do not have a session
-        """
-        return [c for c in self.contributions.values() if not c.getSession()]
-
-
-    def getContributionListSorted(self, includeWithdrawn=True, key="id"):
-        """Returns a list of the conference contribution objects, sorted by key provided
-        """
-        contributions = self.contributions.values()
-        if not includeWithdrawn:
-            contributions = filter(lambda c: not isinstance(c.getCurrentStatus(), ContribStatusWithdrawn), contributions)
-        contributions.sort(key = lambda c: getattr(c, key))
-        return contributions
-
-    def getNumberOfContributions(self, only_scheduled=False):
-        if only_scheduled:
-            return len(filter(lambda c: c.isScheduled(), self.contributions.itervalues()))
-        else:
-            return len(self.contributions)
 
     def getReviewManager(self, contrib):
         return self.getConferencePaperReview().getReviewManager()
