@@ -729,20 +729,19 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
 
     _updateMovedEntry: function(result, oldEntryId) {
-        return this._updateEntry(result, oldEntryId, function(data){
-
-            var oldDay = Util.formatDateTime(Util.parseDateTime(result.old.startDate, IndicoDateTimeFormats.Default),
-                                          IndicoDateTimeFormats.Ordinal);
-
+        return this._updateEntry(result, oldEntryId, function(data) {
+            var oldDate = IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(result.old.startDate), 'd/MM/YYYY hh:mm');
+            var oldDay = Util.formatDateTime(Util.parseDateTime(oldDate, IndicoDateTimeFormats.Default),
+                                             IndicoDateTimeFormats.Ordinal);
             if (result.old.sessionId) {
                 // block was inside session slot
-                delete data[oldDay]['s' + result.old.sessionId + 'l' + result.old.sessionSlotId].entries[result.old.id];
+                delete data[oldDay]['s' + result.old.sessionSlotEntryId].entries[result.old.id];
             } else {
                 // block was in top level
                 delete data[oldDay][result.old.id];
             }
 
-            if(result.slotEntry){
+            if (result.slotEntry) {
                 // block moves inside session slot
                 data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
                 // updates the time of the session if it has to be extended
@@ -750,7 +749,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
                 data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
             } else {
                 // block moves to top level
-                data[result.day][result.id]=result.entry;
+                data[result.day][result.id] = result.entry;
             }
         });
     },
@@ -1241,37 +1240,23 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
          * Deletes the old version of the entry
          */
 
-        var oldStartTime, oldEndTime, oldStartDate;
+        var oldStartDate;
         // Check whether we're operating *over* an existing slot or not
         // it is a slot && slot exists in timetable
-        if (result.entry.entryType=="Session" && data[this.currentDay][result.id]) {
-            var slot = data[this.currentDay][result.entry.id];
-            //var slot = data[result.day][result.entry.id];
-            // in the affirmative case, fetch the time limits
-            oldStartTime = slot.startDate.time.slice(0,5);
-            oldEndTime = slot.endDate.time.slice(0,5);
+        if (result.entry.entryType == "Session" && data[this.currentDay][result.id]) {
+            var slot = data[this.currentDay][result.id];
             oldStartDate = slot.startDate.date.replaceAll('-','');
-
         } else {
             // Contribution or break - event timetable limits
-
-            var entry = data[result.day][result.entry.id];
-
-            oldStartTime = this.eventInfo.startDate.time.slice(0,5);
-            oldEndTime = this.eventInfo.endDate.time.slice(0,5);
             oldStartDate = this.currentDay;
         }
 
-        var oldEntries = data[oldStartDate][oldEntryId]?data[oldStartDate][oldEntryId].entries:null;
-
         delete data[oldStartDate][oldEntryId];
-
-        return oldEntries;
+        return data[oldStartDate][oldEntryId] ? data[oldStartDate][oldEntryId].entries : null;
 
     },
 
     _updateEntry: function(result, oldEntryId, updateCycle) {
-
         var self = this;
         var data = this.getData();
 
@@ -1286,13 +1271,11 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         if (updateCycle) {
             updateCycle(data);
         } else {
-
             // If none is defined in the function args,
             // execute the default action
-            if(exists(result.slotEntry)){
+            if (exists(result.slotEntry)){
                 data[result.day][result.slotEntry.id].entries[result.entry.id] = result.entry;
-            }
-            else {
+            } else {
                 data[result.day][result.id] = result.entry;
             }
 
@@ -1300,7 +1283,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             // should be preserved (e.g. content (contribs, breaks) of
             // the slot).
             if (oldContent) {
-                data[result.day][result.id].entries = result.entry.entryType == "Session"?result.entry.entries:oldContent;
+                data[result.day][result.id].entries = result.entry.entryType == "Session" ? result.entry.entries : oldContent;
             }
 
             // If a session slot is added, let's update the list of sessions

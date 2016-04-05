@@ -610,6 +610,24 @@ function loadBalloonContent(self, api, editable) {
                     }
                 });
             });
+
+            $content.find('.js-move').on('click', function() {
+                var conferenceId = self.eventData.conferenceId[0];
+                var timetableEntryId = self.eventData.scheduleEntryId;
+
+                ajaxDialog({
+                    url: build_url(Indico.Urls.Timetable.entry.move, {'confId': conferenceId,
+                                                                      'timetable_entry_id': timetableEntryId}),
+                    data: {'day': self.timetable.currentDay},
+                    title: $T.gettext("Move entry"),
+                    trigger: this,
+                    onClose: function(data) {
+                        if (data) {
+                            self.managementActions.moveToSession(self.eventData, data, true, null);
+                        }
+                    }
+                });
+            });
         }
         $content.find('.close-balloon').on('click', function() {
             timetableBlock.qtip('hide');

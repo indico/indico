@@ -18,6 +18,8 @@
                    title="{% trans %}Delete timetable entry{% endtrans %}"
                    data-title="{% trans title=contrib.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
                    data-confirm="{% trans title=contrib.title %}Are you sure you want to delete timetable entry '{{ title }}'?{% endtrans %}"></a>
+                <a href="#" class="icon-handle i-button-icon close-balloon js-move"
+                   title="{% trans %}Move{% endtrans %}"></a>
             {% else %}
                 <a class="icon-list i-button-icon" title="{% trans %}View details{% endtrans %}"
                    href="{{ url_for('contributions.display_contribution', contrib) }}"></a>
