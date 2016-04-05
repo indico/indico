@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
@@ -240,9 +241,11 @@ def _set_break(target, value, *unused):
 @listens_for(TimetableEntry.start_dt, 'set')
 def _set_start_dt(target, value, oldvalue, *unused):
     from indico.modules.events.util import register_time_change
-    if oldvalue is not None and value != oldvalue and target.object is not None:
+    if oldvalue in (NEVER_SET, NO_VALUE):
+        return
+    if value != oldvalue and target.object is not None:
         register_time_change(target)
-    if oldvalue is not None and target.type == TimetableEntryType.SESSION_BLOCK:
+    if target.type == TimetableEntryType.SESSION_BLOCK:
         diff = value - oldvalue
         for child in target.children:
             child.start_dt += diff
