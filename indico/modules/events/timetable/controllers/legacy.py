@@ -72,7 +72,7 @@ class RHLegacyTimetableAddContribution(RHManageTimetableBase):
             contrib = create_contribution(self.event_new, form.data)
             return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
         self.commit = False
-        return jsonify_form(form)
+        return jsonify_form(form, fields=form._display_fields)
 
 
 class RHLegacyTimetableAddSessionBlock(RHManageTimetableBase):

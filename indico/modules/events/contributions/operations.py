@@ -65,7 +65,7 @@ def _set_custom_fields(contrib, custom_fields_data):
 
 
 def create_contribution(event, contrib_data, custom_fields_data=None):
-    start_dt = contrib_data.pop('start_date', None)
+    start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(contrib_data)
     if start_dt is not None:

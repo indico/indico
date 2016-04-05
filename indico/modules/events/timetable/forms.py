@@ -98,13 +98,19 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
                                       description=_('Specify text and background colours for the break.'))
 
 
+class ContributionEntryForm(EntryFormMixin, ContributionForm):
+    _entry_type = TimetableEntryType.CONTRIBUTION
+    _default_duration = timedelta(minutes=20)
+    _display_fields = ('title', 'description', 'type', 'time', 'duration', 'person_link_data', 'location_data',
+                       'keywords', 'references')
 
-class ContributionEntryForm(ContributionForm):
+    time = TimeField(_("Time"), description=_("Time when the contribution will be scheduled."))
+    duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
+                              default=timedelta(minutes=60), units=('minutes', 'hours'),
+                              description=_("The duration of the contribution."))
+
     def __init__(self, *args, **kwargs):
         kwargs['to_schedule'] = True
-        duration = self.duration.kwargs['default']
-        self.day = kwargs.pop('day')
-        kwargs['start_date'] = find_earliest_gap(kwargs['event'], day=self.day, duration=duration)
         super(ContributionEntryForm, self).__init__(*args, **kwargs)
 
 
