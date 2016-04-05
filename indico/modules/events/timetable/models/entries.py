@@ -211,6 +211,18 @@ class TimetableEntry(db.Model):
                 return True
             return any(x.can_access(user) for x in self.object.contributions if not x.is_inheriting)
 
+    def move(self, start_dt):
+        """Moves the entry to start at a different time.
+
+        This method automatically moves children of the entry to
+        preserve their start time relative to the parent's start time.
+        """
+        if self.type == TimetableEntryType.SESSION_BLOCK:
+            diff = start_dt - self.start_dt
+            for child in self.children:
+                child.start_dt += diff
+        self.start_dt = start_dt
+
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
@@ -247,10 +259,6 @@ def _set_start_dt(target, value, oldvalue, *unused):
         return
     if value != oldvalue and target.object is not None:
         register_time_change(target)
-    if target.type == TimetableEntryType.SESSION_BLOCK:
-        diff = value - oldvalue
-        for child in target.children:
-            child.start_dt += diff
 
 
 populate_one_to_one_backrefs(TimetableEntry, 'session_block', 'contribution', 'break_')
