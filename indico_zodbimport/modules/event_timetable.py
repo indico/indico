@@ -655,25 +655,38 @@ class TimetableMigration(object):
         for old_entry in old_entries:
             item_type = old_entry.__class__.__name__
             if item_type == 'ContribSchEntry':
-                self._migrate_contribution_timetable_entry(old_entry, session_block)
+                entry = self._migrate_contribution_timetable_entry(old_entry, session_block)
             elif item_type == 'BreakTimeSchEntry':
-                self._migrate_break_timetable_entry(old_entry, session_block)
+                entry = self._migrate_break_timetable_entry(old_entry, session_block)
             elif item_type == 'LinkedTimeSchEntry':
                 parent = old_entry._LinkedTimeSchEntry__owner
                 parent_type = parent.__class__.__name__
                 if parent_type == 'Contribution':
                     self.importer.print_warning(cformat('%{yellow!}Found LinkedTimeSchEntry for contribution'),
                                                 event_id=self.event.id)
-                    self._migrate_contribution_timetable_entry(old_entry, session_block)
-                    continue
+                    entry = self._migrate_contribution_timetable_entry(old_entry, session_block)
                 elif parent_type != 'SessionSlot':
                     self.importer.print_error(cformat('%{red!}Found LinkedTimeSchEntry for {}').format(parent_type),
                                               event_id=self.event.id)
                     continue
-                assert session_block is None
-                self._migrate_block_timetable_entry(old_entry)
+                else:
+                    assert session_block is None
+                    entry = self._migrate_block_timetable_entry(old_entry)
             else:
                 raise ValueError('Unexpected item type: ' + item_type)
+            if session_block:
+                if entry.start_dt < session_block.timetable_entry.start_dt:
+                    self.importer.print_warning(cformat('%{yellow!}Block boundary (start) violated; extending block '
+                                                        'from {} to {}').format(session_block.timetable_entry.start_dt,
+                                                                                entry.start_dt),
+                                                event_id=self.event.id)
+                    session_block.timetable_entry.start_dt = entry.start_dt
+                if entry.end_dt > session_block.timetable_entry.end_dt:
+                    self.importer.print_warning(cformat('%{yellow!}Block boundary (end) violated; extending block '
+                                                        'from {} to {}').format(session_block.timetable_entry.end_dt,
+                                                                                entry.end_dt),
+                                                event_id=self.event.id)
+                    session_block.duration += entry.end_dt - session_block.timetable_entry.end_dt
 
     def _migrate_contribution_timetable_entry(self, old_entry, session_block=None):
         old_contrib = old_entry._LinkedTimeSchEntry__owner
@@ -684,6 +697,7 @@ class TimetableMigration(object):
             contrib.session = session_block.session
             contrib.session_block = session_block
             contrib.timetable_entry.parent = session_block.timetable_entry
+        return contrib.timetable_entry
 
     def _migrate_break_timetable_entry(self, old_entry, session_block=None):
         break_ = Break(title=convert_to_unicode(old_entry.title), description=convert_to_unicode(old_entry.description),
@@ -697,6 +711,7 @@ class TimetableMigration(object):
         self._migrate_location(old_entry, break_)
         if session_block:
             break_.timetable_entry.parent = session_block.timetable_entry
+        return break_.timetable_entry
 
     def _migrate_block_timetable_entry(self, old_entry):
         old_block = old_entry._LinkedTimeSchEntry__owner
@@ -716,6 +731,7 @@ class TimetableMigration(object):
         self._migrate_location(old_block, session_block)
         session_block.person_links = list(self._migrate_session_block_person_links(old_block))
         self._migrate_timetable_entries(old_block._schedule._entries, session_block)
+        return session_block.timetable_entry
 
     def _migrate_location(self, old_entry, new_entry):
         custom_location = (old_entry.places[0] if getattr(old_entry, 'places', None)
