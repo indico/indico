@@ -20,11 +20,14 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.util.string import RichMarkup
 
 
 class DescriptionMixin(object):
-    """Mixin to add an html-enabled description column"""
+    """Mixin to add an html-enabled description column."""
+
+    #: This class attribute will define whether the string
+    #: should be post-processed (e.g. RichMarkup)
+    description_wrapper = None
 
     @declared_attr
     def _description(cls):
@@ -37,7 +40,10 @@ class DescriptionMixin(object):
 
     @hybrid_property
     def description(self):
-        return RichMarkup(self._description)
+        if self.description_wrapper:
+            return self.description_wrapper(self._description)
+        else:
+            return self._description
 
     @description.setter
     def description(self, value):
