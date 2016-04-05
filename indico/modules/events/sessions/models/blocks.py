@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
@@ -156,3 +157,16 @@ def _set_duration(target, value, oldvalue, *unused):
         return
     if value != oldvalue and target.timetable_entry is not None:
         register_time_change(target.timetable_entry)
+
+
+@listens_for(SessionBlock.__table__, 'after_create')
+def _add_timetable_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER INSERT OR UPDATE
+        ON {}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency('session_block');
+    """.format(target.fullname)
+    DDL(sql).execute(conn)
