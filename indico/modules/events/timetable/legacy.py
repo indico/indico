@@ -133,6 +133,7 @@ class TimetableSerializer(object):
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
                      'sessionSlotId': block.id if block else None,
+                     'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution)})
         return data
@@ -150,6 +151,7 @@ class TimetableSerializer(object):
                      'sessionId': block.session_id if block else None,
                      'sessionCode': block.session.code if block else None,
                      'sessionSlotId': block.id if block else None,
+                     'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': break_.title})
         return data
 
