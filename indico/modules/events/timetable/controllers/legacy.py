@@ -38,19 +38,29 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
 
-class RHLegacyTimetableAddBreak(RHManageTimetableBase):
+class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.day = dateutil.parser.parse(request.args['day']).date()
 
-    def _process(self):
+    def _get_form_defaults(self, **kwargs):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
+        return FormDefaults(location_data=inherited_location, **kwargs)
+
+
+class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
+
+    def _get_default_colors(self):
         breaks = Break.query.filter(Break.timetable_entry.has(event_new=self.event_new)).all()
         common_colors = Counter(b.colors for b in breaks)
         most_common = common_colors.most_common(1)
         colors = most_common[0][0] if most_common else get_random_color(self.event_new)
-        defaults = FormDefaults(colors=colors, location_data=inherited_location)
+        return colors
+
+    def _process(self):
+        colors = self._get_default_colors()
+        defaults = self._get_form_defaults(colors=colors)
         form = BreakEntryForm(event=self.event_new, day=self.day, obj=defaults)
         if form.validate_on_submit():
             entry = create_break_entry(self.event_new, form.data)
@@ -58,15 +68,9 @@ class RHLegacyTimetableAddBreak(RHManageTimetableBase):
         return jsonify_form(form, fields=form._display_fields)
 
 
-class RHLegacyTimetableAddContribution(RHManageTimetableBase):
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.day = dateutil.parser.parse(request.args['day']).date()
-
+class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
     def _process(self):
-        inherited_location = self.event_new.location_data
-        inherited_location['inheriting'] = True
-        defaults = FormDefaults(location_data=inherited_location)
+        defaults = self._get_form_defaults()
         form = ContributionEntryForm(event=self.event_new, day=self.day, to_schedule=True, obj=defaults)
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
@@ -75,16 +79,13 @@ class RHLegacyTimetableAddContribution(RHManageTimetableBase):
         return jsonify_form(form, fields=form._display_fields)
 
 
-class RHLegacyTimetableAddSessionBlock(RHManageTimetableBase):
+class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
     def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.day = dateutil.parser.parse(request.args['day']).date()
+        RHLegacyTimetableAddEntryBase._checkParams(self, params)
         self.session = Session.find_one(id=request.args['session'], event_new=self.event_new, is_deleted=False)
 
     def _process(self):
-        inherited_location = self.event_new.location_data
-        inherited_location['inheriting'] = True
-        defaults = FormDefaults(location_data=inherited_location)
+        defaults = self._get_form_defaults()
         form = SessionBlockEntryForm(event=self.event_new, day=self.day, obj=defaults)
         if form.validate_on_submit():
             entry = create_session_block_entry(self.session, form.data)
