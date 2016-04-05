@@ -467,6 +467,15 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             raise ValueError('Exactly one kind of id must be specified')
         return get_related_object(self, 'sessions', criteria)
 
+    def get_session_block(self, id_, scheduled_only=False):
+        """Get a session block of the event"""
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        query = SessionBlock.query.filter(SessionBlock.id == id_,
+                                          SessionBlock.session.has(event_new=self.event_new, is_deleted=False))
+        if scheduled_only:
+            query.filter(SessionBlock.timetable_entry != None)  # noqa
+        return query.first()
+
     @memoize_request
     def has_feature(self, feature):
         """Checks if a feature is enabled for the event"""
