@@ -384,6 +384,6 @@ def _add_timetable_consistency_trigger(target, conn, **kw):
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
-        EXECUTE PROCEDURE events.check_timetable_consistency();
+        EXECUTE PROCEDURE events.check_timetable_consistency('contribution');
     """.format(target.fullname)
     DDL(sql).execute(conn)
