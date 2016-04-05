@@ -13,9 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-import urllib
 from xml.sax.saxutils import quoteattr
 from datetime import datetime
+from flask import session
 from pytz import timezone
 
 import MaKaC.conference as conference
@@ -84,8 +84,10 @@ class WContributionDisplayBase(WICalExportBase):
 
     def _getStatusReviewing(self):
         from MaKaC.paperReviewing import ConferencePaperReview as CPR
-        versioning = self._contrib.getReviewManager().getVersioning()
-        review = self._contrib.getReviewManager().getLastReview()
+        review_manager = self._conf.getReviewManager(self._contrib)
+
+        versioning = review_manager.getVersioning()
+        review = review_manager.getLastReview()
         if self._contrib.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
             if review.getEditorJudgement().isSubmitted():  # editor has accepted or rejected
                 return review.getEditorJudgement().getJudgement()
@@ -190,84 +192,80 @@ class WPContributionDisplay(WPContributionDefaultDisplayBase):
 class WPContributionModifBase(WPConferenceModifBase):
 
     def __init__(self, rh, contribution, **kwargs):
-        WPConferenceModifBase.__init__(self, rh, contribution.getConference(), **kwargs)
+        WPConferenceModifBase.__init__(self, rh, contribution.event_new.as_legacy, **kwargs)
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
-        self._canModify = self._contrib.canModify(rh.getAW()) or (self._contrib.getSession() and self._contrib.getSession().canCoordinate(rh.getAW(), "modifContribs"))
+        self._canModify = (self._contrib.can_manage(session.user) or
+                           (self._contrib.session and
+                            self._contrib.session.can_manage(session.user, role='coordinate')))
 
     def _getEnabledControls(self):
         return False
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._contrib, "isModif": True}
+        pars = {"target": self._conf, "isModif": True}
         return wcomponents.WNavigationDrawer(pars, bgColor="white")
 
     def _createTabCtrl(self):
+        review_manager = self._conf.getReviewManager(self._contrib)
 
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab("main", _("Main"),
-                                             urlHandlers.UHContributionModification.getURL(self._target))
-        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
-                                                     url_for('attachments.management', self._contrib))
-        self._tabSubCont = self._tabCtrl.newTab("subCont", _("Sub Contribution"),
-                                                urlHandlers.UHContribModifSubCont.getURL(self._target))
-        if self._canModify:
-            self._tabAC = self._tabCtrl.newTab("ac", _("Protection"),
-                                               urlHandlers.UHContribModifAC.getURL(self._target))
-            self._tabTools = self._tabCtrl.newTab("tools", _("Tools"),
-                                                  urlHandlers.UHContribModifTools.getURL(self._target))
 
-        hasReviewingEnabled = self._contrib.getConference().hasEnabledSection('paperReviewing')
-        paperReviewChoice = self._contrib.getConference().getConfPaperReview().getChoice()
+        hasReviewingEnabled = self._conf.hasEnabledSection('paperReviewing')
+        paperReviewChoice = self._conf.getConfPaperReview().getChoice()
 
         if hasReviewingEnabled and paperReviewChoice != 1:
-            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
-                self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
-                                                             urlHandlers.UHContributionModifReviewing.getURL(self._target))
+            if self._canModify or self._isPRM or review_manager.isReferee(self._rh._getUser()):
+                self._subtabReviewing = self._tabCtrl.newTab(
+                    "reviewing", _("Paper Reviewing"), url_for('event_mgmt.contributionReviewing', self._target))
             else:
-                if self._contrib.getReviewManager().isEditor(self._rh._getUser()):
-                    self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
-                                                                 urlHandlers.UHContributionEditingJudgement.getURL(self._target))
-                elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
-                    self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
-                                                                 urlHandlers.UHContributionGiveAdvice.getURL(self._target))
+                if review_manager.isEditor(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab(
+                        "reviewing", _("Paper Reviewing"), url_for('event_mgmt.confListContribToJudge-asEditor',
+                                                                   self._target))
+                elif review_manager.isReviewer(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab(
+                        "reviewing", _("Paper Reviewing"), url_for('event_mgmt.confListContribToJudge-asReviewer',
+                                                                   self._target))
 
-            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
-                self._subTabAssign = self._subtabReviewing.newSubTab("assign", _("Assign Team"),
-                                                                     urlHandlers.UHContributionModifReviewing.getURL(self._target))
-                if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (paperReviewChoice == 3 or paperReviewChoice == 1):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab("referee", _("Referee Assessment"),
-                                                                             urlHandlers.UHContributionReviewingJudgements.getURL(self._target))
+            if self._canModify or self._isPRM or review_manager.isReferee(self._rh._getUser()):
+                self._subTabAssign = self._subtabReviewing.newSubTab(
+                    "assign", _("Assign Team"), url_for('event_mgmt.contributionReviewing', self._target))
+                if review_manager.isReferee(self._rh._getUser()) and paperReviewChoice not in (1, 3):
+                    self._subTabJudgements = self._subtabReviewing.newSubTab(
+                        "referee", _("Referee Assessment"), url_for('event_mgmt.confListContribToJudge', self._target))
                 else:
-                    self._subTabJudgements = self._subtabReviewing.newSubTab("Assessments", _("Assessments"),
-                                                                             urlHandlers.UHContributionReviewingJudgements.getURL(self._target))
+                    self._subTabJudgements = self._subtabReviewing.newSubTab(
+                        "Assessments", _("Assessments"), url_for('event_mgmt.confListContribToJudge', self._target))
 
             if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
-               self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
-               not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                self._tabJudgeEditing = self._subtabReviewing.newSubTab("editing", "Assess Layout",
-                                                                        urlHandlers.UHContributionEditingJudgement.getURL(self._target))
+               review_manager.isEditor(self._rh._getUser()) and \
+               not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabJudgeEditing = self._subtabReviewing.newSubTab(
+                    "editing", _("Assess Layout"), url_for('event_mgmt.contributionEditingJudgement', self._target))
 
             if (paperReviewChoice == 2 or paperReviewChoice == 4) and \
-               self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
-               not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                self._tabGiveAdvice = self._subtabReviewing.newSubTab("advice", "Assess Content",
-                                                                      urlHandlers.UHContributionGiveAdvice.getURL(self._target))
+               review_manager.isReviewer(self._rh._getUser()) and \
+               not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabGiveAdvice = self._subtabReviewing.newSubTab(
+                    "advice", _("Assess Content"), url_for('event_mgmt.contributionGiveAdvice', self._target))
 
             if self._canModify or \
                self._isPRM or \
-               self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
-                self._subTabRevMaterial = self._subtabReviewing.newSubTab("revmaterial", _("Material to Review"),
-                                                                          urlHandlers.UHContribModifReviewingMaterials.getURL(self._target))
+               review_manager.isInReviewingTeamforContribution(self._rh._getUser()):
+                self._subTabRevMaterial = self._subtabReviewing.newSubTab(
+                    "revmaterial", _("Material to Review"),
+                    url_for('event_mgmt.contributionReviewing-contributionReviewingMaterials', self._target))
 
             if self._canModify or \
                self._isPRM or \
-               self._contrib.getReviewManager().isReferee(self._rh._getUser()) or \
-               len(self._contrib.getReviewManager().getVersioning()) > 1 or \
-               self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                self._subTabReviewingHistory = self._subtabReviewing.newSubTab("reviewing_history", "History",
-                                                                               urlHandlers.UHContributionModifReviewingHistory.getURL(self._target))
+               review_manager.isReferee(self._rh._getUser()) or \
+               len(review_manager.getVersioning()) > 1 or \
+               review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._subTabReviewingHistory = self._subtabReviewing.newSubTab(
+                    "reviewing_history", _("History"), url_for('event_mgmt.contributionReviewing-reviewingHistory',
+                                                               self._target))
 
         self._setActiveTab()
         self._setupTabCtrl()
@@ -280,22 +278,18 @@ class WPContributionModifBase(WPConferenceModifBase):
 
     @property
     def sidemenu_option(self):
-        return 'timetable' if self._target.isScheduled() else 'contributions'
+        return 'timetable' if self._target.timetable_entry else 'contributions'
 
     def _getPageContent(self, params):
         self._createTabCtrl()
         banner = ""
         if self._canModify or self._isPRM:
-            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
-        else:
             if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
             if self._conf.getConfPaperReview().isReviewerContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
             if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
-        if banner == "":
-            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
 
         body = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
         return banner + body

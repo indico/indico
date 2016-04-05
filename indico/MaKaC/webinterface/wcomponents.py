@@ -779,7 +779,7 @@ class WListOfPapersToReview(WBannerModif):
     def __init__(self, target, user ):
         ## PATH
         # Iterate till conference is reached
-        conf = target.getConference()
+        conf = target.event_new.as_legacy
         if user == "referee":
             path = [{"url": urlHandlers.UHConfModifListContribToJudge.getURL(conf), "title":_("Contributions list")}]
         if user == "reviewer":
@@ -788,7 +788,7 @@ class WListOfPapersToReview(WBannerModif):
             path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf), "title":_("Contributions list")}]
         # TITLE AND TYPE
         itemType = type(target).__name__
-        title = target.getTitle()
+        title = target.title
         WBannerModif.__init__(self, path, itemType, title)
 
 

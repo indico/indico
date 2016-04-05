@@ -50,7 +50,7 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
 
     fossilizes(IReviewManagerFossil)
 
-    def __init__(self, event_id):
+    def __init__(self, contrib_id):
         """ Constructor
             contribution has to be a Contribution object (not an id)
         """
@@ -67,6 +67,7 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             to which the contribution belongs to.
         """
         return self.getConference().getConfPaperReview()
+
 
     #Review methods
     def newReview(self):
@@ -126,14 +127,13 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             raise MaKaCError("This contribution already has a referee")
         else:
             self._referee = referee
-            referee.linkTo(self._contribution, "referee")
-            self.getConfPaperReview().addRefereeContribution(referee, self._contribution)
+            self.getConfPaperReview().addRefereeContribution(referee, self.contribution)
             self.getLastReview().setRefereeDueDate(self.getConfPaperReview().getDefaultRefereeDueDate())
             #e-mail notification will be send when referee is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
-                notification = ContributionReviewingNotification(referee, 'Referee', self._contribution)
+                notification = ContributionReviewingNotification(referee, 'Referee', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._contribution.getConference(),
+                                         self.contribution.getConference(),
                                          'Paper Reviewing')
 
     def removeReferee(self):
@@ -142,17 +142,16 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             The ex-referee is notified by an email.
         """
 
-        self._referee.unlinkTo(self._contribution, "referee")
-        self.getConfPaperReview().removeRefereeContribution(self._referee, self._contribution)
+        self.getConfPaperReview().removeRefereeContribution(self._referee, self.contribution)
         if self.hasEditor():
             self.removeEditor()
         if self.hasReviewers():
             self.removeAllReviewers()
         #e-mail notification will be send when referee is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
-            notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self._contribution)
+            notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self.contribution)
             GenericMailer.sendAndLog(notification,
-                                     self._contribution.getConference(),
+                                     self.contribution.getConference(),
                                      'Paper Reviewing')
         self._referee = None
 
@@ -182,14 +181,13 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             raise MaKaCError("This contribution is already has an editor")
         elif self.hasReferee() or self.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
             self._editor = editor
-            editor.linkTo(self._contribution, "editor")
-            self.getConfPaperReview().addEditorContribution(editor, self._contribution)
+            self.getConfPaperReview().addEditorContribution(editor, self.contribution)
             self.getLastReview().setEditorDueDate(self.getConfPaperReview().getDefaultEditorDueDate())
             #e-mail notification will be send when editor is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
-                notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self._contribution)
+                notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._contribution.getConference(),
+                                         self.contribution.getConference(),
                                          'Paper Reviewing')
         else:
             raise MaKaCError("Please choose a editor before assigning an editor")
@@ -199,12 +197,11 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             There is no 'editor' argument because there is only 1 editor by contribution.
             The ex-editor is notified by an email.
         """
-        self._editor.unlinkTo(self._contribution, "editor")
-        self.getConfPaperReview().removeEditorContribution(self._editor, self._contribution)
+        self.getConfPaperReview().removeEditorContribution(self._editor, self.contribution)
         #e-mail notification will be send when editor is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
-            notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self._contribution)
-            GenericMailer.sendAndLog(notification, self._contribution.getConference(), 'Paper Reviewing')
+            notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self.contribution)
+            GenericMailer.sendAndLog(notification, self.contribution.getConference(), 'Paper Reviewing')
         self._editor = None
 
     def isEditor(self, user):
@@ -228,16 +225,15 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
         elif self.hasReferee():
             self._reviewersList.append(reviewer)
             self.notifyModification()
-            reviewer.linkTo(self._contribution, "reviewer")
-            self.getConfPaperReview().addReviewerContribution(reviewer, self._contribution)
+            self.getConfPaperReview().addReviewerContribution(reviewer, self.contribution)
             self.getLastReview().setReviewerDueDate(self.getConfPaperReview().getDefaultReviewerDueDate())
             if self.getLastReview().getAdviceFrom(reviewer) is None:
                 self.getLastReview().addReviewerJudgement(reviewer)
                 #e-mail notification will be send when reviewer is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self._contribution)
+                notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._contribution.getConference(),
+                                         self.contribution.getConference(),
                                          'Paper Reviewing')
         else:
             raise MaKaCError("Please choose a referee before assigning a reviewer")
@@ -247,29 +243,27 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             The ex-reviewer is notified by an email.
         """
         if reviewer in self._reviewersList:
-            reviewer.unlinkTo(self._contribution, "reviewer")
-            self.getConfPaperReview().removeReviewerContribution(reviewer, self._contribution)
+            self.getConfPaperReview().removeReviewerContribution(reviewer, self.contribution)
             self._reviewersList.remove(reviewer)
             self.notifyModification()
             #e-mail notification will be send when reviewer is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
+                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._contribution.getConference(),
+                                         self.contribution.getConference(),
                                          'Paper Reviewing')
 
     def removeAllReviewers(self):
         """ Removes all the reviewers for this contribution
         """
         for reviewer in self._reviewersList:
-            reviewer.unlinkTo(self._contribution, "reviewer")
-            self.getConfPaperReview().removeReviewerContribution(reviewer, self._contribution)
+            self.getConfPaperReview().removeReviewerContribution(reviewer, self.contribution)
             self.notifyModification()
             #e-mail notification will be send when reviewers are removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
+                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._contribution.getConference(),
+                                         self.contribution.getConference(),
                                          'Paper Reviewing')
         del(self._reviewersList[:])
 

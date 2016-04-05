@@ -26,9 +26,6 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.search import make_participation_from_obj
 
 import MaKaC.conference as conference
-from MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.services.implementation.base import HTMLModificationBase
-from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import AvatarHolder

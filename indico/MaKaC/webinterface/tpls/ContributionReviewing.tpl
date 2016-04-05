@@ -32,7 +32,8 @@
             <td>&nbsp;</td>
             <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
                  <form id="removeRefereeForm" action="${ removeAssignRefereeURL }" method="post">
-                    <input type="submit" id="removeReferee" class=btn value="Remove">
+                     <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
+                     <input type="submit" id="removeReferee" class=btn value="Remove">
                 </form>
             </td>
             </tr>
@@ -65,6 +66,7 @@
          <tr>
             <td>&nbsp;</td>
             <form action="${assignRefereeURL}" method="post">
+            <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
             <% showAssignButton = False %>
             <td width="80%" class='bottom_line' style="padding-top: 10px;">
                 % if CanAssignReferee:
@@ -127,6 +129,7 @@
            <td>&nbsp;</td>
            <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
               <form action="${removeAssignEditingURL}" method="post">
+                  <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
                  <input type="submit" class=btn value="Remove">
                 </form>
            </td>
@@ -152,6 +155,7 @@
             </td>
     </tr>
     <form action="${assignEditingURL}" method="post">
+    <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
     <tr>
         <% showAssignButton = False %>
             % if CanAssignEditorOrReviewers:
@@ -226,6 +230,7 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Content reviewers")}:</span></td>
             % if ContributionReviewManager.hasReviewers():
                 <form action="${removeAssignReviewingURL}" method="post">
+                <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
                 <td width="60%"  class='bottom_line'>
                     <table cellspacing="0" cellpadding="5">
                         <% first = True %>
@@ -276,6 +281,7 @@
             </td>
             </tr>
     <form action="${assignReviewingURL}" method="post">
+    <input type="hidden" name="csrf_token" value="${_session.csrf_token}">
     <tr>
         <% showAssignButton = False %>
             % if CanAssignEditorOrReviewers:

@@ -2959,7 +2959,7 @@ class Conference(CommonObjectBase, Locatable):
         return str(self.__contribGenerator.newCount())
 
     def getReviewManager(self, contrib):
-        return self.getConferencePaperReview().getReviewManager()
+        return self.getConfPaperReview().getReviewManager(contrib)
 
     def hasSomethingOnWeekend(self, day):
         """Checks if the event has a session or contribution on the weekend indicated by `day`.
@@ -6331,11 +6331,6 @@ class Contribution(CommonObjectBase, Locatable):
     def getTimezone(self):
         return self.getConference().getTimezone()
 
-    def getReviewManager(self):
-        if not hasattr(self, "_reviewManager"):
-            self._reviewManager = ReviewManager(self)
-        return self._reviewManager
-
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getAccessController().updateNonInheritingChildren(elem, delete)
         self.notify_protection_to_owner(elem, delete)
@@ -7626,33 +7621,6 @@ class Contribution(CommonObjectBase, Locatable):
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index+1, sb)
                 self.notifyModification(cleanCache = False)
-
-    def setReviewing( self, newReviewing ):
-        if self.getReviewing() != None:
-            raise MaKaCError( _("The reviewing maretial for this contribution has already been set"), _("Contribution"))
-        self.reviewing=newReviewing
-        self.reviewing.setOwner( self )
-        self.notifyModification()
-
-    def removeReviewing( self ):
-        if self.getReviewing() is None:
-            return
-        self.reviewing.delete()
-        self.reviewing.setOwner(None)
-        self.reviewing = None
-        self.notifyModification()
-
-    def recoverReviewing(self, p):
-        self.setReviewing(p)
-        p.recover()
-
-    def getReviewing( self ):
-        try:
-            if self.reviewing:
-                pass
-        except AttributeError, e:
-            self.reviewing = None
-        return self.reviewing
 
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
