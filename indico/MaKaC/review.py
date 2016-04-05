@@ -545,7 +545,7 @@ class AbstractTextField(AbstractField):
         if self._maxLength != 0:
             if self._limitation == "words" and wordsCounter(str(content)) > self._maxLength:
                 errors.append(_("The field '%s' cannot be more than %s words") % (self._caption, self._maxLength))
-            elif self._limitation == "chars" and len(content) > self._maxLength:
+            elif self._limitation == "chars" and len(content.replace('\r\n', '\n')) > self._maxLength:
                 errors.append(_("The field '%s' cannot be more than %s characters") % (self._caption, self._maxLength))
 
         return errors
