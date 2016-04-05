@@ -8,7 +8,7 @@
 {% macro render_contribution_list(event, timezone, contributions, with_session_info=true) %}
     {% for contrib in contributions -%}
         <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
-            <div class="contrib-title info" data-searchable="{{ contrib.title }}">
+            <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
                 <span class="value">
                     <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
                 </span>
@@ -20,19 +20,19 @@
                 </div>
             {%- endif %}
             {% if contrib.track -%}
-                <div class="info" data-searchable="{{ contrib.track.title }}">
+                <div class="info" data-searchable="{{ contrib.track.title|lower }}">
                     <span class="label">{% trans %}Track:{% endtrans %}</span>
                     <span class="value">{{ contrib.track.title }}</span>
                 </div>
             {%- endif %}
             {% if contrib.type -%}
-                <div class="info" data-searchable="{{ contrib.type.name }}">
+                <div class="info" data-searchable="{{ contrib.type.name|lower }}">
                     <span class="label">{% trans %}Type:{% endtrans %}</span>
                     <span class="value">{{ contrib.type.name }}</span>
                 </div>
             {%- endif %}
             {% if contrib.session and with_session_info -%}
-                <div class="info" data-searchable="{{ contrib.session.title }}">
+                <div class="info" data-searchable="{{ contrib.session.title|lower }}">
                     <span class="label">{% trans %}Session:{% endtrans %}</span>
                     <span class="value">
                         <a href="{{ url_for('sessions.display_session', contrib.session) }}">{{ contrib.session.title }}</a>

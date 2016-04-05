@@ -33,7 +33,8 @@
         if ((m = term.match(/^#(\d+)$/))) {
             $visibleEntries = $('[data-friendly-id="' + m[1] + '"]');
         } else {
-            $visibleEntries = $contributions.find('[data-searchable*="' + term + '"]').closest(searchBoxConfig.itemHandle);
+            $visibleEntries = $contributions.find('[data-searchable*="' + term.toLowerCase() + '"]')
+                                            .closest(searchBoxConfig.itemHandle);
         }
 
         if ($visibleEntries.length === 0) {
