@@ -70,7 +70,7 @@ class SessionProtectionForm(IndicoForm):
 
 
 class SessionBlockForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_('Title of the session block'))
+    title = StringField(_('Title'), description=_('Title of the session block'))
     person_links = SessionBlockPersonLinkListField(_('Conveners'))
     location_data = IndicoLocationField(_('Location'))
 
