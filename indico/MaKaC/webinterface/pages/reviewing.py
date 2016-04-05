@@ -372,6 +372,7 @@ class WConfListContribToJudge(wcomponents.WTemplated):
 
         vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
+        vars["conf"] = self._conf
 
         return vars
 
@@ -474,13 +475,16 @@ class WConfReviewingAssignContributions(wcomponents.WTemplated):
         return wcomponents.WTemplated.getHTML(self)
 
     def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars( self )
 
-        vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfPaperReview()
-        vars["IsOnlyReferee"] = self._conf.getConfPaperReview().isReferee(self._aw.getUser()) and not self._conf.canModify(self._aw) and not self._conf.getConfPaperReview().isPaperReviewManager(self._aw.getUser())
+        wvars["Conference"] = self._conf
+        wvars['event'] = self._conf.as_event
+        wvars["ConfReview"] = self._conf.getConfPaperReview()
+        wvars["IsOnlyReferee"] = (self._conf.getConfPaperReview().isReferee(self._aw.getUser()) and
+                                  not self._conf.canModify(self._aw) and
+                                  not self._conf.getConfPaperReview().isPaperReviewManager(self._aw.getUser()))
 
-        return vars
+        return wvars
 
 #classes for user competences tab
 class WPConfModifUserCompetences(WPConfModifReviewingBase):

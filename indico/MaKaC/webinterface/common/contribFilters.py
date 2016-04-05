@@ -27,12 +27,12 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if self._conf.as_event.contribution_types.count() == len(self._values) and contribution.getType():
+        if self._conf.as_event.contribution_types.count() == len(self._values) and contribution.type:
             return True
-        elif contribution.getType() is None:
+        elif contribution.type is None:
             return self._showNoValue
         else:
-            return contribution.getType().getId() in self._values
+            return contribution.type.id in self._values
 
 
 class TrackFilterField( filters.FilterField ):
@@ -50,10 +50,10 @@ class TrackFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getTrackList()) == len(self._values) and contribution.getTrack():
+        if len(self._conf.getTrackList()) == len(self._values) and contribution.track:
             return True
-        elif contribution.getTrack():
-            if contribution.getTrack().getId() in self._values:
+        elif contribution.track:
+            if contribution.track.getId() in self._values:
                 return True
         else:
             return self._showNoValue
@@ -75,10 +75,10 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getSessionList()) == len(self._values) and contribution.getSession():
+        if len(self._conf.sessions) == len(self._values) and contribution.session:
             return True
-        elif contribution.getSession():
-            if contribution.getSession().getId() in self._values:
+        elif contribution.session:
+            if contribution.session.id in self._values:
                 return True
         else:
             return self._showNoValue
@@ -260,7 +260,7 @@ class MaterialSubmittedFilterField( filters.FilterField ):
     _id = "materialsubmitted"
 
     def satisfies( self, contribution ):
-        review = self._conf.getReviewManager(contribution)
+        review = self._conf.getReviewManager(contribution).getLastReview()
         if self._values[0] and review.isAuthorSubmitted():
             return True
         elif review.isAuthorSubmitted():
@@ -289,11 +289,11 @@ class NumberSF( filters.SortingField ):
 
     def compare( self, c1, c2 ):
         try:
-            n1 = int(c1.getId())
-            n2 = int(c2.getId())
-            return cmp(n1,n2)
+            n1 = int(c1.id)
+            n2 = int(c2.id)
+            return cmp(n1, n2)
         except ValueError, e:
-            return cmp( c1.getId(), c2.getId() )
+            return cmp(c1.id, c2.id)
 
 
 class DateSF( filters.SortingField ):

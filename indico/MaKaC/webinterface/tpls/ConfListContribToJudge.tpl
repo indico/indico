@@ -1,6 +1,5 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.timezoneUtils import nowutc %>
-<% from MaKaC.conference import ContribStatusNone %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
@@ -18,20 +17,20 @@
     </tr>
 
     % for c in ConfReview.getJudgedContributions(User):
-        % if not isinstance(c.getStatus(), ContribStatusNone):
+        <% review_manager = conf.getReviewManager(c) %>
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
-            <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
+            <td style="padding-right:5px;padding-left:5px;">${ c.friendly_id }</td>
             <td style="padding-right:5px;padding-left:5px;">
                 <a href="${ url_for('event_mgmt.contributionReviewing-contributionReviewingJudgements', c) }">
-                    ${ c.getTitle() }
+                    ${ c.title }
                 </a>
             </td>
             <td style="padding-right:5px;padding-left:5px;">
-                ${_("Review {0}").format(len(c.getReviewManager().getVersioning()))}
+                ${_("Review {0}").format(len(review_manager.getVersioning()))}
             </td>
             <td style="padding-right:5px;padding-left:5px;">
-            % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                <% assessment = c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %>
+            % if review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                <% assessment = review_manager.getLastReview().getRefereeJudgement().getJudgement() %>
                 <%
                     if assessment == 'Accept':
                         assessment_color = '#118822'
@@ -41,14 +40,14 @@
                         assessment_color = 'orange'
                 %>
                 <span style="color:${assessment_color}">${ _("Assessed: ") + assessment }</span>
-            % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
-                % if len(c.getReviewManager().getVersioning()) > 1:
+            % elif not review_manager.getLastReview().isAuthorSubmitted():
+                % if len(review_manager.getVersioning()) > 1:
                     <span style="color:orange;">${ _("Author has yet to re-submit paper") }</span>
                 % else:
                     <span>${ _("Paper not yet submitted")}</span>
                 % endif
             % else:
-                % if len(c.getReviewManager().getVersioning()) > 1:
+                % if len(review_manager.getVersioning()) > 1:
                     <span style="color:#D18700;">
                         ${ _("Author has re-submitted paper")}
                     </span><br/>
@@ -58,14 +57,14 @@
                     <br>
                 </span>
                 <ul style="margin:0px;padding-left:30px">
-                % for status in (c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)):
+                % for status in (review_manager.getLastReview().getReviewingStatus(forAuthor = False)):
                     <li>${status}</li>
                 % endfor
                 </ul>
             % endif
             </td>
             <td style="padding-right:5px;padding-left:5px;" onmouseover="this.style.borderColor='#ECECEC'" onmouseout="this.style.borderColor='transparent'">
-                <% date = c.getReviewManager().getLastReview().getAdjustedRefereeDueDate() %>
+                <% date = review_manager.getLastReview().getAdjustedRefereeDueDate() %>
                 % if date is None:
                     ${ _("Deadline not set.")}
                 % else:
@@ -73,7 +72,6 @@
                 % endif
             </td>
         </tr>
-        % endif
     % endfor
 </table>
 <br>

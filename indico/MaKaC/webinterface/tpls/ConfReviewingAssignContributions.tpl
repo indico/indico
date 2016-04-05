@@ -8,7 +8,7 @@
 % if not ConfReview.hasReviewing():
 <p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not yet been chosen. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % else:
-% if len(Conference.getContributionListSorted()) == 0:
+% if not event.contributions:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
 %else:
 <table style="margin-left:20px;">
@@ -28,7 +28,7 @@
            </div>
         </td>
         <td align="bottom" style="padding-top:27px;">
-            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSorted()) }</span>
+            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(event.contributions) }</span>
             <span>${_(" )")}</span>
             </div>
         </td>
@@ -65,8 +65,8 @@
                     </tr>
                     % for type in self_._conf.getContribTypeList():
                         <tr>
-                            <td><input type="checkbox" name="selTypes" value="${type.getId()}" checked></td>
-                            <td>${ type.getName() }</td>
+                            <td><input type="checkbox" name="selTypes" value="${type.id}" checked></td>
+                            <td>${ type.name }</td>
                         </tr>
                     % endfor
                 </table>
@@ -476,7 +476,7 @@ var contributionTemplate = function(contribution) {
 
     // Cell2: contribution id
     var cell2 = Html.td({className:'contributionDataCell',style:{"textAlign":"center", "width":"0px"}});
-    cell2.set(contribution.id)
+    cell2.set(contribution.friendly_id)
     row.append(cell2);
 
     // Cell3: contribution title
@@ -484,7 +484,7 @@ var contributionTemplate = function(contribution) {
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
     var url_template = ${ url_rule_to_js('event_mgmt.contributionReviewing') | n,j };
-    var linkString = build_url(url_template, {contribId: contribution.id, confId: ${ Conference.getId() | n,j}});
+    var linkString = build_url(url_template, {contrib_id: contribution.id, confId: ${ Conference.getId() | n,j}});
     var link = Html.a({href: linkString});
     link.set(contribution.title);
     cell3.set(link);

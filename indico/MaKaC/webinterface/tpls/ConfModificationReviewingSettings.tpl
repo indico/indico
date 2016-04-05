@@ -573,19 +573,19 @@ var showEditingCriteria = function() {
 var showDefaultRefereeDate = function() {
     $('#inPlaceEditDefaultRefereeDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
             {conference: '${ ConfReview.getConference().getId() }',
-             dueDateToChange: 'Referee'}, ${ConfReview.getAdjustedDefaultRefereeDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
+             dueDateToChange: 'Referee'}, ${ConfReview.getAdjustedDefaultRefereeDueDate() | n,j}, ${bool(ConfReview.getConference().as_event.contributions)| n,j}).draw().dom);
 }
 
 var showDefaultEditorDate = function() {
     $('#inPlaceEditDefaultEditorDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
             {conference: '${ ConfReview.getConference().getId() }',
-             dueDateToChange: 'Editor'}, ${ConfReview.getAdjustedDefaultEditorDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
+             dueDateToChange: 'Editor'}, ${ConfReview.getAdjustedDefaultEditorDueDate() | n,j}, ${bool(ConfReview.getConference().as_event.contributions)| n,j}).draw().dom);
 }
 
 var showDefaultReviewerDate = function() {
     $('#inPlaceEditDefaultReviewerDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
         {conference: '${ ConfReview.getConference().getId() }',
-    dueDateToChange: 'Reviewer'}, ${ConfReview.getAdjustedDefaultReviewerDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
+    dueDateToChange: 'Reviewer'}, ${ConfReview.getAdjustedDefaultReviewerDueDate() | n,j}, ${bool(ConfReview.getConference().as_event.contributions)| n,j}).draw().dom);
 }
 
 

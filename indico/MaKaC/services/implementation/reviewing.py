@@ -52,6 +52,7 @@ class ConferenceReviewingBase(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
+        self._event = self._target.as_event
         self._confPaperReview = self._conf.getConfPaperReview()
         self._confAbstractReview = self._conf.getConfAbstractReview()
 
@@ -81,8 +82,9 @@ class ConferenceReviewingAssignStaffBase(ConferenceReviewingBase, UserModificati
         ConferenceReviewingBase._checkParams(self)
         if self._params.has_key('contributions'):
             pm = ParameterManager(self._params)
-            contributionsIds = pm.extract("contributions", pType=list, allowEmpty=False)
-            self._contributions = [self._conf.getContributionById(contributionId) for contributionId in contributionsIds]
+            contributionsIds = [int(c) for c in pm.extract("contributions", pType=list, allowEmpty=False)]
+            self._contributions = [contrib for contrib in self._event.contributions
+                                   if contrib.id in contributionsIds]
         else:
             raise ServiceError("ERR-REV2",_("List of contribution ids not set"))
 
@@ -387,24 +389,24 @@ class ConferenceReviewingContributionsAttributeList(ListModificationBase, Confer
 
     def _handleGet(self):
         attributes = []
-        for c in self._conf.getContributionList():
+        for c in self._event.contributions:
             if self._attribute == 'type':
-                if c.getType() is not None and c.getType() not in attributes:
-                    attributes.append(c.getType())
+                if c.type is not None and c.type not in attributes:
+                    attributes.append(c.type)
             elif self._attribute == 'track':
-                if c.getTrack() is not None and c.getTrack() not in attributes:
-                    attributes.append(c.getTrack())
+                if c.track is not None and c.track not in attributes:
+                    attributes.append(c.track)
             elif self._attribute == 'session':
-                if c.getSession() is not None and c.getSession() not in attributes:
-                    attributes.append(c.getSession())
+                if c.session is not None and c.session not in attributes:
+                    attributes.append(c.session)
             else:
                 raise ServiceError("ERR-REV5",_("No attribute specified"))
 
         if self._attribute == 'type':
-            return [{"id": attribute.getId(), "title": attribute.getName()}
+            return [{"id": attribute.id, "title": attribute.name}
                 for attribute in attributes]
         else:
-            return [{"id": attribute.getId(), "title": attribute.getTitle()}
+            return [{"id": attribute.id, "title": attribute.title}
                 for attribute in attributes]
 
 class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
@@ -426,20 +428,20 @@ class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationB
 
     def _handleGet(self):
         contributionsPerSelectedAttribute = []
-        for c in self._conf.getContributionList():
+        for c in self._event.contributions:
             for att in self._selectedAttribute:
                 if self._attribute == 'type':
-                    if c.getType() is not None and c.getId() not in contributionsPerSelectedAttribute:
-                        if c.getType().getId() == att:
-                            contributionsPerSelectedAttribute.append(c.getId())
+                    if c.type is not None and c.id not in contributionsPerSelectedAttribute:
+                        if str(c.type.id) == att:
+                            contributionsPerSelectedAttribute.append(c.id)
                 elif self._attribute == 'track':
-                    if c.getTrack() is not None and c.getId() not in contributionsPerSelectedAttribute:
-                        if c.getTrack().getId() == att:
-                            contributionsPerSelectedAttribute.append(c.getId())
+                    if c.track is not None and c.id not in contributionsPerSelectedAttribute:
+                        if str(c.track.id) == att:
+                            contributionsPerSelectedAttribute.append(c.id)
                 elif self._attribute == 'session':
-                    if c.getSession() is not None and c.getId() not in contributionsPerSelectedAttribute:
-                        if c.getSession().getId() == att:
-                            contributionsPerSelectedAttribute.append(c.getId())
+                    if c.session is not None and c.id not in contributionsPerSelectedAttribute:
+                        if str(c.session.id) == att:
+                            contributionsPerSelectedAttribute.append(c.id)
                 else:
                     raise ServiceError("ERR-REV5",_("No attribute specified"))
 

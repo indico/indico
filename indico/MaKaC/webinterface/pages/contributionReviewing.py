@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
+from indico.web.flask.util import url_for
 
+import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.contributions import WPContributionModifBase
 
 class WPContributionReviewing( WPContributionModifBase ):
@@ -29,13 +29,13 @@ class WPContributionReviewing( WPContributionModifBase ):
         self._subtabReviewing.setActive()
 
     def _getTabContent( self, params ):
-        wc = WContributionReviewing(self._target.getConference(), self._aw)
-        assignRefereeURL = urlHandlers.UHAssignReferee.getURL(self._target)
-        removeAssignRefereeURL = urlHandlers.UHRemoveAssignReferee.getURL(self._target)
-        assignEditingURL = urlHandlers.UHAssignEditing.getURL(self._target)
-        removeAssignEditingURL = urlHandlers.UHRemoveAssignEditing.getURL(self._target)
-        assignReviewingURL = urlHandlers.UHAssignReviewing.getURL(self._target)
-        removeAssignReviewingURL = urlHandlers.UHRemoveAssignReviewing.getURL(self._target)
+        wc = WContributionReviewing(self._conf, self._aw)
+        assignRefereeURL = url_for('event_mgmt.contributionReviewing-assignReferee', self._target)
+        removeAssignRefereeURL = url_for('event_mgmt.contributionReviewing-removeAssignReferee', self._target)
+        assignEditingURL = url_for('event_mgmt.contributionReviewing-assignEditing', self._target)
+        removeAssignEditingURL = url_for('event_mgmt.contributionReviewing-removeAssignEditing', self._target)
+        assignReviewingURL = url_for('event_mgmt.contributionReviewing-assignReviewing', self._target)
+        removeAssignReviewingURL = url_for('event_mgmt.contributionReviewing-removeAssignReviewing', self._target)
 
         return wc.getHTML(self._target, assignRefereeURL, removeAssignRefereeURL, assignEditingURL, removeAssignEditingURL, assignReviewingURL, removeAssignReviewingURL)
 
@@ -95,7 +95,7 @@ class WPContributionReviewingJudgements( WPContributionModifBase ):
 
 
     def _getTabContent( self, params ):
-        wc = WContributionReviewingJudgements(self._target.getConference(), self._aw)
+        wc = WContributionReviewingJudgements(self._target.event_new.as_legacy, self._aw)
         return wc.getHTML(self._target)
 
 class WPContributionModifReviewingMaterials( WPContributionModifBase ):
@@ -251,7 +251,7 @@ class WContributionReviewingHistory(WContributionReviewingBase):
 
     def __init__(self, contribution):
         self._contribution = contribution
-        self._conf = contribution.getConference()
+        self._conf = contribution.event_new.as_legacy
 
     def getHTML( self, params ):
 

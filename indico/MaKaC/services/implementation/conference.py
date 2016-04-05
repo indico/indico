@@ -32,6 +32,7 @@ from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
 from MaKaC.common import indexes, filters
+from MaKaC.common.Conversion import Conversion
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -40,6 +41,7 @@ from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
 from MaKaC.fossils.contribution import IContributionFossil
+from MaKaC.fossils.reviewing import IReviewManagerFossil
 
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
@@ -59,6 +61,26 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
+
+
+def _serialize_contribution(contrib):
+    return {
+        'id': contrib.id,
+        'friendly_id': contrib.friendly_id,
+        'contributionId': contrib.id,
+        'title': contrib.title,
+        'location': contrib.venue_name,
+        'room': contrib.room_name,
+        'startDate': Conversion.datetime(contrib.start_dt),
+        'endDate': Conversion.datetime(contrib.end_dt),
+        'duration': Conversion.duration(contrib.duration),
+        'description': contrib.description,
+        'track': contrib.track.getTitle() if contrib.track else None,
+        'session': contrib.session.title if contrib.session else None,
+        'type': contrib.type.name if contrib.type else None,
+        'address': contrib.address,
+        'reviewManager': fossilize(contrib.event_new.as_legacy.getReviewManager(contrib), IReviewManagerFossil)
+    }
 
 
 class ConferenceBase:
@@ -505,7 +527,7 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
             ProtectedModificationService._checkProtection(self)
 
     def _handleGet(self):
-        contributions = self._conf.getContributionList()
+        contributions = self._conf.as_event.contributions
 
         filter = {}
 
@@ -545,7 +567,7 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
         f = filters.SimpleFilter(filterCrit, sortingCrit)
         contributions = f.apply(contributions)
 
-        return fossilize(contributions, IContributionFossil)
+        return [_serialize_contribution(contrib) for contrib in contributions]
 
 
 class ConferenceDeleteContributions (ConferenceModifBase):

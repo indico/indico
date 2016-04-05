@@ -14,22 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from BTrees.IOBTree import IOBTree
-from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.webinterface import urlHandlers
-from MaKaC.common.mail import GenericMailer
-from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
-from datetime import datetime
-from persistent import Persistent
-from MaKaC.errors import MaKaCError
 import tempfile
+from datetime import datetime
+
+from persistent import Persistent
+from BTrees.IOBTree import IOBTree
+
 from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.events.paper_reviewing.legacy import ConferencePaperReviewLegacyMixin
+
 import conference
 from MaKaC.common.Counter import Counter
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.common.mail import GenericMailer
+from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
+from MaKaC.errors import MaKaCError
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
-from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.mail import GenericNotification
 
-from indico.modules.events.paper_reviewing.legacy import ConferencePaperReviewLegacyMixin
 
 ###############################################
 # Conference-wide classes
@@ -114,7 +118,7 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
         return self._conference
 
     def getReviewManager(self, contribution):
-        return self._contribution_index[contribution.friendly_id]
+        return self._contribution_index[contribution.id]
 
     def setStartSubmissionDate(self, startSubmissionDate):
         self._startSubmissionDate= datetime(startSubmissionDate.year,startSubmissionDate.month,startSubmissionDate.day,23,59,59)

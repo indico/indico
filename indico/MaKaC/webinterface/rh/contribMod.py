@@ -74,13 +74,13 @@ class RCContributionPaperReviewingStaff(object):
         confPaperReview = request._target.getConference().getConfPaperReview()
         paperReviewChoice = confPaperReview.getChoice()
         if contribution:
-            reviewManager = contribution.getReviewManager()
+            reviewManager = confPaperReview.getReviewManager(contribution)
         else:
-            reviewManager = request._target.getReviewManager()
+            reviewManager = confPaperReview.getReviewManager(request.contrib)
         return (confPaperReview.isPaperReviewManager(user) or \
                (reviewManager.hasReferee() and reviewManager.isReferee(user)) or \
                ((paperReviewChoice == 3 or paperReviewChoice == 4) and reviewManager.hasEditor() and reviewManager.isEditor(user)) or \
-               (includingContentReviewer and ((paperReviewChoice == 2 or paperReviewChoice == 4) and request._target.getReviewManager().isReviewer(user))))
+               (includingContentReviewer and ((paperReviewChoice == 2 or paperReviewChoice == 4) and reviewManager.isReviewer(user))))
 
 class RCContributionReferee(object):
     @staticmethod
@@ -88,7 +88,7 @@ class RCContributionReferee(object):
         """ Returns true if the user is a referee of the target contribution
         """
         user = request.getAW().getUser()
-        reviewManager = request._target.getReviewManager()
+        reviewManager = request.contrib.event_new.as_legacy.getReviewManager(request.contrib)
         return reviewManager.hasReferee() and reviewManager.isReferee(user)
 
 class RCContributionEditor(object):
@@ -117,16 +117,6 @@ class RHContribModifBaseSpecialSesCoordRights(RHContribModifBase):
     def _checkProtection(self):
         if not RCSessionCoordinator.hasRights(self):
             RHContribModifBase._checkProtection(self)
-
-class RHContribModifBaseReviewingStaffRights(RHContribModifBase):
-    """ Base class for any RH where a member of the Paper Reviewing staff
-        (a PRM, or a Referee / Editor / Reviewer of the target contribution)
-        has the rights to perform the request
-    """
-
-    def _checkProtection(self):
-        if not RCContributionPaperReviewingStaff.hasRights(self):
-            RHContribModifBase._checkProtection(self);
 
 class RHContribModifBaseSpecialSesCoordAndReviewingStaffRights(RHContribModifBase):
     """ Base class for any RH where a member of the Paper Reviewing staff
