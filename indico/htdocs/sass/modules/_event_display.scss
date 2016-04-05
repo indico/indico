@@ -265,47 +265,41 @@ li > table + .note-area-wrapper {
     white-space: pre-wrap;
 }
 
-.contribution-list {
-    @include border-top();
+.speaker-list {
+    @extend %font-family-modern-body;
+    color: $black;
 
-    .contribution-row {
-        &:not(:last-child) {
-            @include border-bottom();
+    .speaker-item {
+        &:before {
+            vertical-align: middle;
+            color: $dark-blue;
+            margin-right: 0.2em;
         }
 
-        padding: 10px;
+        display: block;
 
-        .info {
-            margin: 5px 0;
+        span {
+            vertical-align: middle;
+        }
 
-            .label {
-                font-weight: bold;
-            }
-
-            .value {
+        .affiliation {
+            color: $dark-gray;
+            font-size: 0.8em;
+            .text {
                 display: inline-block;
-                word-wrap: normal;
-                word-break: break-all;
-
-                .session-bg-color {
-                    display: inline-block;
-                    width: 10px;
-                    height: 10px;
-                }
-            }
-
-            &.contrib-speakers {
-                text-align: right;
-                margin-top: 15px;
-
-                .label {
-                    font-weight: normal;
-                }
+                max-width: 10em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }
-}
 
+    .speaker-item-inline {
+        @extend .speaker-item;
+        display: inline-block;
+    }
+}
 
 .author-info {
     table-layout: auto;

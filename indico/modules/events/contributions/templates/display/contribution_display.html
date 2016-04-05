@@ -1,10 +1,59 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'attachments/_attachments.html' import render_attachments %}
-{% from 'events/display/indico/_common.html' import render_location %}
+{% from 'events/display/indico/_common.html' import render_location, render_users %}
+
+{% macro _render_field_value(field_value) -%}
+    {% set field = field_value.contribution_field %}
+    <dt>{{ field.title }}</dt>
+    <dd>
+        {% if field.field_type == 'text' %}
+            {{ field_value.data }}
+        {% elif field.field_type == 'single_choice' %}
+            {{ field_value.friendly_data }}
+        {% endif %}
+    </dd>
+{%- endmacro %}
 
 {% block title -%}
     {{ contribution.title }}
+{%- endblock %}
+
+{% block description -%}
+    <div>
+        <div class="right">
+            {% if contribution.type -%}
+                <span class="contrib-type">
+                    {{ contribution.type.name }}
+                </span>
+            {%- endif %}
+            {% if contribution.track -%}
+                <span class="icon-stack contrib-track">
+                    {{ contribution.track.getTitle() }}
+                </span>
+            {%- endif %}
+            {% if contribution.session -%}
+                <span class="contrib-session" style="{{ contribution.session.colors.css }}">
+                    <a href="{{ url_for('sessions.display_session', contribution.session) }}"
+                       style="color: #{{ contribution.session.colors.text }}">{{ contribution.session.title }}</a>
+                </span>
+            {%- endif %}
+        </div>
+        <div class="time-data">
+            <span class="time-info icon-time">
+                {% if contribution.timetable_entry -%}
+                    {{ contribution.timetable_entry.start_dt|format_datetime }}
+                {%- else -%}
+                    {% trans %}Not scheduled{% endtrans %}
+                {%- endif %}
+            </span>
+        </div>
+        {% if contribution.has_location_info %}
+            <div class="location-data">
+                {{ render_location(contribution, class='contribution-location') }}
+            </div>
+        {% endif %}
+    </div>
 {%- endblock %}
 
 {% block page_actions -%}
@@ -34,119 +83,78 @@
 {%- endblock %}
 
 {% block content -%}
-    {# TODO: Add abstract related info #}
     <div id="contribution-display">
-        <div class="infogrid condensed">
-            <div class="infoline">
-                <i class="icon-time"></i>
-                <div class="text">
-                    <div>
-                        <span>
-                            {% if contribution.timetable_entry -%}
-                                {{ contribution.timetable_entry.start_dt|format_datetime }}
-                            {%- else -%}
-                                {% trans %}Not scheduled yet{% endtrans %}
-                            {%- endif %}
-                        </span>
-                    </div>
-                    {% if contribution.duration -%}
-                        <div>
-                            <span>
-                                {{ contribution.duration|format_human_timedelta }}
-                            </span>
-                        </div>
-                    {%- endif %}
-                </div>
+        {% if contribution.speakers %}
+            <h3>
+                {%- trans count=contribution.speakers|length -%}
+                    Speaker
+                {%- pluralize -%}
+                    Speakers
+                {%- endtrans -%}
+            </h3>
+            <div class="speaker-list">
+                {{ render_users(contribution.speakers|sort(attribute='full_name'),
+                                span_class='speaker-item icon-user', separator='') }}
             </div>
-            {% if contribution.has_location_info %}
-                <div class="infoline">
-                    <div class="text">
-                        {{ render_location(contribution, class='contribution-location') }}
-                    </div>
+        {% endif %}
+
+        {% if contribution.description %}
+            <h3>{% trans %}Description{% endtrans %}</h3>
+            <div class="description">
+                {{ contribution.description | markdown }}
+            </div>
+        {% endif %}
+
+        {% for field_value in contribution.field_values %}
+            {% set field = field_value.contribution_field %}
+            {% if field.field_type == 'text' and field.field_data.multiline %}
+                <h3>{{ field.title }}</h3>
+                <div id="field-{{ field.id }}">
+                    {{ field_value.data | markdown }}
                 </div>
             {% endif %}
-        </div>
-        <div class="toolbar">
-            {% if contribution.track -%}
-                <span class="icon-stack contrib-track">
-                    {{ contribution.track.getTitle() }}
-                </span>
-            {%- endif %}
-            {% if contribution.session -%}
-                <span class="icon-star contrib-session" style="{{ contribution.session.colors.css }}">
-                    <a href="{{ url_for('sessions.display_session', contribution.session) }}"
-                       style="color: #{{ contribution.session.colors.text }}">{{ contribution.session.title }}</a>
-                </span>
-            {%- endif %}
-            {% if contribution.type -%}
-                <span class="contrib-type">
-                    {{ contribution.type.name }}
-                </span>
-            {%- endif %}
-        </div>
+        {% endfor %}
+
+        <dl id="other-fields">
+            {% for field_value in contribution.field_values %}
+                {% set field = field_value.contribution_field %}
+                {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
+                    {{ _render_field_value(field_value) }}
+                {% endif %}
+            {% endfor %}
+        </dl>
 
         <div class="infogrid condensed">
             {% if contribution.primary_authors %}
                 <div class="infoline">
-                    <div class="text">
-                        <h3>
-                            {% trans count=contribution.primary_authors|length -%}
-                                Primary author
-                            {%- pluralize -%}
-                                Primary authors
-                            {%- endtrans %}
-                        </h3>
-                        <ul>
-                            {% for author in contribution.primary_authors -%}
-                                <li class="icon-user">
-                                    <a href="{{ url_for('.display_author', author) }}">
-                                        {{- author.full_name -}}
-                                    </a>{% if author.affiliation %} ({{ author.affiliation }}){% endif %}
-                                </li>
-                            {%- endfor %}
-                        </ul>
+                    <h3>
+                        {% trans count=contribution.primary_authors|length -%}
+                            Primary author
+                        {%- pluralize -%}
+                            Primary authors
+                        {%- endtrans %}
+                    </h3>
+
+                    <div class="speaker-list">
+                        {{ render_users(contribution.primary_authors,
+                                        span_class='speaker-item icon-user', separator='') }}
                     </div>
                 </div>
             {% endif %}
+
             {% if contribution.secondary_authors %}
                 <div class="infoline">
-                    <div class="text">
-                        <h3>
-                            {% trans count=contribution.secondary_authors -%}
-                                Co-author
-                            {%- pluralize -%}
-                                Co-authors
-                            {%- endtrans %}
-                        </h3>
-                        <ul>
-                            {% for coauthor in contribution.secondary_authors -%}
-                                <li class="icon-user">
-                                    <a href="{{ url_for('.display_author', coauthor) }}">
-                                        {{ coauthor.full_name }}
-                                    </a>{% if coauthor.affiliation %} ({{ coauthor.affiliation }}){% endif %}
-                                </li>
-                            {%- endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
-            {% if contribution.speakers %}
-                <div class="infoline">
-                    <div class="text">
-                        <h3>
-                            {% trans count=contribution.speakers -%}
-                                Speaker
-                            {%- pluralize -%}
-                                Speakers
-                            {%- endtrans %}
-                        </h3>
-                        <ul>
-                            {% for speaker in contribution.speakers -%}
-                                <li class="icon-user">
-                                    {{ speaker.full_name }}
-                                </li>
-                            {%- endfor %}
-                        </ul>
+                    <h3>
+                        {% trans count=contribution.secondary_authors -%}
+                            Co-author
+                        {%- pluralize -%}
+                            Co-authors
+                        {%- endtrans %}
+                    </h3>
+
+                    <div class="speaker-list">
+                        {{ render_users(contribution.secondary_authors,
+                                        span_class='speaker-item icon-user', separator='') }}
                     </div>
                 </div>
             {% endif %}
@@ -156,7 +164,7 @@
             <div class="i-box titled no-padding">
                 <div class="i-box-header">
                     <div class="i-box-title icon-attachment">
-                        {% trans %}Materials{% endtrans %}
+                        {% trans %}Presentation Materials{% endtrans %}
                     </div>
                     <div class="i-box-buttons toolbar right">
                         <div class="group">

@@ -53,7 +53,9 @@
         {%- if use_span -%}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
                 {% if link.title and title -%}
-                    {{ link.title }}
+                    <span class="speaker-title">
+                        {{ link.title }}
+                    </span>
                 {%- endif %}
                 <span itemprop="givenName">{{ link.first_name }}</span>
                 <span itemprop="lastName">{{ link.last_name }}</span>
@@ -61,13 +63,17 @@
             {{ link.first_name }} {{ link.last_name }}
         {% endif %}
         {% if link.affiliation %}
-            <span class="affiliation">(
-            {%- if italic_affiliation -%}
-                <em>{{ link.affiliation }}</em>
-            {%- else -%}
-                {{ link.affiliation }}
-            {%- endif -%}
-            )</span>
+            <span class="affiliation">
+                ({#- -#}
+                <span class="text">
+                    {%- if italic_affiliation -%}
+                        <em>{{ link.affiliation }}</em>
+                    {%- else -%}
+                        {{ link.affiliation }}
+                    {%- endif -%}
+                </span>
+                {#- -#})
+            </span>
         {% endif %}
         {% if not loop.last %}
             {{ separator }}
