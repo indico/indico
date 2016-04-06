@@ -524,7 +524,11 @@ class RH(RequestHandlerBase):
     @jsonify_error
     def _processNoReportError(self, e):
         """Process errors without reporting"""
+        return errors.WPNoReportError(self, e).display()
 
+    @jsonify_error(status=400)
+    def _processUserValueError(self, e):
+        """Process errors without reporting"""
         return errors.WPNoReportError(self, e).display()
 
     @jsonify_error(status=404)
