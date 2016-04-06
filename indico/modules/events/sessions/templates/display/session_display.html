@@ -54,30 +54,36 @@
 {%- endblock %}
 
 {% block content -%}
-    <div class="item-text">
-        {% if sess.blocks -%}
-            <div class="infogrid condensed">
-                <div class="infoline">
-                    <div class="text">
-                        <h2>{% trans %}Conveners{% endtrans %}</h2>
-                        {% for block in sess.blocks -%}
-                            <strong>{{ block.full_title }}</strong>
-                            <ul>
-                                {% for convener in block.person_links -%}
-                                    <li class="icon-user">
-                                        <a href="mailto:{{ convener.person.email }}">{{ convener.person.full_name }}</a>
-                                        ({{ convener.person.affiliation }})
-                                    </li>
-                                {%- else -%}
-                                    <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
-                                {%- endfor %}
-                            </ul>
-                        {%- endfor %}
+    {% if sess.blocks -%}
+        <div class="item-text">
+                <div class="infogrid condensed">
+                    <div class="infoline">
+                        <div class="text">
+                            <h2>{% trans %}Conveners{% endtrans %}</h2>
+                            {% for block in sess.blocks -%}
+                                <h3>{{ block.full_title }}</h3>
+                                <ul>
+                                    {% for convener in block.person_links -%}
+                                        <li class="icon-user">
+                                            {% if sess.can_manage(session.user) %}
+                                                <a href="mailto:{{ convener.person.email }}">
+                                                    {{ convener.person.full_name }}
+                                                </a>
+                                            {% else %}
+                                                {{ convener.person.full_name }}
+                                            {% endif %}
+                                            ({{ convener.person.affiliation }})
+                                        </li>
+                                    {%- else -%}
+                                        <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
+                                    {%- endfor %}
+                                </ul>
+                            {%- endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {%- endif %}
-    </div>
+        </div>
+    {%- endif %}
 
     {% if sess.description %}
         <h3>{% trans %}Description{% endtrans %}</h3>
