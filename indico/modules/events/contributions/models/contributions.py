@@ -37,7 +37,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, return_ascii, MarkdownText
 
 
 def _get_next_friendly_id(context):
@@ -75,6 +75,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     location_backref_name = 'contributions'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    description_wrapper = MarkdownText
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_ATTACHED_NOTES = True
