@@ -132,11 +132,29 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return table
 
     def _participant_list_table(self, regform):
+
         def _process_registration(reg, column_ids):
             data_by_field = reg.data_by_field
-            columns = [{'text': data_by_field[column_id].friendly_data if column_id in data_by_field else ''}
-                       for column_id in column_ids]
+            personal_data = reg.get_personal_data()
+
+            def _content(column_id):
+                if column_id in data_by_field:
+                    column_data = data_by_field[column_id]
+                    personal_data_type = column_data.field_data.field.personal_data_type
+                    if personal_data_type:
+                        # Use information from get_personal_data() instead of the field data
+                        # since it performs special handling of legacy database records.
+                        try:
+                            return personal_data[column_data.field_data.field.personal_data_type.name]
+                        except KeyError:
+                            return ''
+                    return column_data.get_friendly_data(for_humans=True)
+                else:
+                    return ''
+
+            columns = [{'text': _content(column_id)} for column_id in column_ids]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
+
         active_fields = {field.id: field.title for field in regform.active_fields}
         column_ids = [column_id
                       for column_id in registration_settings.get_participant_list_columns(self.event, regform)
