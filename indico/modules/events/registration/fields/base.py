@@ -126,7 +126,11 @@ class RegistrationFormFieldBase(object):
     def view_data(self):
         return self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data)
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
+        """Return the data contained in the field
+
+        If for_humans is True, return a human-readable string representation.
+        """
         return registration_data.data
 
     def iter_placeholder_info(self):

@@ -54,10 +54,10 @@ class NumberField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0) * int(reg_data or 0)
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         if registration_data.data is None:
             return ''
-        return registration_data.data
+        return str(registration_data.data) if for_humans else registration_data.data
 
 
 class TextAreaField(RegistrationFormFieldBase):
@@ -77,7 +77,7 @@ class CheckboxField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0)
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         return self.friendly_data_mapping[registration_data.data]
 
     def get_places_used(self):
@@ -127,7 +127,7 @@ class DateField(RegistrationFormFieldBase):
             value = datetime.strptime(value, date_format).isoformat()
         return super(DateField, self).process_form_data(registration, value, old_data, billable_items_locked)
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         date_string = registration_data.data
         if not date_string:
             return ''
@@ -194,7 +194,7 @@ class BooleanField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0) if reg_data else 0
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         return self.friendly_data_mapping[registration_data.data]
 
 
@@ -222,7 +222,7 @@ class CountryField(RegistrationFormFieldBase):
     def filter_choices(self):
         return dict(self.wtf_field_kwargs['choices'])
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         return CountryHolder.getCountryById(registration_data.data) if registration_data.data else ''
 
 
@@ -263,7 +263,7 @@ class FileField(RegistrationFormFieldBase):
     def default_value(self):
         return None
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         if not registration_data:
             return ''
         return registration_data.filename

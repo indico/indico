@@ -179,7 +179,7 @@ class SingleChoiceField(ChoiceBaseField):
         # only use the default item if it exists in the current version
         return {default_item: 1} if any(x['id'] == default_item for x in versioned_data['choices']) else {}
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         if not registration_data.data:
             return ''
         uuid, number_of_slots = registration_data.data.items()[0]
@@ -208,7 +208,7 @@ class MultiChoiceField(ChoiceBaseField):
     def default_value(self):
         return {}
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         def _format_item(uuid, number_of_slots):
             caption = self.form_item.data['captions'][uuid]
             return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
@@ -216,7 +216,8 @@ class MultiChoiceField(ChoiceBaseField):
         reg_data = registration_data.data
         if not reg_data:
             return ''
-        return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
+        choices = sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
+        return ', '.join(choices) if for_humans else choices
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         # always store no-option as empty dict
@@ -385,16 +386,16 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super(AccommodationField, self).view_data, places_used=self.get_places_used())
 
-    def get_friendly_data(self, registration_data):
+    def get_friendly_data(self, registration_data, for_humans=False):
         friendly_data = dict(registration_data.data)
         if not friendly_data:
-            return {}
+            return '' if for_humans else {}
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
         friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
         friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
-        return friendly_data
+        return friendly_data['choice'] if for_humans else friendly_data
 
     def calculate_price(self, reg_data, versioned_data):
         if not reg_data:
