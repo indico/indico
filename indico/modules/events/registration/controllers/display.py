@@ -133,7 +133,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
     def _participant_list_table(self, regform):
         def _process_registration(reg, column_ids):
-            columns = [{'text': reg.data_by_field[column_id].friendly_data} for column_id in column_ids]
+            data_by_field = reg.data_by_field
+            columns = [{'text': data_by_field[column_id].friendly_data if column_id in data_by_field else ''}
+                       for column_id in column_ids]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
         active_fields = {field.id: field.title for field in regform.active_fields}
         column_ids = [column_id
@@ -158,11 +160,12 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             regforms_dict = {regform.id: regform for regform in regforms if regform.publish_registrations_enabled}
             for form_id in registration_settings.get_participant_list_form_ids(self.event):
                 try:
-                    tables.append(self._participant_list_table(regforms_dict[form_id]))
+                    regform = regforms_dict.pop(form_id)
                 except KeyError:
-                    # The settings might reference forms that are not available anymore (publishing was disabled, etc.)
-                    pass
-                del regforms_dict[form_id]
+                    # The settings might reference forms that are not available
+                    # anymore (publishing was disabled, etc.)
+                    continue
+                tables.append(self._participant_list_table(regform))
             # There might be forms that have not been sorted by the user yet
             tables += map(self._participant_list_table, regforms_dict.viewvalues())
 
