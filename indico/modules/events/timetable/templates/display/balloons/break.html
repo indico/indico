@@ -1,0 +1,37 @@
+<div class="balloon">
+    <div class="title-container">
+        <div class="title">{{ break_.title }}</div>
+        <div class="group right entry-action-buttons">
+            <a class="icon-edit i-button-icon js-dialog-action push-balloon-back js-edit"
+               title="{% trans %}Edit break{% endtrans %}"
+               data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>
+            <a href="#" class="icon-remove i-button-icon push-balloon-back js-delete"
+               title="{% trans %}Delete timetable entry{% endtrans %}"
+               data-title="{% trans title=break_.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
+               data-confirm="{% trans title=break_.title %}Are you sure you want to delete the break '{{ title }}'?{% endtrans %}"></a>
+        </div>
+    </div>
+    <div class="description">{{ break_.description }}</div>
+    <dl class="i-data-list">
+        <dt>
+            <a class="icon-time i-button-icon js-edit-time push-balloon-back"
+               title="{% trans %}Change time{% endtrans %}">
+            </a>
+        </dt>
+        <dd>
+            <div class="duration">
+                <a class="js-edit-time push-balloon-back"
+                   title="{% trans %}Change time{% endtrans %}">
+                    {{- break_.timetable_entry.start_dt | format_time(timezone=break_.timetable_entry.event_new.timezone) }} - {{ break_.timetable_entry.end_dt | format_time(timezone=break_.timetable_entry.event_new.timezone) -}}
+                </a>
+            </div>
+        </dd>
+        <dt><i class='icon-location'></i></dt>
+        <dd>
+            <div>{{ break_.room_name }} ({{ break_.venue_name }})</div>
+            {% if break_.address %}
+                <div class="address">{{ break_.address }}</div>
+            {% endif %}
+        </dd>
+    </dl>
+</div>
