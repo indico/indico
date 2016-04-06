@@ -34,7 +34,7 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, return_ascii, MarkdownText
 
 
 def _get_next_friendly_id(context):
@@ -56,6 +56,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_ATTACHED_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'session_id'
+    description_wrapper = MarkdownText
 
     @declared_attr
     def __table_args__(cls):

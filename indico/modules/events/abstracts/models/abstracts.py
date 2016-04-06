@@ -22,7 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, return_ascii, MarkdownText
 
 
 class Abstract(DescriptionMixin, db.Model):
@@ -31,6 +31,8 @@ class Abstract(DescriptionMixin, db.Model):
     __tablename__ = 'abstracts'
     __auto_table_args = (db.UniqueConstraint('legacy_id', 'event_id'),
                          {'schema': 'event_abstracts'})
+
+    description_wrapper = MarkdownText
 
     @declared_attr
     def __table_args__(cls):

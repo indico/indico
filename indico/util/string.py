@@ -550,3 +550,10 @@ class RichMarkup(Markup):
     def __setstate__(self, state):
         for slot, value in state.iteritems():
             setattr(self, slot, value)
+
+
+class MarkdownText(Markup):
+    """unicode/Markup class that renders markdown."""
+
+    def __html__(self):
+        return render_markdown(unicode(self), extensions=('nl2br',))
