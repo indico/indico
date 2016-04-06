@@ -87,39 +87,27 @@ type("TimeDisplacementManager", [],
              tip.css({'top': this._cache_get('gridTop') + target - (tip.outerHeight() / 2)});
          },
 
-         release: function(startHour, startMinute, endHour, endMinute,
-                           eventData, ui, undo_caption) {
-
-             //
-
+         release: function(startHour, startMinute, endHour, endMinute, eventData, ui, undo_caption) {
              var self = this;
-
-             var startDT = (startHour === null || startHour === undefined) ? eventData.startDate : {
-                 'date': eventData.startDate.date,
-                 'time': startHour + ":" + startMinute
-             };
-
+             var startDT = !startHour ? eventData.startDate : {'date': eventData.startDate.date,
+                                                               'time': startHour + ":" + startMinute};
              var endDT;
-             if (endHour === null || endHour === undefined) {
+
+             if (!endHour) {
                  endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
              } else {
-                 endDT = {
-                     'date': eventData.endDate.date,
-                     'time': endHour + ":" + endMinute
-                 };
+                 endDT = {'date': eventData.endDate.date, 'time': endHour + ":" + endMinute};
              }
 
-             self.managementActions.editEntryStartEndDate(
-                 Util.formatDateTime(startDT, IndicoDateTimeFormats.Server),
-                 Util.formatDateTime(endDT, IndicoDateTimeFormats.Server),
-                 eventData, $(window).data('shiftIsPressed'), undo_caption).fail(
-                     function(error) {
-                         // if something goes wrong, reset the element
-                         _revert_element(ui);
-                     }
-                 );
+             self.managementActions
+                 .editEntryStartEndDate(Util.formatDateTime(startDT, IndicoDateTimeFormats.Server),
+                                        Util.formatDateTime(endDT, IndicoDateTimeFormats.Server), eventData,
+                                        $(window).data('shiftIsPressed'), undo_caption)
+                 .fail(function() {
+                     // if something goes wrong, reset the element
+                     _revert_element(ui);
+                 });
 
-             // clear cache
              self._cache = {};
          },
 
@@ -159,13 +147,10 @@ type("TimeDisplacementManager", [],
                  var width = first_hourline.width();
              }
 
-             var hourline = $('<div class="hourLine"/>').
-                 attr('id', 'hourLine_' + hour).
-                 css({
-                     'top': top + 'px',
-                     height: height,
-                     width: width
-                 }).text(zeropad(hour) + ':00');
+             var hourline = $('<div class="hourLine"/>')
+                 .attr('id', 'hourLine_' + hour)
+                 .css({'top': top + 'px', height: height, width: width})
+                 .text(zeropad(hour) + ':00');
 
              if (direction == 'down') {
                  $('#timetable_grid').append(hourline);
@@ -175,7 +160,7 @@ type("TimeDisplacementManager", [],
              }
 
              $('#timetable_canvas').height($('#timetable_canvas').height() + height);
-             $('#timetableDiv').height($('#timetable_canvas').height() + height);
+             $('#timetable').height($('#timetable_canvas').height() + height);
 
              var ttdrawer = this._timetable.getTimetableDrawer();
              ttdrawer.make_droppable(hourline, hour);
@@ -307,7 +292,7 @@ type("DraggableBlockMixin", [],
 
              /* Resize timeblock if nedeed */
              var maxCol = self.timetable.getTimetableDrawer().maxCol;
-             var newWidth = (Math.round($('#timetableDiv').width()/(maxCol)));
+             var newWidth = (Math.round($('#timetable').width()/(maxCol)));
 
              var heightThreshold = 450;
              var heightChange = (originalHeight > heightThreshold);
@@ -318,13 +303,13 @@ type("DraggableBlockMixin", [],
 
              var draggable = this.element.super_draggable({
                  //Center the mouse in the middle of the block while dragging
-                 containment: $('#timetableDiv'),
+                 containment: $('#timetable'),
                  revert: 'invalid',
                  refreshPositions: true,
                  start: function(event, ui) {/*
                      /* Resize timeblock if nedeed */
                      maxCol = self.timetable.getTimetableDrawer().maxCol;
-                     newWidth = (maxCol > 1) ? Math.round($('#timetableDiv').width()/(maxCol)) : originalWidth;
+                     newWidth = (maxCol > 1) ? Math.round($('#timetable').width()/(maxCol)) : originalWidth;
 
                      ui.helper.animate({width: newWidth});
                      ui.helper.height(newHeight);
@@ -406,9 +391,9 @@ type("ResizableBlockMixin", [],
                      var data = $(ui.helper).data();
 
                      self._withNoEvents(function() {
-                         self.release(
-                             null, null, data.endHour, data.endMinute, self.eventData, ui, "resize");
+                         self.release(null, null, data.endHour, data.endMinute, self.eventData, ui, "resize");
                      });
+
                      self._killTip();
                  }
              });
@@ -446,7 +431,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
 
          make_droppable: function(element, hour) {
              //"unique" name for each drag-handler per hourLine
-             var thisDragSpaceName = ("drag."+hour);
+             var thisDragSpaceName = ("drag." + hour);
              var minute = null;
              var self = this;
 
@@ -454,31 +439,32 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                  drop: function(event, ui) {
                      // execute making sure click events on blocks are disabled
                      self._withNoEvents(function() {
-                         self.release(hour, minute, null, null, $(ui.draggable.context).data("eventData"), ui.helper, "placementChange");
+                         // Prevent firing the same request many times
+                         // It may happen for huge blocks that span multiple hourLines
+                         if (event.target.id === 'hourLine_' + hour.toString().replace(/^0/, '')) {
+                             self.release(hour, minute, null, null, $(ui.draggable.context).data("eventData"), ui.helper,
+                                          "placementChange");
+                         }
                      });
                  },
                  tolerance: 'touch',
                  accept: '.ui-draggable.timetableBlock',
                  over: function(event, ui) {
-                     $('#timetableDiv').on(
-                         thisDragSpaceName,
-                         '.ui-draggable.timetableBlock',
-                         function(event, ui)
-                         {
-                             if (element.droppable("option", "disabled")) {
-                                 return;
-                             }
-                             var gridTime = self._updateTime(ui.helper, "drag");
-                             //null means that the drag is not allowed
-                             if((gridTime == null)) {
-                                 return;
-                             }
-                             hour = gridTime[0];
-                             minute = gridTime[1];
-                         });
+                     $('#timetable').on(thisDragSpaceName, '.ui-draggable.timetableBlock', function(event, ui) {
+                         if (element.droppable("option", "disabled")) {
+                             return;
+                         }
+                         var gridTime = self._updateTime(ui.helper, "drag");
+                         //null means that the drag is not allowed
+                         if ((gridTime == null)) {
+                             return;
+                         }
+                         hour = gridTime[0];
+                         minute = gridTime[1];
+                     });
                  },
                  out: function(event, ui) {
-                     $('#timetableDiv').off(thisDragSpaceName, '.ui-draggable.timetableBlock');
+                     $('#timetable').off(thisDragSpaceName, '.ui-draggable.timetableBlock');
                  }
              });
        }
@@ -527,7 +513,7 @@ type("DroppableBlockMixin", [],
                      }
 
                      var blockEventData = $(ui.draggable).data('eventData');
-                     var chosenValue = self.eventData.sessionId + ':' + self.eventData.sessionSlotId;
+                     var chosenValue = {'parent_id': self.eventData.scheduleEntryId};
                      var initialPosition = $(ui.draggable).data('initialPosition');
 
                      removeBottomMove();

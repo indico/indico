@@ -170,68 +170,41 @@ type("TimetableManagementActions", [], {
         var self = this;
         var info = new WatchObject();
 
-        info.set('scheduleEntry', eventData.scheduleEntryId);
-        info.set('conference', eventData.conferenceId);
         info.set('startDate', startDate);
         info.set('endDate', endDate);
         info.set('reschedule', reschedule);
         info.set('sessionTimetable', this.isSessionTimetable);
 
-        var type = eventData.entryType;
-        if(type == undefined) {
-          type = "Contribution";
-        }
-
         if (exists(eventData.sessionId)) {
             info.set('session', eventData.sessionId);
             info.set('slot', eventData.sessionSlotId);
-
-            if (type != 'Session') {
-                type = 'Session' + eventData.entryType;
-            } else if (!self.isSessionTimetable){
-                type = 'SessionSlot';
-            }
         }
 
-        var dfr = $.Deferred();
-
-        //Displays a "loading ..." div at the righthand bottom side
-        var killProgress = IndicoUI.Dialogs.Util.ttStatusInfo($T('saving...'));
-
-        indicoRequest(this.methods[type].modifyStartEndDate, info, function(result, error){
-            if (!undo) {
-                killProgress();
-            }
-
-            if (error) {
-                IndicoUtil.errorReport(error);
-                dfr.reject(error);
-                self.timetable.timetableDrawer.redraw();
-                if (undo) {
-                    killProgress();
+        return $.ajax({
+            url: build_url(Indico.Urls.Timetable.entry.changeDatetime, {confId: eventData.conferenceId[0],
+                                                                        timetable_entry_id: eventData.scheduleEntryId}),
+            method: 'POST',
+            data: info.getAll(),
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress(),
+            success: function(data) {
+                if (!data.success) {
+                    IndicoUtil.errorReport(data.error);
+                    self.timetable.timetableDrawer.redraw();
+                    return;
                 }
-            } else {
-                // Depending on whether 'reschedule' was selected or not,
-                // update the whole day or just one entry
 
-                if(undo) {
-                    self.timetable.enableUndo(undo, {eventData: eventData,
-                                                     shifted: reschedule});
+                if (undo) {
+                    self.timetable.enableUndo(undo, {eventData: eventData, shifted: reschedule});
                 }
 
                 if (reschedule) {
-                    self.timetable._updateDay(result).done(function() {
-                        dfr.resolve();
-                    });
+                    self.timetable._updateDay(data.entry);
                 } else {
-                    self.timetable._updateEntry(result, result.id).done(function() {
-                        dfr.resolve();
-                    });
+                    self.timetable._updateEntry(data.entry, data.entry.id);
                 }
             }
         });
-
-        return dfr.promise();
     },
 
     /* Takes care of moving a contribution/timeblock to another session/timetable.
@@ -255,8 +228,7 @@ type("TimetableManagementActions", [], {
             complete: IndicoUI.Dialogs.Util.progress(),
             success: function(data) {
                 if (undo) {
-                    self.timetable.enableUndo(undo, {'eventData': eventData,
-                                                     'entry': result.entry}, null);
+                    self.timetable.enableUndo(undo, {eventData: eventData, entry: data.entry}, null);
                 }
 
                 self.timetable._updateMovedEntry(data.entry, data.entry.old.id);
