@@ -156,21 +156,22 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
 
 
 class RHLegacyTimetableReschedule(RHManageTimetableBase):
+    _json_schema = {
+        'type': 'object',
+        'properties': {
+            'mode': {'type': 'string', 'enum': ['none', 'time', 'duration']},
+            'day': {'type': 'string', 'format': 'date'},
+            'gap': {'type': 'integer', 'minimum': 0},
+            'fit_blocks': {'type': 'boolean'},
+            'session_block_id': {'type': 'integer'},
+            'session_id': {'type': 'integer'}
+        },
+        'required': ['mode', 'day', 'gap', 'fit_blocks']
+    }
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        schema = {
-            'type': 'object',
-            'properties': {
-                'mode': {'type': 'string', 'enum': ['none', 'time', 'duration']},
-                'day': {'type': 'string', 'format': 'date'},
-                'gap': {'type': 'integer', 'minimum': 0},
-                'fit_blocks': {'type': 'boolean'},
-                'session_block_id': {'type': 'integer'},
-                'session_id': {'type': 'integer'}
-            },
-            'required': ['mode', 'day', 'gap', 'fit_blocks']
-        }
-        self.validate_json(schema)
+        self.validate_json(self._json_schema)
         self.day = dateutil.parser.parse(request.json['day']).date()
         self.session_block = self.session = None
         if request.json.get('session_block_id') is not None:
