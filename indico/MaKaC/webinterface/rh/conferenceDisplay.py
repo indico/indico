@@ -15,9 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from flask import session
+from flask import flash, request, session
 import os
 import pytz
+from werkzeug.exceptions import Forbidden
 
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
@@ -71,6 +72,12 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
 
 
 class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
+
+    def _forbidden_if_not_admin(self):
+        if not request.is_xhr and session.user and session.user.is_admin:
+            flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
+        else:
+            raise Forbidden
 
     def _checkParams( self, params ):
         RHConferenceBase._checkParams( self, params )
