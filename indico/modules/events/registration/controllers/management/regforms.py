@@ -78,6 +78,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
                 regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
+            return redirect(url_for('.manage_regforms_display', self.event_new))
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
