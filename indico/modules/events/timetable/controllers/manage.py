@@ -67,10 +67,9 @@ class RHTimetableREST(RHManageTimetableBase):
             raise BadRequest('The contribution is already scheduled')
         updates['object'] = contribution
         if data.get('session_block_id'):
-            session_block = SessionBlock.find_first(SessionBlock.id == data['session_block_id'],
-                                                    Session.event_new == self.event_new,
-                                                    ~Session.is_deleted,
-                                                    _join=SessionBlock.session)
+            session_block = self.event_new.get_session_block(data['session_block_id'])
+            if session_block is None:
+                raise BadRequest('Invalid session block id')
             if session_block.timetable_entry is None:
                 raise BadRequest('The session block is not scheduled')
             if contribution.session and session_block.session != contribution.session and not data.get('force'):
