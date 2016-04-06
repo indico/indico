@@ -176,7 +176,7 @@ legacy_endpoints = {
     'roomBooking-saveLocation', 'roomBooking-search4Bookings', 'roomBooking-search4Rooms',
     'roomBooking-setDefaultLocation', 'roomBooking-statement', 'roomMapper',
     'roomMapper-creation', 'roomMapper-details', 'roomMapper-modify', 'roomMapper-performCreation',
-    'roomMapper-performModify', 'sessionDisplay', 'sessionDisplay-ical', 'sessionModifAC',
+    'roomMapper-performModify', 'sessionModifAC',
     'sessionModifAC-setVisibility', 'sessionModifComm', 'sessionModifComm-edit', 'sessionModification',
     'sessionModification-addContribs', 'sessionModification-close', 'sessionModification-contribAction',
     'sessionModification-contribList', 'sessionModification-contribQuickAccess', 'sessionModification-contribsToPDF',
