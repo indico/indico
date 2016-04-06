@@ -1,4 +1,4 @@
-"""Partially added abstract judgmnts to Postgres
+"""Partially added abstract judgments to Postgres
 
 Revision ID: da0ddef1744
 Revises: 4878972d7e2f
@@ -24,49 +24,20 @@ def upgrade():
                     sa.Column('judge_user_id', sa.Integer(), nullable=False),
                     sa.Column('accepted_type_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['abstract_id'],
-                                            [u'event_abstracts.abstracts.id'],
-                                            name=op.f('fk_judgments_abstract_id_abstracts')),
+                                            [u'event_abstracts.abstracts.id']),
                     sa.ForeignKeyConstraint(['accepted_type_id'],
-                                            [u'events.contribution_types.id'],
-                                            name=op.f('fk_judgments_accepted_type_id_contribution_types')),
+                                            [u'events.contribution_types.id']),
                     sa.ForeignKeyConstraint(['judge_user_id'],
-                                            [u'users.users.id'],
-                                            name=op.f('fk_judgments_user_id_users')),
-                    sa.PrimaryKeyConstraint('id', name=op.f('pk_judgments')),
+                                            [u'users.users.id']),
+                    sa.PrimaryKeyConstraint('id'),
                     schema='event_abstracts')
-    op.create_index(op.f('ix_judgments_abstract_id'),
-                    'judgments',
-                    ['abstract_id'],
-                    unique=False,
-                    schema='event_abstracts')
-    op.create_index(op.f('ix_judgments_accepted_type_id'),
-                    'judgments',
-                    ['accepted_type_id'],
-                    unique=False,
-                    schema='event_abstracts')
-    op.create_index(op.f('ix_judgments_creation_dt'),
-                    'judgments',
-                    ['creation_dt'],
-                    unique=False,
-                    schema='event_abstracts')
-    op.create_index(op.f('ix_judgments_judge_user_id'),
-                    'judgments',
-                    ['judge_user_id'],
-                    unique=False,
-                    schema='event_abstracts')
-    op.create_index(op.f('ix_uq_judgments_abstract_id_track_id_judge_user_id'),
-                    'judgments',
-                    ['abstract_id', 'track_id', 'judge_user_id'],
-                    unique=True,
+    op.create_index(None, 'judgments', ['abstract_id'], unique=False, schema='event_abstracts')
+    op.create_index(None, 'judgments', ['accepted_type_id'], unique=False, schema='event_abstracts')
+    op.create_index(None, 'judgments', ['creation_dt'], unique=False, schema='event_abstracts')
+    op.create_index(None, 'judgments', ['judge_user_id'], unique=False, schema='event_abstracts')
+    op.create_index(None, 'judgments', ['abstract_id', 'track_id', 'judge_user_id'], unique=True,
                     schema='event_abstracts')
 
 
 def downgrade():
-    op.drop_index(op.f('ix_uq_judgments_abstract_id_track_id_judge_user_id'),
-                  table_name='judgments',
-                  schema='event_abstracts')
-    op.drop_index(op.f('ix_judgments_judge_user_id'), table_name='judgments', schema='event_abstracts')
-    op.drop_index(op.f('ix_judgments_creation_dt'), table_name='judgments', schema='event_abstracts')
-    op.drop_index(op.f('ix_judgments_accepted_type_id'), table_name='judgments', schema='event_abstracts')
-    op.drop_index(op.f('ix_judgments_abstract_id'), table_name='judgments', schema='event_abstracts')
     op.drop_table('judgments', schema='event_abstracts')
