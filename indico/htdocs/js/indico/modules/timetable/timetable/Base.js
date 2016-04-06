@@ -1434,10 +1434,8 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     },
 
     _updateEntry: function(result, oldEntryId, updateCycle) {
-
         var self = this;
         var slot = this.contextInfo;
-        var data = this.getData();
 
         // Delete the old entry
         delete this.parentTimetable.data[this.currentDay][slot.id].entries[oldEntryId];
@@ -1448,10 +1446,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         if (updateCycle) {
             updateCycle(this.parentTimetable.getData());
         } else {
-
-            // If none is defined in the function args,
-            // execute the default action
-            data[result.id] = result.entry;
 
             if (result.session) {
                 // Account for "collateral damage" on sessions
