@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+
+from indico.modules.events.contributions.controllers.compat import compat_contribution, compat_subcontribution
 from indico.modules.events.contributions.controllers.display import (RHMyContributions, RHContributionDisplay,
                                                                      RHContributionList, RHContributionAuthor,
                                                                      RHContributionExportToPDF, RHContributionReport,
@@ -45,6 +48,7 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHEditContributionType,
                                                                         RHCreateContributionType,
                                                                         RHDeleteContributionType)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -120,3 +124,26 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics', RHContributionExportToICAL)
 _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  RHSubcontributionDisplay)
+
+# Legacy URLs
+_compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<event_id>')
+
+with _compat_bp.add_prefixed_rules('/session/<legacy_session_id>'):
+    _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>', 'contribution',
+                            partial(compat_contribution, 'display_contribution'))
+    _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>.ics', 'contribution_ics',
+                            partial(compat_contribution, 'export_ics'))
+    _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>.pdf', 'contribution_pdf',
+                            partial(compat_contribution, 'export_pdf'))
+    _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>/<legacy_subcontribution_id>',
+                            'subcontribution', compat_subcontribution)
+
+_compat_bp.add_url_rule('!/contributionDisplay.py', 'contribution_modpython',
+                        make_compat_redirect_func(_compat_bp, 'contribution',
+                                                  view_args_conv={'confId': 'event_id',
+                                                                  'contribId': 'legacy_contribution_id'}))
+_compat_bp.add_url_rule('!/subContributionDisplay.py', 'subcontribution_modpython',
+                        make_compat_redirect_func(_compat_bp, 'subcontribution',
+                                                  view_args_conv={'confId': 'event_id',
+                                                                  'contribId': 'legacy_contribution_id',
+                                                                  'subContId': 'legacy_subcontribution_id'}))
