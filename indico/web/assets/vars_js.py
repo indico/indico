@@ -115,7 +115,8 @@ def generate_global_file(config):
             'Timetable': {
                 'reschedule': url_rule_to_js('timetable.reschedule'),
                 'entry': {
-                    'move': url_rule_to_js('timetable.move_timetable_entry')
+                    'move': url_rule_to_js('timetable.move_timetable_entry'),
+                    'changeDatetime': url_rule_to_js('timetable.change_datetime')
                 },
                 'breaks': {
                     'add': url_rule_to_js('timetable.add_break')
