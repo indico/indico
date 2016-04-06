@@ -96,8 +96,7 @@
     <script>
         setupSessionsList();
         {% if selected_entry %}
-            $('#search-input').val('#{{ selected_entry }}');
-            applySearchFilters();
+            $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
     </script>
 {% endblock %}
