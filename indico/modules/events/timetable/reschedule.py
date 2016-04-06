@@ -18,22 +18,32 @@ from __future__ import unicode_literals
 
 from datetime import timedelta, datetime
 
+from flask import session
+
 from pytz import utc
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.modules.events import EventLogRealm
+from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import fit_session_block_entry
+from indico.util.date_time import format_date, format_human_timedelta
 from indico.util.i18n import _
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledEnum
 from indico.util.struct.iterables import materialize_iterable, window
 
 
-class RescheduleMode(unicode, IndicoEnum):
+class RescheduleMode(unicode, TitledEnum):
+    __titles__ = {'none': 'Fit blocks', 'time': 'Start times', 'duration': 'Durations'}
     none = 'none'  # no action, just fit blocks..
     time = 'time'
     duration = 'duration'
+
+    @property
+    def title(self):
+        return TitledEnum.title.fget(self)
 
 
 class Reschedule(object):
@@ -81,6 +91,14 @@ class Reschedule(object):
         elif self.mode == RescheduleMode.duration:
             self._reschedule_duration()
         db.session.flush()
+        self.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+                       "Entries rescheduled", session.user,
+                       data={'Mode': self.mode.title,
+                             'Day': format_date(self.day, locale='en_GB'),
+                             'Fit Blocks': self.fit_blocks,
+                             'Gap': format_human_timedelta(self.gap) if self.gap else None,
+                             'Session': self.session.title if self.session else None,
+                             'Session block': self.session_block.full_title if self.session_block else None})
 
     def _reschedule_time(self):
         start_dt = self._start_dt
@@ -99,7 +117,7 @@ class Reschedule(object):
     def _fit_blocks(self):
         for entry in self._entries:
             if entry.type == TimetableEntryType.SESSION_BLOCK:
-                fit_session_block_entry(entry)
+                fit_session_block_entry(entry, log=False)
 
     @cached_property
     def _start_dt(self):
