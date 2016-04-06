@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import flash, session, request, jsonify
+from flask import session, request, jsonify
 from pytz import timezone
 from sqlalchemy.orm import load_only, noload, joinedload
 from werkzeug.exceptions import Forbidden
@@ -32,7 +32,6 @@ from indico.modules.events.contributions.views import WPMyContributions, WPContr
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
-from indico.util.i18n import _
 from indico.web.flask.util import send_file, jsonify_data
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -64,10 +63,7 @@ class RHDisplayProtectionBase(RHConferenceBaseDisplay):
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event_new):
-            if session.user and session.user.is_admin:
-                flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
-            else:
-                raise Forbidden
+            self._forbidden_if_not_admin()
 
 
 class RHMyContributions(RHDisplayProtectionBase):
@@ -117,8 +113,9 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
     def _checkProtection(self):
         RHContributionDisplayBase._checkProtection(self)
-        if not is_menu_entry_enabled('author_index', self.event_new):
-            raise Forbidden
+        if (not is_menu_entry_enabled('author_index', self.event_new) and
+                not is_menu_entry_enabled('contributions', self.event_new)):
+            self._forbidden_if_not_admin()
 
     def _checkParams(self, params):
         RHContributionDisplayBase._checkParams(self, params)
