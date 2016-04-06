@@ -56,6 +56,13 @@
         </div>
     </div>
 
+    {% if subcontrib.description %}
+        <h3>{% trans %}Description{% endtrans %}</h3>
+        <div class="description">
+            {{ subcontrib.description }}
+        </div>
+    {% endif %}
+
     <div class="i-box-group vert">
         <div class="i-box titled no-padding">
             <div class="i-box-header">
