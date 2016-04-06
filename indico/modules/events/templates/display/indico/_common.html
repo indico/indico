@@ -48,39 +48,41 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ', use_span=true) -%}
+{% macro _render_user_data(user_data, show_title=true, italic_affiliation=false) %}
+    {% if user_data.title and title -%}
+        <span class="speaker-title">
+            {{ user_data.title }}
+        </span>
+    {%- endif %}
+    <span itemprop="givenName">{{ user_data.first_name }}</span>
+    <span itemprop="lastName">{{ user_data.last_name }}</span>
+    {% if user_data.affiliation -%}
+        <span class="affiliation">
+            ({#- -#}
+            <span class="text">
+                {%- if italic_affiliation -%}
+                    <em>{{ user_data.affiliation }}</em>
+                {%- else -%}
+                    {{ user_data.affiliation }}
+                {%- endif -%}
+            </span>
+            {#- -#})
+        </span>
+    {%- endif %}
+{% endmacro %}
+
+{% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ') -%}
     {% for link in user_list -%}
-        {%- if use_span -%}
-            <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
-                {% if link.title and title -%}
-                    <span class="speaker-title">
-                        {{ link.title }}
-                    </span>
-                {%- endif %}
-                <span itemprop="givenName">{{ link.first_name }}</span>
-                <span itemprop="lastName">{{ link.last_name }}</span>
-        {%- else -%}
-            {{ link.first_name }} {{ link.last_name }}
-        {% endif %}
-        {% if link.affiliation %}
-            <span class="affiliation">
-                ({#- -#}
-                <span class="text">
-                    {%- if italic_affiliation -%}
-                        <em>{{ link.affiliation }}</em>
-                    {%- else -%}
-                        {{ link.affiliation }}
-                    {%- endif -%}
-                </span>
-                {#- -#})
-            </span>
-        {% endif %}
-        {% if not loop.last %}
-            {{ separator }}
-        {% endif %}
-        {% if use_span %}
-            </span>
-        {% endif %}
+        <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
+            {% if caller %}
+                {{ caller(link) }}
+            {% else %}
+                {{ _render_user_data(link, show_title=title, italic_affiliation=italic_affiliation) }}
+            {% endif %}
+            {% if not loop.last %}
+                {{ separator }}
+            {% endif %}
+        </span>
     {% endfor %}
 {%- endmacro %}
 
