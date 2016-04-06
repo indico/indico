@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+
+from indico.modules.events.sessions.controllers.compat import compat_session
 from indico.modules.events.sessions.controllers.display import (RHDisplaySessionList, RHDisplaySession,
                                                                 RHExportSessionToICAL, RHExportSessionTimetableToPDF)
 from indico.modules.events.sessions.controllers.management.protection import RHSessionCoordinatorPrivs
@@ -25,6 +28,7 @@ from indico.modules.events.sessions.controllers.management.sessions import (RHSe
                                                                             RHExportSessionsPDF, RHSessionREST,
                                                                             RHSessionPersonList, RHSessionProtection,
                                                                             RHManageSessionBlock)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -55,3 +59,16 @@ _bp.add_url_rule('/sessions/<int:session_id>/', 'display_session', RHDisplaySess
 _bp.add_url_rule('/sessions/<int:session_id>/session.ics', 'export_ics', RHExportSessionToICAL)
 _bp.add_url_rule('/sessions/<int:session_id>/session-timetable.pdf', 'export_session_timetable',
                  RHExportSessionTimetableToPDF)
+
+# Legacy URLs
+_compat_bp = IndicoBlueprint('compat_sessions', __name__, url_prefix='/event/<event_id>')
+
+_compat_bp.add_url_rule('/session/<legacy_session_id>/', 'session',
+                        partial(compat_session, 'display_session'))
+_compat_bp.add_url_rule('/session/<legacy_session_id>/session.ics', 'session_ics',
+                        partial(compat_session, 'export_ics'))
+
+_compat_bp.add_url_rule('!/sessionDisplay.py', 'session_modpython',
+                        make_compat_redirect_func(_compat_bp, 'session',
+                                                  view_args_conv={'confId': 'event_id',
+                                                                  'sessionId': 'legacy_session_id'}))

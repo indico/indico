@@ -29,6 +29,7 @@ event.add_url_rule('/timetable-old/timetable.pdf', 'conferenceTimeTable-pdf', co
                    methods=('GET', 'POST'))
 
 # Sessions
-event.add_url_rule('/session/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
-event.add_url_rule('/session/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
-event.add_url_rule('/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF)
+event.add_url_rule('/session-old/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
+event.add_url_rule('/session-old/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
+event.add_url_rule('/session-old/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
+                   conferenceDisplay.RHTimeTablePDF)
