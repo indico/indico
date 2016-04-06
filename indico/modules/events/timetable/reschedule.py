@@ -46,7 +46,7 @@ class RescheduleMode(unicode, TitledEnum):
         return TitledEnum.title.fget(self)
 
 
-class Reschedule(object):
+class Rescheduler(object):
     """
     Compacts the the schedule of an event day by either adjusting
     start times or durations of timetable entries.

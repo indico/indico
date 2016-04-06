@@ -33,7 +33,7 @@ from indico.modules.events.timetable.legacy import serialize_contribution, seria
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry)
-from indico.modules.events.timetable.reschedule import Reschedule, RescheduleMode
+from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import find_earliest_gap
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.web.forms.base import FormDefaults
@@ -183,11 +183,11 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
                 raise NotFound
 
     def _process(self):
-        reschedule = Reschedule(self.event_new, RescheduleMode[request.json['mode']], self.day,
-                                session=self.session, session_block=self.session_block,
-                                fit_blocks=request.json['fit_blocks'], gap=timedelta(minutes=request.json['gap']))
+        rescheduler = Rescheduler(self.event_new, RescheduleMode[request.json['mode']], self.day,
+                                  session=self.session, session_block=self.session_block,
+                                  fit_blocks=request.json['fit_blocks'], gap=timedelta(minutes=request.json['gap']))
         with track_time_changes():
-            reschedule.run()
+            rescheduler.run()
         return jsonify_data(flash=False)
 
 
