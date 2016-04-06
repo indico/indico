@@ -72,8 +72,6 @@ def generate_global_file(config):
             'SessionProtection': urlHandlers.UHSessionModifAC.getURL(_ignore_static=True).js_router,
             'ContributionProtection': urlHandlers.UHContribModifAC.getURL(_ignore_static=True).js_router,
 
-            'FitSessionSlot': urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router,
-
             'UploadAction': {
                 'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
             },

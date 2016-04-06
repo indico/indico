@@ -47,10 +47,6 @@ event_mgmt.add_url_rule('/session-old/<sessionId>/contributions/edit/<contribId>
 # Timetable
 event_mgmt.add_url_rule('/session-old/<sessionId>/timetable/', 'sessionModifSchedule', sessionModif.RHSessionModifSchedule,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/session-old/<sessionId>/timetable/fit-slot', 'sessionModifSchedule-fitSlot',
-                        sessionModif.RHFitSlot, methods=('POST',))
-event_mgmt.add_url_rule('/session-old/<sessionId>/timetable/slot-calc', 'sessionModifSchedule-slotCalc',
-                        sessionModif.RHSlotCalc, methods=('POST',))
 
 # Comment
 event_mgmt.add_url_rule('/session-old/<sessionId>/comment/', 'sessionModifComm', sessionModif.RHSessionModifComm)

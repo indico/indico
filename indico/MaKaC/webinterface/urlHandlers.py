@@ -976,10 +976,6 @@ class UHSessionDataModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-modify'
 
 
-class UHSessionFitSlot(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifSchedule-fitSlot'
-
-
 class UHSessionModifSchedule(URLHandler):
     _endpoint = 'event_mgmt.sessionModifSchedule'
 
