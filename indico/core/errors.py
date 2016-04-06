@@ -97,3 +97,12 @@ class NoReportError(IndicoError):
 
 class NotFoundError(IndicoError):
     pass
+
+
+class UserValueError(NoReportError):
+    """Error to indicate that the user entered invalid data.
+
+    This behaves basically like NoReportError but it comes with
+    a 400 status code so AJAX error handling properly goes into
+    the error callback instead of the success callback.
+    """
