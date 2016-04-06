@@ -137,4 +137,9 @@
         @include action-box-colors($color: $light-black, $emphasis-color: $green,
                                    $background-color: $light-green, $border-color: $green);
     }
+
+    &.plain {
+        border: none;
+        background-color: transparent;
+    }
 }
