@@ -1,7 +1,7 @@
 {% extends 'layout/conference_page_base.html' %}
 
-{% from 'attachments/_attachments.html' import render_attachments %}
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
+{% from 'events/display/common/_conferences.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
 {% from 'message_box.html' import message_box %}
 
@@ -92,27 +92,7 @@
         </div>
     {% endif %}
 
-    <div id="attachments" class="item-attachments i-box titled">
-        <div class="i-box-header">
-            <div class="i-box-title icon-attachment">
-                {% trans %}Materials{% endtrans %}
-            </div>
-            <div class="i-box-buttons toolbar right">
-                <div class="group">
-                    {% if sess.can_manage_attachments(session.user) -%}
-                        <a href="#" class="i-button icon-edit"
-                           data-locator="{{ sess.locator|tojson|forceescape }}"
-                           data-attachment-editor></a>
-                    {%- endif %}
-                </div>
-            </div>
-        </div>
-        <div class="i-box-content">
-            <div class="attachments-box">
-                {{ render_attachments(sess.attached_items, management=false) }}
-            </div>
-        </div>
-    </div>
+    {{ render_attachments(sess) }}
 
     <div class="item-subitems">
         {% if session_contribs %}

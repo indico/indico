@@ -335,6 +335,10 @@ li > table + .note-area-wrapper {
     }
 
     h3 {
+        &:first-child {
+            margin-top: 0;
+        }
+        margin: 1em 0 0.5em 0;
         color: $orange;
     }
 
@@ -363,12 +367,17 @@ li > table + .note-area-wrapper {
         margin-bottom: 1em;
     }
 
-    .item-attachments, .item-text {
+    .item-attachments .i-button {
+        margin-top: 0;
+    }
+
+    .item-text {
         margin-bottom: 2em;
     }
 
     .item-subitems {
         margin-bottom: 1em;
+        margin-top: 2em;
     }
 
     .infoline {
