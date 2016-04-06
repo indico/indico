@@ -2,10 +2,31 @@
 
 {% from 'attachments/_attachments.html' import render_attachments %}
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
+{% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'message_box.html' import message_box %}
+
+{% block page_class %}conference-page item-summary{% endblock %}
 
 {% block title -%}
     {% trans title=sess.title %}{{ title }}{% endtrans %}
 {%- endblock %}
+
+{% block description %}
+    <div class="time-data">
+        <span class="time-info icon-time">
+            {% if sess.timetable_entry -%}
+                {{ sess.timetable_entry.start_dt|format_datetime }}
+            {%- else -%}
+                {% trans %}Not scheduled{% endtrans %}
+            {%- endif %}
+        </span>
+    </div>
+    {% if sess.has_location_info %}
+        <div class="location-data">
+            {{ render_location(sess, class='session-location') }}
+        </div>
+    {% endif %}
+{% endblock %}
 
 {% block page_actions -%}
     <div class="toolbar right">
@@ -33,30 +54,7 @@
 {%- endblock %}
 
 {% block content -%}
-    <div id="session-display">
-        <div class="infogrid condensed">
-            <div class="infoline">
-                <i class="icon-time"></i>
-                <div class="text">
-                    <div>
-                        <span>
-                            {% if sess.start_dt -%}
-                                {{ sess.start_dt|format_datetime }}
-                            {%- else -%}
-                                {% trans %}Session not scheduled yet.{% endtrans %}
-                            {%- endif %}
-                        </span>
-                    </div>
-                    <div>
-                        <span>
-                            {% if sess.end_dt -%}
-                                {{ sess.end_dt|format_datetime }}
-                            {%- endif %}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="item-text">
         {% if sess.blocks -%}
             <div class="infogrid condensed">
                 <div class="infoline">
@@ -79,56 +77,64 @@
                 </div>
             </div>
         {%- endif %}
+    </div>
 
-        <div id="attachments" class="i-box titled">
-            <div class="i-box-header">
-                <div class="i-box-title icon-attachment">
-                    {% trans %}Materials{% endtrans %}
-                </div>
-                <div class="i-box-buttons toolbar right">
-                    <div class="group">
-                        {% if sess.can_manage_attachments(session.user) -%}
-                            <a href="#" class="i-button icon-edit"
-                               data-locator="{{ sess.locator|tojson|forceescape }}"
-                               data-attachment-editor></a>
-                        {%- endif %}
-                    </div>
-                </div>
+    <div id="attachments" class="item-attachments i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title icon-attachment">
+                {% trans %}Materials{% endtrans %}
             </div>
-            <div class="i-box-content">
-                <div class="attachments-box">
-                    {{ render_attachments(sess.attached_items, management=false) }}
+            <div class="i-box-buttons toolbar right">
+                <div class="group">
+                    {% if sess.can_manage_attachments(session.user) -%}
+                        <a href="#" class="i-button icon-edit"
+                           data-locator="{{ sess.locator|tojson|forceescape }}"
+                           data-attachment-editor></a>
+                    {%- endif %}
                 </div>
             </div>
         </div>
-
-        <div style="margin: 10px 0;">
-            {% if session_contribs %}
-                <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
-                    {% trans %}Contribution list{% endtrans %}
-                </a>
-            {% endif %}
-            {% if not sess.is_poster %}
-                <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
-                    {% trans %}Timetable{% endtrans %}
-                </a>
-            {% endif %}
-        </div>
-
-        <div class="js-container">
-            {% if session_contribs %}
-                <div id="session-contrib-list" class="contribution-list js-view">
-                    {{ render_contribution_list(event, timezone, session_contribs, false) }}
-                </div>
-            {% endif %}
-
-            {% if not sess.is_poster -%}
-                <div id="session-timetable" class="js-view">
-                    {{ template_hook('session-timetable', session=sess, timetable_layout=none) }}
-                </div>
-            {%- endif %}
+        <div class="i-box-content">
+            <div class="attachments-box">
+                {{ render_attachments(sess.attached_items, management=false) }}
+            </div>
         </div>
     </div>
+
+    <div class="item-subitems">
+        {% if session_contribs %}
+            <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
+                {% trans %}Contribution list{% endtrans %}
+            </a>
+        {% endif %}
+        {% if not sess.is_poster %}
+            <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
+                {% trans %}Timetable{% endtrans %}
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="js-container">
+        {% if session_contribs %}
+            <div id="session-contrib-list" class="contribution-list js-view">
+                {{ render_contribution_list(event, timezone, session_contribs, false) }}
+            </div>
+        {% endif %}
+
+        {% if not sess.is_poster -%}
+            <div id="session-timetable" class="js-view">
+                {% set timetable_html = template_hook('session-timetable', session=sess, timetable_layout=none) %}
+                {% if timetable_html %}
+                    {{ timetable_html }}
+                {% else %}
+                    {% call message_box('info') -%}
+                        {% trans %}No scheduled contributions{% endtrans %}
+                    {%- endcall %}
+                {% endif %}
+            </div>
+        {%- endif %}
+    </div>
+
     <script>
         setupAttachmentTreeView();
         $('.js-switch-view').on('click', function(evt) {

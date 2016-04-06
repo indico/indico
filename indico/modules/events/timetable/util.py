@@ -192,6 +192,9 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 
 
 def render_session_timetable(session, timetable_layout=None, management=False):
+    if not session.start_dt:
+        # no scheduled sessions present
+        return ''
     timetable_data = TimetableSerializer().serialize_session_timetable(session)
     event_info = serialize_event_info(session.event_new)
     tpl = get_template_module('events/timetable/_timetable.html')

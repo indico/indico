@@ -3,6 +3,8 @@
 {% from 'attachments/_attachments.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
 
+{% block page_class %}conference-page item-summary{% endblock %}
+
 {% macro _render_field_value(field_value) -%}
     {% set field = field_value.contribution_field %}
     <dt>{{ field.title }}</dt>
@@ -83,7 +85,7 @@
 {%- endblock %}
 
 {% block content -%}
-    <div id="contribution-display">
+    <div class="item-text">
         {% if contribution.speakers %}
             <h3>
                 {%- trans count=contribution.speakers|length -%}
@@ -159,64 +161,65 @@
                 </div>
             {% endif %}
         </div>
+    </div>
 
-        <div class="i-box-group vert">
-            <div class="i-box titled no-padding">
-                <div class="i-box-header">
-                    <div class="i-box-title icon-attachment">
-                        {% trans %}Presentation Materials{% endtrans %}
-                    </div>
-                    <div class="i-box-buttons toolbar right">
-                        <div class="group">
-                            {% if contribution.can_manage_attachments(session.user)
-                                or contribution.can_manage(session.user, role='submit') -%}
-                                <a href="#" class="i-button icon-edit"
-                                   data-locator="{{ contribution.locator|tojson|forceescape }}"
-                                   data-attachment-editor></a>
-                            {%- endif %}
-                        </div>
-                    </div>
+    <div class="i-box-group vert">
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title icon-attachment">
+                    {% trans %}Presentation Materials{% endtrans %}
                 </div>
-                <div class="i-box-content">
-                    <div class="attachments-box">
-                        {{ render_attachments(contribution.attached_items, management=false) }}
+                <div class="i-box-buttons toolbar right">
+                    <div class="group">
+                        {% if contribution.can_manage_attachments(session.user)
+                            or contribution.can_manage(session.user, role='submit') -%}
+                            <a href="#" class="i-button icon-edit"
+                               data-locator="{{ contribution.locator|tojson|forceescape }}"
+                               data-attachment-editor></a>
+                        {%- endif %}
                     </div>
                 </div>
             </div>
+            <div class="i-box-content">
+                <div class="attachments-box">
+                    {{ render_attachments(contribution.attached_items, management=false) }}
+                </div>
+            </div>
+        </div>
 
-            {% if contribution.subcontributions -%}
-                <div class="i-box titled no-padding">
-                    <div class="i-box-header">
-                        <div class="i-box-title">
-                            {% trans %}Subcontributions{% endtrans %}
-                        </div>
-                    </div>
-                    <div class="i-box-content">
-                        <ul class="group-list no-content-before with-buttons">
-                            {% for subcontrib in contribution.subcontributions -%}
-                                <li>
-                                    <span>
-                                        <a href="{{ url_for('.display_subcontribution', subcontrib) }}">
-                                            {{ subcontrib.title }}
-                                        </a>
-                                    </span>
-                                    {% if subcontrib.can_manage(session.user) -%}
-                                        <span class="right group">
-                                            <a href="#" class="icon-edit"
-                                               data-href="{{ url_for('.manage_edit_subcontrib', subcontrib) }}"
-                                               data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
-                                               data-ajax-dialog
-                                               data-reload-after></a>
-                                        </span>
-                                    {%- endif %}
-                                </li>
-                            {%- endfor %}
-                        </ul>
+        {% if contribution.subcontributions -%}
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        {% trans %}Subcontributions{% endtrans %}
                     </div>
                 </div>
-            {%- endif %}
-        </div>
+                <div class="i-box-content">
+                    <ul class="group-list no-content-before with-buttons">
+                        {% for subcontrib in contribution.subcontributions -%}
+                            <li>
+                                <span>
+                                    <a href="{{ url_for('.display_subcontribution', subcontrib) }}">
+                                        {{ subcontrib.title }}
+                                    </a>
+                                </span>
+                                {% if subcontrib.can_manage(session.user) -%}
+                                    <span class="right group">
+                                        <a href="#" class="icon-edit"
+                                           data-href="{{ url_for('.manage_edit_subcontrib', subcontrib) }}"
+                                           data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+                                           data-ajax-dialog
+                                           data-reload-after></a>
+                                    </span>
+                                {%- endif %}
+                            </li>
+                        {%- endfor %}
+                    </ul>
+                </div>
+            </div>
+        {%- endif %}
     </div>
+
     <script>
         setupAttachmentTreeView();
     </script>
