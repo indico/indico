@@ -196,9 +196,7 @@ class WPContributionModifBase(WPConferenceModifBase):
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
-        self._canModify = (self._contrib.can_manage(session.user) or
-                           (self._contrib.session and
-                            self._contrib.session.can_manage(session.user, role='coordinate')))
+        self._canModify = self._contrib.can_manage(session.user)
 
     def _getEnabledControls(self):
         return False
@@ -250,13 +248,6 @@ class WPContributionModifBase(WPConferenceModifBase):
                not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
                 self._tabGiveAdvice = self._subtabReviewing.newSubTab(
                     "advice", _("Assess Content"), url_for('event_mgmt.contributionGiveAdvice', self._target))
-
-            if self._canModify or \
-               self._isPRM or \
-               review_manager.isInReviewingTeamforContribution(self._rh._getUser()):
-                self._subTabRevMaterial = self._subtabReviewing.newSubTab(
-                    "revmaterial", _("Material to Review"),
-                    url_for('event_mgmt.contributionReviewing-contributionReviewingMaterials', self._target))
 
             if self._canModify or \
                self._isPRM or \

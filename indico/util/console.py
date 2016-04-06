@@ -133,11 +133,11 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
     """
 
     def _eventIterator(conference, tabs):
-        for contrib in conference.getContributionList():
+        for contrib in conference.as_event.contributions:
             yield ('contrib', contrib)
 
             if deepness == 'subcontrib':
-                for scontrib in contrib.getSubContributionList():
+                for scontrib in contrib.subcontributions:
                     yield ('subcontrib', scontrib)
 
     idx = ch._getIdx()

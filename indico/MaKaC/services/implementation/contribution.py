@@ -32,6 +32,7 @@ from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
 from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.string import to_unicode
@@ -52,16 +53,8 @@ class ContributionBase(object):
         if self._conf == None:
             raise Exception("Conference id not specified.")
 
-        try:
-            self._target = self._contribution = self._conf.getContributionById(self._params["contribution"])
-        except:
-            try:
-                self._target = self._contribution = self._conf.getContributionById(self._params["contribId"])
-            except:
-                raise ServiceError("ERR-C0", "Invalid contribution id.")
-
-        if self._target == None:
-            raise Exception("Contribution id not specified.")
+        contrib_id = int(self._params.get('contribId', self._params.get('contribution')))
+        self._target = self._contribution = self.contrib = Contribution.get_one(contrib_id)
 
         # create a parameter manager that checks the consistency of passed parameters
         self._pm = ParameterManager(self._params)

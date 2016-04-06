@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+from flask import session
 
 from MaKaC import user
 from MaKaC.common.fossilize import fossilize
@@ -52,7 +53,7 @@ class ConferenceReviewingBase(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._event = self._target.as_event
+        self._event = self._conf.as_event
         self._confPaperReview = self._conf.getConfPaperReview()
         self._confAbstractReview = self._conf.getConfAbstractReview()
 
@@ -82,7 +83,7 @@ class ConferenceReviewingAssignStaffBase(ConferenceReviewingBase, UserModificati
         ConferenceReviewingBase._checkParams(self)
         if self._params.has_key('contributions'):
             pm = ParameterManager(self._params)
-            contributionsIds = [int(c) for c in pm.extract("contributions", pType=list, allowEmpty=False)]
+            contributionsIds = {int(c) for c in pm.extract("contributions", pType=list, allowEmpty=False)}
             self._contributions = [contrib for contrib in self._event.contributions
                                    if contrib.id in contributionsIds]
         else:
@@ -165,7 +166,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingPRMBase):
     def _getAnswer(self):
         date = self._setParam()
         if self._apply:
-            for contrib in self._conf.getContributionList():
+            for contrib in self._event.contributions:
                 lastReview = self._conf.getReviewManager(contrib)
                 if self._dueDateToChange == "Referee":
                     lastReview.setRefereeDueDate(date)
@@ -732,7 +733,7 @@ class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
         self._current = self._params.get("current", None)
 
     def _checkProtection(self):
-        if self._target.getConference().hasEnabledSection("paperReviewing"):
+        if self._target.event_new.as_legacy.hasEnabledSection("paperReviewing"):
             hasRights = False
             if self._current == 'refereeJudgement':
                 hasRights =  RCContributionReferee.hasRights(self)
@@ -742,7 +743,8 @@ class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
                 hasRights = RCContributionReviewer.hasRights(self)
 
             if not hasRights and not RCPaperReviewManager.hasRights(self):
-                ProtectedModificationService._checkProtection(self)
+                if not self._target.can_manage(session.user):
+                    raise ServiceAccessError("You don't have the rights to modify this object")
         else:
             raise ServiceError("ERR-REV1b",_("Paper Reviewing is not active for this conference"))
 

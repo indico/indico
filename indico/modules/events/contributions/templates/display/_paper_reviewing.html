@@ -1,0 +1,112 @@
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% set UPLOAD_NEEDED_STATUSES = ('To be corrected', none) %}
+
+{% macro _render_paper_reviewing_status(status, icon) %}
+    <span class="{{ icon }} status-{{ status }} reviewing-status-display">
+        {{ caller() }}
+    </span>
+{% endmacro %}
+
+{% macro render_paper_files(paper_files) %}
+    <table class="tree" id="paper-files">
+        {% for paper_file in paper_files %}
+            <tr>
+                <td>
+                    <span class="{{ icon_from_mimetype(paper_file.content_type, 'icon-file-filled') }}">
+                        <a href="{{ url_for('paper_reviewing.download_paper_file', paper_file) }}">
+                            {{ paper_file.filename }}
+                        </a>
+                    </span>
+                </td>
+                <td class="actions">
+                    <a class="icon-remove js-delete"
+                       data-method="DELETE"
+                       data-href="{{ url_for('paper_reviewing.remove_paper_file', paper_file) }}"
+                       data-title="{% trans name=paper_file.file_name %}Remove {{ name }}?{% endtrans %}"
+                       data-confirm="{% trans name=paper_file.filename -%}
+                            Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                       {%- endtrans %}"
+                      data-update="#paper-files"></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endmacro %}
+
+{% macro _render_upload_form(form, contribution) %}
+    {{ form_header(form, id='paper-upload-form', orientation='vertical',
+                   action=url_for('paper_reviewing.upload_paper_files', contribution)) }}
+    {{ form_rows(form, skip_labels=true) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Upload{% endtrans %}"
+               data-disabled-until-change>
+    {% endcall %}
+    <script>
+        $(document).ready(function() {
+            var dropzone = Dropzone.forElement('#paper-upload-form');
+
+            dropzone.on("success", function(e, response) {
+                setTimeout(function() {
+                    dropzone.removeAllFiles();
+                    $('#paper-files').html(response.html);
+                }, 500);
+            });
+        });
+    </script>
+{% endmacro %}
+
+{% macro render_paper_reviewing_status(contrib, reviewing_status, upload_form, paper_files) %}
+    {% if reviewing_status == 'Submitted' %}
+        {% call _render_paper_reviewing_status('awaiting-review', 'icon-time') %}
+            {% trans %}Awaiting review{% endtrans %}
+        {% endcall %}
+    {% elif reviewing_status == 'Accept' %}
+        {% call _render_paper_reviewing_status('accepted', 'icon-checkmark') %}
+            {% trans %}Accepted{% endtrans %}
+        {% endcall %}
+    {% elif reviewing_status == 'Reject' %}
+        {% call _render_paper_reviewing_status('rejected', 'icon-cross') %}
+            {% trans %}Rejected{% endtrans %}
+        {% endcall %}
+    {% elif reviewing_status == 'To be corrected' %}
+        {% call _render_paper_reviewing_status('tbc', 'icon-quill') %}
+            {% trans %}To be corrected{% endtrans %}
+        {% endcall %}
+    {% elif reviewing_status is not none %}
+        {% call _render_paper_reviewing_status('other', 'icon-checkmark') %}
+            {{ reviewing_status }}
+        {% endcall %}
+    {% else %}
+        {% call _render_paper_reviewing_status('no-paper', 'icon-time') %}
+            {% trans %}Paper not yet submitted{% endtrans %}
+        {% endcall %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_paper_reviewing(contrib, reviewing_status, upload_form, paper_files, can_submit_paper) %}
+    <div class="i-box-group vert">
+        <div class="i-box no-padding">
+            <div class="i-box-header">
+                {{ render_paper_reviewing_status(contrib, reviewing_status, upload_form, paper_files) }}
+            </div>
+            <div class="i-box-content">
+                <h3>{% trans %}List of files{% endtrans %}</h3>
+                {{ render_paper_files(paper_files) }}
+                {% if reviewing_status in UPLOAD_NEEDED_STATUSES and can_submit_paper %}
+                    {{ _render_upload_form(upload_form, contrib) }}
+                {% endif %}
+            </div>
+            {% if reviewing_status in UPLOAD_NEEDED_STATUSES and can_submit_paper %}
+                <div class="i-box-footer">
+                    <form action="{{ url_for('paper_reviewing.submit_paper', contrib) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <button class="i-button icon-checkmark highlight right" id="js-submit-for-review">
+                            {% trans %}Submit for review{% endtrans %}
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

@@ -54,6 +54,12 @@ class WPMyContributions(WPContributionsDisplayBase):
 class WPContributions(WPContributionsDisplayBase):
     menu_entry_name = 'contributions'
 
+    def getJSFiles(self):
+        return (WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['dropzone_js'].urls())
+
+    def getCSSFiles(self):
+        return (WPContributionsDisplayBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls())
+
 
 class WPAuthorList(WPContributionsDisplayBase):
     menu_entry_name = 'author_index'

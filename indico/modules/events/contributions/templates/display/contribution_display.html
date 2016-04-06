@@ -1,6 +1,7 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'events/display/common/_conferences.html' import render_attachments %}
+{% from 'events/contributions/display/_paper_reviewing.html' import render_paper_reviewing %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -178,11 +179,16 @@
         </div>
     </div>
 
+    {% if show_paper %}
+        <h3 class="icon-file">Paper</h3>
+        {{ render_paper_reviewing(contribution, reviewing_status, paper_upload_form, paper_files, can_submit_paper) }}
+    {% endif %}
+
     {{ render_attachments(contribution) }}
 
     {% if contribution.subcontributions -%}
         <h3>{% trans %}Subcontributions{% endtrans %}</h3>
-        <div class="i-box titled no-padding">
+        <div class="i-box no-padding">
             <div class="i-box-content">
                 <ul class="group-list no-content-before with-buttons">
                     {% for subcontrib in contribution.subcontributions -%}

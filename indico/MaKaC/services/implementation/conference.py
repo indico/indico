@@ -27,6 +27,8 @@ from indico.core import signals
 
 import datetime
 
+from sqlalchemy.orm import joinedload
+
 # legacy indico imports
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
@@ -40,7 +42,6 @@ from MaKaC.common.contextManager import ContextManager
 from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
-from MaKaC.fossils.contribution import IContributionFossil
 from MaKaC.fossils.reviewing import IReviewManagerFossil
 
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
@@ -55,9 +56,11 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 
 # indico imports
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.util import track_time_changes
 from indico.modules.users.util import get_user_by_email
+from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
@@ -75,7 +78,7 @@ def _serialize_contribution(contrib):
         'endDate': Conversion.datetime(contrib.end_dt),
         'duration': Conversion.duration(contrib.duration),
         'description': contrib.description,
-        'track': contrib.track.getTitle() if contrib.track else None,
+        'track': to_unicode(contrib.track.getTitle()) if contrib.track else None,
         'session': contrib.session.title if contrib.session else None,
         'type': contrib.type.name if contrib.type else None,
         'address': contrib.address,
@@ -527,7 +530,8 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
             ProtectedModificationService._checkProtection(self)
 
     def _handleGet(self):
-        contributions = self._conf.as_event.contributions
+        contributions = (Contribution.find(event_new=self._conf.as_event, is_deleted=False).
+                         options(joinedload('timetable_entry'), joinedload('paper_reviewing_roles')))
 
         filter = {}
 

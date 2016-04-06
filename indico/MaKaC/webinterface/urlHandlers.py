@@ -1798,10 +1798,6 @@ class UHContributionModifReviewing(URLHandler):
     _endpoint = 'event_mgmt.contributionReviewing'
 
 
-class UHContribModifReviewingMaterials(URLHandler):
-    _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingMaterials'
-
-
 class UHContributionReviewingJudgements(URLHandler):
     _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingJudgements'
 
