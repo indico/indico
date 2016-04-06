@@ -1,16 +1,18 @@
 {% extends 'layout/conference_page_base.html' %}
 
-{% from 'attachments/_attachments.html' import render_attachments %}
+{% from 'events/display/common/_conferences.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
 
 {% block title -%}
-    {{ subcontrib.contribution.title }}
+    {{ subcontrib.title }}
 {%- endblock %}
 
 {% block subtitle -%}
-    {{ subcontrib.title }}
+    <a href="{{ url_for('contributions.display_contribution', subcontrib.contribution) }}">
+        {{ subcontrib.contribution.title }}
+    </a>
 {%- endblock %}
 
 {% block description %}
@@ -54,38 +56,16 @@
                 </div>
             {% endif %}
         </div>
+        {% if subcontrib.description %}
+            <h3>{% trans %}Description{% endtrans %}</h3>
+            <div class="description">
+                {{ subcontrib.description }}
+            </div>
+        {% endif %}
     </div>
 
-    {% if subcontrib.description %}
-        <h3>{% trans %}Description{% endtrans %}</h3>
-        <div class="description">
-            {{ subcontrib.description }}
-        </div>
-    {% endif %}
 
-    <div class="i-box-group vert">
-        <div class="i-box titled no-padding">
-            <div class="i-box-header">
-                <div class="i-box-title icon-attachment">
-                    {% trans %}Presentation Materials{% endtrans %}
-                </div>
-                <div class="i-box-buttons toolbar right">
-                    <div class="group">
-                        {% if subcontrib.can_manage_attachments(session.user) %}
-                            <a href="#" class="i-button icon-edit"
-                               data-locator="{{ subcontrib.locator|tojson|forceescape }}"
-                               data-attachment-editor></a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="i-box-content">
-                <div class="attachments-box">
-                    {{ render_attachments(subcontrib.attached_items, management=false) }}
-                </div>
-            </div>
-        </div>
-    </div>
+    {{ render_attachments(subcontrib) }}
 
     <script>
         setupAttachmentTreeView();
