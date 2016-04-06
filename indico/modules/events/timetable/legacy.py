@@ -51,7 +51,7 @@ class TimetableSerializer(object):
                 continue
             if not entry.can_view(session.user):
                 continue
-            data = self.serialize_timetable_entry(entry)
+            data = self.serialize_timetable_entry(entry, load_children=False)
             key = self._get_entry_key(entry)
             if entry.parent:
                 parent_code = 's{}'.format(entry.parent_id)
@@ -81,9 +81,9 @@ class TimetableSerializer(object):
                 data[date_key][entry_key] = self.serialize_timetable_entry(child_entry)
         return data
 
-    def serialize_timetable_entry(self, entry):
+    def serialize_timetable_entry(self, entry, **kwargs):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return self.serialize_session_block_entry(entry)
+            return self.serialize_session_block_entry(entry, kwargs.pop('load_children', True))
         elif entry.type == TimetableEntryType.CONTRIBUTION:
             return self.serialize_contribution_entry(entry)
         elif entry.type == TimetableEntryType.BREAK:
@@ -91,9 +91,13 @@ class TimetableSerializer(object):
         else:
             raise TypeError("Unknown timetable entry type.")
 
-    def serialize_session_block_entry(self, entry):
+    def serialize_session_block_entry(self, entry, load_children=True):
         block = entry.session_block
         data = {}
+        if not load_children:
+            entries = defaultdict(dict)
+        else:
+            entries = {self._get_entry_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
@@ -110,7 +114,7 @@ class TimetableSerializer(object):
                      'description': block.session.description,
                      'duration': block.duration.seconds / 60,
                      'isPoster': block.session.is_poster,
-                     'entries': defaultdict(dict),
+                     'entries': entries,
                      'pdf': None,
                      'url': url_for('sessions.display_session', block.session)})
         return data
