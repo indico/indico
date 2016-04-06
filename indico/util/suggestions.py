@@ -17,7 +17,6 @@
 from __future__ import division
 from collections import defaultdict
 from datetime import date, timedelta
-from itertools import islice
 from operator import methodcaller
 
 from MaKaC.common.indexes import IndexesHolder
@@ -25,6 +24,7 @@ from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.util.redis import avatar_links
+from indico.util.struct.iterables import window
 
 
 def _unique(seq, get_identity=None):
@@ -38,19 +38,6 @@ def _unique(seq, get_identity=None):
 
 def _unique_events(seq):
     return _unique(seq, methodcaller('getId'))
-
-
-def _window(seq, n=2):
-    """Returns a sliding window (of width n) over data from the iterable
-       s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
-    """
-    it = iter(seq)
-    result = tuple(islice(it, n))
-    if len(result) == n:
-        yield result
-    for elem in it:
-        result = result[1:] + (elem,)
-        yield result
 
 
 def _get_blocks(events, attended):
@@ -82,7 +69,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
     last_event_date = attended_events[-1].getStartDate().replace(hour=0, minute=0) + timedelta(days=1)
     blocks = _get_blocks(_unique_events(idx.iterateObjectsIn(categ.getId(), first_event_date, last_event_date)),
                          attended_events_set)
-    for a, b in _window(blocks):
+    for a, b in window(blocks):
         # More than 3 months between blocks? Ignore the old block!
         if b[0].getStartDate() - a[-1].getStartDate() > timedelta(weeks=12):
             first_event_date = b[0].getStartDate().replace(hour=0, minute=0)
