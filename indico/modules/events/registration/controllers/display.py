@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from uuid import UUID
 
 from flask import request, session, redirect, flash, jsonify
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -123,6 +124,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                        ~Registration.is_deleted,
                        _join=Registration.registration_form,
                        _eager=Registration.registration_form)
+                 .options(subqueryload('data').joinedload('field_data'))
                  .order_by(*Registration.order_by_name))
         registrations = [_process_registration(reg, column_names) for reg in query]
         table = {'headers': headers, 'rows': registrations}
@@ -144,8 +146,11 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return table
 
     def _process(self):
-        regforms = RegistrationForm.find_all(RegistrationForm.publish_registrations_enabled,
-                                             event_id=int(self.event.id))
+        regforms = (self.event_new.registration_forms
+                    .filter(RegistrationForm.publish_registrations_enabled,
+                            ~RegistrationForm.is_deleted)
+                    .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
+                    .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
         else:
