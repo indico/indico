@@ -168,3 +168,16 @@ def move_timetable_entry(entry, parent=None, day=None):
     if parent and entry.end_dt > parent.end_dt:
         duration = parent.object.duration + (entry.end_dt - parent.end_dt)
         update_session_block(parent.object, {'duration': duration})
+
+
+def update_timetable_entry_object(entry, data):
+    """Update the `object` of a timetable entry according to its type"""
+    from indico.modules.events.contributions.operations import update_contribution
+    obj = entry.object
+    if entry.type == TimetableEntryType.CONTRIBUTION:
+        update_contribution(obj, data)
+    elif entry.type == TimetableEntryType.SESSION_BLOCK:
+        update_session_block(obj, data)
+    elif entry.type == TimetableEntryType.BREAK:
+        obj.populate_from_dict(data)
+    db.session.flush()
