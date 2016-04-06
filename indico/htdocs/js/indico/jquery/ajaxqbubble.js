@@ -31,13 +31,16 @@
             url: null,
             method: 'GET',
             cache: false,
-            success: null
+            success: null,
+            onClose: null // callback to invoke after closing the qtip by submitting the inner form. the argument
+                          // is null if closed manually, otherwise the JSON returned by the server.
         },
 
         _create: function() {
             var self = this;
             var qBubbleOptions = _.pick(self.options, 'qBubbleOptions').qBubbleOptions;
             var ajaxOptions = _.omit(self.options, 'qBubbleOptions');
+            var returnData = null;
 
             self.element.qbubble($.extend(true, {}, qBubbleOptions, {
                 events: {
@@ -84,6 +87,7 @@
                                         success: function(data) {
                                             if (data.success) {
                                                 self.element.next('.label').text(data.new_value);
+                                                returnData = data;
                                                 api.hide(true);
                                             } else {
                                                 updateContent(data);
@@ -99,6 +103,9 @@
                     },
                     hide: function(evt) {
                         var originalEvent = evt.originalEvent;
+
+                        self.options.onClose(returnData);
+                        returnData = null;
 
                         // in order not to hide the qBubble when selecting a date
                         if ((originalEvent && $(originalEvent.target).closest('#ui-datepicker-div').length)) {
