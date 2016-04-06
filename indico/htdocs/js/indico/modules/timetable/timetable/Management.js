@@ -1017,37 +1017,22 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
     __handler: function(confirm) {
         var self = this;
 
-        if (confirm) {
-            if (this.tt.IntervalManagementTimeTable){
-                // Fit session slot according to its entries.
-                IndicoUI.Dialogs.Util.progress($T("Fitting session to content"));
-                Util.postRequest(build_url(Indico.Urls.FitSessionSlot, {
-                    confId: self.tt.contextInfo.conferenceId,
-                    sessionId: self.tt.contextInfo.sessionId,
-                    slotId: self.tt.contextInfo.sessionSlotId,
-                    day: self.tt.currentDay
-                }), null, {});
-            }
-//            else if (this.tt.isSessionTimetable) {
-//                // Fit session according to its session slots
-//                IndicoUI.Dialogs.Util.progress($T("Fitting timetable to content"));
-//                Util.postRequest(Indico.Urls.FitSession,
-//                        {
-//                            confId: self.tt.eventInfo.id,
-//                            sessionId: self.tt.eventInfo.timetableSession.id
-//                        },
-//                        {});
-//            }
-//            else {
-//                // Fit the event according to its entries
-//                IndicoUI.Dialogs.Util.progress($T("Fitting timetable to content"));
-//                Util.postRequest(Indico.Urls.FitConf,
-//                        {
-//                            confId: self.tt.eventInfo.id
-//                        },
-//                        {});
-//            }
+        if (!confirm || !this.tt.IntervalManagementTimeTable) {
+            return;
         }
+
+        $.ajax({
+            url: build_url(Indico.Urls.Timetable.sessionBlocks.fit, {
+                confId: self.tt.contextInfo.conferenceId,
+                block_id: self.tt.contextInfo.sessionSlotId
+            }),
+            method: 'POST',
+            complete: IndicoUI.Dialogs.Util.progress($T.gettext("Fitting...")),
+            error: handleAjaxError,
+            success: function() {
+                location.reload();
+            }
+        });
     }
 },
 

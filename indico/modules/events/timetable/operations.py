@@ -103,3 +103,13 @@ def delete_timetable_entry(entry, log=True):
         entry.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
                             "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
                             data={'Time': format_datetime(entry.start_dt)})
+
+
+def fit_session_block_entry(entry):
+    assert entry.type == TimetableEntryType.SESSION_BLOCK
+    children = entry.children
+    if not children:
+        return
+    entry.start_dt = min(x.start_dt for x in children)
+    end_dt = max(x.end_dt for x in children)
+    entry.session_block.duration = end_dt - entry.start_dt
