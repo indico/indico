@@ -77,11 +77,12 @@ def find_earliest_gap(event, day, duration, session_block=None):
     """
     if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
         raise ValueError("Day is out of bounds.")
-    entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day)
     if session_block:
+        entries = session_block.timetable_entry.children
         start_dt = session_block.timetable_entry.start_dt
         latest_end_dt = session_block.timetable_entry.end_dt
     else:
+        entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day)
         start_dt = event.start_dt if event.start_dt.date() == day else get_day_start(day, tzinfo=event.tzinfo)
         latest_end_dt = event.end_dt
     end_dt = start_dt + duration
