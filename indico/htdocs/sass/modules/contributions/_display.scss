@@ -198,7 +198,7 @@ $display-preview-bg-color: white;
     }
 }
 
-#contribution-display {
+#contribution-display, #subcontribution-display {
     clear: both;
     color: $black;
     @extend %font-family-modern-body;
@@ -230,37 +230,6 @@ $display-preview-bg-color: white;
     .description, .infogrid {
         @extend %font-family-modern-body;
         margin-bottom: 1em;
-    }
-
-    .infoline {
-        .text {
-            padding-left: 0;
-        }
-
-        ul {
-            padding: 0;
-            list-style-type: none;
-
-            li {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin: 5px 0;
-                padding: 0 5px;
-
-                a {
-                    padding: 5px;
-                }
-            }
-        }
-    }
-}
-
-#subcontribution-display {
-    .subcontribution-location {
-        &::before {
-            font-size: 2rem;
-        }
     }
 
     .infoline {

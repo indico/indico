@@ -1,7 +1,7 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'attachments/_attachments.html' import render_attachments %}
-{% from 'events/display/indico/_common.html' import render_location %}
+{% from 'events/display/indico/_common.html' import render_location, render_users %}
 
 {% block title -%}
     {{ subcontrib.contribution.title }}
@@ -10,6 +10,18 @@
 {% block subtitle -%}
     {{ subcontrib.title }}
 {%- endblock %}
+
+{% block description %}
+    <div class="time-data">
+        <span class="time-info icon-time">
+            {% if subcontrib.timetable_entry -%}
+                {{ subcontrib.timetable_entry.start_dt|format_datetime }}
+            {%- else -%}
+                {% trans %}Not scheduled{% endtrans %}
+            {%- endif %}
+        </span>
+    </div>
+{% endblock %}
 
 {% block page_actions -%}
     <div class="toolbar right">
@@ -26,63 +38,41 @@
 {% block content -%}
     <div id="subcontribution-display">
         <div class="infogrid condensed">
-            <div class="infoline">
-                <i class="icon-time"></i>
-                <div class="text">
-                    <div>
-                        <span>
-                            {{ subcontrib.duration|format_human_timedelta }}
-                        </span>
-                    </div>
+            {% if subcontrib.speakers %}
+                <h3>
+                    {%- trans count=subcontrib.speakers|length -%}
+                        Speaker
+                    {%- pluralize -%}
+                        Speakers
+                    {%- endtrans -%}
+                </h3>
+                <div class="speaker-list">
+                    {{ render_users(subcontrib.speakers|sort(attribute='full_name'),
+                                    span_class='speaker-item icon-user', separator='') }}
                 </div>
-            </div>
-            <div class="infoline">
-                <div class="text">
-                    {%- set location_parent = subcontrib.location_parent -%}
-                    {% if location_parent.has_location_info -%}
-                        {{ render_location(location_parent, class='subcontribution-location') }}
-                    {%- endif %}
-                </div>
-            </div>
-            {% if subcontrib.speakers -%}
-                <div class="infoline">
-                    <div class="text">
-                        <h3>
-                            {% trans count=subcontrib.speakers|length -%}
-                                Speaker
-                            {%- pluralize -%}
-                                Speakers
-                            {%- endtrans %}
-                        </h3>
-                        <ul>
-                            {% for speaker in subcontrib.speakers -%}
-                                <li class="icon-user">
-                                    <span>{{- speaker.person.full_name -}}</span>
-                                </li>
-                            {%- endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {%- endif %}
+            {% endif %}
         </div>
-        <div class="i-box titled no-padding">
-            <div class="i-box-header">
-                <div class="i-box-title icon-attachment">
-                    {% trans %}Materials{% endtrans %}
-                </div>
-                <div class="i-box-buttons toolbar right">
-                    <div class="group">
-                        {% if subcontrib.can_manage_attachments(session.user) %}
-                            <a href="#" class="i-button icon-edit"
-                               data-locator="{{ subcontrib.locator|tojson|forceescape }}"
-                               data-attachment-editor></a>
-                        {% endif %}
+
+        <div class="i-box-group vert">
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title icon-attachment">
+                        {% trans %}Presentation Materials{% endtrans %}
+                    </div>
+                    <div class="i-box-buttons toolbar right">
+                        <div class="group">
+                            {% if subcontrib.can_manage_attachments(session.user) %}
+                                <a href="#" class="i-button icon-edit"
+                                   data-locator="{{ subcontrib.locator|tojson|forceescape }}"
+                                   data-attachment-editor></a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="i-box-content">
-                <div class="attachments-box">
-                    {{ render_attachments(subcontrib.attached_items, management=false) }}
+                <div class="i-box-content">
+                    <div class="attachments-box">
+                        {{ render_attachments(subcontrib.attached_items, management=false) }}
+                    </div>
                 </div>
             </div>
         </div>
