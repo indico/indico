@@ -33,7 +33,8 @@ from indico.modules.events.timetable.forms import BreakEntryForm, ContributionEn
 from indico.modules.events.timetable.legacy import serialize_contribution, serialize_entry_update, serialize_session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
-                                                        schedule_contribution, fit_session_block_entry)
+                                                        schedule_contribution, fit_session_block_entry,
+                                                        update_break_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import find_next_start_dt
 from indico.modules.events.util import get_random_color, track_time_changes
@@ -112,6 +113,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                                 .first_or_404())
 
     def _process(self):
+        form = None
         if self.timetable_entry.contribution:
             contrib = self.timetable_entry.contribution
             tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
@@ -122,6 +124,15 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                 with track_time_changes():
                     update_contribution(contrib, *_get_field_values(form.data))
                 return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
+        elif self.timetable_entry.break_:
+            break_ = self.timetable_entry.break_
+            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+            form = BreakEntryForm(event=self.event_new, day=tt_entry_dt.date(),
+                                  obj=FormDefaults(break_, time=tt_entry_dt.time()))
+            if form.validate_on_submit():
+                with track_time_changes():
+                    update_break_entry(break_, form.data)
+                return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)], flash=False)
         self.commit = False
         return jsonify_form(form)
 
