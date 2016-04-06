@@ -45,6 +45,7 @@ class EntryFormMixin(object):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
+        self.session_block = kwargs.pop('session_block', None)
         self.day = kwargs.pop('day')
         kwargs['time'] = self._get_default_time()
         defaults = kwargs.get('obj') or FormDefaults()
@@ -81,7 +82,8 @@ class EntryFormMixin(object):
                                   .format(self._entry_type.title.capitalize()))
 
     def _get_default_time(self):
-        start_dt = find_earliest_gap(self.event, self.day, duration=self._default_duration)
+        start_dt = find_earliest_gap(self.event, self.day, duration=self._default_duration,
+                                     session_block=self.session_block)
         return start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
 
 
