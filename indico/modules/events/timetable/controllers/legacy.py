@@ -165,20 +165,20 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
                 'day': {'type': 'string', 'format': 'date'},
                 'gap': {'type': 'integer', 'minimum': 0},
                 'fit_blocks': {'type': 'boolean'},
-                'session_block': {'type': 'integer'},
-                'session': {'type': 'integer'}
+                'session_block_id': {'type': 'integer'},
+                'session_id': {'type': 'integer'}
             },
             'required': ['mode', 'day', 'gap', 'fit_blocks']
         }
         self.validate_json(schema)
         self.day = dateutil.parser.parse(request.json['day']).date()
         self.session_block = self.session = None
-        if request.json.get('session_block') is not None:
-            self.session_block = self.event_new.get_session_block(request.json['session_block'], scheduled_only=True)
+        if request.json.get('session_block_id') is not None:
+            self.session_block = self.event_new.get_session_block(request.json['session_block_id'], scheduled_only=True)
             if self.session_block is None:
                 raise NotFound
-        elif request.json.get('session') is not None:
-            self.session = self.event_new.get_session(request.json['session'])
+        elif request.json.get('session_id') is not None:
+            self.session = self.event_new.get_session(request.json['session_id'])
             if self.session is None:
                 raise NotFound
 

@@ -898,9 +898,9 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     fit_blocks: self.fitInnerAction == 'doFit'
                 };
                 if (self.isIntervalTimetable) {
-                    data.session_block = self.tt.contextInfo.sessionSlotId;
+                    data.session_block_id = self.tt.contextInfo.sessionSlotId;
                 } else if (self.isTopLevelTimetable && exists(self.tt.contextInfo.timetableSession)) {
-                    data.session = self.tt.contextInfo.timetableSession.id;
+                    data.session_id = self.tt.contextInfo.timetableSession.id;
                 }
 
                 $.ajax({
