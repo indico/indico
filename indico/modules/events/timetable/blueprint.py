@@ -26,7 +26,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableReschedule,
                                                                 RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryTime,
-                                                                RHLegacyTimetableEntryMove)
+                                                                RHLegacyTimetableEntryMove,
+                                                                RHLegacyChangeTimetableEntryDatetime)
 from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST, RHTimetableBalloon
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -42,6 +43,8 @@ _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest',
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/balloon', 'balloon', RHTimetableBalloon)
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/move', 'move_timetable_entry', RHLegacyTimetableEntryMove,
                  methods=('POST', 'PATCH'))
+_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/change-datetime', 'change_datetime',
+                 RHLegacyChangeTimetableEntryDatetime, methods=('POST',))
 
 # Timetable legacy operations
 _bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)

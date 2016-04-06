@@ -36,14 +36,16 @@ from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionE
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,
-                                                        move_timetable_entry)
+                                                        move_timetable_entry, update_timetable_entry_object)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import find_next_start_dt, get_session_block_entries
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import iterdays, as_utc
+from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -328,3 +330,22 @@ class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
         for day in iterdays(self.event_new.start_dt, self.event_new.end_dt):
             entries[day.date()] = get_session_block_entries(self.event_new, day)
         return entries
+
+
+class RHLegacyChangeTimetableEntryDatetime(RHManageTimetableEntryBase):
+    """Changes the start_dt of a `TimetableEntry`"""
+
+    def _process(self):
+        new_start_dt = as_utc(dateutil.parser.parse(request.form.get('startDate'))).astimezone(self.event_new.tzinfo)
+        new_end_dt = as_utc(dateutil.parser.parse(request.form.get('endDate'))).astimezone(self.event_new.tzinfo)
+        new_duration = new_end_dt - new_start_dt
+        is_session_block = self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK
+        if is_session_block and new_end_dt.date() != self.timetable_entry.start_dt.date():
+            return jsonify(success=False, error={'message': _('Session block cannot span more than one day'),
+                                                 'type': 'noReport'})
+        with track_time_changes():
+            if is_session_block:
+                self.timetable_entry.move(new_start_dt)
+            update_timetable_entry_object(self.timetable_entry, {'duration': new_duration})
+            update_timetable_entry(self.timetable_entry, {'start_dt': new_start_dt.astimezone(self.event_new.tzinfo)})
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.timetable_entry))
