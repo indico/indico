@@ -42,7 +42,11 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${md_convert(abstract.getField(field.getId()).value.decode('utf-8'))}
+            % if field._type == 'selection':
+                ${md_convert(abstract.getField(field.getId()))}
+            % else:
+                ${md_convert(abstract.getField(field.getId()).value.decode('utf-8'))}
+            % endif
         }
         \vspace{1.5em}
     \end{addmargin}
