@@ -34,6 +34,7 @@
     }
 
     var filterConfig = {
+        itemHandle: 'tr',
         listItems: '#sessions-wrapper tr.session-row',
         term: '#search-input',
         state: '#filtering-state',
