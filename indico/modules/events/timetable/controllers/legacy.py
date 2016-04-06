@@ -42,15 +42,22 @@ class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.day = dateutil.parser.parse(request.args['day']).date()
+        self.session_block = None
+        if 'session_block_id' in request.args:
+            self.session_block = self.event_new.get_session_block(request.args['session_block_id'])
 
     def _get_form_defaults(self, **kwargs):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
         return FormDefaults(location_data=inherited_location, **kwargs)
 
+    def _get_form_params(self):
+        return {'event': self.event_new,
+                'session_block': self.session_block,
+                'day': self.day}
+
 
 class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
-
     def _get_default_colors(self):
         breaks = Break.query.filter(Break.timetable_entry.has(event_new=self.event_new)).all()
         common_colors = Counter(b.colors for b in breaks)
@@ -61,9 +68,9 @@ class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
     def _process(self):
         colors = self._get_default_colors()
         defaults = self._get_form_defaults(colors=colors)
-        form = BreakEntryForm(event=self.event_new, day=self.day, obj=defaults)
+        form = BreakEntryForm(obj=defaults, **self._get_form_params())
         if form.validate_on_submit():
-            entry = create_break_entry(self.event_new, form.data)
+            entry = create_break_entry(self.event_new, form.data, session_block=self.session_block)
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         return jsonify_form(form, fields=form._display_fields)
 
@@ -71,9 +78,9 @@ class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
 class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
     def _process(self):
         defaults = self._get_form_defaults()
-        form = ContributionEntryForm(event=self.event_new, day=self.day, to_schedule=True, obj=defaults)
+        form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
         if form.validate_on_submit():
-            contrib = create_contribution(self.event_new, form.data)
+            contrib = create_contribution(self.event_new, form.data, session_block=self.session_block)
             return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
         self.commit = False
         return jsonify_form(form, fields=form._display_fields)
@@ -86,7 +93,7 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
 
     def _process(self):
         defaults = self._get_form_defaults()
-        form = SessionBlockEntryForm(event=self.event_new, day=self.day, obj=defaults)
+        form = SessionBlockEntryForm(obj=defaults, **self._get_form_params())
         if form.validate_on_submit():
             entry = create_session_block_entry(self.session, form.data)
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)

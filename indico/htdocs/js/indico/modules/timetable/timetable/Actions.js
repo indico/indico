@@ -500,15 +500,17 @@ type("TimetableManagementActions", [], {
     },
     addBreak: function() {
         var self = this;
-        var params;
-        if (this.session !== null) {
-            params = this._addToSessionParams(this.session, 'Break');
-        } else {
-            params = this._addParams('Break');
+        var params = self._addParams();
+        var args = {
+            confId: self.eventInfo.id,
+            day: params.selectedDay
+        };
+        if (self.session !== null) {
+            args.session_block_id = self.session.sessionSlotId;
         }
         ajaxDialog({
-            trigger: this,
-            url: build_url(Indico.Urls.Timetable.breaks.add, {'confId': params.conference, 'day': params.selectedDay}),
+            trigger: self,
+            url: build_url(Indico.Urls.Timetable.breaks.add, args),
             title: $T.gettext("Add break"),
             onClose: function(data) {
                 if (data) {

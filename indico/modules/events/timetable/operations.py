@@ -43,12 +43,13 @@ def _get_object_info(entry):
     return object_type, object_title
 
 
-def create_break_entry(event, data):
+def create_break_entry(event, data, session_block=None):
     break_ = Break()
     entry_data = {'object': break_,
                   'start_dt': data.pop('start_dt')}
     break_.populate_from_dict(data)
-    return create_timetable_entry(event, entry_data)
+    parent = session_block.timetable_entry if session_block else None
+    return create_timetable_entry(event, entry_data, parent=parent)
 
 
 def create_session_block_entry(session_, data):
@@ -72,11 +73,10 @@ def create_timetable_entry(event, data, parent=None):
 
 
 def schedule_contribution(contribution, start_dt, session_block=None):
-    data = {'contribution': contribution,
-            'type': TimetableEntryType.CONTRIBUTION,
-            'start_dt': start_dt}
+    data = {'object': contribution, 'start_dt': start_dt}
     parent = None
     if session_block:
+        contribution.session = session_block.session
         contribution.session_block = session_block
         parent = session_block.timetable_entry
     return create_timetable_entry(contribution.event_new, data, parent=parent)

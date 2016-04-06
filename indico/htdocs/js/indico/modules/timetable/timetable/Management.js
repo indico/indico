@@ -277,8 +277,15 @@ type("AddNewContributionDialog", [],
     {
         draw: function() {
             var self = this;
+            var args = {
+                confId: self.args.get('conference'),
+                day: self.args.get('selectedDay')
+            };
+            if (self.args.get('slot')) {
+                args.session_block_id = self.args.get('slot');
+            }
             ajaxDialog({
-                url: build_url(Indico.Urls.Timetable.contributions.add, {'confId': self.args.get('conference'), 'day': self.args.get('selectedDay')}),
+                url: build_url(Indico.Urls.Timetable.contributions.add, args),
                 title: $T.gettext("Add contribution"),
                 onClose: function(data) {
                     if (data) {

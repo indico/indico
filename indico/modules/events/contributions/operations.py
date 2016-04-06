@@ -25,8 +25,7 @@ from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
+from indico.modules.events.timetable.operations import (schedule_contribution, update_timetable_entry,
                                                         delete_timetable_entry)
 
 
@@ -64,13 +63,12 @@ def _set_custom_fields(contrib, custom_fields_data):
         contrib.set_custom_field(custom_field_id, custom_field_value)
 
 
-def create_contribution(event, contrib_data, custom_fields_data=None):
+def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None):
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(contrib_data)
     if start_dt is not None:
-        create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
-                                       'contribution': contrib})
+        schedule_contribution(contrib, start_dt=start_dt, session_block=session_block)
     if custom_fields_data:
         _set_custom_fields(contrib, custom_fields_data)
     db.session.flush()

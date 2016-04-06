@@ -10,7 +10,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_session
+from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.legacy import serialize_event_info
