@@ -24,6 +24,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.timetable.operations import fit_session_block_entry
 from indico.util.i18n import _
 from indico.util.struct.enum import IndicoEnum
 from indico.util.struct.iterables import materialize_iterable, window
@@ -98,14 +99,7 @@ class Reschedule(object):
     def _fit_blocks(self):
         for entry in self._entries:
             if entry.type == TimetableEntryType.SESSION_BLOCK:
-                self._fit_block(entry)
-
-    def _fit_block(self, entry):
-        children = entry.children
-        if not children:
-            return
-        entry.start_dt = children[0].start_dt
-        entry.session_block.duration = children[-1].end_dt - entry.start_dt
+                fit_session_block_entry(entry)
 
     @cached_property
     def _start_dt(self):

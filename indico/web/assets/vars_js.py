@@ -125,7 +125,8 @@ def generate_global_file(config):
                     'schedule': url_rule_to_js('timetable.schedule')
                 },
                 'sessionBlocks': {
-                    'add': url_rule_to_js('timetable.add_session_block')
+                    'add': url_rule_to_js('timetable.add_session_block'),
+                    'fit': url_rule_to_js('timetable.fit_session_block')
                 },
                 'sessions': {
                     'add': url_rule_to_js('timetable.add_session')
