@@ -79,6 +79,13 @@
         {%- endif %}
     </div>
 
+    {% if sess.description %}
+        <h3>{% trans %}Description{% endtrans %}</h3>
+        <div class="description">
+            {{ sess.description }}
+        </div>
+    {% endif %}
+
     <div id="attachments" class="item-attachments i-box titled">
         <div class="i-box-header">
             <div class="i-box-title icon-attachment">
