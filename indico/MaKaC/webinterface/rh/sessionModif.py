@@ -321,68 +321,6 @@ class RHSessionDeletion( RHSessionModifBase ):
         else:
             return sessions.WPSessionDeletion( self, self._session ).display()
 
-class RHFitSlot(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slotID = params.get("slotId","")
-        self._slot=self._target.getSlotById(self._slotID)
-        self._sessionID = params.get("sessionId","")
-        self._targetDay=params.get("day","")
-
-    def _process(self):
-        if self._slot is not None:
-            self._slot.fit()
-        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
-
-class RHSlotCalc(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModifBase._checkParams(self, params)
-        self._slotId=params.get("slotId","")
-        self._cancel=params.has_key("CANCEL")
-        self._ok=params.has_key("OK")
-        self._hour=params.get("hour","")
-        self._minute=params.get("minute","")
-        self._action=params.get("action","duration")
-        self._currentDay = params.get("currentDay", "")
-        self._inSessionTimetable = (params.get("inSessionTimetable", "no") == "yes")
-
-        if self._ok:
-            if self._hour.strip() == "" or self._minute.strip() == "":
-                raise MaKaCError( _("Please write the time with the format HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
-            try:
-                if int(self._hour) or int(self._hour):
-                    pass
-            except ValueError, e:
-                raise MaKaCError( _("Please write a number to specify the time HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
-
-    def _formatRedirectURL(self, baseURL):
-        target = "".join([str(baseURL),
-                        "#",
-                       self._currentDay,
-                        ".s",
-                        self._session.getId(),
-                        "l",
-                        self._slotId])
-
-        return target
-
-    def _process(self):
-        if not self._cancel:
-            slot=self._target.getSlotById(self._slotId)
-            if not self._ok:
-                p=sessions.WPModSlotCalc(self,slot)
-                return p.display()
-            else:
-                t=timedelta(hours=int(self._hour), minutes=int(self._minute))
-                slot.recalculateTimes(self._action, t)
-
-        if (self._inSessionTimetable):
-            self._redirect(self._formatRedirectURL(urlHandlers.UHSessionModifSchedule.getURL(self._session)))
-        else:
-            self._redirect(self._formatRedirectURL(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
-
 
 class ContribFilterCrit(filters.FilterCriteria):
     _availableFields = { \
