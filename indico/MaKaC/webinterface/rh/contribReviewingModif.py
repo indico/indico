@@ -89,34 +89,6 @@ class RHContributionReviewingJudgements(RHManageContributionReviewingBase):
         return p.display()
 
 
-class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
-    _uh = urlHandlers.UHContribModifReviewingMaterials
-
-    def _checkProtection(self):
-        """ This disables people that are not conference managers or track coordinators to
-            delete files from a contribution.
-        """
-        RHContribModifBaseReviewingStaffRights._checkProtection(self)
-        for key in self._paramsForCheckProtection.keys():
-            if key.find("delete") != -1:
-                RHContribModifBaseReviewingStaffRights._checkProtection(self)
-
-    def _checkParams(self, params):
-        RHContribModifBaseReviewingStaffRights._checkParams(self, params)
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None:
-            del params["day"]
-        self._paramsForCheckProtection = params
-
-    def _process(self):
-        if self.contrib.event_new.as_legacy.isClosed():
-            p = WPConferenceModificationClosed(self, self.contrib)
-            return p.display()
-
-        p = contributionReviewing.WPContributionModifReviewingMaterials(self, self.contrib)
-        return p.display(**self._getRequestParams())
-
-
 class RHAssignRefereeBase(RHManageContributionReviewingBase):
 
     def _checkProtection(self):
@@ -231,7 +203,7 @@ class RHContributionEditingJudgement(RHEditorBase):
     _uh = urlHandlers.UHContributionEditingJudgement
 
     def _process(self):
-        p = contributionReviewing.WPJudgeEditing(self, self._target)
+        p = contributionReviewing.WPJudgeEditing(self, self.contrib)
         return p.display()
 
 
@@ -239,7 +211,7 @@ class RHContributionEditingJudgement(RHEditorBase):
 class RHReviewerBase(RHManageContributionReviewingBase):
 
     def _checkProtection(self):
-        paper_review = self._conf.getReviewManager(self.contrib)
+        paper_review = self._conf.getConfPaperReview()
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             if not paper_review.getChoice() in (CPR.CONTENT_REVIEWING, CPR.CONTENT_AND_LAYOUT_REVIEWING):
                 raise MaKaCError(_("Content Reviewing is not active for this conference"))

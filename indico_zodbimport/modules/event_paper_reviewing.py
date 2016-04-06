@@ -16,15 +16,20 @@
 
 from __future__ import unicode_literals
 
+import mimetypes
 from collections import defaultdict
 from operator import attrgetter
 
-from BTrees.IOBTree import IOBTree
 import transaction
+from BTrees.IOBTree import IOBTree
 
-from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRole
+from indico.core.db import db
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.paper_reviewing.models.papers import PaperFile
+from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRole, PaperReviewingRoleType
 from indico.util.console import verbose_iterator
 from indico_zodbimport import Importer
+from indico_zodbimport.util import LocalFileImporterMixin
 
 from MaKaC.contributionReviewing import ReviewManager
 
@@ -37,46 +42,95 @@ def _invert_mapping(mapping):
     return result
 
 
-class EventPaperReviewingImporter(Importer):
+class EventPaperReviewingImporter(LocalFileImporterMixin, Importer):
+    def __init__(self, **kwargs):
+        kwargs = self._set_config_options(**kwargs)
+        super(EventPaperReviewingImporter, self).__init__(**kwargs)
+
     def migrate(self):
         self.migrate_reviewing()
 
-    def _zodb_committing_iterator(self, iterable):
+    def _committing_iterator(self, iterable):
         for i, data in enumerate(iterable, 1):
             yield data
             if i % 100 == 0:
+                db.session.commit()
                 transaction.commit()
+        db.session.commit()
         transaction.commit()
 
-    def _migrate_contribution_roles(old_contribution, mapping, role):
-        contribution = old_contribution.as_new
+    def _migrate_contribution_roles(self, old_contribution, new_contribution, mapping, role):
         for avatars in mapping[old_contribution]:
+            if not isinstance(avatars, list):
+                avatars = [avatars]
             for avatar in avatars:
-                contribution.paper_reviewing_roles.append(PaperReviewingRole(user=avatar.as_user, role=role))
+                new_role = PaperReviewingRole(user=avatar.user, role=role)
+                new_contribution.paper_reviewing_roles.append(new_role)
+                self.print_info('{}: {} -> {}'.format(self.event_new.id, new_contribution, new_role))
+
+    def _migrate_resource(self, resource, new_contrib, created_dt, version=None):
+
+        storage_backend, storage_path, size = self._get_local_file_info(resource)
+        content_type = mimetypes.guess_type(resource.fileName)[0] or 'application/octet-stream'
+
+        paper_file = PaperFile(filename=resource.fileName, created_dt=created_dt,
+                               content_type=content_type, size=size, storage_backend=storage_backend,
+                               storage_file_id=storage_path, contribution=new_contrib,
+                               revision_id=version)
+
+        db.session.add(paper_file)
+        self.print_info('{}: {} -> {}'.format(self.event_new.id, resource, paper_file))
+
+    def _migrate_reviewing_materials(self, old_contribution, new_contribution, review_manager):
+        reviewing = getattr(old_contribution, 'reviewing', None)
+        if reviewing:
+            for resource in reviewing._Material__resources.itervalues():
+                self._migrate_resource(resource, new_contribution, reviewing._modificationDS)
+        if review_manager:
+            for review in review_manager._versioning:
+                if getattr(review, '_materials', None):
+                    assert len(review._materials) == 1
+                    for resource in review._materials[0]._Material__resources.itervalues():
+                        self._migrate_resource(resource, new_contribution, reviewing._modificationDS,
+                                               version=review._version)
 
     def migrate_reviewing(self):
-        self.print_step('building new ZODB index for reviewing objects')
+        self.print_step('migrating paper reviewing')
 
-        for old_event in self._zodb_committing_iterator(self._iter_events()):
-            conference_settings = old_event._confPaperReview
+        for old_event in self._committing_iterator(self._iter_events()):
+            conference_settings = getattr(old_event, '_confPaperReview', None)
+            if not conference_settings:
+                continue
+
+            self.event_new = old_event.as_event
             contrib_index = conference_settings._contribution_index = IOBTree()
             contrib_reviewers = _invert_mapping(conference_settings._reviewerContribution)
             contrib_referees = _invert_mapping(conference_settings._refereeContribution)
             contrib_editors = _invert_mapping(conference_settings._editorContribution)
 
             for old_contribution in old_event.contributions.itervalues():
-                review_manager = getattr(old_contribution, '_reviewManager')
-                if not review_manager:
-                    self.print_warning('Contribution {} had no ReviewManager. Fixed.'.format(old_contribution._id),
-                                       event_id=event.id)
-                    cid = int(old_contribution._id)
-                    contrib_index[cid] = old_contribution._reviewManager = ReviewManager(old_contribution)
+                review_manager = getattr(old_contribution, '_reviewManager', None)
+                new_contribution = Contribution.find_one(event_id=self.event_new.id,
+                                                         friendly_id=int(old_contribution.id))
 
-                _migrate_contribution_roles(old_contribution, contrib_reviewers, PaperReviewingRoleType.reviewer)
-                _migrate_contribution_roles(old_contribution, contrib_referees, PaperReviewingRoleType.referee)
-                _migrate_contribution_roles(old_contribution, contrib_editors, PaperReviewingRoleType.editor)
+                cid = int(new_contribution.id)
+                if review_manager:
+                    review_manager._contrib_id = cid
+                    contrib_index[cid] = review_manager
+
+                self._migrate_contribution_roles(old_contribution, new_contribution, contrib_reviewers,
+                                                 PaperReviewingRoleType.reviewer)
+                self._migrate_contribution_roles(old_contribution, new_contribution, contrib_referees,
+                                                 PaperReviewingRoleType.referee)
+                self._migrate_contribution_roles(old_contribution, new_contribution, contrib_editors,
+                                                 PaperReviewingRoleType.editor)
+
+                self._migrate_reviewing_materials(old_contribution, new_contribution, review_manager)
 
     def _iter_events(self):
         old_events = self.zodb_root['conferences']
-        return verbose_iterator(old_events.itervalues(), len(old_events), attrgetter('id'),
-                                attrgetter('title')):
+        wfr = self.zodb_root['webfactoryregistry']
+
+        for conf in verbose_iterator(old_events.itervalues(), len(old_events), attrgetter('id'), lambda x: ''):
+            if wfr.get(conf.id) is None:
+                yield conf

@@ -20,9 +20,9 @@ from collections import defaultdict
 from persistent import Persistent
 
 from indico.core.config import Config
-from indico.modules.events.paper_reviewing.legacy import \
-    ReviewManagerLegacyMixin
+from indico.modules.events.paper_reviewing.legacy import ReviewLegacyMixin, ReviewManagerLegacyMixin
 from indico.util.i18n import ngettext  # unicode ngettext
+from indico.web.flask.util import url_for
 
 from MaKaC.common.Counter import Counter
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -35,8 +35,6 @@ from MaKaC.i18n import _
 from MaKaC.paperReviewing import Answer, ConferencePaperReview
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.webinterface.urlHandlers import (UHContributionDisplay,
-                                            UHContributionReviewingJudgements)
 
 
 ###############################################
@@ -112,12 +110,6 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
                self.isReviewer(user)
 
 
-    #referee methods
-    def getReferee(self):
-        """ Returns the referee for this contribution
-        """
-        return self._referee
-
     def setReferee(self, referee):
         """ Sets the referee for this contribution.
             referee has to be an Avatar object.
@@ -131,9 +123,9 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             self.getLastReview().setRefereeDueDate(self.getConfPaperReview().getDefaultRefereeDueDate())
             #e-mail notification will be send when referee is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
-                notification = ContributionReviewingNotification(referee, 'Referee', self.contribution)
+                notification = ContributionReviewingNotification(referee.user, 'Referee', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self.contribution.getConference(),
+                                         self.contribution.event_new.as_legacy,
                                          'Paper Reviewing')
 
     def removeReferee(self):
@@ -141,36 +133,19 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             There is no 'referee' argument because there is only 1 referee by contribution.
             The ex-referee is notified by an email.
         """
-
-        self.getConfPaperReview().removeRefereeContribution(self._referee, self.contribution)
+        referee = self.getReferee()
+        self.getConfPaperReview().removeRefereeContribution(referee, self.contribution)
         if self.hasEditor():
             self.removeEditor()
         if self.hasReviewers():
             self.removeAllReviewers()
         #e-mail notification will be send when referee is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
-            notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self.contribution)
+            notification = ContributionReviewingRemoveNotification(referee.user, 'Referee', self.contribution)
             GenericMailer.sendAndLog(notification,
-                                     self.contribution.getConference(),
+                                     self.contribution.event_new.as_legacy,
                                      'Paper Reviewing')
         self._referee = None
-
-    def isReferee(self, user):
-        """ Returns if a given user is the referee for this contribution.
-            The user has to be an Avatar object.
-        """
-        return user is not None and user == self._referee
-
-    def hasReferee(self):
-        """ Returns if this conference has a referee already.
-        """
-        return self._referee is not None
-
-    #editor methods
-    def getEditor(self):
-        """ Returns the editor for this contribution
-        """
-        return self._editor
 
     def setEditor(self, editor):
         """ Sets the editor for this contribution.
@@ -185,9 +160,9 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             self.getLastReview().setEditorDueDate(self.getConfPaperReview().getDefaultEditorDueDate())
             #e-mail notification will be send when editor is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
-                notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self.contribution)
+                notification = ContributionReviewingNotification(editor.user, 'Layout Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self.contribution.getConference(),
+                                         self.contribution.event_new.as_legacy,
                                          'Paper Reviewing')
         else:
             raise MaKaCError("Please choose a editor before assigning an editor")
@@ -197,23 +172,13 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             There is no 'editor' argument because there is only 1 editor by contribution.
             The ex-editor is notified by an email.
         """
-        self.getConfPaperReview().removeEditorContribution(self._editor, self.contribution)
+        editor = self.getEditor()
+        self.getConfPaperReview().removeEditorContribution(editor, self.contribution)
         #e-mail notification will be send when editor is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
-            notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self.contribution)
-            GenericMailer.sendAndLog(notification, self.contribution.getConference(), 'Paper Reviewing')
+            notification = ContributionReviewingRemoveNotification(editor.user, 'Layout Reviewer', self.contribution)
+            GenericMailer.sendAndLog(notification, self.contribution.event_new.as_legacy, 'Paper Reviewing')
         self._editor = None
-
-    def isEditor(self, user):
-        """ Returns if a given user is the editor for this contribution.
-            The user has to be an Avatar object.
-        """
-        return user is not None and user == self._editor
-
-    def hasEditor(self):
-        """ Returns if this conference has a editor already.
-        """
-        return self._editor is not None
 
     #reviewer methods
     def addReviewer(self, reviewer):
@@ -231,9 +196,9 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
                 self.getLastReview().addReviewerJudgement(reviewer)
                 #e-mail notification will be send when reviewer is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self.contribution)
+                notification = ContributionReviewingNotification(reviewer.user, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self.contribution.getConference(),
+                                         self.contribution.event_new.as_legacy,
                                          'Paper Reviewing')
         else:
             raise MaKaCError("Please choose a referee before assigning a reviewer")
@@ -242,15 +207,15 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
         """ Removes the reviewer for this contribution.
             The ex-reviewer is notified by an email.
         """
-        if reviewer in self._reviewersList:
+        reviewer_list = self.getReviewersList()
+        if reviewer in reviewer_list:
             self.getConfPaperReview().removeReviewerContribution(reviewer, self.contribution)
-            self._reviewersList.remove(reviewer)
             self.notifyModification()
             #e-mail notification will be send when reviewer is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self.contribution)
+                notification = ContributionReviewingRemoveNotification(reviewer.user, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self.contribution.getConference(),
+                                         self.contribution.event_new.as_legacy,
                                          'Paper Reviewing')
 
     def removeAllReviewers(self):
@@ -261,28 +226,11 @@ class ReviewManager(ReviewManagerLegacyMixin, Persistent, Fossilizable):
             self.notifyModification()
             #e-mail notification will be send when reviewers are removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
-                notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self.contribution)
+                notification = ContributionReviewingRemoveNotification(reviewer.user, 'Content Reviewer', self.contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self.contribution.getConference(),
+                                         self.contribution.event_new.as_legacy,
                                          'Paper Reviewing')
         del(self._reviewersList[:])
-
-    def getReviewersList(self):
-        """ Returns the list of reviewers of this contribution,
-            has a list of Avatar objects.
-        """
-        return self._reviewersList
-
-    def isReviewer(self, user):
-        """ Returns if a given user is the reviewer for this contribution.
-            The user has to be an Avatar object.
-        """
-        return user in self._reviewersList
-
-    def hasReviewers(self):
-        """ Returns if this conference has at least one reviewer already.
-        """
-        return len(self._reviewersList) > 0
 
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
@@ -445,9 +393,9 @@ Please see the comments below from the reviewing team:
             or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
             or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
                 if withdrawn:
-                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
+                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().contribution)
                 else:
-                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
+                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().contribution)
                 GenericMailer.sendAndLog(notification,
                                          self._review.getConference(),
                                          'Paper Reviewing')
@@ -459,9 +407,9 @@ Please see the comments below from the reviewing team:
         or ((self.getConfPaperReview().getChoice() == 2 or self.getConfPaperReview().getChoice() == 4) and isinstance(self, ReviewerJudgement) \
         and self.getConfPaperReview().getEnableReviewerSubmittedRefereeEmailNotif()):
             if withdrawn:
-                notification = ContributionReviewingJudgementRefereeWithdrawalNotification(referee, self, self.getReviewManager().getContribution())
+                notification = ContributionReviewingJudgementRefereeWithdrawalNotification(referee, self, self.getReviewManager().contribution)
             else:
-                notification = ContributionReviewingJudgementRefereeNotification(referee, self, self.getReviewManager().getContribution())
+                notification = ContributionReviewingJudgementRefereeNotification(referee, self, self.getReviewManager().contribution)
             GenericMailer.sendAndLog(notification,
                                      self._review.getConference(),
                                      'Paper Reviewing')
@@ -487,16 +435,13 @@ class RefereeJudgement(Judgement):
         if (not self._submitted):
             # Check if it is necessary to purge some answers
             self.purgeAnswers()
-        matReviewing = self.getReviewManager().getContribution().getReviewing()
-
-        self.getReview().copyMaterials(matReviewing)
 
         # 2 --> to be corrected, > 3 has the same behaviour as 'to be corrected'
         if int(self._judgement.getId()) == 2 or int(self._judgement.getId()) > 3:
             rm = self.getReviewManager()
             rm.newReview()
-            # remove reviewing materials from the contribution
-            rm.getContribution().removeMaterial(matReviewing)
+
+        self.getReview().copyMaterials()
 
 
     def getAnswers(self):
@@ -527,12 +472,9 @@ class EditorJudgement(Judgement):
             self.purgeAnswers()
         # 1 --> Accepted, 2 --> To be corrected, 3 --> Rejected, >3 --> Custom, same behavour as To be corrected.
         if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and (self._judgement.getId() == "2" or int(self._judgement.getId()) > 3):
-            matReviewing = self.getReviewManager().getContribution().getReviewing()
-            self.getReview().copyMaterials(matReviewing)
             rm = self.getReviewManager()
             rm.newReview()
-            # remove reviewing materials from the contribution
-            rm.getContribution().removeMaterial(matReviewing)
+            self.getReview().copyMaterials()
 
     def purgeAnswers(self):
         """ Remove the answers of the questions that were sent but we don't need anymory because
@@ -577,7 +519,7 @@ class ReviewerJudgement(Judgement):
         return questionAnswerList
 
 
-class Review(Persistent, Fossilizable):
+class Review(ReviewLegacyMixin, Persistent, Fossilizable):
     """This class represents the judgement of a contribution made by the referee. It contains judgement and comments
     """
 
@@ -595,7 +537,6 @@ class Review(Persistent, Fossilizable):
 
         self._isAuthorSubmitted = False #boolean that says if the author has submitted his / her materials or not
         self._version = version #the version number for this Review. Different Reviews for the same contribution have increasing version numbers.
-        self._materials = [] #'snapshot' of the materials that were analyzed by the reviewing team. Copied from the Contribution materials when judgement is passed.
         self._authorComments = ""
         self._refereeDueDate = None #the Deadline where the referee has to pass his/her judgement
         self._editorDueDate = None #the Deadline where the editor has to pass his/her judgement
@@ -627,7 +568,7 @@ class Review(Persistent, Fossilizable):
     def getConference(self):
         """ Convenience method that returns the Conference to which this Review belongs.
         """
-        return self._reviewManager.getContribution().getConference()
+        return self._reviewManager.contribution.event_new.as_legacy
 
     def getConfPaperReview(self):
         """ Convenience method that returns the ConferencePaperReview object of the Conference
@@ -707,24 +648,25 @@ class Review(Persistent, Fossilizable):
         self._isAuthorSubmitted = submitted
 
         if submitted:
-
+            contribution = self._reviewManager.contribution
+            conference = contribution.event_new.as_legacy
             if self._reviewManager.hasReferee() and self.getConfPaperReview().getEnableAuthorSubmittedMatRefereeEmailNotif():
-                notification = MaterialsSubmittedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
+                notification = MaterialsSubmittedNotification(self._reviewManager.getReferee().user, 'Referee', contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._reviewManager.getContribution().getConference(),
+                                         conference,
                                          'Paper Reviewing')
 
             if self._reviewManager.hasEditor() and self.getConfPaperReview().getEnableAuthorSubmittedMatEditorEmailNotif():
-                notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
+                notification = MaterialsSubmittedNotification(self._reviewManager.getEditor().user, 'Layout Reviewer', contribution)
                 GenericMailer.sendAndLog(notification,
-                                         self._reviewManager.getContribution().getConference(),
+                                         conference,
                                          'Paper Reviewing')
 
             for reviewer in self._reviewManager.getReviewersList():
                 if self.getConfPaperReview().getEnableAuthorSubmittedMatReviewerEmailNotif():
-                    notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
+                    notification = MaterialsSubmittedNotification(reviewer.user, 'Content Reviewer', contribution)
                     GenericMailer.sendAndLog(notification,
-                                             self._reviewManager.getContribution().getConference(),
+                                             conference,
                                              'Paper Reviewing')
 
     def getVersion(self):
@@ -737,28 +679,6 @@ class Review(Persistent, Fossilizable):
 
     def getAuthorComments(self):
         return self._authorComments
-
-
-    #review materials methods, and methods necessary for material retrieval to work
-    def getMaterials(self):
-        """ Returns the materials stored in this Review.
-        """
-        return self._materials
-
-    def copyMaterials(self, material):
-        """ Copies the materials from the contribution to this review object.
-            This is done by cloning the materials, and putting the contribution as owner.
-            This way, even if the author deletes materials during another review, they endure in this review.
-        """
-        self._materials = [material.clone(self)]
-
-    def getMaterialById(self, materialId=0):
-        """ Returns one of the materials of the review given its id
-
-            So far there is just one material (reviewing) with many resources. So, by default we
-            get the first element of the list of materials.
-        """
-        return self._materials[int(materialId)]
 
     def getLocator(self):
         """Gives back a globaly unique identification encapsulated in a Locator
@@ -916,17 +836,17 @@ class ContributionReviewingNotification(GenericNotification):
 
     def __init__(self, user, role, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         self.setSubject("""You have been chosen as a %s for "%s" """% (role, conference.getTitle()))
 
         if role == 'Referee':
-            urlh = urlHandlers.UHConfModifListContribToJudge
+            url = url_for('event_mgmt.confListContribToJudge', conference, _external=True)
         elif role == 'Layout Reviewer':
-            urlh = urlHandlers.UHConfModifListContribToJudgeAsEditor
+            url = url_for('event_mgmt.confListContribToJudge-asEditor', conference, _external=True)
         elif role == 'Content Reviewer':
-            urlh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
+            url = url_for('event_mgmt.confListContribToJudge-asReviewer', conference, _external=True)
 
         self.setBody("""Dear %s,
 
@@ -937,7 +857,7 @@ You have been chosen as a %s for the paper entitled "%s" (id: %s) for the confer
 Kind regards,
 Indico on behalf of "%s"
 """ % ( user.full_name, role, contribution.title, str(contribution.friendly_id),
-        conference.getTitle(), role, urlh.getURL(contribution), conference.getTitle()))
+        conference.getTitle(), role, url, conference.getTitle()))
 
 class ContributionReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer
@@ -946,7 +866,7 @@ class ContributionReviewingRemoveNotification(GenericNotification):
 
     def __init__(self, user, role, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         self.setSubject("""You are no longer a %s of a paper for "%s" """ % (role, conference.getTitle()))
@@ -967,7 +887,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         self.setBCCList([judgement.getAuthor().getEmail()])
@@ -1002,8 +922,9 @@ You may then apply the requested modifications to your paper and submit the modi
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, role, contribution.title, str(contribution.friendly_id),
-         conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+""" % (user.full_name, role, contribution.title, str(contribution.friendly_id),
+       conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
+       url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
 
     def setPartiallyReviewed(self, user, judgement, contribution, conference, typeR):
@@ -1021,8 +942,9 @@ Note that this is a partial review, a final assessment will be done by the refer
 
 Kind regards,
 Indico on behalf of "%s"
-"""  % ( user.full_name,typeR, contribution.title, str(contribution.friendly_id),
-         conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+"""  % (user.full_name, typeR, contribution.title, str(contribution.friendly_id),
+        conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
+        url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
     def setAcceptedRejected(self, user, judgement, contribution, conference, role):
         if judgement.getJudgement() == "Accept":
@@ -1041,8 +963,9 @@ You may proceed to your paper page:
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, role, judgementText, contribution.title, str(contribution.friendly_id),
-         conference.getTitle(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+""" % (user.full_name, role, judgementText, contribution.title, str(contribution.friendly_id),
+       conference.getTitle(), judgement.getCommentsVerbose(),
+       url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
@@ -1051,7 +974,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         self.setBCCList([judgement.getAuthor().getEmail()])
@@ -1070,9 +993,9 @@ Your paper entitled  "%s" (id: %s) submitted for "%s" has been put back into rev
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, contribution.title, str(contribution.friendly_id),
-        conference.getTitle(), typeR, urlHandlers.UHContributionDisplay.getURL(contribution), conference.getTitle())
-        )
+""" % (user.full_name, contribution.title, str(contribution.friendly_id),
+       conference.getTitle(), typeR, url_for('contributions.display_contribution', contribution, _external=True),
+       conference.getTitle()))
 
 class ContributionReviewingJudgementRefereeNotification(GenericNotification):
     """ Template to build an email notification for a referee
@@ -1081,7 +1004,7 @@ class ContributionReviewingJudgementRefereeNotification(GenericNotification):
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         if isinstance(judgement, EditorJudgement):
@@ -1101,9 +1024,10 @@ You may proceed to the Referee Area for this paper:
 
 Kind regards,
 Indico on behalf of "%s"
-"""  % ( user.full_name, typeR, judgement.getAuthor().getStraightFullName(), contribution.title,
-         str(contribution.friendly_id),conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
-         UHContributionReviewingJudgements.getURL(contribution), conference.getTitle()))
+"""  % (user.user.full_name, typeR, judgement.getAuthor().getStraightFullName(), contribution.title,
+        str(contribution.friendly_id),conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
+        url_for('event_mgmt.contributionReviewing-contributionReviewingJudgements', contribution, _external=True),
+        conference.getTitle()))
 
 class ContributionReviewingJudgementRefereeWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
@@ -1112,7 +1036,7 @@ class ContributionReviewingJudgementRefereeWithdrawalNotification(GenericNotific
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
 
@@ -1129,24 +1053,24 @@ The paper entitled "%s" (id: %s) submitted for "%s" has been put back into revie
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, contribution.title, str(contribution.friendly_id),conference.getTitle(),
-        typeR, urlHandlers.UHConfModifListContribToJudge.getURL(contribution), conference.getTitle()))
+""" % (user.user.full_name, contribution.title, str(contribution.friendly_id), conference.getTitle(),
+       typeR, url_for('event_mgmt.confListContribToJudge', contribution, _external=True), conference.getTitle()))
 
 class MaterialsSubmittedNotification(GenericNotification):
 
     def __init__(self, user, role, contribution):
-        conference = contribution.getConference()
+        conference = contribution.event_new.as_legacy
         GenericNotification.__init__(self)
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.email])
         self.setSubject("""An author has submitted a paper for "%s" """%  conference.getTitle())
 
         if role == 'Referee':
-            urlh = urlHandlers.UHConfModifListContribToJudge
+            url = url_for('event_mgmt.confListContribToJudge', conference, _external=True)
         elif role == 'Layout Reviewer':
-            urlh = urlHandlers.UHConfModifListContribToJudgeAsEditor
+            url = url_for('event_mgmt.confListContribToJudge-asEditor', conference, _external=True)
         elif role == 'Content Reviewer':
-            urlh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
+            url = url_for('event_mgmt.confListContribToJudge-asReviewer', conference, _external=True)
 
         self.setBody("""Dear %s,
 
@@ -1156,4 +1080,4 @@ An author has submitted a paper entitled "%s" (id: %s) for the conference "%s". 
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, contribution.title, str(contribution.friendly_id), conference.getTitle(), role, urlh.getURL(contribution), conference.getTitle()))
+""" % ( user.full_name, contribution.title, str(contribution.friendly_id), conference.getTitle(), role, url, conference.getTitle()))

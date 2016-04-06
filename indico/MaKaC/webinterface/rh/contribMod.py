@@ -98,7 +98,7 @@ class RCContributionEditor(object):
         """
 
         user = request.getAW().getUser()
-        reviewManager = request._target.getReviewManager()
+        reviewManager = request._conf.getReviewManager(request.contrib)
         return reviewManager.hasEditor() and reviewManager.isEditor(user)
 
 class RCContributionReviewer(object):
@@ -107,7 +107,7 @@ class RCContributionReviewer(object):
         """ Returns true if the user is a reviewer of the target contribution
         """
         user = request.getAW().getUser()
-        reviewManager = request._target.getReviewManager()
+        reviewManager = request._conf.getReviewManager(request.contrib)
         return reviewManager.isReviewer(user)
 
 class RHContribModifBaseSpecialSesCoordRights(RHContribModifBase):

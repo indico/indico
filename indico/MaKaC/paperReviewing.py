@@ -118,7 +118,8 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
         return self._conference
 
     def getReviewManager(self, contribution):
-        return self._contribution_index[contribution.id]
+        from MaKaC.contributionReviewing import ReviewManager
+        return self._contribution_index.setdefault(contribution.id, ReviewManager(contribution.id))
 
     def setStartSubmissionDate(self, startSubmissionDate):
         self._startSubmissionDate= datetime(startSubmissionDate.year,startSubmissionDate.month,startSubmissionDate.day,23,59,59)

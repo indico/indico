@@ -85,8 +85,5 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
                             contribReviewingModif.RHContributionEditingJudgement)
     event_mgmt.add_url_rule('/contribution/<contrib_id>/reviewing/assess/content', 'contributionGiveAdvice',
                             contribReviewingModif.RHContributionGiveAdvice)
-    event_mgmt.add_url_rule('/contribution/<contrib_id>/reviewing/material',
-                            'contributionReviewing-contributionReviewingMaterials',
-                            contribReviewingModif.RHContribModifReviewingMaterials)
     event_mgmt.add_url_rule('/contribution/<contrib_id>/reviewing/history', 'contributionReviewing-reviewingHistory',
                             contribReviewingModif.RHReviewingHistory)

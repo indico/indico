@@ -19,6 +19,7 @@ from indico.web.flask.util import url_for
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.contributions import WPContributionModifBase
 
+
 class WPContributionReviewing( WPContributionModifBase ):
 
     def __init__(self, rh, contribution):
@@ -98,21 +99,6 @@ class WPContributionReviewingJudgements( WPContributionModifBase ):
         wc = WContributionReviewingJudgements(self._target.event_new.as_legacy, self._aw)
         return wc.getHTML(self._target)
 
-class WPContributionModifReviewingMaterials( WPContributionModifBase ):
-
-    def __init__(self, rh, contribution):
-        WPContributionModifBase.__init__(self, rh, contribution)
-        self._aw = rh.getAW()
-
-    def _setActiveTab( self ):
-        self._subtabReviewing.setActive()
-        self._subTabRevMaterial.setActive()
-
-
-    def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingReviewingMaterial(self._target)
-        return wc.getHTML( pars )
-
 class WContributionReviewingBase(wcomponents.WTemplated):
 
     def _getStatusClass( self, judgement ):
@@ -183,6 +169,7 @@ class WJudgeEditing(wcomponents.WTemplated):
 
     def __init__(self, contrib):
         self._contrib = contrib
+        self._conf = contrib.event_new.as_legacy
 
     def getHTML( self, target):
         return wcomponents.WTemplated.getHTML(self, {})
@@ -192,8 +179,9 @@ class WJudgeEditing(wcomponents.WTemplated):
         review_manager = self._conf.getReviewManager(self._contrib)
 
         vars["Contribution"] = self._contrib
-        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
-        vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
+        vars['conf'] = self._conf
+        vars["ConfReview"] = self._conf.getConfPaperReview()
+        vars["ConferenceChoice"] = self._conf.getConfPaperReview().getChoice()
         vars["Editing"] = review_manager.getLastReview().getEditorJudgement()
         vars["Review"] = review_manager.getLastReview()
 
@@ -219,6 +207,7 @@ class WGiveAdvice(wcomponents.WTemplated):
 
     def __init__(self, contrib, aw):
         self._contrib = contrib
+        self._conf = contrib.event_new.as_legacy
         self._aw = aw
 
     def getHTML( self):
@@ -229,9 +218,10 @@ class WGiveAdvice(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         review_manager = self._conf.getReviewManager(self._contrib)
 
+        vars["Conference"] = self._conf
         vars["Contribution"] = self._contrib
-        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
-        vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
+        vars["ConferenceChoice"] = self._conf.getConfPaperReview().getChoice()
         vars["Advice"] = review_manager.getLastReview().getAdviceFrom(self.__reviewer)
         vars["Review"] = review_manager.getLastReview()
 

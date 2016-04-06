@@ -93,7 +93,3 @@ class IReviewingStatusFossil(IFossil):
     def getName(self):
         pass
     getName.name = 'text'
-
-
-
-

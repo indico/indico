@@ -19,35 +19,35 @@
     </tr>
 
     % for c in ConfReview.getEditedContributions(User):
-        % if not isinstance(c.getStatus(), ContribStatusNone):
+        <% review_manager = ConfReview.getReviewManager(c) %>
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
-            <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
-            % if c.getReviewManager().getLastReview().isAuthorSubmitted():
-                % if ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+            <td style="padding-right:5px;padding-left:5px;">${ c.id }</td>
+            % if review_manager.getLastReview().isAuthorSubmitted():
+                % if ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
                         <td style="padding-right:5px;padding-left:5px;">
-                            <a href="${ urlHandlers.UHContributionEditingJudgement.getURL(c) }">${ c.getTitle() }</a>
+                            <a href="${ url_for('event_mgmt.contributionEditingJudgement', c) }">${ c.title }</a>
                         </td>
                 % endif
-                % if ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING and c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() :
+                % if ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING and review_manager.getLastReview().getRefereeJudgement().isSubmitted() :
                        <td style="padding-right:5px;padding-left:5px;">
                                 <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Assessment already given by the referee')">
-                                   ${ c.getTitle() }
+                                   ${ c.title }
                                 </span>
                         </td>
                 % endif
             % else:
                        <td style="padding-right:5px;padding-left:5px;">
                                 <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you assess the contribution.')">
-                                   ${ c.getTitle() }
+                                   ${ c.title }
                                 </span>
                        </td>
             % endif
             <td style="padding-right:5px;padding-left:5px;">
-                ${_("Review {0}").format(len(c.getReviewManager().getVersioning()))}
+                ${_("Review {0}").format(len(review_manager.getVersioning()))}
             </td>
             <td style="padding-right:5px;padding-left:5px;">
-                % if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-                    <% assessment = c.getReviewManager().getLastReview().getEditorJudgement().getJudgement() %>
+                % if review_manager.getLastReview().getEditorJudgement().isSubmitted():
+                    <% assessment = review_manager.getLastReview().getEditorJudgement().getJudgement() %>
                     <%
                         if assessment == 'Accept':
                             assessment_color = '#118822'
@@ -57,19 +57,19 @@
                             assessment_color = 'orange'
                     %>
                     <span style="color:${assessment_color}">${ _("Layout assessment given: ") + assessment }</span>
-                % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
-                    % if len(c.getReviewManager().getVersioning()) > 1:
+                % elif not review_manager.getLastReview().isAuthorSubmitted():
+                    % if len(review_manager.getVersioning()) > 1:
                         <span style="color:orange;">${ _("Author has yet to re-submit paper") }</span>
                     % else:
                         <span>${ _("Paper not yet submitted")}</span>
                     % endif
                 % else:
-                    % if len(c.getReviewManager().getVersioning()) > 1:
+                    % if len(review_manager.getVersioning()) > 1:
                         <span style="color:#D18700;">
                             ${ _("Author has re-submitted paper")}
                         </span><br/>
                     % endif
-                    <% referee_did = c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() %>
+                    <% referee_did = review_manager.getLastReview().getRefereeJudgement().isSubmitted() %>
                     <span ${ "style='font-weight: bold;'" if not referee_did else "" }>
                         ${ _("Layout assessment not yet given")}
                     </span>
@@ -79,7 +79,7 @@
                 % endif
             </td>
             <td style="padding-right:5px;padding-left:5px;">
-            <% date = c.getReviewManager().getLastReview().getAdjustedEditorDueDate() %>
+            <% date = review_manager.getLastReview().getAdjustedEditorDueDate() %>
             % if date is None:
                 ${ _("Deadline not set.")}
             % else:
@@ -87,7 +87,6 @@
             % endif
             </td>
         </tr>
-        % endif
     % endfor
 
 </table>

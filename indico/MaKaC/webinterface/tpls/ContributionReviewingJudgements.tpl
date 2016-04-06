@@ -165,8 +165,8 @@ var showWidgets = function(firstLoad) {
 
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
                         'reviewing.contribution.changeJudgement',
-                        {conference: '${ Contribution.getConference().getId() }',
-                        contribution: '${ Contribution.getId() }',
+                        {conference: '${ Contribution.event_new.id }',
+                        contribution: '${ Contribution.id }',
                         current: 'refereeJudgement'
                         }, ${ ConfReview.getStatusesDictionary() }, "${FinalJudge}", observer);
 
@@ -176,8 +176,8 @@ var showWidgets = function(firstLoad) {
     }
 
     $E('inPlaceEditComments').set(new TextAreaEditWidget('reviewing.contribution.changeComments',
-            {conference: '${ Contribution.getConference().getId() }',
-             contribution: '${ Contribution.getId() }',
+            {conference: '${ Contribution.event_new.id }',
+             contribution: '${ Contribution.id }',
              current: 'refereeJudgement'},initialValue).draw());
 
 
@@ -206,8 +206,8 @@ var showWidgets = function(firstLoad) {
                                                     ${ str(ConfReview.reviewingQuestionsLabels) },
                                                     initialValue,
                                                     'reviewing.contribution.changeCriteria',
-                                                    {conference: '${ Contribution.getConference().getId() }',
-                                                    contribution: '${ Contribution.getId() }',
+                                                    {conference: '${ Contribution.event_new.id }',
+                                                    contribution: '${ Contribution.id }',
                                                     criterion: '${ q.getId() }',
                                                     current: 'refereeJudgement'
                                                     }));
@@ -222,8 +222,8 @@ var showWidgets = function(firstLoad) {
 var showValues = function() {
     indicoRequest('reviewing.contribution.changeJudgement',
             {
-                conference: '${ Contribution.getConference().getId() }',
-                contribution: '${ Contribution.getId() }',
+                conference: '${ Contribution.event_new.id }',
+                contribution: '${ Contribution.id }',
                 current: 'refereeJudgement'
             },
             function(result, error){
@@ -237,8 +237,8 @@ var showValues = function() {
 
     indicoRequest('reviewing.contribution.getCriteria',
             {
-                conference: '${ Contribution.getConference().getId() }',
-                contribution: '${ Contribution.getId() }',
+                conference: '${ Contribution.event_new.id }',
+                contribution: '${ Contribution.id }',
                 current: 'refereeJudgement'
             },
             function(result, error){
@@ -293,8 +293,8 @@ var updatePage = function (){
 % if IsReferee:
 var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'), 'reviewing.contribution.setSubmitted',
         {
-            conference: '${ Contribution.getConference().getId() }',
-            contribution: '${ Contribution.getId() }',
+            conference: '${ Contribution.event_new.id }',
+            contribution: '${ Contribution.id }',
             current: 'refereeJudgement',
             value: true
         },

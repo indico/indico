@@ -406,6 +406,7 @@ class WConfListContribToJudgeAsReviewer(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
+        vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
 
@@ -441,6 +442,7 @@ class WConfListContribToJudgeAsEditor(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
+        vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
 

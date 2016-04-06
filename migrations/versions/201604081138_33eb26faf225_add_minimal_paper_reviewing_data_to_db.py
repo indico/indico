@@ -9,16 +9,16 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
-from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRoleType
 
 # revision identifiers, used by Alembic.
 revision = '33eb26faf225'
-down_revision = '1af04f7ede7a'
+down_revision = '3b0b69b541a2'
 
 
 def upgrade():
-    op.execute(CreateSchema('event_abstracts'))
+    op.execute(CreateSchema('event_paper_reviewing'))
 
     op.create_table(
         'contribution_roles',
@@ -32,7 +32,24 @@ def upgrade():
         schema='event_paper_reviewing'
     )
 
+    op.create_table(
+        'paper_files',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('revision_id', sa.Integer(), nullable=True),
+        sa.Column('storage_backend', sa.String(), nullable=False),
+        sa.Column('content_type', sa.String(), nullable=False),
+        sa.Column('size', sa.BigInteger(), nullable=False),
+        sa.Column('storage_file_id', sa.String(), nullable=False),
+        sa.Column('filename', sa.String(), nullable=False),
+        sa.Column('created_dt', UTCDateTime, nullable=False),
+        sa.ForeignKeyConstraint(['contribution_id'], [u'events.contributions.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_paper_reviewing'
+    )
+
 
 def downgrade():
+    op.drop_table('paper_files', schema='event_paper_reviewing')
     op.drop_table('contribution_roles', schema='event_paper_reviewing')
-    op.execute(DropSchema('event_abstracts'))
+    op.execute(DropSchema('event_paper_reviewing'))
