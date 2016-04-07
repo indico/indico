@@ -33,6 +33,17 @@
             width: 73%;
         }
 
+        .balloon-subtitle {
+            color: $dark-gray;
+        }
+
+        &.session-block {
+            .title {
+                font-size: 1.1em;
+                width: 100%;
+            }
+        }
+
         .settings {
             float: right;
             cursor: pointer;
@@ -48,6 +59,19 @@
             }
         }
 
+    }
+
+    .section-title-container {
+
+        .title-header {
+            margin-bottom: 5px;
+        }
+
+        .title-caption {
+            font-weight: bold;
+            display: inline-block;
+            width: 73%;
+        }
     }
 
     .entry-action-buttons a {
@@ -110,6 +134,10 @@
         display: block;
         margin: 10px 0;
         border-bottom: 1px solid $pastel-gray;
+    }
+
+    .bottom-link {
+        margin-top: 10px;
     }
 }
 
