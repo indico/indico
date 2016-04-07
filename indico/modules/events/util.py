@@ -380,14 +380,16 @@ def track_time_changes():
     finally:
         old_times = g.pop('old_times')
         for entry, info in old_times.iteritems():
+            obj = entry.object if not isinstance(entry, Event) else entry
             if entry.start_dt != info['start_dt']:
-                changes[entry.object]['start_dt'] = (info['start_dt'], entry.start_dt)
+                changes[obj]['start_dt'] = (info['start_dt'], entry.start_dt)
             if entry.duration != info['duration']:
-                changes[entry.object]['duration'] = (info['duration'], entry.duration)
+                changes[obj]['duration'] = (info['duration'], entry.duration)
             if entry.end_dt != info['end_dt']:
-                changes[entry.object]['end_dt'] = (info['end_dt'], entry.end_dt)
+                changes[obj]['end_dt'] = (info['end_dt'], entry.end_dt)
         for obj, obj_changes in changes.iteritems():
-            signals.event.times_changed.send(type(obj), entry=obj.timetable_entry, obj=obj, changes=obj_changes)
+            entry = None if isinstance(obj, Event) else obj.timetable_entry
+            signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
 
 
 def register_time_change(entry):
@@ -403,7 +405,7 @@ def register_time_change(entry):
     try:
         old_times = g.old_times
     except AttributeError:
-        msg = 'Time change of {} was not tracked; changes to scheduled object'.format(entry)
+        msg = 'Time change of {} was not tracked'.format(entry)
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
@@ -412,3 +414,27 @@ def register_time_change(entry):
     for field in ('start_dt', 'duration', 'end_dt'):
         if old_times[entry].get(field) is None:
             old_times[entry][field] = getattr(entry, field)
+
+
+def register_event_time_change(event):
+    """Register a time-related change for an event
+
+    This is an internal helper function used in the model to record
+    changes of the start time or end time.  The changes are exposed
+    through the `track_time_changes` contextmanager function.
+    """
+    # if it's a new object it's not a change so we just ignore it
+    if not inspect(event).persistent:
+        return
+    try:
+        old_times = g.old_times
+    except AttributeError:
+        msg = 'Time change of {} was not tracked'.format(event)
+        if current_app.config.get('REPL'):
+            warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
+            return
+        else:
+            raise RuntimeError(msg)
+    for field in ('start_dt', 'duration', 'end_dt'):
+        if old_times[event].get(field) is None:
+            old_times[event][field] = getattr(event, field)

@@ -51,7 +51,7 @@ from indico.modules.events.api import CategoryEventHook
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.operations import update_event
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.events.util import track_time_changes
 from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
@@ -456,8 +456,8 @@ class UtilsConference:
         sDate = cls.get_start_dt(confData)
         eDate = cls.get_end_dt(confData, sDate)
         moveEntries = int(confData.get("move",0))
-        c.setDates( sDate.astimezone(timezone('UTC')), \
-                    eDate.astimezone(timezone('UTC')), moveEntries=moveEntries)
+        with track_time_changes():
+            c.setDates(sDate.astimezone(timezone('UTC')), eDate.astimezone(timezone('UTC')), moveEntries=moveEntries)
 
         #################################
         # Fermi timezone awareness(end) #

@@ -54,6 +54,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 # indico imports
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.modules.events.layout import theme_settings
+from indico.modules.events.util import track_time_changes
 from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
@@ -417,9 +418,8 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
 
         # catch TimingErrors that can be returned by the algorithm
         try:
-            self._target.setDates(self._startDate,
-                                  self._endDate,
-                                  moveEntries=moveEntries)
+            with track_time_changes():
+                self._target.setDates(self._startDate, self._endDate, moveEntries=moveEntries)
         except TimingError, e:
             raise TimingNoReportError(e.getMessage(),
                                       title=_("Cannot set event dates"),
