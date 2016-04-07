@@ -327,17 +327,35 @@ def get_datetime_from_request(prefix='', default=None, source=None):
 
 
 def get_day_start(day, tzinfo=None):
+    """Return the earliest datetime for a given day.
+
+    :param day: A `date` or `datetime`.
+    :param tzinfo: The timezone to display the resulting datetime. Not valid for
+                   non-naive `datetime` objects.
+    """
     if isinstance(day, datetime):
+        if day.tzinfo and tzinfo:
+            raise ValueError("datetime is not naive.")
         tzinfo = day.tzinfo
         day = day.date()
-    return datetime.combine(day, dt_time(0, tzinfo=tzinfo))
+    start_dt = datetime.combine(day, dt_time(0))
+    return pytz.utc.localize(start_dt).astimezone(tzinfo) if tzinfo else start_dt
 
 
 def get_day_end(day, tzinfo=None):
+    """Return the latest datetime for a given day.
+
+    :param day: A `date` or `datetime`.
+    :param tzinfo: The timezone to display the resulting datetime. Not valid for
+                   non-naive `datetime` objects.
+    """
     if isinstance(day, datetime):
+        if day.tzinfo and tzinfo:
+            raise ValueError("datetime is not naive.")
         tzinfo = day.tzinfo
         day = day.date()
-    return datetime.combine(day, dt_time(23, 59, tzinfo=tzinfo))
+    end_dt = datetime.combine(day, dt_time(23, 59))
+    return pytz.utc.localize(end_dt).astimezone(tzinfo) if tzinfo else end_dt
 
 
 def round_up_to_minutes(dt, precision=15):
