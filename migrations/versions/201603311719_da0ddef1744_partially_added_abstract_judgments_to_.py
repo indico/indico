@@ -18,24 +18,16 @@ down_revision = '4878972d7e2f'
 def upgrade():
     op.create_table('judgments',
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('creation_dt', UTCDateTime, nullable=False),
-                    sa.Column('abstract_id', sa.Integer(), nullable=False),
+                    sa.Column('creation_dt', UTCDateTime, nullable=False, index=True),
+                    sa.Column('abstract_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('track_id', sa.Integer(), nullable=False),
-                    sa.Column('judge_user_id', sa.Integer(), nullable=False),
-                    sa.Column('accepted_type_id', sa.Integer(), nullable=True),
-                    sa.ForeignKeyConstraint(['abstract_id'],
-                                            [u'event_abstracts.abstracts.id']),
-                    sa.ForeignKeyConstraint(['accepted_type_id'],
-                                            [u'events.contribution_types.id']),
-                    sa.ForeignKeyConstraint(['judge_user_id'],
-                                            [u'users.users.id']),
+                    sa.Column('judge_user_id', sa.Integer(), nullable=False, index=True),
+                    sa.Column('accepted_type_id', sa.Integer(), nullable=True, index=True),
+                    sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
+                    sa.ForeignKeyConstraint(['accepted_type_id'], ['events.contribution_types.id']),
+                    sa.ForeignKeyConstraint(['judge_user_id'], ['users.users.id']),
+                    sa.UniqueConstraint('abstract_id', 'track_id', 'judge_user_id'),
                     sa.PrimaryKeyConstraint('id'),
-                    schema='event_abstracts')
-    op.create_index(None, 'judgments', ['abstract_id'], unique=False, schema='event_abstracts')
-    op.create_index(None, 'judgments', ['accepted_type_id'], unique=False, schema='event_abstracts')
-    op.create_index(None, 'judgments', ['creation_dt'], unique=False, schema='event_abstracts')
-    op.create_index(None, 'judgments', ['judge_user_id'], unique=False, schema='event_abstracts')
-    op.create_index(None, 'judgments', ['abstract_id', 'track_id', 'judge_user_id'], unique=True,
                     schema='event_abstracts')
 
 

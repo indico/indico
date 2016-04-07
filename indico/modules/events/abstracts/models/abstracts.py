@@ -21,7 +21,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -30,7 +29,7 @@ class Abstract(DescriptionMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
-    __auto_table_args = (db.Index(None, 'legacy_id', 'event_id', unique=True),
+    __auto_table_args = (db.UniqueConstraint('legacy_id', 'event_id'),
                          {'schema': 'event_abstracts'})
 
     @declared_attr
@@ -60,7 +59,8 @@ class Abstract(DescriptionMixin, db.Model):
     )
     accepted_track_id = db.Column(
         db.Integer,
-        nullable=True
+        nullable=True,
+        index=True
     )
     accepted_type_id = db.Column(
         db.Integer,

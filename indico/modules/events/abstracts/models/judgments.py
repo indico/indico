@@ -16,10 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.ext.declarative import declared_attr
-
 from indico.core.db.sqlalchemy import db, UTCDateTime
-from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr, return_ascii
 
@@ -28,7 +25,8 @@ class Judgment(db.Model):
     """Represents an abstract judgment, emitted by a judge"""
 
     __tablename__ = 'judgments'
-    __table_args__ = {'schema': 'event_abstracts'}
+    __table_args__ = (db.UniqueConstraint('abstract_id', 'track_id', 'judge_user_id'),
+                      {'schema': 'event_abstracts'})
 
     id = db.Column(
         db.Integer,
