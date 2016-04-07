@@ -19,13 +19,16 @@ from __future__ import absolute_import
 from contextlib import contextmanager
 
 import logging
+import sys
 from functools import partial
+
 from flask import has_app_context, g, has_request_context
 from flask import session as flask_session
 
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import mapper, Session, CompositeProperty
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
@@ -39,10 +42,64 @@ from indico.core.db.sqlalchemy.util.models import IndicoModel
 flask_sqlalchemy.Model = IndicoModel
 
 
+class ConstraintViolated(Exception):
+    """Indicates that a constraint trigger was violated"""
+    def __init__(self, message, orig):
+        super(ConstraintViolated, self).__init__(message)
+        self.orig = orig
+
+
+def handle_sqlalchemy_database_error():
+    """Handle a SQLAlchemy DatabaseError exception nicely
+
+    Currently this only takes care of custom INDX exception
+    raised from constraint triggers.  It must be invoked from an
+    ``except DatabaseError`` block.
+
+    :raise ConstraintViolated: if an exception with an SQLSTATE of
+                               ``INDX*`` has been thrown.  This is
+                               used in custom constraint triggers
+                               that enforce consistenct
+    :raise DatabaseError: any other database error is simply re-raised
+    """
+    exc_class, exc, tb = sys.exc_info()
+    if not exc.orig.pgcode.startswith('INDX'):
+        # not an indico exception
+        raise
+    msg = exc.orig.diag.message_primary
+    if exc.orig.diag.message_detail:
+        msg += ': {}'.format(exc.orig.diag.message_detail)
+    if exc.orig.diag.message_hint:
+        msg += ' ({})'.format(exc.orig.diag.message_hint)
+    raise ConstraintViolated, (msg, exc.orig), tb  # raise with original traceback
+
+
 class IndicoSQLAlchemy(SQLAlchemy):
     def __init__(self, *args, **kwargs):
         super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
         self.m = type(b'_Models', (object,), {})
+
+    def enforce_constraints(self):
+        """Enables immedaite enforcing of deferred constraints.
+
+        This should be done at the end of normal request processing
+        and exceptions should be handled in a clean way that goes
+        beyond letting the user report an error.  If you do not expect
+        a deferred constraint to be violated do not use this - the
+        constraints will be checked at commit time and result in an
+        error if there are any violations.
+
+        Constraints will revert to their default deferred mode once
+        the active transaction ends, i.e. on rollback or commit.
+
+        Exceptions from custom constraint triggers will raise
+        `ConstraintViolated`.
+        """
+        self.session.flush()
+        try:
+            self.session.execute('SET CONSTRAINTS ALL IMMEDIATE')
+        except DatabaseError:
+            handle_sqlalchemy_database_error()
 
     @cached_property
     def logger(self):

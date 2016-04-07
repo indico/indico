@@ -55,7 +55,9 @@ def _events_schema_created(sender, connection, **kwargs):
                 WHERE c.id = te.contribution_id AND (c.session_id IS NOT NULL or c.session_block_id IS NOT NULL)
             ) AND te.event_id = trigger_event_id
         ) THEN
-            RAISE EXCEPTION 'Found top-level timetable entry for contribution in a session';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Top-level entry for contribution in a session';
         END IF;
 
         IF EXISTS (
@@ -72,7 +74,9 @@ def _events_schema_created(sender, connection, **kwargs):
                 )
             ) AND te.event_id = trigger_event_id
         ) THEN
-            RAISE EXCEPTION 'Found child timetable entry for contribution in a session that does not match the parent session';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Child entry for contribution in a session does not match the parent session';
         END IF;
 
         IF EXISTS (
@@ -81,7 +85,9 @@ def _events_schema_created(sender, connection, **kwargs):
             JOIN events.timetable_entries tep ON (tep.id = te.parent_id)
             WHERE te.event_id = trigger_event_id AND te.parent_id IS NOT NULL AND tep.start_dt > te.start_dt
         ) THEN
-            RAISE EXCEPTION 'Found timetable entry starting before its parent block';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Entry starts before its parent block';
         END IF;
 
         IF EXISTS (
@@ -94,7 +100,9 @@ def _events_schema_created(sender, connection, **kwargs):
             WHERE te.event_id = trigger_event_id AND te.parent_id IS NOT NULL AND te.type IN (2, 3) AND
                   (te.start_dt + COALESCE(c.duration, b.duration)) > (tep.start_dt + bl.duration)
         ) THEN
-            RAISE EXCEPTION 'Found timetable entry ending after its parent block';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Entry ends after its parent block';
         END IF;
 
         IF EXISTS (
@@ -103,7 +111,9 @@ def _events_schema_created(sender, connection, **kwargs):
             JOIN events.events e ON (e.id = te.event_id)
             WHERE te.event_id = trigger_event_id AND te.start_dt < e.start_dt
         ) THEN
-            RAISE EXCEPTION 'Found timetable entry starting before the event';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Entry starts before the event';
         END IF;
 
         IF EXISTS (
@@ -116,7 +126,9 @@ def _events_schema_created(sender, connection, **kwargs):
             WHERE te.event_id = trigger_event_id AND
                   (te.start_dt + COALESCE(c.duration, b.duration, bl.duration)) > e.end_dt
         ) THEN
-            RAISE EXCEPTION 'Found timetable entry ending after the event';
+            RAISE EXCEPTION SQLSTATE 'INDX0' USING
+                MESSAGE = 'Timetable inconsistent',
+                DETAIL = 'Entry ends after the event';
         END IF;
 
         RETURN NULL;

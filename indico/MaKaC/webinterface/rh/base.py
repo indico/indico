@@ -33,6 +33,7 @@ import jsonschema
 import transaction
 from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
 from werkzeug.routing import BuildError
@@ -61,6 +62,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login, redirect_to_login
@@ -726,6 +728,8 @@ class RH(RequestHandlerBase):
                         transaction.abort()
                         Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))
                         time.sleep(i)
+                    except DatabaseError:
+                        handle_sqlalchemy_database_error()
             self._process_success()
         except Exception as e:
             transaction.abort()
