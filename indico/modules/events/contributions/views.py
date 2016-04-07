@@ -38,7 +38,9 @@ class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
         return WPJinjaMixin._getPageContent(self, params)
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
+        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+                self._asset_env['modules_contributions_js'].urls() +
+                self._asset_env['modules_event_display_js'].urls())
 
     def getCSSFiles(self):
         return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls() +
@@ -52,5 +54,10 @@ class WPMyContributions(WPContributionsDisplayBase):
 class WPContributions(WPContributionsDisplayBase):
     menu_entry_name = 'contributions'
 
-    def getJSFiles(self):
-        return WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+
+class WPAuthorList(WPContributionsDisplayBase):
+    menu_entry_name = 'author_index'
+
+
+class WPSpeakerList(WPContributionsDisplayBase):
+    menu_entry_name = 'speaker_index'

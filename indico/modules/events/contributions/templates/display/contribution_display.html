@@ -19,21 +19,23 @@
 
 {% macro render_author_list(authors) %}
     <div class="speaker-list">
-        {% call(user_data) render_users(authors, span_class='speaker-item icon-user', separator='') %}
-            {% if user_data.title -%}
-                <span class="speaker-title">
-                    {{ user_data.title }}
-                </span>
-            {%- endif %}
-            <a href="{{ url_for('contributions.display_author', user_data) }}">
-                <span itemprop="givenName">{{ user_data.first_name }}</span>
-                <span itemprop="lastName">{{ user_data.last_name }}</span>
-            </a>
-            {% if user_data.affiliation -%}
-                <span class="affiliation">
-                    (<span class="text">{{ user_data.affiliation }}</span>)
-                </span>
-            {%- endif %}
+        {% call(user_data) render_users(authors, separator='') %}
+            <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="speaker-item icon-user">
+                {% if user_data.title -%}
+                    <span class="speaker-title">
+                        {{ user_data.title }}
+                    </span>
+                {%- endif %}
+                <a href="{{ url_for('contributions.display_author', user_data) }}">
+                    <span itemprop="givenName">{{ user_data.first_name }}</span>
+                    <span itemprop="lastName">{{ user_data.last_name }}</span>
+                </a>
+                {% if user_data.affiliation -%}
+                    <span class="affiliation">
+                        (<span class="text">{{ user_data.affiliation }}</span>)
+                    </span>
+                {%- endif %}
+            </span>
         {% endcall %}
     </div>
 {% endmacro %}

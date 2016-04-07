@@ -141,22 +141,6 @@ def get_default_menu_entries():
             static_site=True
         ),
         MenuEntryData(
-            title=_("Author List"),
-            name='author_index',
-            endpoint='event.confAuthorIndex',
-            position=5,
-            is_enabled=False,
-            static_site=True
-        ),
-        MenuEntryData(
-            title=_("Speaker List"),
-            name='speaker_index',
-            endpoint='event.confSpeakerIndex',
-            position=6,
-            is_enabled=False,
-            static_site=True
-        ),
-        MenuEntryData(
             title=_("My Conference"),
             name='my_conference',
             endpoint='event.myconference',

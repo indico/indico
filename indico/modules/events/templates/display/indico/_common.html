@@ -73,16 +73,16 @@
 
 {% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ') -%}
     {% for link in user_list -%}
-        <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
             {% if caller %}
                 {{ caller(link) }}
             {% else %}
-                {{ _render_user_data(link, show_title=title, italic_affiliation=italic_affiliation) }}
+                <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
+                    {{ _render_user_data(link, show_title=title, italic_affiliation=italic_affiliation) }}
+                </span>
             {% endif %}
             {% if not loop.last %}
                 {{ separator }}
             {% endif %}
-        </span>
     {% endfor %}
 {%- endmacro %}
 
