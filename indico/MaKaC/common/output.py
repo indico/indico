@@ -1211,11 +1211,6 @@ class outputGenerator(object):
 
         self._generate_references(subcontrib, out)
 
-        out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
-        for keyword in ['FOO', 'BAR']:  # for keyword in subcontrib.keywords:
-            out.writeTag("subfield",keyword,[["code","a"]])
-        out.closeTag("datafield")
-
         for path in subcontrib.event_new.as_legacy.getCategoriesPath():
             out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("subfield", ":".join(path), [["code","a"]])

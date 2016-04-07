@@ -379,7 +379,8 @@ class ProtectionManagersMixin(ProtectionMixin):
                 else:
                     access_list.update(self.protection_parent.get_access_list())
             return access_list
-        return set()
+        else:
+            return set()
 
 
 def _get_acl_data(obj, principal):
