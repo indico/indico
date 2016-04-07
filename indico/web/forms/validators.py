@@ -139,14 +139,14 @@ class DateTimeRange(object):
                 if self.earliest_now:
                     msg = _("'{}' can't be in the past ({})").format(field.label, field.timezone)
                 else:
-                    dt = format_datetime(earliest_dt, timezone=field.timezone),
+                    dt = format_datetime(earliest_dt, timezone=field.timezone)
                     msg = _("'{}' can't be before {} ({})").format(field.label, dt, field.timezone)
                 raise ValidationError(msg)
             if latest_dt and field_dt > latest_dt:
                 if self.latest_now:
                     msg = _("'{}' can't be in the future ({})").format(field.label, field.timezone)
                 else:
-                    dt = format_datetime(latest_dt, timezone=field.timezone),
+                    dt = format_datetime(latest_dt, timezone=field.timezone)
                     msg = _("'{}' can't be after {} ({})").format(field.label, dt, field.timezone)
                 raise ValidationError(msg)
 

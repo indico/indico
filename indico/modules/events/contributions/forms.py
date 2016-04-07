@@ -122,7 +122,7 @@ class ContributionStartDateForm(IndicoForm):
 
     def validate_start_dt(self, field):
         if field.data + self.contrib.duration > self.event.end_dt:
-            raise ValidationError(_('The selected date is incorrect, since the overall time of this contribution would'
+            raise ValidationError(_('The selected date is incorrect, since the overall time of this contribution would '
                                     'exceed the event end date. Either change the date or the contribution duration'))
 
 
