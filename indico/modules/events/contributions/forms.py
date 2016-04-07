@@ -32,6 +32,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
                                      IndicoDateTimeField, IndicoTagListField)
 from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
+from indico.util.date_time import get_day_end
 from indico.util.i18n import _
 
 
@@ -121,9 +122,16 @@ class ContributionStartDateForm(IndicoForm):
         super(ContributionStartDateForm, self).__init__(*args, **kwargs)
 
     def validate_start_dt(self, field):
-        if field.data + self.contrib.duration > self.event.end_dt:
-            raise ValidationError(_('The selected date is incorrect, since the overall time of this contribution would '
-                                    'exceed the event end date. Either change the date or the contribution duration'))
+        event = self.contrib.event_new
+        day = self.contrib.start_dt.astimezone(event.tzinfo).date()
+        if day == event.end_dt_local.date():
+            latest_dt = event.end_dt
+            error_msg = _("With this time, the contribution would exceed the event end time.")
+        else:
+            latest_dt = get_day_end(day, tzinfo=event.tzinfo)
+            error_msg = _("With this time, the contribution would exceed the current day.")
+        if field.data + self.contrib.duration > latest_dt:
+            raise ValidationError(error_msg)
 
 
 class ContributionDurationForm(IndicoForm):
@@ -138,8 +146,17 @@ class ContributionDurationForm(IndicoForm):
     def validate_duration(self, field):
         if field.errors:
             return
-        if self.contrib.is_scheduled and self.contrib.start_dt + field.data > self.contrib.event_new.end_dt:
-            raise ValidationError(_('With the current value, the contribution would exceed event end date'))
+        if self.contrib.is_scheduled:
+            event = self.contrib.event_new
+            day = self.contrib.start_dt.astimezone(event.tzinfo).date()
+            if day == event.end_dt_local.date():
+                latest_dt = event.end_dt
+                error_msg = _("With this duration, the contribution would exceed the event end time.")
+            else:
+                latest_dt = get_day_end(day, tzinfo=event.tzinfo)
+                error_msg = _("With this duration, the contribution would exceed the current day.")
+            if self.contrib.start_dt + field.data > latest_dt:
+                raise ValidationError(error_msg)
 
 
 class ContributionTypeForm(IndicoForm):
