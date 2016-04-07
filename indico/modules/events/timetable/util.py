@@ -1,4 +1,5 @@
 from collections import defaultdict
+from operator import attrgetter
 
 from pytz import utc
 from sqlalchemy import Date, cast
@@ -14,7 +15,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.legacy import serialize_event_info
-from indico.util.date_time import get_day_start, iterdays, overlaps
+from indico.util.date_time import get_day_end, get_day_start, iterdays, overlaps
 from indico.web.flask.templating import get_template_module
 
 
@@ -93,6 +94,68 @@ def find_earliest_gap(event, day, duration, session_block=None):
         end_dt = start_dt + duration
     if end_dt > latest_end_dt or end_dt.astimezone(event.tzinfo).date() > day:
         return None
+    return start_dt
+
+
+def find_latest_entry_end_dt(obj, day=None):
+    """Get the latest end datetime for timetable entries within the object.
+
+    :param obj: The :class:`Event` or :class:`SessionBlock` that will be used to
+                look for timetable entries.
+    :param day: The local event date to look for timetable entries.  Applicable only
+                to ``Event``.
+    :return: The end datetime of the timetable entry finishing the latest. ``None``
+              if no entry was found.
+    """
+    if isinstance(obj, Event):
+        if day is None:
+            raise ValueError("No day specified for event.")
+        if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
+            raise ValueError("Day out of event bounds.")
+        entries = obj.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
+                                               cast(TimetableEntry.start_dt.astimezone(obj.tzinfo), Date) == day).all()
+    elif isinstance(obj, SessionBlock):
+        if day is not None:
+            raise ValueError("Day specified for session block.")
+        entries = obj.timetable_entry.children
+    else:
+        raise ValueError("Invalid object type {}".format(type(obj)))
+    return max(entries, key=attrgetter('end_dt')).end_dt if entries else None
+
+
+def find_next_start_dt(duration, obj, day=None):
+    """Find the next most convenient start date fitting a duration within an object.
+
+    :param duration: Duration to fit into the event/session-block.
+    :param obj: The :class:`Event` or :class:`SessionBlock` the duration needs to
+                fit into.
+    :param day: The local event date where to fit the duration in case the object is
+                an event.
+    :return: The end datetime of the latest scheduled entry in the object if the
+              duration fits then. It it doesn't, the latest datetime that fits it.
+              ``None`` if the duration cannot fit in the object.
+    """
+    if isinstance(obj, Event):
+        if day is None:
+            raise ValueError("No day specified for event.")
+        if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
+            raise ValueError("Day out of event bounds.")
+        earliest_dt = obj.start_dt if obj.start_dt_local.date() == day else obj.start_dt.replace(hour=8, minute=0)
+        latest_dt = obj.end_dt if obj.start_dt.date() == day else get_day_end(day, tzinfo=obj.tzinfo)
+    elif isinstance(obj, SessionBlock):
+        if day is not None:
+            raise ValueError("Day specified for session block.")
+        earliest_dt = obj.timetable_entry.start_dt
+        latest_dt = obj.timetable_entry.end_dt
+    else:
+        raise ValueError("Invalid object type {}".format(type(obj)))
+    max_duration = latest_dt - earliest_dt
+    if duration > max_duration:
+        None
+    start_dt = find_latest_entry_end_dt(obj, day=day) or earliest_dt
+    end_dt = start_dt + duration
+    if end_dt > latest_dt:
+        start_dt = latest_dt - duration
     return start_dt
 
 
