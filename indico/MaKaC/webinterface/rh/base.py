@@ -730,6 +730,7 @@ class RH(RequestHandlerBase):
                         time.sleep(i)
                     except DatabaseError:
                         handle_sqlalchemy_database_error()
+                        break
             self._process_success()
         except Exception as e:
             transaction.abort()
