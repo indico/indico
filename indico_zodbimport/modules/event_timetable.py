@@ -504,12 +504,17 @@ class TimetableMigration(object):
         ac = old_contrib._Contribution__ac
         description = old_contrib._fields.get('content', '')
         description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
+        status = getattr(old_contrib, '_status', None)
+        status_class = status.__class__.__name__ if status else None
+
         contrib = Contribution(event_new=self.event, friendly_id=friendly_id,
                                title=convert_to_unicode(old_contrib.title),
                                description=description, duration=old_contrib.duration,
                                protection_mode=PROTECTION_MODE_MAP[ac._accessProtection],
                                board_number=convert_to_unicode(getattr(old_contrib, '_boardNumber', '')),
-                               keywords=self._process_keywords(old_contrib._keywords))
+                               keywords=self._process_keywords(old_contrib._keywords),
+                               is_deleted=(status_class == 'ContribStatusWithdrawn'))
+
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
         self.legacy_contribution_map[old_contrib] = contrib
