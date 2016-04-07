@@ -747,6 +747,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
                 // updates the time of the session if it has to be extended
                 data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
                 data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
+                data[result.day][result.slotEntry.id].duration = result.slotEntry.duration;
             } else {
                 // block moves to top level
                 data[result.day][result.id] = result.entry;
