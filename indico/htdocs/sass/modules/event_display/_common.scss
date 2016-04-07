@@ -1,0 +1,64 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+ #flashed-messages {
+     margin: 1em auto 0 auto;
+     width: 1000px;
+     &:empty {
+         display: none;
+     }
+ }
+
+ .preformatted {
+     white-space: pre-wrap;
+ }
+
+ .speaker-list {
+     @extend %font-family-modern-body;
+     color: $black;
+
+     .speaker-item {
+         &:before {
+             vertical-align: middle;
+             color: $dark-blue;
+             margin-right: 0.2em;
+         }
+
+         display: block;
+
+         span {
+             vertical-align: middle;
+         }
+
+         .affiliation {
+             color: $dark-gray;
+             font-size: 0.8em;
+             .text {
+                 display: inline-block;
+                 max-width: 10em;
+                 overflow: hidden;
+                 text-overflow: ellipsis;
+                 white-space: nowrap;
+             }
+         }
+     }
+
+     .speaker-item-inline {
+         @extend .speaker-item;
+         display: inline-block;
+     }
+ }

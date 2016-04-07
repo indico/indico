@@ -1,0 +1,245 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+#event-note-section {
+    @include border-bottom($gray);
+    background: white;
+    padding: 10px 50px;
+}
+
+.timetable-title {
+    @extend %font-family-title;
+    color: $black;
+
+    &.top-level {
+        font-size: 1.2em;
+    }
+}
+
+.i-selection.note-visibility-toggle input[type=checkbox] {
+    & + label {
+        border-style: dashed !important;
+    }
+
+    &:not(:checked) + label,
+    &:not(:checked) + label:hover {
+        background: transparent;
+    }
+
+    &:checked + label {
+        background: $postit-yellow !important;
+        color: $light-black !important;
+    }
+
+    &:checked + label:hover {
+        color: $black !important;
+    }
+}
+
+
+li > table + .note-area-wrapper {
+    margin-top: 0.9em;
+}
+
+
+.padded-box-content {
+    .note-actions {
+        float: right;
+
+        a {
+            @include transition;
+            @include transition-property(opacity);
+            color: darken($pastel-blue, $color-variation);
+
+            &:hover {
+                color: $blue;
+            }
+        }
+    }
+
+    .note-text {
+        h2, h1 {
+            color: $black;
+        }
+
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .no-note-text {
+        color: $dark-gray;
+        font-style: italic;
+        font-size: 1.1em;
+    }
+
+    .note-metadata {
+        float: right;
+        clear: both;
+        opacity: 0.6;
+        margin-top: 0.5em;
+        font-size: 0.9em;
+
+        .modification-date {
+            color: $dark-gray;
+        }
+    }
+}
+.participant-list-wrapper {
+    position: relative;
+
+    &.collapsible {
+        &.collapsed {
+            max-height: 4.75em;
+            overflow: hidden;
+
+            .gradient-layer {
+                @include gradient(rgba(0,0,0,0.0), #ECECEC);
+                display: block;
+                position: absolute;
+                bottom: 0;
+                height: 1.5em;
+                width: 100%;
+                cursor: pointer;
+            }
+        }
+
+        &:hover {
+            & > .trigger {
+                color: $light-black;
+            }
+        }
+
+        & > .trigger {
+            display: inline-block;
+            position: absolute;
+            cursor: pointer;
+            right: 0.6em;
+            top: 0;
+            color: $dark-gray;
+            @include user-select(none);
+        }
+
+        & > ul.participant-list {
+            width: 95%; // To avoid overlap with expansion arrow
+        }
+    }
+
+    .gradient-layer, .trigger {
+        display: none;
+    }
+
+    .height-control {
+        height: 5.3em; // Enough to display 3 rows of participants
+        display: none;
+    }
+
+    ul.participant-list {
+        @extend %font-family-title;
+
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+    }
+}
+
+.event-user {
+    @include border-radius();
+    @include border-all($pastel-gray);
+    @include icon-before('icon-user');
+
+    display: inline-block;
+    font-size: 0.95em;
+    padding: 0.2em 0.5em;
+    margin-bottom: 0.1em;
+    color: $black;
+    background: $pastel-gray;
+
+    &:before {
+        color: $gray;
+        margin-right: 0.4em;
+    }
+
+    &:not(first-child) {
+        margin-left: 0.1em;
+    }
+
+    &.checked-in {
+        @include border-all($pastel-green);
+        background: lighten($pastel-green, 30%);
+        color: darken($pastel-green, 20%);
+
+        &:before {
+            color: $pastel-green;
+        }
+    }
+
+    &.no-label {
+        background: none;
+        border: none;
+        color: $dark-gray;
+        padding: 0;
+
+        &:before {
+            color: $gray;
+        }
+    }
+
+}
+
+.meetingTimetable .reference-list {
+    font-size: 0.9em;
+}
+
+.reference-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: block;
+
+    li {
+        &:before {
+            color: $yellow;
+        }
+
+        display: inline-block;
+        margin: 0.2em 0.2em;
+        @include border-radius(2px);
+        padding: 0.2em 0.5em;
+        background-color: lighten($light-yellow, 5%);
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        .type-name {
+            color: $light-black;
+        }
+    }
+}
+
+.session-block-form {
+    width: 840px !important;
+}
+
+.material-list .attachments-display-container {
+    display: inline-block;
+}
