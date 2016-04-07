@@ -185,15 +185,12 @@ type("TimetableManagementActions", [], {
                                                                         timetable_entry_id: eventData.scheduleEntryId}),
             method: 'POST',
             data: info.getAll(),
-            error: handleAjaxError,
+            error: function(xhr) {
+                handleAjaxError(xhr);
+                self.timetable.timetableDrawer.redraw();
+            },
             complete: IndicoUI.Dialogs.Util.progress(),
             success: function(data) {
-                if (!data.success) {
-                    IndicoUtil.errorReport(data.error);
-                    self.timetable.timetableDrawer.redraw();
-                    return;
-                }
-
                 if (undo) {
                     self.timetable.enableUndo(undo, {eventData: eventData, shifted: reschedule});
                 }
@@ -224,7 +221,10 @@ type("TimetableManagementActions", [], {
             data: JSON.stringify(data),
             dataType: 'json',
             contentType: 'application/json',
-            error: handleAjaxError,
+            error: function(xhr) {
+                handleAjaxError(xhr);
+                self.timetable.timetableDrawer.redraw();
+            },
             complete: IndicoUI.Dialogs.Util.progress(),
             success: function(data) {
                 if (undo) {

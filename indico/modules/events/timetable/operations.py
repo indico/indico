@@ -22,12 +22,15 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.sessions.operations import update_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.date_time import format_datetime
+from indico.util.i18n import _
 
 
 def _get_object_info(entry):
@@ -149,15 +152,16 @@ def move_timetable_entry(entry, parent=None, day=None):
     contrib_update_data = {}
     if day:
         new_start_dt = entry.start_dt.replace(day=day.day, month=day.month)
+        if new_start_dt < entry.event_new.start_dt:
+            raise UserValueError(_('You cannot move the block before event start date'))
         updates['start_dt'] = new_start_dt
         updates['parent'] = None
         contrib_update_data = {'session_id': None, 'session_block_id': None}
     elif parent:
-        children = sorted(parent.children, key=attrgetter('end_dt'), reverse=True)
-        if children:
-            new_start_dt = children[0].end_dt
-        else:
-            new_start_dt = parent.start_dt
+        new_start_dt = find_latest_entry_end_dt(parent.object) or parent.start_dt
+        tz = entry.event_new.tzinfo
+        if (new_start_dt + entry.duration).astimezone(tz).date() != parent.start_dt.astimezone(tz).date():
+            raise UserValueError(_('Session block cannot span more than one day'))
         updates['parent'] = parent
         updates['start_dt'] = new_start_dt
         contrib_update_data = {'session': parent.session_block.session, 'session_block': parent.session_block}

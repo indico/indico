@@ -23,6 +23,7 @@ import dateutil.parser
 from flask import request, jsonify
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
 from indico.modules.events.contributions.operations import create_contribution, update_contribution
@@ -340,12 +341,21 @@ class RHLegacyChangeTimetableEntryDatetime(RHManageTimetableEntryBase):
         new_end_dt = as_utc(dateutil.parser.parse(request.form.get('endDate'))).astimezone(self.event_new.tzinfo)
         new_duration = new_end_dt - new_start_dt
         is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
-        if is_session_block and new_end_dt.date() != self.entry.start_dt.date():
-            return jsonify(success=False, error={'message': _('Session block cannot span more than one day'),
-                                                 'type': 'noReport'})
+        tz = self.event_new.tzinfo
+        if is_session_block and new_end_dt.astimezone(tz).date() != self.entry.start_dt.astimezone(tz).date():
+            raise UserValueError(_('Session block cannot span more than one day'))
+        if new_start_dt < self.event_new.start_dt:
+            raise UserValueError(_('You cannot move the block before event start date.'))
+        parent = self.entry.parent
         with track_time_changes():
+            if parent and new_start_dt < parent.start_dt:
+                update_timetable_entry_object(parent, {'duration': parent.end_dt - new_start_dt})
+                update_timetable_entry(parent, {'start_dt': new_start_dt})
+            elif parent and (new_start_dt > parent.end_dt or new_end_dt > parent.end_dt):
+                update_timetable_entry_object(parent, {'duration': new_end_dt - parent.start_dt})
             if is_session_block:
                 self.entry.move(new_start_dt)
             update_timetable_entry_object(self.entry, {'duration': new_duration})
-            update_timetable_entry(self.entry, {'start_dt': new_start_dt.astimezone(self.event_new.tzinfo)})
+            if not is_session_block:
+                update_timetable_entry(self.entry, {'start_dt': new_start_dt})
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry))
