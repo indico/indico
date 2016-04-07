@@ -159,14 +159,12 @@ class EventPerson(PersonMixin, db.Model):
         """
         from indico.modules.events.models.events import Event
         query = (cls.query
-                 .options(noload('*'))
                  .join(EventPerson.event_new)
                  .filter(~Event.is_deleted,
                          cls.email.in_(user.all_emails),
                          cls.user_id.is_(None)))
         for event_person in query:
             existing = (cls.query
-                        .options(noload('*'))
                         .filter_by(user_id=user.id, event_id=event_person.event_id)
                         .one_or_none())
             if existing is None:
@@ -176,6 +174,7 @@ class EventPerson(PersonMixin, db.Model):
                 db.session.delete(event_person)
         db.session.flush()
 
+    @no_autoflush
     def merge_person_info(self, other):
         from indico.modules.events.contributions.models.persons import AuthorType
         for column_name in {'_title', 'affiliation', 'address', 'phone', 'first_name', 'last_name'}:
@@ -191,16 +190,17 @@ class EventPerson(PersonMixin, db.Model):
                 return src_link.author_type
 
         for event_link in other.event_links:
-            existing_event_link = self.event_links.filter_by(event_id=event_link.event_id).one_or_none()
+            existing_event_link = next((link for link in self.event_links if link.event_id == event_link.event_id),
+                                       None)
             if existing_event_link is None:
                 event_link.person = self
             else:
                 db.session.delete(event_link)
 
         for contribution_link in other.contribution_links:
-            existing_contribution_link = (self.contribution_links
-                                          .filter_by(contribution_id=contribution_link.contribution_id)
-                                          .one_or_none())
+            existing_contribution_link = next((link for link in self.contribution_links
+                                               if link.contribution_id == contribution_link.contribution_id), None)
+
             if existing_contribution_link is None:
                 contribution_link.person = self
             else:
@@ -209,13 +209,23 @@ class EventPerson(PersonMixin, db.Model):
                 db.session.delete(contribution_link)
 
         for subcontribution_link in other.subcontribution_links:
-            existing_subcontribution_link = (self.subcontribution_links
-                                             .filter_by(subcontribution_id=subcontribution_link.subcontribution_id)
-                                             .one_or_none())
+            existing_subcontribution_link = next(
+                (link for link in self.subcontribution_links
+                 if link.subcontribution_id == subcontribution_link.subcontribution_id), None)
             if existing_subcontribution_link is None:
                 subcontribution_link.person = self
             else:
                 db.session.delete(subcontribution_link)
+
+        for session_block_link in other.session_block_links:
+            existing_session_block_link = next((link for link in self.session_block_links
+                                                if link.session_block_id == session_block_link.contribution_id),
+                                               None)
+            if existing_session_block_link is None:
+                session_block_link.person = self
+            else:
+                db.session.delete(session_block_link)
+
         db.session.flush()
 
     def has_role(self, role, obj):
@@ -317,7 +327,7 @@ class PersonLinkBase(PersonMixin, db.Model):
                 cls.person_link_backref_name,
                 cascade='all, delete-orphan',
                 cascade_backrefs=False,
-                lazy='dynamic'
+                lazy=True
             )
         )
 
