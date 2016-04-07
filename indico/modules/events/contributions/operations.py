@@ -96,7 +96,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     """
     rv = {'unscheduled': False, 'undo_unschedule': None}
     current_session_block = contrib.session_block
-    start_dt = contrib_data.pop('start_date', None)
+    start_dt = contrib_data.pop('start_dt', None)
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
     contrib.populate_from_dict(contrib_data)
