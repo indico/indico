@@ -104,7 +104,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             updates['start_dt'] = dateutil.parser.parse(data['start_dt'])
         if updates:
             with track_time_changes():
-                update_timetable_entry(self.timetable_entry, updates)
+                update_timetable_entry(self.entry, updates)
         return jsonify()
 
     def _process_DELETE(self):

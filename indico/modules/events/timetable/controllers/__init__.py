@@ -34,14 +34,14 @@ class RHManageTimetableBase(RHConferenceModifBase):
 class RHManageTimetableEntryBase(RHManageTimetableBase):
     normalize_url_spec = {
         'locators': {
-            lambda self: self.timetable_entry
+            lambda self: self.entry
         }
     }
 
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = None
+        self.entry = None
         if 'timetable_entry_id' in request.view_args:
-            self.timetable_entry = (self.event_new.timetable_entries
-                                    .filter_by(id=request.view_args['timetable_entry_id'])
-                                    .first_or_404())
+            self.entry = (self.event_new.timetable_entries
+                          .filter_by(id=request.view_args['timetable_entry_id'])
+                          .first_or_404())
