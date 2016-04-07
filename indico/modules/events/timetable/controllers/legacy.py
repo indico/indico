@@ -302,27 +302,27 @@ class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
         current_day = dateutil.parser.parse(request.form.get('day')).date()
         return jsonify_template('events/timetable/move_entry.html', event=self.event_new,
                                 top_level_entries=self._get_session_timetable_entries(),
-                                current_day=current_day, timetable_entry=self.timetable_entry,
-                                parent_entry=self.timetable_entry.parent)
+                                current_day=current_day, timetable_entry=self.entry,
+                                parent_entry=self.entry.parent)
 
     def _process_PATCH(self):
         self.serializer = TimetableSerializer(True)
         with track_time_changes():
             entry_data = self._move_entry(request.json)
-        rv = dict(serialize_entry_update(self.timetable_entry), **entry_data)
+        rv = dict(serialize_entry_update(self.entry), **entry_data)
         return jsonify_data(flash=False, entry=rv)
 
     def _move_entry(self, data):
         rv = {}
         if data.get('parent_id'):
-            rv['old'] = self.serializer.serialize_timetable_entry(self.timetable_entry)
+            rv['old'] = self.serializer.serialize_timetable_entry(self.entry)
             parent_timetable_entry = self.event_new.timetable_entries.filter_by(id=data['parent_id']).one()
-            move_timetable_entry(self.timetable_entry, parent=parent_timetable_entry)
+            move_timetable_entry(self.entry, parent=parent_timetable_entry)
             rv['session'] = rv['slotEntry'] = self.serializer.serialize_session_block_entry(parent_timetable_entry)
         elif data.get('day'):
-            rv['old'] = self.serializer.serialize_timetable_entry(self.timetable_entry)
+            rv['old'] = self.serializer.serialize_timetable_entry(self.entry)
             new_date = as_utc(dateutil.parser.parse(data['day']))
-            move_timetable_entry(self.timetable_entry, day=new_date)
+            move_timetable_entry(self.entry, day=new_date)
         return rv
 
     def _get_session_timetable_entries(self):
@@ -339,13 +339,13 @@ class RHLegacyChangeTimetableEntryDatetime(RHManageTimetableEntryBase):
         new_start_dt = as_utc(dateutil.parser.parse(request.form.get('startDate'))).astimezone(self.event_new.tzinfo)
         new_end_dt = as_utc(dateutil.parser.parse(request.form.get('endDate'))).astimezone(self.event_new.tzinfo)
         new_duration = new_end_dt - new_start_dt
-        is_session_block = self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK
-        if is_session_block and new_end_dt.date() != self.timetable_entry.start_dt.date():
+        is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
+        if is_session_block and new_end_dt.date() != self.entry.start_dt.date():
             return jsonify(success=False, error={'message': _('Session block cannot span more than one day'),
                                                  'type': 'noReport'})
         with track_time_changes():
             if is_session_block:
-                self.timetable_entry.move(new_start_dt)
-            update_timetable_entry_object(self.timetable_entry, {'duration': new_duration})
-            update_timetable_entry(self.timetable_entry, {'start_dt': new_start_dt.astimezone(self.event_new.tzinfo)})
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.timetable_entry))
+                self.entry.move(new_start_dt)
+            update_timetable_entry_object(self.entry, {'duration': new_duration})
+            update_timetable_entry(self.entry, {'start_dt': new_start_dt.astimezone(self.event_new.tzinfo)})
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry))
