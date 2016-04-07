@@ -26,7 +26,7 @@ from wtforms_components import TimeField
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.util import find_earliest_gap
+from indico.modules.events.timetable.util import find_next_start_dt
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import TimeDeltaField, IndicoPalettePickerField, IndicoLocationField
@@ -82,8 +82,9 @@ class EntryFormMixin(object):
                                   .format(self._entry_type.title.capitalize()))
 
     def _get_default_time(self):
-        start_dt = find_earliest_gap(self.event, self.day, duration=self._default_duration,
-                                     session_block=self.session_block)
+        start_dt = find_next_start_dt(self._default_duration,
+                                      obj=self.session_block or self.event,
+                                      day=None if self.session_block else self.day)
         return start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
 
 

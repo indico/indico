@@ -34,7 +34,7 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
-from indico.modules.events.timetable.util import find_earliest_gap
+from indico.modules.events.timetable.util import find_next_start_dt
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
@@ -145,8 +145,11 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         day = dateutil.parser.parse(data['day']).date()
         query = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(data['contribution_ids']))
         for contribution in query:
-            start_dt = find_earliest_gap(self.event_new, day, contribution.duration, session_block=self.session_block)
+            start_dt = find_next_start_dt(contribution.duration,
+                                          obj=self.session_block or self.event_new,
+                                          day=None if self.session_block else day)
             # TODO: handle scheduling not-fitting contributions
+            #       can only happen within session blocks that are shorter than contribution's duration
             if start_dt:
                 entries.append(self._schedule(contribution, start_dt))
         return jsonify(entries=[serialize_entry_update(x) for x in entries])
