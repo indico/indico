@@ -78,6 +78,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
                 regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
+            flash(_("The participants display settings have been saved."), 'success')
             return redirect(url_for('.manage_regforms_display', self.event_new))
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
@@ -126,7 +127,8 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
         form = ParticipantsDisplayFormColumnsForm()
         if form.validate_on_submit():
             registration_settings.set_participant_list_columns(self.event, form.json.data['columns'], self.regform)
-            return jsonify_data(flash=False)
+            flash(_('The settings for "{}" have been saved.').format(self.regform.title), 'success')
+            return jsonify_data()
 
         available_fields = {field.id: field for field in self.regform.active_fields}
         enabled_fields = []
