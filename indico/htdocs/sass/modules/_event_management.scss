@@ -472,20 +472,6 @@ td.i-table i {
 
 // Filters/lists
 
-#filter-placeholder {
-    @extend %font-family-title;
-    font-size: 1.2em;
-    color: $dark-gray;
-    text-align: center;
-    margin-top: 1em;
-}
-
-#filtering-state.active {
-    background-color: $light-yellow;
-    color: $dark-yellow !important;
-    border-color: $dark-yellow !important;
-}
-
 #eventModificationForm {
     .form-field {
         padding-left: 0;

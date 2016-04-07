@@ -196,3 +196,39 @@
     clear: both;
     padding-top: 0.5em;
 }
+
+ul.author-list {
+    list-style-type: none;
+    padding: 0;
+
+    .speaker-item {
+        border-bottom: 1px solid $pastel-gray;
+        margin-bottom: 0.5em;
+
+        .affiliation {
+            .text {
+                max-width: 30em;
+            }
+            font-size: 1em;
+        }
+        .name {
+            font-size: 1.5em;
+        }
+    }
+
+    > li {
+        margin-bottom: 1.5em;
+    }
+
+    ul.author-links {
+        list-style-type: none;
+        padding-left: 0;
+
+        > li {
+            margin-bottom: 0.5em;
+            .contrib-role {
+                color: $light-black;
+            }
+        }
+    }
+}

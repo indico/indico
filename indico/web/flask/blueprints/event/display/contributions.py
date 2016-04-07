@@ -37,7 +37,3 @@ with event.add_prefixed_rules('/session-old/<sessionId>'):
                        subContribDisplay.RHSubContributionToMarcXML)
     event.add_url_rule('/contribution-old/<contribId>/author/<authorId>', 'contribAuthorDisplay',
                        authorDisplay.RHAuthorDisplay)
-
-# Authors/Speakers
-event.add_url_rule('/authors', 'confAuthorIndex', conferenceDisplay.RHAuthorIndex)
-event.add_url_rule('/speakers', 'confSpeakerIndex', conferenceDisplay.RHSpeakerIndex)

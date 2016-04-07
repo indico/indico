@@ -33,16 +33,11 @@
 
      .speaker-item {
          &:before {
-             vertical-align: middle;
              color: $dark-blue;
              margin-right: 0.2em;
          }
 
          display: block;
-
-         span {
-             vertical-align: middle;
-         }
 
          .affiliation {
              color: $dark-gray;
@@ -53,6 +48,7 @@
                  overflow: hidden;
                  text-overflow: ellipsis;
                  white-space: nowrap;
+                 vertical-align: text-bottom;
              }
          }
      }
