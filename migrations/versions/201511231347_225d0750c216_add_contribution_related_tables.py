@@ -27,6 +27,7 @@ def upgrade():
         'contribution_fields',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('legacy_id', sa.String(), nullable=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
@@ -35,6 +36,7 @@ def upgrade():
         sa.Column('field_type', sa.String(), nullable=True),
         sa.Column('field_data', pg.JSON(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.UniqueConstraint('event_id', 'legacy_id'),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
@@ -183,7 +185,7 @@ def upgrade():
         sa.Column('session_id', sa.Integer(), nullable=True, index=True),
         sa.Column('session_block_id', sa.Integer(), nullable=True, index=True),
         sa.Column('track_id', sa.Integer(), nullable=True),
-        sa.Column('abstract_id', sa.Integer(), nullable=True),
+        sa.Column('abstract_id', sa.Integer(), nullable=True, index=True),
         sa.Column('type_id', sa.Integer(), nullable=True, index=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
@@ -207,6 +209,7 @@ def upgrade():
         sa.CheckConstraint("(room_id IS NULL) OR (venue_id IS NOT NULL)", name='venue_id_if_room_id'),
         sa.CheckConstraint("NOT inherit_location OR (venue_id IS NULL AND room_id IS NULL AND venue_name = '' AND "
                            "room_name = '' AND address = '')", name='inherited_location'),
+        sa.Index(None, 'abstract_id', unique=True, postgresql_where=sa.text("NOT is_deleted")),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
         sa.ForeignKeyConstraint(['venue_id'], ['roombooking.locations.id']),
@@ -273,7 +276,8 @@ def upgrade():
         sa.Column('data', pg.JSON(), nullable=False),
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('contribution_field_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['contribution_field_id'], ['events.contribution_fields.id']),
+        sa.ForeignKeyConstraint(['contribution_field_id'], ['events.contribution_fields.id'],
+                                name='fk_contribution_field_values_contribution_field'),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.PrimaryKeyConstraint('contribution_id', 'contribution_field_id'),
         schema='events'
