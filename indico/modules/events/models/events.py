@@ -19,10 +19,12 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 
 import pytz
+from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
-from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -444,6 +446,10 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         else:
             return True
 
+    @hybrid_property
+    def duration(self):
+        return self.end_dt - self.start_dt
+
     def can_access(self, user, allow_admin=True):
         if not allow_admin:
             raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
@@ -544,3 +550,26 @@ def _category_id_set(target, value, *unused):
     from MaKaC.conference import CategoryManager
     cat = CategoryManager().getById(str(value))
     target.category_chain = map(int, reversed(cat.getCategoryPath()))
+
+
+@listens_for(Event.start_dt, 'set')
+@listens_for(Event.end_dt, 'set')
+def _set_start_end_dt(target, value, oldvalue, *unused):
+    from indico.modules.events.util import register_event_time_change
+    if oldvalue in (NEVER_SET, NO_VALUE):
+        return
+    if value != oldvalue:
+        register_event_time_change(target)
+
+
+@listens_for(Event.__table__, 'after_create')
+def _add_timetable_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER UPDATE
+        ON {}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency('event');
+    """.format(target.fullname)
+    DDL(sql).execute(conn)

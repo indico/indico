@@ -38,4 +38,6 @@ as `entry` and the object is passed as `obj`.  Information about the
 changes are passed as `changes` which is a dict containing old/new
 tuples for `start_dt`, `duration` and `end_dt`.  If an attribute did
 not change, it is not included in the dict.
+If the time of the event itself changes, `entry` is ``None`` and `obj`
+contains the `Event`.
 """)

@@ -33,6 +33,8 @@ def upgrade():
             SELECT s.event_id INTO STRICT trigger_event_id
             FROM events.sessions s
             WHERE s.id = NEW.session_id;
+        ELSIF src = 'event' THEN
+            trigger_event_id := NEW.id;
         ELSE
             trigger_event_id := NEW.event_id;
         END IF;
@@ -93,6 +95,14 @@ def upgrade():
         $BODY$
         LANGUAGE plpgsql;
     """))
+    op.execute("""
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER UPDATE
+        ON events.events
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency('event');
+    """)
     op.execute("""
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE

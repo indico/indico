@@ -33,6 +33,8 @@ def upgrade():
             SELECT s.event_id INTO STRICT trigger_event_id
             FROM events.sessions s
             WHERE s.id = NEW.session_id;
+        ELSIF src = 'event' THEN
+            trigger_event_id := NEW.id;
         ELSE
             trigger_event_id := NEW.event_id;
         END IF;
@@ -147,6 +149,8 @@ def downgrade():
             SELECT s.event_id INTO STRICT trigger_event_id
             FROM events.sessions s
             WHERE s.id = NEW.session_id;
+        ELSIF src = 'event' THEN
+            trigger_event_id := NEW.id;
         ELSE
             trigger_event_id := NEW.event_id;
         END IF;
