@@ -15,7 +15,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.legacy import serialize_event_info
-from indico.util.date_time import get_day_end, get_day_start, iterdays, overlaps
+from indico.util.date_time import get_day_end, iterdays
 from indico.web.flask.templating import get_template_module
 
 
@@ -63,38 +63,6 @@ def _query_blocks(event_ids, dates_overlap, detail_level='session'):
                               dates_overlap(TimetableEntry))
             .options(*options)
             .join(TimetableEntry).join(Session))
-
-
-def find_earliest_gap(event, day, duration, session_block=None):
-    """Find the earliest datetime fitting the duration in an event timetable.
-
-    Return the start datetime for the gap, if there is one, ``None`` otherwise.
-
-    :param event: The event holding the timetable.
-    :param day: The date in which to find the gap.
-    :param duration: The minimum ``timedelta`` necessary for the gap.
-    :param session_block: A session block to further restrict when
-                          to look for a gap.
-    """
-    if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
-        raise ValueError("Day is out of bounds.")
-    if session_block:
-        entries = session_block.timetable_entry.children
-        start_dt = session_block.timetable_entry.start_dt
-        latest_end_dt = session_block.timetable_entry.end_dt
-    else:
-        entries = event.timetable_entries.filter(cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day)
-        start_dt = event.start_dt if event.start_dt.date() == day else get_day_start(day, tzinfo=event.tzinfo)
-        latest_end_dt = event.end_dt
-    end_dt = start_dt + duration
-    for entry in entries:
-        if not overlaps((start_dt, end_dt), (entry.start_dt, entry.end_dt)):
-            break
-        start_dt = entry.end_dt
-        end_dt = start_dt + duration
-    if end_dt > latest_end_dt or end_dt.astimezone(event.tzinfo).date() > day:
-        return None
-    return start_dt
 
 
 def find_latest_entry_end_dt(obj, day=None):
