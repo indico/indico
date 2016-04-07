@@ -135,4 +135,7 @@ class RHTimetableBalloon(RHManageTimetableBase):
         elif self.timetable_entry.break_:
             html = render_template('events/timetable/display/balloons/break.html',
                                    break_=self.timetable_entry.break_)
+        elif self.timetable_entry.session_block:
+            html = render_template('events/timetable/display/balloons/block.html',
+                                   block=self.timetable_entry.session_block)
         return jsonify(html=html)
