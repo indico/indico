@@ -142,6 +142,14 @@ class SessionBlock(LocationMixin, db.Model):
     def can_edit_note(self, user):
         return self.session.can_edit_note(user)
 
+    @property
+    def start_dt(self):
+        return self.timetable_entry.start_dt if self.timetable_entry else None
+
+    @property
+    def end_dt(self):
+        return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)
