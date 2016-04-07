@@ -1,0 +1,9 @@
+{% extends 'events/contributions/display/contribution_person_list_base.html' %}
+
+{% block title -%}
+    {% trans %}List of Speakers{% endtrans %}
+{%- endblock %}
+
+{% block list %}
+    {{ render_person_list(speakers, 'speakers') }}
+{% endblock %}

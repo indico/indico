@@ -20,24 +20,36 @@ from io import BytesIO
 
 from flask import session, request, jsonify
 from pytz import timezone
-from sqlalchemy.orm import load_only, noload, joinedload
+from sqlalchemy.orm import load_only, noload, joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
+from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.util import (get_contributions_with_user_as_submitter,
                                                       serialize_contribution_for_ical, ContributionDisplayReporter)
-from indico.modules.events.contributions.views import WPMyContributions, WPContributions
+from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
 from indico.web.http_api.metadata.serializer import Serializer
+
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.PDFinterface.conference import ContribToPDF, ContribsToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+
+
+def _get_persons(event, condition):
+    """Queries event persons linked to contributions in the event, filtered using the condition provided."""
+    return (event.persons.filter(EventPerson.contribution_links.any(
+                                    db.and_(condition,
+                                            ContributionPersonLink.contribution.has(~Contribution.is_deleted))))
+            .options(joinedload('contribution_links').joinedload('contribution'))
+            .order_by(db.func.lower(EventPerson.last_name)))
 
 
 class RHContributionDisplayBase(RHConferenceBaseDisplay):
@@ -100,6 +112,26 @@ class RHContributionDisplay(RHContributionDisplayBase):
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions')
         return WPContributions.render_template('display/contribution_display.html', self._conf,
                                                contribution=self.contrib, event=self.event_new, **ical_params)
+
+
+class RHAuthorList(RHDisplayProtectionBase):
+
+    MENU_ENTRY_NAME = 'author_index'
+
+    def _process(self):
+        authors = _get_persons(self.event_new, ContributionPersonLink.author_type != AuthorType.none)
+        return WPAuthorList.render_template('display/author_list.html', self._conf,
+                                            authors=authors, event=self.event_new)
+
+
+class RHSpeakerList(RHDisplayProtectionBase):
+
+    MENU_ENTRY_NAME = 'speaker_index'
+
+    def _process(self):
+        speakers = _get_persons(self.event_new, ContributionPersonLink.is_speaker)
+        return WPSpeakerList.render_template('display/speaker_list.html', self._conf,
+                                             speakers=speakers, event=self.event_new)
 
 
 class RHContributionAuthor(RHContributionDisplayBase):

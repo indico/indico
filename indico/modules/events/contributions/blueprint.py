@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 from functools import partial
 
 from indico.modules.events.contributions.controllers.compat import compat_contribution, compat_subcontribution
-from indico.modules.events.contributions.controllers.display import (RHMyContributions, RHContributionDisplay,
-                                                                     RHContributionList, RHContributionAuthor,
-                                                                     RHContributionExportToPDF, RHContributionReport,
-                                                                     RHContributionExportToICAL,
+from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHMyContributions,
+                                                                     RHContributionAuthor, RHContributionDisplay,
+                                                                     RHContributionList, RHContributionExportToPDF,
+                                                                     RHContributionReport, RHContributionExportToICAL,
                                                                      RHContributionsExportToPDF,
-                                                                     RHContributionListStaticURL,
+                                                                     RHContributionListStaticURL, RHSpeakerList,
                                                                      RHSubcontributionDisplay)
 from indico.modules.events.contributions.controllers.management import (RHContributions, RHCreateContribution,
                                                                         RHEditContribution, RHContributionREST,
@@ -113,6 +113,8 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'de
 _bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)
 _bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', RHContributionsExportToPDF)
 _bp.add_url_rule('/contributions/mine', 'my_contributions', RHMyContributions)
+_bp.add_url_rule('/contributions/authors', 'author_list', RHAuthorList)
+_bp.add_url_rule('/contributions/speakers', 'speaker_list', RHSpeakerList)
 _bp.add_url_rule('/contributions/customize', 'customize_contribution_list', RHContributionReport,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url', RHContributionListStaticURL,

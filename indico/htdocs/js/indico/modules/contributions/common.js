@@ -251,4 +251,17 @@
         applySearchFilters();
         setupReporter();
     };
+
+    global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {
+        var filterConfig = {
+            itemHandle: '.author-list > li',
+            listItems: '.author-list > li',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+
+        setupSearchBox(filterConfig);
+        applySearchFilters();
+    };
 })(window);
