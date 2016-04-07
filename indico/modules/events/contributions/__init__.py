@@ -73,6 +73,12 @@ def _check_field_definitions(app, **kwargs):
     get_contrib_field_types()
 
 
+@signals.event.session_deleted.connect
+def _unset_session(sess, **kwargs):
+    for contribution in sess.contributions:
+        contribution.session = None
+
+
 @signals.event_management.get_cloners.connect
 def _get_contribution_cloner(sender, **kwargs):
     from indico.modules.events.contributions import clone
