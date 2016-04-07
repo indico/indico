@@ -15,13 +15,14 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import sys
 import time
 
 import transaction
 from flask import request, session
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
-
+from sqlalchemy.exc import DatabaseError
 
 from MaKaC.errors import NoReportError, FormValuesError
 from MaKaC.common.contextManager import ContextManager
@@ -35,6 +36,7 @@ from MaKaC.services.interface.rpc.common import ProcessError
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
 from indico.core.logger import Logger
 from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.core.db.util import flush_after_commit_queue
@@ -142,11 +144,16 @@ class ServiceRunner(object):
                     except ClientDisconnected:
                         transaction.abort()
                         time.sleep(i)
+                    except DatabaseError:
+                        handle_sqlalchemy_database_error()
+                        break
             self._invokeMethodSuccess()
         except Exception as e:
             transaction.abort()
             if isinstance(e, CausedError):
                 raise
+            elif isinstance(e, ConstraintViolated):
+                raise ProcessError, ('ERR-P0', e.message), sys.exc_info()[2]
             else:
                 raise ProcessError('ERR-P0', 'Error processing method.')
         finally:
