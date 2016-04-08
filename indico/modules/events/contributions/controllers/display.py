@@ -20,7 +20,7 @@ from io import BytesIO
 
 from flask import session, request, jsonify
 from pytz import timezone
-from sqlalchemy.orm import load_only, noload, joinedload, subqueryload
+from sqlalchemy.orm import load_only, noload, joinedload
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db

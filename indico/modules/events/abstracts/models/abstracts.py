@@ -109,7 +109,7 @@ class Abstract(DescriptionMixin, db.Model):
     )
     # relationship backrefs:
     # - contribution (Contribution.abstract)
-    # - judgements (Judgement.abstract)
+    # - judgments (Judgment.abstract)
 
     @locator_property
     def locator(self):

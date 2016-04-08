@@ -63,7 +63,7 @@ class ContributionType(db.Model):
     )
 
     # relationship backrefs:
-    # - abstract_judgements (Judgement.accepted_type)
+    # - abstract_judgments (Judgment.accepted_type)
     # - abstracts (Abstract.type)
     # - accepted_as_abstracts (Abstract.accepted_type)
     # - contributions (Contribution.type)
