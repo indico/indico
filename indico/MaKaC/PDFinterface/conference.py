@@ -731,7 +731,7 @@ class TimeTablePlain(PDFWithTOC):
             return
 
         lt = []
-        date = Paragraph(format_time(contrib.start_dt, timezone=self._tz), self._styles["table_body"])
+        date = format_time(contrib.start_dt, timezone=self._tz)
         caption = '[{}] {}'.format(contrib.id, escape(contrib.title))
 
         if not self._ttPDFFormat.showContribId():
