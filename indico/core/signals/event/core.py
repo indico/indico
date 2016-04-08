@@ -58,8 +58,7 @@ the old/new categories are passed using the `old_parent` and `new_parent` kwargs
 """)
 
 created = _signals.signal('created', """
-Called when a new event is created. The `sender` is the new event, its
-parent category is passed in the `parent` kwarg.
+Called when a new event is created. The `sender` is the new Event.
 """)
 
 protection_changed = _signals.signal('protection-changed', """
@@ -79,10 +78,6 @@ the `domain` is that domain that has been removed.
 
 session_deleted = _signals.signal('session-deleted', """
 Called when a session is deleted. The *sender* is the session.
-""")
-
-session_slot_deleted = _signals.signal('session-slot-deleted', """
-Called when a session slot is deleted. The *sender* is the session slot.
 """)
 
 session_block_deleted = _signals.signal('session-block-deleted', """
