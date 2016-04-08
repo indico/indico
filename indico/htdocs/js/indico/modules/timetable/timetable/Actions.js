@@ -127,12 +127,7 @@ type("TimetableManagementActions", [], {
                         } else {
                             self.timetable.setData(data);
                         }
-
-                        if (type == 'Session') {
-                            // Delete the session from the eventInfo session list
-                            delete self.eventInfo.sessions[eventData.sessionId];
-                        }
-                        else if (type == 'SessionSlot') {
+                        if (type == 'SessionSlot') {
                             self.eventInfo.sessions[eventData.sessionId].numSlots--;
                             if(self.isSessionTimetable && self.eventInfo.sessions[eventData.sessionId].numSlots == 0) {
                                 new AlertPopup($T("Warning"), $T("You have deleted the last slot of the session. As a consequence, the session has also been deleted and you will be redirected to the Timetable management"), function(){

@@ -24,6 +24,7 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.sessions import logger
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.timetable.operations import delete_timetable_entry
 
 
 def create_session(event, data):
@@ -86,3 +87,15 @@ def update_session_block(session_block, data):
     session_block.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session block "{}" has been updated'.format(session_block.title), session.user)
     logger.info('Session block %s modified by %s', session_block, session.user)
+
+
+def delete_session_block(session_block):
+    session_ = session_block.session
+    for contribution in session_block.contributions:
+        contribution.session_block = None
+        delete_timetable_entry(contribution.timetable_entry, log=False)
+    delete_timetable_entry(session_block.timetable_entry, log=False)
+    signals.event.session_block_deleted.send(session_block)
+    session_.blocks.remove(session_block)
+    db.session.flush()
+    logger.info('Session block %s deleted by %s', session_block, session.user)
