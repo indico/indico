@@ -38,6 +38,7 @@ from indico.core.db.sqlalchemy.util.queries import (preprocess_ts_string, escape
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps
 from indico.util.decorators import classproperty, strict_classproperty
@@ -539,6 +540,14 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
 
     def get_contribution_field(self, field_id):
         return next((v for v in self.contribution_fields if v.id == field_id), '')
+
+    def move_start_dt(self, start_dt):
+        """Set event start_dt and adjust its timetable entries"""
+        diff = start_dt - self.start_dt
+        for entry in self.timetable_entries.filter(TimetableEntry.parent_id.is_(None)):
+            new_dt = entry.start_dt + diff
+            entry.move(new_dt)
+        self.start_dt = start_dt
 
     @return_ascii
     def __repr__(self):
