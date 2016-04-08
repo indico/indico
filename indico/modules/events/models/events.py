@@ -306,6 +306,11 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return self
 
     @property
+    def category(self):
+        from MaKaC.conference import CategoryManager
+        return CategoryManager().getById(str(self.category_id), True) if self.category_id else None
+
+    @property
     def has_logo(self):
         return self.logo_metadata is not None
 
