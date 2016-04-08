@@ -226,6 +226,9 @@ class TimetableEntry(db.Model):
                 child.start_dt += diff
         self.start_dt = start_dt
 
+    @property
+    def locator(self):
+        return dict(self.event_new.locator, entry_id=self.id)
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
