@@ -409,6 +409,9 @@ def register_time_change(entry):
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
+        elif current_app.config['TESTING']:
+            warnings.warn(msg + ' (exception converted to a warning during tests)', stacklevel=2)
+            return
         else:
             raise RuntimeError(msg)
     for field in ('start_dt', 'duration', 'end_dt'):
@@ -432,6 +435,9 @@ def register_event_time_change(event):
         msg = 'Time change of {} was not tracked'.format(event)
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
+            return
+        elif current_app.config['TESTING']:
+            warnings.warn(msg + ' (exception converted to a warning during tests)', stacklevel=2)
             return
         else:
             raise RuntimeError(msg)
