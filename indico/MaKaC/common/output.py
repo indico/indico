@@ -46,7 +46,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users import User
 from indico.modules.groups.legacy import LDAPGroupWrapper
-from indico.util.event import uniqueId
+from indico.util.event import uniqueId, unify_event_args
 from indico.util.json import dumps
 from indico.web.flask.util import url_for
 
@@ -843,8 +843,8 @@ class outputGenerator(object):
 
         out.writeXML(xml)
 
-    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
-        event = conf.as_event
+    @unify_event_args
+    def confToXMLMarc21(self,event,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
 
         if not out:
             out = self._XMLGen
@@ -1091,10 +1091,10 @@ class outputGenerator(object):
         out.writeTag("subfield", self._getRecordCollection(contrib), [["code","a"]])
         out.closeTag("datafield")
 
-        self._generate_link_field(url_for('contributions.display_contribution', contrib.event_new, contrib=contrib,
-                                          _external=True), 'Contribution details', out)
+        self._generate_link_field(url_for('contributions.display_contribution', contrib, _external=True),
+                                  'Contribution details', out)
 
-        self._generate_link_field(url_for('event.conferenceDisplay', confId=contrib.event_new.id, _external=True),
+        self._generate_link_field(url_for('event.conferenceDisplay', contrib.event_new, _external=True),
                                   'Event details', out)
 
         self._generateAccessList(contrib, out, objId=uniqueId(contrib))
@@ -1253,10 +1253,10 @@ class outputGenerator(object):
         out.writeTag("subfield", self._getRecordCollection(subcontrib), [["code", "a"]])
         out.closeTag("datafield")
 
-        self._generate_link_field(url_for('contributions.display_contribution', subcontrib.contribution.event_new,
-                                          contrib=subcontrib.contribution, _external=True), 'Contribution details', out)
+        self._generate_link_field(url_for('contributions.display_contribution', subcontrib.contribution,
+                                          _external=True), 'Contribution details', out)
 
-        self._generate_link_field(url_for('event.conferenceDisplay', confId=subcontrib.event_new.id, _external=True),
+        self._generate_link_field(url_for('event.conferenceDisplay', subcontrib.event_new, _external=True),
                                   'Event details', out)
 
         self._generateAccessList(subcontrib.contribution, out, objId=uniqueId(subcontrib))
