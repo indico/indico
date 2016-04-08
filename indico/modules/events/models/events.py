@@ -552,6 +552,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
 
 
 Event.register_location_events()
+Event.register_protection_events()
 
 
 @listens_for(Event.category_id, 'set')

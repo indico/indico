@@ -90,6 +90,15 @@ previous roles/permissions (see `PrincipalRolesMixin.current_data`).
 """)
 
 
+protection_changed = _signals.signal('protection-changed', """
+Called when the protection mode of an object is changed.
+
+The `sender` is the type of the object that's using the mixin.  The
+actual instance is passed as `obj`.  The old protection mode is passed
+as `old_mode`, the new mode as `mode`.
+""")
+
+
 get_management_roles = _signals.signal('get-management-roles', """
 Expected to return `ManagementRole` subclasses.  The `sender` is the
 type of the object the roles may be used for.  Functions subscribing

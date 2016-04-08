@@ -275,7 +275,8 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
 
 
 # Register all SQLAlchemy-related events
-Attachment.register_events()
+Attachment.register_versioned_resource_events()
+Attachment.register_protection_events()
 
 
 def _offline_download_url(attachment):

@@ -227,3 +227,4 @@ def _wrong_attachments_modified(target, value, *unused):
 
 
 AttachmentFolder.register_link_events()
+AttachmentFolder.register_protection_events()
