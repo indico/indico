@@ -112,7 +112,7 @@ class TimetableSerializer(object):
                      'isPoster': block.session.is_poster,
                      'entries': defaultdict(dict),
                      'pdf': None,
-                     'url': None})
+                     'url': url_for('sessions.display_session', block.session)})
         return data
 
     def serialize_contribution_entry(self, entry):
@@ -134,7 +134,7 @@ class TimetableSerializer(object):
                      'sessionId': block.session_id if block else None,
                      'sessionSlotId': block.id if block else None,
                      'title': contribution.title,
-                     'url': None})
+                     'url': url_for('contributions.display_contribution', contribution)})
         if self.management:
             data['boardNumber'] = contribution.board_number
             data['contributionType'] = contribution.type_id
