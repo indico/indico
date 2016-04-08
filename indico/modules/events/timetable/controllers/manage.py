@@ -129,16 +129,17 @@ class RHTimetableBalloon(RHManageTimetableBase):
         self.timetable_entry = (self.event_new.timetable_entries
                                 .filter_by(id=request.view_args['timetable_entry_id'])
                                 .first_or_404())
+        self.editable = (request.args.get('editable') == '1')
 
     def _process(self):
         html = None
         if self.timetable_entry.contribution:
             html = render_template('events/timetable/display/balloons/contribution.html',
-                                   contrib=self.timetable_entry.contribution)
+                                   contrib=self.timetable_entry.contribution, editable=self.editable)
         elif self.timetable_entry.break_:
             html = render_template('events/timetable/display/balloons/break.html',
-                                   break_=self.timetable_entry.break_)
+                                   break_=self.timetable_entry.break_, editable=self.editable)
         elif self.timetable_entry.session_block:
             html = render_template('events/timetable/display/balloons/block.html',
-                                   block=self.timetable_entry.session_block)
+                                   block=self.timetable_entry.session_block, editable=self.editable)
         return jsonify(html=html)
