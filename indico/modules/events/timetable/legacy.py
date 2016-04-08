@@ -115,7 +115,7 @@ class TimetableSerializer(object):
                      'duration': block.duration.seconds / 60,
                      'isPoster': block.session.is_poster,
                      'entries': entries,
-                     'pdf': None,
+                     'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session)})
         return data
 
