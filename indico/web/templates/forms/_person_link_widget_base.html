@@ -205,6 +205,7 @@
             $field.principalfield({
                 eventId: {{ (field.event.id if field.event else none)|tojson }},
                 allowExternalUsers: false,
+                allowEmptyEmail: {{ allow_empty_email | default(false) | tojson }},
                 multiChoice: true,
                 overwriteChoice: false,
                 render: function(people) {

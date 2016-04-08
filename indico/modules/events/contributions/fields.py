@@ -30,7 +30,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = ContributionPersonLink
     linked_object_attr = 'contrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')
+    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
 
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
@@ -74,4 +74,4 @@ class SubContributionPersonLinkListField(ContributionPersonLinkListField):
 
     person_link_cls = SubContributionPersonLink
     linked_object_attr = 'subcontrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')
+    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)

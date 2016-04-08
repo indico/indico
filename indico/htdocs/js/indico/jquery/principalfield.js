@@ -23,6 +23,7 @@
             eventId: null,
             suggestedUsers: null,
             allowExternalUsers: true,
+            allowEmptyEmail: false,
             enableGroupsTab: false,
             multiChoice: false,
             overwriteChoice: true,
@@ -83,14 +84,16 @@
             var self = this;
             var person = _.findWhere(self.people, {id: personId});
             function handle(person) { self.set(person.get('id'), person.getAll()); }
-            var personEditPopup = new UserDataPopup($T("Edit information"), $O(person), handle, false, false, false, false);
+            var personEditPopup = new UserDataPopup($T("Edit information"), $O(person), handle, false, false, false,
+                                                    self.options.allowEmptyEmail);
             personEditPopup.open();
         },
 
         enter: function enter() {
             var self = this;
             function handle(person) { self._add([person.getAll()]); }
-            var personCreatePopup = new UserDataPopup($T("Enter person"), $O(), handle, false, false, false, false);
+            var personCreatePopup = new UserDataPopup($T("Enter person"), $O(), handle, false, false, false,
+                                                      self.options.allowEmptyEmail);
             personCreatePopup.open();
         },
 
