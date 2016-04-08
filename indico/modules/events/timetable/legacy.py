@@ -135,13 +135,6 @@ class TimetableSerializer(object):
                      'sessionSlotId': block.id if block else None,
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution)})
-        if self.management:
-            data['boardNumber'] = contribution.board_number
-            data['contributionType'] = contribution.type_id
-            data['keywords'] = contribution.keywords
-            # TODO
-            data['reportNumbers'] = None
-            data['fields'] = None
         return data
 
     def serialize_break_entry(self, entry, management=False):
@@ -297,9 +290,7 @@ def serialize_session(sess):
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
     }
-
     for convener in sess.all_conveners:
         convener_data = serialize_person_link(convener)
         data['sessionConveners'].append(convener_data)
-
     return data
