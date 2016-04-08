@@ -100,7 +100,7 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
             entry = create_session_block_entry(self.session, form.data)
             return jsonify_data(entry=serialize_entry_update(entry), flash=False)
         self.commit = False
-        return jsonify_form(form, fields=form._display_fields)
+        return jsonify_form(form, fields=form._display_fields, disabled_until_change=False)
 
 
 class RHLegacyTimetableAddSession(RHCreateSession):
