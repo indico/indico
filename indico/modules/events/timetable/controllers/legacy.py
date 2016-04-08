@@ -28,6 +28,7 @@ from indico.modules.events.contributions.controllers.management import _get_fiel
 from indico.modules.events.contributions.operations import create_contribution, update_contribution
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.operations import update_session_block
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm)
@@ -134,6 +135,16 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                 with track_time_changes():
                     update_break_entry(break_, form.data)
                 return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)], flash=False)
+        elif self.timetable_entry.session_block:
+            block = self.timetable_entry.session_block
+            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+            form = SessionBlockEntryForm(obj=FormDefaults(block, time=tt_entry_dt.time()),
+                                         event=self.event_new, session_block=block, to_schedule=False,
+                                         day=tt_entry_dt.date())
+            if form.validate_on_submit():
+                with track_time_changes():
+                    update_session_block(block, form.data)
+                return jsonify_data(entries=[serialize_entry_update(block.timetable_entry)], flash=False)
         self.commit = False
         return jsonify_form(form)
 
@@ -146,11 +157,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
                                 .first_or_404())
 
     def _process(self):
-        item = None
-        if self.timetable_entry.contribution:
-            item = self.timetable_entry.contribution
-        elif self.timetable_entry.break_:
-            item = self.timetable_entry.break_
+        item = self.timetable_entry.object
         tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
         form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
                              event=self.event_new, item=item)
@@ -161,6 +168,8 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
                     update_contribution(item, {'duration': form.duration.data})
                 elif self.timetable_entry.break_:
                     update_break_entry(item, form.data)
+                elif self.timetable_entry.session_block:
+                    update_session_block(item, form.data)
             return jsonify_data(entries=[serialize_entry_update(item.timetable_entry)], flash=False)
         self.commit = False
         return jsonify_form(form, back_button=False, disabled_until_change=True)

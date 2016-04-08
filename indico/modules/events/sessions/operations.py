@@ -24,7 +24,7 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.sessions import logger
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.timetable.operations import delete_timetable_entry
+from indico.modules.events.timetable.operations import delete_timetable_entry, update_timetable_entry
 
 
 def create_session(event, data):
@@ -82,6 +82,9 @@ def delete_session(event_session):
 
 def update_session_block(session_block, data):
     """Update a session block with data passed in the `data` argument"""
+    start_dt = data.pop('start_dt', None)
+    if start_dt is not None:
+        update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
     session_block.populate_from_dict(data)
     db.session.flush()
     session_block.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',

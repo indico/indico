@@ -45,7 +45,7 @@ class EntryFormMixin(object):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
-        self.session_block = kwargs.pop('session_block', None)
+        self.session_block = kwargs.get('session_block')
         self.day = kwargs.pop('day')
         kwargs['time'] = self._get_default_time()
         defaults = kwargs.get('obj') or FormDefaults()
