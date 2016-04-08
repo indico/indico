@@ -42,7 +42,7 @@ _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest',
                  methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/balloon', 'balloon', RHTimetableBalloon)
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/move', 'move_timetable_entry', RHLegacyTimetableEntryMove,
-                 methods=('POST', 'PATCH'))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/change-datetime', 'change_datetime',
                  RHLegacyChangeTimetableEntryDatetime, methods=('POST',))
 
