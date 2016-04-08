@@ -100,8 +100,8 @@ import zope.interface
 
 from indico.core import signals
 from indico.core.db import DBMgr, db
+from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.core.db.event import SupportInfo
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.config import Config
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.modules.events.logs import EventLogRealm, EventLogKind
@@ -2348,26 +2348,6 @@ class Conference(CommonObjectBase, Locatable):
             moveEntries = 0
 
         # Pre-check for moveEntries
-        if moveEntries == 1:
-            # in case the entries are to be simply shifted
-            # we should make sure the interval is big enough
-            # just store the old values for later
-
-            oldInterval = oldEndDate - oldStartDate
-            newInterval = eDate - sDate
-
-            entries = self.getSchedule().getEntries()
-            if oldInterval > newInterval and entries:
-                eventInterval = entries[-1].getEndDate() - entries[0].getStartDate()
-                diff = entries[0].getStartDate() - oldStartDate
-                if sDate + diff + eventInterval > eDate:
-                    raise TimingError(
-                        _("The start/end dates were not changed since the selected "
-                          "timespan is not large enough to accomodate the contained "
-                          "timetable entries and spacings."),
-                        explanation=_("You should try using a larger timespan."))
-
-        # so, we really need to try changing something
 
         self.unindexConf()
 
@@ -2375,6 +2355,14 @@ class Conference(CommonObjectBase, Locatable):
         with db.session.no_autoflush:
             self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
             self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
+
+            if moveEntries == 1:
+                try:
+                    db.enforce_constraints()
+                except ConstraintViolated:
+                    raise TimingError(_("The start/end dates were not changed since the selected timespan is not large "
+                                        "enough to accomodate the contained timetable entries and spacings."),
+                                      explanation=_("You should try using a larger timespan."))
 
         # sanity check
         self._checkInnerSchedule()
@@ -2415,17 +2403,11 @@ class Conference(CommonObjectBase, Locatable):
 
         if index:
             self.unindexConf()
-        self.startDate  = sDate
-        if moveEntries and diff is not None:
+        if moveEntries:
             # If the start date changed, we move entries inside the timetable
-            self.getSchedule()._startDate=None
-            self.getSchedule()._endDate=None
-            #if oldSdate.date() != sDate.date():
-            #    entries = self.getSchedule().getEntries()[:]
-            #else:
-            #    entries = self.getSchedule().getEntriesOnDay(sDate.astimezone(timezone(self.getTimezone())))[:]
-            entries = self.getSchedule().getEntries()[:]
-            self.getSchedule().moveEntriesBelow(diff, entries, check=check)
+            self.as_event.move_start_dt(sDate)
+        else:
+            self.startDate = sDate
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
