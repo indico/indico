@@ -54,7 +54,7 @@ class EntryFormMixin(object):
         self.session_block = kwargs.get('session_block')
         self.day = kwargs.pop('day')
         if self._default_duration is not None:
-            kwargs['time'] = self._get_default_time()
+            kwargs.setdefault('time', self._get_default_time())
             defaults = kwargs.get('obj') or FormDefaults()
             if 'duration' not in defaults:
                 defaults.duration = self._default_duration
