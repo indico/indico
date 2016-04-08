@@ -21,9 +21,9 @@ from flask import request, jsonify, render_template
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
@@ -116,7 +116,10 @@ class RHTimetableREST(RHManageTimetableBase):
 
     def _process_DELETE(self):
         """Delete a timetable entry"""
-        delete_timetable_entry(self.timetable_entry)
+        if self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
+            delete_session_block(self.timetable_entry.session_block)
+        else:
+            delete_timetable_entry(self.timetable_entry)
 
 
 class RHTimetableBalloon(RHManageTimetableBase):
