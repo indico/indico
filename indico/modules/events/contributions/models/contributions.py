@@ -363,6 +363,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             return fv.friendly_data if fv else ''
 
 
+Contribution.register_protection_events()
+
+
 @listens_for(mapper, 'after_configured', once=True)
 def _mapper_configured():
     Contribution.register_location_events()

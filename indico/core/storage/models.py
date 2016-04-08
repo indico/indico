@@ -54,7 +54,7 @@ class VersionedResourceMixin(object):
             target.all_files.append(value)
 
     @classmethod
-    def register_events(cls):
+    def register_versioned_resource_events(cls):
         """Register SQLAlchemy events. Should be called
            right after class definition."""
         listen(cls.file, 'set', cls._add_file_to_relationship)

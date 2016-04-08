@@ -191,3 +191,4 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
 
 Session.register_location_events()
+Session.register_protection_events()

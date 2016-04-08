@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -51,6 +53,20 @@ class ProtectionMixin(object):
     #: ACL entries (which will grant access even if the user cannot
     #: access the parent object).
     inheriting_have_acl = False
+
+    @classmethod
+    def register_protection_events(cls):
+        """Registers sqlalchemy events needed by this mixin.
+
+        Call this method after the definition of a model which uses
+        this mixin class.
+        """
+        @listens_for(cls.protection_mode, 'set')
+        def _set_protection_mode(target, value, oldvalue, *unused):
+            if oldvalue in (NEVER_SET, NO_VALUE):
+                return
+            if value != oldvalue:
+                signals.acl.protection_changed.send(type(target), obj=target, mode=value, old_mode=oldvalue)
 
     @declared_attr
     def protection_mode(cls):
