@@ -836,7 +836,7 @@ class Category(CommonObjectBase):
         ConferenceHolder().add(conf, event)
         self._addConference(conf)
 
-        signals.event.created.send(conf, parent=self)
+        signals.event.created.send(event)
 
         return conf
 
@@ -5844,7 +5844,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         return self.session.conference
 
     def delete(self):
-        signals.event.session_slot_deleted.send(self)
+        # signals.event.session_slot_deleted.send(self)
         self.getSchedule().clear()
         if self.getSession() is not None:
             self.getSession().removeSlot(self)
@@ -6693,8 +6693,8 @@ class Contribution(CommonObjectBase, Locatable):
     def notifyModification( self, date = None, raiseEvent = True, cleanCache = True):
         self.setModificationDate(date)
 
-        if raiseEvent:
-            signals.event.contribution_data_changed.send(self)
+        # if raiseEvent:
+        #     signals.event.contribution_data_changed.send(self)
 
         if cleanCache:
             self.cleanCache()
@@ -6805,8 +6805,8 @@ class Contribution(CommonObjectBase, Locatable):
         self.title = newTitle.strip()
 
         if notify:
-            if oldTitle != newTitle:
-                signals.event.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
+            # if oldTitle != newTitle:
+            #     signals.event.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
             self.notifyModification()
 
     def getTitle( self ):
@@ -7584,9 +7584,9 @@ class Contribution(CommonObjectBase, Locatable):
         self.__ac.setProtection( private )
         self.notify_protection_to_owner(self)
 
-        if oldValue != private:
-            # notify listeners
-            signals.event.contribution_protection_changed.send(self, old=oldValue, new=private)
+        # if oldValue != private:
+        #     # notify listeners
+        #     signals.event.contribution_protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
@@ -8546,8 +8546,8 @@ class SubContribution(CommonObjectBase, Locatable):
         parent = self.getParent()
         if parent:
             parent.setModificationDate()
-        if raiseEvent:
-            signals.event.subcontribution_data_changed.send(self)
+        # if raiseEvent:
+        #     signals.event.subcontribution_data_changed.send(self)
         self._p_changed = 1
 
     def getCategoriesPath(self):
@@ -8577,8 +8577,8 @@ class SubContribution(CommonObjectBase, Locatable):
     def setTitle( self, newTitle ):
         old_title = self.title
         self.title = newTitle.strip()
-        if old_title != self.title:
-            signals.event.subcontribution_title_changed.send(self, old=old_title, new=self.title)
+        # if old_title != self.title:
+        #     signals.event.subcontribution_title_changed.send(self, old=old_title, new=self.title)
         self.notifyModification()
 
     def getTitle( self ):
