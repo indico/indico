@@ -150,7 +150,7 @@
     }
 
     function setupStartDateQBubbles() {
-        $('.contrib-start-date').each(function() {
+        $('.js-contrib-start-date').each(function() {
             var $this = $(this);
 
             $this.ajaxqbubble({
@@ -165,7 +165,7 @@
     }
 
     function setupDurationQBubbles() {
-        $('.contrib-duration').each(function() {
+        $('.js-contrib-duration').each(function() {
             var $this = $(this);
 
             $this.ajaxqbubble({

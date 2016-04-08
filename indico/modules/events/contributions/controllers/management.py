@@ -330,6 +330,11 @@ class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
 
 
 class RHContributionUpdateStartDate(RHManageContributionBase):
+    def _checkParams(self, params):
+        RHManageContributionBase._checkParams(self, params)
+        if self.contrib.session_block:
+            raise BadRequest
+
     def _process(self):
         form = ContributionStartDateForm(obj=FormDefaults(start_dt=self.contrib.start_dt), contrib=self.contrib)
         if form.validate_on_submit():
@@ -340,6 +345,11 @@ class RHContributionUpdateStartDate(RHManageContributionBase):
 
 
 class RHContributionUpdateDuration(RHManageContributionBase):
+    def _checkParams(self, params):
+        RHManageContributionBase._checkParams(self, params)
+        if self.contrib.session_block:
+            raise BadRequest
+
     def _process(self):
         form = ContributionDurationForm(obj=FormDefaults(self.contrib), contrib=self.contrib)
         if form.validate_on_submit():
