@@ -305,7 +305,7 @@ class User(PersonMixin, db.Model):
 
     # relationship backrefs:
     # - _all_settings (UserSetting.user)
-    # - abstract_judgements (Judgement.judge)
+    # - abstract_judgments (Judgment.judge)
     # - agreements (Agreement.user)
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
@@ -328,6 +328,7 @@ class User(PersonMixin, db.Model):
     # - merged_from_users (User.merged_into_user)
     # - oauth_tokens (OAuthToken.user)
     # - owned_rooms (Room.owner)
+    # - paper_reviewing_roles (PaperReviewingRole.user)
     # - registrations (Registration.user)
     # - requests_created (Request.created_by_user)
     # - requests_processed (Request.processed_by_user)
