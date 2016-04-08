@@ -324,7 +324,7 @@ class EventPersonListField(PrincipalListField):
 
     def _create_event_person(self, data):
         title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        return EventPerson(event_new=self.event, email=data['email'].lower(), _title=title,
+        return EventPerson(event_new=self.event, email=data.get('email', '').lower(), _title=title,
                            first_name=data.get('firstName'), last_name=data['familyName'],
                            affiliation=data.get('affiliation'), address=data.get('address'),
                            phone=data.get('phone'))
@@ -332,13 +332,18 @@ class EventPersonListField(PrincipalListField):
     def _get_event_person(self, data):
         person_type = data.get('_type')
         if person_type is None:
-            email = data['email'].lower()
-            user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
-            if user:
-                return EventPerson.for_user(user, self.event)
-            else:
+            if 'email' in data:
+                # Try to use an existing active user with the same e-mail address
+                email = data['email'].lower()
+                user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
+                if user:
+                    return EventPerson.for_user(user, self.event)
+                # Try to find an EventPerson with the same email
                 person = self.event.persons.filter_by(email=email).first()
-                return person or self._create_event_person(data)
+                if person:
+                    return person
+            # We have no way to identify an existing event person with the provided information
+            return self._create_event_person(data)
         elif person_type == 'Avatar':
             user = self._convert_principal(data)
             return EventPerson.for_user(user, self.event)
