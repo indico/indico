@@ -217,7 +217,7 @@ type("TimetableManagementActions", [], {
         return $.ajax({
             url: build_url(Indico.Urls.Timetable.entry.move, {confId: eventData.conferenceId[0],
                                                               timetable_entry_id: eventData.scheduleEntryId}),
-            method: 'PATCH',
+            method: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
             contentType: 'application/json',

@@ -299,14 +299,14 @@ class RHLegacyTimetableFitBlock(RHManageTimetableBase):
 class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
     """Moves a TimetableEntry into a Session or top-level timetable"""
 
-    def _process_POST(self):
-        current_day = dateutil.parser.parse(request.form.get('day')).date()
+    def _process_GET(self):
+        current_day = dateutil.parser.parse(request.args.get('day')).date()
         return jsonify_template('events/timetable/move_entry.html', event=self.event_new,
                                 top_level_entries=self._get_session_timetable_entries(),
                                 current_day=current_day, timetable_entry=self.entry,
                                 parent_entry=self.entry.parent)
 
-    def _process_PATCH(self):
+    def _process_POST(self):
         self.serializer = TimetableSerializer(True)
         with track_time_changes():
             entry_data = self._move_entry(request.json)
