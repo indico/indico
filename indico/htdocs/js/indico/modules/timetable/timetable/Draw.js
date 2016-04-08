@@ -46,7 +46,7 @@ type("TimetableBlockBase", [],
              self.popupActive = true;
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
-             self._drawPopup();
+             self._drawPopup(event);
          },
 
          closePopup: function() {
@@ -548,26 +548,111 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
      }
    );
 
+function drawBalloon(self, evt, editable) {
+    var timetableBlock = self.div.dom;
+    var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
+    var params = {
+       'confId': self.eventData.conferenceId[0],
+       'timetable_entry_id': entryId,
+       'editable': editable ? 1 : 0
+    };
+    var balloonId = '#qtip-' + entryId.toString();
+
+    $(timetableBlock).qbubble({
+       id: entryId.toString(),
+       content: {
+           text: function(evt, api) {
+               $.ajax({
+                   url: build_url(Indico.Urls.Timetable.entries.balloon, params)
+               })
+               .then(function(content) {
+                   // Set the tooltip content upon successful retrieval
+                   api.set('content.text', content.html);
+                   var $content = api.elements.content;
+                   if (editable) {
+                       $duration = $content.find('.js-edit-time');
+                       $duration.ajaxqbubble({
+                           url: build_url(Indico.Urls.Timetable.entries.editTime, params),
+                           qBubbleOptions: {
+                               style: {
+                                   classes: 'balloon-time-qtip'
+                               },
+                               position: {
+                                   at: 'top center',
+                                   my: 'bottom center',
+                                   target: $(timetableBlock)
+                               }
+                           },
+                           onClose: function(data) {
+                               if (data && data.entries) {
+                                   self.managementActions._addEntries(data.entries);
+                               }
+                           }
+                       });
+
+                       $content.find('.js-delete').on('click', function() {
+                           self.managementActions.deleteEntry(self.eventData);
+                       });
+
+                       $content.find('.js-edit').on('click', function() {
+                           ajaxDialog({
+                               trigger: this,
+                               url: build_url(Indico.Urls.Timetable.entries.edit, params),
+                               title: $(this).data('title'),
+                               onClose: function(data) {
+                                   if (data && data.entries) {
+                                       self.managementActions._addEntries(data.entries);
+                                   }
+                               }
+                           });
+                       });
+                   }
+                   $content.find('.push-balloon-back').each(function() {
+                       $(this).on('click', function() {
+                           $(balloonId).addClass('push-back');
+                       });
+                   });
+                   // Change the target of the qTip position in order to open it at the mouse position
+                   api.options.position.target = 'mouse';
+               }, function(xhr, status, error) {
+                   api.set('content.text', status + ': ' + error);
+               });
+
+               return $T.gettext('Loading...');
+           }
+       },
+       show: {
+           ready: true
+       },
+       hide: {
+           event: 'unfocus',
+           fixed: true
+       },
+       events: {
+           hide: function(evt, api) {
+               if (evt.originalEvent.type == 'mouseleave') {
+                   evt.preventDefault();
+               }
+           }
+       },
+       position: {
+           at: 'top center',
+           my: 'bottom center',
+           target: [ evt.pageX, evt.pageY ],
+           adjust: {
+               mouse: false
+           }
+       },
+       style: {
+           classes: 'balloon-qtip'
+       },
+    });
+}
 
 type("TimetableBlockDisplayMixin",[],
      {
-         _drawPopup: function() {
-             var self = this;
-
-             return new TimetableBlockPopup(
-                 this.timetable,
-                 this.eventData,
-                 this.div,
-                 function() {
-                     self.div.dom.style.cursor = 'pointer';
-                     self.popupActive = false;
-                     return self.popupAllowClose;
-                 },
-                 function(color) {
-                     var parent = self.div.getParent();
-                     parent.setStyle('backgroundColor', color);
-                 }
-             );
+         _drawPopup: function(evt) {
+            drawBalloon(this, evt, false);
          }
 
      });
@@ -575,103 +660,8 @@ type("TimetableBlockDisplayMixin",[],
 
 type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
      {
-         _drawPopup: function() {
-
-             var self = this;
-             var timetableBlock = self.div.dom;
-             var params = {
-                'confId': self.eventData.conferenceId[0],
-                'timetable_entry_id': self.eventData.scheduleEntryId
-             };
-             var balloonId = '#qtip-' + self.eventData.scheduleEntryId.toString();
-
-             $(timetableBlock).qbubble({
-                id: self.eventData.scheduleEntryId.toString(),
-                content: {
-                    text: function(event, api) {
-                        $.ajax({
-                            url: build_url(Indico.Urls.Timetable.entries.balloon, params)
-                        })
-                        .then(function(content) {
-                            // Set the tooltip content upon successful retrieval
-                            api.set('content.text', content.html);
-                            var $content = api.elements.content;
-                            $duration = $content.find('.js-edit-time');
-                            $duration.ajaxqbubble({
-                                url: build_url(Indico.Urls.Timetable.entries.editTime, params),
-                                qBubbleOptions: {
-                                    style: {
-                                        classes: 'balloon-time-qtip'
-                                    },
-                                    position: {
-                                        at: 'top center',
-                                        my: 'bottom center',
-                                        target: $(timetableBlock)
-                                    }
-                                },
-                                onClose: function(data) {
-                                    if (data.entries) {
-                                        self.managementActions._addEntries(data.entries)
-                                    }
-                                }
-                            });
-
-                            $content.find('.push-balloon-back').each(function() {
-                                $(this).on('click', function() {
-                                    $(balloonId).addClass('push-back');
-                                });
-                            });
-
-                            $content.find('.js-delete').on('click', function() {
-                                self.managementActions.deleteEntry(self.eventData);
-                            });
-
-                            $content.find('.js-edit').on('click', function() {
-                                ajaxDialog({
-                                    trigger: this,
-                                    url: build_url(Indico.Urls.Timetable.entries.edit, params),
-                                    title: $(this).data('title'),
-                                    onClose: function(data) {
-                                        if (data && data.entries) {
-                                            self.managementActions._addEntries(data.entries)
-                                        }
-                                    }
-                                });
-                            });
-                        }, function(xhr, status, error) {
-                            api.set('content.text', status + ': ' + error);
-                        });
-
-                        return 'Loading...';
-                    }
-                },
-                show: {
-                    event: 'click',
-                    ready : true
-                },
-                hide: {
-                    event: 'unfocus',
-                    fixed: true
-                },
-                events: {
-                    hide: function(event, api) {
-                        if(event.originalEvent.type == 'mouseleave') {
-                            try { event.preventDefault(); } catch(e) {}
-                        }
-                    }
-                },
-                position: {
-                    at: 'top center',
-                    my: 'bottom center',
-                    target: 'mouse',
-                    adjust: {
-                        mouse: false
-                    }
-                },
-                style: {
-                    classes: 'balloon-qtip'
-                },
-             });
+         _drawPopup: function(evt) {
+            drawBalloon(this, evt, true);
          },
 
          _getRightSideDecorators: function()
