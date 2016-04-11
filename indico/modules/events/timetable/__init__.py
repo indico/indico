@@ -29,12 +29,20 @@ from indico.web.menu import SideMenuItem
 logger = Logger.get('events.timetable')
 
 
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.layout.util import MenuEntryData
+    yield MenuEntryData(title=_("Timetable"), name='timetable', endpoint='timetable.timetable', position=3,
+                        static_site=True)
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
     if event.type != 'lecture':
-        return SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80, icon='calendar')
+        return SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80,
+                            icon='calendar')
 
 
 @signals.event_management.get_cloners.connect

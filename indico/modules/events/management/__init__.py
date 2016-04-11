@@ -67,11 +67,6 @@ def _sidemenu_items(sender, event, **kwargs):
                            url_for('event_mgmt.conferenceModification', event),
                            90,
                            icon='settings')
-        if not is_lecture:
-            yield SideMenuItem('timetable_old', _('Timetable (Old)'),
-                               url_for('event_mgmt.confModifSchedule', event),
-                               80,
-                               icon='calendar')
         if rb_active:
             yield SideMenuItem('room_booking', _('Room Booking'),
                                url_for('event_mgmt.rooms_booking_list', event),
