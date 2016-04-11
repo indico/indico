@@ -1,4 +1,4 @@
-{% macro render_timetable(timetable_data, event_info, timetable_layout, management=false) %}
+{% macro render_timetable(timetable_data, event_info, timetable_layout=none, management=false, is_session=false) %}
     <div id="timetable" style="position: relative;">
         <div class="timetablePreLoading" style="height: 300px;">
             <div class="text" style="padding-top: 200px;">
@@ -10,20 +10,30 @@
 
     <script>
         $(window).on('load', function() {
-            var timetableLayout = {{ timetable_layout|tojson }};
             {% if management %}
-                var width = document.body.clientWidth - 300;
                 var timetableClass = TopLevelManagementTimeTable;
+                var width = document.body.clientWidth - 300;
                 var detailLevel = false;
+                var extraArg = {{ is_session|tojson }};
             {% else %}
-                var width = 710;
                 var timetableClass = TopLevelDisplayTimeTable;
+                var width = 710;
                 var detailLevel = 'session';
+                var extraArg = {{ timetable_layout|tojson }};
             {% endif %}
+
+            var timetableArgs = [
+                {{ timetable_data|tojson }},
+                {{ event_info|tojson }},
+                width,
+                $E('timetable'), detailLevel,
+                new BrowserHistoryBroker(),
+                extraArg
+            ];
 
             var timetable = new timetableClass({{ timetable_data|tojson }}, {{ event_info|tojson }}, width,
                                                $E('timetable'), detailLevel, new BrowserHistoryBroker(),
-                                               timetableLayout);
+                                               extraArg);
             $('#timetable').html(timetable.draw());
             timetable.postDraw();
         });
