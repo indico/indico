@@ -25,7 +25,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import can_manage_sessions, get_sessions_for_user
+from indico.modules.events.sessions.util import get_sessions_for_user
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
@@ -73,16 +73,10 @@ def _convert_email_principals(user, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not can_manage_sessions(session.user, event, 'ANY'):
+    if not event.can_manage(session.user, allow_key=True):
         return
     if event.type == 'conference':
         return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
-
-
-@signals.event_management.management_url.connect
-def _get_event_management_url(event, **kwargs):
-    if can_manage_sessions(session.user, event.as_event, 'ANY'):
-        return url_for('sessions.session_list', event)
 
 
 @template_hook('conference-protection')

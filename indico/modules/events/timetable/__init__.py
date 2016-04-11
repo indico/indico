@@ -38,7 +38,8 @@ def _extend_event_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user, allow_key=True):
+    from indico.modules.events.sessions.util import can_manage_sessions
+    if not can_manage_sessions(session.user, event, 'ANY'):
         return
     if event.type != 'lecture':
         return SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80,
