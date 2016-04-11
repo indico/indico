@@ -34,7 +34,7 @@
 
 {% block page_actions -%}
     <div class="toolbar right">
-        {% if sess.can_manage(session.user, role='coordinate') -%}
+        {% if sess.can_manage(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans %}Edit session{% endtrans %}"
                data-href="{{ url_for('.modify_session', sess) }}"

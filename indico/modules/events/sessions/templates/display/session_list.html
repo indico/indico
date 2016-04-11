@@ -16,19 +16,22 @@
             {% for sess in sessions %}
                 <tr>
                     <td>
-                        {% if sess.can_manage(session.user) %}
-                            <a href="{{ url_for('.display_session', sess) }}">{{ sess.title }}</a>
-                        {% else %}
+                        <a href="{{ url_for('.display_session', sess) }}">
                             {{ sess.title }}
-                        {% endif %}
+                        </a>
                     </td>
                     <td>
                         <div class="group right">
-                            <a href="#" class="icon-edit" title="{% trans %}Edit the session{% endtrans %}"
-                               data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
-                               data-href="{{ url_for('.modify_session', sess) }}"
-                               data-ajax-dialog
-                               data-reload-after></a>
+                            {% if sess.can_manage(session.user) %}
+                                <a href="#" class="icon-edit" title="{% trans %}Edit session{% endtrans %}"
+                                   data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
+                                   data-href="{{ url_for('.modify_session', sess) }}"
+                                   data-ajax-dialog
+                                   data-reload-after></a>
+                            {% endif %}
+                            <a href="{{ url_for('timetable.manage_session', sess) }}"
+                               class="icon-calendar"
+                               title="{% trans %}Manage timetable{% endtrans %}"></a>
                         </div>
                     </td>
                 </tr>
