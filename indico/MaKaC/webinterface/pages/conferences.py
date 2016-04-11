@@ -139,6 +139,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
+    def get_extra_css_files(self):
+        theme_url = get_css_url(self._conf.as_event)
+        return [theme_url] if theme_url else []
+
     def getJSFiles(self):
         return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') +
                 self._includeJSPackage('MaterialEditor'))
@@ -558,8 +562,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         return WPConferenceBase._getHTMLHeader(self)
 
     def _getHeadContent( self ):
-        config = Config.getInstance()
-        htdocs = config.getHtdocsDir()
         baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
         try:

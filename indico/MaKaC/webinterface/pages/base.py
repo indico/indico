@@ -136,6 +136,10 @@ class WPBase():
                 self._asset_env['attachments_sass'].urls() +
                 self._asset_env['users_sass'].urls())
 
+    def get_extra_css_files(self):
+        """Return CSS urls that will be included after all other CSS"""
+        return []
+
     def getJSFiles(self):
         return (self._asset_env['base_js'].urls() +
                 self._asset_env['dropzone_js'].urls() +
@@ -184,7 +188,7 @@ class WPBase():
             "baseurl": self._getBaseURL(),
             "conf": Config.getInstance(),
             "page": self,
-            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css),
+            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "language": session.lang or info.getLang(),
             "social": info.getSocialAppConfig(),
