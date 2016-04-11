@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from itertools import count, chain
+
 from sqlalchemy.exc import IntegrityError
+from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import Config
@@ -221,8 +223,9 @@ def get_css_url(event, force_theme=None, for_preview=False):
     """
     from indico.modules.events.layout import layout_settings
 
+    css_base = url_parse(Config.getInstance().getCssConfTemplateBaseURL()).path
     if force_theme and force_theme != '_custom':
-        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), force_theme)
+        return '{}/{}'.format(css_base, force_theme)
     elif for_preview and force_theme is None:
         return None
     elif force_theme == '_custom' or layout_settings.get(event, 'use_custom_css'):
@@ -230,7 +233,7 @@ def get_css_url(event, force_theme=None, for_preview=False):
             return None
         return url_for('event_layout.css_display', event, slug=event.stylesheet_metadata['hash'])
     elif layout_settings.get(event, 'theme'):
-        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), layout_settings.get(event, 'theme'))
+        return '{}/{}'.format(css_base, layout_settings.get(event, 'theme'))
 
 
 @unify_event_args(legacy=True)
