@@ -31,9 +31,10 @@ from indico.modules.events.contributions.controllers.management import _get_fiel
 from indico.modules.events.contributions.operations import create_contribution, update_contribution
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.forms import SessionForm
-from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import update_session_block, update_session
-from indico.modules.events.timetable.controllers import RHManageTimetableBase, RHManageTimetableEntryBase
+from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase, 
+                                                         SessionManagementLevel)
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm, LegacyExportTimetablePDFForm)
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
@@ -58,12 +59,16 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.manage
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.day = dateutil.parser.parse(request.args['day']).date()
         self.session_block = None
         if 'session_block_id' in request.args:
             self.session_block = self.event_new.get_session_block(request.args['session_block_id'])
+            if not self.session_block:
+                raise BadRequest
 
     def _get_form_defaults(self, **kwargs):
         inherited_location = self.event_new.location_data
@@ -77,6 +82,8 @@ class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
 
 
 class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
+    session_management_level = SessionManagementLevel.coordinate
+
     def _get_default_colors(self):
         breaks = Break.query.filter(Break.timetable_entry.has(event_new=self.event_new)).all()
         common_colors = Counter(b.colors for b in breaks)
@@ -95,6 +102,8 @@ class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
 
 
 class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
+    session_management_level = SessionManagementLevel.manage
+
     def _process(self):
         defaults = self._get_form_defaults()
         form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
@@ -106,9 +115,14 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
 
 
 class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
+    session_management_level = SessionManagementLevel.coordinate_with_blocks
+
     def _checkParams(self, params):
         RHLegacyTimetableAddEntryBase._checkParams(self, params)
-        self.session = Session.find_one(id=request.args['session'], event_new=self.event_new, is_deleted=False)
+        if not self.session:
+            self.session = self.event_new.get_session(request.args['session'])
+        elif self.session.id != request.args['session']:
+            raise BadRequest
 
     def _process(self):
         defaults = self._get_form_defaults()
@@ -121,11 +135,24 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
 
 
 class RHLegacyTimetableEditEntry(RHManageTimetableBase):
+
+    @property
+    def session_management_level(self):
+        if self.edit_session:
+            return SessionManagementLevel.manage
+        elif self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        elif self.timetable_entry.type == TimetableEntryType.CONTRIBUTION:
+            return SessionManagementLevel.coordinate_with_contribs
+        else:
+            return SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.timetable_entry = (self.event_new.timetable_entries
                                 .filter_by(id=request.view_args['timetable_entry_id'])
                                 .first_or_404())
+        self.edit_session = request.args.get('edit_session') == '1'
 
     def _process(self):
         form = None
@@ -150,7 +177,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                     update_break_entry(break_, form.data)
                 return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)], flash=False)
         elif self.timetable_entry.session_block:
-            if request.args.get('edit_session') == '1':
+            if self.edit_session:
                 session_ = self.timetable_entry.session_block.session
                 form = SessionForm(obj=FormDefaults(session_), event=self.event_new)
                 if form.validate_on_submit():
@@ -172,6 +199,13 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
 
 
 class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
+    @property
+    def session_management_level(self):
+        if self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.timetable_entry = (self.event_new.timetable_entries
@@ -203,14 +237,15 @@ class RHLegacyTimetableAddSession(RHCreateSession):
 
 
 class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        try:
-            # no need to validate whether it's in the event; we just
-            # use it to filter the event's contribution list
-            self.session_id = int(request.args['session_id'])
-        except KeyError:
-            self.session_id = None
+        self.session_id = None
+        if 'session_block_id' in request.args:
+            self.session_id = SessionBlock.get_one(request.args['session_block_id']).session_id
+            if self.session and self.session.id != self.session_id:
+                raise BadRequest
 
     def _process(self):
         contributions = Contribution.query.with_parent(self.event_new).filter_by(is_scheduled=False)
@@ -219,6 +254,8 @@ class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
 
 
 class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.session_block = None
@@ -266,35 +303,50 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
         'required': ['mode', 'day', 'gap', 'fit_blocks']
     }
 
+    @property
+    def session_management_level(self):
+        if self.session_block:
+            return SessionManagementLevel.coordinate
+        elif self.session:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.none
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.validate_json(self._json_schema)
         self.day = dateutil.parser.parse(request.json['day']).date()
-        self.session_block = self.session = None
+        self.session_block = None
         if request.json.get('session_block_id') is not None:
             self.session_block = self.event_new.get_session_block(request.json['session_block_id'], scheduled_only=True)
             if self.session_block is None:
                 raise NotFound
+            if self.session and self.session != self.session_block.session:
+                raise BadRequest
         elif request.json.get('session_id') is not None:
-            self.session = self.event_new.get_session(request.json['session_id'])
-            if self.session is None:
-                raise NotFound
+            if self.session.id != request.json['session_id']:
+                raise BadRequest
 
     def _process(self):
+        sess = self.session if not self.session_block else None
         rescheduler = Rescheduler(self.event_new, RescheduleMode[request.json['mode']], self.day,
-                                  session=self.session, session_block=self.session_block,
-                                  fit_blocks=request.json['fit_blocks'], gap=timedelta(minutes=request.json['gap']))
+                                  session=sess, session_block=self.session_block, fit_blocks=request.json['fit_blocks'],
+                                  gap=timedelta(minutes=request.json['gap']))
         with track_time_changes():
             rescheduler.run()
         return jsonify_data(flash=False)
 
 
 class RHLegacyTimetableFitBlock(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.coordinate_with_blocks
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.session_block = self.event_new.get_session_block(request.view_args['block_id'], scheduled_only=True)
         if self.session_block is None:
             raise NotFound
+        if self.session and self.session != self.session_block.session:
+            raise BadRequest
 
     def _process(self):
         with track_time_changes():

@@ -146,8 +146,11 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         function(hook) {
             var self = this;
             var args = {'confId': self.args.get('conference')};
-            if (self.args.get('session')) {
-                args.session_id = self.args.get('session');
+            if (self.timetable.contextInfo.sessionSlotId) {
+                args.session_block_id = self.timetable.contextInfo.sessionSlotId;
+            }
+            if (self.timetable.contextInfo.sessionId) {
+                args.session_id = self.timetable.contextInfo.sessionId;
             }
             $.ajax({
                 url: build_url(Indico.Urls.Timetable.contributions.notScheduled, args),
@@ -178,8 +181,11 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
     addExisting: function(contributionIds, date) {
         var self = this;
         var urlArgs = {'confId': self.args.get('conference')};
-        if (this.args.get('slot')) {
-            urlArgs.block_id = this.args.get('slot');
+        if (self.args.get('slot')) {
+            urlArgs.block_id = self.args.get('slot');
+        }
+        if (self.args.get('session')) {
+            urlArgs.session_id = self.args.get('session');
         }
         $.ajax({
             url: build_url(Indico.Urls.Timetable.contributions.schedule, urlArgs),
@@ -283,6 +289,9 @@ type("AddNewContributionDialog", [],
             };
             if (self.args.get('slot')) {
                 args.session_block_id = self.args.get('slot');
+            }
+            if (self.args.get('session')) {
+                args.session_id = self.args.get('session');
             }
             ajaxDialog({
                 url: build_url(Indico.Urls.Timetable.contributions.add, args),
@@ -891,6 +900,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                 if (!confirm) {
                     return;
                 }
+                var urlArgs = {confId: self.tt.eventInfo.id};
                 var data = {
                     mode: self.rescheduleAction,
                     gap: +self.minuteInput.get(),
@@ -902,9 +912,11 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                 } else if (self.isTopLevelTimetable && exists(self.tt.contextInfo.timetableSession)) {
                     data.session_id = self.tt.contextInfo.timetableSession.id;
                 }
-
+                if (self.tt.contextInfo.timetableSession) {
+                    urlArgs.session_id = self.tt.contextInfo.timetableSession.id;
+                }
                 $.ajax({
-                    url: build_url(Indico.Urls.Timetable.reschedule, {confId: self.tt.eventInfo.id}),
+                    url: build_url(Indico.Urls.Timetable.reschedule, urlArgs),
                     method: 'POST',
                     data: JSON.stringify(data),
                     contentType: 'application/json',
@@ -1016,16 +1028,18 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
      */
     __handler: function(confirm) {
         var self = this;
-
         if (!confirm || !this.tt.IntervalManagementTimeTable) {
             return;
         }
-
+        var urlArgs = {
+            confId: self.tt.contextInfo.conferenceId,
+            block_id: self.tt.contextInfo.sessionSlotId
+        };
+        if (self.tt.contextInfo.sessionId) {
+            urlArgs.session_id = self.tt.contextInfo.sessionId;
+        }
         $.ajax({
-            url: build_url(Indico.Urls.Timetable.sessionBlocks.fit, {
-                confId: self.tt.contextInfo.conferenceId,
-                block_id: self.tt.contextInfo.sessionSlotId
-            }),
+            url: build_url(Indico.Urls.Timetable.sessionBlocks.fit, urlArgs),
             method: 'POST',
             complete: IndicoUI.Dialogs.Util.progress($T.gettext("Fitting...")),
             error: handleAjaxError,
