@@ -14,31 +14,42 @@
     <div class="section-title-container">
         <div class="title-header">
             <div class="title-caption">{% trans %}Block{% endtrans %}</div>
-            <div class="group right entry-action-buttons">
-                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
-                   title="{% trans %}Edit block{% endtrans %}"
-                   data-title="{% trans title=block.title %}Edit block '{{ title }}'{% endtrans %}"></a>
-                <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
-                   title="{% trans %}Delete timetable entry{% endtrans %}"
-                   data-title="{% trans title=block.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
-                   data-confirm="{% trans title=block.title %}Are you sure you want to delete the session block '{{ title }}'?{% endtrans %}"></a>
-            </div>
+            {% if editable %}
+                <div class="group right entry-action-buttons">
+                    <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                       title="{% trans %}Edit block{% endtrans %}"
+                       data-title="{% trans title=block.title %}Edit block '{{ title }}'{% endtrans %}"></a>
+                    <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
+                       title="{% trans %}Delete timetable entry{% endtrans %}"
+                       data-title="{% trans title=block.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
+                       data-confirm="{% trans title=block.title %}Are you sure you want to delete the session block '{{ title }}'?{% endtrans %}"></a>
+                </div>
+            {% endif %}
         </div>
         <div class="title">{{ block.title }}</div>
     </div>
     <dl class="i-data-list">
-        <dt>
-            <a class="icon-time i-button-icon js-edit-time close-balloon"
-               title="{% trans %}Change time{% endtrans %}">
-            </a>
-        </dt>
-        <dd>
-            <div class="duration">
-                <a class="js-edit-time close-balloon" title="{% trans %}Change time{% endtrans %}">
-                    {{- block.start_dt | format_time(timezone=block.event_new.timezone) }} - {{ block.end_dt | format_time(timezone=block.event_new.timezone) -}}
-                </a>
-            </div>
-        </dd>
+        {% if editable %}
+            <dt>
+                <a class="icon-time i-button-icon js-edit-time close-balloon"
+                   title="{% trans %}Change time{% endtrans %}"></a>
+            </dt>
+            <dd>
+                <div class="duration">
+                    <a class="js-edit-time close-balloon"
+                       title="{% trans %}Change time{% endtrans %}">
+                        {{- block.start_dt | format_time(timezone=block.event_new.timezone) }} -
+                        {{ block.end_dt | format_time(timezone=block.event_new.timezone) -}}
+                    </a>
+                </div>
+            </dd>
+        {% else %}
+            <dt class="icon-time"></dt>
+            <dd>
+                {{- block.start_dt | format_time(timezone=block.event_new.timezone) }} -
+                {{ block.end_dt | format_time(timezone=block.event_new.timezone) -}}
+            </dd>
+        {% endif %}
         <dt><i class='icon-location'></i></dt>
         <dd>
             <div>{{ block.room_name }} ({{ block.venue_name }})</div>
@@ -52,28 +63,35 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Session{% endtrans %}</div>
             <div class="group right entry-action-buttons">
-                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
-                   title="{% trans %}Edit session{% endtrans %}"
-                   data-extra-params='{"edit_session": 1}'
-                   data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
-                <a class="icon-shield i-button-icon close-balloon"
-                   title="{% trans %}Manage protection{% endtrans %}"
-                   data-href="{{ url_for('sessions.session_protection', block.session) }}"
-                   data-title="{% trans %}Manage session protection{% endtrans %}"
-                   data-ajax-dialog></a>
+                {% if editable %}
+                    <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                       title="{% trans %}Edit session{% endtrans %}"
+                       data-extra-params='{"edit_session": 1}'
+                       data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
+                    <a class="icon-shield i-button-icon close-balloon"
+                       title="{% trans %}Manage protection{% endtrans %}"
+                       data-href="{{ url_for('sessions.session_protection', block.session) }}"
+                       data-title="{% trans %}Manage session protection{% endtrans %}"
+                       data-ajax-dialog></a>
+                {% else %}
+                    <a class="icon-list i-button-icon" title="{% trans %}View details{% endtrans %}"
+                       href="{{ url_for('sessions.display_session', block.session) }}"></a>
+                {% endif %}
             </div>
         </div>
         <div class="title">{{ block.session.title }}</div>
     </div>
-    <dl class="i-data-list thirty-seventy">
-        <dt>{% trans %}Color{% endtrans %}</dt>
-        <dd>
-            <a class="i-button icon-palette palette-picker-trigger close-balloon js-edit"
-               style="{{ block.session.colors.css }}"
-               data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"
-               data-extra-params='{"edit_session": 1}'></a>
-        </dd>
-    </dl>
+    {% if editable %}
+        <dl class="i-data-list thirty-seventy">
+            <dt>{% trans %}Color{% endtrans %}</dt>
+            <dd>
+                <a class="i-button icon-palette palette-picker-trigger close-balloon js-edit"
+                   style="{{ block.session.colors.css }}"
+                   data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"
+                   data-extra-params='{"edit_session": 1}'></a>
+            </dd>
+        </dl>
+    {% endif %}
     <span class="hr"></span>
     <div class="attribute">
         <div class="attribute-title">
@@ -81,11 +99,13 @@
             <span class="badge">{{ block.contribution_count -}}</span>
         </div>
     </div>
-    <div class="bottom-link">
-        <!-- TODO: Add proper link -->
-        <a href="#" class="right">
-            {% trans %}Go to session timetable{% endtrans %}
-            <i class="icon-arrow-right"></i>
-        </a>
-    </div>
+    {% if editable %}
+        <div class="bottom-link">
+            <!-- TODO: Add proper link -->
+            <a href="#" class="right">
+                {% trans %}Go to session timetable{% endtrans %}
+                <i class="icon-arrow-right"></i>
+            </a>
+        </div>
+    {% endif %}
 </div>
