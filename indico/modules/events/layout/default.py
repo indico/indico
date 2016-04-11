@@ -127,20 +127,6 @@ def get_default_menu_entries():
             parent='call_for_abstracts'
         ),
         MenuEntryData(
-            title=_("Timetable"),
-            name='timetable',
-            endpoint='timetable.timetable',
-            position=3,
-            static_site=True
-        ),
-        MenuEntryData(
-            title=_("Timetable (Old)"),
-            name='timetable_old',
-            endpoint='event.conferenceTimeTable',
-            position=3,
-            static_site=True
-        ),
-        MenuEntryData(
             title=_("My Conference"),
             name='my_conference',
             endpoint='event.myconference',
