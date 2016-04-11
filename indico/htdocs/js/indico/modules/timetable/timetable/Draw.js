@@ -595,9 +595,10 @@ function drawBalloon(self, evt, editable) {
                        });
 
                        $content.find('.js-edit').on('click', function() {
+                           var extraParams = $(this).data('extra-params');
                            ajaxDialog({
                                trigger: this,
-                               url: build_url(Indico.Urls.Timetable.entries.edit, params),
+                               url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
                                title: $(this).data('title'),
                                onClose: function(data) {
                                    if (data && data.entries) {
