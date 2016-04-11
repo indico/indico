@@ -107,11 +107,6 @@ class ContributionEntryForm(EntryFormMixin, ContributionForm):
     _display_fields = ('title', 'description', 'type', 'time', 'duration', 'person_link_data', 'location_data',
                        'keywords', 'references')
 
-    time = TimeField(_("Time"), description=_("Time when the contribution will be scheduled."))
-    duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              default=timedelta(minutes=60), units=('minutes', 'hours'),
-                              description=_("The duration of the contribution."))
-
     def __init__(self, *args, **kwargs):
         kwargs['to_schedule'] = kwargs.get('to_schedule', True)
         super(ContributionEntryForm, self).__init__(*args, **kwargs)
