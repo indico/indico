@@ -549,16 +549,15 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
    );
 
 function drawBalloon(self, evt, editable) {
-    var timetableBlock = self.div.dom;
+    var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
     var params = {
        'confId': self.eventData.conferenceId[0],
        'timetable_entry_id': entryId,
        'editable': editable ? 1 : 0
     };
-    var balloonId = '#qtip-' + entryId.toString();
 
-    $(timetableBlock).qbubble({
+    timetableBlock.qbubble({
        id: entryId.toString(),
        content: {
            text: function(evt, api) {
@@ -570,8 +569,7 @@ function drawBalloon(self, evt, editable) {
                    api.set('content.text', content.html);
                    var $content = api.elements.content;
                    if (editable) {
-                       $duration = $content.find('.js-edit-time');
-                       $duration.ajaxqbubble({
+                       $content.find('.js-edit-time').ajaxqbubble({
                            url: build_url(Indico.Urls.Timetable.entries.editTime, params),
                            qBubbleOptions: {
                                style: {
@@ -580,7 +578,7 @@ function drawBalloon(self, evt, editable) {
                                position: {
                                    at: 'top center',
                                    my: 'bottom center',
-                                   target: $(timetableBlock)
+                                   target: timetableBlock
                                }
                            },
                            onClose: function(data) {
@@ -608,15 +606,13 @@ function drawBalloon(self, evt, editable) {
                            });
                        });
                    }
-                   $content.find('.push-balloon-back').each(function() {
-                       $(this).on('click', function() {
-                           $(balloonId).addClass('push-back');
-                       });
+                   $content.find('.close-balloon').on('click', function() {
+                       timetableBlock.qtip('hide');
                    });
                    // Change the target of the qTip position in order to open it at the mouse position
                    api.options.position.target = 'mouse';
-               }, function(xhr, status, error) {
-                   api.set('content.text', status + ': ' + error);
+               }, function(xhr) {
+                   handleAjaxError(xhr);
                });
 
                return $T.gettext('Loading...');
