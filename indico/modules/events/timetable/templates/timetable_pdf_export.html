@@ -1,0 +1,16 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'forms/_form.html' import form_fieldset, form_rows, form_row, form_header, form_footer %}
+
+{% block content %}
+    {{ form_header(form) }}
+    {% call form_fieldset(_('PDF Customisation')) %}
+        {{ form_rows(form, skip=form._pdf_options_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_('PDF Options')) %}
+        {{ form_rows(form, fields=form._pdf_options_fields) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Generate{% endtrans %}">
+        <button type="button" class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</button>
+    {% endcall %}
+{% endblock %}

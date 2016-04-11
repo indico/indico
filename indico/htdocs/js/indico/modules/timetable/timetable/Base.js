@@ -247,11 +247,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     pdf: function() {
-        window.location = build_url(Indico.Urls.ConfTimeTableCustomPDF, {
-            confId: this.eventInfo.id,
-            showDays: 'all',
-            showSessions: 'all'
-        });
+        window.location = build_url(Indico.Urls.ConfTimeTableCustomPDF, {confId: this.eventInfo.id});
     },
 
     fullScreen: function() {
