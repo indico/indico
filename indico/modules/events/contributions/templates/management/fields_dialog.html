@@ -3,9 +3,9 @@
 
 <div class="manage-contribution-fields">
     <div class="toolbar">
-        <button class="i-button arrow icon-plus highlight" data-toggle="dropdown">
+        <a class="i-button arrow icon-plus highlight" data-toggle="dropdown">
             {% trans %}New contribution field{% endtrans %}
-        </button>
+        </a>
         <ul class="dropdown">
             {% for form_type in custom_field_types %}
                 <li>
@@ -60,7 +60,7 @@
 
         var $dialog = $('.manage-contribution-fields');
 
-        $dialog.dropdown();
+        $dialog.find('.toolbar').dropdown();
 
         $dialog.on('indico:confirmed', '.js-delete-contribution-field', function(evt) {
             evt.preventDefault();
