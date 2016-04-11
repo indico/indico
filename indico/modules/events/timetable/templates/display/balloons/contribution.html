@@ -5,15 +5,15 @@
         <div class="title">{{ contrib.title }}</div>
         <div class="group right entry-action-buttons">
             {% if editable %}
-                <a class="icon-edit i-button-icon js-dialog-action push-balloon-back js-edit"
+                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                    title="{% trans %}Edit contribution{% endtrans %}"
                    data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"></a>
-                <a class="icon-shield i-button-icon push-balloon-back"
+                <a class="icon-shield i-button-icon close-balloon"
                    title="{% trans %}Manage contribution protection{% endtrans %}"
                    data-href="{{ url_for('contributions.manage_contrib_protection', contrib) }}"
                    data-title="{% trans %}Manage contribution protection{% endtrans %}"
                    data-ajax-dialog></a>
-                <a href="#" class="icon-remove i-button-icon push-balloon-back js-delete"
+                <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
                    title="{% trans %}Delete timetable entry{% endtrans %}"
                    data-title="{% trans title=contrib.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
                    data-confirm="{% trans title=contrib.title %}Are you sure you want to delete timetable entry '{{ title }}'?{% endtrans %}"></a>
@@ -28,12 +28,12 @@
     <dl class="i-data-list">
         {% if editable %}
             <dt>
-                <a class="icon-time i-button-icon js-edit-time push-balloon-back"
+                <a class="icon-time i-button-icon js-edit-time close-balloon"
                    title="{% trans %}Change time{% endtrans %}"></a>
             </dt>
             <dd>
                 <div class="duration">
-                    <a class="js-edit-time push-balloon-back"
+                    <a class="js-edit-time close-balloon"
                        title="{% trans %}Change time{% endtrans %}">
                         {{- contrib.start_dt | format_time(timezone=contrib.event_new.timezone) }} -
                         {{ contrib.end_dt | format_time(timezone=contrib.event_new.timezone) -}}
@@ -76,7 +76,7 @@
         </div>
         {% if editable %}
             <div class="group right entry-action-buttons">
-                <a class="attribute-settings icon-settings push-balloon-back"
+                <a class="attribute-settings icon-settings close-balloon"
                    title="{% trans %}Manage subcontributions{% endtrans %}"
                    data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
                    data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"

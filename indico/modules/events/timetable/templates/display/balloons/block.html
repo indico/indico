@@ -15,10 +15,10 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Block{% endtrans %}</div>
             <div class="group right entry-action-buttons">
-                <a class="icon-edit i-button-icon js-dialog-action push-balloon-back js-edit"
+                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                    title="{% trans %}Edit block{% endtrans %}"
                    data-title="{% trans title=block.title %}Edit block '{{ title }}'{% endtrans %}"></a>
-                <a href="#" class="icon-remove i-button-icon push-balloon-back js-delete"
+                <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
                    title="{% trans %}Delete timetable entry{% endtrans %}"
                    data-title="{% trans title=block.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
                    data-confirm="{% trans title=block.title %}Are you sure you want to delete the session block '{{ title }}'?{% endtrans %}"></a>
@@ -28,13 +28,13 @@
     </div>
     <dl class="i-data-list">
         <dt>
-            <a class="icon-time i-button-icon js-edit-time push-balloon-back"
+            <a class="icon-time i-button-icon js-edit-time close-balloon"
                title="{% trans %}Change time{% endtrans %}">
             </a>
         </dt>
         <dd>
             <div class="duration">
-                <a class="js-edit-time push-balloon-back" title="{% trans %}Change time{% endtrans %}">
+                <a class="js-edit-time close-balloon" title="{% trans %}Change time{% endtrans %}">
                     {{- block.start_dt | format_time(timezone=block.event_new.timezone) }} - {{ block.end_dt | format_time(timezone=block.event_new.timezone) -}}
                 </a>
             </div>
@@ -52,11 +52,11 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Session{% endtrans %}</div>
             <div class="group right entry-action-buttons">
-                <a class="icon-edit i-button-icon js-dialog-action push-balloon-back js-edit"
+                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                    title="{% trans %}Edit session{% endtrans %}"
                    data-extra-params='{"edit_session": 1}'
                    data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
-                <a class="icon-shield i-button-icon push-balloon-back"
+                <a class="icon-shield i-button-icon close-balloon"
                    title="{% trans %}Manage protection{% endtrans %}"
                    data-href="{{ url_for('sessions.session_protection', block.session) }}"
                    data-title="{% trans %}Manage session protection{% endtrans %}"
