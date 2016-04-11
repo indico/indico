@@ -1,18 +1,18 @@
 {% block page %}
     <div class="{% block page_class %}management-page{% endblock %}">
         <header>
-            <div class="title-with-actions">
+            <div class="{% if self.page_actions() %}title-with-actions{% endif %}">
                 <div class="title">
                     <h2>{% block title %}{% endblock %}</h2>
                     {% if self.subtitle() -%}
                         <h3>{% block subtitle %}{% endblock %}</h3>
                     {% endif %}
                 </div>
-                <div class="actions">
-                    {% if self.page_actions() %}
+                {% if self.page_actions() %}
+                    <div class="actions">
                         {% block page_actions %}{% endblock %}
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
             </div>
             {% if self.description() -%}
                 <div class="description">
