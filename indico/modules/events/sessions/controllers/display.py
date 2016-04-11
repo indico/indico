@@ -24,7 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_sessions_for_user, serialize_session_for_ical
-from indico.modules.events.sessions.views import WPDisplayMySessionsConference
+from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
@@ -66,10 +66,9 @@ class RHDisplaySession(RHDisplaySessionBase):
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions')
         session_contribs = [c for c in self.session.contributions if not c.is_deleted]
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
-        return WPDisplayMySessionsConference.render_template('display/session_display.html', self._conf,
-                                                             sess=self.session, event=self.event_new,
-                                                             session_contribs=session_contribs, timezone=tz,
-                                                             **ical_params)
+        return WPDisplaySession.render_template('display/session_display.html', self._conf, sess=self.session,
+                                                event=self.event_new, session_contribs=session_contribs, timezone=tz,
+                                                **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):

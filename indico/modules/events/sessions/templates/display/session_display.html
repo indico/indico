@@ -7,9 +7,13 @@
 
 {% block page_class %}conference-page item-summary{% endblock %}
 
-{% block title -%}
-    {% trans title=sess.title %}{{ title }}{% endtrans %}
-{%- endblock %}
+{% block title %}
+    {% trans %}Session{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {{ sess.title }}
+{% endblock %}
 
 {% block description %}
     <div class="time-data">
