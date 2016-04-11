@@ -54,19 +54,23 @@
             {% endif %}
         </dd>
     </dl>
-    <span class="hr"></span>
-    <dl class="i-data-list thirty-seventy">
-        <dt>{% trans count=contrib.speaker_names|count %}Presenter{% pluralize %}Presenters{% endtrans %}</dt>
-        <dd>
-            {% for speaker in contrib.speakers | sort(attribute='full_name') -%}
-                <div>{{ speaker.full_name }}</div>
-            {%- endfor %}
-        </dd>
-        {% if editable %}
-            <dt>{% trans %}Material{% endtrans %}</dt>
-            <dd>{{ render_attachment_info(contrib) }}</dd>
-        {% endif %}
-    </dl>
+    {% if contrib.speaker_names or editable %}
+        <span class="hr"></span>
+        <dl class="i-data-list thirty-seventy">
+            {% if contrib.speaker_names %}
+                <dt>{% trans count=contrib.speaker_names|count %}Presenter{% pluralize %}Presenters{% endtrans %}</dt>
+                <dd>
+                    {% for speaker in contrib.speakers | sort(attribute='full_name') -%}
+                        <div>{{ speaker.full_name }}</div>
+                    {%- endfor %}
+                </dd>
+            {% endif %}
+            {% if editable %}
+                <dt>{% trans %}Material{% endtrans %}</dt>
+                <dd>{{ render_attachment_info(contrib) }}</dd>
+            {% endif %}
+        </dl>
+    {% endif %}
     <span class="hr"></span>
     <div class="attribute">
         <div class="attribute-title">
