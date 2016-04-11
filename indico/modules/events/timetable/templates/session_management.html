@@ -1,0 +1,11 @@
+{% extends 'events/timetable/management.html' %}
+
+{% block subtitle %}
+    {% trans title=session_.title%}
+        Session: {{ title }}
+    {% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ render_timetable(timetable_data, event_info, management=true, is_session=True) }}
+{% endblock %}
