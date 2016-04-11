@@ -47,27 +47,24 @@ _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/move', 'move_timeta
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/change-datetime', 'change_datetime',
                  RHLegacyChangeTimetableEntryDatetime, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/sessions/<int:session_id>', 'manage_session', RHManageSessionTimetable)
+_bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
 
 # Timetable legacy operations
-_bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
-_bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution,
-                 methods=('POST',))
-_bp.add_url_rule('/manage/timetable/block/<block_id>/fit', 'fit_session_block', RHLegacyTimetableFitBlock,
-                 methods=('POST',))
-_bp.add_url_rule('/manage/timetable/reschedule', 'reschedule', RHLegacyTimetableReschedule, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/add-break',
-                 'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/add-contribution',
-                 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry,
-                 methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/time', 'edit_entry_time',
-                 RHLegacyTimetableEditEntryTime, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/add-session-block',
-                 'add_session_block', RHLegacyTimetableAddSessionBlock, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
+with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/manage/timetable'):
+    _bp.add_url_rule('/entry/<int:timetable_entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry,
+                     methods=('GET', 'POST'))
+    _bp.add_url_rule('/entry/<int:timetable_entry_id>/edit/time', 'edit_entry_time', RHLegacyTimetableEditEntryTime,
+                     methods=('GET', 'POST'))
+    _bp.add_url_rule('/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
+    _bp.add_url_rule('/block/<block_id>/fit', 'fit_session_block', RHLegacyTimetableFitBlock, methods=('POST',))
+    _bp.add_url_rule('/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
+    _bp.add_url_rule('/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
+    _bp.add_url_rule('/reschedule', 'reschedule', RHLegacyTimetableReschedule, methods=('POST',))
+    _bp.add_url_rule('/add-break', 'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
+    _bp.add_url_rule('/add-contribution', 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
+    _bp.add_url_rule('/add-session-block', 'add_session_block', RHLegacyTimetableAddSessionBlock,
+                     methods=('GET', 'POST'))
 
 
 # Display

@@ -458,6 +458,9 @@ type("TimetableManagementActions", [], {
         if (self.session !== null) {
             args.session_block_id = self.session.sessionSlotId;
         }
+        if (self.timetable.contextInfo.sessionId) {
+            args.session_id = self.timetable.contextInfo.sessionId;
+        }
         ajaxDialog({
             trigger: self,
             url: build_url(Indico.Urls.Timetable.breaks.add, args),
@@ -538,6 +541,9 @@ type("TimetableManagementActions", [], {
             'session': params.session,
             'day': params.selectedDay
         };
+        if (self.timetable.contextInfo.sessionId) {
+            args.session_id = self.timetable.contextInfo.sessionId;
+        }
         ajaxDialog({
             trigger: this,
             url: build_url(Indico.Urls.Timetable.sessionBlocks.add, args),
