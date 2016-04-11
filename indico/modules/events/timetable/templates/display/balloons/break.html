@@ -1,3 +1,5 @@
+{% from 'events/timetable/display/balloons/_balloon_utils.html' import render_time_and_location %}
+
 <div class="balloon">
     <div class="title-container">
         <div class="title">{{ break_.title }}</div>
@@ -14,35 +16,5 @@
         {% endif %}
     </div>
     <div class="description">{{ break_.description }}</div>
-    <dl class="i-data-list">
-        {% set tt_entry = break_.timetable_entry %}
-        {% if editable %}
-            <dt>
-                <a class="icon-time i-button-icon js-edit-time close-balloon"
-                   title="{% trans %}Change time{% endtrans %}"></a>
-            </dt>
-            <dd>
-                <div class="duration">
-                    <a class="js-edit-time close-balloon"
-                       title="{% trans %}Change time{% endtrans %}">
-                        {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
-                        {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
-                    </a>
-                </div>
-            </dd>
-        {% else %}
-            <dt class="icon-time"></dt>
-            <dd>
-                {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
-                {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
-            </dd>
-        {% endif %}
-        <dt><i class='icon-location'></i></dt>
-        <dd>
-            <div>{{ break_.room_name }} ({{ break_.venue_name }})</div>
-            {% if break_.address %}
-                <div class="address">{{ break_.address }}</div>
-            {% endif %}
-        </dd>
-    </dl>
+    {{ render_time_and_location(break_, editable) }}
 </div>

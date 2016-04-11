@@ -1,0 +1,35 @@
+{% macro render_time_and_location(obj, editable) %}
+    {% set tt_entry = obj.timetable_entry %}
+    <dl class="i-data-list">
+        {% if editable %}
+            <dt>
+                <a class="icon-time i-button-icon js-edit-time close-balloon"
+                   title="{% trans %}Change time{% endtrans %}"></a>
+            </dt>
+            <dd>
+                <div class="duration">
+                    <a class="js-edit-time close-balloon"
+                       title="{% trans %}Change time{% endtrans %}">
+                        {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
+                        {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
+                    </a>
+                </div>
+            </dd>
+        {% else %}
+            <dt class="icon-time"></dt>
+            <dd>
+                {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
+                {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
+            </dd>
+        {% endif %}
+        {% if obj.venue_name %}
+            <dt><i class='icon-location'></i></dt>
+            <dd>
+                <div>{{ obj.room_name }} ({{ obj.venue_name }})</div>
+                {% if obj.address %}
+                    <div class="address">{{ obj.address }}</div>
+                {% endif %}
+            </dd>
+        {% endif %}
+    </dl>
+{% endmacro %}
