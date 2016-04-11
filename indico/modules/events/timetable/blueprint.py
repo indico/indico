@@ -27,7 +27,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryTime,
                                                                 RHLegacyTimetableEntryMove,
-                                                                RHLegacyChangeTimetableEntryDatetime)
+                                                                RHLegacyChangeTimetableEntryDatetime,
+                                                                RHLegacyTimetableExportPDF)
 from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST, RHTimetableBalloon
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -66,5 +67,7 @@ _bp.add_url_rule('/manage/timetable/add-session-block',
                  'add_session_block', RHLegacyTimetableAddSessionBlock, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
 
+
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
+_bp.add_url_rule('/timetable/pdf', 'export_pdf', RHLegacyTimetableExportPDF, methods=('GET', 'POST'))

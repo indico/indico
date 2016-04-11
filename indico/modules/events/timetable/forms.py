@@ -19,9 +19,10 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 
 from pytz import utc
-from wtforms.fields import StringField, TextAreaField
-from wtforms.validators import DataRequired, ValidationError, InputRequired
+from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, IntegerField
+from wtforms.validators import DataRequired, ValidationError, InputRequired, NumberRange
 from wtforms_components import TimeField
+from wtforms.widgets.html5 import NumberInput
 
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
@@ -30,7 +31,9 @@ from indico.modules.events.timetable.util import find_next_start_dt
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import TimeDeltaField, IndicoPalettePickerField, IndicoLocationField
-from indico.web.forms.validators import MaxDuration
+from indico.web.forms.util import get_form_field_names
+from indico.web.forms.validators import MaxDuration, HiddenUnless
+from indico.web.forms.widgets import SwitchWidget
 from indico.util.i18n import _
 
 
@@ -123,3 +126,59 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
     def __init__(self, *args, **kwargs):
         self._entry_type = kwargs.pop('entry').type
         super(BaseEntryForm, self).__init__(*args, **kwargs)
+
+
+class LegacyExportTimetablePDFForm(IndicoForm):
+    _pdf_options_fields = {'pagesize', 'fontsize', 'firstPageNumber'}
+
+    simplified = BooleanField(_('Simplified Timetable'), widget=SwitchWidget(),
+                              description=_("Enable to get a simplified version of the timetable"))
+
+    showCoverPage = BooleanField(_('Cover page'), [HiddenUnless('simplified', False)], default=True,
+                                 description=_('Whether to include cover page'))
+    showTableContents = BooleanField(_('Table of contents'), [HiddenUnless('simplified', False)], default=True,
+                                     description=_('Whether to include table of contents'))
+    showSessionTOC = BooleanField(_('Show sessions'), [HiddenUnless('showTableContents'),
+                                                       HiddenUnless('simplified', False)], default=True,
+                                  description=_('Whether to show the sessions inside the table of contents'))
+    showContribId = BooleanField(_('Contribution ID'), [HiddenUnless('simplified', False)], default=True,
+                                 description=_('Whether to print the ID of each contribution'))
+    showAbstract = BooleanField(_('Abstract content'), [HiddenUnless('simplified', False)],
+                                description=_('Print abstract content of all the contributions '))
+    dontShowPosterAbstract = BooleanField(_('Include abstract info'), [HiddenUnless('showAbstract')],
+                                          description=_('Do not print the abstract content for poster sessions'))
+    showLengthContribs = BooleanField(_('Contribution Length'), [HiddenUnless('simplified', False)],
+                                      description=_('Whether to include contribution length'))
+    showSpeakerTitle = BooleanField(_('Speaker title'), [HiddenUnless('simplified', False)], default=True,
+                                    description=_('Whether to include speaker title'))
+    showSpeakerAffiliation = BooleanField(_('Speaker affiliation'), [HiddenUnless('simplified', False)],
+                                          description=_('Whether to include speaker affiliation'))
+    newPagePerSession = BooleanField(_('New page for session'), [HiddenUnless('simplified', False)],
+                                     description=_('Print each session on separate page'))
+    useSessionColorCodes = BooleanField(_('Session colors'), [HiddenUnless('simplified', False)], default=True,
+                                        description=_('Whether to use session color codes'))
+    showSessionDescription = BooleanField(_('Session description'), [HiddenUnless('simplified', False)], default=True,
+                                          description=_("Whether to include session description"))
+    showContribsAtConfLevel = BooleanField(_('Top-level contribution'),
+                                           description=_("Whether to include contributions that are not inside any "
+                                                         "session"))
+    showBreaksAtConfLevel = BooleanField(_('Top-level breaks'),
+                                         description=_('Whether to include breaks that are not inside any session'))
+    printDateCloseToSessions = BooleanField(_('Start date'), [HiddenUnless('simplified', False)],
+                                            description=_('Print the start date close to session title'))
+    pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
+                                                    ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
+    fontsize = SelectField(_('Font size'), choices=[('xxx-small', _('xxx-small')), ('xx-small', _('xx-small')),
+                                                    ('x-small', _('x-small')), ('smaller', _('smaller')),
+                                                    ('small', _('small')), ('normal', _('normal')), ('large', _('large')),
+                                                    ('larger', _('larger'))], default='normal')
+    firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,
+                                   widget=NumberInput(step=1))
+
+    @property
+    def data_for_format(self):
+        if self.simplified.data:
+            fields = ('showContribsAtConfLevel', 'showBreaksAtConfLevel')
+        else:
+            fields = set(get_form_field_names(LegacyExportTimetablePDFForm)) - self._pdf_options_fields - {'csrf_token'}
+        return {x: getattr(self, x).data for x in fields}

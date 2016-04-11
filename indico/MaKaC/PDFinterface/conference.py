@@ -695,17 +695,17 @@ class TimeTablePlain(PDFWithTOC):
 
         lt = []
         date = format_time(contrib.start_dt, timezone=self._tz)
-        caption = '[{}] {}'.format(contrib.friendly_id, escape(contrib.title))
+        caption = u'[{}] {}'.format(contrib.friendly_id, escape(contrib.title))
 
         if not self._ttPDFFormat.showContribId():
             caption = escape(contrib.title)
         elif self._ttPDFFormat.showLengthContribs():
-            caption = "{} ({})".format(caption, format_human_timedelta(contrib.timetable_entry.duration))
+            caption = u"{} ({})".format(caption, format_human_timedelta(contrib.timetable_entry.duration))
         elif self._ttPDFFormat.showContribAbstract():
-            caption = '<font face="Times-Bold"><b>{}</b></font>'.format(caption)
+            caption = u'<font face="Times-Bold"><b>{}</b></font>'.format(caption)
 
         color_cell = ""
-        caption = '<font size="{}">{}</font>'.format(str(modifiedFontSize(10, self._fontsize)), caption)
+        caption = u'<font size="{}">{}</font>'.format(str(modifiedFontSize(10, self._fontsize)), caption)
         lt.append([self._fontify(caption, 10)])
 
         if self._useColors():
