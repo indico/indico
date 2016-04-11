@@ -60,26 +60,27 @@ class TimetableSerializer(object):
                 timetable[date_str][key] = data
         return timetable
 
-    def serialize_session_timetable(self, session_):
-        data = {}
+    def serialize_session_timetable(self, session_, without_blocks=False):
+        timetable = {}
         if session_.is_poster:
-            return data
+            return timetable
         tzinfo = session_.event_new.tzinfo
         start_dt = session_.start_dt.astimezone(tzinfo)
         end_dt = session_.end_dt.astimezone(tzinfo)
         for day in iterdays(start_dt, end_dt):
-            data[day.strftime('%Y%m%d')] = {}
+            timetable[day.strftime('%Y%m%d')] = {}
         for block in session_.blocks:
-            tt_entry = block.timetable_entry
-            if not tt_entry:
+            block_entry = block.timetable_entry
+            if not block_entry:
                 continue
-            for child_entry in tt_entry.children:
-                if not child_entry.can_view(session.user):
+            date_key = block_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
+            entries = block_entry.children if without_blocks else [block_entry]
+            for entry in entries:
+                if not entry.can_view(session.user):
                     continue
-                date_key = child_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
-                entry_key = self._get_entry_key(tt_entry) + 'l{}'.format(child_entry.id)
-                data[date_key][entry_key] = self.serialize_timetable_entry(child_entry)
-        return data
+                entry_key = self._get_entry_key(entry)
+                timetable[date_key][entry_key] = self.serialize_timetable_entry(entry, load_children=True)
+        return timetable
 
     def serialize_timetable_entry(self, entry, **kwargs):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
@@ -292,13 +293,10 @@ def serialize_session(sess):
         'protectionURL': '',
         'room': sess.room_name,
         'roomFullname': sess.room_name,
-        'sessionConveners': [],
+        'sessionConveners': [serialize_person_link(x) for x in sess.conveners],
         'startDate': _serialize_date(sess.start_dt) if sess.start_dt else '',
         'textColor': '#' + sess.colors.text,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
     }
-    for convener in sess.conveners:
-        convener_data = serialize_person_link(convener)
-        data['sessionConveners'].append(convener_data)
     return data

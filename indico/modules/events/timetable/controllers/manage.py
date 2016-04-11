@@ -23,30 +23,44 @@ from werkzeug.exceptions import BadRequest
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
-from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info, serialize_session
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.controllers import RHManageTimetableBase, RHManageTimetableEntryBase
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
 from indico.modules.events.timetable.views import WPManageTimetable
-from indico.modules.events.timetable.util import serialize_event_info
 from indico.modules.events.util import track_time_changes
 
 
 class RHManageTimetable(RHManageTimetableBase):
     """Display timetable management page"""
 
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.layout = request.args.get('layout', None)
-        if not self.layout:
-            self.layout = request.args.get('ttLyt', None)
-
     def _process(self):
         event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
         return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
-                                                 timetable_data=timetable_data, timetable_layout=self.layout)
+                                                 timetable_data=timetable_data)
+
+
+class RHManageSessionTimetable(RHManageTimetableBase):
+    """Display session timetable management page."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.session
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.session = self.event_new.get_session(request.view_args['session_id'])
+
+    def _process(self):
+        event_info = serialize_event_info(self.event_new)
+        event_info['timetableSession'] = serialize_session(self.session)
+        timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
+        return WPManageTimetable.render_template('session_management.html', self._conf, event_info=event_info,
+                                                 timetable_data=timetable_data, session_=self.session)
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
