@@ -28,6 +28,7 @@ from indico.modules.attachments.forms import (AddAttachmentFilesForm, AddAttachm
                                               EditAttachmentFileForm, EditAttachmentLinkForm)
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
+from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -116,16 +117,7 @@ class AddAttachmentLinkMixin:
     def _process(self):
         form = AddAttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
-            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
-            link = Attachment(user=session.user, type=AttachmentType.link)
-            form.populate_obj(link, skip={'acl'})
-            if link.is_self_protected:
-                link.acl = form.acl.data
-            link.folder = folder
-
-            db.session.flush()
-            logger.info('Attachment %s added by %s', link, session.user)
-            signals.attachments.attachment_created.send(link, user=session.user)
+            add_attachment_link(form.data, self.object)
             flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form,

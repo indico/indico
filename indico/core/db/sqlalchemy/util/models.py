@@ -132,13 +132,16 @@ class IndicoModel(Model):
             id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).one()[0]
         setattr(self, attr_name, id_)
 
-    def populate_from_dict(self, data):
+    def populate_from_dict(self, data, skip=None):
         """Populates the object with values in a dictionary
 
         :param data: a dict containing values to populate the object.
+        :param skip: If set, fields in that list are skipped.
         """
         cls = type(self)
         for key, value in data.iteritems():
+            if skip and key in skip:
+                continue
             if not hasattr(cls, key):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
             setattr(self, key, value)
