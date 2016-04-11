@@ -40,7 +40,8 @@ class ContribFieldConfigForm(IndicoForm):
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
                                description=_("Whether the user has to fill out the field"))
     is_active = BooleanField(_('Active'), widget=SwitchWidget(),
-                             description=_("Whether the field is available."))
+                             description=_("Whether the field is available."),
+                             default=True)
 
 
 class ContribField(BaseField):
