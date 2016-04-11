@@ -27,8 +27,9 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
 from indico.modules.events.contributions.operations import create_contribution, update_contribution
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
+from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.operations import update_session_block
+from indico.modules.events.sessions.operations import update_session_block, update_session
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm)
@@ -136,15 +137,23 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                     update_break_entry(break_, form.data)
                 return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)], flash=False)
         elif self.timetable_entry.session_block:
-            block = self.timetable_entry.session_block
-            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
-            form = SessionBlockEntryForm(obj=FormDefaults(block, time=tt_entry_dt.time()),
-                                         event=self.event_new, session_block=block, to_schedule=False,
-                                         day=tt_entry_dt.date())
-            if form.validate_on_submit():
-                with track_time_changes():
-                    update_session_block(block, form.data)
-                return jsonify_data(entries=[serialize_entry_update(block.timetable_entry)], flash=False)
+            if request.args.get('edit_session') == '1':
+                session_ = self.timetable_entry.session_block.session
+                form = SessionForm(obj=FormDefaults(session_), event=self.event_new)
+                if form.validate_on_submit():
+                    update_session(session_, form.data)
+                    return jsonify_data(entries=[serialize_entry_update(x.timetable_entry) for x in session_.blocks],
+                                        flash=False)
+            else:
+                block = self.timetable_entry.session_block
+                tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+                form = SessionBlockEntryForm(obj=FormDefaults(block, time=tt_entry_dt.time()),
+                                             event=self.event_new, session_block=block, to_schedule=False,
+                                             day=tt_entry_dt.date())
+                if form.validate_on_submit():
+                    with track_time_changes():
+                        update_session_block(block, form.data)
+                    return jsonify_data(entries=[serialize_entry_update(block.timetable_entry)], flash=False)
         self.commit = False
         return jsonify_form(form)
 
