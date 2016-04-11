@@ -24,7 +24,6 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -120,21 +119,7 @@ class SessionBlock(LocationMixin, db.Model):
         return '{}: {}'.format(self.session.title, self.title) if self.title else self.session.title
 
     def can_manage(self, user, allow_admin=True):
-        """Check whether a user can manage this session block.
-
-        This only applies to the block itself, not to contributions inside it.
-        """
-        if user is None:
-            return False
-        # full session manager can always manage blocks. this also includes event managers and higher.
-        elif self.session.can_manage(user, allow_admin=allow_admin):
-            return True
-        # session coordiator if block management is allowed
-        elif self.session.can_manage(user, 'coordinate') and session_coordinator_priv_enabled(self.event_new,
-                                                                                              'manage-blocks'):
-            return True
-        else:
-            return False
+        return self.session.can_manage_blocks(user, allow_admin=allow_admin)
 
     def can_manage_attachments(self, user):
         return self.session.can_manage_attachments(user)

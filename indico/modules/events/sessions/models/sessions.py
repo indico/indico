@@ -222,6 +222,24 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     def __repr__(self):
         return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
 
+    def can_manage_blocks(self, user, allow_admin=True):
+        """Check whether a user can manage session blocks.
+
+        This only applies to the blocks themselves, not to contributions inside them.
+        """
+        from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+        if user is None:
+            return False
+        # full session manager can always manage blocks. this also includes event managers and higher.
+        elif self.session.can_manage(user, allow_admin=allow_admin):
+            return True
+        # session coordiator if block management is allowed
+        elif (self.session.can_manage(user, 'coordinate') and
+                session_coordinator_priv_enabled(self.event_new, 'manage-blocks')):
+            return True
+        else:
+            return False
+
 
 Session.register_location_events()
 Session.register_protection_events()
