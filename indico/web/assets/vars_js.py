@@ -65,7 +65,7 @@ def generate_global_file(config):
             'ContribToPDF': urlHandlers.UHContribToPDF.getURL(_ignore_static=True).js_router,
 
             'ConfTimeTablePDF': urlHandlers.UHConfTimeTablePDF.getURL(_ignore_static=True).js_router,
-            'ConfTimeTableCustomPDF': urlHandlers.UHConfTimeTableCustomizePDF.getURL(_ignore_static=True).js_router,
+            'ConfTimeTableCustomPDF': url_rule_to_js('timetable.export_pdf'),
 
             'SessionModification': urlHandlers.UHSessionModification.getURL(_ignore_static=True).js_router,
             'ContributionModification': urlHandlers.UHContributionModification.getURL(_ignore_static=True).js_router,
