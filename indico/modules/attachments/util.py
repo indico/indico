@@ -104,8 +104,6 @@ def can_manage_attachments(obj, user):
         return True
     if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit'):
         return True
-    if isinstance(obj, db.m.Session) and obj.can_manage(user, 'coordinate'):
-        return True
     if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
         return True
     if isinstance(obj, db.m.SubContribution):
