@@ -42,7 +42,7 @@ from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMo
 from indico.modules.events.timetable.util import find_next_start_dt
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
@@ -127,6 +127,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                 with track_time_changes():
                     update_contribution(contrib, *_get_field_values(form.data))
                 return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
+            return jsonify_template('events/contributions/forms/contribution.html', form=form)
         elif self.timetable_entry.break_:
             break_ = self.timetable_entry.break_
             tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
