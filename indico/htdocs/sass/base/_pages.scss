@@ -21,7 +21,7 @@
 
 %indico-page {
     header {
-        $separator-margin: 0.4rem;
+        $separator-margin: 0.42rem;
         margin-bottom: 2em;
 
         h2, h3 {
@@ -51,8 +51,14 @@
             display: flex;
             padding-bottom: $separator-margin;
 
-            > .actions .i-button{
+            .toolbar {
+                margin-bottom: -3px;
                 margin-top: 3px;
+                padding: 0;
+
+                .group {
+                    margin-bottom: 0;
+                }
             }
         }
     }
