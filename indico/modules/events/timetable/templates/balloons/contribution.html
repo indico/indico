@@ -6,14 +6,16 @@
         <div class="title">{{ contrib.title }}</div>
         <div class="group right entry-action-buttons">
             {% if editable %}
-                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
-                   title="{% trans %}Edit contribution{% endtrans %}"
-                   data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"></a>
-                <a class="icon-shield i-button-icon close-balloon"
-                   title="{% trans %}Manage contribution protection{% endtrans %}"
-                   data-href="{{ url_for('contributions.manage_contrib_protection', contrib) }}"
-                   data-title="{% trans %}Manage contribution protection{% endtrans %}"
-                   data-ajax-dialog></a>
+                {% if can_manage_contributions %}
+                    <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                       title="{% trans %}Edit contribution{% endtrans %}"
+                       data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"></a>
+                    <a class="icon-shield i-button-icon close-balloon"
+                       title="{% trans %}Manage contribution protection{% endtrans %}"
+                       data-href="{{ url_for('contributions.manage_contrib_protection', contrib) }}"
+                       data-title="{% trans %}Manage contribution protection{% endtrans %}"
+                       data-ajax-dialog></a>
+                {% endif %}
                 <a class="icon-transmission i-button-icon close-balloon js-move"
                    title="{% trans %}Move contribution{% endtrans %}"></a>
                 <a class="icon-remove i-button-icon close-balloon js-delete"
@@ -34,8 +36,8 @@
         </div>
     </div>
     <div class="description">{{ contrib.description }}</div>
-    {{ render_time_and_location(contrib, editable) }}
-    {% if contrib.speaker_names or editable %}
+    {{ render_time_and_location(contrib, editable=can_manage_contributions) }}
+    {% if contrib.speaker_names or (editable and can_manage_contributions) %}
         <span class="hr"></span>
         <dl class="i-data-list thirty-seventy">
             {% if contrib.speaker_names %}
@@ -46,7 +48,7 @@
                     {%- endfor %}
                 </dd>
             {% endif %}
-            {% if editable %}
+            {% if editable and can_manage_contributions %}
                 <dt>{% trans %}Material{% endtrans %}</dt>
                 <dd>{{ render_attachment_info(contrib) }}</dd>
             {% endif %}
@@ -58,7 +60,7 @@
             {%- trans %}Subcontributions{% endtrans %}
             <span class="badge">{{ contrib.subcontribution_count }}</span>
         </div>
-        {% if editable %}
+        {% if editable and can_manage_contributions %}
             <div class="group right entry-action-buttons">
                 <a class="attribute-settings icon-settings close-balloon js-manage-subcontribs"
                    title="{% trans %}Manage subcontributions{% endtrans %}"
