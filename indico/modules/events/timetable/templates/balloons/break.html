@@ -8,8 +8,10 @@
                 <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                    title="{% trans %}Edit break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>
-                <a class="icon-transmission i-button-icon close-balloon js-move"
-                   title="{% trans %}Move break{% endtrans %}"></a>
+                {% if can_manage_event %}
+                    <a class="icon-transmission i-button-icon close-balloon js-move"
+                       title="{% trans %}Move break{% endtrans %}"></a>
+                {% endif %}
                 <a class="icon-remove i-button-icon close-balloon js-delete"
                    title="{% trans %}Delete break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Delete break '{{ title }}'?{% endtrans %}"

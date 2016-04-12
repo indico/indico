@@ -25,7 +25,7 @@ from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info, serialize_session
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.controllers import (RHManageTimetableBase, SessionManagementLevel, 
+from indico.modules.events.timetable.controllers import (RHManageTimetableBase, SessionManagementLevel,
                                                          RHManageTimetableEntryBase)
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
@@ -140,6 +140,7 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
 
     def _process(self):
         html = render_entry_info_balloon(self.entry, editable=True,
+                                         can_manage_event=self.event_new.can_manage(session.user),
                                          can_manage_session=self.session.can_manage(session.user),
                                          can_manage_blocks=self.session.can_manage_blocks(session.user),
                                          can_manage_contributions=self.session.can_manage_contributions(session.user))
