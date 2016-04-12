@@ -616,12 +616,15 @@ function loadBalloonContent(self, api, editable) {
             });
 
             $content.find('.js-move').on('click', function() {
-                var conferenceId = self.eventData.conferenceId[0];
-                var timetableEntryId = self.eventData.scheduleEntryId;
-
+                var urlArgs = {
+                    confId: self.eventData.conferenceId[0],
+                    entry_id: self.eventData.scheduleEntryId
+                };
+                if (self.timetable.contextInfo.sessionId) {
+                    urlArgs.session_id = self.timetable.contextInfo.sessionId;
+                }
                 ajaxDialog({
-                    url: build_url(Indico.Urls.Timetable.entry.move, {'confId': conferenceId,
-                                                                      'entry_id': timetableEntryId}),
+                    url: build_url(Indico.Urls.Timetable.entries.move, urlArgs),
                     data: {'day': self.timetable.currentDay},
                     title: $T.gettext("Move entry"),
                     trigger: this,

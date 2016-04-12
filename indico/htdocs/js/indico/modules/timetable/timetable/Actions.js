@@ -175,14 +175,19 @@ type("TimetableManagementActions", [], {
         info.set('reschedule', reschedule);
         info.set('sessionTimetable', this.isSessionTimetable);
 
+        var urlArgs = {
+            confId: eventData.conferenceId[0],
+            entry_id: eventData.scheduleEntryId
+        };
+
         if (exists(eventData.sessionId)) {
+            urlArgs.session_id = eventData.sessionId;
             info.set('session', eventData.sessionId);
             info.set('slot', eventData.sessionSlotId);
         }
 
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entry.changeDatetime, {confId: eventData.conferenceId[0],
-                                                                        entry_id: eventData.scheduleEntryId}),
+            url: build_url(Indico.Urls.Timetable.entries.editDatetime, urlArgs),
             method: 'POST',
             data: info.getAll(),
             error: function(xhr) {
@@ -214,9 +219,16 @@ type("TimetableManagementActions", [], {
             return false;
         }
 
+        var urlArgs = {
+            confId: eventData.conferenceId[0],
+            entry_id: eventData.scheduleEntryId
+        };
+        if (self.timetable.contextInfo.sessionId) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId;
+        }
+
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entry.move, {confId: eventData.conferenceId[0],
-                                                              entry_id: eventData.scheduleEntryId}),
+            url: build_url(Indico.Urls.Timetable.entries.move, urlArgs),
             method: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
