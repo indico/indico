@@ -14,16 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from copy import copy
-
 from werkzeug.exceptions import NotFound
 
 from MaKaC.review import Abstract
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
-from MaKaC.errors import NotFoundError, AccessError
-from MaKaC.conference import Reviewing, LocalFile
-from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
+from MaKaC.errors import NotFoundError
+from MaKaC.conference import LocalFile
 
 from indico.web.flask.util import send_file
 
@@ -36,14 +33,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             raise NotFoundError("The file you tried to access does not exist.")
 
     def _checkProtection( self ):
-        if isinstance(self._file.getOwner(), Reviewing):
-            selfcopy = copy(self)
-            selfcopy._target = self._file.getOwner().getContribution()
-            if not (RCContributionPaperReviewingStaff.hasRights(selfcopy) or \
-                selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
-                self._target.canModify( self.getAW() )):
-                raise AccessError()
-        elif isinstance(self._file.getOwner(), Abstract):
+        if isinstance(self._file.getOwner(), Abstract):
             RHDisplayBaseProtected._checkProtection(self)
         else:
             # superseded by attachments
