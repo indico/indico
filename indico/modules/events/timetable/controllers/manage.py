@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, session
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
@@ -55,7 +55,9 @@ class RHManageSessionTimetable(RHManageTimetableBase):
         event_info['timetableSession'] = serialize_session(self.session)
         timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
         return WPManageTimetable.render_template('session_management.html', self._conf, event_info=event_info,
-                                                 timetable_data=timetable_data, session_=self.session)
+                                                 timetable_data=timetable_data, session_=self.session,
+                                                 can_manage_session=self.session.can_manage(session.user),
+                                                 can_manage_blocks=self.session.can_manage_blocks(session.user))
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
