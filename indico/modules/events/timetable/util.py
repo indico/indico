@@ -17,7 +17,7 @@
 from collections import defaultdict
 from operator import attrgetter
 
-from flask import render_template
+from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload
@@ -240,18 +240,19 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     return result
 
 
-def render_entry_info_balloon(entry, editable=False, can_manage_event=False, can_manage_session=False,
-                              can_manage_blocks=False, can_manage_contributions=False):
+def render_entry_info_balloon(entry, editable=False, sess=None):
     if entry.break_:
         return render_template('events/timetable/balloons/break.html', break_=entry.break_, editable=editable,
-                               can_manage_event=can_manage_event)
+                               can_manage_event=entry.event_new.can_manage(session.user))
     elif entry.contribution:
         return render_template('events/timetable/balloons/contribution.html', contrib=entry.contribution,
-                               editable=editable, can_manage_event=can_manage_event,
-                               can_manage_contributions=can_manage_contributions)
+                               editable=editable,
+                               can_manage_event=entry.event_new.can_manage(session.user),
+                               can_manage_contributions=sess.can_manage_contributions(session.user) if sess else True)
     elif entry.session_block:
         return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
-                               can_manage_session=can_manage_session, can_manage_blocks=can_manage_blocks)
+                               can_manage_session=sess.can_manage(session.user) if sess else True,
+                               can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True)
     else:
         raise ValueError("Invalid entry")
 
