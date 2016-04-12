@@ -1090,10 +1090,6 @@ class UHSubContributionModification(URLHandler):
     _endpoint = 'event_mgmt.subContributionModification'
 
 
-class UHFileAccess(URLHandler):
-    _endpoint = 'files.getFile-access'
-
-
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
 
