@@ -41,8 +41,7 @@ class PaperFile(StoredFileMixin, db.Model):
         nullable=False
     )
     revision_id = db.Column(
-        db.Integer,
-        index=True
+        db.Integer
     )
     contribution = db.relationship(
         'Contribution',
