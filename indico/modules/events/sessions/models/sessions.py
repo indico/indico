@@ -222,6 +222,19 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     def __repr__(self):
         return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
 
+    def can_manage_contributions(self, user, allow_admin=True):
+        """Check whether a user can manage contributions within the session."""
+        from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+        if user is None:
+            return False
+        elif self.session.can_manage(user, allow_admin=allow_admin):
+            return True
+        elif (self.session.can_manage(user, 'coordinate') and
+                session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
+            return True
+        else:
+            return False
+
     def can_manage_blocks(self, user, allow_admin=True):
         """Check whether a user can manage session blocks.
 
