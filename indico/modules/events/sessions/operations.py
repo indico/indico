@@ -81,6 +81,8 @@ def delete_session(event_session):
 
 def update_session_block(session_block, data):
     """Update a session block with data passed in the `data` argument"""
+    from indico.modules.events.timetable.operations import update_timetable_entry
+
     start_dt = data.pop('start_dt', None)
     if start_dt is not None:
         update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
@@ -92,7 +94,7 @@ def update_session_block(session_block, data):
 
 
 def delete_session_block(session_block):
-    from indico.modules.events.timetable.operations import delete_timetable_entry, update_timetable_entry
+    from indico.modules.events.timetable.operations import delete_timetable_entry
     session_ = session_block.session
     for contribution in session_block.contributions:
         contribution.session_block = None
