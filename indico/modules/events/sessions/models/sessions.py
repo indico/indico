@@ -186,30 +186,6 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
                 .distinct(SessionBlockPersonLink.person_id)
                 .all())
 
-    @property
-    def start_dt(self):
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-        start_dt = (self.event_new.timetable_entries
-                    .with_entities(TimetableEntry.start_dt)
-                    .join('session_block')
-                    .filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK, SessionBlock.session == self)
-                    .first())
-        if start_dt:
-            return start_dt[0]
-
-    @property
-    def end_dt(self):
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-        block = (SessionBlock.query.with_parent(self)
-                 .join(TimetableEntry)
-                 .options(noload('*'))
-                 .options(load_only('id'))
-                 .options(contains_eager('timetable_entry').load_only('start_dt'))
-                 .order_by((TimetableEntry.start_dt + SessionBlock.duration).desc())
-                 .first())
-        if block:
-            return block.timetable_entry.end_dt
-
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, session_id=self.id)
