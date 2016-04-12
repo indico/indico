@@ -584,7 +584,8 @@ function loadBalloonContent(self, api, editable) {
                 }
             });
 
-            $content.on('indico:confirmed', '.js-delete', function(e) {
+            $content.on('indico:confirmed', '.js-delete', function(evt) {
+                evt.preventDefault()
                 self.managementActions.deleteEntry(self.eventData);
             })
             .on('ajaxDialog:closed', '.js-manage-attachments, .js-manage-subcontribs', function(e) {
