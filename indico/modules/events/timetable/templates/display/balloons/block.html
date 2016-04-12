@@ -16,14 +16,15 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Block{% endtrans %}</div>
             {% if editable %}
+                {% set title=' \'{}\''.format(block.title) if block.title else '' %}
                 <div class="group right entry-action-buttons">
                     <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
-                       title="{% trans %}Edit block{% endtrans %}"
-                       data-title="{% trans title=block.title %}Edit block '{{ title }}'{% endtrans %}"></a>
+                       title="{% trans %}Edit session block{% endtrans %}"
+                       data-title="{% trans title=title %}Edit session block{{ title }}{% endtrans %}"></a>
                     <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
-                       title="{% trans %}Delete timetable entry{% endtrans %}"
-                       data-title="{% trans title=block.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
-                       data-confirm="{% trans title=block.title %}Are you sure you want to delete the session block '{{ title }}'?{% endtrans %}"></a>
+                       title="{% trans %}Delete session block{% endtrans %}"
+                       data-title="{% trans title=title %}Delete session block{{ title }}?{% endtrans %}"
+                       data-confirm="{% trans title=title %}Are you sure you want to delete the session block{{ title }}?{% endtrans %}"></a>
                 </div>
             {% endif %}
         </div>
@@ -41,12 +42,12 @@
                        data-extra-params='{"edit_session": 1}'
                        data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
                     <a class="icon-shield i-button-icon close-balloon"
-                       title="{% trans %}Manage protection{% endtrans %}"
+                       title="{% trans %}Manage session protection{% endtrans %}"
                        data-href="{{ url_for('sessions.session_protection', block.session) }}"
                        data-title="{% trans %}Manage session protection{% endtrans %}"
                        data-ajax-dialog></a>
                 {% else %}
-                    <a class="icon-list i-button-icon" title="{% trans %}View details{% endtrans %}"
+                    <a class="icon-list i-button-icon" title="{% trans %}View session details{% endtrans %}"
                        href="{{ url_for('sessions.display_session', block.session) }}"></a>
                 {% endif %}
             </div>
