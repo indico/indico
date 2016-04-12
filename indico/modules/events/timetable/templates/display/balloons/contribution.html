@@ -53,7 +53,7 @@
         </div>
         {% if editable %}
             <div class="group right entry-action-buttons">
-                <a class="attribute-settings icon-settings close-balloon"
+                <a class="attribute-settings icon-settings close-balloon js-manage-subcontribs"
                    title="{% trans %}Manage subcontributions{% endtrans %}"
                    data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
                    data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
