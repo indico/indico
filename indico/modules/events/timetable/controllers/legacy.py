@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import Counter
 from datetime import timedelta
+from pytz import utc
 
 import dateutil.parser
 from flask import request, jsonify
@@ -337,8 +338,9 @@ class RHLegacyChangeTimetableEntryDatetime(RHManageTimetableEntryBase):
     """Changes the start_dt of a `TimetableEntry`"""
 
     def _process(self):
-        new_start_dt = as_utc(dateutil.parser.parse(request.form.get('startDate'))).astimezone(self.event_new.tzinfo)
-        new_end_dt = as_utc(dateutil.parser.parse(request.form.get('endDate'))).astimezone(self.event_new.tzinfo)
+        new_start_dt = self.event_new.tzinfo.localize(
+            dateutil.parser.parse(request.form.get('startDate'))).astimezone(utc)
+        new_end_dt = self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('endDate'))).astimezone(utc)
         new_duration = new_end_dt - new_start_dt
         is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
         tz = self.event_new.tzinfo
