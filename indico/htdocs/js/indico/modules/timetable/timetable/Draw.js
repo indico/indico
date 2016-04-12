@@ -587,8 +587,7 @@ function drawBalloon(self, evt, editable) {
                                }
                            }
                        });
-
-                       $content.find('.js-delete').on('click', function() {
+                       $content.on('indico:confirmed', '.js-delete', function(e) {
                            self.managementActions.deleteEntry(self.eventData);
                        });
 
