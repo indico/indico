@@ -621,7 +621,7 @@ function loadBalloonContent(self, api, editable) {
 
                 ajaxDialog({
                     url: build_url(Indico.Urls.Timetable.entry.move, {'confId': conferenceId,
-                                                                      'timetable_entry_id': timetableEntryId}),
+                                                                      'entry_id': timetableEntryId}),
                     data: {'day': self.timetable.currentDay},
                     title: $T.gettext("Move entry"),
                     trigger: this,

@@ -182,7 +182,7 @@ type("TimetableManagementActions", [], {
 
         return $.ajax({
             url: build_url(Indico.Urls.Timetable.entry.changeDatetime, {confId: eventData.conferenceId[0],
-                                                                        timetable_entry_id: eventData.scheduleEntryId}),
+                                                                        entry_id: eventData.scheduleEntryId}),
             method: 'POST',
             data: info.getAll(),
             error: function(xhr) {
@@ -216,7 +216,7 @@ type("TimetableManagementActions", [], {
 
         return $.ajax({
             url: build_url(Indico.Urls.Timetable.entry.move, {confId: eventData.conferenceId[0],
-                                                              timetable_entry_id: eventData.scheduleEntryId}),
+                                                              entry_id: eventData.scheduleEntryId}),
             method: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
