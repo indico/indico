@@ -55,13 +55,10 @@
     </div>
     {% if editable %}
         <dl class="i-data-list thirty-seventy">
-            <dt>{% trans %}Color{% endtrans %}</dt>
-            <dd>
-                <a class="i-button icon-palette palette-picker-trigger close-balloon js-edit"
-                   style="{{ block.session.colors.css }}"
-                   data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"
-                   data-extra-params='{"edit_session": 1}'></a>
-            </dd>
+            <a class="i-button icon-palette palette-picker-trigger close-balloon js-edit"
+               style="{{ block.session.colors.css }}"
+               data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"
+               data-extra-params='{"edit_session": 1}'></a>
         </dl>
     {% endif %}
     <span class="hr"></span>
