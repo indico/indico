@@ -909,12 +909,15 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         if (this._allowCreateHere('Contribution')){
             $('<a href="#"/>').text($T('Contribution')).bind('menu_select', function() {
                 self.managementActions.addContribution();
+                // Dirty hack to avoid Chrome glitch
+                $(this).closest('.group').dropdown('close');
                 return false;
             }).appendTo(ul).wrap("<li/>");
         }
         if (this._allowCreateHere('Break')){
             $('<a href="#"/>').text($T('Break')).bind('menu_select', function() {
                 self.managementActions.addBreak();
+                $(this).closest('.group').dropdown('close');
                 return false;
             }).appendTo(ul).wrap("<li/>");
         }
