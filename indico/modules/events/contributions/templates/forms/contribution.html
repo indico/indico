@@ -2,7 +2,7 @@
 
 {%- block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, skip=('references', 'keywords') + form.custom_field_names) }}
+    {{ form_rows(form, fields=fields or none, skip=('references', 'keywords') + form.custom_field_names) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
         {{ form_rows(form, fields=form.custom_field_names + ('references', 'keywords')) }}
     {% endcall %}
