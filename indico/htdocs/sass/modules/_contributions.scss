@@ -74,6 +74,32 @@
             display: inline-block;
         }
     }
+
+    .tablesorter {
+        .material-column {
+            width: 5em;
+        }
+
+        .id-column {
+            width: 3em;
+        }
+
+        .duration-column {
+            width: 5em;
+        }
+
+        .type-column {
+            width: 6em;
+        }
+
+        .actions-column {
+            width: 5em;
+        }
+
+        .title-column {
+            min-width: 10em;
+        }
+    }
 }
 
 #subcontribution-list {

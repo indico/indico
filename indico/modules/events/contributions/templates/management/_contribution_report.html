@@ -13,19 +13,19 @@
                             {% trans %}ID{% endtrans %}
                         </th>
                         <th class="i-table protection-column" data-sorter="false"></th>
-                        <th class="i-table">
+                        <th class="i-table title-column">
                             {% trans %}Title{% endtrans %}
                         </th>
                         <th class="i-table">
                             {% trans %}Time{% endtrans %}
                         </th>
-                        <th class="i-table">
+                        <th class="i-table duration-column">
                             {% trans %}Duration{% endtrans %}
                         </th>
                         <th class="i-table">
                             {% trans %}Presenters{% endtrans %}
                         </th>
-                        <th class="i-table">
+                        <th class="i-table type-column">
                             {% trans %}Type{% endtrans %}
                         </th>
                         <th class="i-table">
@@ -37,10 +37,10 @@
                         <th class="i-table">
                             {% trans %}Track{% endtrans %}
                         </th>
-                        <th class="i-table">
+                        <th class="i-table material-column">
                             {% trans %}Material{% endtrans %}
                         </th>
-                        <th>
+                        <th class="actions-column">
                             {# Actions #}
                         </th>
                     </tr>
@@ -50,7 +50,7 @@
                         <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
                             data-friendly-id="{{ contrib.friendly_id }}"
                             data-title="{{ contrib.title }}">
-                            <td class="i-table">
+                            <td class="i-table id-column">
                                 <span class="vertical-aligner">
                                     <input type="checkbox" class="select-row" name="contribution_id"
                                            value="{{ contrib.id }}">
@@ -65,9 +65,9 @@
                                               {% elif contrib.is_public %}public-protection-icon{% endif %}"></i>
                                 </span>
                             </td>
-                            <td class="i-table" data-searchable="{{ contrib.title | lower }}">
+                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}">
                                 <span class="vertical-aligner">
-                                    <strong>{{ contrib.title }}</strong>
+                                    {{ contrib.title }}
                                 </span>
                             </td>
                             <td class="i-table start-date">
@@ -91,7 +91,7 @@
                                     {%- endif %}
                                 </span>
                             </td>
-                            <td class="i-table">
+                            <td class="i-table duration-column">
                                 <span class="vertical-aligner">
                                     {% if not contrib.session_block %}
                                         <a href="#" class="icon-time js-contrib-duration"
@@ -111,7 +111,7 @@
                                     {%- endfor %}
                                 </span>
                             </td>
-                            <td class="i-table" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                            <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
                                 <span class="vertical-aligner">
                                     {% if contrib.type -%}
                                         {{ contrib.type.name }}
@@ -173,7 +173,7 @@
                                 </a>
                             </td>
                             {{ render_attachment_info(contrib) }}
-                            <td class="i-table">
+                            <td class="i-table actions-column">
                                 <div class="group right entry-action-buttons vertical-aligner">
                                     <a href="#" class="icon-edit i-button-icon js-dialog-action"
                                        data-href="{{ url_for('.manage_update_contrib', contrib) }}"
