@@ -971,7 +971,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         this.menu = $('<div class="group right"/>');
 
-        if (this.isSessionTimetable) {
+        if (this.isSessionTimetable && this.isTopLevel) {
             if (this.canManageBlocks) {
                 this.menu.append(this.addIntervalLink);
             }
@@ -996,7 +996,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         this.menu.children('a').addClass('i-button');
 
-        if (!this.contextInfo.isPoster && !this.isSessionTimetable) {
+        if (!this.contextInfo.isPoster && !this.isTopLevel) {
             this.menu.find('#add_new').after(this._createAddMenu(this.addMenuLink.parent()));
         }
 
@@ -1407,6 +1407,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
      function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
 
          this.isSessionTimetable = isSessionTimetable;
+         this.isTopLevel = true;
 
          this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
@@ -1527,6 +1528,8 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
 },
      function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
+         this.isSessionTimetable = isSessionTimetable;
+         this.isTopLevel = false;
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions, 'proportional');

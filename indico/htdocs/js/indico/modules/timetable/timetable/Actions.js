@@ -179,9 +179,11 @@ type("TimetableManagementActions", [], {
             confId: eventData.conferenceId[0],
             entry_id: eventData.scheduleEntryId
         };
+        if (self.isSessionTimetable) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId || self.timetable.contextInfo.timetableSession.id;
+        }
 
         if (exists(eventData.sessionId)) {
-            urlArgs.session_id = eventData.sessionId;
             info.set('session', eventData.sessionId);
             info.set('slot', eventData.sessionSlotId);
         }
@@ -223,7 +225,7 @@ type("TimetableManagementActions", [], {
             confId: eventData.conferenceId[0],
             entry_id: eventData.scheduleEntryId
         };
-        if (self.timetable.contextInfo.sessionId) {
+        if (self.isSessionTimetable) {
             urlArgs.session_id = self.timetable.contextInfo.sessionId;
         }
 
@@ -465,19 +467,19 @@ type("TimetableManagementActions", [], {
     addBreak: function() {
         var self = this;
         var params = self._addParams();
-        var args = {
+        var urlArgs = {
             confId: self.eventInfo.id,
             day: params.selectedDay
         };
         if (self.session !== null) {
-            args.session_block_id = self.session.sessionSlotId;
+            urlArgs.session_block_id = self.session.sessionSlotId;
         }
-        if (self.timetable.contextInfo.sessionId) {
-            args.session_id = self.timetable.contextInfo.sessionId;
+        if (self.isSessionTimetable) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId;
         }
         ajaxDialog({
             trigger: self,
-            url: build_url(Indico.Urls.Timetable.breaks.add, args),
+            url: build_url(Indico.Urls.Timetable.breaks.add, urlArgs),
             title: $T.gettext("Add break"),
             onClose: function(data) {
                 if (data) {
@@ -550,17 +552,17 @@ type("TimetableManagementActions", [], {
     addSessionSlot: function(session) {
         var self = this;
         var params = this._addToSessionParams(session, 'SessionSlot');
-        var args = {
+        var urlArgs = {
             'confId': params.conference,
-            'session': params.session,
+            'session_id': params.session,
             'day': params.selectedDay
         };
-        if (self.timetable.contextInfo.sessionId) {
-            args.session_id = self.timetable.contextInfo.sessionId;
+        if (self.isSessionTimetable) {
+            urlArgs.session_id = self.timetable.contextInfo.timetableSession.id;
         }
         ajaxDialog({
             trigger: this,
-            url: build_url(Indico.Urls.Timetable.sessionBlocks.add, args),
+            url: build_url(Indico.Urls.Timetable.sessionBlocks.add, urlArgs),
             title: $T.gettext("Add session block"),
             onClose: function(data) {
                 if (data) {

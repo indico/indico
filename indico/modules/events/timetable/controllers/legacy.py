@@ -121,9 +121,9 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
     def _checkParams(self, params):
         RHLegacyTimetableAddEntryBase._checkParams(self, params)
         if not self.session:
-            self.session = self.event_new.get_session(request.args['session'])
-        elif self.session.id != request.args['session']:
-            raise BadRequest
+            self.session = self.event_new.get_session(request.args['session_id'])
+            if not self.session:
+                raise NotFound
 
     def _process(self):
         defaults = self._get_form_defaults()
