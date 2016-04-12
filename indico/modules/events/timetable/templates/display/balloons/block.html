@@ -54,14 +54,6 @@
         </div>
         <div class="title">{{ block.session.title }}</div>
     </div>
-    {% if editable %}
-        <dl class="i-data-list thirty-seventy">
-            <a class="i-button icon-palette palette-picker-trigger close-balloon js-edit"
-               style="{{ block.session.colors.css }}"
-               data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"
-               data-extra-params='{"edit_session": 1}'></a>
-        </dl>
-    {% endif %}
     <span class="hr"></span>
     <div class="attribute">
         <div class="attribute-title">
