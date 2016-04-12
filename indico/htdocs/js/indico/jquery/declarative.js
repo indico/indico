@@ -40,6 +40,14 @@
         $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href]):not(a[data-ajax-dialog][data-href])', function() {
             var $this = $(this);
             confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
+                var evt = $.Event('indico:confirmed');
+                $this.trigger(evt);
+
+                // Handle custom code
+                if (evt.isDefaultPrevented()) {
+                    return;
+                }
+
                 if ($this.is('form')) {
                     $this.submit();
                 } else {
