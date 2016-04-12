@@ -24,10 +24,10 @@
                     </span>
                 {%- endif %}
             </div>
+            {% if item.description %}
+                {{ render_description(item, class='break-description') }}
+            {% endif %}
         </div>
 
-        {% if item.description %}
-            {{ render_description(item, class='break-description') }}
-        {% endif %}
     </li>
 {% endmacro %}

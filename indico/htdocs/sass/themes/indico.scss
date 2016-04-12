@@ -337,15 +337,19 @@ div.event-header {
     .timetable-item-body {
         .timetable-title {
             text-align: center;
-            color: $tt-secondary-color !important;
+            color: darken($tt-secondary-color, 10%) !important;
         }
-        background: repeating-linear-gradient(
-            -40deg,
-            $tt-secondary-pastel,
-            $tt-secondary-pastel 10px,
-            lighten($tt-secondary-pastel, 0.5*$light-color-variation) 10px,
-            lighten($tt-secondary-pastel, 0.5*$light-color-variation) 20px
-        );
+
+        .timetable-item-header {
+            background: repeating-linear-gradient(
+                -40deg,
+                $tt-secondary-pastel,
+                $tt-secondary-pastel 10px,
+                lighten($tt-secondary-pastel, 0.5*$light-color-variation) 10px,
+                lighten($tt-secondary-pastel, 0.5*$light-color-variation) 20px
+            );
+            padding-bottom: 0.5em;
+        }
     }
 }
 
