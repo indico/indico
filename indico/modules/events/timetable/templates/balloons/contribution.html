@@ -16,8 +16,10 @@
                        data-title="{% trans %}Manage contribution protection{% endtrans %}"
                        data-ajax-dialog></a>
                 {% endif %}
-                <a class="icon-transmission i-button-icon close-balloon js-move"
-                   title="{% trans %}Move contribution{% endtrans %}"></a>
+                {% if can_manage_event %}
+                    <a class="icon-transmission i-button-icon close-balloon js-move"
+                       title="{% trans %}Move contribution{% endtrans %}"></a>
+                {% endif %}
                 <a class="icon-remove i-button-icon close-balloon js-delete"
                     {%- if contrib.event_new.type != 'conference' %}
                         data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"

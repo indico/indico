@@ -582,17 +582,23 @@ type("DroppableBlockMixin", [],
 
 type("DragAndDropBlockMixin", ["DroppableBlockMixin", "ResizableBlockMixin",
                                "DraggableBlockMixin", "TimeDisplacementManager"],
-     {
-         _postDraw: function() {
-             this._makeResizable();
-             this._makeDraggable();
-             this._makeDroppable();
-         }
-     }, function(){
-         this.TimeDisplacementManager(this.timetable);
-         this.element = $(this.block.dom);
-         this._grid = _(this.timetable.getTimetableDrawer().grid);
-     });
+    {
+        _postDraw: function() {
+            var entryType = this.eventData.entryType;
+            if (!this.timetable.isSessionTimetable || entryType != 'Session' || this.timetable.canManageBlocks) {
+                this._makeResizable();
+                this._makeDraggable();
+                this._makeDroppable();
+            }
+        }
+    },
+
+    function() {
+        this.TimeDisplacementManager(this.timetable);
+        this.element = $(this.block.dom);
+        this._grid = _(this.timetable.getTimetableDrawer().grid);
+    }
+);
 
 
 var activeTT;
