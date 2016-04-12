@@ -584,8 +584,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
         # Add the view as a parameter to keep track of the current layout
         # when exporting a pdf
         urlCustPDF.addParam("view", vars["currentView"])
-        vars["pdfURL"]=str(urlCustPDF)
-
 
         return vars
 
