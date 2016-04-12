@@ -431,12 +431,14 @@ class TimetableMigration(object):
             return value if value > 0 else None
 
         limitation = getattr(content_field, '_limitation', 'chars')
-        abstracts_settings.set(self.event, 'description_settings', {
-            'is_active': content_field._active,
+        settings = {
+            'is_active': bool(content_field._active),
             'is_required': bool(content_field._isMandatory),
             'max_words': _positive_or_none(content_field._maxLength) if limitation == 'words' else None,
             'max_length': _positive_or_none(content_field._maxLength) if limitation == 'chars' else None
-        })
+        }
+        if settings != abstracts_settings.defaults['description_settings']:
+            abstracts_settings.set(self.event, 'description_settings', settings)
 
     def _migrate_contribution_field(self, old_field, position):
         field_type = old_field.__class__.__name__
