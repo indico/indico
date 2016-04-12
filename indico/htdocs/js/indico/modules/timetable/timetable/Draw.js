@@ -587,7 +587,7 @@ function loadBalloonContent(self, api, editable) {
             $content.on('indico:confirmed', '.js-delete', function(e) {
                 self.managementActions.deleteEntry(self.eventData);
             })
-            .on('ajaxDialog:closed', '.js-manage-attachments', function(e) {
+            .on('ajaxDialog:closed', '.js-manage-attachments, .js-manage-subcontribs', function(e) {
                 api.set('content.text', function(evt, api) {
                     loadBalloonContent(self, api, editable);
                 });
