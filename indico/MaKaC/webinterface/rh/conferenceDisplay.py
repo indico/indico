@@ -674,41 +674,41 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
         filename = "%s-BookOfAbstracts.zip" % self._target.getTitle()
         zipdata = StringIO()
         zip = zipfile.ZipFile(zipdata, "w")
-        for cont in self._target.getContributionList():
+        for cont in self._target.as_event.contributions:
             f = []
-            f.append("""\\section*{%s}"""%cont.getTitle())
+            f.append("""\\section*{%s}""" % cont.title)
             f.append(" ")
             l = []
             affil = {}
             i = 1
-            for pa in cont.getPrimaryAuthorList():
-                if pa.getAffiliation() in affil.keys():
-                    num = affil[pa.getAffiliation()]
+            for pa in cont.primary_authors:
+                if pa.affiliation in affil.keys():
+                    num = affil[pa.affiliation]
                 else:
-                    affil[pa.getAffiliation()] = i
+                    affil[pa.affiliation] = i
                     num = i
                     i += 1
 
-                l.append("""\\noindent \\underline{%s}$^%d$"""%(pa.getFullName(), num))
+                l.append("""\\noindent \\underline{%s}$^%d$""" % (pa.full_name, num))
 
-            for ca in cont.getCoAuthorList():
-                if ca.getAffiliation() in affil.keys():
-                    num = affil[ca.getAffiliation()]
+            for ca in cont.secondary_authors:
+                if ca.affiliation in affil.keys():
+                    num = affil[ca.affiliation]
                 else:
-                    affil[ca.getAffiliation()] = i
+                    affil[ca.affiliation] = i
                     num = i
                     i += 1
-                l.append("""%s$^%d$"""%(ca.getFullName(), num))
+                l.append("""%s$^%d$""" % (ca.full_name, num))
 
             f.append(",\n".join(l))
             f.append("\n")
             l = []
             for key in affil.keys():
-                l.append("""$^%d$%s"""%(affil[key], key))
+                l.append("""$^%d$%s""" % (affil[key], key))
             f.append("\\noindent " + ",\n".join(l))
             f.append("\n")
-            f.append("""\\noindent %s"""%cont.getDescription())
-            zip.writestr("contribution-%s"%cont.getId(), "\n".join(f))
+            f.append("""\\noindent %s""" % cont.description)
+            zip.writestr("contribution-%s" % cont.id, "\n".join(f))
         zip.close()
         zipdata.seek(0)
 
