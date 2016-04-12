@@ -20,6 +20,7 @@ from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
@@ -33,6 +34,7 @@ from indico.modules.events.contributions.forms import (ContributionProtectionFor
                                                        ContributionTypeForm)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
+from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
@@ -43,6 +45,7 @@ from indico.modules.events.contributions.util import (ContributionReporter, gene
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.util import update_object_principals, track_time_changes
@@ -617,3 +620,43 @@ class RHManageDescriptionField(RHManageContributionsBase):
             abstracts_settings.set(self.event_new, 'description_settings', form.data)
             return jsonify_data(flash=False)
         return jsonify_form(form)
+
+class RHCreateReferenceMixin:
+    """Common methods for RH class creating a ContibutionReference or SubContributionReference"""
+
+    def _checkParams(self):
+        self.reference_value = request.form['value']
+        reference_type_name = request.form['type']
+        self.reference_type = ReferenceType.find_one(db.func.lower(ReferenceType.name) == reference_type_name.lower())
+
+    @staticmethod
+    def jsonify_reference(reference):
+        return jsonify(id=reference.id)
+
+
+class RHCreateContributionReferenceREST(RHCreateReferenceMixin, RHManageContributionBase):
+    """REST endpoint to add a reference to a Contribution"""
+
+    def _checkParams(self, params):
+        RHManageContributionBase._checkParams(self, params)
+        RHCreateReferenceMixin._checkParams(self)
+
+    def _process_POST(self):
+        reference = ContributionReference(reference_type=self.reference_type, value=self.reference_value,
+                                          contribution=self.contrib)
+        db.session.flush()
+        return self.jsonify_reference(reference)
+
+
+class RHCreateSubContributionReferenceREST(RHCreateReferenceMixin, RHManageSubContributionBase):
+    """REST endpoint to add a reference to a SubContribution"""
+
+    def _checkParams(self, params):
+        RHManageSubContributionBase._checkParams(self, params)
+        RHCreateReferenceMixin._checkParams(self)
+
+    def _process_POST(self):
+        reference = SubContributionReference(reference_type=self.reference_type, value=self.reference_value)
+        self.subcontrib.references.append(reference)
+        db.session.flush()
+        return self.jsonify_reference(reference)
