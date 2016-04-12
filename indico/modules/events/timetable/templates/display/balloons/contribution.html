@@ -15,13 +15,20 @@
                    data-title="{% trans %}Manage contribution protection{% endtrans %}"
                    data-ajax-dialog></a>
                 <a class="icon-transmission i-button-icon close-balloon js-move"
-                   title="{% trans %}Move{% endtrans %}"></a>
+                   title="{% trans %}Move contribution{% endtrans %}"></a>
                 <a class="icon-remove i-button-icon close-balloon js-delete"
-                   title="{% trans %}Delete timetable entry{% endtrans %}"
-                   data-title="{% trans title=contrib.title %}Delete timetable entry '{{ title }}'?{% endtrans %}"
-                   data-confirm="{% trans title=contrib.title %}Are you sure you want to delete timetable entry '{{ title }}'?{% endtrans %}"></a>
+                    {%- if contrib.event_new.type != 'conference' %}
+                        data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
+                        title="{% trans %}Delete contribution{% endtrans %}"
+                        data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution '{{ title }}'?{% endtrans %}"
+                    {% else %}
+                        data-title="{% trans title=contrib.title %}Delete contribution timetable entry '{{ title }}'?{% endtrans %}"
+                        title="{% trans %}Delete contribution timetable entry{% endtrans %}"
+                        data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution timetable entry '{{ title }}'?{% endtrans %}"
+                    {% endif %}>
+                </a>
             {% else %}
-                <a class="icon-list i-button-icon" title="{% trans %}View details{% endtrans %}"
+                <a class="icon-list i-button-icon" title="{% trans %}View contribution details{% endtrans %}"
                    href="{{ url_for('contributions.display_contribution', contrib) }}"></a>
             {% endif %}
         </div>
@@ -56,7 +63,7 @@
                 <a class="attribute-settings icon-settings close-balloon js-manage-subcontribs"
                    title="{% trans %}Manage subcontributions{% endtrans %}"
                    data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
-                   data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
+                   data-title="{% trans title=contrib.title %}Subcontributions of contribution '{{ title }}'{% endtrans %}"
                    data-ajax-dialog></a>
             </div>
         {% endif %}
