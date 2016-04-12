@@ -52,7 +52,7 @@
                     </div>
                 </div>
             % elif field.getType() == "input":
-                <input id=${fid} name=${fid} value="${fdict[fid]}" style="width:100%">
+                <input type="text" id=${fid} name=${fid} value="${fdict[fid]}" style="width:100%">
             % elif field.getType() == "selection":
                 <select id=${fid} name=${fid}>
                     <% nooption = "{0}...".format(_("Choose")) %>
