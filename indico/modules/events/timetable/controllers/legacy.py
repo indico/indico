@@ -166,7 +166,8 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                 with track_time_changes():
                     update_contribution(contrib, *_get_field_values(form.data))
                 return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
-            return jsonify_template('events/contributions/forms/contribution.html', form=form)
+            return jsonify_template('events/contributions/forms/contribution.html', form=form,
+                                    fields=form._display_fields)
         elif self.timetable_entry.break_:
             break_ = self.timetable_entry.break_
             tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
@@ -195,7 +196,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                         update_session_block(block, form.data)
                     return jsonify_data(entries=[serialize_entry_update(block.timetable_entry)], flash=False)
         self.commit = False
-        return jsonify_form(form)
+        return jsonify_form(form, fields=getattr(form, '_display_fields', None))
 
 
 class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
