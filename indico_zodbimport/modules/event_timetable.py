@@ -66,7 +66,7 @@ from indico.util.date_time import as_utc
 from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
 from indico.util.struct.iterables import committing_iterator
 
-from MaKaC.conference import _get_room_mapping
+from MaKaC.conference import _get_room_mapping, CustomLocation, CustomRoom
 
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import convert_principal, patch_default_group_provider
@@ -898,9 +898,11 @@ class TimetableMigration(object):
                            else getattr(old_entry, 'place', None))
         custom_room = (old_entry.rooms[0] if getattr(old_entry, 'rooms', None)
                        else getattr(old_entry, 'room', None))
-        new_entry.inherit_location = not custom_location
+        new_entry.inherit_location = not custom_location and not custom_room
         if new_entry.inherit_location:
             return
+        custom_location = custom_location or old_entry.getLocation() or CustomLocation()
+        custom_room = custom_room or old_entry.getRoom() or CustomRoom()
         # we don't inherit, so let's migrate the data we have
         # address is always allowed
         new_entry.address = (convert_to_unicode(fix_broken_string(custom_location.address, True))
