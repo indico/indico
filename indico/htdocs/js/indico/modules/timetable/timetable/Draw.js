@@ -649,7 +649,7 @@ function drawBalloon(self, evt, editable) {
         id: entryId.toString(),
         content: {
             text: function(evt, api) {
-                loadBalloonContent(self, api, editable);
+                return loadBalloonContent(self, api, editable);
             }
         },
         show: {
