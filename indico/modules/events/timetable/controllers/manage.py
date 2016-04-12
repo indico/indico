@@ -139,9 +139,5 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
         self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
-        html = render_entry_info_balloon(self.entry, editable=True,
-                                         can_manage_event=self.event_new.can_manage(session.user),
-                                         can_manage_session=self.session.can_manage(session.user),
-                                         can_manage_blocks=self.session.can_manage_blocks(session.user),
-                                         can_manage_contributions=self.session.can_manage_contributions(session.user))
+        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
         return jsonify(html=html)
