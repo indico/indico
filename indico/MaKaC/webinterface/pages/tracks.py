@@ -1119,46 +1119,6 @@ class WTrackModContribList(wcomponents.WTemplated):
         url.addParam("OK","1")
         return url
 
-    def _getContribHTML(self,contrib):
-        sdate = ""
-        if contrib.isScheduled():
-            sdate=contrib.getStartDate().strftime("%Y-%b-%d %H:%M" )
-        title = """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHContributionModification.getURL(contrib))), self.htmlText(contrib.getTitle()))
-        strdur = ""
-        if contrib.getDuration() is not None and contrib.getDuration().seconds != 0:
-            strdur = (datetime(1900,1,1)+ contrib.getDuration()).strftime("%Hh%M'")
-            dur = contrib.getDuration()
-            self._totaldur = self._totaldur + dur
-        l = []
-        for spk in contrib.getSpeakerList():
-            l.append( self.htmlText( spk.getFullName() ) )
-        speaker = "<br>".join( l )
-        session = ""
-        if contrib.getSession() is not None:
-            session=self.htmlText(contrib.getSession().getCode())
-        cType=""
-        if contrib.getType() is not None:
-            cType=self.htmlText(contrib.getType().getName())
-        status=contrib.getCurrentStatus()
-        statusCaption=ContribStatusList().getCode(status.__class__)
-        html = """
-            <tr>
-                <td><input type="checkbox" name="contributions" value=%s></td>
-                <td valign="top" class="abstractLeftDataCell">%s</td>
-                <td valign="top" nowrap class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-            </tr>
-                """%(contrib.getId(), self.htmlText(contrib.getId()),\
-                    sdate or "&nbsp;",strdur or "&nbsp;",cType or "&nbsp;",title or "&nbsp;",\
-                        speaker or "&nbsp;",session or "&nbsp;",\
-                        statusCaption or "&nbsp;")
-        return html
-
     def _getTypeItemsHTML(self):
         checked=""
         if self._filterCrit.getField("type").getShowNoValue():
@@ -1196,124 +1156,11 @@ class WTrackModContribList(wcomponents.WTemplated):
         return "<br>".join(res)
 
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["quickAccessURL"]=quoteattr(str(urlHandlers.UHTrackModContribQuickAccess.getURL(self._track)))
-        vars["filterPostURL"]=quoteattr(str(urlHandlers.UHTrackModContribList.getURL(self._track)))
-        vars["authSearch"]=""
-        authField=self._filterCrit.getField("author")
-        if authField is not None:
-            vars["authSearch"]=quoteattr(str(authField.getValues()[0]))
-        vars["types"]=self._getTypeItemsHTML()
-        vars["sessions"]=self._getSessionItemsHTML()
-        vars["status"]=self._getStatusItemsHTML()
-        sortingField = self._sortingCrit.getField()
-        self._currentSorting=""
-        if sortingField is not None:
-            self._currentSorting=sortingField.getId()
-        vars["currentSorting"]=""
-
-        url=self._getURL()
-        url.addParam("sortBy","number")
-        vars["numberImg"]=""
-        if self._currentSorting == "number":
-            vars["currentSorting"] ="""<input type="hidden" name="sortBy" value="number">"""
-            if self._order == "down":
-                vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["numberSortingURL"]=quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "date")
-        vars["dateImg"] = ""
-        if self._currentSorting == "date":
-            vars["currentSorting"]="""<input type="hidden" name="sortBy" value="date">"""
-            if self._order == "down":
-                vars["dateImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["dateImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["dateSortingURL"]=quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "name")
-        vars["titleImg"] = ""
-        if self._currentSorting == "name":
-            vars["currentSorting"]="""<input type="hidden" name="sortBy" value="name">"""
-            if self._order == "down":
-                vars["titleImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["titleImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["titleSortingURL"]=quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "speaker")
-        vars["speakerImg"]=""
-        if self._currentSorting=="speaker":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="speaker">"""
-            if self._order == "down":
-                vars["speakerImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["speakerImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["speakerSortingURL"]=quoteattr( str( url ) )
-
-        url = self._getURL()
-        url.addParam("sortBy","session")
-        vars["sessionImg"] = ""
-        if self._currentSorting == "session":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="session">"""
-            if self._order == "down":
-                vars["sessionImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["sessionImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["sessionSortingURL"] = quoteattr( str( url ) )
-
-        url = self._getURL()
-        url.addParam("sortBy", "type")
-        vars["typeImg"] = ""
-        if self._currentSorting == "type":
-            vars["currentSorting"]="""<input type="hidden" name="sortBy" value="type">"""
-            if self._order == "down":
-                vars["typeImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["typeSortingURL"] = quoteattr( str( url ) )
-
-        f=filters.SimpleFilter(self._filterCrit,self._sortingCrit)
-        numContribs=0
-        l=[]
-        contribsToPrint = []
-        for contrib in f.apply(self._track.getContributionList()):
-            l.append(self._getContribHTML(contrib))
-            numContribs+=1
-            contribsToPrint.append("""<input type="hidden" name="contributions" value="%s">"""%contrib.getId())
-        if self._order =="up":
-            l.reverse()
-        vars["contributions"] = "".join(l)
-        vars["contribsToPrint"] = "".join(contribsToPrint)
-        vars["numContribs"]=str(numContribs)
-        vars["contributionActionURL"]=quoteattr(str(urlHandlers.UHTrackModContributionAction.getURL(self._track)))
-        vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHTrackModToPDF.getURL(self._track)))
-        vars["participantListURL"]=quoteattr(str(urlHandlers.UHTrackModParticipantList.getURL(self._track)))
-        totaldur = self._totaldur
-        days = totaldur.days
-        hours = (totaldur.seconds)/3600
-        dayhours = (days * 24)+hours
-        mins = ((totaldur.seconds)/60)-(hours*60)
-        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
-        return vars
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["contributions"] = [contrib for contrib in self._conf.as_event.contributions
+                                  if contrib.track == self._track]
+        return wvars
 
 
 class WPModContribList(WPTrackModifBase):
