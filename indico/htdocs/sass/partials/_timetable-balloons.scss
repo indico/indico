@@ -31,16 +31,20 @@
             line-height: 1;
             display: inline-block;
             width: 73%;
+            color: $orange;
         }
 
         .balloon-subtitle {
-            color: $dark-gray;
+            color: $black;
         }
 
         &.session-block {
             .title {
-                font-size: 1.1em;
                 width: 100%;
+            }
+
+            .balloon-subtitle {
+                font-size: 0.9em;
             }
         }
 
