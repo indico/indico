@@ -1964,25 +1964,86 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             var topPx = 0;
             each(data, function(blockData, id) {
 
-                var editLink = Html.a({className: 'dropDownMenu', style: {fontWeight: 'bold'}}, $T('Edit'));
-                var menuItems = {};
-                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);}, display: $T('Basic edit')};
-                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edit')};
-                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(blockData), display: $T('Edit protection')};
-                editLink.observeClick(function() {
-                    var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
-                    var pos = editLink.getAbsolutePosition();
-                    menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
-                });
+                function createEditLink(blockData) {
+                    var link = $('<a>', {
+                        class: 'icon-edit i-button-icon',
+                        title: $T.gettext("Edit"),
+                        data: {
+                            title: $T.gettext("Edit poster"),
+                            confId: blockData.conferenceId[0],
+                            timetableEntryId: blockData.scheduleEntryId
+                        }
+                    }).on('click', function(evt, params) {
+                        var $this = $(this);
+                        var params = {
+                           'confId': $this.data('confId'),
+                           'timetable_entry_id': $this.data('timetableEntryId')
+                        };
+                        ajaxDialog({
+                            trigger: this,
+                            url: build_url(Indico.Urls.Timetable.entries.edit, params),
+                            title: $this.data('title'),
+                            onClose: function(data) {
+                                if (data && data.entries) {
+                                    self.managementActions._addEntries(data.entries);
+                                }
+                            }
+                        });
+                    });
 
-                var deleteLink = Html.a('fakeLink', "Delete");
-                deleteLink.observeClick(function() {
-                    self.managementActions.deleteEntry(blockData);
-                });
+                    return Html.$(link);
+                }
 
+                function createProtectionLink(blockData) {
+                    var link = $('<a>', {
+                        class: 'icon-shield i-button-icon',
+                        title: $T.gettext("Manage protection"),
+                        data: {
+                            title: $T.gettext("Manage poster protection"),
+                            confId: blockData.conferenceId[0],
+                            contribId: blockData.contributionId
+                        }
+                    }).on('click', function(evt) {
+                        var $this = $(this);
+                        var params = {
+                           'confId': $this.data('confId'),
+                           'contrib_id': $this.data('contribId'),
+                        };
+                        ajaxDialog({
+                            trigger: this,
+                            url: build_url(Indico.Urls.Timetable.contributions.protection, params),
+                            title: $this.data('title'),
+                            onClose: function(data) {
+                                if (data && data.entries) {
+                                    self.managementActions._addEntries(data.entries);
+                                }
+                            }
+                        });
+                    });
 
-                var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
-                var entryInfo = Html.div({},blockData.contributionId + " - " + blockData.title );
+                    return Html.$(link);
+                }
+
+                function createDeleteLink(blockData) {
+                    var link = $('<a>', {
+                        class: 'icon-remove i-button-icon',
+                        title: $T.gettext("Delete"),
+                        data: {
+                            title: $T.gettext("Delete poster"),
+                            confirm: $T.gettext("Are you sure you want to delete the poster?")
+                        }
+                    }).on('click', function(evt) {
+                        confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
+                            self.managementActions.deleteEntry(blockData);
+                        });
+                    });
+
+                    return Html.$(link);
+                }
+
+                var entryTools = Html.div({className: 'group right'}, createEditLink(blockData),
+                                          createProtectionLink(blockData), createDeleteLink(blockData));
+                var entryInfo = Html.div({},blockData.friendlyId + " - " + blockData.title );
                 var block = Html.div({className:'posterEntry'},
                     entryTools,
                     entryInfo,
