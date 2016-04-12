@@ -918,8 +918,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["defaultStyle"] = self._conf.as_event.theme
         vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
-        vars["addTypeURL"]=urlHandlers.UHConfAddContribType.getURL(self._conf)
-        vars["removeTypeURL"]=urlHandlers.UHConfRemoveContribType.getURL(self._conf)
         vars["title"]=self._conf.getTitle()
         if isStringHTML(self._conf.getDescription()):
             vars["description"] = self._conf.getDescription()
@@ -2854,49 +2852,6 @@ class WPModMoveContribsToSessionConfirmation(WPModifContribList):
         p={"postURL":urlHandlers.UHConfModMoveContribsToSession.getURL(self._conf),}
         return wc.getHTML(p)
 
-
-class WPConfEditContribType(WPConferenceModifBase):
-
-    sidemenu_option = 'general'
-
-    def __init__(self, rh, ct):
-        self._conf = ct.getConference()
-        self._contribType = ct
-        WPConferenceModifBase.__init__(self, rh, self._conf)
-
-    def _getPageContent( self, params ):
-        wc = WConfEditContribType(self._contribType)
-        params["saveURL"] = quoteattr(str(urlHandlers.UHConfEditContribType.getURL(self._contribType)))
-        return wc.getHTML(params)
-
-
-class WConfEditContribType(wcomponents.WTemplated):
-
-    def __init__(self, contribType):
-        self._contribType = contribType
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["ctName"] = self._contribType.getName()
-        vars["ctDescription"] = self._contribType.getDescription()
-
-        return vars
-
-class WPConfAddContribType(WPConferenceModifBase):
-
-    sidemenu_option = 'general'
-
-    def _getPageContent( self, params ):
-        wc = WConfAddContribType()
-        params["saveURL"] = quoteattr(str(urlHandlers.UHConfAddContribType.getURL(self._conf)))
-        return wc.getHTML(params)
-
-
-class WConfAddContribType(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        return vars
 
 class WAbstractsParticipantList(wcomponents.WTemplated):
 

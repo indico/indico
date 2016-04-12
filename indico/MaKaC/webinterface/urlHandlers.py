@@ -341,18 +341,6 @@ class UHConfPerformDataModif(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-dataPerform'
 
 
-class UHConfAddContribType(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-addContribType'
-
-
-class UHConfRemoveContribType(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-removeContribType'
-
-
-class UHConfEditContribType(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-editContribType'
-
-
 class UHConfModifCFAOptFld(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-abstractFields'
 
