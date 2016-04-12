@@ -60,7 +60,6 @@ def _sidemenu_items(sender, event, **kwargs):
     is_conference = event_type == 'conference'
     paper_review = event.as_legacy.getConfPaperReview()
     is_review_staff = paper_review.isInReviewingTeam(session.avatar)
-    is_review_manager = paper_review.isPaperReviewManager(session.avatar)
 
     if can_modify:
         yield SideMenuItem('general', _('General settings'),
@@ -80,10 +79,6 @@ def _sidemenu_items(sender, event, **kwargs):
         if can_modify and cfa_enabled:
             yield SideMenuItem('abstracts', _('Abstracts'),
                                url_for('event_mgmt.confModifCFA', event),
-                               section='organization')
-        if can_modify or is_review_manager:
-            yield SideMenuItem('contributions_old', _('Contributions (Old)'),
-                               url_for('event_mgmt.confModifContribList', event),
                                section='organization')
         if can_modify or is_review_staff:
             yield SideMenuItem('paper_reviewing', _('Paper Reviewing'),
