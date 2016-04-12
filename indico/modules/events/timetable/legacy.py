@@ -116,7 +116,8 @@ class TimetableSerializer(object):
                      'isPoster': block.session.is_poster,
                      'entries': entries,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
-                     'url': url_for('sessions.display_session', block.session)})
+                     'url': url_for('sessions.display_session', block.session),
+                     'friendlyId': block.session.friendly_id})
         return data
 
     def serialize_contribution_entry(self, entry):
@@ -139,7 +140,8 @@ class TimetableSerializer(object):
                      'sessionSlotId': block.id if block else None,
                      'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': contribution.title,
-                     'url': url_for('contributions.display_contribution', contribution)})
+                     'url': url_for('contributions.display_contribution', contribution),
+                     'friendlyId': contribution.friendly_id})
         return data
 
     def serialize_break_entry(self, entry, management=False):

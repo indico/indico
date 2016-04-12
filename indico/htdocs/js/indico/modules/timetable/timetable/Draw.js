@@ -771,14 +771,7 @@ type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockM
      {
          _getTitle: function(){
              var title = this.TimetableBlockNormal.prototype._getTitle.call(this);
-
-             if (this.eventData.entryType == "Session") {
-                 return this.eventData.sessionId + " - " + title;
-             } else if (this.eventData.entryType == "Contribution") {
-                 return this.eventData.contributionId + " - " + title;
-             }
-
-             return title;
+             return this.eventData.friendlyId ? this.eventData.friendlyId + " - " + title : title;
          }
      },
      function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementActions)
