@@ -455,10 +455,10 @@ class WMenuConferenceHeader( WConferenceHeader ):
             sessions = [ i18nformat(""" <select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
             for session in self._conf.getSessionList():
                 selected = ""
-                id = session.getId()
-                if id == selectedSession:
+                sid = session.friendly_id
+                if sid == selectedSession:
                     selected = "selected"
-                sessions.append(""" <option value="%s" %s>%s</option> """%(id, selected, session.getTitle()))
+                sessions.append(""" <option value="%s" %s>%s</option> """ % (sid, selected, session.title))
             sessions.append("</select>")
         else:
             sessions.append("""<input type="hidden" name="showSession" value="all">""")

@@ -887,8 +887,8 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
 
     def _getSessionItemsHTML( self ):
         items = [ i18nformat("""<option value="conf">--_("no session")--</option>""")]
-        for session in sorted(self._conf.getSessionList(), key=lambda s: natural_sort_key(s.getTitle().lower())):
-            items.append("""<option value="%s">%s</option>"""%(session.getId(), session.getTitle()))
+        for session in sorted(self._conf.getSessionList(), key=lambda s: natural_sort_key(s.title.lower())):
+            items.append("""<option value="%s">%s</option>"""%(session.friendly_id, session.title))
         return items
 
     def _checkNotificationTpl(self):

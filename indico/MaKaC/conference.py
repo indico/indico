@@ -2843,78 +2843,13 @@ class Conference(CommonObjectBase, Locatable):
         """
         return str(self.__sessionGenerator.newCount())
 
-    def addSession(self, new_session, check=2, session_id=None):
-        """Adds a new session object to the conference taking care of assigning
-            a new unique id to it
-        """
-        """check parameter:
-            0: no check at all
-            1: check and raise error in case of problem
-            2: check and adapt the owner dates"""
-
-        if self.hasSession(new_session):
-            return
-        if self.getSchedule().isOutside(new_session):
-            if check == 1:
-                raise MaKaCError(_("Cannot add this session  (Start:%s - End:%s) "
-                                   "Outside of the event's time table(Start:%s - End:%s)").format(
-                    new_session.getStartDate(),
-                    new_session.getEndDate(),
-                    self.getSchedule().getStartDate(),
-                    self.getSchedule().getEndDate()),
-                    "Event")
-            elif check == 2:
-                if self.getSchedule().getStartDate() > new_session.getStartDate():
-                    self.setStartDate(new_session.getStartDate())
-                if self.getSchedule().getEndDate() < new_session.getEndDate():
-                    self.setEndDate(new_session.getEndDate())
-        if session_id is not None:
-            session_id = session_id
-            # Keep ID counter up to date
-            self.__sessionGenerator.sync(session_id)
-        else:
-            session_id = self.__generateNewSessionId()
-        self.sessions[session_id] = new_session
-        new_session.includeInConference(self, session_id)
-        # keep the session coordinator index updated
-        for sc in new_session.getCoordinatorList():
-            self.addSessionCoordinator(new_session, sc)
-        self.notifyModification()
-
-    def hasSession(self,session):
-        if session != None and session.getConference()==self and \
-                self.sessions.has_key(session.getId()):
-            return True
-        return False
-
-    def removeSession(self,session, deleteContributions=False):
-        if self.hasSession(session):
-            for sc in session.getCoordinatorList():
-                self.removeSessionCoordinator(session,sc)
-
-            if deleteContributions:
-                for contrib in session.getContributionList():
-                    contrib.delete()
-
-            session.remove_attachments()
-
-            del self.sessions[session.getId()]
-            self._p_changed = True
-
-            session.delete()
-            self.notifyModification()
-
-    def recoverSession(self, session, check, isCancelled):
-        self.addSession(session, check, session.getId())
-        session.recover(isCancelled)
-
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
         """
         if not sessionId.isdigit():
             return None
-        return self.as_event.get_session(friendly_id=sessionId)
+        return self.as_event.get_session(friendly_id=int(sessionId))
 
     def getRoomList(self):
         roomList =[]
@@ -2928,25 +2863,10 @@ class Conference(CommonObjectBase, Locatable):
     def getSessionList( self ):
         """Retruns a list of the conference session objects
         """
-        return self.sessions.values()
-
-    def getSessionListSorted( self ):
-        """Retruns a sorted list of the conference sessions
-        """
-        res=[]
-        for entry in self.getSchedule().getEntries():
-            if isinstance(entry,LinkedTimeSchEntry) and \
-                                isinstance(entry.getOwner(),SessionSlot):
-                session=entry.getOwner().getSession()
-                if session not in res:
-                    res.append(session)
-        return res
-
-    def getSessionSlotList(self):
-        return [slot for session in self.sessions.values() for slot in session.getSlotList()]
+        return self.as_event.sessions
 
     def getNumberOfSessions(self):
-        return len(self.sessions)
+        return len(self.as_event.sessions)
 
     def _generateNewContributionId(self):
         """Returns a new unique identifier for the current conference
