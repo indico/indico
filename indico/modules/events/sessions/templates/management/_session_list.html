@@ -84,7 +84,8 @@
                                        data-title="{% trans %}Manage session protection{% endtrans %}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-time highlight i-button-icon"
+                                    <a href="{{ url_for('timetable.manage_session', sess) }}"
+                                       class="icon-time highlight i-button-icon"
                                        title="{% trans %}Go to this session timetable{% endtrans %}"></a>
                                     <a href="#" class="icon-remove highlight i-button-icon"
                                        title="{% trans %}Remove this session{% endtrans %}"

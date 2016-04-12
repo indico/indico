@@ -17,6 +17,7 @@
 from collections import defaultdict
 from operator import attrgetter
 
+from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload
@@ -239,11 +240,28 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     return result
 
 
+def render_entry_info_balloon(entry, editable=False, sess=None):
+    if entry.break_:
+        return render_template('events/timetable/balloons/break.html', break_=entry.break_, editable=editable,
+                               can_manage_event=entry.event_new.can_manage(session.user))
+    elif entry.contribution:
+        return render_template('events/timetable/balloons/contribution.html', contrib=entry.contribution,
+                               editable=editable,
+                               can_manage_event=entry.event_new.can_manage(session.user),
+                               can_manage_contributions=sess.can_manage_contributions(session.user) if sess else True)
+    elif entry.session_block:
+        return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
+                               can_manage_session=sess.can_manage(session.user) if sess else True,
+                               can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True)
+    else:
+        raise ValueError("Invalid entry")
+
+
 def render_session_timetable(session, timetable_layout=None, management=False):
     if not session.start_dt:
         # no scheduled sessions present
         return ''
-    timetable_data = TimetableSerializer().serialize_session_timetable(session)
+    timetable_data = TimetableSerializer().serialize_session_timetable(session, without_blocks=True)
     event_info = serialize_event_info(session.event_new)
     tpl = get_template_module('events/timetable/_timetable.html')
     return tpl.render_timetable(timetable_data, event_info, timetable_layout=timetable_layout, management=management)

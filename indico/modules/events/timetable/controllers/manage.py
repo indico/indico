@@ -17,36 +17,48 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
-from flask import request, jsonify, render_template
+from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
-from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info, serialize_session
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.controllers import RHManageTimetableBase, RHManageTimetableEntryBase
+from indico.modules.events.timetable.controllers import (RHManageTimetableBase, SessionManagementLevel,
+                                                         RHManageTimetableEntryBase)
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
+from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
-from indico.modules.events.timetable.util import serialize_event_info
 from indico.modules.events.util import track_time_changes
 
 
 class RHManageTimetable(RHManageTimetableBase):
     """Display timetable management page"""
 
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.layout = request.args.get('layout', None)
-        if not self.layout:
-            self.layout = request.args.get('ttLyt', None)
+    session_management_level = SessionManagementLevel.coordinate
 
     def _process(self):
         event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
         return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
-                                                 timetable_data=timetable_data, timetable_layout=self.layout)
+                                                 timetable_data=timetable_data)
+
+
+class RHManageSessionTimetable(RHManageTimetableBase):
+    """Display session timetable management page."""
+
+    session_management_level = SessionManagementLevel.coordinate
+
+    def _process(self):
+        event_info = serialize_event_info(self.event_new)
+        event_info['timetableSession'] = serialize_session(self.session)
+        timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
+        return WPManageTimetable.render_template('session_management.html', self._conf, event_info=event_info,
+                                                 timetable_data=timetable_data, session_=self.session,
+                                                 can_manage_session=self.session.can_manage(session.user),
+                                                 can_manage_blocks=self.session.can_manage_blocks(session.user))
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
@@ -117,24 +129,15 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-class RHTimetableBalloon(RHManageTimetableBase):
-    """Create the appropriate timetable entry balloon depending on the entry type."""
+class RHManageTimetableEntryInfo(RHManageTimetableBase):
+    """Display timetable entry info balloon in management mode."""
+
+    session_management_level = SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['timetable_entry_id'])
-                                .first_or_404())
-        self.editable = (request.args.get('editable') == '1')
+        self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
-        html = None
-        if self.timetable_entry.contribution:
-            html = render_template('events/timetable/display/balloons/contribution.html',
-                                   contrib=self.timetable_entry.contribution, editable=self.editable)
-        elif self.timetable_entry.break_:
-            html = render_template('events/timetable/display/balloons/break.html',
-                                   break_=self.timetable_entry.break_, editable=self.editable)
-        elif self.timetable_entry.session_block:
-            html = render_template('events/timetable/display/balloons/block.html',
-                                   block=self.timetable_entry.session_block, editable=self.editable)
+        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
         return jsonify(html=html)

@@ -186,30 +186,6 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
                 .distinct(SessionBlockPersonLink.person_id)
                 .all())
 
-    @property
-    def start_dt(self):
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-        start_dt = (self.event_new.timetable_entries
-                    .with_entities(TimetableEntry.start_dt)
-                    .join('session_block')
-                    .filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK, SessionBlock.session == self)
-                    .first())
-        if start_dt:
-            return start_dt[0]
-
-    @property
-    def end_dt(self):
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-        block = (SessionBlock.query.with_parent(self)
-                 .join(TimetableEntry)
-                 .options(noload('*'))
-                 .options(load_only('id'))
-                 .options(contains_eager('timetable_entry').load_only('start_dt'))
-                 .order_by((TimetableEntry.start_dt + SessionBlock.duration).desc())
-                 .first())
-        if block:
-            return block.timetable_entry.end_dt
-
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, session_id=self.id)
@@ -221,6 +197,37 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
+
+    def can_manage_contributions(self, user, allow_admin=True):
+        """Check whether a user can manage contributions within the session."""
+        from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+        if user is None:
+            return False
+        elif self.session.can_manage(user, allow_admin=allow_admin):
+            return True
+        elif (self.session.can_manage(user, 'coordinate') and
+                session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
+            return True
+        else:
+            return False
+
+    def can_manage_blocks(self, user, allow_admin=True):
+        """Check whether a user can manage session blocks.
+
+        This only applies to the blocks themselves, not to contributions inside them.
+        """
+        from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+        if user is None:
+            return False
+        # full session manager can always manage blocks. this also includes event managers and higher.
+        elif self.session.can_manage(user, allow_admin=allow_admin):
+            return True
+        # session coordiator if block management is allowed
+        elif (self.session.can_manage(user, 'coordinate') and
+                session_coordinator_priv_enabled(self.event_new, 'manage-blocks')):
+            return True
+        else:
+            return False
 
 
 Session.register_location_events()

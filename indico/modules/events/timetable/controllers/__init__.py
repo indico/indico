@@ -16,32 +16,74 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from enum import Enum
+
+from flask import request, session
+from werkzeug.exceptions import Forbidden, NotFound
 
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+class SessionManagementLevel(Enum):
+    none = 0
+    manage = 1
+    coordinate_with_blocks = 2
+    coordinate_with_contribs = 3
+    coordinate = 4
 
 
 class RHManageTimetableBase(RHConferenceModifBase):
     """Base class for all timetable management RHs"""
 
     CSRF_ENABLED = True
+    session_management_level = SessionManagementLevel.none
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.session = None
+        if 'session_id' in request.view_args:
+            self.session = self.event_new.get_session(request.view_args['session_id'])
+            if self.session is None:
+                raise NotFound
+
+    def _checkProtection(self):
+        if not self.session or self.session_management_level == SessionManagementLevel.none:
+            RHConferenceModifBase._checkProtection(self)
+        else:
+            if self.session_management_level == SessionManagementLevel.manage:
+                func = lambda u: self.session.can_manage(u)
+            elif self.session_management_level == SessionManagementLevel.coordinate_with_blocks:
+                func = lambda u: self.session.can_manage_blocks(u)
+            elif self.session_management_level == SessionManagementLevel.coordinate_with_contribs:
+                func = lambda u: self.session.can_manage_contributions(u)
+            elif self.session_management_level == SessionManagementLevel.coordinate:
+                func = lambda u: self.session.can_manage(u, role='coordinate')
+            else:
+                raise Exception("Invalid session management level")
+            if not func(session.user):
+                raise Forbidden
 
     def _process(self):
         return RH._process(self)
 
 
 class RHManageTimetableEntryBase(RHManageTimetableBase):
+
     normalize_url_spec = {
         'locators': {
-            lambda self: self.entry
+            lambda self: self._get_locator()
         }
     }
+
+    def _get_locator(self):
+        locator = self.entry.locator
+        if 'session_id' in request.view_args:
+            locator['session_id'] = self.session.id
+        return locator
 
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.entry = None
-        if 'timetable_entry_id' in request.view_args:
-            self.entry = (self.event_new.timetable_entries
-                          .filter_by(id=request.view_args['timetable_entry_id'])
-                          .first_or_404())
+        if 'entry_id' in request.view_args:
+            self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()

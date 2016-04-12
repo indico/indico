@@ -99,7 +99,7 @@ type("TimetableManagementActions", [], {
 
         var params = {
             'confId': eventData.conferenceId[0],
-            'timetable_entry_id': eventData.scheduleEntryId
+            'entry_id': eventData.scheduleEntryId
         };
         $.ajax({
             url: build_url(Indico.Urls.Timetable.entries.delete, params),
@@ -175,14 +175,19 @@ type("TimetableManagementActions", [], {
         info.set('reschedule', reschedule);
         info.set('sessionTimetable', this.isSessionTimetable);
 
+        var urlArgs = {
+            confId: eventData.conferenceId[0],
+            entry_id: eventData.scheduleEntryId
+        };
+
         if (exists(eventData.sessionId)) {
+            urlArgs.session_id = eventData.sessionId;
             info.set('session', eventData.sessionId);
             info.set('slot', eventData.sessionSlotId);
         }
 
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entry.changeDatetime, {confId: eventData.conferenceId[0],
-                                                                        timetable_entry_id: eventData.scheduleEntryId}),
+            url: build_url(Indico.Urls.Timetable.entries.editDatetime, urlArgs),
             method: 'POST',
             data: info.getAll(),
             error: function(xhr) {
@@ -214,9 +219,16 @@ type("TimetableManagementActions", [], {
             return false;
         }
 
+        var urlArgs = {
+            confId: eventData.conferenceId[0],
+            entry_id: eventData.scheduleEntryId
+        };
+        if (self.timetable.contextInfo.sessionId) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId;
+        }
+
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entry.move, {confId: eventData.conferenceId[0],
-                                                              timetable_entry_id: eventData.scheduleEntryId}),
+            url: build_url(Indico.Urls.Timetable.entries.move, urlArgs),
             method: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
@@ -376,6 +388,7 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Contribution');
         }
 
+        var canCreateNew = !self.isSessionTimetable || self.timetable.canManageSession;
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -392,7 +405,8 @@ type("TimetableManagementActions", [], {
             },
             this.eventInfo.isCFAEnabled,
             this.eventInfo.bookedRooms,
-            false);
+            false,
+            canCreateNew);
 
         dialog.execute();
     },
@@ -457,6 +471,9 @@ type("TimetableManagementActions", [], {
         };
         if (self.session !== null) {
             args.session_block_id = self.session.sessionSlotId;
+        }
+        if (self.timetable.contextInfo.sessionId) {
+            args.session_id = self.timetable.contextInfo.sessionId;
         }
         ajaxDialog({
             trigger: self,
@@ -538,6 +555,9 @@ type("TimetableManagementActions", [], {
             'session': params.session,
             'day': params.selectedDay
         };
+        if (self.timetable.contextInfo.sessionId) {
+            args.session_id = self.timetable.contextInfo.sessionId;
+        }
         ajaxDialog({
             trigger: this,
             url: build_url(Indico.Urls.Timetable.sessionBlocks.add, args),

@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import request, session
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -44,6 +45,10 @@ class RHManageSessionBase(RHManageSessionsBase):
     def _checkParams(self, params):
         RHManageSessionsBase._checkParams(self, params)
         self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
+
+    def _checkProtection(self):
+        if not self.session.can_manage(session.user):
+            raise Forbidden
 
 
 class RHManageSessionsActionsBase(RHManageSessionsBase):

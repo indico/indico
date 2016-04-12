@@ -31,9 +31,9 @@ class WPManageSessions(WPJinjaMixin, WPConferenceModifBase):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls()
 
 
-class WPDisplayMySessionsConference(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplaySession(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/sessions/'
-    menu_entry_name = 'my_sessions'
+    menu_entry_name = 'timetable'
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
@@ -44,3 +44,7 @@ class WPDisplayMySessionsConference(WPJinjaMixin, WPConferenceDefaultDisplayBase
     def getCSSFiles(self):
         return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls() +
                 self._asset_env['event_display_sass'].urls() + self._asset_env['timetable_sass'].urls())
+
+
+class WPDisplayMySessionsConference(WPDisplaySession):
+    menu_entry_name = 'my_sessions'

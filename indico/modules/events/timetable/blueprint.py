@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.timetable.controllers.display import RHTimetable
+from indico.modules.events.timetable.controllers.display import RHTimetable, RHTimetableEntryInfo
 from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddContribution,
                                                                 RHLegacyTimetableAddBreak,
                                                                 RHLegacyTimetableAddSession,
@@ -27,9 +27,10 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryTime,
                                                                 RHLegacyTimetableEntryMove,
-                                                                RHLegacyChangeTimetableEntryDatetime,
+                                                                RHLegacyTimetableEditEntryDateTime,
                                                                 RHLegacyTimetableExportPDF)
-from indico.modules.events.timetable.controllers.manage import RHManageTimetable, RHTimetableREST, RHTimetableBalloon
+from indico.modules.events.timetable.controllers.manage import (RHManageTimetable, RHManageSessionTimetable,
+                                                                RHTimetableREST, RHManageTimetableEntryInfo)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -39,35 +40,32 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest', RHTimetableREST,
-                 methods=('PATCH', 'DELETE'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/balloon', 'balloon', RHTimetableBalloon)
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/move', 'move_timetable_entry', RHLegacyTimetableEntryMove,
-                 methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/change-datetime', 'change_datetime',
-                 RHLegacyChangeTimetableEntryDatetime, methods=('POST',))
+_bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
+_bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
 
 # Timetable legacy operations
-_bp.add_url_rule('/manage/timetable/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
-_bp.add_url_rule('/manage/timetable/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution,
-                 methods=('POST',))
-_bp.add_url_rule('/manage/timetable/block/<block_id>/fit', 'fit_session_block', RHLegacyTimetableFitBlock,
-                 methods=('POST',))
-_bp.add_url_rule('/manage/timetable/reschedule', 'reschedule', RHLegacyTimetableReschedule, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/add-break',
-                 'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/add-contribution',
-                 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry,
-                 methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>/edit/time', 'edit_entry_time',
-                 RHLegacyTimetableEditEntryTime, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/timetable/add-session-block',
-                 'add_session_block', RHLegacyTimetableAddSessionBlock, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
+with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/manage/timetable'):
+    _bp.add_url_rule('/entry/<int:entry_id>/info', 'entry_info_manage', RHManageTimetableEntryInfo)
+    _bp.add_url_rule('/entry/<int:entry_id>/move', 'move_entry', RHLegacyTimetableEntryMove,
+                     methods=('GET', 'POST'))
+    _bp.add_url_rule('/entry/<int:entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry, methods=('GET', 'POST'))
+    _bp.add_url_rule('/entry/<int:entry_id>/edit/time', 'edit_entry_time', RHLegacyTimetableEditEntryTime,
+                     methods=('GET', 'POST'))
+    _bp.add_url_rule('/entry/<int:entry_id>/edit/datetime', 'edit_entry_datetime', RHLegacyTimetableEditEntryDateTime,
+                     methods=('POST',))
+    _bp.add_url_rule('/block/<block_id>/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
+    _bp.add_url_rule('/block/<block_id>/fit', 'fit_session_block', RHLegacyTimetableFitBlock, methods=('POST',))
+    _bp.add_url_rule('/not-scheduled', 'not_scheduled', RHLegacyTimetableGetUnscheduledContributions)
+    _bp.add_url_rule('/schedule', 'schedule', RHLegacyTimetableScheduleContribution, methods=('POST',))
+    _bp.add_url_rule('/reschedule', 'reschedule', RHLegacyTimetableReschedule, methods=('POST',))
+    _bp.add_url_rule('/add-break', 'add_break', RHLegacyTimetableAddBreak, methods=('GET', 'POST'))
+    _bp.add_url_rule('/add-contribution', 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
+    _bp.add_url_rule('/add-session-block', 'add_session_block', RHLegacyTimetableAddSessionBlock,
+                     methods=('GET', 'POST'))
 
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
 _bp.add_url_rule('/timetable/pdf', 'export_pdf', RHLegacyTimetableExportPDF, methods=('GET', 'POST'))
+_bp.add_url_rule('/timetable/entry/<int:entry_id>/info', 'entry_info', RHTimetableEntryInfo)
