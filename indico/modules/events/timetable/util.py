@@ -119,7 +119,7 @@ def find_next_start_dt(duration, obj, day=None):
         raise ValueError("Invalid object type {}".format(type(obj)))
     max_duration = latest_dt - earliest_dt
     if duration > max_duration:
-        None
+        return None
     start_dt = find_latest_entry_end_dt(obj, day=day) or earliest_dt
     end_dt = start_dt + duration
     if end_dt > latest_dt:
