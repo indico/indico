@@ -39,7 +39,7 @@ from indico.util.string import format_repr, return_ascii, MarkdownText
 
 
 def _get_next_friendly_id(context):
-    """Get the next friendly id for a contribution."""
+    """Get the next friendly id for a session."""
     from indico.modules.events import Event
     event_id = context.current_parameters['event_id']
     assert event_id is not None
@@ -67,7 +67,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         db.Integer,
         primary_key=True
     )
-    #: The human-friendly ID for the contribution
+    #: The human-friendly ID for the session
     friendly_id = db.Column(
         db.Integer,
         nullable=False,
