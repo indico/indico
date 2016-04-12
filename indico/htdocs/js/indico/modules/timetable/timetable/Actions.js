@@ -521,6 +521,10 @@ type("TimetableManagementActions", [], {
             onClose: function(data) {
                 if (data) {
                     self.timetable.eventInfo.sessions[data.session.id] = data.session;
+
+                    if (data.success) {
+                        self.addSessionSlot(data.session);
+                    }
                 }
             }
         });
