@@ -26,7 +26,4 @@ import indico.web.flask.blueprints.event.management.lists
 import indico.web.flask.blueprints.event.management.rooms
 import indico.web.flask.blueprints.event.management.abstracts
 import indico.web.flask.blueprints.event.management.tracks
-import indico.web.flask.blueprints.event.management.schedule
-import indico.web.flask.blueprints.event.management.contributions
-import indico.web.flask.blueprints.event.management.sessions
 import indico.web.flask.blueprints.event.management.paperreviewing
