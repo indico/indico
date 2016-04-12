@@ -548,7 +548,7 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
      }
    );
 
-function drawBalloon(self, evt, editable) {
+function loadBalloonContent(self, api, editable) {
     var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
     var params = {
@@ -557,69 +557,81 @@ function drawBalloon(self, evt, editable) {
        'editable': editable ? 1 : 0
     };
 
+    $.ajax({
+        url: build_url(Indico.Urls.Timetable.entries.balloon, params)
+    })
+    .then(function(content) {
+        // Set the tooltip content upon successful retrieval
+        api.set('content.text', content.html);
+        var $content = api.elements.content;
+        if (editable) {
+            $content.find('.js-edit-time').ajaxqbubble({
+                url: build_url(Indico.Urls.Timetable.entries.editTime, params),
+                qBubbleOptions: {
+                    style: {
+                        classes: 'balloon-time-qtip'
+                    },
+                    position: {
+                        at: 'top center',
+                        my: 'bottom center',
+                        target: timetableBlock
+                    }
+                },
+                onClose: function(data) {
+                    if (data && data.entries) {
+                        self.managementActions._addEntries(data.entries);
+                    }
+                }
+            });
+
+            $content.on('indico:confirmed', '.js-delete', function(e) {
+                self.managementActions.deleteEntry(self.eventData);
+            })
+            .on('ajaxDialog:closed', '.js-manage-attachments', function(e) {
+                api.set('content.text', function(evt, api) {
+                    loadBalloonContent(self, api, editable);
+                });
+            });
+
+            $content.find('.js-switch-to-interval').on('click', function() {
+                self.managementActions.switchToIntervalTimetable(self.eventData.id);
+            });
+
+            $content.find('.js-edit').on('click', function() {
+                var extraParams = $(this).data('extra-params');
+                ajaxDialog({
+                    trigger: this,
+                    url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
+                    title: $(this).data('title'),
+                    onClose: function(data) {
+                        if (data && data.entries) {
+                            self.managementActions._addEntries(data.entries);
+                        }
+                    }
+                });
+            });
+        }
+        $content.find('.close-balloon').on('click', function() {
+            timetableBlock.qtip('hide');
+        });
+        // Change the target of the qTip position in order to open it at the mouse position
+        api.options.position.target = 'mouse';
+    }, function(xhr) {
+        handleAjaxError(xhr);
+    });
+
+    return $T.gettext('Loading...');
+}
+
+function drawBalloon(self, evt, editable) {
+    var timetableBlock = $(self.div.dom);
+    var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
+
     timetableBlock.qbubble({
         id: entryId.toString(),
         content: {
             text: function(evt, api) {
-                $.ajax({
-                    url: build_url(Indico.Urls.Timetable.entries.balloon, params)
-                })
-                .then(function(content) {
-                    // Set the tooltip content upon successful retrieval
-                    api.set('content.text', content.html);
-                    var $content = api.elements.content;
-                    if (editable) {
-                        $content.find('.js-edit-time').ajaxqbubble({
-                            url: build_url(Indico.Urls.Timetable.entries.editTime, params),
-                            qBubbleOptions: {
-                                style: {
-                                    classes: 'balloon-time-qtip'
-                                },
-                                position: {
-                                    at: 'top center',
-                                    my: 'bottom center',
-                                    target: timetableBlock
-                                }
-                            },
-                            onClose: function(data) {
-                                if (data && data.entries) {
-                                    self.managementActions._addEntries(data.entries);
-                                }
-                            }
-                        });
-
-                        $content.on('indico:confirmed', '.js-delete', function(e) {
-                            self.managementActions.deleteEntry(self.eventData);
-                        });
-
-                        $content.find('.js-switch-to-interval').on('click', function() {
-                            self.managementActions.switchToIntervalTimetable(self.eventData.id);
-                        });
-
-                        $content.find('.js-edit').on('click', function() {
-                            var extraParams = $(this).data('extra-params');
-                            ajaxDialog({
-                                trigger: this,
-                                url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
-                                title: $(this).data('title'),
-                                onClose: function(data) {
-                                    if (data && data.entries) {
-                                        self.managementActions._addEntries(data.entries);
-                                    }
-                                }
-                            });
-                        });
-                    }
-                    $content.find('.close-balloon').on('click', function() {
-                        timetableBlock.qtip('hide');
-                    });
-                    // Change the target of the qTip position in order to open it at the mouse position
-                    api.options.position.target = 'mouse';
-                }, function(xhr) {
-                    handleAjaxError(xhr);
-                });
-
-                return $T.gettext('Loading...');
+                loadBalloonContent(self, api, editable);
             }
         },
         show: {
