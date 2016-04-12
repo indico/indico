@@ -28,9 +28,14 @@
                                    data-href="{{ url_for('.modify_session', sess) }}"
                                    data-ajax-dialog
                                    data-reload-after></a>
+                                <a href="#" class="icon-shield" title="{% trans %}Manage protection{% endtrans %}"
+                                   data-title="{% trans title=sess.title %}Manage protection for session '{{ title }}'{% endtrans %}"
+                                   data-href="{{ url_for('.session_protection', sess) }}"
+                                   data-ajax-dialog
+                                   data-reload-after></a>
                             {% endif %}
                             <a href="{{ url_for('timetable.manage_session', sess) }}"
-                               class="icon-calendar"
+                               class="icon-time"
                                title="{% trans %}Manage timetable{% endtrans %}"></a>
                         </div>
                     </td>
