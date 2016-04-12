@@ -109,12 +109,12 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 
     def _process_DELETE(self):
         """Delete a timetable entry"""
-        if self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
-            delete_session_block(self.timetable_entry.session_block)
-        elif self.event_new.type != 'conference' and self.timetable_entry.type == TimetableEntryType.CONTRIBUTION:
-            delete_contribution(self.timetable_entry.contribution)
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            delete_session_block(self.entry.session_block)
+        elif self.event_new.type != 'conference' and self.entry.type == TimetableEntryType.CONTRIBUTION:
+            delete_contribution(self.entry.contribution)
         else:
-            delete_timetable_entry(self.timetable_entry)
+            delete_timetable_entry(self.entry)
 
 
 class RHTimetableBalloon(RHManageTimetableBase):
