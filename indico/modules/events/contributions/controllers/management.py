@@ -20,7 +20,7 @@ from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
@@ -93,6 +93,10 @@ class RHManageContributionBase(RHManageContributionsBase):
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
+
+    def _checkProtection(self):
+        if not self.contrib.can_manage(session.user):
+            raise Forbidden
 
 
 class RHManageSubContributionBase(RHManageContributionBase):
