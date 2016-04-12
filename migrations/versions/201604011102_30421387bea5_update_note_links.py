@@ -64,15 +64,15 @@ def upgrade():
                                'link_type != 4 OR (contribution_id IS NULL AND linked_event_id IS NULL AND '
                                'session_id IS NULL AND subcontribution_id IS NOT NULL)',
                                schema='events')
-    # op.drop_column('notes', 'legacy_session_id', schema='events')
-    # op.drop_column('notes', 'legacy_contribution_id', schema='events')
-    # op.drop_column('notes', 'legacy_subcontribution_id', schema='events')
+    op.drop_column('notes', 'legacy_session_id', schema='events')
+    op.drop_column('notes', 'legacy_contribution_id', schema='events')
+    op.drop_column('notes', 'legacy_subcontribution_id', schema='events')
 
 
 def downgrade():
-    # op.add_column('notes', sa.Column('legacy_session_id', sa.String(), nullable=True), schema='events')
-    # op.add_column('notes', sa.Column('legacy_contribution_id', sa.String(), nullable=True), schema='events')
-    # op.add_column('notes', sa.Column('legacy_subcontribution_id', sa.String(), nullable=True), schema='events')
+    op.add_column('notes', sa.Column('legacy_session_id', sa.String(), nullable=True), schema='events')
+    op.add_column('notes', sa.Column('legacy_contribution_id', sa.String(), nullable=True), schema='events')
+    op.add_column('notes', sa.Column('legacy_subcontribution_id', sa.String(), nullable=True), schema='events')
     op.drop_constraint('ck_notes_valid_session_link', 'notes', schema='events')
     op.drop_constraint('ck_notes_valid_contribution_link', 'notes', schema='events')
     op.drop_constraint('ck_notes_valid_subcontribution_link', 'notes', schema='events')

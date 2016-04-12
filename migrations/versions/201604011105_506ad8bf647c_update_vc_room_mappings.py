@@ -42,11 +42,11 @@ def upgrade():
                                'link_type != 3 OR (contribution_id IS NULL AND linked_event_id IS NULL AND '
                                'session_block_id IS NOT NULL)',
                                schema='events')
-    # op.drop_column('vc_room_events', 'link_id', schema='events')
+    op.drop_column('vc_room_events', 'link_id', schema='events')
 
 
 def downgrade():
     op.drop_constraint('ck_vc_room_events_valid_event_link', 'vc_room_events', schema='events')
     op.drop_constraint('ck_vc_room_events_valid_contribution_link', 'vc_room_events', schema='events')
     op.drop_constraint('ck_vc_room_events_valid_block_link', 'vc_room_events', schema='events')
-    # op.add_column('vc_room_events', sa.Column('link_id', sa.String(), nullable=True), schema='events')
+    op.add_column('vc_room_events', sa.Column('link_id', sa.String(), nullable=True), schema='events')
