@@ -376,6 +376,7 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Contribution');
         }
 
+        var canCreateNew = !self.isSessionTimetable || self.timetable.canManageSession;
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -392,7 +393,8 @@ type("TimetableManagementActions", [], {
             },
             this.eventInfo.isCFAEnabled,
             this.eventInfo.bookedRooms,
-            false);
+            false,
+            canCreateNew);
 
         dialog.execute();
     },

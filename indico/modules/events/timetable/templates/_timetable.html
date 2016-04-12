@@ -1,4 +1,5 @@
-{% macro render_timetable(timetable_data, event_info, timetable_layout=none, management=false, is_session=false) %}
+{% macro render_timetable(timetable_data, event_info, timetable_layout=none, management=false, is_session=false,
+                          can_manage_session=false, can_manage_blocks=false) %}
     <div id="timetable" style="position: relative;">
         <div class="timetablePreLoading" style="height: 300px;">
             <div class="text" style="padding-top: 200px;">
@@ -10,30 +11,38 @@
 
     <script>
         $(window).on('load', function() {
+            'use strict';
+
+            var extraArgs;
+
             {% if management %}
                 var timetableClass = TopLevelManagementTimeTable;
                 var width = document.body.clientWidth - 300;
                 var detailLevel = false;
-                var extraArg = {{ is_session|tojson }};
+                var isSession = {{ is_session|tojson }};
+                var customLinks = null;
+                var canManageSession = !isSession || {{ can_manage_session|tojson }};
+                var canManageBlocks = !isSession || {{ can_manage_blocks|tojson }};
+                extraArgs = [isSession, customLinks, canManageSession, canManageBlocks];
             {% else %}
                 var timetableClass = TopLevelDisplayTimeTable;
                 var width = 710;
                 var detailLevel = 'session';
-                var extraArg = {{ timetable_layout|tojson }};
+                var layout = {{ timetable_layout|tojson }};
+                extraArgs = [layout];
             {% endif %}
 
             var timetableArgs = [
+                null,
                 {{ timetable_data|tojson }},
                 {{ event_info|tojson }},
                 width,
-                $E('timetable'), detailLevel,
+                $E('timetable'),
+                detailLevel,
                 new BrowserHistoryBroker(),
-                extraArg
-            ];
+            ].concat(extraArgs);
 
-            var timetable = new timetableClass({{ timetable_data|tojson }}, {{ event_info|tojson }}, width,
-                                               $E('timetable'), detailLevel, new BrowserHistoryBroker(),
-                                               extraArg);
+            var timetable = new (Function.prototype.bind.apply(timetableClass, timetableArgs));
             $('#timetable').html(timetable.draw());
             timetable.postDraw();
         });
