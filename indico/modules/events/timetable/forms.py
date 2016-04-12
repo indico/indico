@@ -123,6 +123,9 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
+    shift_later = BooleanField(_('Shift down'), widget=SwitchWidget(),
+                               description=_("Shift down everything else that starts after this"))
+
     def __init__(self, *args, **kwargs):
         self._entry_type = kwargs.pop('entry').type
         super(BaseEntryForm, self).__init__(*args, **kwargs)
