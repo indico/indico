@@ -137,7 +137,10 @@ def generate_global_file(config):
                     'delete': url_rule_to_js('timetable.timetable_rest'),
                     'edit': url_rule_to_js('timetable.edit_entry'),
                     'editTime': url_rule_to_js('timetable.edit_entry_time'),
-                    'balloon': url_rule_to_js('timetable.balloon')
+                    'info': {
+                        'display': url_rule_to_js('timetable.entry_info'),
+                        'manage': url_rule_to_js('timetable.entry_info_manage'),
+                    }
                 }
             }
         },

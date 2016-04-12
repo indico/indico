@@ -17,6 +17,7 @@
 from collections import defaultdict
 from operator import attrgetter
 
+from flask import render_template
 from pytz import utc
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload
@@ -237,6 +238,20 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                 start_date = b.timetable_entry.start_dt.astimezone(tz).date()
                 result[b.timetable_entry.event_id]['breaks'][start_date].append((b.timetable_entry, b))
     return result
+
+
+def render_entry_info_balloon(entry, editable=False):
+    if entry.contribution:
+        return render_template('events/timetable/balloons/contribution.html',
+                               contrib=entry.contribution, editable=editable)
+    elif entry.break_:
+        return render_template('events/timetable/balloons/break.html',
+                               break_=entry.break_, editable=editable)
+    elif entry.session_block:
+        return render_template('events/timetable/balloons/block.html',
+                               block=entry.session_block, editable=editable)
+    else:
+        raise ValueError("Invalid entry")
 
 
 def render_session_timetable(session, timetable_layout=None, management=False):
