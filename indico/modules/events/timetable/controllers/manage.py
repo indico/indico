@@ -21,6 +21,7 @@ from flask import request, jsonify, render_template
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntryType
@@ -118,6 +119,8 @@ class RHTimetableREST(RHManageTimetableBase):
         """Delete a timetable entry"""
         if self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
             delete_session_block(self.timetable_entry.session_block)
+        elif self.event_new.type != 'conference' and self.timetable_entry.type == TimetableEntryType.CONTRIBUTION:
+            delete_contribution(self.timetable_entry.contribution)
         else:
             delete_timetable_entry(self.timetable_entry)
 
