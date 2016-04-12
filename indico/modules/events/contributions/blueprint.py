@@ -36,6 +36,8 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHCreateSubContribution,
                                                                         RHEditSubContribution, RHSubContributionREST,
                                                                         RHCreateSubContributionREST,
+                                                                        RHCreateContributionReferenceREST,
+                                                                        RHCreateSubContributionReferenceREST,
                                                                         RHDeleteSubContributions,
                                                                         RHContributionUpdateStartDate,
                                                                         RHContributionUpdateDuration,
@@ -95,6 +97,10 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/start-date', 'manage_st
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/duration', 'manage_duration', RHContributionUpdateDuration,
                  methods=('GET', 'POST'))
 
+# Contribution RESTful endpoints
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/references', 'create_contrib_reference_rest',
+                 RHCreateContributionReferenceREST, methods=('POST',))
+
 # Subcontributions
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/', 'manage_subcontributions',
                  RHContributionSubContributions)
@@ -110,6 +116,8 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/',
                  'create_subcontrib_rest', RHCreateSubContributionREST, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
                  'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>/references',
+                 'create_subcontrib_reference_rest', RHCreateSubContributionReferenceREST, methods=('POST',))
 
 # Contribution types
 _bp.add_url_rule('/manage/contributions/types/', 'manage_types', RHManageContributionTypes)
