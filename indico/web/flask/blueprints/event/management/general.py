@@ -26,11 +26,3 @@ event_mgmt.add_url_rule('/general/data', 'conferenceModification-data', conferen
                         methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/general/data/save', 'conferenceModification-dataPerform',
                         conferenceModif.RHConfPerformDataModif, methods=('POST',))
-
-# Contribution types
-event_mgmt.add_url_rule('/contribution-types/add', 'conferenceModification-addContribType',
-                        conferenceModif.RHConfAddContribType, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contribution-types/delete', 'conferenceModification-removeContribType',
-                        conferenceModif.RHConfRemoveContribType, methods=('POST',))
-event_mgmt.add_url_rule('/contribution-types/<contribTypeId>', 'conferenceModification-editContribType',
-                        conferenceModif.RHConfEditContribType, methods=('GET', 'POST'))
