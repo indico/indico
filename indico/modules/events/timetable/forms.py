@@ -47,11 +47,12 @@ class EntryFormMixin(object):
         self.event = kwargs['event']
         self.session_block = kwargs.get('session_block')
         self.day = kwargs.pop('day')
-        kwargs['time'] = self._get_default_time()
-        defaults = kwargs.get('obj') or FormDefaults()
-        if 'duration' not in defaults:
-            defaults.duration = self._default_duration
-            kwargs['obj'] = defaults
+        if self._default_duration is not None:
+            kwargs['time'] = self._get_default_time()
+            defaults = kwargs.get('obj') or FormDefaults()
+            if 'duration' not in defaults:
+                defaults.duration = self._default_duration
+                kwargs['obj'] = defaults
         super(EntryFormMixin, self).__init__(*args, **kwargs)
         self.time.description = _("Time when the {} will be scheduled.").format(self._entry_type.title.lower())
         self.duration.description = _("The duration of the break").format(self._entry_type.title.lower())
@@ -120,9 +121,5 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
     def __init__(self, *args, **kwargs):
-        self.event = kwargs['event']
-        self.day = kwargs.pop('day')
-        self.item = kwargs.pop('item')
-        super(EntryFormMixin, self).__init__(*args, **kwargs)
-        self.time.description = _("Time when the {} will be scheduled.").format(self.item.title.lower())
-        self.duration.description = _("The duration of the {}").format(self.item.title.lower())
+        self._entry_type = kwargs.pop('entry').type
+        super(BaseEntryForm, self).__init__(*args, **kwargs)

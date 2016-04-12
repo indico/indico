@@ -170,7 +170,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
         item = self.timetable_entry.object
         tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
         form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
-                             event=self.event_new, item=item)
+                             event=self.event_new, entry=self.timetable_entry)
         if form.validate_on_submit():
             with track_time_changes():
                 if self.timetable_entry.contribution:
