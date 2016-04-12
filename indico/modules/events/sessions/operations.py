@@ -85,6 +85,7 @@ def update_session_block(session_block, data):
 
     start_dt = data.pop('start_dt', None)
     if start_dt is not None:
+        session_block.timetable_entry.move(start_dt)
         update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
     session_block.populate_from_dict(data)
     db.session.flush()
