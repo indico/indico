@@ -33,7 +33,7 @@ from indico.modules.events.sessions.controllers.management.sessions import RHCre
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import update_session_block, update_session
-from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase, 
+from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm, LegacyExportTimetablePDFForm)
@@ -392,8 +392,15 @@ class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
         return entries
 
 
-class RHLegacyChangeTimetableEntryDatetime(RHManageTimetableEntryBase):
+class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
     """Changes the start_dt of a `TimetableEntry`"""
+
+    @property
+    def session_management_level(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.coordinate
 
     def _process(self):
         new_start_dt = self.event_new.tzinfo.localize(
