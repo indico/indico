@@ -469,7 +469,9 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
                                                                  this.canvas[0],
                                                                  'contribution',
                                                                  this.isSessionTimetable,
-                                                                 this.customLinks);
+                                                                 this.customLinks,
+                                                                 this.canManageSession,
+                                                                 this.canManageBlocks);
 
         this.intervalTimeTable.setData(intervalInfo);
         var content = this.intervalTimeTable.draw();
@@ -970,17 +972,21 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.menu = $('<div class="group right"/>');
 
         if (this.isSessionTimetable) {
-            this.menu.append(this.addIntervalLink)
+            if (this.canManageBlocks) {
+                this.menu.append(this.addIntervalLink);
+            }
         }
         else {
             this.menu.append(this.addMenuLink);
         }
 
         if (!this.contextInfo.isPoster) {
-            if (this.contextInfo.entryType == 'Session') {
-                this.fitInnerTimetableLink.appendTo(this.menu);
+            if (this.canManageBlocks) {
+                if (this.contextInfo.entryType == 'Session') {
+                    this.fitInnerTimetableLink.appendTo(this.menu);
+                }
+                this.rescheduleLink.appendTo(this.menu);
             }
-            this.rescheduleLink.appendTo(this.menu);
         }
 
         customLinks.appendTo(this.menu);
@@ -1010,10 +1016,12 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     }
 
 },
-     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks) {
+     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks) {
          this.customLinks = customLinks;
          this.eventInfo = eventInfo;
          this.contextInfo = contextInfo;
+         this.canManageSession = canManageSession || false;
+         this.canManageBlocks = canManageBlocks || false;
          this.warnings = new WatchList();
          this.TimeTable(data, width, wrappingElement, detailLevel, true);
      }
@@ -1396,13 +1404,13 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
     }
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks) {
+     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
 
          this.isSessionTimetable = isSessionTimetable;
 
-         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks);
+         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
-       this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker, 'proportional');
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker, 'proportional');
 
          this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
 
@@ -1518,9 +1526,8 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     }
 
 },
-     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable, customLinks) {
-
-         this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks);
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
+         this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions, 'proportional');
 
@@ -1530,7 +1537,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
          this.setData = IntervalTimeTableMixin.prototype.setData;
          this.getById = IntervalTimeTableMixin.prototype.getById;
          this.postDraw = IntervalTimeTableMixin.prototype.postDraw;
-
      });
 
 type("SessionManagementTimeTable", ["TopLevelManagementTimeTable"], {

@@ -167,7 +167,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     _processDialogState: function() {
         var self = this;
-        if (this.existing.length.get() === 0) {
+        if (this.existing.length.get() === 0 && self.canCreateNew) {
             var dialog = createObject(AddNewContributionDialog, self.newArgs);
             dialog.draw();
             this.open = function() {};
@@ -237,15 +237,22 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                  self.existingSelectionObserver(selectedList);
              });
 
+             var createNewLink;
+             if (self.canCreateNew) {
+                createNewLink = Html.li({
+                    style:{marginBottom: '10px'}},
+                    Widget.link(command(function() {
+                        var dialog = createObject(AddNewContributionDialog, self.newArgs);
+                        self.close();
+                        dialog.draw();
+                    }, $T("Create a new one")))
+                );
+             }
+
              var content = Html.div({},
                      $T("You may choose to:"),
                      Html.ul({},
-                         Html.li({style:{marginBottom: '10px'}},
-                             Widget.link(command(function() {
-                                 var dialog = createObject(AddNewContributionDialog, self.newArgs);
-                                 self.close();
-                                 dialog.draw();
-                             }, $T("Create a new one")))),
+                         createNewLink,
                          Html.li({},
                              $T("Choose one (or more) unscheduled"),
                              Html.div("UnscheduledContribListDiv",
@@ -261,7 +268,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
          }
      },
      function(method, timeStartMethod, args, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit, canCreateNew) {
          var self = this;
          this.newArgs = Array.prototype.slice.call(arguments, 0);
          this.args = args;
@@ -270,6 +277,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
          this.successFunc = successFunc;
          this.timetable = timetable;
          this.isCFAEnabled = isCFAEnabled;
+         this.canCreateNew = canCreateNew || false;
 
          this.PreLoadHandler(
              self._preload,
