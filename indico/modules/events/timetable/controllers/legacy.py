@@ -46,7 +46,8 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         update_break_entry, update_timetable_entry,
                                                         move_timetable_entry, update_timetable_entry_object)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
-from indico.modules.events.timetable.util import find_next_start_dt, get_session_block_entries
+from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
+                                                  reschedule_subsequent_entries)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import iterdays, as_utc
@@ -218,16 +219,26 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
         tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
         form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
                              event=self.event_new, entry=self.timetable_entry)
+        data = form.data
+        shift_later = data.pop('shift_later')
+        updated_entries = []
+
         if form.validate_on_submit():
             with track_time_changes():
+                if shift_later:
+                    updated_entries += reschedule_subsequent_entries(self.event_new, self.timetable_entry,
+                                                                     form.start_dt.data)
                 if self.timetable_entry.contribution:
                     update_timetable_entry(self.timetable_entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
                 elif self.timetable_entry.break_:
-                    update_break_entry(item, form.data)
+                    update_break_entry(item, data)
                 elif self.timetable_entry.session_block:
-                    update_session_block(item, form.data)
-            return jsonify_data(entries=[serialize_entry_update(item.timetable_entry)], flash=False)
+                    update_session_block(item, data)
+
+            updated_entries.append(item.timetable_entry)
+            return jsonify_data(entries=[serialize_entry_update(entry) for entry in updated_entries], flash=False,
+                                shift_later=shift_later)
         self.commit = False
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
