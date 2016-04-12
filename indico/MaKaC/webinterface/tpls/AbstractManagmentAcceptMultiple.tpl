@@ -44,7 +44,7 @@ function showAbstracts()
                         <select name="session">
                                 <option value="conf">--${ _("no session") }--</option>
                                 % for session in sessions:
-                                    <option value=${ session.getId() } >${ session.getTitle() }</option>
+                                    <option value=${ session.friendly_id } >${ session.title }</option>
                                 % endfor
                         </select>
                     </td>
