@@ -63,5 +63,5 @@
           class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
-    <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
+    <input type="hidden" name="{{ fieldName }}" value="{{ getChoiceValue(fieldName) }}">
 </ng-form>

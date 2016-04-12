@@ -29,7 +29,7 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import get_default_booking_interval, rb_is_admin
@@ -39,7 +39,7 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookin
                                                        WPRoomBookingNewBookingConfirm,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking,
                                                        WPRoomBookingBookingDetails)
-from indico.util.date_time import get_datetime_from_request
+from indico.util.date_time import get_datetime_from_request, round_up_to_minutes
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
@@ -457,9 +457,30 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
     def _get_view(self, **kwargs):
         return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
+    def _update_datetime(self):
+        """Make necessary changes to reservation's start and end datetime.
+
+        Move the start date to the current day, adjust the end date
+        accordingly and if the start datetime is still in the past, change the
+        start and end time to the current (rounded up) time.
+
+        :return: A dict with the new start and end datetime
+        """
+        reservation_duration = self._reservation.end_dt - self._reservation.start_dt
+        date_delta = date.today() - self._reservation.start_dt.date()
+        start_dt = self._reservation.start_dt + date_delta
+        end_dt = start_dt + reservation_duration
+        if start_dt < datetime.now():
+            new_start_dt = round_up_to_minutes(datetime.now(), 15) + timedelta(minutes=15)
+            time_delta = new_start_dt - start_dt
+            start_dt = new_start_dt
+            end_dt = end_dt + time_delta
+        return {'start_dt': start_dt, 'end_dt': end_dt}
+
     def _make_form(self):
         self.past_date = self.date_changed = False
         changes = {'room_id': self._room.id}
+        changes.update(self._update_datetime())
 
         if self._reservation.created_by_user != session.user:
             # if the user is cloning someone else's booking, set him/her as booked_for

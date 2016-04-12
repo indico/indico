@@ -546,7 +546,11 @@ class MonthOverview( Overview ):
     def getOverviewNextBigPeriod( self ):
         """Returns an exact copy of the current overview object for the next
             day"""
-        d = self.getDate().replace(year=self.getDate().year+1)
+        d = self.getDate()
+        offset = {'year': d.year+1}
+        if d.month == 2 and d.day == 29:
+            offset['day'] = 28
+        d = d.replace(**offset)
         ow = MonthOverview( self.getAW(), \
                         d, \
                         self.getCategoryList() )
@@ -556,7 +560,11 @@ class MonthOverview( Overview ):
     def getOverviewPrevBigPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             day"""
-        d = self.getDate().replace(year=self.getDate().year-1)
+        d = self.getDate()
+        offset = {'year': d.year-1}
+        if d.month == 2 and d.day == 29:
+            offset['day'] = 28
+        d = d.replace(**offset)
         ow = MonthOverview( self.getAW(), \
                         d, \
                         self.getCategoryList() )

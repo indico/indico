@@ -304,8 +304,8 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))
         if item.input_type == 'accommodation':
-            field_names.append(unique_col('{}_{}'.format(item.title, 'Arrival'), item.id))
-            field_names.append(unique_col('{}_{}'.format(item.title, 'Departure'), item.id))
+            field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
+            field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in special_items)
     rows = []
     for registration in registrations:
@@ -318,10 +318,10 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
             key = unique_col(item.title, item.id)
             if item.input_type == 'accommodation':
                 registration_dict[key] = data[item.id].friendly_data.get('choice') if item.id in data else ''
-                key = '{}_{}_{}'.format(item.title, 'Arrival', item.id)
+                key = unique_col('{} ({})'.format(item.title, 'Arrival'), item.id)
                 arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
                 registration_dict[key] = format_date(arrival_date) if arrival_date else ''
-                key = '{}_{}_{}'.format(item.title, 'Departure', item.id)
+                key = unique_col('{} ({})'.format(item.title, 'Departure'), item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
                 registration_dict[key] = format_date(departure_date) if departure_date else ''
             else:
