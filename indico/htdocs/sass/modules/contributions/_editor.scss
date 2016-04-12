@@ -213,8 +213,3 @@ $editor-preview-bg-color: $light-gray;
     @include single-box-shadow();
     @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }
-
-input[type=text] {
-    height: 2em;
-    padding: 0.5em;
-}
