@@ -558,90 +558,90 @@ function drawBalloon(self, evt, editable) {
     };
 
     timetableBlock.qbubble({
-       id: entryId.toString(),
-       content: {
-           text: function(evt, api) {
-               $.ajax({
-                   url: build_url(Indico.Urls.Timetable.entries.balloon, params)
-               })
-               .then(function(content) {
-                   // Set the tooltip content upon successful retrieval
-                   api.set('content.text', content.html);
-                   var $content = api.elements.content;
-                   if (editable) {
-                       $content.find('.js-edit-time').ajaxqbubble({
-                           url: build_url(Indico.Urls.Timetable.entries.editTime, params),
-                           qBubbleOptions: {
-                               style: {
-                                   classes: 'balloon-time-qtip'
-                               },
-                               position: {
-                                   at: 'top center',
-                                   my: 'bottom center',
-                                   target: timetableBlock
-                               }
-                           },
-                           onClose: function(data) {
-                               if (data && data.entries) {
-                                   self.managementActions._addEntries(data.entries);
-                               }
-                           }
-                       });
-                       $content.on('indico:confirmed', '.js-delete', function(e) {
-                           self.managementActions.deleteEntry(self.eventData);
-                       });
+        id: entryId.toString(),
+        content: {
+            text: function(evt, api) {
+                $.ajax({
+                    url: build_url(Indico.Urls.Timetable.entries.balloon, params)
+                })
+                .then(function(content) {
+                    // Set the tooltip content upon successful retrieval
+                    api.set('content.text', content.html);
+                    var $content = api.elements.content;
+                    if (editable) {
+                        $content.find('.js-edit-time').ajaxqbubble({
+                            url: build_url(Indico.Urls.Timetable.entries.editTime, params),
+                            qBubbleOptions: {
+                                style: {
+                                    classes: 'balloon-time-qtip'
+                                },
+                                position: {
+                                    at: 'top center',
+                                    my: 'bottom center',
+                                    target: timetableBlock
+                                }
+                            },
+                            onClose: function(data) {
+                                if (data && data.entries) {
+                                    self.managementActions._addEntries(data.entries);
+                                }
+                            }
+                        });
+                        $content.on('indico:confirmed', '.js-delete', function(e) {
+                            self.managementActions.deleteEntry(self.eventData);
+                        });
 
-                       $content.find('.js-edit').on('click', function() {
-                           var extraParams = $(this).data('extra-params');
-                           ajaxDialog({
-                               trigger: this,
-                               url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
-                               title: $(this).data('title'),
-                               onClose: function(data) {
-                                   if (data && data.entries) {
-                                       self.managementActions._addEntries(data.entries);
-                                   }
-                               }
-                           });
-                       });
-                   }
-                   $content.find('.close-balloon').on('click', function() {
-                       timetableBlock.qtip('hide');
-                   });
-                   // Change the target of the qTip position in order to open it at the mouse position
-                   api.options.position.target = 'mouse';
-               }, function(xhr) {
-                   handleAjaxError(xhr);
-               });
+                        $content.find('.js-edit').on('click', function() {
+                            var extraParams = $(this).data('extra-params');
+                            ajaxDialog({
+                                trigger: this,
+                                url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
+                                title: $(this).data('title'),
+                                onClose: function(data) {
+                                    if (data && data.entries) {
+                                        self.managementActions._addEntries(data.entries);
+                                    }
+                                }
+                            });
+                        });
+                    }
+                    $content.find('.close-balloon').on('click', function() {
+                        timetableBlock.qtip('hide');
+                    });
+                    // Change the target of the qTip position in order to open it at the mouse position
+                    api.options.position.target = 'mouse';
+                }, function(xhr) {
+                    handleAjaxError(xhr);
+                });
 
-               return $T.gettext('Loading...');
-           }
-       },
-       show: {
-           ready: true
-       },
-       hide: {
-           event: 'unfocus',
-           fixed: true
-       },
-       events: {
-           hide: function(evt, api) {
-               if (evt.originalEvent.type == 'mouseleave') {
-                   evt.preventDefault();
-               }
-           }
-       },
-       position: {
-           at: 'top center',
-           my: 'bottom center',
-           target: [ evt.pageX, evt.pageY ],
-           adjust: {
-               mouse: false
-           }
-       },
-       style: {
-           classes: 'balloon-qtip'
-       },
+                return $T.gettext('Loading...');
+            }
+        },
+        show: {
+            ready: true
+        },
+        hide: {
+            event: 'unfocus',
+            fixed: true
+        },
+        events: {
+            hide: function(evt, api) {
+                if (evt.originalEvent.type == 'mouseleave') {
+                    evt.preventDefault();
+                }
+            }
+        },
+        position: {
+            at: 'top center',
+            my: 'bottom center',
+            target: [ evt.pageX, evt.pageY ],
+            adjust: {
+                mouse: false
+            }
+        },
+        style: {
+            classes: 'balloon-qtip'
+        },
     });
 }
 
