@@ -273,3 +273,25 @@ def get_session_block_entries(event, day):
             .filter(db.cast(TimetableEntry.start_dt.astimezone(event.tzinfo), db.Date) == day.date(),
                     TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
             .all())
+
+
+def reschedule_subsequent_entries(event, entry, start_dt, parent=None):
+    """Reschedules entries with start_dt > entry.start_dt"""
+    from indico.modules.events.timetable.operations import update_timetable_entry_object
+
+    tz = event.tzinfo
+    entries = (event.timetable_entries
+               .filter(db.cast(TimetableEntry.start_dt.astimezone(tz), db.Date) == entry.start_dt.date(),
+                       TimetableEntry.start_dt >= entry.start_dt, TimetableEntry.id != entry.id))
+    if parent is None:
+        entries = entries.filter(TimetableEntry.parent_id.is_(None))
+    else:
+        entries = entries.filter(TimetableEntry.parent_id == parent.id)
+    if not entries:
+        return
+
+    diff = start_dt - entry.start_dt
+    for entr in entries:
+        entr.move(entr.start_dt + diff)
+    if parent:
+        update_timetable_entry_object(parent, {'duration': parent.duration + diff})
