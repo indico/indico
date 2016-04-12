@@ -199,7 +199,7 @@ class TimetableEntry(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, timetable_entry_id=self.id)
+        return dict(self.event_new.locator, entry_id=self.id)
 
     @return_ascii
     def __repr__(self):
