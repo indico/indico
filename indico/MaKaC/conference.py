@@ -1763,7 +1763,6 @@ class Conference(CommonObjectBase, Locatable):
         self.___contribTypeGenerator = Counter()
         self._authorIdx=AuthorIndex()
         self._speakerIdx=AuthorIndex()
-        self._primAuthIdx=_PrimAuthIdx(self)
         self._sessionCoordinators=SCIndex()
         self._sessionCoordinatorRights = []
         self._submitterIdx=SubmitterIndex()
@@ -3502,20 +3501,6 @@ class Conference(CommonObjectBase, Locatable):
         c=auth.getContribution()
         if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
             self.getSpeakerIndex().unindex(auth)
-
-    def _getPrimAuthIndex(self):
-        try:
-            if self._primAuthIdx:
-                pass
-        except AttributeError:
-            self._primAuthIdx=_PrimAuthIdx(self)
-        return self._primAuthIdx
-
-    def getContribsMatchingAuth(self,query,onlyPrimary=True):
-        if str(query).strip()=="":
-            return self.getContributionList()
-        res=self._getPrimAuthIndex().match(query)
-        return [self.getContributionById(id) for id in res]
 
     def getCoordinatedSessions( self, av ):
         """Returns a list with the sessions for which a user is coordinator.
@@ -6243,15 +6228,6 @@ class _AuthIdx(Persistent):
             if k.find(query)!=-1:
                 res=union(res,self._idx[k])
         return res
-
-
-class _PrimAuthIdx(_AuthIdx):
-
-    def __init__(self,conf):
-        _AuthIdx.__init__(self,conf)
-        for contrib in self._conf.getContributionList():
-            for auth in contrib.getPrimaryAuthorList():
-                self.index(auth)
 
 
 class Contribution(CommonObjectBase, Locatable):

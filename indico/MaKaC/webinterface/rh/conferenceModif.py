@@ -412,20 +412,23 @@ class RHConfGrantSubmissionToAllSpeakers( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfGrantSubmissionToAllSpeakers
 
     def _process( self ):
-        for cont in self._target.getContributionList():
-            speakers = cont.getSpeakerList()[:]
-            for sCont in cont.getSubContributionList():
-                speakers += sCont.getSpeakerList()[:]
+        for cont in self._target.as_event.contributions:
+            speakers = cont.speakers[:]
+            for sCont in cont.subcontributions:
+                speakers += sCont.speakers
             for speaker in speakers:
-                cont.grantSubmission(speaker,False)
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
+                if speaker.person.user:
+                    cont.update_principal(speaker.person.user, add_roles={'submit'})
+        self._redirect(urlHandlers.UHConfModifAC.getURL( self._target ))
 
 class RHConfRemoveAllSubmissionRights( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfRemoveAllSubmissionRights
 
     def _process( self ):
-        for cont in self._target.getContributionList():
-            cont.revokeAllSubmitters()
+        for cont in self._target.as_event.contributions:
+            for entry in set(cont.acl_entries):
+                if entry.has_management_role('submit', explicit=True):
+                    cont.update_principal(entry.principal, del_roles={'submit'})
         event = self._conf.as_event
         for entry in set(event.acl_entries):
             if entry.has_management_role('submit', explicit=True):
