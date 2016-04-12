@@ -78,7 +78,7 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.entry = None
-        if 'timetable_entry_id' in request.view_args:
+        if 'entry_id' in request.view_args:
             self.entry = (self.event_new.timetable_entries
-                          .filter_by(id=request.view_args['timetable_entry_id'])
+                          .filter_by(id=request.view_args['entry_id'])
                           .first_or_404())
