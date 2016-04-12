@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 
 from pytz import utc
 from wtforms.fields import StringField, TextAreaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, InputRequired
 from wtforms_components import TimeField
 
 from indico.modules.events.contributions.forms import ContributionForm
@@ -39,7 +39,7 @@ class EntryFormMixin(object):
     _default_duration = None
     _display_fields = None
 
-    time = TimeField(_("Time"), [DataRequired()])
+    time = TimeField(_("Time"), [InputRequired()])
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               units=('minutes', 'hours'))
 
