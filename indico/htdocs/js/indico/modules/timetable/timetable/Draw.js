@@ -587,8 +587,13 @@ function drawBalloon(self, evt, editable) {
                                 }
                             }
                         });
+
                         $content.on('indico:confirmed', '.js-delete', function(e) {
                             self.managementActions.deleteEntry(self.eventData);
+                        });
+
+                        $content.find('.js-switch-to-interval').on('click', function() {
+                            self.managementActions.switchToIntervalTimetable(self.eventData.id);
                         });
 
                         $content.find('.js-edit').on('click', function() {
