@@ -149,7 +149,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             if (self.timetable.contextInfo.sessionSlotId) {
                 args.session_block_id = self.timetable.contextInfo.sessionSlotId;
             }
-            if (self.timetable.contextInfo.sessionId) {
+            if (self.timetable.isSessionTimetable) {
                 args.session_id = self.timetable.contextInfo.sessionId;
             }
             $.ajax({
@@ -184,7 +184,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         if (self.args.get('slot')) {
             urlArgs.block_id = self.args.get('slot');
         }
-        if (self.args.get('session')) {
+        if (self.timetable.isSessionTimetable) {
             urlArgs.session_id = self.args.get('session');
         }
         $.ajax({
@@ -291,18 +291,18 @@ type("AddNewContributionDialog", [],
     {
         draw: function() {
             var self = this;
-            var args = {
+            var urlArgs = {
                 confId: self.args.get('conference'),
                 day: self.args.get('selectedDay')
             };
             if (self.args.get('slot')) {
-                args.session_block_id = self.args.get('slot');
+                urlArgs.session_block_id = self.args.get('slot');
             }
-            if (self.args.get('session')) {
-                args.session_id = self.args.get('session');
+            if (self.timetable.isSessionTimetable) {
+                urlArgs.session_id = self.args.get('session');
             }
             ajaxDialog({
-                url: build_url(Indico.Urls.Timetable.contributions.add, args),
+                url: build_url(Indico.Urls.Timetable.contributions.add, urlArgs),
                 title: $T.gettext("Add contribution"),
                 onClose: function(data) {
                     if (data) {
@@ -317,6 +317,7 @@ type("AddNewContributionDialog", [],
              days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
         var self = this;
         this.args = clone(args);
+        this.timetable = timetable;
         this.successFunc = successFunc;
         this.favoriteRooms = favoriteRooms;
         this.bookedRooms = bookedRooms;
@@ -920,7 +921,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                 } else if (self.isTopLevelTimetable && exists(self.tt.contextInfo.timetableSession)) {
                     data.session_id = self.tt.contextInfo.timetableSession.id;
                 }
-                if (self.tt.contextInfo.timetableSession) {
+                if (self.tt.isSessionTimetable) {
                     urlArgs.session_id = self.tt.contextInfo.timetableSession.id;
                 }
                 $.ajax({
@@ -1043,7 +1044,7 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
             confId: self.tt.contextInfo.conferenceId,
             block_id: self.tt.contextInfo.sessionSlotId
         };
-        if (self.tt.contextInfo.sessionId) {
+        if (self.tt.isSessionTimetable) {
             urlArgs.session_id = self.tt.contextInfo.sessionId;
         }
         $.ajax({

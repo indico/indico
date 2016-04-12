@@ -556,7 +556,7 @@ function loadBalloonContent(self, api, editable) {
        'confId': self.eventData.conferenceId[0],
        'entry_id': entryId,
     };
-    if (self.eventData.sessionId) {
+    if (self.timetable.isSessionTimetable) {
         urlParams.session_id = self.eventData.sessionId;
     }
 
@@ -620,7 +620,7 @@ function loadBalloonContent(self, api, editable) {
                     confId: self.eventData.conferenceId[0],
                     entry_id: self.eventData.scheduleEntryId
                 };
-                if (self.timetable.contextInfo.sessionId) {
+                if (self.timetable.isSessionTimetable) {
                     urlArgs.session_id = self.timetable.contextInfo.sessionId;
                 }
                 ajaxDialog({
