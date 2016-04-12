@@ -114,10 +114,6 @@ def generate_global_file(config):
 
             'Timetable': {
                 'reschedule': url_rule_to_js('timetable.reschedule'),
-                'entry': {
-                    'move': url_rule_to_js('timetable.move_timetable_entry'),
-                    'changeDatetime': url_rule_to_js('timetable.change_datetime')
-                },
                 'breaks': {
                     'add': url_rule_to_js('timetable.add_break')
                 },
@@ -136,11 +132,13 @@ def generate_global_file(config):
                 'entries': {
                     'delete': url_rule_to_js('timetable.timetable_rest'),
                     'edit': url_rule_to_js('timetable.edit_entry'),
+                    'editDatetime': url_rule_to_js('timetable.edit_entry_datetime'),
                     'editTime': url_rule_to_js('timetable.edit_entry_time'),
+                    'move': url_rule_to_js('timetable.move_entry'),
                     'info': {
                         'display': url_rule_to_js('timetable.entry_info'),
                         'manage': url_rule_to_js('timetable.entry_info_manage'),
-                    }
+                    },
                 }
             }
         },
