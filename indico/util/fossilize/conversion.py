@@ -153,7 +153,7 @@ class Conversion(object):
     def sessionList(cls, event):
         sessions = {}
         for session in event.getSessionList():
-            sessions[session.getId()] = session;
+            sessions[session.id] = session;
         return sessions
 
     @classmethod

@@ -438,11 +438,6 @@ class IConferenceEventInfoFossil(IConferenceMinimalFossil):
     getAdjustedEndDate.convert = Conversion.datetime
     getAdjustedEndDate.name = "endDate"
 
-    def getSessions(self):
-        """ Conference Sessions """
-    getSessions.produce = lambda s: Conversion.sessionList(s)
-    getSessions.result = ISessionFossil
-
     def isConference(self):
         """ Is this event a conference ? """
     isConference.produce = lambda s : s.getType() == 'conference'
