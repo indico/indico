@@ -35,6 +35,7 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHContributionSubContributions,
                                                                         RHCreateSubContribution,
                                                                         RHEditSubContribution, RHSubContributionREST,
+                                                                        RHCreateSubContributionREST,
                                                                         RHDeleteSubContributions,
                                                                         RHContributionUpdateStartDate,
                                                                         RHContributionUpdateDuration,
@@ -106,10 +107,14 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/create
                  RHCreateSubContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/sort', 'sort_subcontributions',
                  RHSortSubContributions, methods=('POST',))
-_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
-                 'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>/edit',
                  'manage_edit_subcontrib', RHEditSubContribution, methods=('GET', 'POST'))
+
+# Subcontributions RESTful endpoints
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/',
+                 'create_subcontrib_rest', RHCreateSubContributionREST, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
+                 'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
 
 # Contribution types
 _bp.add_url_rule('/manage/contributions/types/', 'manage_types', RHManageContributionTypes)

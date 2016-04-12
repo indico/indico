@@ -345,6 +345,17 @@ class RHSubContributionREST(RHManageSubContributionBase):
         return jsonify_data(html=_render_subcontribution_list(self.contrib))
 
 
+class RHCreateSubContributionREST(RHManageContributionBase):
+    """REST endpoint to create a subcontribution"""
+
+    def _process_POST(self):
+        form = SubContributionForm(event=self.event_new)
+        if form.validate_on_submit():
+            subcontrib = create_subcontribution(self.contrib, form.data)
+            return jsonify(id=subcontrib.id, contribution_id=subcontrib.contribution_id, event_id=self.event_new.id)
+        return jsonify_data(success=False, errors=form.errors), 400
+
+
 class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
     def _process(self):
         for subcontrib in self.subcontribs:

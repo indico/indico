@@ -473,7 +473,7 @@ class ResponseUtil(object):
         if self.call:
             raise Exception('Cannot use make_response when a callable is set')
 
-        if isinstance(res, (app.response_class, WerkzeugResponse)):
+        if isinstance(res, (app.response_class, WerkzeugResponse, tuple)):
             if self.modified:
                 # If we receive a response - most likely one created by send_file - we do not allow any
                 # external modifications.
