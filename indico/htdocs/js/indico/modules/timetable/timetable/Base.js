@@ -611,7 +611,7 @@ type("IntervalTimeTableMixin", [], {
     _getInfoBoxContent: function() {
 
         return Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-            $T('You are viewing the contents of the interval:')),
+            $T('You are viewing the contents of the session block:')),
             Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
             this._generateSlotTitle(this.contextInfo),
             Html.span({style: {fontWeight: 'normal'}},
