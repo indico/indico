@@ -101,7 +101,7 @@
                                         <i class="icon-time text-superfluous"
                                            title="{% trans %}This contribution is scheduled within a session block and duration can't be modified.{% endtrans %}"></i>
                                     {% endif %}
-                                    <span class="label">{{ contrib.duration|format_human_timedelta }}</span>
+                                    <span class="label">{{ contrib.duration|format_timedelta(format='narrow') }}</span>
                                 </span>
                             </td>
                             <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') | lower }}">
