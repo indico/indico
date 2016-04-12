@@ -22,14 +22,16 @@ from indico.web.flask.blueprints.event.display import event
 event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
 event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
 
-# Timetable
-event.add_url_rule('/timetable-old/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
-event.add_url_rule('/timetable-old/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
-event.add_url_rule('/timetable-old/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
-                   methods=('GET', 'POST'))
+# TODO: remove with the old legacy code
+# # Timetable
+# event.add_url_rule('/timetable-old/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
+# event.add_url_rule('/timetable-old/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
+# event.add_url_rule('/timetable-old/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
+#                    methods=('GET', 'POST'))
 
-# Sessions
-event.add_url_rule('/session-old/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
-event.add_url_rule('/session-old/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
-event.add_url_rule('/session-old/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
-                   conferenceDisplay.RHTimeTablePDF)
+# TODO: remove with the old legacy code
+# # Sessions
+# event.add_url_rule('/session-old/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
+# event.add_url_rule('/session-old/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
+# event.add_url_rule('/session-old/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
+#                    conferenceDisplay.RHTimeTablePDF)
