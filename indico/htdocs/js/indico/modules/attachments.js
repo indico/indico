@@ -198,6 +198,7 @@
     global.openAttachmentManager = function openAttachmentManager(itemLocator, title, reloadOnChange, trigger) {
         reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
         ajaxDialog({
+            trigger: trigger,
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
             title: title || $T.gettext("Manage material"),
             confirmCloseUnsaved: false,
