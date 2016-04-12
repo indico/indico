@@ -58,23 +58,7 @@ def generate_global_file(config):
             'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),
 
             'ConferenceDisplay': urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router,
-            'ContributionDisplay': urlHandlers.UHContributionDisplay.getURL(_ignore_static=True).js_router,
-            'SessionDisplay': urlHandlers.UHSessionDisplay.getURL(_ignore_static=True).js_router,
 
-            'ContribToXML': urlHandlers.UHContribToXML.getURL(_ignore_static=True).js_router,
-            'ContribToPDF': urlHandlers.UHContribToPDF.getURL(_ignore_static=True).js_router,
-
-            'ConfTimeTablePDF': urlHandlers.UHConfTimeTablePDF.getURL(_ignore_static=True).js_router,
-            'ConfTimeTableCustomPDF': url_rule_to_js('timetable.export_pdf'),
-
-            'SessionModification': urlHandlers.UHSessionModification.getURL(_ignore_static=True).js_router,
-            'ContributionModification': urlHandlers.UHContributionModification.getURL(_ignore_static=True).js_router,
-            'SessionProtection': urlHandlers.UHSessionModifAC.getURL(_ignore_static=True).js_router,
-            'ContributionProtection': urlHandlers.UHContribModifAC.getURL(_ignore_static=True).js_router,
-
-            'UploadAction': {
-                'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
-            },
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
@@ -82,10 +66,6 @@ def generate_global_file(config):
             'RoomBookingBook': url_rule_to_js('rooms.book'),
             'RoomBookingDetails': urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router,
             'RoomBookingCloneBooking': url_rule_to_js('rooms.roomBooking-cloneBooking'),
-            'ConfModifSchedule': urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router,
-            'SubcontrModif': urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router,
-            'AuthorDisplay': urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router,
-            'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router,
 
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
