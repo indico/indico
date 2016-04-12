@@ -64,16 +64,13 @@ class TimetableSerializer(object):
         timetable = {}
         if session_.is_poster:
             return timetable
-        tzinfo = session_.event_new.tzinfo
-        start_dt = session_.start_dt.astimezone(tzinfo)
-        end_dt = session_.end_dt.astimezone(tzinfo)
-        for day in iterdays(start_dt, end_dt):
+        for day in iterdays(session_.event_new.start_dt_local, session_.event_new.end_dt_local):
             timetable[day.strftime('%Y%m%d')] = {}
         for block in session_.blocks:
             block_entry = block.timetable_entry
             if not block_entry:
                 continue
-            date_key = block_entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d')
+            date_key = block_entry.start_dt.astimezone(session_.event_new.tzinfo).strftime('%Y%m%d')
             entries = block_entry.children if without_blocks else [block_entry]
             for entry in entries:
                 if not entry.can_view(session.user):
