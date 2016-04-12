@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import jsonify, request
 
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable
-from indico.modules.events.timetable.util import serialize_event_info
+from indico.modules.events.timetable.util import render_entry_info_balloon, serialize_event_info
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -36,3 +36,15 @@ class RHTimetable(RHConferenceBaseDisplay):
         timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
         return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
                                                   timetable_data=timetable_data, timetable_layout=self.layout)
+
+
+class RHTimetableEntryInfo(RHConferenceBaseDisplay):
+    """Display timetable entry info balloon."""
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+
+    def _process(self):
+        html = render_entry_info_balloon(self.entry)
+        return jsonify(html=html)

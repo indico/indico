@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
-from flask import request, jsonify, render_template, session
+from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions import Contribution
@@ -29,6 +29,7 @@ from indico.modules.events.timetable.controllers import (RHManageTimetableBase, 
                                                          RHManageTimetableEntryBase)
 from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
                                                         delete_timetable_entry)
+from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import track_time_changes
 
@@ -128,24 +129,15 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-class RHTimetableBalloon(RHManageTimetableBase):
-    """Create the appropriate timetable entry balloon depending on the entry type."""
+class RHManageTimetableEntryInfo(RHManageTimetableBase):
+    """Display timetable entry info balloon in management mode."""
+
+    session_management_level = SessionManagementLevel.coordinate
+
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['timetable_entry_id'])
-                                .first_or_404())
-        self.editable = (request.args.get('editable') == '1')
+        self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
-        html = None
-        if self.timetable_entry.contribution:
-            html = render_template('events/timetable/display/balloons/contribution.html',
-                                   contrib=self.timetable_entry.contribution, editable=self.editable)
-        elif self.timetable_entry.break_:
-            html = render_template('events/timetable/display/balloons/break.html',
-                                   break_=self.timetable_entry.break_, editable=self.editable)
-        elif self.timetable_entry.session_block:
-            html = render_template('events/timetable/display/balloons/block.html',
-                                   block=self.timetable_entry.session_block, editable=self.editable)
+        html = render_entry_info_balloon(self.entry, editable=True)
         return jsonify(html=html)

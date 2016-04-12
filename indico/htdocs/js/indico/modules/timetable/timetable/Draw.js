@@ -551,14 +551,17 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
 function loadBalloonContent(self, api, editable) {
     var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
-    var params = {
+    var url = editable ? Indico.Urls.Timetable.entries.info.manage : Indico.Urls.Timetable.entries.info.display;
+    var urlParams = {
        'confId': self.eventData.conferenceId[0],
-       'timetable_entry_id': entryId,
-       'editable': editable ? 1 : 0
+       'entry_id': entryId,
     };
+    if (self.eventData.sessionId) {
+        urlParams.session_id = self.eventData.sessionId;
+    }
 
     $.ajax({
-        url: build_url(Indico.Urls.Timetable.entries.balloon, params)
+        url: build_url(url, urlParams)
     })
     .then(function(content) {
         // Set the tooltip content upon successful retrieval
@@ -566,7 +569,7 @@ function loadBalloonContent(self, api, editable) {
         var $content = api.elements.content;
         if (editable) {
             $content.find('.js-edit-time').ajaxqbubble({
-                url: build_url(Indico.Urls.Timetable.entries.editTime, params),
+                url: build_url(Indico.Urls.Timetable.entries.editTime, urlParams),
                 qBubbleOptions: {
                     style: {
                         classes: 'balloon-time-qtip'
@@ -602,7 +605,7 @@ function loadBalloonContent(self, api, editable) {
                 var extraParams = $(this).data('extra-params');
                 ajaxDialog({
                     trigger: this,
-                    url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, params, extraParams)),
+                    url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, urlParams, extraParams)),
                     title: $(this).data('title'),
                     onClose: function(data) {
                         if (data && data.entries) {

@@ -99,7 +99,7 @@ type("TimetableManagementActions", [], {
 
         var params = {
             'confId': eventData.conferenceId[0],
-            'timetable_entry_id': eventData.scheduleEntryId
+            'entry_id': eventData.scheduleEntryId
         };
         $.ajax({
             url: build_url(Indico.Urls.Timetable.entries.delete, params),

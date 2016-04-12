@@ -150,7 +150,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['timetable_entry_id'])
+                                .filter_by(id=request.view_args['entry_id'])
                                 .first_or_404())
         self.edit_session = request.args.get('edit_session') == '1'
 
@@ -210,7 +210,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
         self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['timetable_entry_id'])
+                                .filter_by(id=request.view_args['entry_id'])
                                 .first_or_404())
 
     def _process(self):
