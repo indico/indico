@@ -69,7 +69,7 @@
 %highlighted-data {
     display: inline-block;
     padding: 0 0.25em 0 0.25em;
-    line-height: 2rem;
+    line-height: 1.5rem;
     background-color: $tt-primary-color;
     color: $light-gray;
 }
@@ -133,6 +133,7 @@
 
 .chairperson-list .author {
     @extend %highlighted-header-data;
+    margin-bottom: 2px;
 }
 
 .speaker-list, .convener-list {
