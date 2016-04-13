@@ -471,7 +471,8 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
                                                                  this.isSessionTimetable,
                                                                  this.customLinks,
                                                                  this.canManageSession,
-                                                                 this.canManageBlocks);
+                                                                 this.canManageBlocks,
+                                                                 this.canManageContribs);
 
         this.intervalTimeTable.setData(intervalInfo);
         var content = this.intervalTimeTable.draw();
@@ -1016,12 +1017,14 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     }
 
 },
-     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks) {
+     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks,
+              canManageSession, canManageBlocks, canManageContribs) {
          this.customLinks = customLinks;
          this.eventInfo = eventInfo;
          this.contextInfo = contextInfo;
          this.canManageSession = canManageSession || false;
          this.canManageBlocks = canManageBlocks || false;
+         this.canManageContribs = canManageContribs || false;
          this.warnings = new WatchList();
          this.TimeTable(data, width, wrappingElement, detailLevel, true);
      }
@@ -1404,12 +1407,13 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
     }
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
+     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks,
+              canManageSession, canManageBlocks, canManageContribs) {
 
          this.isSessionTimetable = isSessionTimetable;
          this.isTopLevel = true;
 
-         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
+         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks, canManageContribs);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker, 'proportional');
 
@@ -1527,10 +1531,11 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     }
 
 },
-     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable, customLinks, canManageSession, canManageBlocks) {
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable, customLinks,
+              canManageSession, canManageBlocks, canManageContribs) {
          this.isSessionTimetable = isSessionTimetable;
          this.isTopLevel = false;
-         this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks);
+         this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks, canManageContribs);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions, 'proportional');
 

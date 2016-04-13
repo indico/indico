@@ -1,5 +1,5 @@
 {% macro render_timetable(timetable_data, event_info, timetable_layout=none, management=false, is_session=false,
-                          can_manage_session=false, can_manage_blocks=false) %}
+                          can_manage_session=false, can_manage_blocks=false, can_manage_contributions=false) %}
     <div id="timetable" style="position: relative;">
         <div class="timetablePreLoading" style="height: 300px;">
             <div class="text" style="padding-top: 200px;">
@@ -23,7 +23,8 @@
                 var customLinks = null;
                 var canManageSession = !isSession || {{ can_manage_session|tojson }};
                 var canManageBlocks = !isSession || {{ can_manage_blocks|tojson }};
-                extraArgs = [isSession, customLinks, canManageSession, canManageBlocks];
+                var canManageContribs = !isSession || {{ can_manage_contributions|tojson }};
+                extraArgs = [isSession, customLinks, canManageSession, canManageBlocks, canManageContribs];
             {% else %}
                 var timetableClass = TopLevelDisplayTimeTable;
                 var width = 710;

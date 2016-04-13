@@ -2041,8 +2041,14 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                     return Html.$(link);
                 }
 
-                var entryTools = Html.div({className: 'group right'}, createEditLink(blockData),
-                                          createProtectionLink(blockData), createDeleteLink(blockData));
+                var entryTools;
+                var entryToolsStyle = {className: 'group right'};
+                if (!self.timetable.isSessionTimetable || self.timetable.canManageContribs) {
+                    entryTools = Html.div(entryToolsStyle, createEditLink(blockData), createProtectionLink(blockData),
+                                          createDeleteLink(blockData));
+                } else {
+                    entryTools = Html.div(entryToolsStyle, createDeleteLink(blockData));
+                }
                 var entryInfo = Html.div({},blockData.friendlyId + " - " + blockData.title );
                 var block = Html.div({className:'posterEntry'},
                     entryTools,

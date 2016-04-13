@@ -55,10 +55,14 @@ class RHManageSessionTimetable(RHManageTimetableBase):
         event_info = serialize_event_info(self.event_new)
         event_info['timetableSession'] = serialize_session(self.session)
         timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
+        management_rights = {
+            'can_manage_session': self.session.can_manage(session.user),
+            'can_manage_blocks': self.session.can_manage_blocks(session.user),
+            'can_manage_contributions': self.session.can_manage_contributions(session.user)
+        }
         return WPManageTimetable.render_template('session_management.html', self._conf, event_info=event_info,
                                                  timetable_data=timetable_data, session_=self.session,
-                                                 can_manage_session=self.session.can_manage(session.user),
-                                                 can_manage_blocks=self.session.can_manage_blocks(session.user))
+                                                 **management_rights)
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
