@@ -49,11 +49,11 @@
 
             <table class="timetable-item-details session-details">
                 <tbody>
-                    {{ render_attachments(session) }}
+                    {{ render_attachments(session_) }}
                 </tbody>
             </table>
 
-            {{ render_notes(block.session) }}
+            {{ render_notes(session_) }}
 
             {% if entries and not hide_contribs -%}
                 <ul class="meeting-sub-timetable">
