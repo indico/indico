@@ -340,7 +340,7 @@ class WAbstractDisplay(wcomponents.WTemplated):
         if isinstance(status, review.AbstractStatusAccepted):
             vars["statusText"] = _("ACCEPTED ")
             if status.getType() is not None and status.getType() != "":
-                vars["statusText"] += "as %s" % status.getType().getName()
+                vars["statusText"] += "as %s" % status.getType().name
             vars["statusClass"] = "abstractStatusAccepted"
             vars["statusComments"] = ""
         elif isinstance(status, review.AbstractStatusRejected):
