@@ -55,6 +55,12 @@
             </div>
         </div>
         <div class="title">{{ block.session.title }}</div>
+        {% if editable and can_manage_session %}
+            <dl class="i-data-list thirty-seventy">
+                <dt>{% trans %}Material{% endtrans %}</dt>
+                <dd>{{ render_attachment_info(block.session) }}</dd>
+            </dl>
+        {% endif %}
     </div>
     <span class="hr"></span>
     <div class="attribute">
