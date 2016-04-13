@@ -46,8 +46,8 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
     event.add('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
     event.add('dtstamp', now)
-    event.add('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
-    event.add('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
+    event.add('dtstart', fossil['startDate'])
+    event.add('dtend', fossil['endDate'])
     event.add('url', fossil['url'])
     event.add('summary', to_unicode(fossil['title']))
     loc = fossil['location'] or ''
