@@ -3229,15 +3229,7 @@ class Conference(CommonObjectBase, Locatable):
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
-        conf.setReportNumberHolder(self.getReportNumberHolder().clone(self))
-        for ch in self.getChairList():
-            conf.addChair(ch.clone())
-        ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
 
-        if options.get("sessions", False):
-            for entry in self.getSchedule().getEntries():
-                if isinstance(entry,BreakTimeSchEntry):
-                    conf.getSchedule().addEntry(entry.clone(conf))
         db_root = DBMgr.getInstance().getDBConnection().root()
         if db_root.has_key( "webfactoryregistry" ):
             confRegistry = db_root["webfactoryregistry"]
@@ -3254,12 +3246,6 @@ class Conference(CommonObjectBase, Locatable):
         if options.get("tracks",False) :
             for tr in self.getTrackList() :
                 conf.addTrack(tr.clone(conf))
-        # Meetings' and conferences' sessions cloning
-        if options.get("sessions",False) :
-            for s in self.getSessionList() :
-                newSes = s.clone(timeDelta, conf, options, session_id=s.getId())
-                ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
-                conf.addSession(newSes)
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
@@ -3276,26 +3262,6 @@ class Conference(CommonObjectBase, Locatable):
                 conf.addSessionCoordinatorRight(right)
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
-        # Conference's abstracts
-        if options.get("abstracts",False) :
-            conf.abstractMgr = self.abstractMgr.clone(conf)
-        # Meetings' and conferences' contributions cloning
-        if options.get("contributions",False) :
-            sch = conf.getSchedule()
-            for cont in self.getContributionList():
-                if cont.getSession() is None :
-                    if not meeting:
-                        nc = cont.clone(conf, options, timeDelta)
-                        conf.addContribution(nc)
-                        if cont.isScheduled() :
-                            sch.addEntry(nc.getSchEntry())
-                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
-                    elif cont.isScheduled():
-                        # meetings...only scheduled
-                        nc = cont.clone(conf, options, timeDelta)
-                        conf.addContribution(nc)
-                        sch.addEntry(nc.getSchEntry())
-                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
         conf.notifyModification()
 
         # Copy the list of enabled features
