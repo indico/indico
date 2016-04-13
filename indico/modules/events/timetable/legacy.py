@@ -62,8 +62,6 @@ class TimetableSerializer(object):
 
     def serialize_session_timetable(self, session_, without_blocks=False):
         timetable = {}
-        if session_.is_poster:
-            return timetable
         for day in iterdays(session_.event_new.start_dt_local, session_.event_new.end_dt_local):
             timetable[day.strftime('%Y%m%d')] = {}
         for block in session_.blocks:
