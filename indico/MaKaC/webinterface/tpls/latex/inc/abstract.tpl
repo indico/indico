@@ -45,7 +45,7 @@
             % if field._type == 'selection':
                 ${md_convert(abstract.getField(field.getId()))}
             % else:
-                ${md_convert(abstract.getField(field.getId()).value.decode('utf-8'))}
+                ${md_convert(unicode(abstract.getField(field.getId()).value or ''))}
             % endif
         }
         \vspace{1.5em}
@@ -77,7 +77,7 @@
         \bf
         \noindent ${_("Contribution Type")} :
     }
-    ${latex_escape(contrib_type.getName())}
+    ${latex_escape(contrib_type.name)}
 }
 % endif
 
