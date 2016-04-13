@@ -265,7 +265,7 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
 
     def _make_confirm_form(self, *args, **kwargs):
         defaults = kwargs['defaults']
-        for key, value in _get_defaults_from_object(self.event).iteritems():
+        for key, value in _get_defaults_from_object(self.event_new).iteritems():
             defaults[key] = value
         return RHRoomBookingNewBookingSimple._make_confirm_form(self, *args, **kwargs)
 
@@ -293,7 +293,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         if not assign or assign == 'nothing':
             self._assign_to = None
         elif assign == 'event':
-            self._assign_to = self.event
+            self._assign_to = self.event_new
         else:
             element, _, element_id = assign.partition('-')
             if element == 'session':
