@@ -29,6 +29,7 @@ from indico.modules.events.contributions.models.persons import SubContributionPe
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_person_link, ReporterBase
 from indico.modules.attachments.util import get_attached_items
+from indico.util.caching import memoize_request
 from indico.util.date_time import format_human_timedelta, format_date
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -227,6 +228,7 @@ def contribution_type_row(contrib_type):
     return jsonify_data(html_row=html, flash=False)
 
 
+@memoize_request
 def get_contributions_with_user_as_submitter(event, user):
     """Get a list of contributions in which the `user` has submission rights"""
     contribs = (Contribution.query.with_parent(event)
