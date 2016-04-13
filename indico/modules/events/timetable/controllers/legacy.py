@@ -155,30 +155,27 @@ class RHLegacyTimetableDeleteEntry(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-class RHLegacyTimetableEditEntry(RHManageTimetableBase):
+class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
     @property
     def session_management_level(self):
         if self.edit_session:
             return SessionManagementLevel.manage
-        elif self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
+        elif self.entry.type == TimetableEntryType.SESSION_BLOCK:
             return SessionManagementLevel.coordinate_with_blocks
-        elif self.timetable_entry.type == TimetableEntryType.CONTRIBUTION:
+        elif self.entry.type == TimetableEntryType.CONTRIBUTION:
             return SessionManagementLevel.coordinate_with_contribs
         else:
             return SessionManagementLevel.coordinate
 
     def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['entry_id'])
-                                .first_or_404())
+        RHManageTimetableEntryBase._checkParams(self, params)
         self.edit_session = request.args.get('edit_session') == '1'
 
     def _process(self):
         form = None
-        if self.timetable_entry.contribution:
-            contrib = self.timetable_entry.contribution
-            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+        if self.entry.contribution:
+            contrib = self.entry.contribution
+            tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
             form = ContributionEntryForm(obj=FormDefaults(contrib, time=tt_entry_dt.time()),
                                          event=self.event_new, contrib=contrib, to_schedule=False,
                                          day=tt_entry_dt.date())
@@ -188,26 +185,26 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
                 return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)], flash=False)
             return jsonify_template('events/contributions/forms/contribution.html', form=form,
                                     fields=form._display_fields)
-        elif self.timetable_entry.break_:
-            break_ = self.timetable_entry.break_
-            tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+        elif self.entry.break_:
+            break_ = self.entry.break_
+            tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
             form = BreakEntryForm(event=self.event_new, day=tt_entry_dt.date(),
                                   obj=FormDefaults(break_, time=tt_entry_dt.time()))
             if form.validate_on_submit():
                 with track_time_changes():
                     update_break_entry(break_, form.data)
                 return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)], flash=False)
-        elif self.timetable_entry.session_block:
+        elif self.entry.session_block:
             if self.edit_session:
-                session_ = self.timetable_entry.session_block.session
+                session_ = self.entry.session_block.session
                 form = SessionForm(obj=FormDefaults(session_), event=self.event_new)
                 if form.validate_on_submit():
                     update_session(session_, form.data)
                     return jsonify_data(entries=[serialize_entry_update(x.timetable_entry) for x in session_.blocks],
                                         flash=False)
             else:
-                block = self.timetable_entry.session_block
-                tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+                block = self.entry.session_block
+                tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
                 form = SessionBlockEntryForm(obj=FormDefaults(block, time=tt_entry_dt.time()),
                                              event=self.event_new, session_block=block, to_schedule=False,
                                              day=tt_entry_dt.date())
@@ -219,25 +216,19 @@ class RHLegacyTimetableEditEntry(RHManageTimetableBase):
         return jsonify_form(form, fields=getattr(form, '_display_fields', None))
 
 
-class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
+class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
     @property
     def session_management_level(self):
-        if self.timetable_entry.type == TimetableEntryType.SESSION_BLOCK:
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
             return SessionManagementLevel.coordinate_with_blocks
         else:
             return SessionManagementLevel.coordinate
 
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
-        self.timetable_entry = (self.event_new.timetable_entries
-                                .filter_by(id=request.view_args['entry_id'])
-                                .first_or_404())
-
     def _process(self):
-        item = self.timetable_entry.object
-        tt_entry_dt = self.timetable_entry.start_dt.astimezone(self.event_new.tzinfo)
+        item = self.entry.object
+        tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
         form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
-                             event=self.event_new, entry=self.timetable_entry)
+                             event=self.event_new, entry=self.entry)
         data = form.data
         shift_later = data.pop('shift_later')
         updated_entries = []
@@ -245,14 +236,13 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableBase):
         if form.validate_on_submit():
             with track_time_changes():
                 if shift_later:
-                    updated_entries += reschedule_subsequent_entries(self.event_new, self.timetable_entry,
-                                                                     form.start_dt.data)
-                if self.timetable_entry.contribution:
-                    update_timetable_entry(self.timetable_entry, {'start_dt': form.start_dt.data})
+                    updated_entries += reschedule_subsequent_entries(self.event_new, self.entry, form.start_dt.data)
+                if self.entry.contribution:
+                    update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
-                elif self.timetable_entry.break_:
+                elif self.entry.break_:
                     update_break_entry(item, data)
-                elif self.timetable_entry.session_block:
+                elif self.entry.session_block:
                     update_session_block(item, data)
 
             updated_entries.append(item.timetable_entry)
@@ -385,7 +375,7 @@ class RHLegacyTimetableFitBlock(RHManageTimetableBase):
         return jsonify_data(flash=False)
 
 
-class RHLegacyTimetableEntryMove(RHManageTimetableEntryBase):
+class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
     """Moves a TimetableEntry into a Session or top-level timetable"""
 
     def _process_GET(self):
