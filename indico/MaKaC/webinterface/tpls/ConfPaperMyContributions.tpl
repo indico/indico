@@ -1,7 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 % if User is not None:
-    <% contributions = Conference.getContribsForSubmitter(User) %>
     % if len(contributions) > 0:
         <table class="infoTable" cellspacing="0" width="100%">
             <tr>
@@ -15,23 +14,23 @@
             % for c in contributions:
             <tr class="infoTR">
                 <td class="content" valign="top">
-                    ${str(c.getId())}
+                    ${ c.id }
                 </td>
                 <td class="content" valign="top">
-                    ${c.getTitle()}
+                    ${ c.title }
                 </td>
                 % if Conference.getConfPaperReview().hasReviewing():
                 <td class="content" valign="top">
-                    ${"<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True))}
+                    ${"<br>".join(Conference.getReviewManager(c).getLastReview().getReviewingStatus(forAuthor = True))}
                 </td>
                 % endif
                 <td nowrap class="content" valign="top" style="text-align: right;">
-                % if c.canModify(self_._aw):
-                        <a href="${urlHandlers.UHContributionModification.getURL(c)}">${ _("Edit") }</a><span class="horizontalSeparator">|</span><a href="${urlHandlers.UHContributionDisplay.getURL(c)}">${ _("View") }</a>
+                % if c.can_manage(_session.user):
+                    <a href="${ url_for('contributions.manage_contributions', c, selected=c.friendly_id) }">${ _("Edit") }</a>
+                    <span class="horizontalSeparator">|</span>
+                    <a href="${ url_for('contributions.display_contribution', c) }">${ _("View") }</a>
                 % else:
-                    <% url = urlHandlers.UHContributionDisplay.getURL(c) %>
-                    <% url.addParam("s",1) %>
-                        <a href="${url}">${ _("Upload Paper") }</a>
+                    <a href="${ url_for('contributions.display_contribution', c) }">${ _("Upload Paper") }</a>
                 % endif
                 </td>
             </tr>

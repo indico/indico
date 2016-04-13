@@ -44,7 +44,8 @@ def _visibility_paper_review(event):
 
 
 def _visibility_paper_review_transfer(event):
-    return bool(_visibility_paper_review(event) and event.getContribsForSubmitter(session.avatar))
+    return bool(_visibility_paper_review(event) and
+                any(c for c in event.as_event.contributions if c.can_manage(session.user, 'submit')))
 
 
 def _visibility_role(event, role):

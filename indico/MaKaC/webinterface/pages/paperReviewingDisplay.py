@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -109,5 +111,6 @@ class WConfPaperMyContributions(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["User"] = self._aw.getUser()
         vars["Conference"] = self._conf
+        vars["contributions"] = [c for c in self._conf.as_event.contributions if c.can_manage(session.user, 'submit')]
         vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
