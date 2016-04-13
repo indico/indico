@@ -474,7 +474,6 @@ class WPXSLConferenceDisplay(WPConferenceBase):
     def _getBodyVariables(self):
         pars = { \
         "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
-        "iCalURL": urlHandlers.UHConferenceToiCal.getURL(self._conf), \
         "cloneURL": urlHandlers.UHConfClone.getURL( self._conf ), \
         "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
         "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \

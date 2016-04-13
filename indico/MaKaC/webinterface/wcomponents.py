@@ -339,7 +339,6 @@ class WConferenceHeader(WHeader):
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 
         vars["conf"] = vars["target"] = self._conf;
-        vars["urlICSFile"] = urlHandlers.UHConferenceToiCal.getURL(self._conf, detail = "events")
 
         vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
@@ -675,7 +674,6 @@ class WEventFooter(WFooter):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         app_data = minfo.getSocialAppConfig()
 
-        v['icalURL'] = urlHandlers.UHConferenceToiCal.getURL(self._conf)
         v["shortURL"] = Config.getInstance().getShortEventURL() + cid
         v["app_data"] = app_data
         v["showSocial"] = app_data.get('active', False) and layout_settings.get(self._conf, 'show_social_badges')

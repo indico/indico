@@ -1,0 +1,38 @@
+{% extends '_ical_export.html' %}
+
+{% block download_text %}
+    {% trans %}Download current event:{% endtrans %}
+{% endblock %}
+
+{% block extra_download %}
+    {% if item.type != 'lecture' %}
+        <div class="iCalExportSection">
+            <a class="icon-calendar" href="{{ url_for('events.export_event_ical', item, detail='contributions') }}">
+                {% trans %}Detailed timetable calendar file{% endtrans %}
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_info %}
+    {% if item.getType() != 'lecture' %}
+        <input type="checkbox" id="detailExport{{ item.id }}"> {% trans %}Detailed timetable{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+
+    <script type="text/javascript">
+        exportPopups["{{ item.id }}"] = new ExportIcalInterface(
+            {{ api_mode|tojson }}, {{ persistent_user_enabled|tojson }}, {{ persistent_allowed|tojson }},
+            {{ api_active|tojson }}, {{ user_logged|tojson }}, setURLs, 'event.api.getExportURLs',
+            {confId: "{{ item.id }}"}, {{ request_urls|tojson  }}, "{{ item.id }}",
+            "{{ session.user.id if session.user else '' }}"
+        );
+
+        $('body').delegate('#detailExport{{ item.id }}', 'click', function(e) {
+            setURLs(exportPopups['{{ item.id }}'].getRequestURLs());
+        });
+    </script>
+{% endblock %}

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.controllers.admin import (RHReferenceTypes, RHCreateReferenceType, RHEditReferenceType,
                                                      RHDeleteReferenceType)
+from indico.modules.events.controllers.display import RHExportEventICAL
 from indico.modules.events.controllers.management import (RHManageReferences, RHManageEventLocation,
                                                           RHManageEventPersonLinks)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -36,6 +37,7 @@ _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'updat
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_reference_type', RHDeleteReferenceType,
                  methods=('DELETE',))
 
+_bp.add_url_rule('/event/<confId>/event.ics', 'export_event_ical', RHExportEventICAL)
 _bp.add_url_rule('/event/<confId>/manage/external-ids', 'manage_event_references', RHManageReferences,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/event-location', 'manage_event_location', RHManageEventLocation,

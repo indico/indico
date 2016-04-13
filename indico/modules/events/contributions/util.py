@@ -244,7 +244,7 @@ def serialize_contribution_for_ical(contrib):
         'id': contrib.id,
         'startDate': contrib.timetable_entry.start_dt if contrib.timetable_entry else None,
         'endDate': contrib.timetable_entry.end_dt if contrib.timetable_entry else None,
-        'url': to_unicode(url_for('contributions.display_contribution', contrib, _external=True)),
+        'url': url_for('contributions.display_contribution', contrib, _external=True),
         'title': contrib.title,
         'location': contrib.venue_name,
         'roomFullname': contrib.room_name,

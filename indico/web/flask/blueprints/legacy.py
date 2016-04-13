@@ -70,7 +70,7 @@ legacy_endpoints = {
     'confDisplayEvaluation-submit', 'confDisplayEvaluation-submitted', 'conferenceCFA', 'conferenceCreation',
     'conferenceCreation-createConference', 'conferenceDisplay', 'conferenceDisplay-abstractBook',
     'conferenceDisplay-abstractBookLatex', 'conferenceDisplay-accessKey', 'conferenceDisplay-getCSS',
-    'conferenceDisplay-getLogo', 'conferenceDisplay-getPic', 'conferenceDisplay-ical', 'conferenceDisplay-marcxml',
+    'conferenceDisplay-getLogo', 'conferenceDisplay-getPic', 'conferenceDisplay-marcxml',
     'conferenceDisplay-matPkg', 'conferenceDisplay-next', 'conferenceDisplay-performMatPkg', 'conferenceDisplay-prev',
     'conferenceDisplay-xml', 'conferenceModification', 'conferenceModification-addContribType',
     'conferenceModification-close', 'conferenceModification-closeModifKey', 'conferenceModification-data',

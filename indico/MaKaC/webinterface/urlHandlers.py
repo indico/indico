@@ -1347,10 +1347,6 @@ class UHConfAbstractBook(URLHandler):
         return "files/generatedPdf/BookOfAbstracts.pdf"
 
 
-class UHConferenceToiCal(URLHandler):
-    _endpoint = 'event.conferenceDisplay-ical'
-
-
 class UHConfModAbstractBook(URLHandler):
     _endpoint = 'event_mgmt.confModBOA'
 

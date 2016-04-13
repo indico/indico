@@ -589,24 +589,6 @@ class RHAbstractBook(RHConferenceBaseDisplay):
             return send_file(pdfFilename, cacheFile, 'PDF')
 
 
-class RHConferenceToiCal(RHConferenceBaseDisplay):
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._detailLevel = params.get("detail","events")
-
-    def _process(self):
-        filename = "%s-Event.ics" % self._target.getTitle()
-
-        hook = CategoryEventHook({'detail': self._detailLevel}, 'event',
-                                 {'idlist': self._conf.getId(), 'dformat': 'ics'})
-        res = hook(self.getAW())
-        resultFossil = {'results': res[0]}
-
-        serializer = Serializer.create('ics')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
-
-
 class RHConferenceToXML(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):

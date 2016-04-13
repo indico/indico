@@ -281,3 +281,11 @@ def _render_event_person_link_list_field(event, event_type, **kwargs):
     form = EventPersonLinkForm(event=event, event_type=event_type)
     tpl = get_template_module('forms/_form.html')
     return tpl.form_row(form.person_link_data, skip_label=True)
+
+
+@template_hook('event-ical-export')
+def _render_event_ical_export(event, **kwargs):
+    from indico.modules.events.util import get_base_ical_parameters
+    return render_template('events/display/event_ical_export.html', item=event,
+                           ics_url=url_for('events.export_event_ical', event),
+                           **get_base_ical_parameters(session.user, event, 'events'))

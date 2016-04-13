@@ -85,6 +85,5 @@ event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDispla
                    methods=('GET', 'POST'))
 
 # Machine-readable formats
-event.add_url_rule('/event.ics', 'conferenceDisplay-ical', conferenceDisplay.RHConferenceToiCal)
 event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', conferenceDisplay.RHConferenceToMarcXML)
 event.add_url_rule('/event.xml', 'conferenceDisplay-xml', conferenceDisplay.RHConferenceToXML)
