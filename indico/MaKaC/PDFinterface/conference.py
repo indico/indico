@@ -435,7 +435,7 @@ class ContributionBook(PDFLaTeXBase):
             if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
                 corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links if pl.is_submitter]
             elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
-                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.spekaers]
+                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.speakers]
 
         self._args.update({
             'affiliation_contribs': affiliation_contribs,
