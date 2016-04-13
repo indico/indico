@@ -491,7 +491,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             l=[]
             for t in self._filterCrit.getField( "type" ).getValues():
                 if t:
-                    l.append(t.getId())
+                    l.append(str(t.id))
             url.addParam( "selTypes", l )
             if self._filterCrit.getField( "type" ).getShowNoValue():
                 url.addParam( "typeShowNoValue", "1" )
@@ -501,7 +501,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             l=[]
             for t in self._filterCrit.getField( "acc_type" ).getValues():
                 if t:
-                    l.append(t.getId())
+                    l.append(str(t.id))
             url.addParam("selAccTypes",l)
             if self._filterCrit.getField( "acc_type" ).getShowNoValue():
                 url.addParam( "accTypeShowNoValue", "1" )
@@ -524,7 +524,8 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             checked = ""
             if type in self._filterCrit.getField("type").getValues():
                 checked = " checked"
-            l.append( """<input type="checkbox" name="selTypes" value=%s%s> %s"""%(quoteattr(type.getId()), checked, self.htmlText(type.getName())) )
+            l.append("""<input type="checkbox" name="selTypes" value=%s%s> %s""" % (type.id, checked,
+                                                                                    self.htmlText(type.name)))
         return l
 
     def _getAccTypeFilterItemList(self):
@@ -536,7 +537,8 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             checked = ""
             if type in self._filterCrit.getField("acc_type").getValues():
                 checked=" checked"
-            l.append("""<input type="checkbox" name="selAccTypes" value=%s%s> %s"""%(quoteattr(type.getId()),checked,self.htmlText(type.getName())))
+            l.append("""<input type="checkbox" name="selAccTypes" value=%s%s> %s""" % (type.id, checked,
+                                                                                       self.htmlText(type.name)))
         return l
 
     def _getStatusFilterItemList( self ):
