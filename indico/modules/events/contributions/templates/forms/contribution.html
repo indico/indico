@@ -2,9 +2,9 @@
 
 {%- block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, fields=fields or none, skip=('references', 'keywords') + form.custom_field_names) }}
+    {{ form_rows(form, fields=fields or none, skip=('references',) + form.custom_field_names) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
-        {{ form_rows(form, fields=form.custom_field_names + ('references', 'keywords')) }}
+        {{ form_rows(form, fields=form.custom_field_names + ('references',)) }}
     {% endcall %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
