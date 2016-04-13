@@ -67,6 +67,8 @@ _compat_bp.add_url_rule('/session/<legacy_session_id>/', 'session',
                         partial(compat_session, 'display_session'))
 _compat_bp.add_url_rule('/session/<legacy_session_id>/session.ics', 'session_ics',
                         partial(compat_session, 'export_ics'))
+_compat_bp.add_url_rule('/my-conference/sessions', 'my_sessions',
+                        make_compat_redirect_func(_bp, 'my_sessions', view_args_conv={'event_id': 'confId'}))
 
 _compat_bp.add_url_rule('!/sessionDisplay.py', 'session_modpython',
                         make_compat_redirect_func(_compat_bp, 'session',
