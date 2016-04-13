@@ -44,6 +44,7 @@ from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
+from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -3222,7 +3223,8 @@ class Conference(CommonObjectBase, Locatable):
         startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
-        conf.setDates( startDate, endDate, moveEntries=1 )
+        with track_time_changes():
+            conf.setDates(startDate, endDate, moveEntries=1)
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
