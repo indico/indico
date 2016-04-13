@@ -239,25 +239,18 @@ def get_contributions_with_user_as_submitter(event, user):
 
 
 def serialize_contribution_for_ical(contrib):
-    contrib_data = {
+    return {
         '_fossil': 'contributionMetadata',
         'id': contrib.id,
         'startDate': contrib.timetable_entry.start_dt if contrib.timetable_entry else None,
         'endDate': contrib.timetable_entry.end_dt if contrib.timetable_entry else None,
-        'url': url_for('contributions.display_contribution', contrib, _external=True),
+        'url': to_unicode(url_for('contributions.display_contribution', contrib, _external=True)),
         'title': contrib.title,
         'location': contrib.venue_name,
-        'roomFullname': contrib.room_name
+        'roomFullname': contrib.room_name,
+        'speakers': [serialize_person_link(x) for x in contrib.speakers],
+        'description': contrib.description
     }
-
-    description = ''
-    if contrib.speakers:
-        speakers = ('{} ({})'.format(s.full_name, s.affiliation) for s in contrib.speakers)
-        description = 'Speakers: {}\n'.format(', '.join(speakers))
-
-    description += contrib.description
-    contrib_data['description'] = description
-    return contrib_data
 
 
 class ContributionDisplayReporter(ContributionReporter):
