@@ -996,7 +996,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         this.menu.children('a').addClass('i-button');
 
-        if (!this.contextInfo.isPoster && !this.isTopLevel) {
+        if (!this.contextInfo.isPoster && (!this.isTopLevel || !this.sessionTimetable)) {
             this.menu.find('#add_new').after(this._createAddMenu(this.addMenuLink.parent()));
         }
 
