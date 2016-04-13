@@ -249,6 +249,10 @@ class AbstractParticipation(Persistent):
     def getAffiliation(self):
         return self._affilliation
 
+    @property
+    def affiliation(self):
+        return self._affilliation
+
     def setAddress(self, address):
         self._address = address.strip()
         self._notifyModification()
@@ -291,6 +295,10 @@ class AbstractParticipation(Persistent):
         if self.getTitle():
             res = "%s %s" % (self.getTitle(), res)
         return res
+
+    @property
+    def full_name(self):
+        return self.getFullName()
 
     def getStraightFullName(self):
         name = ""

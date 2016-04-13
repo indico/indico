@@ -159,6 +159,10 @@ class AbstractFieldWrapper(object):
             return [_("The field '{}' is mandatory").format(self.field.title)]
         return []
 
+    @property
+    def _type(self):
+        return self.getType()
+
 
 class AbstractTextFieldWrapper(AbstractFieldWrapper):
     """Wraps legacy ``AbstractTextAreaField`` and ``AbstractInputField``."""
