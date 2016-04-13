@@ -89,8 +89,8 @@ def contribution_from_abstract(abstract, sess):
         links.append(ContributionPersonLink(author_type=author_type, person=person,
                                             is_speaker=abstract.isSpeaker(auth), **person_data))
 
-    custom_fields_data = [{field_val.contribution_field.id: field_val.data} for
-                          field_val in abstract.as_new.field_values]
+    custom_fields_data = {'custom_{}'.format(field_val.contribution_field.id): field_val.data for
+                          field_val in abstract.as_new.field_values}
     contrib = create_contribution(event, {'title': abstract.getTitle(), 'duration': duration,
                                           'person_link_data': {link: True for link in links}},
                                   custom_fields_data=custom_fields_data)
