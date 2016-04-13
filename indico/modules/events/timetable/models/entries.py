@@ -207,9 +207,7 @@ class TimetableEntry(db.Model):
 
     def can_view(self, user):
         """Checks whether the user will see this entry in the timetable."""
-        if self.type == TimetableEntryType.BREAK:
-            return True
-        elif self.type == TimetableEntryType.CONTRIBUTION:
+        if self.type in (TimetableEntryType.CONTRIBUTION, TimetableEntryType.BREAK):
             return self.object.can_access(user)
         elif self.type == TimetableEntryType.SESSION_BLOCK:
             if self.object.can_access(user):
