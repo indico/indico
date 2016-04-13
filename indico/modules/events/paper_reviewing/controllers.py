@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import mimetypes
 
 from flask import flash, redirect, request, session
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.events.paper_reviewing.models.papers import PaperFile
@@ -29,6 +30,8 @@ from indico.util.fs import secure_filename
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
+
+from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 
 
 def _render_paper_file_list(contrib):
@@ -110,6 +113,11 @@ class RHDownloadPaperFile(RHContributionDisplayBase):
             lambda self: self.paper_file
         }
     }
+
+    def _checkProtection(self):
+        has_pr_rights = RCContributionPaperReviewingStaff.hasRights(self)
+        if not self.contrib.can_manage(session.user, 'submit') and not has_pr_rights:
+            raise Forbidden
 
     def _checkParams(self, params):
         RHContributionDisplayBase._checkParams(self, params)
