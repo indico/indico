@@ -32,6 +32,8 @@ from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
 from MaKaC.common.TemplateExec import render
 
+from indico.web.flask.util import url_for
+
 
 class WPTrackModifBase(WPConferenceModifBase):
     sidemenu_option = 'program'
@@ -448,17 +450,17 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         if isinstance(aStatus,_ASTrackViewPA):
             label="""%s"""%(label)
             if aStatus.getContribType() is not None and aStatus.getContribType()!="":
-                accType=aStatus.getContribType().getName()
+                accType=aStatus.getContribType().name
             if aStatus.getConflicts():
                 label = i18nformat("""%s<br><font color="red">[ _("conflicts") ]</font>""")%label
         elif isinstance(aStatus,_ASTrackViewAccepted):
             if aStatus.getContribType() is not None and aStatus.getContribType()!="":
-                accType=aStatus.getContribType().getName()
+                accType=aStatus.getContribType().name
                 label="""%s"""%(label)
         contribType=abstract.getContribType()
         contribTypeName = i18nformat("""--_("not specified")--""")
         if contribType is not None:
-            contribTypeName=contribType.getName()
+            contribTypeName = contribType.name
         comments = ""
         if abstract.getComments():
             comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
@@ -714,7 +716,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         elif isinstance(status, _ASTrackViewPA):
             ct=""
             if status.getContribType() is not None:
-                ct=" (%s)"%self.htmlText(status.getContribType().getName())
+                ct=" (%s)"%self.htmlText(status.getContribType().name)
         elif isinstance(status, _ASTrackViewIC):
             res = self.htmlText(status.getLabel().upper())
         elif isinstance(status, _ASTrackViewDuplicated):
@@ -749,7 +751,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             if status.getContribType() is not None and \
                                             status.getContribType()!="":
                 res = "%s as %s"%(self.htmlText(status.getLabel().upper()), \
-                             self.htmlText(status.getContribType().getName()))
+                             self.htmlText(status.getContribType().name))
         return res
 
     def _getLastJudgement(self):
@@ -798,12 +800,12 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
 
     def _getContribHTML(self):
         res = ""
-        contrib = self._abstract.getContribution()
+        contrib = self._abstract.as_new.contribution
         if contrib is not None:
-            url=urlHandlers.UHContributionModification.getURL(contrib)
-            title=self.htmlText(contrib.getTitle())
-            id=self.htmlText(contrib.getId())
-            res = """<a href=%s>%s - %s</a>"""%(quoteattr(str(url)),id,title)
+            res = '<a href="{}">{} - {}</a>'.format(
+                url_for('contributions.manage_contributions', contrib.event_new, selected=contrib.friendly_id),
+                contrib.id, contrib.title
+            )
         return res
 
     def _getAdditionalFields(self):
@@ -836,7 +838,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["speakers"] = "<br>".join( speakers )
         vars["type"] = i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
-            vars["type"] = self.htmlText( self._abstract.getContribType().getName() )
+            vars["type"] = self.htmlText( self._abstract.getContribType().name )
         tracks = []
         for track in self._abstract.getTrackListSorted():
             tracks.append( """%s"""%track.getTitle() )
