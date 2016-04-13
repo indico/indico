@@ -40,6 +40,8 @@ class PersonLinkDataMixin(object):
         for person_link, is_submitter in value.iteritems():
             person = person_link.person
             principal = person.principal
+            if not principal:
+                continue
             action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
             self.update_principal(principal, **action)
 
@@ -136,6 +138,14 @@ class EventPerson(PersonMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.full_name)
+
+    @property
+    def principal(self):
+        if self.user is not None:
+            return self.user
+        elif self.email:
+            return EmailPrincipal(self.email)
+        return None
 
     @classmethod
     def create_from_user(cls, user, event):
@@ -333,14 +343,6 @@ class PersonLinkBase(PersonMixin, db.Model):
     @property
     def email(self):
         return self.person.email
-
-    @property
-    def principal(self):
-        if self.person.user is not None:
-            return self.person.user
-        elif self.email:
-            return EmailPrincipal(self.email)
-        return None
 
     @hybrid_property
     def object(self):

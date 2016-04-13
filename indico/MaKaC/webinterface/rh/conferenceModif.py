@@ -442,8 +442,9 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
         event = self._conf.as_event
         for sess in event.sessions:
             for convener in sess.conveners:
-                if convener.principal:
-                    sess.update_principal(convener.principal, full_access=True)
+                principal = convener.person.principal
+                if principal:
+                    sess.update_principal(principal, full_access=True)
         self._redirect(urlHandlers.UHConfModifAC.getURL(self._target))
 
 
