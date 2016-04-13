@@ -21,6 +21,7 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableAddBreak,
                                                                 RHLegacyTimetableAddSession,
                                                                 RHLegacyTimetableAddSessionBlock,
+                                                                RHLegacyTimetableDeleteEntry,
                                                                 RHLegacyTimetableGetUnscheduledContributions,
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableReschedule,
@@ -47,6 +48,7 @@ _bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session'
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
 with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/manage/timetable'):
     _bp.add_url_rule('/entry/<int:entry_id>/info', 'entry_info_manage', RHManageTimetableEntryInfo)
+    _bp.add_url_rule('/entry/<int:entry_id>/delete', 'delete_entry', RHLegacyTimetableDeleteEntry, methods=('POST',))
     _bp.add_url_rule('/entry/<int:entry_id>/move', 'move_entry', RHLegacyTimetableEntryMove,
                      methods=('GET', 'POST'))
     _bp.add_url_rule('/entry/<int:entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry, methods=('GET', 'POST'))

@@ -97,13 +97,16 @@ type("TimetableManagementActions", [], {
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
 
-        var params = {
+        var urlArgs = {
             'confId': eventData.conferenceId[0],
             'entry_id': eventData.scheduleEntryId
         };
+        if (self.timetable.isSessionTimetable) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId || self.timetable.contextInfo.timetableSession.id;
+        }
         $.ajax({
-            url: build_url(Indico.Urls.Timetable.entries.delete, params),
-            method: 'DELETE',
+            url: build_url(Indico.Urls.Timetable.entries.delete, urlArgs),
+            method: 'POST',
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
             success: function() {

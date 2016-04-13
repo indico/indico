@@ -112,7 +112,7 @@ def generate_global_file(config):
                     'add': url_rule_to_js('timetable.add_session')
                 },
                 'entries': {
-                    'delete': url_rule_to_js('timetable.timetable_rest'),
+                    'delete': url_rule_to_js('timetable.delete_entry'),
                     'edit': url_rule_to_js('timetable.edit_entry'),
                     'editDatetime': url_rule_to_js('timetable.edit_entry_datetime'),
                     'editTime': url_rule_to_js('timetable.edit_entry_time'),

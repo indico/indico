@@ -28,11 +28,11 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
-from indico.modules.events.contributions.operations import create_contribution, update_contribution
+from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.operations import update_session_block, update_session
+from indico.modules.events.sessions.operations import delete_session_block, update_session_block, update_session
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
@@ -44,7 +44,8 @@ from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,
-                                                        move_timetable_entry, update_timetable_entry_object)
+                                                        move_timetable_entry, update_timetable_entry_object,
+                                                        delete_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   reschedule_subsequent_entries)
@@ -135,8 +136,26 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
         return jsonify_form(form, fields=form._display_fields, disabled_until_change=False)
 
 
-class RHLegacyTimetableEditEntry(RHManageTimetableBase):
+class RHLegacyTimetableDeleteEntry(RHManageTimetableEntryBase):
+    @property
+    def session_management_level(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        elif self.entry.type == TimetableEntryType.CONTRIBUTION and self.event_new.type != 'conference':
+            return SessionManagementLevel.coordinate_with_contribs
+        else:
+            return SessionManagementLevel.coordinate
 
+    def _process(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            delete_session_block(self.entry.session_block)
+        elif self.entry.type == TimetableEntryType.CONTRIBUTION and self.event_new.type != 'conference':
+            delete_contribution(self.entry.contribution)
+        else:
+            delete_timetable_entry(self.entry)
+
+
+class RHLegacyTimetableEditEntry(RHManageTimetableBase):
     @property
     def session_management_level(self):
         if self.edit_session:
