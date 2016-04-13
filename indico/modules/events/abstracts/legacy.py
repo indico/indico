@@ -389,7 +389,7 @@ class AbstractLegacyMixin(object):
             return AbstractDescriptionValue(self.as_new)
         else:
             field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
-            fval = self.event.abstract_fields.filter_by(contribution_field=field, abstract=self.as_new).first()
+            fval = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
             if fval:
                 return fval
             else:
