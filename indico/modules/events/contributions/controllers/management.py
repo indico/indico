@@ -533,7 +533,7 @@ class RHCreateContributionField(RHManageContributionsBase):
         return jsonify_template('forms/form_common_fields_first.html', form=form)
 
 
-class RHManageContributionFieldBase(RHManageContributionBase):
+class RHManageContributionFieldBase(RHManageContributionsBase):
     """Manage a custom contribution field of an event"""
 
     normalize_url_spec = {
