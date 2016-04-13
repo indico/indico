@@ -93,6 +93,7 @@ def generate_global_file(config):
             },
 
             'Timetable': {
+                'pdf': url_rule_to_js('timetable.export_pdf'),
                 'reschedule': url_rule_to_js('timetable.reschedule'),
                 'breaks': {
                     'add': url_rule_to_js('timetable.add_break')
