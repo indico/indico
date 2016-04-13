@@ -184,7 +184,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
                                                RegistrationForm.event_id == int(self.event.id)).count())
-        no_participants = not any(table['rows'] for table in tables)
+        num_participants = sum(len(table['rows']) for table in tables)
 
         return self.view_class.render_template(
             'display/participant_list.html',
@@ -193,7 +193,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             regforms=regforms,
             tables=tables,
             published=published,
-            no_participants=no_participants
+            num_participants=num_participants
         )
 
 

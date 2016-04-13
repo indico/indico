@@ -6,9 +6,8 @@
 {% endblock %}
 
 {% block subtitle %}
-    {% set count = registrations | length %}
-    {% if count > 1 %}
-        {%- trans %}{{ count }} participants{% endtrans -%}
+    {% if num_participants > 1 %}
+        {%- trans num=num_participants %}{{ num }} participants{% endtrans -%}
     {% endif %}
 {% endblock %}
 
@@ -67,7 +66,7 @@
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no published registrations.{% endtrans %}
         {% endcall %}
-    {% elif no_participants %}
+    {% elif not num_participants %}
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no participants yet.{% endtrans %}
         {% endcall %}
