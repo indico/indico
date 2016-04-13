@@ -44,7 +44,7 @@ class ReservationOccurrence(db.Model, Serializer):
     #: users linked to a reservation.  You want to use this in pretty
     #: much all cases where you eager-load the `reservation` relationship.
     NO_RESERVATION_USER_STRATEGY = defaultload('reservation')
-    NO_RESERVATION_USER_STRATEGY.noload('created_by_user')
+    NO_RESERVATION_USER_STRATEGY.lazyload('created_by_user')
     NO_RESERVATION_USER_STRATEGY.noload('booked_for_user')
 
     reservation_id = db.Column(
