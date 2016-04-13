@@ -2848,6 +2848,8 @@ class Conference(CommonObjectBase, Locatable):
         """
         return self.as_event.sessions
 
+    getSessionListSorted = getSessionList
+
     def getNumberOfSessions(self):
         return len(self.as_event.sessions)
 
