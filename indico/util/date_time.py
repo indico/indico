@@ -339,7 +339,7 @@ def get_day_start(day, tzinfo=None):
         tzinfo = day.tzinfo
         day = day.date()
     start_dt = datetime.combine(day, dt_time(0))
-    return pytz.utc.localize(start_dt).astimezone(tzinfo) if tzinfo else start_dt
+    return tzinfo.localize(start_dt) if tzinfo else start_dt
 
 
 def get_day_end(day, tzinfo=None):
@@ -355,7 +355,7 @@ def get_day_end(day, tzinfo=None):
         tzinfo = day.tzinfo
         day = day.date()
     end_dt = datetime.combine(day, dt_time(23, 59))
-    return pytz.utc.localize(end_dt).astimezone(tzinfo) if tzinfo else end_dt
+    return tzinfo.localize(end_dt) if tzinfo else end_dt
 
 
 def round_up_to_minutes(dt, precision=15):
