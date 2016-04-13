@@ -42,10 +42,10 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            % if field._type == 'selection':
+            % if field.getType() == 'selection':
                 ${md_convert(abstract.getField(field.getId()))}
             % else:
-                ${md_convert(abstract.getField(field.getId()).value.decode('utf-8'))}
+                ${md_convert(unicode(abstract.getField(field.getId()).value or ''))}
             % endif
         }
         \vspace{1.5em}
@@ -55,9 +55,9 @@
 
 \vspace{1.5em}
 
-<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=abstract.getPrimaryAuthorsList()" />
-<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=abstract.getCoAuthorList()" />
-<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=abstract.getSpeakerList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Primary author(s)'), list=abstract.getPrimaryAuthorsList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Co-author(s)'), list=abstract.getCoAuthorList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Presenter(s)'), list=abstract.getSpeakerList()" />
 
 \vspace{0.5em}
 
@@ -77,7 +77,7 @@
         \bf
         \noindent ${_("Contribution Type")} :
     }
-    ${latex_escape(contrib_type.getName())}
+    ${latex_escape(contrib_type.name)}
 }
 % endif
 
