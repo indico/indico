@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import noload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -40,7 +39,7 @@ class PersonLinkDataMixin(object):
         self.person_links = value.keys()
         for person_link, is_submitter in value.iteritems():
             person = person_link.person
-            principal = person.user if person.user is not None else EmailPrincipal(person.email)
+            principal = person.principal
             action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
             self.update_principal(principal, **action)
 
@@ -334,6 +333,14 @@ class PersonLinkBase(PersonMixin, db.Model):
     @property
     def email(self):
         return self.person.email
+
+    @property
+    def principal(self):
+        if self.person.user is not None:
+            return self.person.user
+        elif self.email:
+            return EmailPrincipal(self.email)
+        return None
 
     @hybrid_property
     def object(self):

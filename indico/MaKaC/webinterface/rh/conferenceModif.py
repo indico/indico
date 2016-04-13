@@ -438,12 +438,13 @@ class RHConfRemoveAllSubmissionRights( RHConferenceModifBase ):
 class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfGrantModificationToAllConveners
 
-    def _process( self ):
-        for ses in self._target.getSessionList():
-            for slot in ses.getSlotList():
-                for convener in slot.getConvenerList():
-                    ses.grantModification(convener,False)
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
+    def _process(self):
+        event = self._conf.as_event
+        for sess in event.sessions:
+            for convener in sess.conveners:
+                if convener.principal:
+                    sess.update_principal(convener.principal, full_access=True)
+        self._redirect(urlHandlers.UHConfModifAC.getURL(self._target))
 
 
 #######################################################################################
