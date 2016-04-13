@@ -1977,7 +1977,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         var $this = $(this);
                         var params = {
                            'confId': $this.data('confId'),
-                           'timetable_entry_id': $this.data('timetableEntryId')
+                           'entry_id': $this.data('timetableEntryId')
                         };
                         ajaxDialog({
                             trigger: this,
