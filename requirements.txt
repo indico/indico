@@ -45,7 +45,7 @@ Werkzeug==0.11.4
 Flask==0.10.1
 bcrypt==1.0.2
 beautifulsoup4==4.2.1
-Pillow==3.0.0
+Pillow==2.7.0
 qrcode==3.0
 Markdown==2.3.1
 bleach==1.4.2
