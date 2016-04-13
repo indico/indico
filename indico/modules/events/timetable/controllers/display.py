@@ -21,6 +21,7 @@ from flask import jsonify, request
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.timetable.util import render_entry_info_balloon, serialize_event_info
+from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -34,8 +35,12 @@ class RHTimetable(RHConferenceBaseDisplay):
     def _process(self):
         event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
-        return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
-                                                  timetable_data=timetable_data, timetable_layout=self.layout)
+        if self.event_new.theme == 'static':
+            return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
+                                                      timetable_data=timetable_data, timetable_layout=self.layout)
+        else:
+            page = WPTPLConferenceDisplay(self, self._conf, view=self.event_new.theme, type='meeting', params={})
+            return page.display()
 
 
 class RHTimetableEntryInfo(RHConferenceBaseDisplay):
