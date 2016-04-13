@@ -34,6 +34,7 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 from MaKaC.common.timezoneUtils import DisplayTZ
 
@@ -241,7 +242,7 @@ def serialize_contribution_for_ical(contrib):
         'id': contrib.id,
         'startDate': contrib.timetable_entry.start_dt if contrib.timetable_entry else None,
         'endDate': contrib.timetable_entry.end_dt if contrib.timetable_entry else None,
-        'url': '',
+        'url': url_for('contributions.display_contribution', contrib, _external=True),
         'title': contrib.title,
         'location': contrib.venue_name,
         'roomFullname': contrib.room_name
@@ -249,9 +250,10 @@ def serialize_contribution_for_ical(contrib):
 
     description = ''
     if contrib.speakers:
-        speakers = ('{} ({})'.format(s.person.full_name, s.person.affiliation) for s in contrib.speakers)
+        speakers = ('{} ({})'.format(s.full_name, s.affiliation) for s in contrib.speakers)
         description = 'Speakers: {}\n'.format(', '.join(speakers))
 
+    description += contrib.description
     contrib_data['description'] = description
     return contrib_data
 
