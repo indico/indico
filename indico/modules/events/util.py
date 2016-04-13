@@ -198,6 +198,7 @@ def serialize_person_link(person_link):
             'personId': person_link.person.id,
             'email': person_link.person.email,
             'name': person_link.full_name,
+            'fullName': person_link.full_name,
             'firstName': person_link.first_name,
             'familyName': person_link.last_name,
             'title': person_link.title,

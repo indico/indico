@@ -67,9 +67,10 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     if fossil['roomFullname']:
         loc += ' ' + to_unicode(fossil['roomFullname'])
     event.add('location', loc)
-    description = ""
+    description = ''
     if fossil.get('speakers'):
-        speakers = ('{} ({})'.format(speaker['fullName'], speaker['affiliation']) for speaker in fossil['speakers'])
+        speakers = ('{} ({})'.format(speaker['fullName'].encode('utf-8'),
+                                     speaker['affiliation'].encode('utf-8')) for speaker in fossil['speakers'])
         description += 'Speakers: {}\n'.format(', '.join(speakers))
 
     if fossil['description']:
@@ -77,11 +78,12 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         if not desc_text:
             desc_text = '<p/>'
         try:
-            description += '{}\n\n{}'.format(html.fromstring(to_unicode(desc_text)).text_content().encode('utf-8'),
-                                             fossil['url'])
+            description += '{}\n\n{}'.format(to_unicode(html.fromstring(to_unicode(desc_text))
+                                                        .text_content()).encode('utf-8'),
+                                             fossil['url'].encode('utf-8'))
         except ParserError:
             # this happens e.g. if desc_text contains only a html comment
-            description += fossil['url']
+            description += fossil['url'].encode('utf-8')
     else:
         description += fossil['url']
     event.add('description', description)
