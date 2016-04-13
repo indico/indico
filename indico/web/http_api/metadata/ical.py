@@ -46,6 +46,8 @@ ical.cal.types_factory['recur'] = vRecur
 
 
 def _deserialize_date(date_dict):
+    if isinstance(date_dict, datetime):
+        return date_dict
     dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
                           dateutil.parser.parse(date_dict['time']).time())
     return timezone(date_dict['tz']).localize(dt)
