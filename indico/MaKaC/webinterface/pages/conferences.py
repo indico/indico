@@ -509,7 +509,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def __init__(self, rh, conference, view, type, params):
         WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
-        theme_id = self._view or self._conf.as_event.theme
+        theme_id = self._view if self._view and self._view in theme_settings.themes else self._conf.as_event.theme
         self.theme_id = theme_id
         self.theme = theme_settings.themes[theme_id]
 
