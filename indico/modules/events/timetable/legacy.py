@@ -201,7 +201,7 @@ class TimetableSerializer(object):
         data.update(self._get_date_data(entry))
         data['id'] = self._get_entry_key(entry)
         data['uniqueId'] = data['id']
-        data['conferenceId'] = entry.event_id,
+        data['conferenceId'] = entry.event_id
         if self.management:
             data['scheduleEntryId'] = entry.id
         return data
@@ -238,7 +238,7 @@ class TimetableSerializer(object):
         data['affiliation'] = person_link.affiliation
         data['email'] = person_link.person.email
         data['name'] = person_link.get_full_name(last_name_first=False, last_name_upper=False,
-                                                 abbrev_first_name=False, show_title=True),
+                                                 abbrev_first_name=False, show_title=True)
         if self.management:
             data['id'] = person_link.person_id
             data['address'] = person_link.person.address
