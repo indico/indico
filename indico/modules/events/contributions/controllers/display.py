@@ -111,16 +111,20 @@ class RHContributionDisplay(RHContributionDisplayBase):
     """Display page with contribution details """
 
     def _process(self):
-        reviewing_status = get_reviewing_status(self.contrib, self._conf)
-        show_paper = ((self._conf.getConfPaperReview().hasReviewing() and
-                       self.contrib.can_manage(session.user, 'submit')) or reviewing_status == 'Accept')
-        paper_upload_form = PaperUploadForm()
-        paper_file_data = self.contrib.paper_files.filter_by(revision_id=None) if show_paper else None
+        if self.event_new.type == 'conference':
+            reviewing_status = get_reviewing_status(self.contrib, self._conf)
+            show_paper = ((self._conf.getConfPaperReview().hasReviewing() and
+                           self.contrib.can_manage(session.user, 'submit')) or reviewing_status == 'Accept')
+            paper_upload_form = PaperUploadForm()
+            paper_file_data = self.contrib.paper_files.filter_by(revision_id=None) if show_paper else None
+        else:
+            reviewing_status = paper_upload_form = paper_file_data = None
+            show_paper = False
 
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions')
         return WPContributions.render_template('display/contribution_display.html', self._conf,
                                                contribution=self.contrib, event=self.event_new,
-                                               reviewing_status=get_reviewing_status(self.contrib, self._conf),
+                                               reviewing_status=reviewing_status,
                                                show_paper=show_paper,
                                                can_submit_paper=self.contrib.can_manage(session.user, 'submit'),
                                                paper_files=paper_file_data,
