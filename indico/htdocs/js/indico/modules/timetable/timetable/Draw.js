@@ -1975,13 +1975,16 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         }
                     }).on('click', function(evt, params) {
                         var $this = $(this);
-                        var params = {
+                        var urlArgs = {
                            'confId': $this.data('confId'),
                            'entry_id': $this.data('timetableEntryId')
                         };
+                        if (self.timetable.isSessionTimetable) {
+                            urlArgs.session_id = self.timetable.contextInfo.sessionId;
+                        }
                         ajaxDialog({
                             trigger: this,
-                            url: build_url(Indico.Urls.Timetable.entries.edit, params),
+                            url: build_url(Indico.Urls.Timetable.entries.edit, urlArgs),
                             title: $this.data('title'),
                             onClose: function(data) {
                                 if (data && data.entries) {
@@ -2005,13 +2008,13 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         }
                     }).on('click', function(evt) {
                         var $this = $(this);
-                        var params = {
+                        var urlArgs = {
                            'confId': $this.data('confId'),
                            'contrib_id': $this.data('contribId'),
                         };
                         ajaxDialog({
                             trigger: this,
-                            url: build_url(Indico.Urls.Timetable.contributions.protection, params),
+                            url: build_url(Indico.Urls.Timetable.contributions.protection, urlArgs),
                             title: $this.data('title'),
                             onClose: function(data) {
                                 if (data && data.entries) {
