@@ -291,7 +291,11 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def _serialize_date(self, date):
         if date:
-            return date
+            return {
+                'date': str(date.date()),
+                'time': str(date.time()),
+                'tz': str(date.tzinfo)
+            }
 
     def _serialize_persons(self, persons, person_type):
         return [self._serialize_person(person, person_type) for person in persons]

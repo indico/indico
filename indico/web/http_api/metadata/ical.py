@@ -14,14 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+
+import dateutil.parser
+import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
-
-import icalendar as ical
+from pytz import timezone
 
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
+from MaKaC.common.timezoneUtils import nowutc
 
 
 class vRecur(ical.vRecur):
@@ -42,12 +45,18 @@ class vRecur(ical.vRecur):
 ical.cal.types_factory['recur'] = vRecur
 
 
+def _deserialize_date(date_dict):
+    dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
+                          dateutil.parser.parse(date_dict['time']).time())
+    return timezone(date_dict['tz']).localize(dt)
+
+
 def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
     event.add('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
     event.add('dtstamp', now)
-    event.add('dtstart', fossil['startDate'])
-    event.add('dtend', fossil['endDate'])
+    event.add('dtstart', _deserialize_date(fossil['startDate']))
+    event.add('dtend', _deserialize_date(fossil['endDate']))
     event.add('url', fossil['url'])
     event.add('summary', to_unicode(fossil['title']))
     loc = fossil['location'] or ''
