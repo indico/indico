@@ -23,6 +23,7 @@ from hashlib import md5
 
 from flask import request
 from sqlalchemy.orm import joinedload, subqueryload
+from werkzeug.exceptions import ServiceUnavailable
 
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
@@ -70,6 +71,7 @@ class EventTimeTableHook(HTTPAPIHook):
         self._idList = self._pathParams['idlist'].split('-')
 
     def export_timetable(self, aw):
+        raise ServiceUnavailable
         ch = ConferenceHolder()
         d = {}
         for cid in self._idList:
