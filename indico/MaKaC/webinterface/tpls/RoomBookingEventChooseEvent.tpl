@@ -20,16 +20,16 @@
             <input type="radio" name="assign" value="event" id="assign-event">
             <label for="assign-event" style="font-weight: normal;">${ event.getVerboseType() }: <strong>${escape( event.getTitle() )}</strong></label>
         </li>
-        % for session in sorted(event.getSessionList(), key=lambda s: s.getStartDate()):
+        % for sess in sessions:
             <li>
-                <input type="radio" name="assign" value="session-${ session.getId() }" id="assign-session-${ session.getId() }">
-                <label for="assign-session-${ session.getId() }" style="font-weight: normal;">Session: <strong>${escape( session.getTitle() )}</strong></label>
+                <input type="radio" name="assign" value="session-${ sess.id }" id="assign-session-${ sess.id }">
+                <label for="assign-session-${ sess.id }" style="font-weight: normal;">Session: <strong>${escape( sess.title )}</strong></label>
             </li>
         % endfor
-        % for contribution in sorted((c for c in event.getContributionList() if c.getStartDate()), key=lambda c: c.getStartDate()):
+        % for contrib in contribs:
             <li>
-                <input type="radio" name="assign" value="contribution-${ contribution.getId() }" id="assign-contribution-${ contribution.getId() }">
-                <label for="assign-contribution-${ contribution.getId() }" style="font-weight: normal;">Contribution: <strong>${escape( contribution.getTitle() )}</strong></label>
+                <input type="radio" name="assign" value="contribution-${ contrib.id }" id="assign-contribution-${ contrib.id }">
+                <label for="assign-contribution-${ contrib.id }" style="font-weight: normal;">Contribution: <strong>${escape( contrib.title )}</strong></label>
             </li>
         % endfor
     </ul>

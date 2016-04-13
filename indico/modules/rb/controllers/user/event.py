@@ -14,9 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from operator import attrgetter
+
 from flask import request, flash
 
+from indico.core.db import db
 from indico.core.errors import NoReportError
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
                                                              RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple,
@@ -25,9 +30,7 @@ from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookin
                                                              RHRoomBookingCancelBookingOccurrence,
                                                              RHRoomBookingRejectBookingOccurrence)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
-from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
                                                 WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
                                                 WPRoomBookingEventNewBookingSimple, WPRoomBookingEventChooseEvent,
@@ -36,40 +39,38 @@ from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, W
                                                 WPRoomBookingEventNewBookingConfirm)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.conference import CustomRoom, CustomLocation, Session
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
+def _get_object_type(obj):
+    if isinstance(obj, db.m.Event):
+        return 'Event'
+    elif isinstance(obj, db.m.Session):
+        return 'Session'
+    elif isinstance(obj, db.m.Contribution):
+        return 'Contribution'
+    else:
+        raise TypeError('Invalid type: {}'.format(type(obj)))
+
+
 def _get_defaults_from_object(obj):
-    defaults = {'start_dt': obj.getAdjustedStartDate().replace(tzinfo=None),
-                'end_dt': obj.getAdjustedEndDate().replace(tzinfo=None),
-                'booking_reason': "{} '{}'".format(obj.getVerboseType(), obj.getTitle())}
+    defaults = {'start_dt': obj.start_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
+                'end_dt': obj.end_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
+                'booking_reason': "{} '{}'".format(_get_object_type(obj), obj.title)}
     if defaults['end_dt'].date() != defaults['start_dt'].date():
         defaults['repeat_frequency'] = RepeatFrequency.DAY
         defaults['repeat_interval'] = 1
-    if obj.getLocation() and obj.getRoom():
-        room = Room.find_first(Room.name == obj.getRoom().getName(), Location.name == obj.getLocation().getName(),
-                               _join=Room.location)
-        if room:
-            defaults['room_ids'] = [room.id]
+    if obj.room:
+        defaults['room_ids'] = [obj.room.id]
     return defaults
 
 
 def _assign_room(obj, room, flash_message=True):
     if flash_message:
-        flash(_(u"Room of {0} '{1}' set to '{2}'").format(obj.getVerboseType().lower(), obj.getTitle().decode('utf-8'),
-                                                          room.full_name), 'info')
-    if isinstance(obj, Session):
-        for slot in obj.getSlotList():
-            _assign_room(slot, room, False)
-        return
-    custom_location = CustomLocation()
-    custom_location.setName(room.location_name)
-    custom_room = CustomRoom()
-    custom_room.setName(room.name)
-    custom_room.setFullName(room.full_name)
-    obj.setRoom(custom_room)
-    obj.setLocation(custom_location)
+        flash(_(u"Room of {0} '{1}' set to '{2}'").format(_get_object_type(obj).lower(), obj.title, room.full_name),
+              'info')
+    obj.inherit_location = False
+    obj.room = room
 
 
 class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
@@ -94,7 +95,13 @@ class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
 
 class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
     def _process(self):
-        return WPRoomBookingEventChooseEvent(self, self.event).display()
+        contribs = (Contribution.query
+                    .with_parent(self.event_new)
+                    .join(TimetableEntry)  # implies is_scheduled
+                    .order_by(TimetableEntry.start_dt)
+                    .all())
+        sessions = sorted([s for s in self.event_new.sessions if s.start_dt is not None], key=attrgetter('start_dt'))
+        return WPRoomBookingEventChooseEvent(self, self.event).display(contribs=contribs, sessions=sessions)
 
 
 class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDetails):
@@ -290,9 +297,9 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         else:
             element, _, element_id = assign.partition('-')
             if element == 'session':
-                self._assign_to = self.event.getSessionById(element_id)
+                self._assign_to = self.event_new.get_session(element_id)
             elif element == 'contribution':
-                self._assign_to = self.event.getContributionById(element_id)
+                self._assign_to = self.event_new.get_contribution(element_id)
             else:
                 raise NoReportError('Invalid assignment')
             if not self._assign_to:
