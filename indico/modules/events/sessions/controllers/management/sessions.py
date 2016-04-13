@@ -179,7 +179,8 @@ class RHSessionProtection(RHManageSessionBase):
     def _get_defaults(self):
         acl = {x.principal for x in self.session.acl_entries if x.read_access}
         managers = {x.principal for x in self.session.acl_entries if x.full_access}
-        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_role(role='coordinate')}
+        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_role('coordinate',
+                                                                                               explicit=True)}
         return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
                 'acl': acl}
 
