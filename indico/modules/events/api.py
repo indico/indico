@@ -381,7 +381,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'startDate': self._serialize_date(event.start_dt),
             'timezone': event.timezone,
             'endDate': self._serialize_date(event.end_dt),
-            'room': event.room_name,
+            'room': event.get_room_name(full=False),
             'location': event.venue_name,
             'address': event.address,
             'type': event.as_legacy.getType()
