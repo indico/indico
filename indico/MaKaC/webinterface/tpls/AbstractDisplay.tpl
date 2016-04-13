@@ -100,7 +100,7 @@
                     % if contribType:
                         <li>
                             <span class="name">${_("Contribution type")}:</span>
-                            <span class="value">${contribType.getName()}</span>
+                            <span class="value">${contribType.name}</span>
                         <li>
                     % endif
                     % if False:
