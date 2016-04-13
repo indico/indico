@@ -21,7 +21,7 @@ from io import BytesIO
 from flask import session, request, jsonify
 from pytz import timezone
 from sqlalchemy.orm import load_only, noload, joinedload
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -203,6 +203,8 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
     """Export contribution to ICS"""
 
     def _process(self):
+        if not self.contrib.is_scheduled:
+            raise NotFound('This contribution is not scheduled')
         data = {'results': serialize_contribution_for_ical(self.contrib)}
         serializer = Serializer.create('ics')
         return send_file('contribution.ics', BytesIO(serializer(data)), 'text/calendar')
