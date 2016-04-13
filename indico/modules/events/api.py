@@ -341,8 +341,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'description': session_.description,
             'material': build_material_legacy_api_data(session_),
             'isPoster': session_.is_poster,
-            'url': url_for('event.sessionDisplay', confId=session_.event_id, sessionId=session_.friendly_id,
-                           _external=True),  # TODO: Change to new endpoint once it's there
+            'url': url_for('sessions.display_session', session_, _external=True),
             'protectionURL': url_for('sessions.session_protection', session_.event_new, session_, _external=True),
             'roomFullname': session_.room_name,
             'location': session_.venue_name,
@@ -456,8 +455,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 'endDate': self._serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
                 'description': '',  # Session blocks don't have a description
                 'title': block.full_title,
-                'url': url_for('event.sessionDisplay', confId=session_.event_id, sessionId=session_.friendly_id,
-                               _external=True),
+                'url': url_for('sessions.display_session', session_, _external=True),
                 'contributions': map(self._build_contribution_api_data, block.contributions),
                 'note': build_note_api_data(block.note),
                 'session': serialized_session,
