@@ -321,7 +321,7 @@ class WAbstractDisplay(wcomponents.WTemplated):
             vars["tracks"] = status.getTrack()
         else:
             vars["tracks"] = self._abstract.getTrackListSorted()
-            vars["contribType"] = self._abstract.getContribType()
+            vars["contribType"] = self._abstract.as_new.type
         vars["modifyURL"] = str(urlHandlers.UHAbstractModify.getURL(self._abstract))
         vars["withdrawURL"] = str(urlHandlers.UHAbstractWithdraw.getURL(self._abstract))
         vars["recoverURL"] = str(urlHandlers.UHAbstractRecovery.getURL(self._abstract))
