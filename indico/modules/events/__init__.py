@@ -251,6 +251,7 @@ def _check_cloners(app, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_cloners(sender, **kwargs):
     from indico.modules.events import clone
+    yield clone.EventLocationCloner
     yield clone.EventPersonCloner
     yield clone.EventPersonLinkCloner
 
