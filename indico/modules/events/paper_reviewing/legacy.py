@@ -34,9 +34,12 @@ def _load_roles(contribution):
         for r in contribution.paper_reviewing_roles:
             g.contribution_roles[contribution][r.role.name].append(r)
 
+
 @signals.event.contributions.contribution_created.connect
 def _add_legacy_index_entry(contribution, **kwargs):
     from MaKaC.contributionReviewing import ReviewManager
+    if contribution.event_new.type != 'conference':
+        return
     cpr = contribution.event_new.as_legacy.getConfPaperReview()
     cpr._contribution_index[contribution.id] = ReviewManager(contribution.id)
 
