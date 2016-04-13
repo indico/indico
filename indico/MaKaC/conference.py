@@ -2325,7 +2325,7 @@ class Conference(CommonObjectBase, Locatable):
             self._observers = []
         return self._observers
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=0):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0, enforce_constraints=True):
         """
         Set the start/end date for a conference
         """
@@ -2357,7 +2357,7 @@ class Conference(CommonObjectBase, Locatable):
             self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
             self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
-            if moveEntries == 1:
+            if moveEntries == 1 and enforce_constraints:
                 try:
                     db.enforce_constraints()
                 except ConstraintViolated:
@@ -3224,7 +3224,7 @@ class Conference(CommonObjectBase, Locatable):
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
         with track_time_changes():
-            conf.setDates(startDate, endDate, moveEntries=1)
+            conf.setDates(startDate, endDate, moveEntries=1, enforce_constraints=False)
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
