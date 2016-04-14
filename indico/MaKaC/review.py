@@ -731,7 +731,7 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
             if isinstance(abstract.getCurrentStatus(), AbstractStatusAccepted):
                 raise NoReportError(_("Cannot remove an accepted abstract before removing the contribution linked to it"))
             # If it's a withdrawn abstract-->remove abstract from contribution
-            if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn) and abstract.getContribution():
+            if abstract.as_new.contribution:
                 raise NoReportError(_("Cannot remove the abstract before removing the contribution linked to it"))
             for abs in self._abstracts.values():
                 if abs != abstract:

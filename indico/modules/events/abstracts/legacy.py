@@ -23,6 +23,7 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.persons import EventPerson
@@ -485,7 +486,14 @@ class AbstractManagerLegacyMixin(object):
         db.session.flush()
 
     def _remove_abstract(self, legacy_abstract):
-        db.session.delete(legacy_abstract.as_new)
+        abstract = legacy_abstract.as_new
+        # do not use relationshio or with_parent since the contribution
+        # might have been soft-deleted and this does not show up in the
+        # relationship anymore
+        for contrib in Contribution.find(abstract=abstract):
+            contrib.abstract = None
+        db.session.delete(abstract)
+        db.session.flush()
 
 
 class AbstractStatusAcceptedLegacyMixin(object):
