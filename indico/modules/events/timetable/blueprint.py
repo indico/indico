@@ -28,7 +28,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryTime,
                                                                 RHLegacyTimetableMoveEntry,
-                                                                RHLegacyTimetableEditEntryDateTime)
+                                                                RHLegacyTimetableEditEntryDateTime,
+                                                                RHLegacyTimetableShiftEntries)
 from indico.modules.events.timetable.controllers.manage import (RHManageTimetable, RHManageSessionTimetable,
                                                                 RHTimetableREST, RHManageTimetableEntryInfo)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -50,6 +51,7 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
     _bp.add_url_rule('/entry/<int:entry_id>/delete', 'delete_entry', RHLegacyTimetableDeleteEntry, methods=('POST',))
     _bp.add_url_rule('/entry/<int:entry_id>/move', 'move_entry', RHLegacyTimetableMoveEntry,
                      methods=('GET', 'POST'))
+    _bp.add_url_rule('/entry/<int:entry_id>/shift', 'shift_entries', RHLegacyTimetableShiftEntries, methods=('POST',))
     _bp.add_url_rule('/entry/<int:entry_id>/edit/', 'edit_entry', RHLegacyTimetableEditEntry, methods=('GET', 'POST'))
     _bp.add_url_rule('/entry/<int:entry_id>/edit/time', 'edit_entry_time', RHLegacyTimetableEditEntryTime,
                      methods=('GET', 'POST'))

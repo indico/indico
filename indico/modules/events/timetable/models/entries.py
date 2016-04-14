@@ -280,7 +280,7 @@ class TimetableEntry(db.Model):
                 self.parent.extend_parent()
 
     def move(self, start_dt):
-        """Moves the entry to start at a different time.
+        """Move the entry to start at a different time.
 
         This method automatically moves children of the entry to
         preserve their start time relative to the parent's start time.

@@ -291,8 +291,11 @@ def shift_following_entries(event, entry, start_dt):
         return []
 
     diff = start_dt - entry.start_dt
+    new_end_dt = getattr(entry.parent, 'end_dt', None)
     for entr in entries:
         entr.move(entr.start_dt + diff)
-    if entry.parent:
+        if new_end_dt is None or entr.end_dt > new_end_dt:
+            new_end_dt = entr.end_dt
+    if entry.parent and new_end_dt != entry.parent.end_dt:
         update_timetable_entry_object(entry.parent, {'duration': entry.parent.duration + diff})
     return entries

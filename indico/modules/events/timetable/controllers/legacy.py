@@ -410,6 +410,24 @@ class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
         return entries
 
 
+class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
+    @property
+    def session_management_level(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.coordinate
+
+    def _process(self):
+        new_start_dt = (self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('startDate')))
+                        .astimezone(utc))
+        with track_time_changes():
+            shift_following_entries(self.event_new, self.entry, new_start_dt)
+            self.entry.move(new_start_dt)
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry),
+                            timetable=TimetableSerializer(True).serialize_timetable(self.event_new))
+
+
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
     """Changes the start_dt of a `TimetableEntry`"""
 
@@ -429,8 +447,11 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
         tzinfo = self.event_new.tzinfo
         if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
             raise UserValueError(_('Session block cannot span more than one day'))
+        if new_start_dt < self.event_new.start_dt:
+            raise UserValueError(_('You cannot move the block before event start date.'))
         with track_time_changes(auto_extend=True) as changes:
             parent = self.entry.parent
+            update_timetable_entry_object(self.entry, {'duration': new_duration})
             if parent and new_start_dt < parent.start_dt:
                 update_timetable_entry_object(parent, {'duration': parent.end_dt - new_start_dt})
                 update_timetable_entry(parent, {'start_dt': new_start_dt})
@@ -438,7 +459,6 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
                 update_timetable_entry_object(parent, {'duration': new_end_dt - parent.start_dt})
             if is_session_block:
                 self.entry.move(new_start_dt)
-            update_timetable_entry_object(self.entry, {'duration': new_duration})
             if not is_session_block:
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
         if is_session_block and self.entry.children:
