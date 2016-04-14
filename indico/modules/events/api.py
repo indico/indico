@@ -25,6 +25,7 @@ from flask import request
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import ServiceUnavailable
 
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
@@ -161,6 +162,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         self._occurrences = hook._occurrences
         self._location = hook._location
         self._room = hook._room
+        self.user = getattr(aw.getUser(), 'user', None)
 
     def _postprocess(self, obj, fossil, iface):
         return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
@@ -289,6 +291,15 @@ class CategoryEventFetcher(IteratedDataFetcher):
     def serialize_events(self, events):
         return map(self._build_event_api_data, events)
 
+    def _serialize_access_list(self, obj):
+        data = {'users': [], 'groups': []}
+        for manager in obj.get_access_list():
+            if manager.principal_type in (PrincipalType.user, PrincipalType.email):
+                data['users'].append(manager.email)
+            elif manager.principal_type == PrincipalType.multipass_group:
+                data['groups'].append(manager.name)
+        return data
+
     def _serialize_date(self, date):
         if date:
             return {
@@ -297,19 +308,22 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 'tz': str(date.tzinfo)
             }
 
-    def _serialize_persons(self, persons, person_type):
-        return [self._serialize_person(person, person_type) for person in persons]
+    def _serialize_persons(self, persons, person_type, can_manage=False):
+        return [self._serialize_person(person, person_type, can_manage) for person in persons]
 
-    def _serialize_person(self, person, person_type):
+    def _serialize_person(self, person, person_type, can_manage=False):
         if person:
-            return {
+            data = {
                 '_type': person_type,
                 '_fossil': self.fossils_mapping['person'].get(person_type, None),
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': person.id if getattr(person, 'id', None) else person.person_id,
                 'affiliation': person.affiliation,
-                'emailHash': md5(person.email).hexdigest() if person.email else None,
+                'emailHash': md5(person.email).hexdigest() if person.email else None
             }
+            if self.user and can_manage:
+                data['email'] = person.email or None
+            return data
 
     def _serialize_convener(self, convener):
         return {
@@ -388,6 +402,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         }
 
     def _build_event_api_data(self, event):
+        can_manage = self.user is not None and event.can_manage(self.user)
         data = self._build_event_basic_api_data(event)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level, None),
@@ -398,14 +413,16 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
             'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
             'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
-            'creator': self._serialize_person(event.creator, person_type='Avatar'),
+            'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
             'hasAnyProtection': event.as_legacy.hasAnyProtection(),
             'roomMapURL': event.room.map_url if event.room else None,
             'visibility': Conversion.visibility(event.as_legacy),
             'folders': build_folders_api_data(event),
-            'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair'),
+            'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
             'material': build_material_legacy_api_data(event) + [build_note_legacy_api_data(event.note)]
         })
+        if can_manage:
+            data['allowed'] = self._serialize_access_list(event)
         if self._detail_level in {'contributions', 'subcontributions'}:
             data['contributions'] = []
             for contribution in event.contributions:
@@ -444,9 +461,12 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def _build_session_api_data(self, session_):
         data = []
+        session_access_list = None
         serialized_session = self._serialize_session(session_)
+        if self.user and session_.can_manage(self.user):
+            session_access_list = self._serialize_access_list(session_)
         for block in session_.blocks:
-            data.append({
+            block_data = {
                 '_type': 'SessionSlot',
                 '_fossil': 'sessionMetadata',
                 'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
@@ -467,10 +487,14 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 'slotTitle': block.title,
                 'address': block.address,
                 'conveners': map(self._serialize_convener, block.person_links)
-            })
+            }
+            if session_access_list:
+                block_data['allowed'] = session_access_list
+            data.append(block_data)
         return data
 
     def _build_contribution_api_data(self, contrib, include_subcontribs=True):
+        can_manage = self.user is not None and contrib.can_manage(self.user)
         data = {
             '_type': 'Contribution',
             '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
@@ -489,20 +513,23 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'url': url_for('contributions.display_contribution', contrib, _external=True),
             'material': build_material_legacy_api_data(contrib),
             'speakers': self._serialize_persons([x.person for x in contrib.speakers],
-                                                person_type='ContributionParticipation'),
+                                                person_type='ContributionParticipation', can_manage=can_manage),
             'primaryauthors': self._serialize_persons([x.person for x in contrib.primary_authors],
-                                                      person_type='ContributionParticipation'),
+                                                      person_type='ContributionParticipation', can_manage=can_manage),
             'coauthors': self._serialize_persons([x.person for x in contrib.secondary_authors],
-                                                 person_type='ContributionParticipation'),
+                                                 person_type='ContributionParticipation', can_manage=can_manage),
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
         }
         if include_subcontribs:
             data['subContributions'] = map(self._build_subcontribution_api_data, contrib.subcontributions)
+        if can_manage:
+            data['allowed'] = self._serialize_access_list(contrib)
         return data
 
     def _build_subcontribution_api_data(self, subcontrib):
+        can_manage = self.user is not None and subcontrib.contribution.can_manage(self.user)
         data = {
             '_type': 'SubContribution',
             '_fossil': 'subContributionMetadata',
@@ -513,7 +540,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'material': build_material_legacy_api_data(subcontrib),
             'folders': build_folders_api_data(subcontrib),
             'speakers': self._serialize_persons([x.person for x in subcontrib.speakers],
-                                                person_type='SubContribParticipation')
+                                                person_type='SubContribParticipation', can_manage=can_manage)
         }
         return data
 

@@ -535,7 +535,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
 
     # XXX: Delete once event ACLs are in the new DB
     def get_access_list(self):
-        return self.as_legacy.getRecursiveAllowedToAccessList()
+        return {x.as_new for x in self.as_legacy.getRecursiveAllowedToAccessList()}
 
     def get_contribution_field(self, field_id):
         return next((v for v in self.contribution_fields if v.id == field_id), '')
