@@ -66,6 +66,7 @@ class EventPersonCloner(EventCloner):
 class EventPersonLinkCloner(EventCloner):
     name = 'event_person_links'
     requires = {'event_persons'}
+    is_default = True
 
     @property
     def friendly_name(self):
