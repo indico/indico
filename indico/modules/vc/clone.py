@@ -26,6 +26,7 @@ class VCCloner(EventCloner):
     name = 'vc'
     friendly_name = _('Videoconference rooms')
     uses = {'sessions', 'contributions'}
+    is_default = True
 
     @property
     def is_visible(self):
