@@ -20,7 +20,6 @@ from datetime import timedelta
 from operator import attrgetter
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import noload, contains_eager, load_only
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
