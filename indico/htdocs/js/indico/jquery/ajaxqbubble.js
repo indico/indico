@@ -104,7 +104,9 @@
                     hide: function(evt) {
                         var originalEvent = evt.originalEvent;
 
-                        self.options.onClose(returnData);
+                        if (self.options.onClose) {
+                            self.options.onClose(returnData);
+                        }
                         returnData = null;
 
                         // in order not to hide the qBubble when selecting a date
