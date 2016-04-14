@@ -49,7 +49,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         delete_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
-                                                  reschedule_subsequent_entries)
+                                                  shift_following_entries)
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import format_time, iterdays, as_utc
 from indico.util.i18n import _
@@ -234,7 +234,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         if form.validate_on_submit():
             with track_time_changes():
                 if shift_later:
-                    updated_entries += reschedule_subsequent_entries(self.event_new, self.entry, form.start_dt.data)
+                    updated_entries += shift_following_entries(self.event_new, self.entry, form.start_dt.data)
                 if self.entry.contribution:
                     update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})

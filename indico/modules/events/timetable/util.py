@@ -275,7 +275,7 @@ def get_session_block_entries(event, day):
             .all())
 
 
-def reschedule_subsequent_entries(event, entry, start_dt):
+def shift_following_entries(event, entry, start_dt):
     """Reschedules entries with start_dt > entry.start_dt"""
     from indico.modules.events.timetable.operations import update_timetable_entry_object
 
