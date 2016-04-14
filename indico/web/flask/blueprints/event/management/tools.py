@@ -23,8 +23,8 @@ from MaKaC.webinterface.rh import conferenceModif
 event_mgmt.add_url_rule('/tools/', 'confModifTools', redirect_view('event_mgmt.confModifTools-badgePrinting'))
 
 # Tools: Clone
-event_mgmt.add_url_rule('/tools/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
-event_mgmt.add_url_rule('/tools/clone', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
+event_mgmt.add_url_rule('/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
+event_mgmt.add_url_rule('/clone', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
                         methods=('POST',))
 
 # Tools: Posters
