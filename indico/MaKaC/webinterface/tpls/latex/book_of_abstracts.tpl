@@ -21,10 +21,10 @@
 <%block name="book_body">
     % for contrib in contribs:
         % if contrib.can_access(_session.user):
-            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{300pt} / ${_("Book of Abstracts")}}
+            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Book of Abstracts")}}
             \fancyhead[R]{}
 
-            \addcontentsline{toc}{chapter}{${contrib.title | latex_escape} ${('{0}').format(contrib.getId()) if conf.getBOAConfig().getShowIds() else ''}
+            \addcontentsline{toc}{chapter}{${contrib.title | latex_escape} ${('{0}').format(contrib.id) if conf.getBOAConfig().getShowIds() else ''}
             }
 
             <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>

@@ -412,7 +412,8 @@ class RHContributionsExportPDFBook(RHManageContributionsActionsBase):
 
 class RHContributionsExportPDFBookSorted(RHManageContributionsActionsBase):
     def _process(self):
-        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone, sort_by='boardNo')
+        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone,
+                               sort_by='board_number')
         return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')
 
 

@@ -29,7 +29,7 @@
             \textbf {${_("Author(s):")}}
         % endif
         % for author, affil_id in affiliation_contribs[contrib.id]['authors_affil']:
-            ${author.person.full_name}\textsuperscript{${affil_id}}
+            ${author.full_name | latex_escape}\textsuperscript{${affil_id}}
             % if not loop.last:
                 ;
             % endif
@@ -41,7 +41,7 @@
     \footnotesize {
         \textbf {${_("Co-author(s):")}}
         % for author, affil_id in affiliation_contribs[contrib.id]['coauthors_affil']:
-            ${author.person.full_name}
+            ${author.full_name | latex_escape}
             % if affil_id is not None:
                 \textsuperscript{${affil_id}}
             % endif
@@ -63,7 +63,7 @@
 
 % if corresp_authors.get(contrib.id):
 \textbf {${_("Corresponding Author(s):")}}
-        ${", ".join(corresp_authors[contrib.id])}
+        ${", ".join(corresp_authors[contrib.id]) | latex_escape}
 % endif
 
 \vspace{0.5em}
@@ -92,7 +92,7 @@
         \sectionfont{\normalsize\rmfamily}
         \subsectionfont{\small\rmfamily}
         \small
-        ${ md_convert(field_value.friendly_data.decode('utf-8')).encode('utf-8') }
+        ${ md_convert(field_value.friendly_data) }
     }
 
     \vspace{0.5em}

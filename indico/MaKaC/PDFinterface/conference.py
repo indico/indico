@@ -410,8 +410,20 @@ class ContributionBook(PDFLaTeXBase):
     _tpl_filename = "contribution_list_boa.tpl"
 
     def _sort_contribs(self, contribs, sort_by, aw):
-        attr = {'boardNo': 'board_number', 'schedule': 'start_dt'}.get(sort_by, 'title')
-        return sorted(contribs, key=attrgetter(attr))
+        mapping = {'number': 'id', 'name': 'title'}
+        if sort_by == 'schedule':
+            key_func = lambda c: (c.start_dt is None, c.start_dt)
+        elif sort_by == 'sessionTitle':
+            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '')
+        elif sort_by == 'speaker':
+            def key_func(c):
+                speakers = c.speakers
+                if not c.speakers:
+                    return True, None
+                return False, speakers[0].get_full_name(last_name_upper=False, abbrev_first_name=False).lower()
+        else:
+            key_func = attrgetter(mapping.get(sort_by) or 'title')
+        return sorted(contribs, key=key_func)
 
     def __init__(self, conf, aw, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
