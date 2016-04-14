@@ -288,7 +288,7 @@ def reschedule_subsequent_entries(event, entry, start_dt):
     else:
         entries = entries.filter(TimetableEntry.parent == entry.parent).all()
     if not entries:
-        return
+        return []
 
     diff = start_dt - entry.start_dt
     for entr in entries:
