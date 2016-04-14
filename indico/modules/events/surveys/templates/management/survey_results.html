@@ -11,7 +11,7 @@
                 <h4>{{ section.title }}</h4>
             {% endif %}
             {% for question in section.children if question.type.name == 'question' %}
-                <div class="i-box titled">
+                <div class="i-box">
                     <div class="i-box-header">
                         <div class="i-box-title">
                             {{ question.title }}

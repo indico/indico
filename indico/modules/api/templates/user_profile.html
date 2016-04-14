@@ -8,7 +8,7 @@
 
 {% block user_content %}
     <div class="i-box-group vert">
-        <div class="i-box titled">
+        <div class="i-box">
             <div class="i-box-header">
                 <div class="i-box-title">
                     {%- trans %}API Key{% endtrans -%}
@@ -96,7 +96,7 @@
         </div>
 
         {% if session.user.is_admin and (key or old_keys) %}
-            <div class="i-box titled">
+            <div class="i-box">
                 <div class="i-box-header">
                     <div class="i-box-title">
                         {%- trans %}Administration{% endtrans -%}

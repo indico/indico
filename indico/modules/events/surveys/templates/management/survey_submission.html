@@ -23,7 +23,7 @@
 {% block content %}
     <div id="survey-submission" class="i-box-content">
         {% for section in survey.sections if section.children -%}
-            <div class="i-box titled">
+            <div class="i-box">
                 {%- if section.display_as_section %}
                     <div class="i-box-header">
                         <div class="i-box-title">{{ section.title }}</div>

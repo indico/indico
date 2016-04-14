@@ -56,7 +56,7 @@
 </h2>
 
 <div class="i-box-group horz">
-    <div class="i-box titled">
+    <div class="i-box">
         <div class="i-box-header">
             <div class="i-box-title">
                 ${ _('Booking stats') }
@@ -114,7 +114,7 @@
             </table>
         </div>
     </div>
-    <div class="i-box titled occupancy-stats">
+    <div class="i-box occupancy-stats">
         <div class="i-box-header">
             <div class="i-box-header-text">
                 <div class="i-box-title">
