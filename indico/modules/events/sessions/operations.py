@@ -103,5 +103,7 @@ def delete_session_block(session_block):
     delete_timetable_entry(session_block.timetable_entry, log=False)
     signals.event.session_block_deleted.send(session_block)
     session_.blocks.remove(session_block)
+    if not session_.blocks and session_.event_new.type != 'conference':
+        delete_session(session_)
     db.session.flush()
     logger.info('Session block %s deleted by %s', session_block, session.user)

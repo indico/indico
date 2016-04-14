@@ -284,7 +284,6 @@ def serialize_session(sess):
         'id': sess.id,
         'isPoster': sess.is_poster,
         'location': sess.venue_name,
-        'numSlots': len(sess.blocks),
         'protectionURL': '',
         'room': sess.room_name,
         'roomFullname': sess.room_name,

@@ -79,18 +79,6 @@ type("TimetableManagementActions", [], {
     deleteEntry: function(eventData) {
         var self = this;
         var info = new WatchObject();
-        var type = eventData.entryType;
-
-        if (exists(eventData.sessionId)) {
-            info.set('session', eventData.sessionId);
-            info.set('slot', eventData.sessionSlotId);
-
-            if (type != 'Session') {
-                type = 'Session' + eventData.entryType;
-            } else if(self.isSessionTimetable || self.eventInfo.sessions[eventData.sessionId].numSlots > 1) {
-                type = 'SessionSlot';
-            }
-        }
 
         info.set('scheduleEntry', eventData.scheduleEntryId);
         info.set('conference', eventData.conferenceId);
@@ -123,14 +111,6 @@ type("TimetableManagementActions", [], {
                         self.timetable.setData(self.session);
                     } else {
                         self.timetable.setData(timetableData);
-                    }
-                    if (type == 'SessionSlot') {
-                        self.eventInfo.sessions[eventData.sessionId].numSlots--;
-                        // if(self.isSessionTimetable && self.eventInfo.sessions[eventData.sessionId].numSlots == 0) {
-                        //     new AlertPopup($T("Warning"), $T("You have deleted the last slot of the session. As a consequence, the session has also been deleted and you will be redirected to the Timetable management"), function(){
-                        //         location.href = Indico.Urls.ConfModifSchedule + "?confId=" + self.eventInfo.id
-                        //     }).open();
-                        // }
                     }
                 }
             }
