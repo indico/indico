@@ -75,6 +75,7 @@ type("TimetableManagementActions", [], {
             moveEntry: 'schedule.event.moveEntry'
         }
     },
+
     deleteEntry: function(eventData) {
         var self = this;
         var info = new WatchObject();
@@ -95,8 +96,6 @@ type("TimetableManagementActions", [], {
         info.set('conference', eventData.conferenceId);
         info.set('sessionTimetable', self.isSessionTimetable);
 
-        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
-
         var urlArgs = {
             'confId': eventData.conferenceId[0],
             'entry_id': eventData.scheduleEntryId
@@ -109,34 +108,35 @@ type("TimetableManagementActions", [], {
             method: 'POST',
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
-            success: function() {
-                var data = self.timetable.getData();
-                var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+            success: function(data) {
+                if (data) {
+                    var timetableData = self.timetable.getData();
+                    var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
 
-                killProgress();
+                    if (self.session) {
+                        delete timetableData[eventData.id];
+                    } else {
+                        delete timetableData[day][eventData.id];
+                    }
 
-                if (self.session) {
-                    delete data[eventData.id];
-                } else {
-                    delete data[day][eventData.id];
-                }
-
-                if (self.session) {
-                    self.timetable.setData(self.session);
-                } else {
-                    self.timetable.setData(data);
-                }
-                if (type == 'SessionSlot') {
-                    self.eventInfo.sessions[eventData.sessionId].numSlots--;
-                    // if(self.isSessionTimetable && self.eventInfo.sessions[eventData.sessionId].numSlots == 0) {
-                    //     new AlertPopup($T("Warning"), $T("You have deleted the last slot of the session. As a consequence, the session has also been deleted and you will be redirected to the Timetable management"), function(){
-                    //         location.href = Indico.Urls.ConfModifSchedule + "?confId=" + self.eventInfo.id
-                    //     }).open();
-                    // }
+                    if (self.session) {
+                        self.timetable.setData(self.session);
+                    } else {
+                        self.timetable.setData(timetableData);
+                    }
+                    if (type == 'SessionSlot') {
+                        self.eventInfo.sessions[eventData.sessionId].numSlots--;
+                        // if(self.isSessionTimetable && self.eventInfo.sessions[eventData.sessionId].numSlots == 0) {
+                        //     new AlertPopup($T("Warning"), $T("You have deleted the last slot of the session. As a consequence, the session has also been deleted and you will be redirected to the Timetable management"), function(){
+                        //         location.href = Indico.Urls.ConfModifSchedule + "?confId=" + self.eventInfo.id
+                        //     }).open();
+                        // }
+                    }
                 }
             }
         });
     },
+
     editEntry: function(eventData) {
         var url, urlParams;
 

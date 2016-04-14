@@ -153,6 +153,7 @@ class RHLegacyTimetableDeleteEntry(RHManageTimetableEntryBase):
             delete_contribution(self.entry.contribution)
         else:
             delete_timetable_entry(self.entry)
+        return jsonify_data(flash=False)
 
 
 class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
