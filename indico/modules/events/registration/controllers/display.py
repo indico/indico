@@ -118,7 +118,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         query = (Registration
                  .find(Registration.event_id == self.event.id,
-                       Registration.state == RegistrationState.complete,
+                       Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
                        RegistrationForm.publish_registrations_enabled,
                        ~RegistrationForm.is_deleted,
                        ~Registration.is_deleted,
