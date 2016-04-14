@@ -35,6 +35,14 @@
 
 <table width="90%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
 
+<tr>
+    <td colspan="5" style="padding: 1em 0;">
+        <h3>Paper files</h3>
+        ${ render_template('events/paper_reviewing/mako_compat/paper_file_list.html',
+                           paper_files=Contribution.paper_files) }
+    </td>
+</tr>
+
 % if ConferenceChoice == 3 or ConferenceChoice == 4:
 <tr><td>
 <table width="100%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
