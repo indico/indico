@@ -33,9 +33,9 @@ class RHTimetable(RHConferenceBaseDisplay):
             self.layout = request.args.get('ttLyt')
 
     def _process(self):
-        event_info = serialize_event_info(self.event_new)
-        timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
         if self.event_new.theme == 'static':
+            event_info = serialize_event_info(self.event_new)
+            timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
             return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
                                                       timetable_data=timetable_data, timetable_layout=self.layout)
         else:
