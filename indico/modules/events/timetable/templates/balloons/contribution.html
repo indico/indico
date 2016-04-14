@@ -20,17 +20,17 @@
                     <a class="icon-transmission i-button-icon close-balloon js-move"
                        title="{% trans %}Move contribution{% endtrans %}"></a>
                 {% endif %}
-                <a class="icon-remove i-button-icon close-balloon js-delete"
-                    {%- if contrib.event_new.type != 'conference' %}
-                        data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
-                        title="{% trans %}Delete contribution{% endtrans %}"
-                        data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution '{{ title }}'?{% endtrans %}"
-                    {% else %}
-                        data-title="{% trans title=contrib.title %}Delete contribution timetable entry '{{ title }}'?{% endtrans %}"
-                        title="{% trans %}Delete contribution timetable entry{% endtrans %}"
-                        data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution timetable entry '{{ title }}'?{% endtrans %}"
-                    {% endif %}>
-                </a>
+                {% if contrib.event_new.type == 'conference' %}
+                    <a class="icon-remove i-button-icon close-balloon js-delete"
+                       data-title="{% trans title=contrib.title %}Delete contribution timetable entry '{{ title }}'?{% endtrans %}"
+                       title="{% trans %}Delete contribution timetable entry{% endtrans %}"
+                       data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution timetable entry '{{ title }}'?{% endtrans %}"></a>
+                {% elif can_manage_contributions %}
+                    <a class="icon-remove i-button-icon close-balloon js-delete"
+                       data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
+                       title="{% trans %}Delete contribution{% endtrans %}"
+                       data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution '{{ title }}'?{% endtrans %}"></a>
+                {% endif %}
             {% else %}
                 <a class="icon-list i-button-icon" title="{% trans %}View contribution details{% endtrans %}"
                    href="{{ url_for('contributions.display_contribution', contrib) }}"></a>

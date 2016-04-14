@@ -2044,13 +2044,13 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                     return Html.$(link);
                 }
 
-                var entryTools;
-                var entryToolsStyle = {className: 'group right'};
+                var entryTools = Html.div({className: 'group right'});
                 if (!self.timetable.isSessionTimetable || self.timetable.canManageContribs) {
-                    entryTools = Html.div(entryToolsStyle, createEditLink(blockData), createProtectionLink(blockData),
-                                          createDeleteLink(blockData));
-                } else {
-                    entryTools = Html.div(entryToolsStyle, createDeleteLink(blockData));
+                    entryTools.append(createEditLink(blockData));
+                    entryTools.append(createProtectionLink(blockData));
+                }
+                if (self.timetable.eventInfo.isConference || self.timetable.canManageContribs) {
+                    entryTools.append(createDeleteLink(blockData));
                 }
                 var entryInfo = Html.div({},blockData.friendlyId + " - " + blockData.title );
                 var block = Html.div({className:'posterEntry'},
