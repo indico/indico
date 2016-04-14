@@ -213,7 +213,11 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
     def _process( self ):
         if self._accept:
             cType=self._conf.getContribTypeById(self._typeId)
+
             st = review.AbstractStatusAccepted(self._target, None, '')
+            self._target.as_new.accepted_track_id = self._track.id if self._track else None
+            self._target.as_new.accepted_type = cType
+
             wrapper=_AbstractWrapper(st)
             tpl=self._target.getOwner().getNotifTplForAbstract(wrapper)
             if self._doNotify and not self._warningShown and tpl is None:

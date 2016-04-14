@@ -128,9 +128,5 @@ class Abstract(DescriptionMixin, db.Model):
         return amgr.getAbstractById(str(self.legacy_id))
 
     @property
-    def track(self):
-        return self.event_new.as_legacy.getTrackById(str(self.track_id))
-
-    @property
     def accepted_track(self):
         return self.event_new.as_legacy.getTrackById(str(self.accepted_track_id))

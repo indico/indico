@@ -500,6 +500,12 @@ class AbstractStatusAcceptedLegacyMixin(object):
     def getType(self):
         return self._abstract.as_new.accepted_type
 
+    def _setTrack(self, track):
+        self._abstract.as_new.accepted_track_id = track.id
+
+    def getTrack(self):
+        return self._abstract.as_new.accepted_track
+
 
 class AbstractJudgmentLegacyMixin(object):
     @property

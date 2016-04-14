@@ -478,7 +478,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
                 if cType is None or cType=="":
                     cType="--none--"
                 elif cType not in ["--none--","--any--"]:
-                    cType=cType.getName()
+                    cType=cType.name
                 caption= _("""ACCEPTED - type: %s - track: %s""")%(self.htmlText(cType),self.htmlText(track))
             elif isinstance(cond,review.NotifTplCondRejected):
                 caption= _("""REJECTED""")

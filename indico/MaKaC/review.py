@@ -32,6 +32,7 @@ from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
                                                     AbstractLegacyMixin,
                                                     AbstractManagerLegacyMixin,
                                                     AbstractStatusAcceptedLegacyMixin)
+from indico.modules.events.contributions.models.types import ContributionType
 from indico.util.string import safe_slice, safe_upper
 from indico.util.text import wordsCounter
 
@@ -2596,17 +2597,6 @@ class AbstractStatusAccepted(AbstractStatusAcceptedLegacyMixin, AbstractStatus):
             self._comments = ""
         return self._comments
 
-    def _setTrack( self, track ):
-        self._track = track
-
-    def getTrack( self ):
-        try:
-            if self._track:
-                pass
-        except AttributeError:
-            self._track = None
-        return self._track
-
     def update( self ):
         return
 
@@ -3346,8 +3336,8 @@ class NotifTplCondAccepted(NotifTplCondition):
 
     def __init__(self,track="--any--",contribType="--any--"):
         NotifTplCondition.__init__(self)
-        self._track=track
-        self._contribType=contribType
+        self._track = track
+        self._contrib_type_id = contribType if isinstance(contribType, basestring) else contribType.id
 
     def clone(self, conference, template):
         ntca = NotifTplCondAccepted()
@@ -3361,10 +3351,12 @@ class NotifTplCondAccepted(NotifTplCondition):
         return ntca
 
     def setContribType(self, ct="--any--"):
-        self._contribType = ct
+        self._contrib_type_id = '--any--' if ct == '--any--' else ct.id
 
     def getContribType(self):
-        return self._contribType
+        # Ugly, but only way to handle '--any--'
+        return (ContributionType.get(self._contrib_type_id) if isinstance(self._contrib_type_id, int)
+                else self._contrib_type_id)
 
     def setTrack(self, tr="--any--"):
         self._track = tr
@@ -3377,26 +3369,29 @@ class NotifTplCondAccepted(NotifTplCondition):
             self._track="--any--"
         return self._track
 
-    def _satifiesContribType(self,abs):
-        status=abs.getCurrentStatus()
-        if self._contribType=="--any--":
+    def _satifiesContribType(self, abs_wrap):
+        abstract_type = abs_wrap.getCurrentStatus().getAbstract().as_new.accepted_type
+        if self._contrib_type_id == "--any--":
             return True
         else:
-            if self._contribType=="" or self._contribType==None or \
-                                            self._contribType=="--none--":
-                return status.getType()=="" or status.getType()==None
-            return status.getType()==self._contribType
+            if self._contrib_type_id == '--none--':
+                return not abstract_type
+            if not abstract_type:
+                return False
+            # TODO: use ids in db, instead of objects!
+            return abstract_type.id == self._contrib_type_id
         return False
 
-    def _satifiesTrack(self,abs):
-        status=abs.getCurrentStatus()
-        if self.getTrack()=="--any--":
+    def _satifiesTrack(self, abs_wrap):
+        accepted_track = abs_wrap.getCurrentStatus().getTrack()
+        target_track = self.getTrack()
+
+        if target_track == "--any--":
             return True
         else:
-            if self.getTrack()=="" or self.getTrack() is None or \
-                                            self.getTrack()=="--none--":
-                return status.getTrack()=="" or status.getTrack()==None
-            return status.getTrack()==self.getTrack()
+            if not target_track or target_track == '--none--':
+                return not bool(accepted_track)
+            return accepted_track == target_track
         return False
 
     def satisfies(self,abs):

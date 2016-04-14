@@ -1518,7 +1518,7 @@ class RHAbstractManagmentMultiple( RHConferenceModifBase ):
         for abstract in self._abstracts:
             if statusKlass == review.AbstractStatusAccepted:
                 status = statusKlass(abstract, None)
-                abstract.as_new.track_id = self._track.id if self._track else None
+                abstract.as_new.accepted_track_id = self._track.id if self._track else None
                 abstract.as_new.accepted_type = cType
             elif statusKlass == review.AbstractStatusRejected:
                 status=statusKlass(abstract,None, None)

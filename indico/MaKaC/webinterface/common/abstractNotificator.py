@@ -104,7 +104,7 @@ class AbsContribTypeTplVar(TplVar):
         status=abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
             if status.getType() is not None:
-                return status.getType().getName()
+                return status.getType().name
         return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
