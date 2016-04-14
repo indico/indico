@@ -309,8 +309,23 @@ div.event-header {
     line-height: 2rem;
 
     &.top-level {
-        &.start-time {
+        .start-time {
             background-color: $tt-primary-color;
+            margin-left: -10px;
+            padding-left: 10px;
+            position: relative;
+
+            &:before {
+                content: ' ';
+                position: absolute;
+                width: 0;
+                height: 0;
+                left: 0px;
+                top: 100%;
+                border-width: 5px 5px;
+                border-style: solid;
+                border-color: $light-black $light-black transparent transparent;
+            }
         }
     }
 
