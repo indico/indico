@@ -129,7 +129,7 @@ class TimetableSerializer(object):
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration.seconds / 60,
-                     'pdf': None,
+                     'pdf': url_for('contributions.export_pdf', entry.contribution),
                      'presenters': map(self._get_person_data,
                                        sorted(contribution.person_links,
                                               key=lambda x: (x.author_type != AuthorType.primary,
