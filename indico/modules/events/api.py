@@ -362,7 +362,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'address': session_.address,
             '_fossil': 'sessionMinimal',
             'numSlots': len(session_.blocks),
-            'id': session_.legacy_mapping.legacy_session_id if session_.legacy_mapping else session_.id,
+            'id': (session_.legacy_mapping.legacy_session_id
+                   if session_.legacy_mapping else unicode(session_.friendly_id)),
+            'db_id': session_.id,
             'room': session_.get_room_name(full=False)
         }
 
@@ -498,7 +500,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
         data = {
             '_type': 'Contribution',
             '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
-            'id': contrib.legacy_mapping.legacy_contribution_id if contrib.legacy_mapping else contrib.id,
+            'id': (contrib.legacy_mapping.legacy_contribution_id
+                   if contrib.legacy_mapping else unicode(contrib.friendly_id)),
+            'db_id': contrib.id,
             'title': contrib.title,
             'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
             'endDate': self._serialize_date(contrib.start_dt + contrib.duration) if contrib.start_dt else None,
@@ -533,7 +537,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
         data = {
             '_type': 'SubContribution',
             '_fossil': 'subContributionMetadata',
-            'id': subcontrib.legacy_mapping.legacy_subcontribution_id if subcontrib.legacy_mapping else subcontrib.id,
+            'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
+                   if subcontrib.legacy_mapping else unicode(subcontrib.friendly_id)),
+            'db_id': subcontrib.id,
             'title': subcontrib.title,
             'duration': subcontrib.duration.seconds // 60,
             'note': build_note_api_data(subcontrib.note),
