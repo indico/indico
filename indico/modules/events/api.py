@@ -34,6 +34,7 @@ from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
@@ -87,14 +88,9 @@ class EventTimeTableHook(HTTPAPIHook):
         self._idList = self._pathParams['idlist'].split('-')
 
     def export_timetable(self, aw):
-        raise ServiceUnavailable
-        ch = ConferenceHolder()
-        d = {}
-        for cid in self._idList:
-            conf = ch.getById(cid)
-            d[cid] = ScheduleToJson.process(conf.getSchedule(), self._tz.tzname(None),
-                                            aw, days=None, mgmtMode=False)
-        return d
+        serializer = TimetableSerializer(management=False)
+        events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
+        return {event.id: serializer.serialize_timetable(event) for event in events}
 
 
 @HTTPAPIHook.register
