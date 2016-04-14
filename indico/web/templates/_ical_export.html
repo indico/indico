@@ -66,13 +66,13 @@
 
 {% block javascript %}
     <script>
-        var setURLs = function(urls){
-            if ($('#detailExport{{ item.id }}').prop("checked")) {
-                $('#publicLink{{ item.id }}').val(urls["publicRequestDetailedURL"]).attr('title', urls["publicRequestDetailedURL"]);
-                $('#authLink{{ item.id }}').val(urls["authRequestDetailedURL"]).attr('title', urls["authRequestDetailedURL"]);
+        var setURLs = function(urls) {
+            if ($('#detailExport{{ item.id }}').prop('checked')) {
+                $('#publicLink{{ item.id }}').val(urls['publicRequestDetailedURL']);
+                $('#authLink{{ item.id }}').val(urls['authRequestDetailedURL']);
             } else {
-                $('#publicLink{{ item.id }}').val(urls["publicRequestURL"]).attr('title', urls["publicRequestURL"]);
-                $('#authLink{{ item.id }}').val(urls["authRequestURL"]).attr('title', urls["authRequestURL"]);
+                $('#publicLink{{ item.id }}').val(urls['publicRequestURL']);
+                $('#authLink{{ item.id }}').val(urls['authRequestURL']);
             }
         };
     </script>

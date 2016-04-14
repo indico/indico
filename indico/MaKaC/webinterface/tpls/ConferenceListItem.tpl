@@ -35,7 +35,7 @@ if lItem.getType() == "simple_event":
 %>
 <li itemscope itemtype="http://data-vocabulary.org/Event">
     <span class="ical">
-        <a href="${ urlHandlers.UHConferenceToiCal.getURL(lItem) }"><img src="${ systemIcon("ical_grey") }" alt="iCal export" /></a>
+        <a href="${ url_for('events.export_event_ical', lItem) }"><img src="${ systemIcon("ical_grey") }" alt="iCal export" /></a>
     </span>
     <span class="listName">
         <span class="date ${ happeningNowClass }">${ evtDate }<time itemprop="startDate" datetime="${ startDate.isoformat() }" /></span><a href="${ conferenceDisplayURLGen(lItem)}" itemprop="url" ><span itemprop="summary">${ eventTitle }</span></a>

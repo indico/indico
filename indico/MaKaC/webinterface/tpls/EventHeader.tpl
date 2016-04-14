@@ -137,7 +137,8 @@ $(function() {
     createTooltip($('#printButton'), '${ _("Printable version")}');
     createTooltip($('#manageEventButton'), '${ _("Switch to management area for this event")}');
 
-    $(".exportIcal").click(function(){
+    $('.exportIcal').on('click', function(evt) {
+        evt.preventDefault();
         $(this).trigger('menu_select');
     });
 

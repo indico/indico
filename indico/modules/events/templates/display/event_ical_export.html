@@ -31,7 +31,7 @@
             "{{ session.user.id if session.user else '' }}"
         );
 
-        $('body').delegate('#detailExport{{ item.id }}', 'click', function(e) {
+        $('body').on('click', '#detailExport{{ item.id }}', function() {
             setURLs(exportPopups['{{ item.id }}'].getRequestURLs());
         });
     </script>
