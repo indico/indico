@@ -2028,12 +2028,22 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                 }
 
                 function createDeleteLink(blockData) {
+                    var tooltipText, dialogTitle, dialogText;
+                    if (self.timetable.eventInfo.isConference) {
+                        tooltipText = $T.gettext("Unschedule");
+                        dialogTitle = $T.gettext("Unschedule poster");
+                        dialogText = $T.gettext("Are you sure you want to unschedule the poster?");
+                    } else {
+                        tooltipText = $T.gettext("Delete");
+                        dialogTitle = $T.gettext("Delete poster");
+                        dialogText = $T.gettext("Are you sure you want to delete the poster?");
+                    }
                     var link = $('<a>', {
                         class: 'icon-remove i-button-icon',
-                        title: $T.gettext("Delete"),
+                        title: tooltipText,
                         data: {
-                            title: $T.gettext("Delete poster"),
-                            confirm: $T.gettext("Are you sure you want to delete the poster?")
+                            title: dialogTitle,
+                            confirm: dialogText
                         }
                     }).on('click', function(evt) {
                         confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
