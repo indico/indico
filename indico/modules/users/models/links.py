@@ -70,8 +70,6 @@ class UserLink(db.Model):
         mapping = {
             'category': 'setCategory',
             'conference': 'setConference',
-            'session': 'setSession',
-            'contribution': 'setContribution',
             'track': 'setTrack',
             'resource': 'setResource',
             'abstract': 'setAbstract',
@@ -142,12 +140,10 @@ class UserLink(db.Model):
             'conference': {'cls': MaKaC.conference.Conference,
                            'roles': {'abstractSubmitter', 'access', 'chair', 'editor', 'paperReviewManager', 'referee',
                                      'reviewer'}},
-            'session': {'cls': MaKaC.conference.Session,
-                        'roles': {'access', 'coordinator', 'manager'}},
-            'contribution': {'cls': MaKaC.conference.Contribution,
-                             'roles': {'access', 'editor', 'manager', 'referee', 'reviewer', 'submission'}},
             'track': {'cls': MaKaC.conference.Track,
                       'roles': {'coordinator'}},
+            # XXX: remove when removing the old material code. probably already unused now that papers
+            # are not using the old material code anymore
             'resource': {'cls': MaKaC.conference.Resource,
                          'roles': {'access'}},
             'abstract': {'cls': MaKaC.review.Abstract,
