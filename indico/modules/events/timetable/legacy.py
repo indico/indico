@@ -125,6 +125,8 @@ class TimetableSerializer(object):
             data.update(self._get_color_data(contribution.session))
         data.update(self._get_location_data(contribution))
         data.update({'entryType': 'Contribution',
+                     '_type': 'ContribSchEntry',
+                     '_fossil': 'contribSchEntryDisplay',
                      'contributionId': contribution.id,
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
@@ -151,6 +153,8 @@ class TimetableSerializer(object):
         data.update(self._get_color_data(break_))
         data.update(self._get_location_data(break_))
         data.update({'entryType': 'Break',
+                     '_type': 'BreakTimeSchEntry',
+                     '_fossil': 'breakTimeSchEntry',
                      'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
@@ -162,10 +166,17 @@ class TimetableSerializer(object):
 
     def _get_attachment_data(self, obj):
         def serialize_attachment(attachment):
-            return {'title': attachment.title, 'download_url': attachment.download_url}
+            return {'id': attachment.id,
+                    '_type': 'Attachment',
+                    '_fossil': 'attachment',
+                    'title': attachment.title,
+                    'download_url': attachment.download_url}
 
         def serialize_folder(folder):
-            return {'title': folder.title,
+            return {'id': folder.id,
+                    '_type': 'AttachmentFolder',
+                    '_fossil': 'folder',
+                    'title': folder.title,
                     'attachments': map(serialize_attachment, folder.attachments)}
 
         data = {'files': [], 'folders': []}
