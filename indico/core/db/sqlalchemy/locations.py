@@ -66,9 +66,15 @@ class LocationMixin(object):
         this mixin class.
         """
 
-        @listens_for(cls.own_room, 'set')
-        def _set_room_venue(target, value, *unused):
+        @listens_for(cls.own_venue, 'set')
+        def _venue_changed(target, value, *unused):
             if value is not None:
+                target.own_venue_name = ''
+
+        @listens_for(cls.own_room, 'set')
+        def _room_changed(target, value, *unused):
+            if value is not None:
+                target.own_room_name = ''
                 target.own_venue = value.location
 
     @property
@@ -263,24 +269,6 @@ class LocationMixin(object):
                     'room_name': data_source.room_name, 'venue_name': data_source.venue_name,
                     'address': data_source.address, 'inheriting': self.inherit_location}
 
-    @property
-    def widget_location_data(self):
-        """All location data for the item, meant to be used in the location
-        widget.
-        """
-        location_data = self.location_data
-        return {
-            'address': location_data['address'],
-            'room_name': location_data['room_name'],
-            'room_id': location_data['room'].id if location_data['room'] else '',
-            'venue_name': location_data['venue_name'],
-            'venue_id': location_data['venue'].id if location_data['venue'] else '',
-        }
-
-    @property
-    def inherited_widget_location_data(self):
-        return self.location_parent.widget_location_data if self.location_parent else self.widget_location_data
-
     @location_data.setter
     def location_data(self, data):
         self.inherit_location = data['inheriting']
@@ -298,3 +286,21 @@ class LocationMixin(object):
                 self.room_name = data.get('room_name', '')
             if not self.venue:
                 self.venue_name = data.get('venue_name', '')
+
+    @property
+    def widget_location_data(self):
+        """All location data for the item, meant to be used in the location
+        widget.
+        """
+        location_data = self.location_data
+        return {
+            'address': location_data['address'],
+            'room_name': location_data['room_name'],
+            'room_id': location_data['room'].id if location_data['room'] else '',
+            'venue_name': location_data['venue_name'],
+            'venue_id': location_data['venue'].id if location_data['venue'] else '',
+        }
+
+    @property
+    def inherited_widget_location_data(self):
+        return self.location_parent.widget_location_data if self.location_parent else self.widget_location_data
