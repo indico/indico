@@ -1293,9 +1293,9 @@ class outputGenerator(object):
         manager_list = set(linked_object.get_manager_list(recursive=True))
 
         if attachment.is_self_protected:
-            return {e.as_legacy for e in attachment.acl} | manager_list
+            return {e for e in attachment.acl} | manager_list
         if attachment.is_inheriting and attachment.folder.is_self_protected:
-            return {e.as_legacy for e in attachment.folder.acl} | manager_list
+            return {e for e in attachment.folder.acl} | manager_list
         else:
             return linked_object.get_access_list()
 
