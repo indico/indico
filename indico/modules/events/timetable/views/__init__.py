@@ -117,7 +117,7 @@ def inject_meeting_body(event, **kwargs):
     entries.sort(key=lambda entry: (entry.start_dt, entry.object.title if entry.object else entry.title))
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
-    theme_id = view or event.theme
+    theme_id = view if view and view in theme_settings.themes else event.theme
     theme = theme_settings.themes[theme_id]
     tt_tpl = theme.get('tt_template', theme['template'])
 

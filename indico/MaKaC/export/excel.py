@@ -125,7 +125,7 @@ class AbstractListToExcel:
                     contribType = abstract.getContribType()
                     ctname = ""
                     if contribType is not None:
-                        ctname = contribType.getName()
+                        ctname = contribType.name
                     excelGen.addValue(ctname)
                 elif key == "Status":
                     excelGen.addValue(AbstractStatusList.getInstance().getCaption(status.__class__))

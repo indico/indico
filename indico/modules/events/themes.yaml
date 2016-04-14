@@ -71,7 +71,7 @@ definitions:
 
   # Meetings - CERN extensions from base
   atlas:
-    event_types: [meeting]
+    event_types: [meeting, conference]
     stylesheet: atlas.scss
     template: indico/meeting.html
     title: ATLAS meeting

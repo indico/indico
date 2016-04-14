@@ -852,7 +852,7 @@ class RHContribList(RHTrackAbstractsBase):
         ltypes = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():
-                ltypes.append(type.getId())
+                ltypes.append(type.id)
         else:
             for id in self._normaliseListParam(params.get("types",[])):
                 ltypes.append(id)
@@ -860,7 +860,7 @@ class RHContribList(RHTrackAbstractsBase):
         lsessions= []
         if not filterUsed:
             for session in self._conf.getSessionList():
-                lsessions.append( session.getId() )
+                lsessions.append( session.id )
         filter["session"]=self._normaliseListParam(params.get("sessions",lsessions))
         lstatus=[]
         if not filterUsed:
@@ -990,6 +990,3 @@ class RHContribQuickAccess(RHTrackAbstractsBase):
         if self._contrib is not None:
             url=urlHandlers.UHContributionModification.getURL(self._contrib)
         self._redirect(url)
-
-
-

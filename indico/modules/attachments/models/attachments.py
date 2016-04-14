@@ -25,6 +25,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.storage import VersionedResourceMixin, StoredFileMixin
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
@@ -86,6 +87,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
     def is_previewable(self):
         return get_file_previewer(self) is not None
 
+    @no_autoflush
     def _build_storage_path(self):
         folder = self.attachment.folder
         assert folder.object is not None

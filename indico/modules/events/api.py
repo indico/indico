@@ -23,6 +23,7 @@ from hashlib import md5
 
 from flask import request
 from sqlalchemy.orm import joinedload, subqueryload
+from werkzeug.exceptions import ServiceUnavailable
 
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
@@ -70,6 +71,7 @@ class EventTimeTableHook(HTTPAPIHook):
         self._idList = self._pathParams['idlist'].split('-')
 
     def export_timetable(self, aw):
+        raise ServiceUnavailable
         ch = ConferenceHolder()
         d = {}
         for cid in self._idList:
@@ -339,8 +341,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'description': session_.description,
             'material': build_material_legacy_api_data(session_),
             'isPoster': session_.is_poster,
-            'url': url_for('event.sessionDisplay', confId=session_.event_id, sessionId=session_.friendly_id,
-                           _external=True),  # TODO: Change to new endpoint once it's there
+            'url': url_for('sessions.display_session', session_, _external=True),
             'protectionURL': url_for('sessions.session_protection', session_.event_new, session_, _external=True),
             'roomFullname': session_.room_name,
             'location': session_.venue_name,
@@ -380,7 +381,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'startDate': self._serialize_date(event.start_dt),
             'timezone': event.timezone,
             'endDate': self._serialize_date(event.end_dt),
-            'room': event.room_name,
+            'room': event.get_room_name(full=False),
             'location': event.venue_name,
             'address': event.address,
             'type': event.as_legacy.getType()
@@ -454,8 +455,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 'endDate': self._serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
                 'description': '',  # Session blocks don't have a description
                 'title': block.full_title,
-                'url': url_for('event.sessionDisplay', confId=session_.event_id, sessionId=session_.friendly_id,
-                               _external=True),
+                'url': url_for('sessions.display_session', session_, _external=True),
                 'contributions': map(self._build_contribution_api_data, block.contributions),
                 'note': build_note_api_data(block.note),
                 'session': serialized_session,
@@ -486,8 +486,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'type': contrib.type.name if contrib.type else None,
             'description': contrib.description,
             'folders': build_folders_api_data(contrib),
-            'url': url_for('event.contributionDisplay', confId=contrib.event_id, contribId=contrib.friendly_id,
-                           _external=True),
+            'url': url_for('contributions.display_contribution', contrib, _external=True),
             'material': build_material_legacy_api_data(contrib),
             'speakers': self._serialize_persons([x.person for x in contrib.speakers],
                                                 person_type='ContributionParticipation'),

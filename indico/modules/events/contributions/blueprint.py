@@ -158,6 +158,9 @@ with _compat_bp.add_prefixed_rules('/session/<legacy_session_id>'):
     _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>/<legacy_subcontribution_id>',
                             'subcontribution', compat_subcontribution)
 
+_compat_bp.add_url_rule('/my-conference/contributions', 'my_contributions',
+                        make_compat_redirect_func(_bp, 'my_contributions', view_args_conv={'event_id': 'confId'}))
+
 _compat_bp.add_url_rule('!/contributionDisplay.py', 'contribution_modpython',
                         make_compat_redirect_func(_compat_bp, 'contribution',
                                                   view_args_conv={'confId': 'event_id',

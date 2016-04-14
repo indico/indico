@@ -28,7 +28,7 @@
 <div>
     % for i, contrib in enumerate(contributions):
         <div class="contribItem" style="clear: both; padding-bottom: 7px; padding-left: 20px;">
-            <a href="${url_for('event.contributionDisplay', contrib)}">${contrib.getTitle()}</a>
+            <a href="${url_for('contributions.display_contribution', contrib)}">${contrib.getTitle()}</a>
         </div>
     % endfor
 </div>

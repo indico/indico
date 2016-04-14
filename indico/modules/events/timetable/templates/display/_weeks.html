@@ -2,7 +2,7 @@
 
 {% macro _render_contribution(item, count) %}
     <a class="week-anchor"
-       href="{{ url_for('event.contributionDisplay', confId=item.event_id, contribId=item.id) }}">
+       href="{{ url_for('contributions.display_contribution', item) }}">
         <span class="main">
             <span class="title">{{ item.title }}</span>
             {% set speakers = item.person_links|selectattr("is_speaker")|list %}

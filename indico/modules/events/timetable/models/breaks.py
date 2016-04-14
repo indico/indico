@@ -56,6 +56,13 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     # relationship backrefs:
     # - timetable_entry (TimetableEntry.break_)
 
+    def can_access(self, user):
+        parent = self.timetable_entry.parent
+        if parent:
+            return parent.object.can_access(user)
+        else:
+            return self.timetable_entry.event_new.can_access(user)
+
     @property
     def location_parent(self):
         return (self.timetable_entry.event_new

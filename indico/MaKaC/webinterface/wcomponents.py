@@ -60,6 +60,7 @@ from indico.util.date_time import utc_timestamp, is_same_month, format_date
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 
 MIN_PRESENT_EVENTS = 6
@@ -481,10 +482,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
         vars["printURL"]=str(urlCustPrint)
 
         vars["printIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("printer")))
-        urlCustPDF = urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
-        urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
-        urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
-        vars["pdfURL"] = quoteattr(str(urlCustPDF))
+        vars["pdfURL"] = quoteattr(url_for('timetable.export_pdf', self._conf))
         vars["pdfIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["zipIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("smallzip")))
 

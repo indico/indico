@@ -30,6 +30,14 @@
             ${inlineContextHelp(_('Here is displayed the assessment given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective assessments.'))}
         </td>
     </tr>
+    <tr>
+        <td colspan="5" style="padding: 1em 0;">
+            <h3>Paper files</h3>
+            ${ render_template('events/paper_reviewing/mako_compat/paper_file_list.html',
+                               paper_files=Contribution.paper_files) }
+            <h3>Questionnaire</h3>
+        </td>
+    </tr>
     % if len (ConfReview.getReviewingQuestions()) > 0 :
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}</span></td>

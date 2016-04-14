@@ -59,7 +59,7 @@
                                    title="{% trans %}This contribution is scheduled within a session block and time can't be modified.{% endtrans %}"></i>
                             {% endif %}
                             <span class="label">
-                                {{ contrib.start_dt|format_datetime('short', timezone=event.timezone) }}
+                                {{ contrib.start_dt|format_datetime('short', timezone=contrib.event_new.timezone) }}
                             </span>
                         {%- else -%}
                             <em>

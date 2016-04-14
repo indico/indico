@@ -476,6 +476,10 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
 
+    def get_contribution(self, id_):
+        """Get a contribution of the event"""
+        return get_related_object(self, 'contributions', {'id': id_})
+
     def get_session(self, id_=None, friendly_id=None):
         """Get a session of the event"""
         if friendly_id is None and id_ is not None:

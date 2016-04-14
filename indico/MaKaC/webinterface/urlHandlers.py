@@ -1331,16 +1331,8 @@ class UHConfMyStuff(URLHandler):
     _endpoint = 'event.myconference'
 
 
-class UHConfMyStuffMySessions(URLHandler):
-    _endpoint = 'event.myconference-mySessions'
-
-
 class UHConfMyStuffMyTracks(URLHandler):
     _endpoint = 'event.myconference-myTracks'
-
-
-class UHConfMyStuffMyContributions(URLHandler):
-    _endpoint = 'event.myconference-myContributions'
 
 
 class UHConfModMoveContribsToSession(URLHandler):

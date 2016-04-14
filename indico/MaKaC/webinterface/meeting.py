@@ -472,9 +472,7 @@ class WPMConfClone(conferences.WPConfClone):
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
-            "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
-                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
-               """)
+            "cloneOptions": ''
         }
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)

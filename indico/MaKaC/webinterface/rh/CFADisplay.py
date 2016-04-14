@@ -177,7 +177,7 @@ class _AbstractSubmissionNotification:
         msg.append("")
         ctype = i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
-            ctype = self._abstract.getContribType().getName()
+            ctype = self._abstract.getContribType().name
         msg.append(i18nformat("""_("Presentation type"): %s""") % ctype)
         msg.append("")
         msg.append(i18nformat("""_("Comments"): %s""") % self._abstract.getComments())

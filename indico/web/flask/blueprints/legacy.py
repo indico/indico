@@ -161,7 +161,7 @@ legacy_endpoints = {
     'groupModification', 'groupModification-update', 'groupRegistration', 'groupRegistration-update', 'help',
     'identityCreation', 'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove',
     'index', 'internalPage', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
-    'myconference', 'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news',
+    'myconference', 'myconference-myTracks', 'news',
     'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
     'paperReviewingDisplay-uploadPaper', 'payment', 'posterTemplates', 'posterTemplates-posterDesign',
     'posterTemplates-posterPrinting', 'resetSessionTZ', 'roomBooking', 'roomBooking-acceptBooking',

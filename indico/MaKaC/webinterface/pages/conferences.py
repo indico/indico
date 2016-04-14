@@ -509,7 +509,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def __init__(self, rh, conference, view, type, params):
         WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
-        theme_id = self._view or self._conf.as_event.theme
+        theme_id = self._view if self._view and self._view in theme_settings.themes else self._conf.as_event.theme
         self.theme_id = theme_id
         self.theme = theme_settings.themes[theme_id]
 
@@ -1523,9 +1523,7 @@ class WPConfClone(WPConferenceModifBase):
         p = WConferenceClone(self._conf)
         pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
                 "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
-                "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
-                                     <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
-                                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>""") }
+                "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1">_("Tracks")</li>""")}
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
 
@@ -3226,93 +3224,6 @@ class WConfMyContributions(wcomponents.WTemplated):
         vars["Conference"] = self._conf
         vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
-
-
-class WConfMyStuffMySessions(WConfDisplayBodyBase):
-
-    _linkname = 'my_sessions'
-
-    def __init__(self, aw, conf):
-        self._aw = aw
-        self._conf = conf
-
-    def _getSessionsHTML(self):
-        if self._aw.getUser() is None:
-            return ""
-        #ls=self._conf.getCoordinatedSessions(self._aw.getUser())+self._conf.getManagedSession(self._aw.getUser())
-        ls = set(self._conf.getCoordinatedSessions(self._aw.getUser()))
-        ls = list(ls | set(self._conf.getManagedSession(self._aw.getUser())))
-        if len(ls) <= 0:
-            return ""
-        res = []
-        iconURL = Config.getInstance().getSystemIconURL("conf_edit")
-        for s in ls:
-            modURL = urlHandlers.UHSessionModification.getURL(s)
-            dispURL = urlHandlers.UHSessionDisplay.getURL(s)
-            res.append("""
-                <tr class="infoTR">
-                    <td class="infoTD" width="100%%">%s</td>
-                    <td nowrap class="infoTD"><a href=%s>%s</a><span class="horizontalSeparator">|</span><a href=%s>%s</a></td>
-                </tr>""" % (self.htmlText(s.getTitle()),
-                            quoteattr(str(modURL)),
-                            _("Edit"),
-                            quoteattr(str(dispURL)),
-                            _("View")))
-        return """
-            <table class="infoTable" cellspacing="0" width="100%%">
-                <tr>
-                    <td nowrap class="tableHeader"> %s </td>
-                    <td nowrap class="tableHeader" style="text-align:right;"> %s </td>
-                </tr>
-                <tr>
-                    <td>%s</td>
-                </tr>
-            </table>
-            """ % (_("Session"),
-                   _("Actions"),
-                   "".join(res))
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["body_title"] = self._getTitle()
-        wvars["items"] = self._getSessionsHTML()
-        return wvars
-
-
-class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEMyStuff
-    menu_entry_name = 'my_conference'
-
-    def _getBody(self,params):
-        wc=WConfMyStuffMySessions(self._getAW(),self._conf)
-        return wc.getHTML()
-
-
-class WConfMyStuffMyContributions(WConfDisplayBodyBase):
-
-    _linkname = 'my_contributions'
-
-    def __init__(self, aw, conf):
-        self._aw = aw
-        self._conf = conf
-
-    def _getContribsHTML(self):
-        return WConfMyContributions(self._aw, self._conf).getHTML({})
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["body_title"] = self._getTitle()
-        wvars["items"] = self._getContribsHTML()
-        return wvars
-
-
-class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEMyStuff
-    menu_entry_name = 'my_contributions'
-
-    def _getBody(self,params):
-        wc=WConfMyStuffMyContributions(self._getAW(),self._conf)
-        return wc.getHTML()
 
 
 class WConfMyStuffMyTracks(WConfDisplayBodyBase):

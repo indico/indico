@@ -30,6 +30,14 @@
             ${inlineContextHelp(_('Here is displayed the assessment given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
         </td>
     </tr>
+    <tr>
+        <td colspan="5" style="padding: 1em 0;">
+            <h3>Paper files</h3>
+            ${ render_template('events/paper_reviewing/mako_compat/paper_file_list.html',
+                               paper_files=Contribution.paper_files) }
+            <h3>Questionnaire</h3>
+        </td>
+    </tr>
      % if len (ConfReview.getLayoutQuestions()) > 0 :
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}:</span></td>

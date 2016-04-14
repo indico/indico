@@ -23,6 +23,21 @@ from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.util.i18n import _
 
 
+class EventLocationCloner(EventCloner):
+    name = 'event_location'
+    friendly_name = _('Location')
+    is_internal = True
+    is_default = True
+
+    def run(self, new_event, cloners, shared_data):
+        with db.session.no_autoflush:
+            self._clone_location(new_event)
+        db.session.flush()
+
+    def _clone_location(self, new_event):
+        new_event.location_data = self.old_event.location_data
+
+
 class EventPersonCloner(EventCloner):
     name = 'event_persons'
     friendly_name = _('Persons')

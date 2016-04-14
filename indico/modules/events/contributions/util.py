@@ -29,11 +29,13 @@ from indico.modules.events.contributions.models.persons import SubContributionPe
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_person_link, ReporterBase
 from indico.modules.attachments.util import get_attached_items
+from indico.util.caching import memoize_request
 from indico.util.date_time import format_human_timedelta, format_date
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 from MaKaC.common.timezoneUtils import DisplayTZ
 
@@ -226,6 +228,7 @@ def contribution_type_row(contrib_type):
     return jsonify_data(html_row=html, flash=False)
 
 
+@memoize_request
 def get_contributions_with_user_as_submitter(event, user):
     """Get a list of contributions in which the `user` has submission rights"""
     contribs = (Contribution.query.with_parent(event)
@@ -241,7 +244,7 @@ def serialize_contribution_for_ical(contrib):
         'id': contrib.id,
         'startDate': contrib.timetable_entry.start_dt if contrib.timetable_entry else None,
         'endDate': contrib.timetable_entry.end_dt if contrib.timetable_entry else None,
-        'url': '',
+        'url': url_for('contributions.display_contribution', contrib, _external=True),
         'title': contrib.title,
         'location': contrib.venue_name,
         'roomFullname': contrib.room_name
@@ -249,9 +252,10 @@ def serialize_contribution_for_ical(contrib):
 
     description = ''
     if contrib.speakers:
-        speakers = ('{} ({})'.format(s.person.full_name, s.person.affiliation) for s in contrib.speakers)
+        speakers = ('{} ({})'.format(s.full_name, s.affiliation) for s in contrib.speakers)
         description = 'Speakers: {}\n'.format(', '.join(speakers))
 
+    description += contrib.description
     contrib_data['description'] = description
     return contrib_data
 

@@ -79,8 +79,8 @@
                     </tr>
                     % for s in self_._conf.getSessionListSorted():
                         <tr>
-                            <td><input type="checkbox" name="selSessions" value="${s.getId()}" checked></td>
-                            <td>${ s.getTitle() }</td>
+                            <td><input type="checkbox" name="selSessions" value="${s.id}" checked></td>
+                            <td>${ s.title }</td>
                         </tr>
                     % endfor
                 </table>

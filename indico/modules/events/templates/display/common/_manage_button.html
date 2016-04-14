@@ -57,7 +57,6 @@
                         {%- trans %}Material Editor{% endtrans -%}
                     </a>
                 </li>
-
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
@@ -69,6 +68,14 @@
                        data-ajax-dialog
                        data-reload-after>
                         {% trans %}Edit session block{% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
+            {% if session_.can_manage(session.user, 'coordinate') %}
+                <li>
+                    <a href="{{ url_for('timetable.manage_session', session_) }}"
+                       title="{% trans %}Edit the timetable for this session{% endtrans %}">
+                        {% trans %}Edit session timetable{% endtrans %}
                     </a>
                 </li>
             {% endif %}
@@ -104,15 +111,15 @@
             {% endif %}
         {% endif %}
         {% if item_type != 'SESSION_BLOCK' and item.can_manage_attachments(session.user) %}
-        <li>
-            <a href="" class="js-material-editor"
-                       data-attachment-editor
-                       data-reload-on-change
-                       data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                       data-locator="{{ item.locator | tojson | forceescape }}">
-                {%- trans %}Material Editor{% endtrans -%}
-            </a>
-        </li>
+            <li>
+                <a href="" class="js-material-editor"
+                           data-attachment-editor
+                           data-reload-on-change
+                           data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                           data-locator="{{ item.locator | tojson | forceescape }}">
+                    {%- trans %}Material Editor{% endtrans -%}
+                </a>
+            </li>
         {% endif %}
     </ul>
 {%- endmacro %}

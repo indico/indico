@@ -23,6 +23,7 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.persons import EventPerson
@@ -89,8 +90,8 @@ def contribution_from_abstract(abstract, sess):
         links.append(ContributionPersonLink(author_type=author_type, person=person,
                                             is_speaker=abstract.isSpeaker(auth), **person_data))
 
-    custom_fields_data = [{field_val.contribution_field.id: field_val.data} for
-                          field_val in abstract.as_new.field_values]
+    custom_fields_data = {'custom_{}'.format(field_val.contribution_field.id): field_val.data for
+                          field_val in abstract.as_new.field_values}
     contrib = create_contribution(event, {'title': abstract.getTitle(), 'duration': duration,
                                           'person_link_data': {link: True for link in links}},
                                   custom_fields_data=custom_fields_data)
@@ -158,6 +159,10 @@ class AbstractFieldWrapper(object):
         if self.field.is_active and self.field.is_required and not content:
             return [_("The field '{}' is mandatory").format(self.field.title)]
         return []
+
+    @property
+    def _type(self):
+        return self.getType()
 
 
 class AbstractTextFieldWrapper(AbstractFieldWrapper):
@@ -389,7 +394,7 @@ class AbstractLegacyMixin(object):
             return AbstractDescriptionValue(self.as_new)
         else:
             field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
-            fval = self.event.abstract_fields.filter_by(contribution_field=field, abstract=self.as_new).first()
+            fval = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
             if fval:
                 return fval
             else:
@@ -481,7 +486,14 @@ class AbstractManagerLegacyMixin(object):
         db.session.flush()
 
     def _remove_abstract(self, legacy_abstract):
-        db.session.delete(legacy_abstract.as_new)
+        abstract = legacy_abstract.as_new
+        # do not use relationshio or with_parent since the contribution
+        # might have been soft-deleted and this does not show up in the
+        # relationship anymore
+        for contrib in Contribution.find(abstract=abstract):
+            contrib.abstract = None
+        db.session.delete(abstract)
+        db.session.flush()
 
 
 class AbstractStatusAcceptedLegacyMixin(object):

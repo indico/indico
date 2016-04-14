@@ -48,17 +48,19 @@ def get_authors_from_author_index(event, limit):
     :param limit: The limit of the authors to be returned
     :return: A list of authors.
     """
-    author_index = event.getAuthorIndex()
-    fav_users_emails = (set(itertools.chain.from_iterable(f.all_emails for f in session.user.favorite_users))
-                        if session.user else [])
-    sorted_authors = [x[0] for x in sorted((p for p in author_index.getParticipations()
-                                           if p[0].getEmail() not in fav_users_emails), key=len, reverse=True)]
-    authors = []
-    # Check if there is a corresponding Avatar for the specific user and use that.
-    for author in sorted_authors[:limit]:
-        user = get_user_by_email(author.getEmail())
-        authors.append(user.as_avatar if user else author)
-    return authors
+    # TODO: re-implement using EventPersons
+    # author_index = event.getAuthorIndex()
+    # fav_users_emails = (set(itertools.chain.from_iterable(f.all_emails for f in session.user.favorite_users))
+    #                     if session.user else [])
+    # sorted_authors = [x[0] for x in sorted((p for p in author_index.getParticipations()
+    #                                        if p[0].getEmail() not in fav_users_emails), key=len, reverse=True)]
+    # authors = []
+    # # Check if there is a corresponding Avatar for the specific user and use that.
+    # for author in sorted_authors[:limit]:
+    #     user = get_user_by_email(author.getEmail())
+    #     authors.append(user.as_avatar if user else author)
+    # return authors
+    return []
 
 
 def make_participation_from_obj(obj, contrib_participation=None):

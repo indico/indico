@@ -129,14 +129,11 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
                     p = WPPage.render_template('page.html', self._conf, page=event.default_page)
         elif view in theme_settings.xml_themes:
             self._responseUtil.content_type = 'text/xml'
-            p = conferences.WPXSLConferenceDisplay( self, self._target, view, evt_type, self._reqParams )
+            p = conferences.WPXSLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
         elif view != "static":
-            p = conferences.WPTPLConferenceDisplay( self, self._target, view, evt_type, self._reqParams )
+            p = conferences.WPTPLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
         else:
-            if wf != None:
-                p = wf.getConferenceDisplayPage( self, self._target, self._reqParams )
-            else:
-                p = conferences.WPConferenceDisplay( self, self._target )
+            p = conferences.WPConferenceDisplay(self, self._target)
 
         return warningText + (p if isinstance(p, basestring) else p.display(**params))
 
@@ -512,30 +509,6 @@ class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
         p=conferences.WPMyStuff(self,self._target)
         return p.display()
 
-class RHConfMyStuffMySessions(RHConferenceBaseDisplay,base.RHProtected):
-    _uh=urlHandlers.UHConfMyStuffMySessions
-
-    def _checkProtection(self):
-        base.RHProtected._checkProtection(self)
-
-    def _process(self):
-        ls = set(self._conf.getCoordinatedSessions(self._aw.getUser())) | \
-             set(self._conf.getManagedSession(self._aw.getUser()))
-        if len(ls) == 1:
-            self._redirect(urlHandlers.UHSessionModification.getURL(ls.pop()))
-        else:
-            p = conferences.WPConfMyStuffMySessions(self, self._target)
-            return p.display()
-
-class RHConfMyStuffMyContributions(RHConferenceBaseDisplay,base.RHProtected):
-    _uh=urlHandlers.UHConfMyStuffMyContributions
-
-    def _checkProtection(self):
-        base.RHProtected._checkProtection(self)
-
-    def _process(self):
-        p=conferences.WPConfMyStuffMyContributions(self,self._target)
-        return p.display()
 
 class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuffMyTracks

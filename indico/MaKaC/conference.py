@@ -44,6 +44,7 @@ from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
+from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -2324,7 +2325,7 @@ class Conference(CommonObjectBase, Locatable):
             self._observers = []
         return self._observers
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=0):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0, enforce_constraints=True):
         """
         Set the start/end date for a conference
         """
@@ -2356,7 +2357,7 @@ class Conference(CommonObjectBase, Locatable):
             self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
             self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
-            if moveEntries == 1:
+            if moveEntries == 1 and enforce_constraints:
                 try:
                     db.enforce_constraints()
                 except ConstraintViolated:
@@ -2847,6 +2848,8 @@ class Conference(CommonObjectBase, Locatable):
         """
         return self.as_event.sessions
 
+    getSessionListSorted = getSessionList
+
     def getNumberOfSessions(self):
         return len(self.as_event.sessions)
 
@@ -3222,20 +3225,13 @@ class Conference(CommonObjectBase, Locatable):
         startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
-        conf.setDates( startDate, endDate, moveEntries=1 )
+        with track_time_changes():
+            conf.setDates(startDate, endDate, moveEntries=1, enforce_constraints=False)
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
-        conf.setReportNumberHolder(self.getReportNumberHolder().clone(self))
-        for ch in self.getChairList():
-            conf.addChair(ch.clone())
-        ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
 
-        if options.get("sessions", False):
-            for entry in self.getSchedule().getEntries():
-                if isinstance(entry,BreakTimeSchEntry):
-                    conf.getSchedule().addEntry(entry.clone(conf))
         db_root = DBMgr.getInstance().getDBConnection().root()
         if db_root.has_key( "webfactoryregistry" ):
             confRegistry = db_root["webfactoryregistry"]
@@ -3252,12 +3248,6 @@ class Conference(CommonObjectBase, Locatable):
         if options.get("tracks",False) :
             for tr in self.getTrackList() :
                 conf.addTrack(tr.clone(conf))
-        # Meetings' and conferences' sessions cloning
-        if options.get("sessions",False) :
-            for s in self.getSessionList() :
-                newSes = s.clone(timeDelta, conf, options, session_id=s.getId())
-                ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
-                conf.addSession(newSes)
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
@@ -3274,26 +3264,6 @@ class Conference(CommonObjectBase, Locatable):
                 conf.addSessionCoordinatorRight(right)
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
-        # Conference's abstracts
-        if options.get("abstracts",False) :
-            conf.abstractMgr = self.abstractMgr.clone(conf)
-        # Meetings' and conferences' contributions cloning
-        if options.get("contributions",False) :
-            sch = conf.getSchedule()
-            for cont in self.getContributionList():
-                if cont.getSession() is None :
-                    if not meeting:
-                        nc = cont.clone(conf, options, timeDelta)
-                        conf.addContribution(nc)
-                        if cont.isScheduled() :
-                            sch.addEntry(nc.getSchEntry())
-                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
-                    elif cont.isScheduled():
-                        # meetings...only scheduled
-                        nc = cont.clone(conf, options, timeDelta)
-                        conf.addContribution(nc)
-                        sch.addEntry(nc.getSchEntry())
-                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
         conf.notifyModification()
 
         # Copy the list of enabled features
