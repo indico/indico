@@ -1331,11 +1331,9 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
      *
      */
     _updateDay: function(result) {
-
         this._processAutoOps(result);
 
         var data = this.getData();
-
         var entry = {};
         entry[result.id] = result.entry; // entry contains a whole day
 
@@ -1347,7 +1345,8 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         // Check if the result overflows the conference ending time
         var latestTime = null;
-        for(var key in result.entry) {
+
+        for (var key in result.entry) {
             if(!latestTime || result.entry[key].endDate.time.replaceAll(':','') > latestTime.replaceAll(':','')) {
                 latestTime = result.entry[key].endDate.time;
             }
@@ -1494,25 +1493,24 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         extend(data, result.entry);
 
         if (exists(result.session)) {
-            this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
+            this.parentTimetable.eventInfo.sessions[result.session.sessionId] = result.session;
         }
 
         if (exists(result.slotEntry)) {
-
             // Save the entries, otherwise they are lost
             result.slotEntry.entries = slot.entries;
             this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
             this.contextInfo = result.slotEntry;
 
             // Update the times for the slot
-            this._updateTimes(result.slotEntry.startDate.time,
-                              result.slotEntry.endDate.time);
+            this._updateTimes(result.slotEntry.startDate.time, result.slotEntry.endDate.time);
         }
 
         var dfr = $.Deferred();
         $('body').bind('timetable_redraw', function() {
             dfr.resolve();
         });
+
         this.timetableDrawer.redraw();
         return dfr.promise();
     },

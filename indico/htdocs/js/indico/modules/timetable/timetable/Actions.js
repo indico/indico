@@ -172,7 +172,7 @@ type("TimetableManagementActions", [], {
         }
 
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entries.editDatetime, urlArgs),
+            url: build_url(Indico.Urls.Timetable.entries[reschedule ? 'shift' : 'editDatetime'], urlArgs),
             method: 'POST',
             data: info.getAll(),
             error: function(xhr) {
@@ -186,7 +186,19 @@ type("TimetableManagementActions", [], {
                 }
 
                 if (reschedule) {
-                    self.timetable._updateDay(data.entry);
+                    var entries;
+                    if (data.entry.slotEntry) {
+                        entries = data.timetable[self.timetable.currentDay][data.entry.slotEntry.id].entries;
+                    } else {
+                        entries = data.timetable[self.timetable.currentDay];
+                    }
+
+                    self.timetable._updateDay({
+                        id: self.timetable.currentDay,
+                        entry: entries,
+                        slotEntry: data.entry.slotEntry,
+                        session: data.entry.slotEntry
+                    });
                 } else {
                     self.timetable._updateEntry(data.entry, data.entry.id);
                 }

@@ -117,6 +117,7 @@ def generate_global_file(config):
                     'editDatetime': url_rule_to_js('timetable.edit_entry_datetime'),
                     'editTime': url_rule_to_js('timetable.edit_entry_time'),
                     'move': url_rule_to_js('timetable.move_entry'),
+                    'shift': url_rule_to_js('timetable.shift_entries'),
                     'info': {
                         'display': url_rule_to_js('timetable.entry_info'),
                         'manage': url_rule_to_js('timetable.entry_info_manage'),
