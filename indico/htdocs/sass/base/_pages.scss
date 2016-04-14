@@ -30,36 +30,53 @@
             margin-bottom: 0;
         }
 
+        h2 {
+            margin-right: 0.5rem;
+        }
+
         h3 {
             color: $light-black;
             margin-top: $separator-margin;
-            margin-left: 0.5em;
         }
 
-        > div:not(.title-with-actions) > div.title, > div.title {
+        div.title {
             @extend %title-border;
-        }
-
-        div.description {
-            @extend %font-family-title-light;
-            color: $dark-gray;
-            margin-top: $separator-margin;
-        }
-
-        .title-with-actions {
-            @extend %title-border;
+            align-items: baseline;
             display: flex;
             padding-bottom: $separator-margin;
 
-            .toolbar {
-                margin-bottom: -3px;
-                margin-top: 3px;
-                padding: 0;
+            .text {
+                flex-grow: 1;
+            }
 
-                .group {
-                    margin-bottom: 0;
+            .actions {
+                flex-grow: 0;
+                flex-shrink: 0;
+                white-space: nowrap;
+
+                .toolbar {
+                    margin-bottom: -10px;
+                    margin-top: 3px;
+                    padding: 0;
+
+                    .group {
+                        margin-bottom: 0;
+                    }
                 }
             }
+        }
+
+        .page-description {
+            @extend %font-family-title-light;
+            color: $dark-gray;
+            font-size: 1.2em;
+            margin-top: $separator-margin;
+        }
+
+        .page-info {
+            @extend %font-family-title;
+            color: $dark-gray;
+            margin-top: $separator-margin;
         }
     }
 }
@@ -71,8 +88,7 @@
     }
 }
 
-.banner
-{
+.banner {
     $banner-color: #888;
     $banner-title-color: #777777;
 
@@ -137,14 +153,6 @@
 
 .conference-page {
     @extend %indico-page;
-
-    .title {
-        width: 70%;
-    }
-
-    .actions {
-        width: 30%;
-    }
 
     header h2 {
         color: $orange;
