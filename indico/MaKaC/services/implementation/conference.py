@@ -427,7 +427,6 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
         self._shiftTimes = pm.extract('shiftTimes', pType=bool)
 
     def _getAnswer(self):
-
         ContextManager.set('dateChangeNotificationProblems', {})
 
         if (self._shiftTimes):

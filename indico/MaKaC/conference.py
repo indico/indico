@@ -2357,7 +2357,7 @@ class Conference(CommonObjectBase, Locatable):
             self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
             self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
-            if moveEntries == 1 and enforce_constraints:
+            if enforce_constraints:
                 try:
                     db.enforce_constraints()
                 except ConstraintViolated:
