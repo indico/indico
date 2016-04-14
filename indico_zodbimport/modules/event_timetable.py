@@ -904,13 +904,16 @@ class TimetableMigration(object):
         new_entry.inherit_location = not custom_location and not custom_room
         if new_entry.inherit_location:
             return
-        custom_location = custom_location or old_entry.getLocation() or CustomLocation()
-        custom_room = custom_room or old_entry.getRoom() or CustomRoom()
         # we don't inherit, so let's migrate the data we have
         # address is always allowed
+        if not custom_location:
+            custom_location = self._get_parent_location(old_entry, attr='places')
+        if not custom_room:
+            custom_room = self._get_parent_location(old_entry, attr='rooms')
         new_entry.address = (convert_to_unicode(fix_broken_string(custom_location.address, True))
-                             if custom_location.address else '')
-        location_name = convert_to_unicode(fix_broken_string(custom_location.name, True))
+                             if custom_location and custom_location.address else '')
+        location_name = (convert_to_unicode(fix_broken_string(custom_location.name, True))
+                         if custom_location and custom_location.name else '')
         if custom_room:
             room_name = convert_to_unicode(fix_broken_string(custom_room.name, True))
             rb_room = self.importer.room_mapping.get((location_name, room_name))
@@ -925,6 +928,34 @@ class TimetableMigration(object):
             # store proper reference to the venue if it's a predefined one
             new_entry.venue = venue
             new_entry.venue_name = ''
+
+    def _get_parent_location(self, obj, attr):
+        type_ = obj.__class__.__name__
+        if type_ == 'SessionSlot':
+            conf = obj.session.conference
+            return getattr(conf, attr)[0] if getattr(conf, attr, None) else None
+        elif type_ in ('BreakTimeSchEntry', 'Contribution', 'AcceptedContribution'):
+            if type_ == 'AcceptedContribution':
+                contrib_parent = obj._session
+                if getattr(contrib_parent, attr, None):
+                    return getattr(contrib_parent, attr)[0]
+                else:
+                    owner = contrib_parent.conference
+            elif type_ == 'Contribution':
+                contrib_parent = obj.parent
+                if attr == 'places' and contrib_parent:
+                    places = getattr(contrib_parent, attr, None)
+                    return getattr(contrib_parent, 'place', None) if not places else places[0]
+                if attr == 'rooms' and contrib_parent:
+                    rooms = getattr(contrib_parent, attr, None)
+                    return getattr(contrib_parent, 'room', None) if not rooms else rooms[0]
+            elif type_ == 'BreakTimeSchEntry':
+                owner = obj._sch._owner
+            return self._get_parent_location(owner, attr)
+        elif type_ == 'Conference':
+            return getattr(obj, attr)[0] if getattr(obj, attr, None) else None
+        elif type_ == 'Session':
+            return self._get_parent_location(obj.conference, attr)
 
 
 class EventTimetableImporter(Importer):
