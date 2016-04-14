@@ -22,7 +22,9 @@
           ${event.venue_name}
         </div>
       % if event.room_name:
-        <div class="room text">${event.room_name}</div>
+        <div class="room text">
+            <a href="${event.room.map_url}">${event.room_name}</a>
+        </div>
       % endif
       % if event.address:
         <div class="address text nohtml">${event.address}</div>
