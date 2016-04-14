@@ -36,7 +36,7 @@
             margin-left: 0.5em;
         }
 
-        > div.title {
+        > div:not(.title-with-actions) > div.title, > div.title {
             @extend %title-border;
         }
 
