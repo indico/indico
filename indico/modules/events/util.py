@@ -370,6 +370,9 @@ def track_time_changes():
 
     This provides a list of changes while the context manager was
     active and also triggers `times_changed` signals.
+
+    If the code running inside the ``with`` block of this context
+    manager raises an exception, no signals will be triggered.
     """
     if 'old_times' in g:
         raise RuntimeError('time change tracking may not be nested')
@@ -377,7 +380,10 @@ def track_time_changes():
     changes = defaultdict(dict)
     try:
         yield changes
-    finally:
+    except:
+        del g.old_times
+        raise
+    else:
         old_times = g.pop('old_times')
         for entry, info in old_times.iteritems():
             obj = entry.object if not isinstance(entry, Event) else entry
