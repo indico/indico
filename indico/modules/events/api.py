@@ -262,7 +262,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def event(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        query = (Event.find(Event.id.in_(idlist), ~Event.is_deleted)
+        query = (Event.find(Event.id.in_(idlist),
+                            ~Event.is_deleted,
+                            Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
