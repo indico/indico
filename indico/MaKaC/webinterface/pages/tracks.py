@@ -925,11 +925,11 @@ class WTrackAbstractPropToAcc( wcomponents.WTemplated ):
         for ctype in conf.getContribTypeList():
             selected = ""
             if vars.has_key("contribType"):
-                if ctype==vars["contribType"]:
+                if ctype == vars["contribType"]:
                     selected = " selected"
-            elif self._abstract.getContribType()==ctype:
+            elif self._abstract.getContribType() == ctype:
                 selected = " selected"
-            l.append( """<option value="%s"%s>%s</option>"""%(ctype.getId(), selected, ctype.getName() ) )
+            l.append('<option value="%s"%s>%s</option>' % (ctype.id, selected, ctype.name))
         vars["contribTypes"] = ""
         if len(l) > 0:
             vars["contribTypes"] =  i18nformat("""
