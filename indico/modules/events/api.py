@@ -271,7 +271,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
                          Event.category_chain.overlap(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
-        return self._process((x.as_legacy for x in query), filter)
+        return self.serialize_events(x for x in query if x.can_access(self.user))
 
     def event(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
