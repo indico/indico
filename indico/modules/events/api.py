@@ -370,6 +370,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'id': (session_.legacy_mapping.legacy_session_id
                    if session_.legacy_mapping else unicode(session_.friendly_id)),
             'db_id': session_.id,
+            'friendly_id': session_.friendly_id,
             'room': session_.get_room_name(full=False)
         }
 
@@ -508,6 +509,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'id': (contrib.legacy_mapping.legacy_contribution_id
                    if contrib.legacy_mapping else unicode(contrib.friendly_id)),
             'db_id': contrib.id,
+            'friendly_id': contrib.friendly_id,
             'title': contrib.title,
             'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
             'endDate': self._serialize_date(contrib.start_dt + contrib.duration) if contrib.start_dt else None,
@@ -545,6 +547,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
                    if subcontrib.legacy_mapping else unicode(subcontrib.friendly_id)),
             'db_id': subcontrib.id,
+            'friendly_id': subcontrib.friendly_id,
             'title': subcontrib.title,
             'duration': subcontrib.duration.seconds // 60,
             'note': build_note_api_data(subcontrib.note),
