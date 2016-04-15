@@ -38,7 +38,7 @@ class ConferenceLocation:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        return conf.getLocation().getName() if conf.getLocation() else ""
+        return conf.as_event.venue_name
     getValue = classmethod (getValue)
 
 
@@ -49,7 +49,7 @@ class ConferenceAddress:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        return conf.getLocation().getAddress() if conf.getLocation() else ""
+        return conf.as_event.address
     getValue = classmethod (getValue)
 
 class LectureCategory:
@@ -76,10 +76,8 @@ class ConferenceRoom:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        if conf.getRoom():
-            return conf.getRoom().getName()
-        else:
-            return ""
+        return conf.as_event.room_name
+
     getValue = classmethod (getValue)
 
 class ConferenceChairperson:
@@ -88,7 +86,7 @@ class ConferenceChairperson:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        list = conf.getChairList()
+        list = conf.as_event.person_links
         return list
 
     getValue = classmethod (getValue)
@@ -124,10 +122,10 @@ class PosterDesignConfiguration:
 
         self.items_actions = {
                          "Lecture Category": (_("Lecture Category"), LectureCategory),
-                         "Lecture Name": (_("Lecture Name"), Conference.getTitle),
+                         "Lecture Name": (_("Lecture Name"), lambda x: x.as_event.title.encode('utf-8')),
                          "Lecture Date(s)": (_("Lecture Date(s)"), ConferenceDates),
                          "Speaker(s)": (_("Speaker(s)"), ConferenceChairperson),
-                         "Description": (_("Description"), Conference.getDescription),
+                         "Description": (_("Description"), lambda x: x.as_event.description.encode('utf-8')),
                          "Location (name)": (_("Location (name)"), ConferenceLocation),
                          "Location (address)": (_("Location (address)"), ConferenceAddress),
                          "Location (room)": (_("Location (room)"), ConferenceRoom),

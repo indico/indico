@@ -96,7 +96,7 @@ class BadgeDesignConfiguration:
             "Phone": (_("Phone"), lambda x: x.get_personal_data().get('phone', '')),
             "Email": (_("Email"), lambda x: x.email),
             "Amount": (_("Amount"), lambda x: x.price),
-            "Conference Name": (_("Conference Name"), Conference.getTitle),
+            "Conference Name": (_("Conference Name"), lambda x: x.event_new.title),
             "Conference Dates": (_("Conference Dates"), ConferenceDates),
             "Fixed Text": (_("Fixed Text"), BadgeTemplateItem.getFixedText)
         }

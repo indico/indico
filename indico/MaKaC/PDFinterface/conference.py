@@ -1872,6 +1872,7 @@ class LectureToPosterPDF:
         """
 
         self.__conf = conf
+        self._event = conf.as_event
         if not tz:
             self._tz = self.__conf.getTimezone()
         else:
@@ -1990,6 +1991,8 @@ class LectureToPosterPDF:
                     text = [action.__call__(item)]
                 else:
                     text= [_("Error")]
+            elif isinstance(action, types.FunctionType):
+                text = [action(self.__conf)]
             elif isinstance(action, types.ClassType):
                 # If the action is a class, it must be a class who complies to the following interface:
                 #  -it must have a getArgumentType() method, which returns either Conference or PosterTemplateItem.
@@ -1999,16 +2002,16 @@ class LectureToPosterPDF:
                 argumentType = action.getArgumentType()
                 if action.__name__ == "ConferenceChairperson":
                     #this specific case may need more than one line
-                    chairList = action.getValue(self.__conf)
+                    person_list = action.getValue(self.__conf)
 
                     # 'text' is a list of lines
                     text = []
                     # let's fill it with the chairpersons' names
-                    for chair in chairList:
-                        if chair.getAffiliation() != "":
-                            text.append("%s (%s)" % (chair.getDirectFullName(),chair.getAffiliation()))
+                    for person in person_list:
+                        if person.affiliation != "":
+                            text.append("%s (%s)" % (person.get_full_name(show_title=True), person.affiliation))
                         else:
-                            text.append(chair.getDirectFullName())
+                            text.append(person.get_full_name(show_title=True))
 
                 elif argumentType == conference.Conference:
                     text = [action.getValue(self.__conf)]
