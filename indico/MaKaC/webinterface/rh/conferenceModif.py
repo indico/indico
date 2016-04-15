@@ -67,6 +67,8 @@ from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 
+from markupsafe import Markup
+
 
 class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
 
@@ -1436,13 +1438,13 @@ class RHAbstractsMerge(RHConfModifCFABase):
             absMgr = self._target.getAbstractMgr()
             if len(self._abstractIds) == 0:
                 errorList.append(
-                    _("No ABSTRACT TO BE MERGED has been specified"))
+                    _("No abstract has been specified"))
             else:
                 self._abstracts = []
                 for id in self._abstractIds:
                     abst = absMgr.getAbstractById(id)
                     if abst is None:
-                        errorList.append(_("ABSTRACT TO BE MERGED ID '%s' is not valid") % (id))
+                        errorList.append(_("ID of abstract to be merged ('%s') is not valid") % id)
                     else:
                         statusKlass = abst.getCurrentStatus().__class__
                         if statusKlass in (review.AbstractStatusAccepted,
@@ -1452,16 +1454,17 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                            review.AbstractStatusMerged):
                             label = AbstractStatusList.getInstance(
                             ).getCaption(statusKlass)
-                            errorList.append(_("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)") % (abst.getId(), label.upper()))
+                            errorList.append(_("Abstract '%s' is in a state which does not allow merging (%s)") %
+                                             (abst.getId(), label.upper()))
                         self._abstracts.append(abst)
             if self._targetAbsId == "":
-                errorList.append(_("Invalid TARGET ABSTRACT ID"))
+                errorList.append(_("Invalid target abstract ID"))
             else:
                 if self._targetAbsId in self._abstractIds:
-                    errorList.append(_("TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"))
+                    errorList.append(_("Target abstract ID is among the abstract IDs to be merged"))
                 self._targetAbs = absMgr.getAbstractById(self._targetAbsId)
                 if self._targetAbs is None:
-                    errorList.append(_("Invalid TARGET ABSTRACT ID"))
+                    errorList.append(_("Invalid target abstract ID"))
                 else:
                     statusKlass = self._targetAbs.getCurrentStatus().__class__
                     if statusKlass in (review.AbstractStatusAccepted,
@@ -1471,7 +1474,9 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                        review.AbstractStatusDuplicated):
                         label = AbstractStatusList.getInstance(
                         ).getInstance().getCaption(statusKlass)
-                        errorList.append(_("TARGET ABSTRACT is in status which does not allow to merge (%s)") % label.upper())
+                        errorList.append(_("Target abstract is in a state which does not allow merging (%s)") %
+                                         label.upper())
+
             if len(errorList) == 0:
                 for abs in self._abstracts:
                     abs.mergeInto(self._getUser(), self._targetAbs,
@@ -1479,6 +1484,10 @@ class RHAbstractsMerge(RHConfModifCFABase):
                     if self._doNotify:
                         abs.notify(EmailNotificator(), self._getUser())
                 return self._redirect(urlHandlers.UHAbstractManagment.getURL(self._targetAbs))
+
+        flash(Markup('Errors found: <ul>{}</ul>'.format(
+                     ''.join('<li>{}</li>'.format(error) for error in errorList))), 'error')
+
         p = conferences.WPModMergeAbstracts(self, self._target)
         return p.display(absIdList=self._abstractIds,
                          targetAbsId=self._targetAbsId,
