@@ -36,14 +36,14 @@
 
             &.header-sort-asc {
                 @include icon-before('icon-arrow-down');
-            }
-
-            &.header-sort-desc {
-                @include icon-before('icon-arrow-down');
 
                 &:before {
                     @include rotate(-180deg);
                 }
+            }
+
+            &.header-sort-desc {
+                @include icon-before('icon-arrow-down');
             }
 
             > div {
