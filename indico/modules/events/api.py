@@ -302,6 +302,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def _serialize_date(self, date):
         if date:
+            date = date.astimezone(self._hook._tz)
             return {
                 'date': str(date.date()),
                 'time': str(date.time()),
