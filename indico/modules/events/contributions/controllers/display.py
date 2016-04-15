@@ -85,6 +85,11 @@ class RHMyContributions(RHDisplayProtectionBase):
 
     MENU_ENTRY_NAME = 'my_contributions'
 
+    def _checkProtection(self):
+        RHDisplayProtectionBase._checkProtection(self)
+        if not session.user:
+            raise Forbidden
+
     def _process(self):
         contributions = get_contributions_with_user_as_submitter(self.event_new, session.user)
         return WPMyContributions.render_template('display/user_contribution_list.html', self._conf,

@@ -45,7 +45,7 @@ def _visibility_paper_review(event):
 
 
 def _visibility_paper_review_transfer(event):
-    return (_visibility_paper_review(event) and
+    return (session.user and _visibility_paper_review(event) and
             bool(get_contributions_with_user_as_submitter(event.as_event, session.user)))
 
 
