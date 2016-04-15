@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 import itertools
 
-from indico.modules.attachments.controllers.compat import compat_folder, compat_folder_old, compat_attachment
+from indico.modules.attachments.controllers.compat import (compat_folder, compat_folder_old, compat_attachment,
+                                                           RHCompatAttachmentNew)
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
@@ -143,10 +144,22 @@ compat_attachment_rules = [
     '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>',
     '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>'
 ]
+old_obj_prefix_rules = {
+    'session': ['!/event/<confId>/session/<sessionId>'],
+    'contribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>',
+                     '!/event/<confId>/contribution/<contribId>'],
+    'subcontribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>',
+                        '!/event/<confId>/contribution/<contribId>/<subContId>']
+}
 for rule in compat_folder_rules:
     _compat_bp.add_url_rule(rule, 'folder', compat_folder)
 for rule in compat_attachment_rules:
     _compat_bp.add_url_rule(rule, 'attachment', compat_attachment)
+for object_type, prefixes in old_obj_prefix_rules.iteritems():
+    for prefix in prefixes:
+        # we rely on url normalization to redirect to the proper URL for the object
+        _compat_bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>',
+                                'compat_download', RHCompatAttachmentNew, defaults={'object_type': object_type})
 
 _compat_bp.add_url_rule('!/getFile.py/access', 'getfile',
                         make_compat_redirect_func(_compat_bp, 'attachment',

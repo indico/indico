@@ -19,11 +19,12 @@ from __future__ import unicode_literals
 from flask import current_app, redirect, request
 from werkzeug.exceptions import NotFound
 
+from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
 from indico.modules.events import LegacyEventMapping
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple
+from MaKaC.webinterface.rh.base import RHSimple, RH
 
 
 def _clean_args(kwargs):
@@ -81,3 +82,11 @@ def compat_attachment(**kwargs):
     if attachment.is_deleted or attachment.folder.is_deleted:
         raise NotFound
     return redirect(attachment.download_url, 302 if current_app.debug else 301)
+
+
+class RHCompatAttachmentNew(SpecificAttachmentMixin, RH):
+    normalize_url_spec = dict(SpecificAttachmentMixin.normalize_url_spec,
+                              endpoint='attachments.download')
+
+    def _process(self):
+        raise Exception('This RH should only perform URL normalization!')
