@@ -492,6 +492,9 @@ class AbstractManagerLegacyMixin(object):
         # relationship anymore
         for contrib in Contribution.find(abstract=abstract):
             contrib.abstract = None
+
+        for judgment in abstract.judgments:
+            db.session.delete(judgment)
         db.session.delete(abstract)
         db.session.flush()
 
