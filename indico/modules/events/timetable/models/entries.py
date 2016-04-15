@@ -320,6 +320,17 @@ class TimetableEntry(db.Model):
                 child.start_dt += diff
         self.start_dt = start_dt
 
+    def move_next_to(self, sibling, position='before'):
+        if sibling not in self.siblings:
+            raise ValueError("Not a sibling")
+        if position not in ('before', 'after'):
+            raise ValueError("Invalid position")
+        if position == 'before':
+            start_dt = sibling.start_dt - self.duration
+        else:
+            start_dt = sibling.end_dt
+        self.move(start_dt)
+
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):

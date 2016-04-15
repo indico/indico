@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import session
 
 from indico.core import signals
@@ -186,3 +184,27 @@ def update_timetable_entry_object(entry, data):
     elif entry.type == TimetableEntryType.BREAK:
         obj.populate_from_dict(data)
     db.session.flush()
+
+
+def swap_timetable_entry(entry, direction, session_=None):
+    """Swap entry with closest gap or non-parallel sibling"""
+    sibling = None
+    query = entry.siblings if not session_ else entry.session_siblings
+    if direction == 'down':
+        sibling = (query.filter(TimetableEntry.start_dt >= entry.end_dt)
+                        .order_by(TimetableEntry.start_dt.asc()).first())
+        if sibling:
+            if entry.end_dt != sibling.start_dt:
+                entry.move_next_to(sibling, position='before')
+            elif not sibling.is_parallel(in_session=session is not None):
+                sibling.move(entry.start_dt)
+                entry.move(sibling.end_dt)
+    elif direction == 'up':
+        sibling = (query.filter(TimetableEntry.end_dt <= entry.start_dt)
+                        .order_by(TimetableEntry.end_dt.desc()).first())
+        if sibling:
+            if entry.start_dt != sibling.end_dt:
+                entry.move_next_to(sibling, position='after')
+            elif not sibling.is_parallel(in_session=session is not None):
+                entry.move(sibling.start_dt)
+                sibling.move(entry.end_dt)

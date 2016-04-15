@@ -307,10 +307,6 @@
     display: none !important;
 }
 
-.ttentryArrows, .ttentryArrowsBackground {
-    display: none !important;
-}
-
 .bottomTip {
     @include border-all();
     @include border-radius();

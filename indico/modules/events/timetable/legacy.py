@@ -225,6 +225,8 @@ class TimetableSerializer(object):
         data['uniqueId'] = data['id']
         data['conferenceId'] = entry.event_id
         if self.management:
+            data['isParallel'] = entry.is_parallel()
+            data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
         return data
 

@@ -25,6 +25,7 @@ from flask import flash, request, jsonify, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
@@ -41,12 +42,12 @@ from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionE
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,
                                                         move_timetable_entry, update_timetable_entry_object,
-                                                        delete_timetable_entry)
+                                                        delete_timetable_entry, swap_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   get_time_changes_notifications,
@@ -462,6 +463,31 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
         notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable,
                             notifications=notifications)
+
+
+class RHLegacyTimetableSwapEntries(RHManageTimetableEntryBase):
+    @property
+    def session_management_level(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.coordinate
+
+    def _checkParams(self, params):
+        RHManageTimetableEntryBase._checkParams(self, params)
+        if self.entry.is_parallel(in_session=self.session is not None):
+            raise BadRequest
+
+    def _process(self):
+        direction = request.form['direction']
+        with track_time_changes():
+            swap_timetable_entry(self.entry, direction, session_=self.session)
+        serializer = TimetableSerializer(management=True)
+        if self.session:
+            timetable_data = serializer.serialize_session_timetable(self.session)
+        else:
+            timetable_data = serializer.serialize_timetable(self.event_new)
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable_data)
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):

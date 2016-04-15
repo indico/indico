@@ -792,54 +792,57 @@ type("TimetableBlockDisplayMixin",[],
 
 
 type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
-     {
-         _drawPopup: function(evt) {
+    {
+        _drawPopup: function(evt) {
             drawBalloon(this, evt, true);
-         },
+        },
 
-         _getRightSideDecorators: function()
-         {
-             return this.arrows;
-         }
+        _getRightSideDecorators: function() {
+            return this.arrows;
+        },
 
-     },
-     function() {
-         var arrowUp = Html.img({src: imageSrc('upArrow'), title: $T('Move up')});
-         var arrowDown = Html.img({src: imageSrc('downArrow'), style:{paddingLeft: '5px'}, title: $T('Move down')});
+        _drawArrows: function() {
+            var self = this;
+            var arrowUp = Html.img({src: imageSrc('upArrow'), title: $T('Move up')});
+            var arrowDown = Html.img({src: imageSrc('downArrow'), style:{paddingLeft: '5px'}, title: $T('Move down')});
 
-         var self = this;
+            arrowUp.observeClick(function(event) {
+                self.managementActions.swapEntry(self.eventData, 'up');
+                if (event.stopPropagation) {
+                    event.stopPropagation();
+                } else {
+                    event.cancelBubble = true;
+                }
+            });
 
-         arrowUp.observeClick(
-             function(event) {
-                 self.managementActions.moveEntryUpDown(self.eventData, true);
-                 if (event.stopPropagation) {
-                     event.stopPropagation();
-                 } else {
-                     event.cancelBubble = true;
-                 }
-                 return false;
-             });
+            arrowDown.observeClick(function(event) {
+                self.managementActions.swapEntry(self.eventData, 'down');
+                if (event.stopPropagation) {
+                    event.stopPropagation();
+                } else {
+                    event.cancelBubble = true;
+                }
+            });
 
-         arrowDown.observeClick(
-             function(event) {
-                 self.managementActions.moveEntryUpDown(self.eventData, false);
-                 if (event.stopPropagation) {
-                     event.stopPropagation();
-                 } else {
-                     event.cancelBubble = true;
-                 }
-                 return false;
-             });
+            var startDate = parseInt(this.eventData.startDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.startDate.time.substring(3, 5));
+            var endDate = parseInt(this.eventData.endDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.endDate.time.substring(3, 5));
+            var shifted = (endDate - startDate < 20) ? " ttentryArrowsShifted" : "";
 
-         var startDate = parseInt(this.eventData.startDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.startDate.time.substring(3, 5));
-         var endDate = parseInt(this.eventData.endDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.endDate.time.substring(3, 5));
-         var shifted = (endDate - startDate < 20) ? " ttentryArrowsShifted" : "";
+            this.arrows = Html.div({},
+                                Html.div({className: "ttentryArrowsBackground" + shifted}),
+                                Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
+        }
+    },
+    function() {
+        var isParallel = this.timetable.isSessionTimetable ? this.eventData.isParallelInSession
+                                                           : this.eventData.isParallel;
 
-         this.arrows = Html.div({},
-                             Html.div({className: "ttentryArrowsBackground" + shifted}),
-                             Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
-         this.DragAndDropBlockMixin();
-     });
+        if (!isParallel && (!this.timetable.isTopLevel || this.timetable.canManageBlocks)) {
+            this._drawArrows();
+        }
+        this.DragAndDropBlockMixin();
+    }
+);
 
 type("TimetableBlockWholeDayDisplay", ["TimetableBlockWholeDayBase", "TimetableBlockDisplayMixin"],
      {
