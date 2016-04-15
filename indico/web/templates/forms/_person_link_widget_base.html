@@ -63,7 +63,7 @@
                     $noCoauthorPlaceholder.toggle($coauthorList.is(':empty'));
                 {% endif %}
                 $otherListTitle.toggle($otherList.is(':not(:empty)'));
-                $noOtherPlaceholder.toggle(people.length == 0);
+                $noOtherPlaceholder.toggle($otherList.is(':empty'));
             }
 
             function renderPerson(person) {
