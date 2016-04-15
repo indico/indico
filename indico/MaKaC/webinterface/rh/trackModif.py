@@ -405,8 +405,10 @@ class RHTrackAbstractAccept(RHTrackAbstractSetStatusBase):
         if self._action:
             cType = self._abstract.getConference().getContribTypeById(self._typeId)
             self._abstract.accept(self._getUser(), self._track, cType, self._comments, self._session)
-            self._notifyStatus(review.AbstractStatusAccepted(self._abstract, None, self._track, cType))
-            self._redirect(urlHandlers.UHTrackAbstractModif.getURL( self._track, self._abstract ))
+            self._abstract.as_new.accepted_track_id = self._track.id if self._track else None
+            self._abstract.as_new.accepted_type = cType
+            self._notifyStatus(review.AbstractStatusAccepted(self._abstract, None, ''))
+            self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track, self._abstract))
         else:
             p = tracks.WPTrackAbstractAccept(self, self._track, self._abstract)
             return p.display(**self._getRequestParams())

@@ -164,7 +164,7 @@
                                    data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
                                     <span class="label">
                                         {% if contrib.track %}
-                                            {%- trans title=contrib.track.getTitle() %}
+                                            {%- trans title=contrib.track.getTitle().decode('utf-8') %}
                                                 {{ title }}
                                             {% endtrans -%}
                                         {% else %}
