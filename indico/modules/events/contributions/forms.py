@@ -62,6 +62,8 @@ class ContributionForm(IndicoForm):
         to_schedule = kwargs.pop('to_schedule', False)
         super(ContributionForm, self).__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
+        if self.event.type != 'conference':
+            self.person_link_data.label.text = _("Speakers")
         if not self.type.query.count():
             del self.type
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
