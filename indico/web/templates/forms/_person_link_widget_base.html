@@ -49,6 +49,7 @@
             var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-{{ field.id }}');
             var $buttonAddExisting = $('#add-existing-{{ field.id }}');
             var $buttonAddNew = $('#add-new-{{ field.id }}');
+            var allowAuthors = {{ (field.allow_authors or none)|tojson }};
             var authorTypes = {{ (field.author_types or none)|tojson }};
 
             function renderPeople(people) {
@@ -93,7 +94,7 @@
                     }
                 {% endif %}
 
-                if (!authorTypes || person.authorType == authorTypes.none) {
+                if (!authorTypes || person.authorType == authorTypes.none || (!allowAuthors && person.isSpeaker)) {
                     $otherList.append($personRow);
                 } else if (person.authorType == authorTypes.primary) {
                     $authorList.append($personRow);
