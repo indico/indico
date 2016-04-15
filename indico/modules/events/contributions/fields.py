@@ -38,6 +38,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.allow_submitters = kwargs.pop('allow_submitters', True)
         self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        self.default_is_speaker = True
         super(ContributionPersonLinkListField, self).__init__(*args, **kwargs)
 
     @property
@@ -47,12 +48,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
     @allow_authors.setter
     def allow_authors(self, value):
         self._allow_authors = value
-        if value:
-            self.default_author_type = AuthorType.primary
-            self.default_is_speaker = False
-        else:
-            self.default_author_type = AuthorType.none
-            self.default_is_speaker = True
+        self.default_author_type = AuthorType.primary if value else AuthorType.none
 
     def _convert_data(self, data):
         return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
