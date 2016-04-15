@@ -28,6 +28,7 @@ from werkzeug.exceptions import ServiceUnavailable
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
+from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
@@ -319,10 +320,13 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 '_type': person_type,
                 '_fossil': self.fossils_mapping['person'].get(person_type, None),
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
-                'id': unicode(person.id) if getattr(person, 'id', None) else unicode(person.person_id),
+                'id': unicode(person.id),
                 'affiliation': person.affiliation,
                 'emailHash': md5(person.email).hexdigest() if person.email else None
             }
+            if isinstance(person, PersonLinkBase):
+                data['db_id'] = person.id
+                data['person_id'] = person.person_id
             if self.user and can_manage:
                 data['email'] = person.email or None
             if person_type == 'ConferenceChair':
@@ -523,12 +527,12 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'folders': build_folders_api_data(contrib),
             'url': url_for('contributions.display_contribution', contrib, _external=True),
             'material': build_material_legacy_api_data(contrib),
-            'speakers': self._serialize_persons([x.person for x in contrib.speakers],
-                                                person_type='ContributionParticipation', can_manage=can_manage),
-            'primaryauthors': self._serialize_persons([x.person for x in contrib.primary_authors],
-                                                      person_type='ContributionParticipation', can_manage=can_manage),
-            'coauthors': self._serialize_persons([x.person for x in contrib.secondary_authors],
-                                                 person_type='ContributionParticipation', can_manage=can_manage),
+            'speakers': self._serialize_persons(contrib.speakers, person_type='ContributionParticipation',
+                                                can_manage=can_manage),
+            'primaryauthors': self._serialize_persons(contrib.primary_authors, person_type='ContributionParticipation',
+                                                      can_manage=can_manage),
+            'coauthors': self._serialize_persons(contrib.secondary_authors, person_type='ContributionParticipation',
+                                                 can_manage=can_manage),
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
@@ -553,8 +557,8 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'note': build_note_api_data(subcontrib.note),
             'material': build_material_legacy_api_data(subcontrib),
             'folders': build_folders_api_data(subcontrib),
-            'speakers': self._serialize_persons([x.person for x in subcontrib.speakers],
-                                                person_type='SubContribParticipation', can_manage=can_manage)
+            'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
+                                                can_manage=can_manage)
         }
         return data
 
