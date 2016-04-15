@@ -2365,9 +2365,6 @@ class Conference(CommonObjectBase, Locatable):
                                         "enough to accomodate the contained timetable entries and spacings."),
                                       explanation=_("You should try using a larger timespan."))
 
-        # sanity check
-        self._checkInnerSchedule()
-
         # reindex the conference
         self.indexConf()
 
