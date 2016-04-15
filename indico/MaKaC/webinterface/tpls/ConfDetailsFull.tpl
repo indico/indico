@@ -21,9 +21,13 @@
         <div class="place text">
           ${event.venue_name}
         </div>
-      % if event.room_name:
+      % if event.room and event.room.map_url:
         <div class="room text">
-            <a href="${event.room.map_url}">${event.room_name}</a>
+          <a href="${event.room.map_url}">${event.room_name}</a>
+        </div>
+      % elif event.room_name:
+        <div class="room text">
+          ${event.room_name}
         </div>
       % endif
       % if event.address:
