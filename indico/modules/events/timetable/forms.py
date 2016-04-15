@@ -58,7 +58,7 @@ class EntryFormMixin(object):
                 kwargs['obj'] = defaults
         super(EntryFormMixin, self).__init__(*args, **kwargs)
         self.time.description = _("Time when the {} will be scheduled.").format(self._entry_type.title.lower())
-        self.duration.description = _("The duration of the break").format(self._entry_type.title.lower())
+        self.duration.description = _("The duration of the {}").format(self._entry_type.title.lower())
 
     @property
     def data(self):
