@@ -44,9 +44,9 @@ logger = Logger.get('events')
 #: url space.
 event_object_url_prefixes = {
     'event': [''],
-    'session': ['/session/<int:session_id>'],
-    'contribution': ['/contribution/<int:contrib_id>'],
-    'subcontribution': ['/contribution/<int:contrib_id>/<int:subcontrib_id>']
+    'session': ['/sessions/<int:session_id>'],
+    'contribution': ['/contributions/<int:contrib_id>'],
+    'subcontribution': ['/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>']
 }
 
 #: URL prefixes for the various event objects (management area)
@@ -56,7 +56,7 @@ event_management_object_url_prefixes = {
     'event': ['/manage'],
     'session': ['/manage/sessions/<int:session_id>'],
     'contribution': ['/manage/contributions/<int:contrib_id>'],
-    'subcontribution': ['/manage/contributions/<int:contrib_id>/subcontribution/<int:subcontrib_id>']
+    'subcontribution': ['/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>']
 }
 
 
