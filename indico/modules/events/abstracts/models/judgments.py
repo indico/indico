@@ -91,9 +91,9 @@ class Judgment(db.Model):
 
     @property
     def as_legacy(self):
-        return next((judgment for judgment in self.abstract.as_legacy.getJudgementHistoryByTrack(str(self.track_id))
+        return next((judgment for judgment in self.abstract.as_legacy.getJudgementHistoryByTrack(self.track)
                     if judgment.getResponsible().as_new == self.judge), None)
 
     @property
     def track(self):
-        return self.event_new.as_legacy.getTrackById(str(self.track_id))
+        return self.abstract.event_new.as_legacy.getTrackById(str(self.track_id))
