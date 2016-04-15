@@ -317,7 +317,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 '_type': person_type,
                 '_fossil': self.fossils_mapping['person'].get(person_type, None),
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
-                'id': person.id if getattr(person, 'id', None) else person.person_id,
+                'id': unicode(person.id) if getattr(person, 'id', None) else unicode(person.person_id),
                 'affiliation': person.affiliation,
                 'emailHash': md5(person.email).hexdigest() if person.email else None
             }
@@ -394,7 +394,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
     def _build_event_basic_api_data(self, event):
         return {
             '_type': 'Conference',
-            'id': event.id,
+            'id': unicode(event.id),
             'title': event.title,
             'description': event.description,
             'startDate': self._serialize_date(event.start_dt),
@@ -411,7 +411,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         data = self._build_event_basic_api_data(event)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level, None),
-            'categoryId': event.category_id,
+            'categoryId': unicode(event.category_id),
             'category': event.category.getTitle(),
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
