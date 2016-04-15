@@ -252,43 +252,58 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def category(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        filter = None
-
-        def filter(obj):
-            if self._room or self._location or self._eventType:
-                if self._eventType and obj.as_legacy.getType() != self._eventType:
-                    return False
-                if self._location:
-                    name = obj.venue_name
-                    if not name or not fnmatch.fnmatch(name.lower(), self._location.lower()):
-                        return False
-                if self._room:
-                    name = obj.room_name
-                    if not name or not fnmatch.fnmatch(name.lower(), self._room.lower()):
-                        return False
-            return True
-
         query = (Event.query
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
-        return self.serialize_events(x for x in query if x.can_access(self.user) and filter(x))
+        query = self._update_query(query)
+        return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
 
     def event(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        events = (Event.find(Event.id.in_(idlist), ~Event.is_deleted)
-                  .options(*self._get_query_options(self._detail_level))
-                  .all())
+        query = (Event.find(Event.id.in_(idlist), ~Event.is_deleted)
+                 .options(*self._get_query_options(self._detail_level)))
+        query = self._update_query(query)
+        return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
 
-        ch = ConferenceHolder()
+    def _filter_event(self, event):
+        if self._room or self._location or self._eventType:
+            if self._eventType and event.as_legacy.getType() != self._eventType:
+                return False
+            if self._location:
+                name = event.venue_name
+                if not name or not fnmatch.fnmatch(name.lower(), self._location.lower()):
+                    return False
+            if self._room:
+                name = event.room_name
+                if not name or not fnmatch.fnmatch(name.lower(), self._room.lower()):
+                    return False
+        return True
 
-        def _iterate_objs(objIds):
-            for objId in objIds:
-                obj = ch.getById(objId, True)
-                if obj is not None:
-                    yield obj
-        return self.serialize_events(events)
+    def _update_query(self, query):
+        order = get_query_parameter(request.args.to_dict(), ['o', 'order'])
+        desc = get_query_parameter(request.args.to_dict(), ['c', 'descending']) == 'yes'
+        limit = get_query_parameter(request.args.to_dict(), ['n', 'limit'])
+        offset = get_query_parameter(request.args.to_dict(), ['O', 'offset'])
+
+        col = None
+        if order == 'start':
+            col = Event.start_dt
+        elif order == 'end':
+            col = Event.end_dt
+        elif order == 'id':
+            col = Event.id
+        elif order == 'title':
+            col = Event.title
+        if col:
+            query = query.order_by(col.desc if desc else col)
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        return query
 
     def serialize_events(self, events):
         return map(self._build_event_api_data, events)
