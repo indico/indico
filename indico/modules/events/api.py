@@ -252,26 +252,27 @@ class CategoryEventFetcher(IteratedDataFetcher):
     def category(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
         filter = None
-        if self._room or self._location or self._eventType:
-            def filter(obj):
-                if self._eventType and obj.getType() != self._eventType:
+
+        def filter(obj):
+            if self._room or self._location or self._eventType:
+                if self._eventType and obj.as_legacy.getType() != self._eventType:
                     return False
                 if self._location:
-                    name = obj.getLocation() and obj.getLocation().getName()
+                    name = obj.venue_name
                     if not name or not fnmatch.fnmatch(name.lower(), self._location.lower()):
                         return False
                 if self._room:
-                    name = obj.getRoom() and obj.getRoom().getName()
+                    name = obj.room_name
                     if not name or not fnmatch.fnmatch(name.lower(), self._room.lower()):
                         return False
-                return True
+            return True
 
         query = (Event.query
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
-        return self.serialize_events(x for x in query if x.can_access(self.user))
+        return self.serialize_events(x for x in query if x.can_access(self.user) and filter(x))
 
     def event(self, idlist):
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
