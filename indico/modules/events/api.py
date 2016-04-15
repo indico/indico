@@ -30,6 +30,7 @@ from indico.modules.attachments.api.util import build_folders_api_data, build_ma
 from indico.modules.events import Event
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
@@ -149,7 +150,248 @@ class CategoryEventHook(HTTPAPIHook):
         return expInt.event(self._idList)
 
 
-class CategoryEventFetcher(IteratedDataFetcher):
+class SerializerBase(object):
+    """Common methods for different serializers"""
+
+    def _serialize_access_list(self, obj):
+        data = {'users': [], 'groups': []}
+        for manager in obj.get_access_list():
+            if manager.principal_type in (PrincipalType.user, PrincipalType.email):
+                data['users'].append(manager.email)
+            elif manager.principal_type == PrincipalType.multipass_group:
+                data['groups'].append(manager.name)
+        return data
+
+    def _serialize_date(self, date):
+        if date:
+            date = date.astimezone(self._hook._tz)
+            return {
+                'date': str(date.date()),
+                'time': str(date.time()),
+                'tz': str(date.tzinfo)
+            }
+
+    def _serialize_person(self, person, person_type, can_manage=False):
+        """Serialize an event associated person"""
+
+        if person:
+            data = {
+                '_type': person_type,
+                '_fossil': self.fossils_mapping['person'].get(person_type, None),
+                'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
+                'id': unicode(person.id),
+                'affiliation': person.affiliation,
+                'emailHash': md5(person.email).hexdigest() if person.email else None
+            }
+            if isinstance(person, PersonLinkBase):
+                data['db_id'] = person.id
+                data['person_id'] = person.person_id
+            if can_manage:
+                data['email'] = person.email or None
+            if person_type == 'ConferenceChair':
+                data['fullName'] = person.get_full_name(last_name_upper=False, abbrev_first_name=False,
+                                                        show_title=True),
+            return data
+
+    def _serialize_persons(self, persons, person_type, can_manage=False):
+        return [self._serialize_person(person, person_type, can_manage) for person in persons]
+
+    def _serialize_convener(self, convener, can_manage=False):
+        data = {
+            'fax': '',
+            'familyName': convener.last_name,
+            'name': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
+            'firstName': convener.first_name,
+            'title': convener.title,
+            '_type': 'SlotChair',
+            'affiliation': convener.affiliation,
+            '_fossil': 'conferenceParticipation',
+            'fullName': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
+            'id': convener.person_id,
+            'db_id': convener.id,
+            'person_id': convener.person_id,
+            'emailHash': md5(convener.person.email).hexdigest() if convener.person.email else None
+        }
+        if can_manage:
+            data['address'] = convener.address,
+            data['phone'] = convener.phone,
+            data['email'] = convener.person.email,
+        return data
+
+    def _serialize_session(self, session_, can_manage=False):
+        return {
+            'folders': build_folders_api_data(session_),
+            'startDate': self._serialize_date(session_.start_dt) if session_.blocks else None,
+            'endDate': self._serialize_date(session_.end_dt) if session_.blocks else None,
+            '_type': 'Session',
+            'sessionConveners': [self._serialize_convener(c, can_manage) for c in session_.conveners],
+            'title': session_.title,
+            'color': '#{}'.format(session_.colors.background),
+            'textColor': '#{}'.format(session_.colors.text),
+            'description': session_.description,
+            'material': build_material_legacy_api_data(session_),
+            'isPoster': session_.is_poster,
+            'url': url_for('sessions.display_session', session_, _external=True),
+            'protectionURL': url_for('sessions.session_protection', session_.event_new, session_, _external=True),
+            'roomFullname': session_.room_name,
+            'location': session_.venue_name,
+            'address': session_.address,
+            '_fossil': 'sessionMinimal',
+            'numSlots': len(session_.blocks),
+            'id': (session_.legacy_mapping.legacy_session_id
+                   if session_.legacy_mapping else unicode(session_.friendly_id)),
+            'db_id': session_.id,
+            'friendly_id': session_.friendly_id,
+            'room': session_.get_room_name(full=False)
+        }
+
+    fossils_mapping = {
+        'event': {
+            None: 'conferenceMetadata',
+            'contributions': 'conferenceMetadataWithContribs',
+            'subcontributions': 'conferenceMetadataWithSubContribs',
+            'sessions': 'conferenceMetadataWithSessions'
+        },
+        'contribution': {
+            'contributions': 'contributionMetadata',
+            'subcontributions': 'contributionMetadataWithSubContribs',
+            'sessions': 'contributionMetadataWithSubContribs'
+        },
+        'person': {
+            'Avatar': 'conferenceChairMetadata',
+            'ConferenceChair': 'conferenceChairMetadata',
+            'ContributionParticipation': 'contributionParticipationMetadata',
+            'SubContribParticipation': 'contributionParticipationMetadata'
+        }
+    }
+
+    def _build_event_api_data_base(self, event):
+        return {
+            '_type': 'Conference',
+            'id': unicode(event.id),
+            'title': event.title,
+            'description': event.description,
+            'startDate': self._serialize_date(event.start_dt),
+            'timezone': event.timezone,
+            'endDate': self._serialize_date(event.end_dt),
+            'room': event.get_room_name(full=False),
+            'location': event.venue_name,
+            'address': event.address,
+            'type': event.as_legacy.getType()
+        }
+
+    def _build_session_event_api_data(self, event):
+        data = self._build_event_api_data_base(event)
+        data.update({
+            '_fossil': 'conference',
+            'adjustedStartDate': self._serialize_date(event.as_legacy.getAdjustedStartDate()),
+            'adjustedEndDate': self._serialize_date(event.as_legacy.getAdjustedEndDate()),
+            'bookedRooms': Conversion.reservationsList(event.reservations.all()),
+            'supportInfo': {
+                '_fossil': 'supportInfo',
+                'caption': event.as_legacy.getSupportInfo().getCaption(),
+                '_type': 'SupportInfo',
+                'email': event.as_legacy.getSupportInfo().getEmail(),
+                'telephone': event.as_legacy.getSupportInfo().getTelephone()
+            },
+        })
+        return data
+
+    def _serialize_session_block(self, block, serialized_session, session_access_list, can_manage):
+        block_data = {
+            '_type': 'SessionSlot',
+            '_fossil': 'sessionMetadata',
+            'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
+            'conference': self._build_session_event_api_data(block.event_new),
+            'startDate': self._serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
+            'endDate': self._serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
+            'description': '',  # Session blocks don't have a description
+            'title': block.full_title,
+            'url': url_for('sessions.display_session', block.session, _external=True),
+            'contributions': map(self._serialize_contribution, block.contributions),
+            'note': build_note_api_data(block.note),
+            'session': serialized_session,
+            'room': block.get_room_name(full=False),
+            'roomFullname': block.room_name,
+            'location': block.venue_name,
+            'inheritLoc': block.inherit_location,
+            'inheritRoom': block.own_room is None,
+            'slotTitle': block.title,
+            'address': block.address,
+            'conveners': [self._serialize_convener(c, can_manage) for c in block.person_links]
+        }
+        if session_access_list:
+            block_data['allowed'] = session_access_list
+        return block_data
+
+    def _build_session_api_data(self, session_):
+        can_manage = self.user is not None and session_.can_manage(self.user)
+        session_access_list = None
+        serialized_session = self._serialize_session(session_, can_manage)
+        if can_manage:
+            session_access_list = self._serialize_access_list(session_)
+        return [self._serialize_session_block(b, serialized_session, session_access_list, can_manage)
+                for b in session_.blocks]
+
+    def _serialize_contribution(self, contrib, include_subcontribs=True):
+        can_manage = self.user is not None and contrib.can_manage(self.user)
+        data = {
+            '_type': 'Contribution',
+            '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
+            'id': (contrib.legacy_mapping.legacy_contribution_id
+                   if contrib.legacy_mapping else unicode(contrib.friendly_id)),
+            'db_id': contrib.id,
+            'friendly_id': contrib.friendly_id,
+            'title': contrib.title,
+            'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
+            'endDate': self._serialize_date(contrib.start_dt + contrib.duration) if contrib.start_dt else None,
+            'duration': contrib.duration.seconds // 60,
+            'roomFullname': contrib.room_name,
+            'room': contrib.get_room_name(full=False),
+            'note': build_note_api_data(contrib.note),
+            'location': contrib.venue_name,
+            'type': contrib.type.name if contrib.type else None,
+            'description': contrib.description,
+            'folders': build_folders_api_data(contrib),
+            'url': url_for('contributions.display_contribution', contrib, _external=True),
+            'material': build_material_legacy_api_data(contrib),
+            'speakers': self._serialize_persons(contrib.speakers, person_type='ContributionParticipation',
+                                                can_manage=can_manage),
+            'primaryauthors': self._serialize_persons(contrib.primary_authors, person_type='ContributionParticipation',
+                                                      can_manage=can_manage),
+            'coauthors': self._serialize_persons(contrib.secondary_authors, person_type='ContributionParticipation',
+                                                 can_manage=can_manage),
+            'keywords': contrib.keywords,
+            'track': contrib.track.title if contrib.track else None,
+            'session': contrib.session.title if contrib.session else None,
+        }
+        if include_subcontribs:
+            data['subContributions'] = map(self._serialize_subcontribution, contrib.subcontributions)
+        if can_manage:
+            data['allowed'] = self._serialize_access_list(contrib)
+        return data
+
+    def _serialize_subcontribution(self, subcontrib):
+        can_manage = self.user is not None and subcontrib.contribution.can_manage(self.user)
+        data = {
+            '_type': 'SubContribution',
+            '_fossil': 'subContributionMetadata',
+            'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
+                   if subcontrib.legacy_mapping else unicode(subcontrib.friendly_id)),
+            'db_id': subcontrib.id,
+            'friendly_id': subcontrib.friendly_id,
+            'title': subcontrib.title,
+            'duration': subcontrib.duration.seconds // 60,
+            'note': build_note_api_data(subcontrib.note),
+            'material': build_material_legacy_api_data(subcontrib),
+            'folders': build_folders_api_data(subcontrib),
+            'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
+                                                can_manage=can_manage)
+        }
+        return data
+
+
+class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     DETAIL_INTERFACES = {
         'events': IConferenceMetadataFossil,
         'contributions': IConferenceMetadataWithContribsFossil,
@@ -310,129 +552,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
     def serialize_events(self, events):
         return map(self._build_event_api_data, events)
 
-    def _serialize_access_list(self, obj):
-        data = {'users': [], 'groups': []}
-        for manager in obj.get_access_list():
-            if manager.principal_type in (PrincipalType.user, PrincipalType.email):
-                data['users'].append(manager.email)
-            elif manager.principal_type == PrincipalType.multipass_group:
-                data['groups'].append(manager.name)
-        return data
-
-    def _serialize_date(self, date):
-        if date:
-            date = date.astimezone(self._hook._tz)
-            return {
-                'date': str(date.date()),
-                'time': str(date.time()),
-                'tz': str(date.tzinfo)
-            }
-
-    def _serialize_persons(self, persons, person_type, can_manage=False):
-        return [self._serialize_person(person, person_type, can_manage) for person in persons]
-
-    def _serialize_person(self, person, person_type, can_manage=False):
-        if person:
-            data = {
-                '_type': person_type,
-                '_fossil': self.fossils_mapping['person'].get(person_type, None),
-                'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
-                'id': unicode(person.id),
-                'affiliation': person.affiliation,
-                'emailHash': md5(person.email).hexdigest() if person.email else None
-            }
-            if isinstance(person, PersonLinkBase):
-                data['db_id'] = person.id
-                data['person_id'] = person.person_id
-            if self.user and can_manage:
-                data['email'] = person.email or None
-            if person_type == 'ConferenceChair':
-                data['fullName'] = person.get_full_name(last_name_upper=False, abbrev_first_name=False,
-                                                        show_title=True),
-            return data
-
-    def _serialize_convener(self, convener):
-        return {
-            'fax': '',
-            'familyName': convener.last_name,
-            'name': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
-            'firstName': convener.first_name,
-            'phone': convener.phone,
-            'title': convener.title,
-            '_type': 'SlotChair',
-            'email': convener.person.email,
-            'affiliation': convener.affiliation,
-            'address': convener.address,
-            '_fossil': 'conferenceParticipation',
-            'fullName': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
-            'id': convener.person_id
-        }
-
-    def _serialize_session(self, session_):
-        return {
-            'folders': build_folders_api_data(session_),
-            'startDate': self._serialize_date(session_.start_dt) if session_.blocks else None,
-            'endDate': self._serialize_date(session_.end_dt) if session_.blocks else None,
-            '_type': 'Session',
-            'sessionConveners': map(self._serialize_convener, session_.conveners),
-            'title': session_.title,
-            'color': '#{}'.format(session_.colors.background),
-            'textColor': '#{}'.format(session_.colors.text),
-            'description': session_.description,
-            'material': build_material_legacy_api_data(session_),
-            'isPoster': session_.is_poster,
-            'url': url_for('sessions.display_session', session_, _external=True),
-            'protectionURL': url_for('sessions.session_protection', session_.event_new, session_, _external=True),
-            'roomFullname': session_.room_name,
-            'location': session_.venue_name,
-            'address': session_.address,
-            '_fossil': 'sessionMinimal',
-            'numSlots': len(session_.blocks),
-            'id': (session_.legacy_mapping.legacy_session_id
-                   if session_.legacy_mapping else unicode(session_.friendly_id)),
-            'db_id': session_.id,
-            'friendly_id': session_.friendly_id,
-            'room': session_.get_room_name(full=False)
-        }
-
-    fossils_mapping = {
-        'event': {
-            None: 'conferenceMetadata',
-            'contributions': 'conferenceMetadataWithContribs',
-            'subcontributions': 'conferenceMetadataWithSubContribs',
-            'sessions': 'conferenceMetadataWithSessions'
-        },
-        'contribution': {
-            'contributions': 'contributionMetadata',
-            'subcontributions': 'contributionMetadataWithSubContribs',
-            'sessions': 'contributionMetadataWithSubContribs'
-        },
-        'person': {
-            'Avatar': 'conferenceChairMetadata',
-            'ConferenceChair': 'conferenceChairMetadata',
-            'ContributionParticipation': 'contributionParticipationMetadata',
-            'SubContribParticipation': 'contributionParticipationMetadata'
-        }
-    }
-
-    def _build_event_basic_api_data(self, event):
-        return {
-            '_type': 'Conference',
-            'id': unicode(event.id),
-            'title': event.title,
-            'description': event.description,
-            'startDate': self._serialize_date(event.start_dt),
-            'timezone': event.timezone,
-            'endDate': self._serialize_date(event.end_dt),
-            'room': event.get_room_name(full=False),
-            'location': event.venue_name,
-            'address': event.address,
-            'type': event.as_legacy.getType()
-        }
-
     def _build_event_api_data(self, event):
         can_manage = self.user is not None and event.can_manage(self.user)
-        data = self._build_event_basic_api_data(event)
+        data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level, None),
             'categoryId': unicode(event.category_id),
@@ -456,127 +578,19 @@ class CategoryEventFetcher(IteratedDataFetcher):
             data['contributions'] = []
             for contribution in event.contributions:
                 include_subcontribs = self._detail_level == 'subcontributions'
-                serialized_contrib = self._build_contribution_api_data(contribution, include_subcontribs)
+                serialized_contrib = self._serialize_contribution(contribution, include_subcontribs)
                 data['contributions'].append(serialized_contrib)
         elif self._detail_level == 'sessions':
             # Contributions without a session
             data['contributions'] = []
             for contribution in event.contributions:
                 if not contribution.session:
-                    serialized_contrib = self._build_contribution_api_data(contribution)
+                    serialized_contrib = self._serialize_contribution(contribution)
                     data['contributions'].append(serialized_contrib)
 
             data['sessions'] = []
             for session_ in event.sessions:
                 data['sessions'].extend(self._build_session_api_data(session_))
-        return data
-
-    def _build_session_event_api_data(self, event):
-        data = self._build_event_basic_api_data(event)
-        data.update({
-            '_fossil': 'conference',
-            'adjustedStartDate': self._serialize_date(event.as_legacy.getAdjustedStartDate()),
-            'adjustedEndDate': self._serialize_date(event.as_legacy.getAdjustedEndDate()),
-            'bookedRooms': Conversion.reservationsList(event.reservations.all()),
-            'supportInfo': {
-                '_fossil': 'supportInfo',
-                'caption': event.as_legacy.getSupportInfo().getCaption(),
-                '_type': 'SupportInfo',
-                'email': event.as_legacy.getSupportInfo().getEmail(),
-                'telephone': event.as_legacy.getSupportInfo().getTelephone()
-            },
-        })
-        return data
-
-    def _build_session_api_data(self, session_):
-        data = []
-        session_access_list = None
-        serialized_session = self._serialize_session(session_)
-        if self.user and session_.can_manage(self.user):
-            session_access_list = self._serialize_access_list(session_)
-        for block in session_.blocks:
-            block_data = {
-                '_type': 'SessionSlot',
-                '_fossil': 'sessionMetadata',
-                'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
-                'conference': self._build_session_event_api_data(block.event_new),
-                'startDate': self._serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
-                'endDate': self._serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
-                'description': '',  # Session blocks don't have a description
-                'title': block.full_title,
-                'url': url_for('sessions.display_session', session_, _external=True),
-                'contributions': map(self._build_contribution_api_data, block.contributions),
-                'note': build_note_api_data(block.note),
-                'session': serialized_session,
-                'room': block.get_room_name(full=False),
-                'roomFullname': block.room_name,
-                'location': block.venue_name,
-                'inheritLoc': block.inherit_location,
-                'inheritRoom': block.own_room is None,
-                'slotTitle': block.title,
-                'address': block.address,
-                'conveners': map(self._serialize_convener, block.person_links)
-            }
-            if session_access_list:
-                block_data['allowed'] = session_access_list
-            data.append(block_data)
-        return data
-
-    def _build_contribution_api_data(self, contrib, include_subcontribs=True):
-        can_manage = self.user is not None and contrib.can_manage(self.user)
-        data = {
-            '_type': 'Contribution',
-            '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
-            'id': (contrib.legacy_mapping.legacy_contribution_id
-                   if contrib.legacy_mapping else unicode(contrib.friendly_id)),
-            'db_id': contrib.id,
-            'friendly_id': contrib.friendly_id,
-            'title': contrib.title,
-            'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
-            'endDate': self._serialize_date(contrib.start_dt + contrib.duration) if contrib.start_dt else None,
-            'duration': contrib.duration.seconds // 60,
-            'roomFullname': contrib.room_name,
-            'room': contrib.get_room_name(full=False),
-            'note': build_note_api_data(contrib.note),
-            'location': contrib.venue_name,
-            'type': contrib.type.name if contrib.type else None,
-            'description': contrib.description,
-            'folders': build_folders_api_data(contrib),
-            'url': url_for('contributions.display_contribution', contrib, _external=True),
-            'material': build_material_legacy_api_data(contrib),
-            'speakers': self._serialize_persons(contrib.speakers, person_type='ContributionParticipation',
-                                                can_manage=can_manage),
-            'primaryauthors': self._serialize_persons(contrib.primary_authors, person_type='ContributionParticipation',
-                                                      can_manage=can_manage),
-            'coauthors': self._serialize_persons(contrib.secondary_authors, person_type='ContributionParticipation',
-                                                 can_manage=can_manage),
-            'keywords': contrib.keywords,
-            'track': contrib.track.title if contrib.track else None,
-            'session': contrib.session.title if contrib.session else None,
-        }
-        if include_subcontribs:
-            data['subContributions'] = map(self._build_subcontribution_api_data, contrib.subcontributions)
-        if can_manage:
-            data['allowed'] = self._serialize_access_list(contrib)
-        return data
-
-    def _build_subcontribution_api_data(self, subcontrib):
-        can_manage = self.user is not None and subcontrib.contribution.can_manage(self.user)
-        data = {
-            '_type': 'SubContribution',
-            '_fossil': 'subContributionMetadata',
-            'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
-                   if subcontrib.legacy_mapping else unicode(subcontrib.friendly_id)),
-            'db_id': subcontrib.id,
-            'friendly_id': subcontrib.friendly_id,
-            'title': subcontrib.title,
-            'duration': subcontrib.duration.seconds // 60,
-            'note': build_note_api_data(subcontrib.note),
-            'material': build_material_legacy_api_data(subcontrib),
-            'folders': build_folders_api_data(subcontrib),
-            'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
-                                                can_manage=can_manage)
-        }
         return data
 
 
@@ -621,24 +635,45 @@ class SessionHook(SessionContribHook):
     METHOD_NAME = 'export_session'
 
 
-class SessionFetcher(SessionContribFetcher):
+class SessionFetcher(SessionContribFetcher, SerializerBase):
     DETAIL_INTERFACES = {
         'contributions': ISessionMetadataWithContributionsFossil,
         'subcontributions': ISessionMetadataWithSubContribsFossil,
     }
 
+    def __init__(self, aw, hook):
+        super(SessionFetcher, self).__init__(aw, hook)
+        self.user = getattr(aw.getUser(), 'user', None)
+
     def session(self, idlist):
-        ch = ConferenceHolder()
-        event = ch.getById(self._eventId)
+        event = Event.get_one(self._eventId)
+        idlist = set(map(int, idlist))
+        sessions = (Session.query.with_parent(event)
+                    .filter(Session.id.in_(idlist),
+                            ~Session.is_deleted)
+                    .all())
+        # Fallback for friendly_id
+        sessions += (Session.query
+                     .with_parent(event)
+                     .filter(Session.friendly_id.in_(idlist - {s.id for s in sessions}),
+                             ~Session.is_deleted)
+                     .all())
+        self._detail_level = 'contributions'
+        return self._build_sessions_api_data(sessions)
 
-        def _iterate_objs(objIds):
-            for objId in objIds:
-                session = event.getSessionById(objId)
-                for obj in session.getSlotList():
-                    if obj is not None:
-                        yield obj
+    def _build_sessions_api_data(self, sessions):
+        """Returns an aggregated list of session blocks given the sessions."""
 
-        return self._process(_iterate_objs(idlist))
+        session_blocks = []
+        for session_ in sessions:
+            can_manage = self.user is not None and session_.can_manage(self.user)
+            session_access_list = None
+            serialized_session = self._serialize_session(session_)
+            if self.user and session_.can_manage(self.user):
+                session_access_list = self._serialize_access_list(session_)
+            session_blocks.extend(self._serialize_session_block(b, serialized_session, session_access_list, can_manage)
+                                  for b in session_.blocks)
+        return session_blocks
 
 
 @HTTPAPIHook.register
