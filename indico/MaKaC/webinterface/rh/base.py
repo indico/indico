@@ -196,6 +196,10 @@ class RH(RequestHandlerBase):
     #: be copied from the current request if present.
     #: The callables are always invoked with a single `self` argument
     #: containing the RH instance.
+    #: `endpoint` may be used to specify the endpoint used to build
+    #: the URL in case of a redirect.  Usually this should not be used
+    #: in favor of ``request.endpoint`` being used if no custom endpoint
+    #: is set.
     #: Arguments specified in the `defaults` of any rule matching the
     #: current endpoint are always excluded when checking if the args
     #: match or when building a new URL.
@@ -209,7 +213,8 @@ class RH(RequestHandlerBase):
     normalize_url_spec = {
         'args': {},
         'locators': set(),
-        'preserved_args': set()
+        'preserved_args': set(),
+        'endpoint': None
     }
 
     def __init__(self):
@@ -335,6 +340,7 @@ class RH(RequestHandlerBase):
             'args': self.normalize_url_spec.get('args', {}),
             'locators': self.normalize_url_spec.get('locators', set()),
             'preserved_args': self.normalize_url_spec.get('preserved_args', set()),
+            'endpoint': self.normalize_url_spec.get('endpoint', None)
         }
         # Initialize the new view args with preserved arguments (since those would be lost otherwise)
         new_view_args = {k: v for k, v in request.view_args.iteritems() if k in spec['preserved_args']}
@@ -362,8 +368,9 @@ class RH(RequestHandlerBase):
         new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems()}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
+                endpoint = spec['endpoint'] or request.endpoint
                 try:
-                    return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+                    return redirect(url_for(endpoint, **dict(request.args.to_dict(), **new_view_args)))
                 except BuildError as e:
                     if current_app.debug:
                         raise
