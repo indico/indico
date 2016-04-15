@@ -323,6 +323,9 @@ class CategoryEventFetcher(IteratedDataFetcher):
             }
             if self.user and can_manage:
                 data['email'] = person.email or None
+            if person_type == 'ConferenceChair':
+                data['fullName'] = person.get_full_name(last_name_upper=False, abbrev_first_name=False,
+                                                        show_title=True),
             return data
 
     def _serialize_convener(self, convener):
