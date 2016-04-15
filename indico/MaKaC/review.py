@@ -1846,7 +1846,8 @@ class Abstract(AbstractLegacyMixin, Persistent):
 
         for x in toDelete:
             self.getTrackJudgementsHistorical()[track.getId()].remove(x)
-            self._del_judgment(x)
+            if isinstance(x, AbstractAcceptance):
+                self._del_judgment(x)
 
 
     def proposeToAccept( self, responsible, track, contribType, comment="", answers=[] ):
@@ -1938,7 +1939,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         # check if judgements for specified trak are the same. If not there is a conflict.
         if all(jud.__class__ == lastJud.__class__ for jud in self.getJudgementHistoryByTrack(track)):
             return lastJud
-        return AbstractInConflict(track)
+        return AbstractInConflict(self, track)
 
     def getTrackAcceptances( self ):
         try:
@@ -2263,6 +2264,7 @@ class AbstractJudgement(AbstractJudgmentLegacyMixin, Persistent):
         self._track = track
         self._setResponsible( responsible )
         self._comment = ""
+        self._date = nowutc()
         self._answers = answers
         self._judValue = self.calculateJudgementAverage() # judgement average value
         self._totalJudValue = self.calculateAnswersTotalValue()
@@ -2275,10 +2277,10 @@ class AbstractJudgement(AbstractJudgmentLegacyMixin, Persistent):
         return self._responsible
 
     def getDate( self ):
-        return self.as_new.creation_dt
+        return self._date
 
     def setDate(self, date):
-        self.as_new.creation_dt = date
+        self._date = date
 
     def getTrack( self ):
         return self._track
@@ -2355,6 +2357,12 @@ class AbstractAcceptance( AbstractJudgement ):
     def __init__(self, abstract, track, responsible, contribType, answers):
         AbstractJudgement.__init__(self, abstract, track, responsible, answers)
         self._contribType = contribType
+
+    def getDate( self ):
+        return self.as_new.creation_dt
+
+    def setDate(self, date):
+        self.as_new.creation_dt = date
 
     def clone(self,track):
         aa = AbstractAcceptance(self._abstract, track, self.getResponsible(), self.getContribType(), self.getAnswers())
