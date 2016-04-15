@@ -38,7 +38,7 @@
                 <br>
             {% endif %}
             <span class="materialDisplayName">
-                {{ render_linked_attachments(contrib) }}
+                {{ render_linked_attachments(contrib, link_documents=link_documents) }}
                 {% if contrib.has_note %}
                     <a href="{{ url_for('event_notes.view', contrib) }}">
                         {% trans %}Minutes{% endtrans %}
