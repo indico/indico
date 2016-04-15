@@ -144,7 +144,14 @@ class ProtectionMixin(object):
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
-            return user is not None and any(user in entry.principal for entry in iter_acl(self.acl_entries))
+            if user is None:
+                return False
+            elif any(user in entry.principal for entry in iter_acl(self.acl_entries)):
+                return True
+            elif isinstance(self, ProtectionManagersMixin):
+                return self.can_manage(user, allow_admin=allow_admin)
+            else:
+                return False
         elif self.protection_mode == ProtectionMode.inheriting:
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
