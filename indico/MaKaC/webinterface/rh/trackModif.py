@@ -462,7 +462,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractPropBase ):
         if params.has_key("OK"):
             ctId = ""
             if self._abstract.getContribType():
-                ctId = self._abstract.getContribType().getId()
+                ctId = self._abstract.getContribType().id
             ctId = params.get("contribType",ctId)
             self._contribType = self._abstract.getConference().getContribTypeById(ctId)
 
