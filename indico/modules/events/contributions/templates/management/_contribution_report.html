@@ -8,7 +8,7 @@
             <table class="i-table tablesorter">
                 <thead>
                     <tr class="i-table">
-                        <th class="i-table checkbox-column"></th>
+                        <th class="i-table checkbox-column" data-sorter="false"></th>
                         <th class="i-table id-column">
                             {% trans %}ID{% endtrans %}
                         </th>
@@ -22,7 +22,7 @@
                         <th class="i-table duration-column">
                             {% trans %}Duration{% endtrans %}
                         </th>
-                        <th class="i-table">
+                        <th class="i-table" data-sorter="false">
                             {% trans %}Presenters{% endtrans %}
                         </th>
                         <th class="i-table type-column">
@@ -40,7 +40,7 @@
                         <th class="i-table material-column">
                             {% trans %}Material{% endtrans %}
                         </th>
-                        <th class="actions-column">
+                        <th class="actions-column" data-sorter="false">
                             {# Actions #}
                         </th>
                     </tr>
@@ -128,7 +128,7 @@
                                     {%- endif %}
                                 </span>
                             </td>
-                            <td class="i-table">
+                            <td class="i-table" data-text="{{ contrib.subcontribution_count }}">
                                 <a href="#" class="i-label subcontribution-count"
                                    title="{% trans %}Manage subcontributions{% endtrans %}"
                                    data-href="{{ url_for('.manage_subcontributions', contrib) }}"
