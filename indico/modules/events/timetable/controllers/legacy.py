@@ -25,6 +25,7 @@ from flask import request, jsonify, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
@@ -41,7 +42,7 @@ from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionE
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,
@@ -432,6 +433,55 @@ class RHLegacyShiftTimetableEntries(RHManageTimetableEntryBase):
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry),
                             timetable=TimetableSerializer(True).serialize_timetable(self.event_new))
+
+
+class RHLegacyTimetableMoveEntryUpDown(RHManageTimetableEntryBase):
+    def _process(self):
+        direction = request.form.get('direction')
+        with track_time_changes():
+            self._move_entry(direction)
+            return jsonify_data(flash=False, entry=TimetableSerializer(True).serialize_timetable(self.event_new))
+
+    def _move_entry(self, direction):
+        entries = (self.entry.parent.timetable_entries
+                   if self.entry.parent
+                   else self.event_new.timetable_entries.filter(TimetableEntry.parent_id.is_(None)))
+        tz = self.event_new.tzinfo
+        entries_on_day = (entries
+                          .filter(db.cast(TimetableEntry.start_dt.astimezone(tz),
+                                          db.Date) == self.entry.start_dt.astimezone(tz).date(),
+                                  TimetableEntry.id != self.entry.id)
+                          .order_by(TimetableEntry.start_dt.asc()))
+        if not entries_on_day:
+            return
+        if direction == 'up':
+            self._move_up(entries_on_day)
+        else:
+            self._move_down(entries_on_day)
+
+    def _move_up(self, entries_on_day):
+        earlier_entries = entries_on_day.filter(TimetableEntry.start_dt <= self.entry.start_dt).all()
+        if not earlier_entries:
+            for entry in entries_on_day:
+                entry.move(entry.start_dt - self.entry.duration)
+            new_start_dt = sorted(entries_on_day, key=attrgetter('end_dt'))[-1].end_dt
+        else:
+            closest_entry = sorted(earlier_entries, key=attrgetter('end_dt'))[-1]
+            new_start_dt = closest_entry.start_dt
+            closest_entry.move(new_start_dt + self.entry.duration)
+        self.entry.move(new_start_dt)
+
+    def _move_down(self, entries_on_day):
+        later_entries = entries_on_day.filter(TimetableEntry.start_dt >= self.entry.start_dt).all()
+        if not later_entries:
+            new_start_dt = sorted(entries_on_day, key=attrgetter('end_dt'))[0].start_dt
+            for entry in entries_on_day:
+                entry.move(entry.start_dt + self.entry.duration)
+        else:
+            closest_entry = sorted(later_entries, key=attrgetter('end_dt'))[0]
+            closest_entry.move(self.entry.start_dt)
+            new_start_dt = closest_entry.end_dt
+        self.entry.move(new_start_dt)
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
