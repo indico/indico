@@ -16,7 +16,7 @@
                         <th class="i-table title-column">
                             {% trans %}Title{% endtrans %}
                         </th>
-                        <th class="i-table">
+                        <th class="i-table" data-sorter="text">
                             {% trans %}Time{% endtrans %}
                         </th>
                         <th class="i-table duration-column">
@@ -70,7 +70,8 @@
                                     {{ contrib.title }}
                                 </span>
                             </td>
-                            <td class="i-table start-date">
+                            <td class="i-table start-date" data-text="{{ contrib.start_dt.isoformat()
+                                                                         if contrib.is_scheduled else ''}}">
                                 <span class="vertical-aligner">
                                     {% if contrib.is_scheduled %}
                                         {% if not contrib.session_block %}
