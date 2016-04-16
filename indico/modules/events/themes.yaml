@@ -150,12 +150,12 @@ definitions:
   picosec:
     event_types: [meeting]
     stylesheet: picosec.scss
-    template: openlab.html
+    template: indico/meeting.html
     title: Picosec
   picosec_endtofpet:
     event_types: [meeting]
     stylesheet: picosec_endotofpet.scss
-    template: openlab.html
+    template: indico/meeting.html
     title: PicoSEC - EndoTOFPET US
   tical-meetings:
     event_types: [meeting]
