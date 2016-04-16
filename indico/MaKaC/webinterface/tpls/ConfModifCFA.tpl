@@ -104,24 +104,6 @@
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
-    <tr>
-        <td class="dataCaptionTD">
-          <a name="optional"></a>
-          <span class="dataCaptionFormat"> ${ _("Abstract fields")}</span>
-          <br>
-          <br>
-          <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled field")}</small><br>
-          <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled field")}</small>
-        </td>
-        <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px" colspan="2">
-            <table align="left" width="100%">
-                    ${ abstractFields }
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>
 </table>
 
 <%include file="ConfModifCFAAddFieldTooltip.tpl"/>
