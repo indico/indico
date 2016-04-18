@@ -130,7 +130,7 @@ class ContribTypeFilterField(filters.FilterField):
     _id = "type"
 
     def satisfies( self, abstract ):
-        if self._conf.as_event.contribution_types.count() == len(self._values):
+        if len(self._conf.getContribTypeList()) == len(self._values):
             return True
         elif not abstract.as_new.type:
             return self._showNoValue
@@ -150,7 +150,7 @@ class AccContribTypeFilterField(filters.FilterField):
     _id = "acc_type"
 
     def satisfies(self,abstract):
-        if self._conf.as_event.contribution_types.count() == len(self._values):
+        if len(self._conf.getContribTypeList()) == len(self._values):
             return True
         else:
             s = abstract.getCurrentStatus()

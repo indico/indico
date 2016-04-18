@@ -2121,6 +2121,7 @@ class Conference(CommonObjectBase, Locatable):
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
+    @memoize_request
     def getContribTypeList(self):
         return self.as_event.contribution_types.all()
 
