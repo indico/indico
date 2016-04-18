@@ -68,9 +68,9 @@ class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 def inject_meeting_body(event, **kwargs):
     event_tz_name = DisplayTZ(session.user, event.as_legacy).getDisplayTZ()
     event_tz = timezone(event_tz_name)
-    show_date = request.args.get('showDate', 'all')
-    show_session = request.args.get('showSession', 'all')
-    detail_level = request.args.get('detailLevel', 'contribution')
+    show_date = request.args.get('showDate') or 'all'
+    show_session = request.args.get('showSession') or 'all'
+    detail_level = request.args.get('detailLevel') or 'contribution'
     view = request.args.get('view')
 
     children_strategy = joinedload('children')

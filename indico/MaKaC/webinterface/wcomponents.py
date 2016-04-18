@@ -471,11 +471,11 @@ class WMenuConferenceHeader( WConferenceHeader ):
                 else:
                     hideContributions = ""
         # Save to session
-        vars["hideContributions"] = hideContributions;
+        vars["hideContributions"] = hideContributions
 
         urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
-        urlCustPrint.addParam("showDate", vars.get("selectedDate", "all"))
-        urlCustPrint.addParam("showSession", vars.get("selectedSession", "all"))
+        urlCustPrint.addParam("showDate", vars.get("selectedDate") or "all")
+        urlCustPrint.addParam("showSession", vars.get("selectedSession") or "all")
         urlCustPrint.addParam("fr", "no")
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
@@ -564,12 +564,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
                     hideContributions = "checked"
                 else:
                     hideContributions = ""
-        vars["hideContributions"] = hideContributions;
+        vars["hideContributions"] = hideContributions
 
         urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
-        urlCustPrint.addParam("showDate", vars.get("selectedDate", "all"))
-        urlCustPrint.addParam("showSession", vars.get("selectedSession", "all"))
-        urlCustPrint.addParam("detailLevel", vars.get("detailLevel", "all"))
+        urlCustPrint.addParam("showDate", vars.get("selectedDate") or "all")
+        urlCustPrint.addParam("showSession", vars.get("selectedSession") or "all")
+        urlCustPrint.addParam("detailLevel", vars.get("detailLevel") or "all")
         urlCustPrint.addParam("fr", "no")
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
