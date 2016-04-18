@@ -20,7 +20,7 @@ import dateutil.parser
 from pyatom import AtomFeed
 from pytz import timezone, utc
 
-from indico.util.string import unicodeOrNone
+from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -49,8 +49,8 @@ class AtomSerializer(Serializer):
 
         for fossil in results:
             feed.add(
-                title=unicodeOrNone(fossil['title']),
-                summary=unicodeOrNone(fossil['description']),
+                title=to_unicode(fossil['title']) or None,
+                summary=to_unicode(fossil['description']) or None,
                 url=fossil['url'],
                 updated=_deserialize_date(fossil['startDate'])  # ugh, but that's better than creationDate
             )

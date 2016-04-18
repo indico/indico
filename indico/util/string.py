@@ -88,11 +88,7 @@ def fix_broken_string(text, as_unicode=False):
 
 def to_unicode(text):
     """Converts a string to unicode if it isn't already unicode."""
-    if isinstance(text, unicode):
-        return text
-    elif not isinstance(text, str):
-        return unicode(text)
-    return fix_broken_string(text, as_unicode=True)
+    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
 
 
 def fix_broken_obj(obj):
