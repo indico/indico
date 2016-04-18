@@ -20,8 +20,10 @@ import re
 import pytz
 from datetime import datetime
 from hashlib import md5
+from operator import attrgetter
 
 from flask import request
+from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import ServiceUnavailable
 
@@ -31,6 +33,7 @@ from indico.modules.events import Event
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
@@ -62,6 +65,16 @@ class Period(object):
     def __init__(self, startDT, endDT):
         self.startDT = startDT
         self.endDT = endDT
+
+
+def find_event_day_bounds(obj, day):
+    if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
+        return None, None
+    entries = obj.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
+                                           cast(TimetableEntry.start_dt.astimezone(obj.tzinfo), Date) == day).all()
+    first = min(entries, key=attrgetter('start_dt')).start_dt if entries else None
+    last = max(entries, key=attrgetter('end_dt')).end_dt if entries else None
+    return first, last
 
 
 @HTTPAPIHook.register
@@ -473,6 +486,14 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
                 {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
         return fossil
 
+    def _calculate_occurrences(self, event, from_dt, to_dt, tz):
+        start_dt = max(from_dt, event.start_dt) if from_dt else event.start_dt
+        end_dt = min(to_dt, event.end_dt) if to_dt else event.end_dt
+        for day in iterdays(start_dt, end_dt):
+            first_start, last_end = find_event_day_bounds(event, day.date())
+            if first_start is not None:
+                yield Period(first_start, last_end)
+
     def _makeFossil(self, obj, iface):
         legacy_obj = obj.as_legacy if isinstance(obj, Event) else obj
         return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
@@ -595,6 +616,10 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             data['sessions'] = []
             for session_ in event.sessions:
                 data['sessions'].extend(self._build_session_api_data(session_))
+        if self._occurrences:
+            data['occurrences'] = fossilize(self._calculate_occurrences(event, self._fromDT, self._toDT,
+                                            pytz.timezone(self._serverTZ)),
+                                            {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
         return data
 
 
