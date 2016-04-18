@@ -178,6 +178,8 @@ class SerializerBase(object):
             data = {
                 '_type': person_type,
                 '_fossil': self.fossils_mapping['person'].get(person_type, None),
+                'firstName': person.first_name,
+                'familyName': person.last_name,
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': unicode(person.id),
                 'affiliation': person.affiliation,
