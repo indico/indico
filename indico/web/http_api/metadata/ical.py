@@ -20,7 +20,7 @@ import dateutil.parser
 import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
-from pytz import timezone
+from pytz import timezone, utc
 
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
@@ -50,7 +50,7 @@ def _deserialize_date(date_dict):
         return date_dict
     dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
                           dateutil.parser.parse(date_dict['time']).time())
-    return timezone(date_dict['tz']).localize(dt)
+    return timezone(date_dict['tz']).localize(dt).astimezone(utc)
 
 
 def serialize_event(cal, fossil, now, id_prefix="indico-event"):
