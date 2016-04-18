@@ -73,7 +73,7 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
                 pdf_class = TimeTablePlain
                 additional_params = {'firstPageNumber': form.firstPageNumber.data,
                                      'showSpeakerAffiliation': form_data['showSpeakerAffiliation']}
-            pdf = pdf_class(self._conf, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
+            pdf = pdf_class(self.event_new, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
                             pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
             return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
         return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form,

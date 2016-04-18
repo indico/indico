@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from io import BytesIO
+from flask import session
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
@@ -172,3 +173,11 @@ def serialize_session_for_ical(sess):
         'speakers': [serialize_person_link(x) for c in sess.contributions for x in c.speakers],
         'contributions': [serialize_contribution_for_ical(c) for c in sess.contributions]
     }
+
+
+def get_session_timetable_pdf(sess, **kwargs):
+    from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
+    pdf_format = TimetablePDFFormat(params={'coverPage': False})
+    return TimeTablePlain(sess.event_new, session.user, showSessions=[sess.id], showDays=[],
+                          sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',
+                          firstPageNumber=1, showSpeakerAffiliation=False, **kwargs)

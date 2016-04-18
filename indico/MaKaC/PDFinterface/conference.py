@@ -581,10 +581,10 @@ def sortEntries(x,y):
 
 
 class TimeTablePlain(PDFWithTOC):
-    def __init__(self, conf, aw, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
+    def __init__(self, event, aw, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
                  pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False, tz=None):
-        self._conf = conf
-        self._event = conf.as_event
+        self._conf = event.as_legacy
+        self._event = event
         self._aw = aw
         self._tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
         self._showSessions = showSessions

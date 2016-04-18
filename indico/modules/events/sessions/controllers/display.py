@@ -25,12 +25,12 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_sessions_for_user, serialize_session_for_ical
+from indico.modules.events.sessions.util import get_session_timetable_pdf
 from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -92,8 +92,5 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):
     def _process(self):
-        pdf_format = TimetablePDFFormat(params={'coverPage': False})
-        pdf = TimeTablePlain(self._conf, session.user, showSessions=[self.session.id], showDays=[], sortingCrit=None,
-                             ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal', firstPageNumber=1,
-                             showSpeakerAffiliation=False)
+        pdf = get_session_timetable_pdf(self.session)
         return send_file('session-timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
