@@ -24,12 +24,11 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_sessions_for_user, serialize_session_for_ical
-from indico.modules.events.sessions.util import get_session_timetable_pdf
+from indico.modules.events.sessions.util import (get_sessions_for_user, get_session_ical_file,
+                                                 get_session_timetable_pdf)
 from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
-from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -85,9 +84,7 @@ class RHDisplaySession(RHDisplaySessionBase):
 
 class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
-        data = {'results': serialize_session_for_ical(self.session)}
-        serializer = Serializer.create('ics')
-        return send_file('session.ics', BytesIO(serializer(data)), 'text/calendar')
+        return send_file('session.ics', get_session_ical_file(self.session), 'text/calendar')
 
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):

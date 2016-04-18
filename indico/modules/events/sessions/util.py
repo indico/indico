@@ -175,6 +175,13 @@ def serialize_session_for_ical(sess):
     }
 
 
+def get_session_ical_file(sess):
+    from indico.web.http_api.metadata.serializer import Serializer
+    data = {'results': serialize_session_for_ical(sess)}
+    serializer = Serializer.create('ics')
+    return BytesIO(serializer(data))
+
+
 def get_session_timetable_pdf(sess, **kwargs):
     from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
     pdf_format = TimetablePDFFormat(params={'coverPage': False})
