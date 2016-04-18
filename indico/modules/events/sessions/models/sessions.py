@@ -158,6 +158,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         return self
 
     @property
+    @memoize_request
     def start_dt(self):
         from indico.modules.events.sessions.models.blocks import SessionBlock
         start_dt = (self.event_new.timetable_entries
@@ -170,6 +171,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         return start_dt[0] if start_dt else None
 
     @property
+    @memoize_request
     def end_dt(self):
         sorted_blocks = sorted(self.blocks, key=attrgetter('timetable_entry.end_dt'), reverse=True)
         return sorted_blocks[0].timetable_entry.end_dt if sorted_blocks else None

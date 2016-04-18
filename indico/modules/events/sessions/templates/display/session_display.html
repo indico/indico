@@ -18,8 +18,8 @@
 {% block info %}
     <div class="time-data">
         <span class="time-info icon-time">
-            {% if sess.timetable_entry -%}
-                {{ sess.timetable_entry.start_dt|format_datetime }}
+            {% if sess.start_dt -%}
+                {{ sess.start_dt|format_datetime }}
             {%- else -%}
                 {% trans %}Not scheduled{% endtrans %}
             {%- endif %}
@@ -71,32 +71,32 @@
 {% block content -%}
     {% if sess.blocks -%}
         <div class="item-text">
-                <div class="infogrid condensed">
-                    <div class="infoline">
-                        <div class="text">
-                            <h2>{% trans %}Conveners{% endtrans %}</h2>
-                            {% for block in sess.blocks -%}
-                                <h3>{{ block.full_title }}</h3>
-                                <ul>
-                                    {% for convener in block.person_links -%}
-                                        <li class="icon-user">
-                                            {% if sess.can_manage(session.user) %}
-                                                <a href="mailto:{{ convener.person.email }}">
-                                                    {{ convener.person.full_name }}
-                                                </a>
-                                            {% else %}
+            <div class="infogrid condensed">
+                <div class="infoline">
+                    <div class="text">
+                        <h2>{% trans %}Conveners{% endtrans %}</h2>
+                        {% for block in sess.blocks -%}
+                            <h3>{{ block.full_title }}</h3>
+                            <ul>
+                                {% for convener in block.person_links -%}
+                                    <li class="icon-user">
+                                        {% if sess.can_manage(session.user) %}
+                                            <a href="mailto:{{ convener.person.email }}">
                                                 {{ convener.person.full_name }}
-                                            {% endif %}
-                                            ({{ convener.person.affiliation }})
-                                        </li>
-                                    {%- else -%}
-                                        <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
-                                    {%- endfor %}
-                                </ul>
-                            {%- endfor %}
-                        </div>
+                                            </a>
+                                        {% else %}
+                                            {{ convener.person.full_name }}
+                                        {% endif %}
+                                        ({{ convener.person.affiliation }})
+                                    </li>
+                                {%- else -%}
+                                    <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
+                                {%- endfor %}
+                            </ul>
+                        {%- endfor %}
                     </div>
                 </div>
+            </div>
         </div>
     {%- endif %}
 
@@ -110,7 +110,7 @@
     {{ render_attachments(sess) }}
 
     <div class="item-subitems">
-        {% if session_contribs %}
+        {% if sess.contributions %}
             <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
                 {% trans %}Contribution list{% endtrans %}
             </a>
@@ -123,9 +123,9 @@
     </div>
 
     <div class="js-container">
-        {% if session_contribs %}
+        {% if sess.contributions %}
             <div id="session-contrib-list" class="contribution-list js-view">
-                {{ render_contribution_list(event, timezone, session_contribs, false) }}
+                {{ render_contribution_list(event, timezone, sess.contributions, false) }}
             </div>
         {% endif %}
 

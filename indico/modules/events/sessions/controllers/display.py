@@ -20,6 +20,7 @@ from io import BytesIO
 
 from flask import session, request
 from pytz import timezone
+from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
@@ -64,11 +65,22 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
 class RHDisplaySession(RHDisplaySessionBase):
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions')
-        session_contribs = [c for c in self.session.contributions if not c.is_deleted]
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
-        return WPDisplaySession.render_template('display/session_display.html', self._conf, sess=self.session,
-                                                event=self.event_new, session_contribs=session_contribs, timezone=tz,
-                                                **ical_params)
+        contributions_strategy = subqueryload('contributions')
+        _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
+        _contrib_tte_strategy.lazyload('*')
+        contributions_strategy.joinedload('person_links')
+        blocks_strategy = joinedload('blocks')
+        blocks_strategy.joinedload('person_links')
+        _block_tte_strategy = blocks_strategy.joinedload('timetable_entry')
+        _block_tte_strategy.lazyload('*')
+        _block_tte_strategy.joinedload('children')
+        sess = (Session.query
+                .filter_by(id=self.session.id)
+                .options(contributions_strategy, blocks_strategy)
+                .one())
+        return WPDisplaySession.render_template('display/session_display.html', self._conf, sess=sess,
+                                                event=self.event_new, timezone=tz, **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):
