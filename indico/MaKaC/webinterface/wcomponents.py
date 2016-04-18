@@ -1818,8 +1818,8 @@ class WConfTickerTapeDrawer(WTemplated):
         vars = WTemplated.getVars( self )
 
         vars["nowHappeningArray"] = None
-        if layout_settings.get(self._conf, 'show_banner'):
-            vars["nowHappeningArray"] = self._getNowHappening()
+        #if layout_settings.get(self._conf, 'show_banner'):
+        #    vars["nowHappeningArray"] = self._getNowHappening()
 
         return vars
 
