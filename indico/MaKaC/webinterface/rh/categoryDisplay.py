@@ -21,6 +21,7 @@ from datetime import timedelta, datetime
 
 from flask import session, request
 from pytz import timezone
+from sqlalchemy.orm import subqueryload
 
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.url import ShortURLMapper
@@ -35,7 +36,6 @@ import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
 from indico.core import signals
 from indico.core.config import Config
-import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
@@ -56,7 +56,9 @@ from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.web.flask.util import send_file, endpoint_for_url
+from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
+from indico.web.flask.util import send_file, endpoint_for_url, url_for
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -561,15 +563,25 @@ class RHTodayCategoryToRSS(RHCategoryToRSS):
 
 
 class RHCategoryToAtom(RHCategDisplayBase):
-    _uh = urlHandlers.UHCategoryToAtom
-
     def _process(self):
-        filename = "%s-Categ.atom" % self._target.getName().replace("/", "")
-        hook = CategoryEventHook({'from': 'today'}, 'categ', {'idlist': self._target.getId(), 'dformat': 'atom'})
-        res = hook(self.getAW())
-        resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
-        serializer = Serializer.create('atom')
-        return send_file(filename, StringIO(serializer(resultFossil).encode('utf-8')), 'ATOM')
+        from indico.modules.events import Event
+        events = (Event.query
+                  .filter(Event.category_chain.contains([int(self._target.id)]),
+                          Event.end_dt >= now_utc(),
+                          ~Event.is_deleted)
+                  .options(subqueryload('acl_entries'))
+                  .all())
+        data = [{'title': e.title,
+                 'description': e.description,
+                 'url': url_for('event.conferenceDisplay', confId=e.id, _external=True),
+                 'startDate': e.start_dt}
+                for e in events
+                if e.can_access(session.user)]
+        res = {'results': data, 'url': url_for(request.endpoint, self._target)}
+        serialize = Serializer.create('atom')
+        atom = serialize(res)
+        filename = '{}-category.atom'.format(secure_filename(self._target.getName(), str(self._target.id)))
+        return send_file(filename, StringIO(atom.encode('utf-8')), 'ATOM')
 
 
 def sortByStartDate(conf1,conf2):
