@@ -21,7 +21,7 @@ from collections import defaultdict
 from flask import session
 from sqlalchemy.orm import defaultload
 
-from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
@@ -130,7 +130,10 @@ class TimetableSerializer(object):
                      'description': contribution.description,
                      'duration': contribution.duration.seconds / 60,
                      'pdf': None,
-                     'presenters': [self._get_person_data(x) for x in contribution.person_links],
+                     'presenters': map(self._get_person_data,
+                                       sorted(contribution.person_links,
+                                              key=lambda x: (x.author_type != AuthorType.primary,
+                                                             x.author_type != AuthorType.secondary))),
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
                      'sessionSlotId': block.id if block else None,
