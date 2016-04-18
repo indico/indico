@@ -23,6 +23,7 @@ from hashlib import md5
 
 from flask import request
 from sqlalchemy.orm import joinedload, subqueryload
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -647,7 +648,9 @@ class SessionFetcher(SessionContribFetcher, SerializerBase):
         self.user = getattr(aw.getUser(), 'user', None)
 
     def session(self, idlist):
-        event = Event.get_one(self._eventId)
+        event = Event.get(self._eventId, is_deleted=False)
+        if not event:
+            return []
         idlist = set(map(int, idlist))
         sessions = (Session.query.with_parent(event)
                     .filter(Session.id.in_(idlist),
