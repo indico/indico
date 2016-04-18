@@ -30,7 +30,7 @@
         </div>
         <div class="title">{{ block.title }}</div>
     </div>
-    {{ render_time_and_location(block, editable=can_manage_blocks) }}
+    {{ render_time_and_location(block, editable=(editable and can_manage_blocks)) }}
     <span class="hr"></span>
     <div class="section-title-container">
         <div class="title-header">
