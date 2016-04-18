@@ -23,7 +23,6 @@ from hashlib import md5
 
 from flask import request
 from sqlalchemy.orm import joinedload, subqueryload
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -179,8 +178,8 @@ class SerializerBase(object):
             data = {
                 '_type': person_type,
                 '_fossil': self.fossils_mapping['person'].get(person_type, None),
-                'firstName': person.first_name,
-                'familyName': person.last_name,
+                'first_name': person.first_name,
+                'last_name': person.last_name,
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': unicode(person.id),
                 'affiliation': person.affiliation,
@@ -203,8 +202,10 @@ class SerializerBase(object):
         data = {
             'fax': '',
             'familyName': convener.last_name,
-            'name': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
             'firstName': convener.first_name,
+            'name': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
+            'last_name': convener.last_name,
+            'first_name': convener.first_name,
             'title': convener.title,
             '_type': 'SlotChair',
             'affiliation': convener.affiliation,
