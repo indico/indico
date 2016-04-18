@@ -14,14 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# python stdlib imports
+from datetime import datetime
+
+import dateutil.parser
 from pyatom import AtomFeed
+from pytz import timezone, utc
 
-# indico imports
 from indico.util.string import unicodeOrNone
-
-# module imports
 from indico.web.http_api.metadata.serializer import Serializer
+
+
+def _deserialize_date(date_dict):
+    if isinstance(date_dict, datetime):
+        return date_dict
+    dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
+                          dateutil.parser.parse(date_dict['time']).time())
+    return timezone(date_dict['tz']).localize(dt).astimezone(utc)
 
 
 class AtomSerializer(Serializer):
@@ -44,6 +52,6 @@ class AtomSerializer(Serializer):
                 title=unicodeOrNone(fossil['title']),
                 summary=unicodeOrNone(fossil['description']),
                 url=fossil['url'],
-                updated=fossil['startDate']  # ugh, but that's better than creationDate
-                )
+                updated=_deserialize_date(fossil['startDate'])  # ugh, but that's better than creationDate
+            )
         return feed.to_string()
