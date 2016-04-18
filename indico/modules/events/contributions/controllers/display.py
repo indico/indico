@@ -127,8 +127,16 @@ class RHContributionDisplay(RHContributionDisplayBase):
             show_paper = False
 
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions')
+        contrib = (Contribution.query
+                   .filter_by(id=self.contrib.id)
+                   .options(joinedload('type'),
+                            joinedload('session'),
+                            joinedload('subcontributions'),
+                            joinedload('timetable_entry').lazyload('*'))
+                   .one())
         return WPContributions.render_template('display/contribution_display.html', self._conf,
-                                               contribution=self.contrib, event=self.event_new,
+                                               contribution=contrib,
+                                               event=self.event_new,
                                                reviewing_status=reviewing_status,
                                                show_paper=show_paper,
                                                can_submit_paper=self.contrib.can_manage(session.user, 'submit'),
