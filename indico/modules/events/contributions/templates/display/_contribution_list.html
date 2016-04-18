@@ -15,6 +15,17 @@
                     <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
                 </span>
             </div>
+            {% if contrib.speakers -%}
+                <div class="speaker-list icon-user">
+                    {{ render_users(contrib.speakers|sort(attribute='full_name'),
+                                    span_class='speaker-item-inline') }}
+                </div>
+            {%- endif %}
+            {% if contrib.timetable_entry -%}
+                <div class="contrib-time icon-time">
+                    {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
+                </div>
+            {%- endif %}
             <div class="">
                 {% if contrib.track -%}
                     <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
@@ -35,21 +46,9 @@
                     </div>
                 {%- endif %}
             </div>
-
             {% if contrib.description -%}
                 <div class="description">
                     {{ contrib.description|truncate(400) }}
-                </div>
-            {%- endif %}
-            {% if contrib.speakers -%}
-                <div class="speaker-list icon-user">
-                    {{ render_users(contrib.speakers|sort(attribute='full_name'),
-                                    span_class='speaker-item-inline') }}
-                </div>
-            {%- endif %}
-            {% if contrib.timetable_entry -%}
-                <div class="contrib-time icon-time">
-                    {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
                 </div>
             {%- endif %}
 
