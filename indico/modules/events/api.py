@@ -234,7 +234,6 @@ class SerializerBase(object):
             'material': build_material_legacy_api_data(session_),
             'isPoster': session_.is_poster,
             'url': url_for('sessions.display_session', session_, _external=True),
-            'protectionURL': url_for('sessions.session_protection', session_.event_new, session_, _external=True),
             'roomFullname': session_.room_name,
             'location': session_.venue_name,
             'address': session_.address,
@@ -291,7 +290,7 @@ class SerializerBase(object):
             'bookedRooms': Conversion.reservationsList(event.reservations.all()),
             'supportInfo': {
                 '_fossil': 'supportInfo',
-                'caption': event.as_legacy.getSupportInfo().getCaption(),
+                'caption': to_unicode(event.as_legacy.getSupportInfo().getCaption()),
                 '_type': 'SupportInfo',
                 'email': event.as_legacy.getSupportInfo().getEmail(),
                 'telephone': event.as_legacy.getSupportInfo().getTelephone()
