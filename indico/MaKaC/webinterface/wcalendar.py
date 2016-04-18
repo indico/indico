@@ -310,8 +310,8 @@ class Overview:
 
     def getDayList( self ):
         if not self._cal:
-            self._cal = Calendar( self._aw, self.getStartDate(), \
-                                    self.getEndDate(), self.getCategoryList() )
+            self._cal = MonthCalendar(self._aw, self.getStartDate(),
+                                      1, 3, self.getCategoryList())
         return self._cal.getDayList()
 
     def getAW( self ):
