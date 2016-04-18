@@ -25,6 +25,11 @@
                         {% trans %}Edit Event{% endtrans %}
                     </a>
                 </li>
+                <li>
+                    <a href="{{ url_for('event_mgmt.confModifTools-clone', item) }}">
+                        {% trans %}Clone Event{% endtrans %}
+                    </a>
+                </li>
             {% endif %}
             {% if item.can_edit_note(session.user) %}
                 {% if item.as_legacy.getType() != 'simple_event' %}
