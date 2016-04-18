@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="description">{{ contrib.description }}</div>
-    {{ render_time_and_location(contrib, editable=can_manage_contributions) }}
+    {{ render_time_and_location(contrib, editable=(editable and can_manage_contributions)) }}
     {% if contrib.speaker_names or (editable and can_manage_contributions) %}
         <span class="hr"></span>
         <dl class="i-data-list thirty-seventy">
