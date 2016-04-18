@@ -259,6 +259,10 @@ class SerializerBase(object):
             'subcontributions': 'contributionMetadataWithSubContribs',
             'sessions': 'contributionMetadataWithSubContribs'
         },
+        'block': {
+            None: 'sessionMetadata',
+            'contributions': 'sessionMetadataWithContributions'
+        },
         'person': {
             'Avatar': 'conferenceChairMetadata',
             'ConferenceChair': 'conferenceChairMetadata',
@@ -302,7 +306,7 @@ class SerializerBase(object):
     def _serialize_session_block(self, block, serialized_session, session_access_list, can_manage):
         block_data = {
             '_type': 'SessionSlot',
-            '_fossil': 'sessionMetadata',
+            '_fossil': self.fossils_mapping['block'].get(self._detail_level, None),
             'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
             'conference': self._build_session_event_api_data(block.event_new),
             'startDate': self._serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
