@@ -266,7 +266,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 if status.getContribType() is None:
                     contribType = ""
                 else:
-                    contribType = status.getContribType().getName()
+                    contribType = status.getContribType().name
                 st = _("Proposed to accept: {0}").format(contribType)
 
             elif isinstance(status, review.AbstractRejection):
