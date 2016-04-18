@@ -86,7 +86,26 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection(self)
 
 
-class RHConferenceDisplay(RHConferenceBaseDisplay):
+class MeetingRendererMixin:
+    def render_meeting_page(self, conf, view, hide_frame=False):
+        evt_type = conf.getType()
+        view = view or conf.as_event.theme
+
+        # if the current view is invalid, use the default
+        if view not in theme_settings.themes:
+            view = theme_settings.defaults[evt_type]
+
+        if view in theme_settings.xml_themes:
+            if hide_frame:
+                self._responseUtil.content_type = 'text/xml'
+            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type, self._reqParams)
+        elif view == "static":
+            return conferences.WPConferenceDisplay(self, conf)
+        else:
+            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type, self._reqParams)
+
+
+class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceDisplay
 
     def _checkProtection(self):
@@ -97,28 +116,17 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
 
     def _process( self ):
         params = self._getRequestParams()
-        #set default variables
         if not self._reqParams.has_key("showDate"):
             self._reqParams["showDate"] = "all"
         if not self._reqParams.has_key("showSession"):
             self._reqParams["showSession"] = "all"
         if not self._reqParams.has_key("detailLevel"):
             self._reqParams["detailLevel"] = "contribution"
-        #get default/selected view
-        view = "static"
-        evt_type = self._conf.getType()
 
-        if self._reqParams.has_key("view"):
-            view = self._reqParams["view"]
-        else:
-            view = layout_settings.get(self._conf, 'timetable_theme')
-            # if no default view was attributed, then get the configuration default
-            if not view or view not in theme_settings.themes:
-                view = theme_settings.defaults[evt_type]
         warningText = ""
 
         # create the html factory
-        if evt_type == "conference":
+        if self._target.getType() == "conference":
             if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:
@@ -127,13 +135,8 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
                     p = conferences.WPConferenceDisplay(self, self._conf)
                 else:
                     p = WPPage.render_template('page.html', self._conf, page=event.default_page)
-        elif view in theme_settings.xml_themes:
-            self._responseUtil.content_type = 'text/xml'
-            p = conferences.WPXSLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
-        elif view != "static":
-            p = conferences.WPTPLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
         else:
-            p = conferences.WPConferenceDisplay(self, self._target)
+            p = self.render_meeting_page(self._conf, self._reqParams.get("view"), self._reqParams.get('fr') == 'no')
 
         return warningText + (p if isinstance(p, basestring) else p.display(**params))
 
@@ -151,7 +154,7 @@ class RHRelativeEvent(RHConferenceBaseDisplay):
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
-class RHConferenceOtherViews(RHConferenceBaseDisplay):
+class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
     """
     this class is for the conference type objects only
     it is an alternative to the standard TimeTable view
@@ -159,34 +162,14 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceOtherViews
 
     def _process( self ):
-        #set default variables
         if not self._reqParams.has_key("showDate"):
             self._reqParams["showDate"] = "all"
         if not self._reqParams.has_key("showSession"):
             self._reqParams["showSession"] = "all"
         if not self._reqParams.has_key("detailLevel"):
             self._reqParams["detailLevel"] = "contribution"
-        #get default/selected view
-        view = "standard"
-        evt_type = "conference"
 
-        if self._reqParams.has_key("view"):
-            view = self._reqParams["view"]
-        else:
-            view = self._target.as_event.theme
-            # if no default view was attributed, then get the configuration default
-            if view == "":
-                view = theme_settings.defaults[evt_type]
-        # create the html factory
-        if view in theme_settings.xml_themes:
-            p = conferences.WPXSLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
-        elif view != "static":
-            p = conferences.WPTPLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
-        else:
-            p = conferences.WPMeetingTimeTable(self, self._target, "parallel", "meeting", self._reqParams)
-        # generate the html
-        if view == "xml" and self._reqParams.get('fr') == 'no':
-            self._responseUtil.content_type = 'text/xml'
+        p = self.render_meeting_page(self._conf, self._reqParams.get("view"), self._reqParams.get('fr') == 'no')
         return p.display()
 
 
