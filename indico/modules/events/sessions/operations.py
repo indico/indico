@@ -97,7 +97,7 @@ def update_session_block(session_block, data):
 def delete_session_block(session_block):
     from indico.modules.events.timetable.operations import delete_timetable_entry
     session_ = session_block.session
-    for contribution in session_block.contributions:
+    for contribution in session_block.contributions[:]:
         contribution.session_block = None
         delete_timetable_entry(contribution.timetable_entry, log=False)
     delete_timetable_entry(session_block.timetable_entry, log=False)
