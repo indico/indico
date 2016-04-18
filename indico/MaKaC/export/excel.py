@@ -142,7 +142,7 @@ class AbstractListToExcel:
                 elif key == "AccType":
                     accType = ""
                     if isStatusAccpeted and status.getType():
-                        accType = status.getType().getName()
+                        accType = status.getType().name
                     excelGen.addValue(accType)
                 elif key == "SubmissionDate":
                     excelGen.addValue(format_date(abstract.getSubmissionDate(), format="short"))
