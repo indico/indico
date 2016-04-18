@@ -90,7 +90,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
         return None
 
     def handle_log(self, obj):
-        if obj.get('req_path') in self.server.ignored_request_paths:
+        if any(p.match(obj.get('req_path')) for p in self.server.ignored_request_paths):
             return
         sql_log_type = obj.get('sql_log_type')
         if sql_log_type == 'start_request':
@@ -150,7 +150,11 @@ class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
         self.traceback_frames = traceback_frames
         self.ignore_selects = ignore_selects
         self.ignored_sources = [ignored_line_re.match(s).groupdict() for s in ignored_sources]
-        self.ignored_request_paths = set(ignored_request_paths)
+        self.ignored_request_paths = {self._process_path(x) for x in ignored_request_paths}
+
+    def _process_path(self, path):
+        regex = path[1:] if path[0] == '~' else re.escape(path)
+        return re.compile('^{}$'.format(regex))
 
 
 def terminal_size():
@@ -216,7 +220,7 @@ def sigint(*unused):
                    'file is ignored.  If no frame is specified, frame 1 (the topmost one in the log) will be used.')
 @click.option('-I', '--ignored-request-paths', multiple=True, metavar='PATH',
               help='Request paths to ignore. May be used multiple times.  Matched against request.path (e.g. '
-                   '/assets/js-vars/user.js).')
+                   '/assets/js-vars/user.js). Prefix with ~ to use a regex match instead of an exact string match.')
 @click.option('-H', '--setup-help', is_flag=True, help='Explain how to enable db logging for this script')
 def main(port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths, setup_help):
     if setup_help:
