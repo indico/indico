@@ -64,7 +64,7 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
 
 class RHDisplaySession(RHDisplaySessionBase):
     def _process(self):
-        ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions')
+        ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions', self.session)
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         contributions_strategy = subqueryload('contributions')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
