@@ -538,17 +538,14 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         limit = get_query_parameter(request.args.to_dict(), ['n', 'limit'])
         offset = get_query_parameter(request.args.to_dict(), ['O', 'offset'])
 
-        col = None
-        if order == 'start':
-            col = Event.start_dt
-        elif order == 'end':
-            col = Event.end_dt
-        elif order == 'id':
-            col = Event.id
-        elif order == 'title':
-            col = Event.title
+        col = {
+            'start': Event.start_dt,
+            'end': Event.end_dt,
+            'id': Event.id,
+            'title': Event.title
+        }.get(order)
         if col:
-            query = query.order_by(col.desc if desc else col)
+            query = query.order_by(col.desc() if desc else col)
         if limit:
             query = query.limit(limit)
         if offset:
