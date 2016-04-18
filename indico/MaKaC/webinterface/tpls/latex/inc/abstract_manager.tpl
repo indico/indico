@@ -10,7 +10,7 @@
 
     \setdescription{leftmargin=2em,labelindent=2em}
 
-    % if track_judgements:
+    % if track_judgements and any(x[1] for x in track_judgements):
         \textbf{${_("Track Judgements:")}}
         \begin{description}
             % for track_name, judgement in track_judgements:
