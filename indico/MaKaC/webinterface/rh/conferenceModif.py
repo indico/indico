@@ -1710,8 +1710,8 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
             #To change for the new contribution type system to:
             #x.writeTag("ContributionType", abstract.getContribType().getName())
-            if abstract.getContribType() <> None:
-                x.writeTag("ContributionType", abstract.getContribType().getName())
+            if abstract.as_new.type:
+                x.writeTag("ContributionType", abstract.as_new.type.name)
             else:
                 x.writeTag("ContributionType", None)
             #x.writeTag("ContributionType", abstract.getContribType())
