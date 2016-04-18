@@ -56,20 +56,22 @@
             {% endif %}
         </dl>
     {% endif %}
-    <span class="hr"></span>
-    <div class="attribute">
-        <div class="attribute-title">
-            {%- trans %}Subcontributions{% endtrans %}
-            <span class="badge">{{ contrib.subcontribution_count }}</span>
-        </div>
-        {% if editable and can_manage_contributions %}
-            <div class="group right entry-action-buttons">
-                <a class="attribute-settings icon-settings close-balloon js-manage-subcontribs"
-                   title="{% trans %}Manage subcontributions{% endtrans %}"
-                   data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
-                   data-title="{% trans title=contrib.title %}Subcontributions of contribution '{{ title }}'{% endtrans %}"
-                   data-ajax-dialog></a>
+    {% if (editable and can_manage_contributions) or subcontribution_count %}
+        <span class="hr"></span>
+        <div class="attribute">
+            <div class="attribute-title">
+                {%- trans %}Subcontributions{% endtrans %}
+                <span class="badge">{{ contrib.subcontribution_count }}</span>
             </div>
-        {% endif %}
-    </div>
+            {% if editable and can_manage_contributions %}
+                <div class="group right entry-action-buttons">
+                    <a class="attribute-settings icon-settings close-balloon js-manage-subcontribs"
+                       title="{% trans %}Manage subcontributions{% endtrans %}"
+                       data-href="{{ url_for('contributions.manage_subcontributions', contrib) }}"
+                       data-title="{% trans title=contrib.title %}Subcontributions of contribution '{{ title }}'{% endtrans %}"
+                       data-ajax-dialog></a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
