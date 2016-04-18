@@ -626,11 +626,12 @@ class TimeDeltaField(Field):
                   If not specified, ``('hours', 'days')`` is assumed.
     """
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
+    # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': _(u'Seconds'),
-        'minutes': _(u'Minutes'),
-        'hours': _(u'Hours'),
-        'days': _(u'Days')
+        'seconds': u'Seconds',
+        'minutes': u'Minutes',
+        'hours': u'Hours',
+        'days': u'Days'
     }
     magnitudes = OrderedDict([
         ('days', 86400),
