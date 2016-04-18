@@ -172,7 +172,7 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingCloneBooking._create_booking(self, form, room)
-        booking.event_id = self.event_id
+        booking.event_new = self.event_new
         return booking
 
     def _process(self):
@@ -274,7 +274,7 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBookingSimple._create_booking(self, form, room)
-        booking.event_id = self.event_id
+        booking.event_new = self.event_new
         return booking
 
     def _process(self):
@@ -330,7 +330,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBooking._create_booking(self, form, room)
-        booking.event_id = self.event_id
+        booking.event_new = self.event_new
         if self._assign_to:
             _assign_room(self._assign_to, room)
 
