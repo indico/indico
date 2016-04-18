@@ -6079,6 +6079,10 @@ ul.material_list {
     padding-left: 0;
 }
 
+ul.material_list a {
+    color: #0b63a5;
+}
+
 ul.material_list h3 {
     margin-top: 0;
     text-align: right;
