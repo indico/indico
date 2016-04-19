@@ -154,7 +154,7 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None):
     return _format_timedelta(td, format=format, locale=locale, threshold=threshold).encode('utf-8')
 
 
-def format_human_timedelta(delta, granularity='seconds'):
+def format_human_timedelta(delta, granularity='seconds', narrow=False):
     """Formats a timedelta in a human-readable way
 
     :param delta: the timedelta to format
@@ -164,6 +164,7 @@ def format_human_timedelta(delta, granularity='seconds'):
                         the whole timedelta spans less than a minute.
                         Accepted values are 'seconds', 'minutes',
                         'hours' and 'days'.
+    :param narrow: if true, only the short unit names will be used
     """
     field_order = ('days', 'hours', 'minutes', 'seconds')
     long_names = {
@@ -178,7 +179,8 @@ def format_human_timedelta(delta, granularity='seconds'):
         'hours': lambda n: ngettext(u'{0}h', u'{0}h', n).format(n),
         'days': lambda n: ngettext(u'{0}d', u'{0}d', n).format(n),
     }
-
+    if narrow:
+        long_names = short_names
     values = OrderedDict((key, 0) for key in field_order)
     values['seconds'] = delta.total_seconds()
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
