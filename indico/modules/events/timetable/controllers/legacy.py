@@ -432,10 +432,8 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
         tz = self.event_new.tzinfo
         if is_session_block and new_end_dt.astimezone(tz).date() != self.entry.start_dt.astimezone(tz).date():
             raise UserValueError(_('Session block cannot span more than one day'))
-        if new_start_dt < self.event_new.start_dt:
-            raise UserValueError(_('You cannot move the block before event start date.'))
         parent = self.entry.parent
-        with track_time_changes():
+        with track_time_changes(auto_extend=True) as changes:
             if parent and new_start_dt < parent.start_dt:
                 update_timetable_entry_object(parent, {'duration': parent.end_dt - new_start_dt})
                 update_timetable_entry(parent, {'start_dt': new_start_dt})
@@ -446,6 +444,13 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
             update_timetable_entry_object(self.entry, {'duration': new_duration})
             if not is_session_block:
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
+        if self.event_new in changes and not self.event_new.can_manage(session.user):
+            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
+                                   "to manage the event."))
+        if (self.entry.parent and self.entry.parent.session_block in changes
+                and self.session and not self.session.can_manage_blocks(session.user)):
+            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
+                                   "to manage the event."))
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry))
 
 
