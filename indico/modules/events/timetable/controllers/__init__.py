@@ -77,6 +77,8 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
     }
 
     def _get_locator(self):
+        if not self.entry:
+            return self.event_new
         locator = self.entry.locator
         if 'session_id' in request.view_args:
             locator['session_id'] = self.session.id
