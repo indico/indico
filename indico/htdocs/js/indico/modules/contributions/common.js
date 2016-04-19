@@ -86,7 +86,7 @@
 
                         if (data.unscheduled) {
                             var row = $this.closest('tr');
-                            var startDateCol = row.find('td.start-date');
+                            var startDateCol = row.find('td.start-date > .vertical-aligner');
                             var oldLabelHtml = startDateCol.children().detach();
 
                             startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
@@ -95,7 +95,7 @@
                                 $T.gettext("Undo successful! Timetable entry and session have been restored."),
                                 function() {
                                     return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
-                                        oldLabelHtml.filter('.label').text(moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                                        oldLabelHtml.filter('.label').text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
                                         startDateCol.html(oldLabelHtml);
                                         $this.itempicker('selectItem', oldSession ? oldSession.id : null);
                                     });
