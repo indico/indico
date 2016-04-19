@@ -778,7 +778,7 @@ type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockM
      {
          _getTitle: function(){
              var title = this.TimetableBlockNormal.prototype._getTitle.call(this);
-             return this.eventData.friendlyId ? this.eventData.friendlyId + " - " + title : title;
+             return this.eventData.friendlyId >= 0 ? this.eventData.friendlyId + " - " + title : title;
          }
      },
      function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementActions)
