@@ -190,6 +190,16 @@ type("TimetableManagementActions", [], {
                 } else {
                     self.timetable._updateEntry(data.entry, data.entry.id);
                 }
+
+                if (data.notifications) {
+                    _.each(data.notifications, function(notification) {
+                        cornerMessage({
+                            message: notification,
+                            duration: 10000,
+                            class: 'highlight'
+                        });
+                    });
+                }
             }
         });
     },
