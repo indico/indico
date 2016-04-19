@@ -65,9 +65,14 @@
                                               {% elif contrib.is_public %}public-protection-icon{% endif %}"></i>
                                 </span>
                             </td>
-                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}">
+                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
+                                data-text="{{ contrib.title | lower }}">
                                 <span class="vertical-aligner">
-                                    {{ contrib.title }}
+                                    {% if event.type == 'conference' %}
+                                        <a href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                                    {% else %}
+                                        {{ contrib.title }}
+                                    {% endif %}
                                 </span>
                             </td>
                             <td class="i-table start-date" data-text="{{ contrib.start_dt.isoformat()
