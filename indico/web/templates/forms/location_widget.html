@@ -77,7 +77,6 @@
             var roomJustCleared = false;
             var venueJustChanged = false;
             var justUseOptionSelected = false;
-            var resultsWereOpen = false;
 
             function initializeInputs() {
                 address.val(hiddenData.address);
@@ -285,6 +284,40 @@
                 }
             }
 
+            function handleKeystrokes(node) {
+                node.on('keydown', function(evt) {
+                    var $this = $(this);
+                    var typeaheadField = $this.parent();
+                    var activeItem = typeaheadField.find('.typeahead-item.active');
+                    var justUseActive = typeaheadField.find('.just-use-option.active');
+                    if (evt.keyCode == K.TAB && (activeItem.length || justUseActive.length)) {
+                        evt.stopImmediatePropagation();
+                        if ($this.val() || activeItem.length || justUseActive.length) {
+                            // Treat tab as the return key
+                            var returnKey = jQuery.Event("keydown");
+                            returnKey.which = K.ENTER;
+                            returnKey.keyCode = K.ENTER;
+                            $this.trigger(returnKey);
+                        } else {
+                            clearField($this);
+                        }
+                    } else if (evt.keyCode == K.ENTER) {
+                        if ($this.val() && justUseActive.length) {
+                            evt.stopImmediatePropagation();
+                            if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
+                                $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                            } else {
+                                $this.trigger('typeahead:close-results-list');
+                            }
+                        }
+                    } else if (evt.keyCode == K.ESCAPE) {
+                        evt.preventDefault();
+                        $this.trigger('typeahead:close-results-list');
+                        resetSelectedOption();
+                    }
+                });
+            }
+
             initializeInputs();
 
             var latestVenueValue = venueInput.val();
@@ -311,6 +344,7 @@
                 callback: {
                     onInit: function(node) {
                         this.query = node.val();  // Updates the results dropdown on init
+                        handleKeystrokes(node);
                     },
                     onClickBefore: function() {
                         // Used in the onHideLayout callback to identify the reason of the dropdown closure
@@ -354,9 +388,6 @@
                         if (event.keyCode == K.TAB) {
                             preventGuessing = true
                         }
-                        /* Used in the keydown event handler of the input fields to identify whether the results
-                        dropdown were open before the keydown (since the focus remains on the field even after a selection). */
-                        resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
                     onResult: function(node, query, result, resultCount) {
                         node.parent().find('.just-use-option').toggleClass('active', !resultCount);
@@ -379,6 +410,7 @@
                 callback: {
                     onInit: function(node) {
                         this.query = node.val();
+                        handleKeystrokes(node);
                     },
                     onClickBefore: function() {
                         validRoom = true;
@@ -430,7 +462,6 @@
                         if (event.keyCode == K.TAB) {
                             preventGuessing = true;
                         }
-                        resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
                     onResult: function(node, query, result, resultCount) {
                         node.parent().find('.just-use-option').toggleClass('active', !resultCount);
@@ -462,6 +493,7 @@
                 venueInput.val(data.item_name);
                 validVenue = true;
                 justUseOptionSelected = false;
+                venueInput.attr('title', data.item_name);
                 venueInput.trigger('typeahead:close-results-list');
             });
 
@@ -472,6 +504,7 @@
                 roomInput.val(data.item_name);
                 validRoom = true;
                 justUseOptionSelected = false;
+                roomInput.attr('title', data.item_name);
                 roomInput.trigger('typeahead:close-results-list');
             });
 
@@ -497,35 +530,11 @@
                 toggleOpenResultsList($this);
                 latestUsedField = $(this);
             })
-            .on('keydown', function(e) {
-                var $this = $(this);
-                if (resultsWereOpen) {
-                    if (e.keyCode == K.TAB) {
-                        if ($this.val()) {
-                            // Treat tab as the return key
-                            var returnKey = jQuery.Event("keydown");
-                            returnKey.which = K.ENTER;
-                            returnKey.keyCode = K.ENTER;
-                            $this.trigger(returnKey);
-                        } else {
-                            clearField($this);
-                        }
-                    } else if (e.keyCode == K.ENTER) {
-                        e.preventDefault();
-                        if ($this.val()) {
-                            if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
-                                $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
-                            }
-                        } else {
-                            clearField($this);
-                        }
-                    } else if (e.keyCode == K.ESCAPE) {
-                        e.preventDefault();
-                        resetSelectedOption();
-                    } else if (~[K.UP, K.DOWN].indexOf(e.keyCode)) {
-                        scrollResultsList($this);
-                        $this.trigger('focus.typeahead');
-                    }
+            .on('keydown', function(evt) {
+                if (~[K.UP, K.DOWN].indexOf(evt.keyCode)) {
+                    var $this = $(this);
+                    scrollResultsList($this);
+                    $this.trigger('focus.typeahead');
                 }
             })
             .on('click', function() {
