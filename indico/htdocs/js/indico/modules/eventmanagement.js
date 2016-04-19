@@ -37,6 +37,30 @@
             headerTemplate: '',
             sortList: [[1, 0]]
         });
+
+        $('#persons-list .js-count-label').qbubble({
+            show: {
+                event: 'mouseover'
+            },
+            content: {
+                text: function() {
+                    var items = $(this).data('items');
+                    var html = $('<ul>');
+
+                    $.each(items, function() {
+                        var item = $('<li>');
+                        if (this.url) {
+                            item.append($('<a>', {text: this.title, 'href': this.url}));
+                        } else {
+                            item.text(this.title);
+                        }
+                        html.append(item);
+                    });
+
+                    return html;
+                }
+            }
+        });
     };
 
 
