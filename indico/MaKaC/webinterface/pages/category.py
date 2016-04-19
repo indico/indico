@@ -806,7 +806,7 @@ class WPCategOverview( WPCategoryDisplayBase ):
     def _getHeadContent( self ):
         # add RSS feed
         if self._ow.getDate().date() == nowutc().astimezone(timezone(self._locTZ)).date():
-            url = urlHandlers.UHCategOverviewToRSS.getURL(self._categ)
+            url = url_for('category.categoryDisplay-atom', self._categ)
             return i18nformat("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
         return ""
 

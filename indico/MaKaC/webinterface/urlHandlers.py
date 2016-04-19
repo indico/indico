@@ -1465,10 +1465,6 @@ class UHCategoryToAtom(URLHandler):
     _endpoint = 'category.categoryDisplay-atom'
 
 
-class UHCategOverviewToRSS(URLHandler):
-    _endpoint = 'category.categOverview-rss'
-
-
 class UHConfModifPendingQueues(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues'
 
