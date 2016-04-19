@@ -85,7 +85,7 @@ type("TimetableManagementActions", [], {
         info.set('sessionTimetable', self.isSessionTimetable);
 
         var urlArgs = {
-            'confId': eventData.conferenceId[0],
+            'confId': eventData.conferenceId,
             'entry_id': eventData.scheduleEntryId
         };
         if (self.timetable.isSessionTimetable) {
@@ -159,7 +159,7 @@ type("TimetableManagementActions", [], {
         info.set('sessionTimetable', this.isSessionTimetable);
 
         var urlArgs = {
-            confId: eventData.conferenceId[0],
+            confId: eventData.conferenceId,
             entry_id: eventData.scheduleEntryId
         };
         if (self.isSessionTimetable) {
@@ -205,7 +205,7 @@ type("TimetableManagementActions", [], {
         }
 
         var urlArgs = {
-            confId: eventData.conferenceId[0],
+            confId: eventData.conferenceId,
             entry_id: eventData.scheduleEntryId
         };
         if (self.isSessionTimetable) {

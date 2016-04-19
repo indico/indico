@@ -553,7 +553,7 @@ function loadBalloonContent(self, api, editable) {
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
     var url = editable ? Indico.Urls.Timetable.entries.info.manage : Indico.Urls.Timetable.entries.info.display;
     var urlParams = {
-       'confId': self.eventData.conferenceId[0],
+       'confId': self.eventData.conferenceId,
        'entry_id': entryId,
     };
     if (self.timetable.isSessionTimetable) {
@@ -617,7 +617,7 @@ function loadBalloonContent(self, api, editable) {
 
             $content.find('.js-move').on('click', function() {
                 var urlArgs = {
-                    confId: self.eventData.conferenceId[0],
+                    confId: self.eventData.conferenceId,
                     entry_id: self.eventData.scheduleEntryId
                 };
                 if (self.timetable.isSessionTimetable) {
@@ -1970,7 +1970,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         title: $T.gettext("Edit"),
                         data: {
                             title: $T.gettext("Edit poster"),
-                            confId: blockData.conferenceId[0],
+                            confId: blockData.conferenceId,
                             timetableEntryId: blockData.scheduleEntryId
                         }
                     }).on('click', function(evt, params) {
@@ -2003,7 +2003,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         title: $T.gettext("Manage protection"),
                         data: {
                             title: $T.gettext("Manage poster protection"),
-                            confId: blockData.conferenceId[0],
+                            confId: blockData.conferenceId,
                             contribId: blockData.contributionId
                         }
                     }).on('click', function(evt) {
