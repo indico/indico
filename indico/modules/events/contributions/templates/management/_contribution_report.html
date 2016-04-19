@@ -16,7 +16,7 @@
                         <th class="i-table title-column">
                             {% trans %}Title{% endtrans %}
                         </th>
-                        <th class="i-table" data-sorter="text">
+                        <th class="i-table time-column" data-sorter="text">
                             {% trans %}Time{% endtrans %}
                         </th>
                         <th class="i-table duration-column">
@@ -103,7 +103,7 @@
                                            title="{% trans %}This contribution is scheduled within a session block and duration can't be modified.{% endtrans %}"></i>
                                     {% endif %}
                                     <span class="label">
-                                        {{ contrib.duration|format_timedelta(format='narrow') if contrib.duration else 'n/a' }}
+                                        {{ contrib.duration|format_human_timedelta(narrow=true) if contrib.duration else 'n/a' }}
                                     </span>
                                 </span>
                             </td>

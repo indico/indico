@@ -20,7 +20,7 @@
                 </span>
                 {% if hide_end_time and item.duration -%}
                     <span class="icon-time timetable-duration">
-                        {{ item.duration | format_timedelta(format='narrow') }}
+                        {{ item.duration | format_human_timedelta(narrow=true) }}
                     </span>
                 {%- endif %}
             </div>

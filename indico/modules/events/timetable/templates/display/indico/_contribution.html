@@ -19,7 +19,7 @@
                 </span>
                 {% if contrib.duration -%}
                     <span class="icon-time timetable-duration">
-                        {{- contrib.duration | format_timedelta(format='narrow') -}}
+                        {{- contrib.duration | format_human_timedelta(narrow=true) -}}
                     </span>
                 {%- endif %}
                 {% if not contrib.inherit_location and contrib.has_location_info -%}
