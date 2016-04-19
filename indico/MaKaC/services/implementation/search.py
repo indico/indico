@@ -44,7 +44,7 @@ class SearchUsers(SearchBase):
         self._email = self._params.get("email", "")
         self._exactMatch = self._params.get("exactMatch", False)
         self._confId = self._params.get("conferenceId", None)
-        self._event = Event.get(self._confId) if self._confId else None
+        self._event = Event.get(self._confId, is_deleted=False) if self._confId else None
 
     def _getAnswer(self):
         event_persons = []

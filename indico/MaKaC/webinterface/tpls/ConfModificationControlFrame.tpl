@@ -72,7 +72,7 @@ var methods = {'addExisting': 'event.protection.addExistingManager',
 
 var params = {confId: '${ confId }'};
 
-var modificationControlManager = new ListOfUsersManager('${ confId }',
+var modificationControlManager = new ListOfUsersManager(null,
         methods, params, $E('inPlaceManagers'), "manager", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
