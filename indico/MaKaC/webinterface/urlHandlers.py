@@ -1457,14 +1457,6 @@ class UHConfTimeTableCustomizePDF(URLHandler):
         return "files/generatedPdf/Conference.pdf"
 
 
-class UHCategoryToiCal(URLHandler):
-    _endpoint = 'category.categoryDisplay-ical'
-
-
-class UHCategoryToAtom(URLHandler):
-    _endpoint = 'category.categoryDisplay-atom'
-
-
 class UHConfModifPendingQueues(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues'
 

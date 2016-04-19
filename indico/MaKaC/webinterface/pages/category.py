@@ -101,8 +101,8 @@ class WCategoryDisplay(WICalExportBase):
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
         vars["img"] = self._target.getIconURL()
-        vars["categ"] = vars["target"] = self._target;
-        vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
+        vars["categ"] = vars["target"] = self._target
+        vars["urlICSFile"] = url_for('category.categoryDisplay-ical', self._target)
         vars["isRootCategory"] = isRootCategory
         vars["timezone"] = self._timezone
         subcats = self._target.subcategories
@@ -164,7 +164,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
 
     def _getHeadContent(self):
         # add RSS feed
-        url = urlHandlers.UHCategoryToAtom.getURL(self._target)
+        url = url_for('category.categoryDisplay-atom', self._target)
 
         return WPCategoryDisplayBase._getHeadContent( self ) + \
         i18nformat("""<link rel="alternate" type="application/atom+xml" title="_('Indico Atom Feed')" href="%s">""") % url
