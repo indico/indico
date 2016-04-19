@@ -143,18 +143,32 @@
                 throw new BuildError('Could not build an URL', template.endpoint, params);
             }
 
-            url = Indico.Urls.BasePath + url;
+            if (window.indicoOfflineSite) {
+                // See url_to_static_filename() in modules/events/static/util.py
+                url = url.replace(/^\/event\/\d+/, '');
+                if (url.indexOf('static/') == 0) {
+                    url = url.substring(7);
+                }
+                url = url.replace(/^\/+/, '').replace(/\/$/, '').replace(/\//g, '--');
+                if (!url.match(/.*\.([^\/]+)$/)) {
+                    url += '.html';
+                }
+            } else {
+                url = Indico.Urls.BasePath + url;
+            }
         }
         else {
             throw new BuildError('Invalid URL template', template);
         }
 
-        var qs = $.param(qsParams);
-        if (qs) {
-            url += (~url.indexOf('?') ? '&' : '?') + qs;
-        }
-        if (fragment) {
-            url += '#' + fragment.replace(/^#/, '');
+        if (!window.indicoOfflineSite) {
+            var qs = $.param(qsParams);
+            if (qs) {
+                url += (~url.indexOf('?') ? '&' : '?') + qs;
+            }
+            if (fragment) {
+                url += '#' + fragment.replace(/^#/, '');
+            }
         }
         return url;
     }
