@@ -90,7 +90,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
         return None
 
     def handle_log(self, obj):
-        if any(p.match(obj.get('req_path')) for p in self.server.ignored_request_paths):
+        if any(p.match(obj.get('req_path') or '') for p in self.server.ignored_request_paths):
             return
         sql_log_type = obj.get('sql_log_type')
         if sql_log_type == 'start_request':
