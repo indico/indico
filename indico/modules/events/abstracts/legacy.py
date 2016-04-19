@@ -413,7 +413,11 @@ class AbstractLegacyMixin(object):
     @property
     @memoize_request
     def as_new(self):
-        return self.all_for_event(self.event)[int(self._id)]
+        try:
+            return self.all_for_event(self.event)[int(self._id)]
+        except KeyError:
+            # then the abstract is new and has to be fetched from the DB
+            return Abstract.find_one(event_new=self.event, legacy_id=self._id)
 
     @no_autoflush
     def _add_judgment(self, legacy_judgment):
