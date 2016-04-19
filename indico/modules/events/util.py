@@ -43,6 +43,7 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -370,7 +371,7 @@ def create_event_logo_tmp_file(event):
 
 
 @contextmanager
-def track_time_changes():
+def track_time_changes(auto_extend=False):
     """Track time changes of event objects.
 
     This provides a list of changes while the context manager was
@@ -378,6 +379,9 @@ def track_time_changes():
 
     If the code running inside the ``with`` block of this context
     manager raises an exception, no signals will be triggered.
+
+    :param auto_extend: Whether entry parents will get their end_dt
+                        automatically extended or not.
     """
     if 'old_times' in g:
         raise RuntimeError('time change tracking may not be nested')
@@ -389,15 +393,21 @@ def track_time_changes():
         del g.old_times
         raise
     else:
+        if auto_extend:
+            # g.old_times changes during iteration
+            for obj in list(g.old_times):
+                if not isinstance(obj, Event):
+                    obj.extend_parent()
         old_times = g.pop('old_times')
-        for entry, info in old_times.iteritems():
-            obj = entry.object if not isinstance(entry, Event) else entry
-            if entry.start_dt != info['start_dt']:
-                changes[obj]['start_dt'] = (info['start_dt'], entry.start_dt)
-            if entry.duration != info['duration']:
-                changes[obj]['duration'] = (info['duration'], entry.duration)
-            if entry.end_dt != info['end_dt']:
-                changes[obj]['end_dt'] = (info['end_dt'], entry.end_dt)
+        for obj, info in old_times.iteritems():
+            if isinstance(obj, TimetableEntry):
+                obj = obj.object
+            if obj.start_dt != info['start_dt']:
+                changes[obj]['start_dt'] = (info['start_dt'], obj.start_dt)
+            if obj.duration != info['duration']:
+                changes[obj]['duration'] = (info['duration'], obj.duration)
+            if obj.end_dt != info['end_dt']:
+                changes[obj]['end_dt'] = (info['end_dt'], obj.end_dt)
         for obj, obj_changes in changes.iteritems():
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
