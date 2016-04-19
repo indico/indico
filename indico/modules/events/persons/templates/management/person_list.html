@@ -1,0 +1,71 @@
+{% extends 'events/persons/management/_persons_list_base.html' %}
+
+{% block title %}
+    {% trans %}Persons{% endtrans %}
+{% endblock %}
+
+{% block persons %}
+    <table class="i-table-widget tablesorter">
+        <thead>
+            <tr class="i-table">
+                <th class="i-table checkbox-column" data-sorter="false"></th>
+                <th class="i-table">{% trans %}Name{% endtrans %}</th>
+                <th class="i-table">{% trans %}Email{% endtrans %}</th>
+                <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
+                <th class="i-table">{% trans %}Speaker in contributions{% endtrans %}</th>
+                <th class="i-table">{% trans %}Speaker in subcontributions{% endtrans %}</th>
+                <th class="i-table">{% trans %}Convener in session blocks{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person, person_data in persons.iteritems() -%}
+                <tr class="i-table">
+                    <td class="i-table">
+                        <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id"
+                               {{ 'disabled' if not person.email }}>
+                    </td>
+                    <td class="i-table">{{ person.full_name }}</td>
+                    <td class="i-contributiontable email-column">{{ person.email }}</td>
+                    <td class="i-table">{{ person.affiliation }}</td>
+                    <td class="i-table">
+                        {% if person_data.contributions %}
+                            <span class="i-label js-count-label"
+                                  data-items="{{ person_data.contributions | tojson | forceescape }}">
+                                {% trans %}Contributions{% endtrans %}
+                                <span class="badge">
+                                    {{ person_data.contributions | length }}
+                                </span>
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="i-table">
+                        {% if person_data.subcontributions %}
+                            <span class="i-label js-count-label"
+                                  data-items="{{ person_data.subcontributions | tojson | forceescape }}">
+                                {% trans %}Subcontributions{% endtrans %}
+                                <span class="badge">
+                                    {{ person_data.subcontributions | length }}
+                                </span>
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="i-table">
+                        {% if person_data.session_blocks %}
+                            <span class="i-label js-count-label"
+                                  data-items="{{ person_data.session_blocks | tojson | forceescape }}">
+                                {% trans %}Session blocks{% endtrans %}
+                                <span class="badge">
+                                    {{ person_data.session_blocks | length }}
+                                </span>
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {%- else -%}
+                <tr class="i-table">
+                    <td colspan="7">{% trans %}No persons{% endtrans %}</td>
+                </tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}

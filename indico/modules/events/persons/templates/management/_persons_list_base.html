@@ -1,0 +1,42 @@
+{% extends 'layout/full_content_base.html' %}
+
+{% block content %}
+    <div id="persons-list">
+        <div class="flashed-messages"></div>
+        <div>
+            <div class="toolbar form-group">
+                <div class="group">
+                    <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" data-select-all="#persons-list input.select-row:visible">
+                                {% trans %}All{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-select-none="#persons-list input.select-row:visible">
+                                {% trans %}None{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
+                       data-href="{{ url_for('event_management.email_event_persons', event) }}"
+                       data-title="{% trans %}Send email{% endtrans %}"
+                       data-method="POST"
+                       data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
+                       data-ajax-dialog>
+                        {%- trans %}Send emails{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            {% block persons %}{% endblock %}
+        </div>
+    </div>
+    <script>
+        setupEventPersonsList();
+    </script>
+{% endblock %}
