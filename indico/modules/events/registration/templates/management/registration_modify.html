@@ -18,6 +18,7 @@
             registration-meta-data="{{ registration_metadata | tojson | forceescape }}"
             registration-uuid="{{ registration.uuid }}"
             update-mode="true"
-            management="true"></div>
+            management="true"
+            notify-default="{{ session.get('registration_notify_user_default', true) | tojson | forceescape }}"></div>
     </div>
 {% endblock %}

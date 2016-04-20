@@ -507,7 +507,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
         form = make_registration_form(self.regform, management=True)()
         if form.validate_on_submit():
             data = form.data
-            notify_user = data.pop('notify_user', False)
+            session['registration_notify_user_default'] = notify_user = data.pop('notify_user', False)
             create_registration(self.regform, data, management=True, notify_user=notify_user)
             flash(_("The registration was created."), 'success')
             return redirect(url_for('.manage_reglist', self.regform))

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request
+from flask import flash, redirect, request, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -47,6 +47,8 @@ class RegistrationEditMixin:
         if form.validate_on_submit():
             data = form.data
             notify_user = not self.management or data.pop('notify_user', False)
+            if self.management:
+                session['registration_notify_user_default'] = notify_user
             modify_registration(self.registration, data, management=self.management, notify_user=notify_user)
             return redirect(self.success_url)
         elif form.is_submitted():

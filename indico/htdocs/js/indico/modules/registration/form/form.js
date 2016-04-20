@@ -136,6 +136,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             editMode: '=',
             updateMode: '=',
             management: '=',
+            notifyDefault: '=',
             postUrl: '=',
             checkEmailUrl: '='
         },
@@ -151,6 +152,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $rootScope.eventStartDate = $scope.eventStartDate;
             $rootScope.eventEndDate = $scope.eventEndDate;
             $rootScope.editMode = $scope.editMode;
+            $rootScope.notifyDefault = $scope.notifyDefault;
 
             $scope.csrfToken = $('#csrf-token').attr('content');
             $scope.dialogs = {
