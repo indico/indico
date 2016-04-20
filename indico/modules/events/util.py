@@ -402,13 +402,13 @@ def track_time_changes(auto_extend=False, user=None):
         raise
     else:
         if auto_extend:
+            initial_changes = set(g.old_times)
             # g.old_times changes during iteration
-            old = set(g.old_times)
             for obj in list(g.old_times):
                 if not isinstance(obj, Event):
                     obj.extend_parent()
-            new = set(g.old_times) - old
-            for obj in new:
+            cascade_changes = set(g.old_times) - initial_changes
+            for obj in cascade_changes:
                 if isinstance(obj, Event):
                     if not obj.can_manage(user):
                         # TODO: raise Forbidden exceptions after adding protection check in the UI

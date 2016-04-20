@@ -234,7 +234,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         if form.validate_on_submit():
             with track_time_changes():
                 if shift_later:
-                    updated_entries += shift_following_entries(self.event_new, self.entry, form.start_dt.data)
+                    updated_entries += shift_following_entries(self.entry, form.start_dt.data, session_=self.session)
                 if self.entry.contribution:
                     update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
@@ -421,11 +421,15 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
     def _process(self):
         new_start_dt = (self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('startDate')))
                         .astimezone(utc))
-        with track_time_changes():
-            shift_following_entries(self.event_new, self.entry, new_start_dt)
+        with track_time_changes(auto_extend=True, user=session.user):
+            shift_following_entries(self.entry, new_start_dt, session_=self.session)
             self.entry.move(new_start_dt)
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry),
-                            timetable=TimetableSerializer(True).serialize_timetable(self.event_new))
+        serializer = TimetableSerializer(management=True)
+        if self.session:
+            timetable = serializer.serialize_session_timetable(self.session)
+        else:
+            timetable = serializer.serialize_timetable(self.event_new)
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable)
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):

@@ -275,27 +275,24 @@ def get_session_block_entries(event, day):
             .all())
 
 
-def shift_following_entries(event, entry, start_dt):
+def shift_following_entries(entry, start_dt, session_=None):
     """Reschedules entries with start_dt > entry.start_dt"""
-    from indico.modules.events.timetable.operations import update_timetable_entry_object
-
-    tz = event.tzinfo
-    entries = (event.timetable_entries
-               .filter(db.cast(TimetableEntry.start_dt.astimezone(tz), db.Date) == entry.start_dt.date(),
-                       TimetableEntry.start_dt >= entry.start_dt, TimetableEntry.id != entry.id))
-    if entry.parent is None:
-        entries = entries.filter(TimetableEntry.parent_id.is_(None)).all()
+    event = entry.event_new
+    tzinfo = event.tzinfo
+    day = entry.start_dt.astimezone(tzinfo).date()
+    if entry.parent:
+        query = TimetableEntry.query.with_parent(entry.parent)
+    elif session_:
+        query = event.timetable_entries.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
+                                               TimetableEntry.session_block.has(session_id=session_.id))
     else:
-        entries = entries.filter(TimetableEntry.parent == entry.parent).all()
+        query = event.timetable_entries
+    entries = (query.filter(db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
+                            TimetableEntry.start_dt >= entry.start_dt,
+                            TimetableEntry.id != entry.id)).all()
     if not entries:
         return []
-
     diff = start_dt - entry.start_dt
-    new_end_dt = getattr(entry.parent, 'end_dt', None)
     for entr in entries:
         entr.move(entr.start_dt + diff)
-        if new_end_dt is None or entr.end_dt > new_end_dt:
-            new_end_dt = entr.end_dt
-    if entry.parent and new_end_dt != entry.parent.end_dt:
-        update_timetable_entry_object(entry.parent, {'duration': entry.parent.duration + diff})
     return entries
