@@ -294,9 +294,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             vars["confDateInterval"] = format_date(adjusted_sDate, format='long')
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
             vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
-        vars["confLocation"] = ""
-        if self._conf.getLocationList():
-            vars["confLocation"] =  self._conf.getLocationList()[0].getName()
+        vars["confLocation"] = self.event.venue_name
         vars["body"] = self._body
         vars["supportEmail"] = ""
         vars["supportTelephone"] = ""
