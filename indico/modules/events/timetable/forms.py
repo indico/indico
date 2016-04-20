@@ -134,40 +134,39 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
 class TimetablePDFExportForm(IndicoForm):
     _pdf_options_fields = {'pagesize', 'fontsize', 'firstPageNumber'}
 
-    simplified = BooleanField(_('Simplified Timetable'), widget=SwitchWidget(),
-                              description=_("Enable to get a simplified version of the timetable"))
-
-    showCoverPage = BooleanField(_('Cover page'), [HiddenUnless('simplified', False)], default=True,
+    advanced = BooleanField(_("Advanced timetable"), widget=SwitchWidget(),
+                            description=_("Advanced customization options"))
+    showCoverPage = BooleanField(_('Cover page'), [HiddenUnless('advanced')], default=True,
                                  description=_('Whether to include cover page'))
-    showTableContents = BooleanField(_('Table of contents'), [HiddenUnless('simplified', False)], default=True,
+    showTableContents = BooleanField(_('Table of contents'), [HiddenUnless('advanced')], default=True,
                                      description=_('Whether to include table of contents'))
     showSessionTOC = BooleanField(_('Show sessions'), [HiddenUnless('showTableContents'),
-                                                       HiddenUnless('simplified', False)], default=True,
+                                                       HiddenUnless('advanced')], default=True,
                                   description=_('Whether to show the sessions inside the table of contents'))
-    showContribId = BooleanField(_('Contribution ID'), [HiddenUnless('simplified', False)], default=True,
+    showContribId = BooleanField(_('Contribution ID'), [HiddenUnless('advanced')], default=True,
                                  description=_('Whether to print the ID of each contribution'))
-    showAbstract = BooleanField(_('Abstract content'), [HiddenUnless('simplified', False)],
+    showAbstract = BooleanField(_('Abstract content'), [HiddenUnless('advanced')],
                                 description=_('Print abstract content of all the contributions '))
     dontShowPosterAbstract = BooleanField(_('Include abstract info'), [HiddenUnless('showAbstract')],
                                           description=_('Do not print the abstract content for poster sessions'))
-    showLengthContribs = BooleanField(_('Contribution Length'), [HiddenUnless('simplified', False)],
+    showLengthContribs = BooleanField(_('Contribution Length'), [HiddenUnless('advanced')],
                                       description=_('Whether to include contribution length'))
-    showSpeakerTitle = BooleanField(_('Speaker title'), [HiddenUnless('simplified', False)], default=True,
+    showSpeakerTitle = BooleanField(_('Speaker title'), [HiddenUnless('advanced')], default=True,
                                     description=_('Whether to include speaker title'))
-    showSpeakerAffiliation = BooleanField(_('Speaker affiliation'), [HiddenUnless('simplified', False)],
+    showSpeakerAffiliation = BooleanField(_('Speaker affiliation'), [HiddenUnless('advanced')],
                                           description=_('Whether to include speaker affiliation'))
-    newPagePerSession = BooleanField(_('New page for session'), [HiddenUnless('simplified', False)],
+    newPagePerSession = BooleanField(_('New page for session'), [HiddenUnless('advanced')],
                                      description=_('Print each session on separate page'))
-    useSessionColorCodes = BooleanField(_('Session colors'), [HiddenUnless('simplified', False)], default=True,
+    useSessionColorCodes = BooleanField(_('Session colors'), [HiddenUnless('advanced')], default=True,
                                         description=_('Whether to use session color codes'))
-    showSessionDescription = BooleanField(_('Session description'), [HiddenUnless('simplified', False)], default=True,
+    showSessionDescription = BooleanField(_('Session description'), [HiddenUnless('advanced')], default=True,
                                           description=_("Whether to include session description"))
     showContribsAtConfLevel = BooleanField(_('Top-level contribution'),
                                            description=_("Whether to include contributions that are not inside any "
                                                          "session"))
     showBreaksAtConfLevel = BooleanField(_('Top-level breaks'),
                                          description=_('Whether to include breaks that are not inside any session'))
-    printDateCloseToSessions = BooleanField(_('Start date'), [HiddenUnless('simplified', False)],
+    printDateCloseToSessions = BooleanField(_('Start date'), [HiddenUnless('advanced')],
                                             description=_('Print the start date close to session title'))
     pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
@@ -180,7 +179,7 @@ class TimetablePDFExportForm(IndicoForm):
 
     @property
     def data_for_format(self):
-        if self.simplified.data:
+        if not self.advanced.data:
             fields = ('showContribsAtConfLevel', 'showBreaksAtConfLevel')
         else:
             fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token'}
