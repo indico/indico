@@ -22,7 +22,7 @@ from operator import itemgetter
 import transaction
 from flask import request, session, redirect, flash, json, Response
 from sqlalchemy import func, inspect
-from sqlalchemy.orm import lazyload
+from sqlalchemy.orm import joinedload, lazyload
 from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 
 from indico.core.db import db
@@ -342,7 +342,8 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .join(VCRoomEventAssociation)
                  # Plugins might add eager-loaded extensions to the table - since we cannot group by them
                  # we need to make sure everything is lazy-loaded here.
-                 .options(lazyload(r) for r in inspect(VCRoom).relationships.keys())
+                 .options((lazyload(r) for r in inspect(VCRoom).relationships.keys()),
+                          joinedload('events').joinedload('event_new').joinedload('acl_entries'))
                  .group_by(VCRoom.id)
                  .order_by(db.desc('event_count'))
                  .limit(10))
