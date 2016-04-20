@@ -46,7 +46,8 @@
                 <table class="i-table-widget tablesorter">
                     <thead>
                         <tr class="i-table">
-                            <th class="i-table checkbox-column"></th>
+                            <th class="i-table" data-sorter="false"></th>
+                            <th class="i-table checkbox-column" data-sorter="false"></th>
                             <th class="i-table id-column">
                                 {% trans %}ID{% endtrans %}
                             </th>
@@ -56,7 +57,7 @@
                             <th class="i-table">
                                 {% trans %}Duration{% endtrans %}
                             </th>
-                            <th class="i-table">
+                            <th class="i-table" data-sorter="false">
                                 {% trans %}Material{% endtrans %}
                             </th>
                             <th data-sorter="false">
@@ -66,7 +67,10 @@
                     </thead>
                     <tbody>
                         {% for subcontribution in subcontributions -%}
-                            <tr class="i-table">
+                            <tr class="i-table js-sortable-subcontribution-row"
+                                id="{{ subcontribution.id }}"
+                                data-sort-url="{{ url_for('.sort_subcontributions', contrib) }}">
+                                <td class="ui-sortable-handle"></td>
                                 <td class="i-table">
                                     <input type="checkbox" class="select-row" name="subcontribution_id"
                                            value="{{ subcontribution.id }}">
@@ -95,7 +99,7 @@
                             </tr>
                         {%- else -%}
                             <tr class="i-table">
-                                <td colspan="6">
+                                <td colspan="7">
                                     {%- trans %}There are no subcontributions in this contribution yet{% endtrans -%}
                                 </td>
                             </tr>
