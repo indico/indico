@@ -406,6 +406,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
      {
          _shiftKeyListener: function() {
              var indicatorDiv = $('.bottomTip');
+             var self = this;
 
              //If its not already drawn/appended
              if(!(indicatorDiv.length > 0)) {
@@ -416,7 +417,13 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
              // Keyboard Key "Shift" pressed > listener for shifting while dragging blocks
              $(document).keydown(function(e) {
                  // if Shift is currently pressed
-                 if(e.keyCode == '16') {
+                 if (self._timetable.isTopLevel
+                        && self._timetable.isSessionTimetable
+                        && !self._timetable.canManageBlocks) {
+                     return;
+                 }
+
+                 if (e.keyCode == '16') {
                      $(window).data('shiftIsPressed', true);
                      indicatorDiv.fadeIn("fast");
                  }}).keyup(function(e){
@@ -471,7 +478,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
      }, function(timetable) {
          this.TimeDisplacementManager(this.timetable);
          if (this.managementMode) {
-             this._shiftKeyListener();
+             this._shiftKeyListener.call(this);
          }
          this._grid = _(this.grid);
      });
