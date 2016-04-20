@@ -196,11 +196,13 @@ class ProtectionMixin(object):
         if entry is None and read_access:
             entry = principal_class(principal=principal)
             self.acl_entries.add(entry)
+            db.session.flush()
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True,
                                            old_data=None, quiet=quiet)
             return entry
         elif entry is not None and not read_access:
             self.acl_entries.remove(entry)
+            db.session.flush()
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
                                            old_data=None, quiet=quiet)
             return None
@@ -346,6 +348,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                 return None
             entry = principal_class(principal=principal, read_access=False, full_access=False, roles=[])
             self.acl_entries.add(entry)
+            db.session.flush()
             new_entry = True
         old_data = entry.current_data
         # update roles
@@ -370,9 +373,11 @@ class ProtectionManagersMixin(ProtectionMixin):
         # remove entry from acl if no privileges
         if not entry.read_access and not entry.full_access and not entry.roles:
             self.acl_entries.remove(entry)
+            db.session.flush()
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
                                            old_data=old_data, quiet=quiet)
             return None
+        db.session.flush()
         signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=new_entry,
                                        old_data=old_data, quiet=quiet)
         return entry
