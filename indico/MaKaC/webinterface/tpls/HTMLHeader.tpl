@@ -57,6 +57,10 @@
             <link rel="stylesheet" type="text/css" href="${cssFile}">
         % endfor
 
+        % for cssFile in printCSS:
+            <link rel="stylesheet" type="text/css" media="print" href="${cssFile}">
+        % endfor
+
         ${ template_hook('html-head', template=self) }
     </head>
     <body data-user-id="${ user.getId() if user else 'null' }" data-debug="${ _app.debug|n,j }">

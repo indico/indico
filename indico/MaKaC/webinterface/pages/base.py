@@ -129,6 +129,9 @@ class WPBase():
     def _setTitle(self, newTitle):
         self._title = newTitle.strip()
 
+    def getPrintCSSFiles(self):
+        return []
+
     def getCSSFiles(self):
         return (self._asset_env['base_css'].urls() +
                 self._asset_env['dropzone_css'].urls() +
@@ -188,6 +191,7 @@ class WPBase():
             "baseurl": self._getBaseURL(),
             "conf": Config.getInstance(),
             "page": self,
+            "printCSS": map(self._fix_path, self.getPrintCSSFiles()),
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "language": session.lang or info.getLang(),
