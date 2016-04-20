@@ -232,25 +232,12 @@ class TimetableSerializer(object):
         return data
 
     def _get_person_data(self, person_link):
-        data = {}
-        data['firstName'] = person_link.first_name
-        data['familyName'] = person_link.last_name
-        data['affiliation'] = person_link.affiliation
-        data['email'] = person_link.person.email
-        data['name'] = person_link.get_full_name(last_name_first=False, last_name_upper=False,
-                                                 abbrev_first_name=False, show_title=True)
-        if self.management:
-            data['id'] = person_link.person_id
-            data['address'] = person_link.person.address
-            data['phone'] = person_link.person.phone
-            data['title'] = person_link.person.title
-            if isinstance(person_link, ContributionPersonLink):
-                data['isSubmitter'] = person_link.is_submitter
-                # TODO: URL to person page
-                data['url'] = None
-            if isinstance(person_link, SessionBlockPersonLink):
-                data['fullName'] = data['name']
-        return data
+        return {'firstName': person_link.first_name,
+                'familyName': person_link.last_name,
+                'affiliation': person_link.affiliation,
+                'email': person_link.person.email,
+                'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
+                                                  abbrev_first_name=False, show_title=True)}
 
 
 def serialize_contribution(contribution):
@@ -281,28 +268,16 @@ def serialize_event_info(event):
 
 def serialize_session(sess):
     """Return data for a single session"""
-    from indico.modules.events.util import serialize_person_link
-
-    def _serialize_date(dt):
-        tzinfo = sess.event_new.tzinfo
-        return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
-                'time': dt.astimezone(tzinfo).strftime('%H:%M:%S'),
-                'tz': str(tzinfo)}
-
     data = {
         '_type': 'Session',
         'address': sess.address,
         'color': '#' + sess.colors.background,
         'description': sess.description,
-        'endDate': _serialize_date(sess.end_dt) if sess.end_dt else '',
         'id': sess.id,
         'isPoster': sess.is_poster,
         'location': sess.venue_name,
-        'protectionURL': '',
         'room': sess.room_name,
         'roomFullname': sess.room_name,
-        'sessionConveners': [serialize_person_link(x) for x in sess.conveners],
-        'startDate': _serialize_date(sess.start_dt) if sess.start_dt else '',
         'textColor': '#' + sess.colors.text,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
