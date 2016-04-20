@@ -53,7 +53,8 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHEditContributionField,
                                                                         RHDeleteContributionField,
                                                                         RHSortContributionFields,
-                                                                        RHManageDescriptionField)
+                                                                        RHManageDescriptionField,
+                                                                        RHSortSubContributions)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -101,6 +102,8 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/delete
                  RHDeleteSubContributions, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/create', 'manage_create_subcontrib',
                  RHCreateSubContribution, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/sort', 'sort_subcontributions',
+                 RHSortSubContributions, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
                  'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>/edit',

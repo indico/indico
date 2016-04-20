@@ -236,6 +236,30 @@
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
+
+
+        $('#subcontribution-list table').sortable({
+            items: '.js-sortable-subcontribution-row',
+            handle: '.ui-sortable-handle',
+            placeholder: 'sortable-placeholder',
+            tolerance: 'pointer',
+            distance: 10,
+            axis: 'y',
+            containment: '#subcontribution-list table',
+            start: function(e, ui){
+                ui.placeholder.height(ui.helper.outerHeight());
+            },
+            update: function(e, ui) {
+                var self = $(this);
+
+                $.ajax({
+                    url: ui.item.data('sort-url'),
+                    method: 'POST',
+                    data: {subcontrib_ids: self.sortable('toArray')},
+                    error: handleAjaxError
+                });
+            }
+        });
     };
 
     global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
