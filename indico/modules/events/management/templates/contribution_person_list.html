@@ -80,7 +80,7 @@
     </div>
     <div class="form-group form-group">
         <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
-           data-href="{{ url_for('event_management.email_event_persons', event) }}"
+           data-href="{{ url_for('persons.email_event_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
            data-method="POST"
            data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"

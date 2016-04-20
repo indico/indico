@@ -18,13 +18,18 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
+from flask import request, flash
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.notifications import make_email, send_email
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.persons.forms import EmailEventPersonsForm
 from indico.modules.events.persons.views import WPManagePersons, WPManagePendingPersons
-from indico.web.flask.util import url_for
+from indico.util.i18n import ngettext, _
+from indico.web.flask.util import url_for, jsonify_data
+from indico.web.util import jsonify_form
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -87,3 +92,30 @@ class RHPendingPersonsList(RHConferenceModifBase):
                     data['sessions'][sess.id] = {'title': sess.title}
         return WPManagePendingPersons.render_template('management/pending_person_list.html', self._conf,
                                                       event=self.event_new, pending_persons=pending_persons)
+
+
+class RHEmailEventPersons(RHConferenceModifBase):
+    """Send emails to selected EventPersons"""
+
+    def _checkParams(self, params):
+        self._doNotSanitizeFields.append('from_address')
+        RHConferenceModifBase._checkParams(self, params)
+
+    def _process(self):
+        person_ids = request.form.getlist('person_id')
+        recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
+        form = EmailEventPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
+        if form.validate_on_submit():
+            for recipient in recipients:
+                email = make_email(to_list=recipient, from_address=form.from_address.data,
+                                   subject=form.subject.data, body=form.body.data, html=True)
+                send_email(email, self.event_new, 'Event Persons')
+            num = len(recipients)
+            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
+            return jsonify_data()
+        return jsonify_form(form, submit=_('Send'))
+
+    def _find_event_persons(self, person_ids):
+        return (self.event_new.persons
+                .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
+                .all())
