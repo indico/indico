@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.timetable.controllers.display import RHTimetable, RHTimetableEntryInfo
+from indico.modules.events.timetable.controllers.display import RHTimetable, RHTimetableEntryInfo, RHTimetableExportPDF
 from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddContribution,
                                                                 RHLegacyTimetableAddBreak,
                                                                 RHLegacyTimetableAddSession,
@@ -28,8 +28,7 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryTime,
                                                                 RHLegacyTimetableMoveEntry,
-                                                                RHLegacyTimetableEditEntryDateTime,
-                                                                RHLegacyTimetableExportPDF)
+                                                                RHLegacyTimetableEditEntryDateTime)
 from indico.modules.events.timetable.controllers.manage import (RHManageTimetable, RHManageSessionTimetable,
                                                                 RHTimetableREST, RHManageTimetableEntryInfo)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -69,5 +68,5 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
-_bp.add_url_rule('/timetable/pdf', 'export_pdf', RHLegacyTimetableExportPDF, methods=('GET', 'POST'))
+_bp.add_url_rule('/timetable/pdf', 'export_pdf', RHTimetableExportPDF, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable/entry/<int:entry_id>/info', 'entry_info', RHTimetableEntryInfo)
