@@ -48,7 +48,8 @@ def _get_next_friendly_id(context):
 class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
               AttachedNotesMixin, db.Model):
     __tablename__ = 'sessions'
-    __auto_table_args = {'schema': 'events'}
+    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
+                         {'schema': 'events'})
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
     default_colors = ColorTuple('#202020', '#e3f2d3')
