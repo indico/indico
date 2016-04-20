@@ -194,7 +194,7 @@ type("TimetableManagementActions", [], {
                     }
 
                     self.timetable._updateDay({
-                        id: self.timetable.currentDay,
+                        day: self.timetable.currentDay,
                         entry: entries,
                         slotEntry: data.entry.slotEntry,
                         session: data.entry.slotEntry

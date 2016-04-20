@@ -1335,8 +1335,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         var data = this.getData();
         var entry = {};
-        entry[result.id] = result.entry; // entry contains a whole day
-
+        entry[result.day] = result.entry; // entry contains a whole day
         extend(data, entry);
 
         if (exists(result.session)) {
@@ -1487,7 +1486,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         this._processAutoOps(result);
 
         var slot = this.contextInfo;
-        var day = result.id;
         var data = this.getData();
 
         extend(data, result.entry);
