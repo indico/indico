@@ -68,7 +68,6 @@
             var hiddenData = field.val() ? JSON.parse(field.val()) : {};  // Contains all location related data sent to
                                                                           // the server
             var latestUsedField = null;
-            var latestSelectedOption = {field: '', value: ''};
             var currentScrollPos = 0;
             var delta = 0;
             var validRoom = false;
@@ -76,7 +75,6 @@
             var preventGuessing = false;
             var roomJustCleared = false;
             var venueJustChanged = false;
-            var justUseOptionSelected = false;
 
             function initializeInputs() {
                 address.val(hiddenData.address);
@@ -97,7 +95,6 @@
                 if (!locationInheritanceAllowed) {
                     return;
                 }
-
                 var message = ($T.gettext('Using default location from: {0} ({1})').format({{ parent[1] | tojson }},
                                                                                            {{ parent[0] | tojson }}));
                 var text = isChecked ? message : $T.gettext('Using custom location');
@@ -186,13 +183,14 @@
                     if (!justUse.length) {
                         justUse = $('<div>', {
                             'class': 'just-use-option'
-                        })
-                        .on('click', function() {
+                        });
+                        var justUseLink = $('<a>').on('click', function() {
                             node.trigger('typeahead:click-on-custom-option', {item_name: node.val()});
                         });
+                        justUse.append(justUseLink);
                         resultsWrapper.append(justUse);
                     }
-                    justUse.text($T.gettext('Just use "{0}"').format(node.val()));
+                    justUse.find('a').text($T.gettext('Just use "{0}"').format(node.val()));
                 } else {
                     justUse.remove();
                 }
@@ -201,10 +199,8 @@
                 var firstOption = resultHtmlList.find('li.typeahead-item').first();
                 if (!firstOption.length) {
                     node.parent().find('.just-use-option').addClass('active');
-                    justUseOptionSelected = true;
                 } else {
                     resultHtmlList.find('li.typeahead-item').first().addClass('active');
-                    justUseOptionSelected = false;
                 }
                 return resultHtmlList;
             }
@@ -228,7 +224,6 @@
                     }
                 }
                 parent.find('.just-use-option').toggleClass('active', !activeOption.length);
-                justUseOptionSelected = !activeOption.length;
             }
 
             function postSelectionActions(inputField, value) {
@@ -272,11 +267,13 @@
 
             function resetSelectedOption() {
                 if (latestUsedField.is(venueInput)) {
+                    validVenue = true;
                     venueInput.val(latestVenueValue);
                     if (hiddenData.venue_id) {
                         highlightOption(venueInput, latestVenueValue)
                     }
                 } else if (latestUsedField.is(roomInput)) {
+                    validRoom = true;
                     roomInput.val(latestRoomValue);
                     if (hiddenData.room_id) {
                         highlightOption(roomInput, latestRoomValue)
@@ -288,32 +285,17 @@
                 node.on('keydown', function(evt) {
                     var $this = $(this);
                     var typeaheadField = $this.parent();
-                    var activeItem = typeaheadField.find('.typeahead-item.active');
-                    var justUseActive = typeaheadField.find('.just-use-option.active');
-                    if (evt.keyCode == K.TAB && (activeItem.length || justUseActive.length)) {
+                    var activeItem = typeaheadField.find('.active');
+                    if ((evt.keyCode == K.TAB || evt.keyCode == K.ENTER) && activeItem.length) {
+                        preventGuessing = true;
                         evt.stopImmediatePropagation();
-                        if ($this.val() || activeItem.length || justUseActive.length) {
-                            // Treat tab as the return key
-                            var returnKey = jQuery.Event("keydown");
-                            returnKey.which = K.ENTER;
-                            returnKey.keyCode = K.ENTER;
-                            $this.trigger(returnKey);
-                        } else {
-                            clearField($this);
-                        }
-                    } else if (evt.keyCode == K.ENTER) {
-                        if ($this.val() && justUseActive.length) {
-                            evt.stopImmediatePropagation();
-                            if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
-                                $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
-                            } else {
-                                $this.trigger('typeahead:close-results-list');
-                            }
-                        }
-                    } else if (evt.keyCode == K.ESCAPE) {
+                        activeItem.find('a').click();
+                    }
+                    else if (evt.keyCode == K.ESCAPE) {
                         evt.preventDefault();
-                        $this.trigger('typeahead:close-results-list');
+                        evt.stopImmediatePropagation();
                         resetSelectedOption();
+                        $this.trigger('typeahead:close-results-list');
                     }
                 });
             }
@@ -327,7 +309,6 @@
                 usingDefault.on('click', function () {
                     toggleDefaultLocation(this.checked);
                 });
-
                 toggleDefaultLocation(usingDefault.prop('checked'), true);
             }
 
@@ -366,32 +347,26 @@
                         venueInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
-                    onHideLayout: function(node, query) {
-                        if (justUseOptionSelected) {
-                            venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
-                        } else if (!validVenue && node.val() && !preventGuessing) {
+                    onHideLayout: function(node) {
+                        var venueValue = venueInput.val();
+                        if (!validVenue && node.val() && !preventGuessing) {
                             /* Try to guess the choice of the user in case the results dropdown closes without a
-                            selection. If an exact match is found, select it, otherwise use the 'just-use' option */
+                            selection (i.e. clicking outside). If an exact match is found, select it, otherwise
+                            use the 'just-use' option */
                             var result = $.grep(venues.data, function(venue) {
-                                return venue.name.toUpperCase() == query.toUpperCase();
+                                return venue.name.toUpperCase() == venueValue.toUpperCase();
                             });
                             if (result.length) {
-                                $('#location-venue-' + result[0].id).parent().trigger('click');
+                                $('#location-venue-' + result[0].id).parent().click();
                             } else {
-                                venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
+                                venueInput.trigger('typeahead:click-on-custom-option', {item_name: venueValue});
                             }
                         }
                         preventGuessing = false;
                         validVenue = false;
                     },
-                    onNavigateBefore: function(node, query, event) {
-                        if (event.keyCode == K.TAB) {
-                            preventGuessing = true
-                        }
-                    },
                     onResult: function(node, query, result, resultCount) {
                         node.parent().find('.just-use-option').toggleClass('active', !resultCount);
-                        justUseOptionSelected = !resultCount;
                     }
                 }
             });
@@ -422,7 +397,6 @@
                         delete hiddenData.room_name;
 
                         postSelectionActions(roomInput, item.name);
-                        latestSelectedOption = {field: node.attr('id'), value: item.name};
                         highlightOption(roomInput, item.name);
                         roomInput.attr('title', item.name);
                     },
@@ -436,36 +410,29 @@
                         roomInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
-                    onHideLayout: function(node, query) {
-                        if (justUseOptionSelected) {
-                            roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
-                        } else if (!validRoom && node.val() && !preventGuessing) {
+                    onHideLayout: function(node) {
+                        if (!validRoom && node.val() && !preventGuessing) {
                             var result = [];
                             var venueValue = venueInput.val();
+                            var roomValue = roomInput.val();
                             if (venueValue) {
-                                result = findRoomInVenue(query, venueValue);
+                                result = findRoomInVenue(roomValue, venueValue);
                             } else {
                                 for (var i = 0; i < venueNames.length && !result.length; i++) {
-                                    result = findRoomInVenue(query, venueNames[i]);
+                                    result = findRoomInVenue(roomValue, venueNames[i]);
                                 }
                             }
                             if (result.length) {
                                 $('#location-room-' + result[0].id).parent().trigger('click');
                             } else {
-                                roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
+                                roomInput.trigger('typeahead:click-on-custom-option', {item_name: roomValue});
                             }
                         }
                         preventGuessing = false;
                         validRoom = false;
                     },
-                    onNavigateBefore: function(node, query, event) {
-                        if (event.keyCode == K.TAB) {
-                            preventGuessing = true;
-                        }
-                    },
                     onResult: function(node, query, result, resultCount) {
                         node.parent().find('.just-use-option').toggleClass('active', !resultCount);
-                        justUseOptionSelected = !resultCount;
                     }
                 }
             });
@@ -481,7 +448,6 @@
                 postSelectionActions(venueInput, data.item_name);
                 highlightOption(venueInput, data.item_name);
                 venueInput.attr('title', data.item_name);
-                latestSelectedOption = {field: venueInput.attr('id'), value: data.item_name};
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
                 if (hiddenData.room_id) {
@@ -492,7 +458,6 @@
                 postSelectionActions(venueInput, data.item_name);
                 venueInput.val(data.item_name);
                 validVenue = true;
-                justUseOptionSelected = false;
                 venueInput.attr('title', data.item_name);
                 venueInput.trigger('typeahead:close-results-list');
             });
@@ -503,7 +468,6 @@
                 postSelectionActions(roomInput, data.item_name);
                 roomInput.val(data.item_name);
                 validRoom = true;
-                justUseOptionSelected = false;
                 roomInput.attr('title', data.item_name);
                 roomInput.trigger('typeahead:close-results-list');
             });
