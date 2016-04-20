@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from collections import Counter
 from datetime import timedelta
-from io import BytesIO
 
 import dateutil.parser
 from flask import request, jsonify, session
@@ -37,7 +36,7 @@ from indico.modules.events.sessions.operations import delete_session_block, upda
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
-                                                   BaseEntryForm, LegacyExportTimetablePDFForm)
+                                                   BaseEntryForm)
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
@@ -50,15 +49,11 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   reschedule_subsequent_entries)
-from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import format_time, iterdays, as_utc
 from indico.util.i18n import _
-from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
@@ -480,21 +475,3 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
             if msg:
                 notifications.append(msg.format(format_time(new_time, timezone=self.event_new.tzinfo)))
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), notifications=notifications)
-
-
-class RHLegacyTimetableExportPDF(RHConferenceBaseDisplay):
-    def _process(self):
-        form = LegacyExportTimetablePDFForm()
-        if form.validate_on_submit():
-            pdf_format = TimetablePDFFormat(form.data_for_format)
-            if form.simplified.data:
-                pdf_class = SimplifiedTimeTablePlain
-                additional_params = {}
-            else:
-                pdf_class = TimeTablePlain
-                additional_params = {'firstPageNumber': form.firstPageNumber.data,
-                                     'showSpeakerAffiliation': form.showSpeakerAffiliation.data}
-            pdf = pdf_class(self._conf, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
-                            pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
-            return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
-        return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form)

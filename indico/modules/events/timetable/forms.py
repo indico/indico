@@ -131,7 +131,7 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
         super(BaseEntryForm, self).__init__(*args, **kwargs)
 
 
-class LegacyExportTimetablePDFForm(IndicoForm):
+class TimetablePDFExportForm(IndicoForm):
     _pdf_options_fields = {'pagesize', 'fontsize', 'firstPageNumber'}
 
     simplified = BooleanField(_('Simplified Timetable'), widget=SwitchWidget(),
@@ -173,8 +173,8 @@ class LegacyExportTimetablePDFForm(IndicoForm):
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
     fontsize = SelectField(_('Font size'), choices=[('xxx-small', _('xxx-small')), ('xx-small', _('xx-small')),
                                                     ('x-small', _('x-small')), ('smaller', _('smaller')),
-                                                    ('small', _('small')), ('normal', _('normal')), ('large', _('large')),
-                                                    ('larger', _('larger'))], default='normal')
+                                                    ('small', _('small')), ('normal', _('normal')),
+                                                    ('large', _('large')), ('larger', _('larger'))], default='normal')
     firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,
                                    widget=NumberInput(step=1))
 
@@ -183,5 +183,5 @@ class LegacyExportTimetablePDFForm(IndicoForm):
         if self.simplified.data:
             fields = ('showContribsAtConfLevel', 'showBreaksAtConfLevel')
         else:
-            fields = set(get_form_field_names(LegacyExportTimetablePDFForm)) - self._pdf_options_fields - {'csrf_token'}
+            fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token'}
         return {x: getattr(self, x).data for x in fields}

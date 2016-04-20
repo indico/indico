@@ -16,11 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request
+from io import BytesIO
 
+from flask import jsonify, request, session
+
+from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.timetable.util import render_entry_info_balloon, serialize_event_info
+from indico.web.flask.util import send_file
+from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -53,3 +58,21 @@ class RHTimetableEntryInfo(RHConferenceBaseDisplay):
     def _process(self):
         html = render_entry_info_balloon(self.entry)
         return jsonify(html=html)
+
+
+class RHTimetableExportPDF(RHConferenceBaseDisplay):
+    def _process(self):
+        form = TimetablePDFExportForm()
+        if form.validate_on_submit():
+            pdf_format = TimetablePDFFormat(form.data_for_format)
+            if form.simplified.data:
+                pdf_class = SimplifiedTimeTablePlain
+                additional_params = {}
+            else:
+                pdf_class = TimeTablePlain
+                additional_params = {'firstPageNumber': form.firstPageNumber.data,
+                                     'showSpeakerAffiliation': form.showSpeakerAffiliation.data}
+            pdf = pdf_class(self._conf, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
+                            pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
+            return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form)
