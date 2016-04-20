@@ -5,27 +5,23 @@ defaults:
     meeting: standard
 definitions:
   # Lectures - base
-  event:
-    event_types: [simple_event]
-    stylesheet: indico.scss
-    template: indico/lecture.html
-    title: Event
-  lecture:
+  lecture: &lecture
     event_types: [simple_event]
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Lecture
+  event:
+    <<: *lecture
+    title: Event
 
   # Meetings - base
-  standard:
+  standard: &standard
     event_types: [conference, meeting]
     stylesheet: indico.scss
     template: indico/meeting.html
     title: Indico style
   standard_inline_minutes:
-    event_types: [meeting]
-    stylesheet: indico.scss
-    template: indico/meeting.html
+    <<: *standard
     title: Indico style - inline minutes
     settings:
       show_notes: true
@@ -49,151 +45,124 @@ definitions:
 
   # Lectures - CERN extensions from base
   egee_lecture:
-    event_types: [simple_event]
+    <<: *lecture
     stylesheet: egee.scss
-    template: indico/lecture.html
     title: EGEE lecture
   picosec_endtofpet_lectures:
-    event_types: [simple_event]
+    <<: *lecture
     stylesheet: picosec_endotofpet.scss
-    template: indico/lecture.html
     title: PicoSEC - EndoTOFPET US
   picosec_lecture:
-    event_types: [simple_event]
+    <<: *lecture
     stylesheet: picosec.scss
-    template: indico/lecture.html
     title: PicoSEC Lectures
   tical-lectures:
-    event_types: [simple_event]
+    <<: *lecture
     stylesheet: tical.scss
-    template: indico/lecture.html
     title: TICAL
 
   # Meetings - CERN extensions from base
   atlas:
-    event_types: [meeting, conference]
+    <<: *standard
     stylesheet: atlas.scss
-    template: indico/meeting.html
     title: ATLAS meeting
   cms:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: cms.scss
-    template: indico/meeting.html
     title: CMS meeting
   alice_meeting:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: alice.scss
-    template: indico/meeting.html
     title: ALICE meeting
   lhcb_meeting:
-    event_types: [conference, meeting]
+    <<: *standard
     stylesheet: lhcb.scss
-    template: indico/meeting.html
     title: LHCb meeting
   cast:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: cast.scss
-    template: indico/meeting.html
     title: CAST meeting
   fcc:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: fcc.scss
-    template: indico/meeting.html
     title: FCC
   ilc:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: ilc.scss
-    template: indico/meeting.html
     title: ILC style
   intelum:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: intelum.scss
-    template: indico/meeting.html
     title: Intelum
   fast:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: fast.scss
-    template: indico/meeting.html
     title: FAST meetings
   EuroCirCol:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: eurocirccol.scss
-    template: indico/meeting.html
     title: EuroCirCol
   crystal_clear:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: crystalclear.scss
-    template: indico/meeting.html
     title: Crystal Clear
   egee_meeting:
-    event_types: [conference, meeting]
+    <<: *standard
     stylesheet: egee.scss
-    template: indico/meeting.html
     title: EGEE meeting
   endotofpet:
+    <<: *standard
     event_types: [simple_event, meeting]
     stylesheet: endotofpet.scss
-    template: indico/meeting.html
     title: EndoTOFPET
   openlab:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: openlab.scss
-    template: indico/meeting.html
     title: Openlab
     settings:
       logo_link: http://www.cern.ch/openlab
   lcg:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: lcg.scss
-    template: indico/meeting.html
     title: LCG style
   picosec:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: picosec.scss
-    template: indico/meeting.html
     title: Picosec
   picosec_endtofpet:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: picosec_endotofpet.scss
-    template: indico/meeting.html
     title: PicoSEC - EndoTOFPET US
   tical-meetings:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: tical.scss
-    template: indico/meeting.html
     title: TICAL Meetings
   totem_meeting:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: totem.scss
-    template: indico/meeting.html
     title: TOTEM meeting
   sa2:
-    event_types: [meeting]
+    <<: *standard
     stylesheet: staff_assoc_modern.scss
-    template: indico/meeting.html
     title: Staff Association (with time)
 
   # Meetings - CERN Administrative
-  administrative:
+  administrative: &administrative
     event_types: [conference, meeting]
     stylesheet: administrative.scss
     template: administrative/event.html
     title: Administrative style
   administrative2:
-    event_types: [meeting]
-    stylesheet: administrative.scss
-    template: administrative/event.html
+    <<: *administrative
     title: Administrative style (with time)
     settings:
       hide_time: false
   administrative4:
-    event_types: [meeting]
-    stylesheet: administrative.scss
-    template: administrative/event.html
+    <<: *administrative
     title: Administrative style (all material)
     settings:
       link_documents: false
-  cern_committees:
+  cern_committees: &cern_committees
     event_types: [meeting]
     stylesheet: cern_committees.scss
     template: cern_committees.html
@@ -205,10 +174,8 @@ definitions:
       show_numerals: false
       print_mode: true
   lhcrrb:
-    event_types: [meeting]
+    <<: *cern_committees
     stylesheet: lhc_rrb.scss
-    template: cern_committees.html
-    tt_template: administrative/event.html
     title: LHC RRB
     settings:
       session_attachments: true
@@ -223,9 +190,7 @@ definitions:
     settings:
       link_documents: false
   sa:
-    event_types: [meeting]
-    stylesheet: administrative.scss
-    template: administrative/event.html
+    <<: *administrative
     settings:
       show_notes: true
       title_en: 'Staff Association'
