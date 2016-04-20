@@ -63,7 +63,8 @@ class CustomFieldsMixin(object):
 class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
                    AttachedNotesMixin, PersonLinkDataMixin, CustomFieldsMixin, db.Model):
     __tablename__ = 'contributions'
-    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
+    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
+                                  postgresql_where=db.text('NOT is_deleted')),
                          db.Index(None, 'event_id', 'track_id'),
                          db.Index(None, 'event_id', 'abstract_id'),
                          db.Index(None, 'abstract_id', unique=True, postgresql_where=db.text('NOT is_deleted')),
