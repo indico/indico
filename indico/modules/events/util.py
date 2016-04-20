@@ -32,6 +32,7 @@ from sqlalchemy.orm import load_only, noload, joinedload
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.errors import UserValueError
 from indico.core.notifications import send_email, make_email
 from indico.modules.api import settings as api_settings
 from indico.modules.auth.util import url_for_register
@@ -44,6 +45,7 @@ from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.util.i18n import _
 from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -374,7 +376,7 @@ def create_event_logo_tmp_file(event):
 
 
 @contextmanager
-def track_time_changes(auto_extend=False):
+def track_time_changes(auto_extend=False, user=None):
     """Track time changes of event objects.
 
     This provides a list of changes while the context manager was
@@ -385,7 +387,10 @@ def track_time_changes(auto_extend=False):
 
     :param auto_extend: Whether entry parents will get their end_dt
                         automatically extended or not.
+    :param user: The `User` that will trigger time changes.
     """
+    if auto_extend:
+        assert user is not None
     if 'old_times' in g:
         raise RuntimeError('time change tracking may not be nested')
     g.old_times = defaultdict(dict)
@@ -398,9 +403,21 @@ def track_time_changes(auto_extend=False):
     else:
         if auto_extend:
             # g.old_times changes during iteration
+            old = set(g.old_times)
             for obj in list(g.old_times):
                 if not isinstance(obj, Event):
                     obj.extend_parent()
+            new = set(g.old_times) - old
+            for obj in new:
+                if isinstance(obj, Event):
+                    if not obj.can_manage(user):
+                        # TODO: raise Forbidden exceptions after adding protection check in the UI
+                        raise UserValueError(_("Your action requires modification of event boundaries, but you are "
+                                               "not authorized to manage the event."))
+                elif not obj.object.can_manage(user):
+                    # TODO: raise Forbidden exceptions after adding protection check in the UI
+                    raise UserValueError(_("Your action requires modification of session block boundaries, but you are "
+                                           "not authorized to manage the session block."))
         old_times = g.pop('old_times')
         for obj, info in old_times.iteritems():
             if isinstance(obj, TimetableEntry):

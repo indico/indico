@@ -447,16 +447,8 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
         tzinfo = self.event_new.tzinfo
         if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
             raise UserValueError(_('Session block cannot span more than one day'))
-        if new_start_dt < self.event_new.start_dt:
-            raise UserValueError(_('You cannot move the block before event start date.'))
-        with track_time_changes(auto_extend=True) as changes:
-            parent = self.entry.parent
+        with track_time_changes(auto_extend=True, user=session.user) as changes:
             update_timetable_entry_object(self.entry, {'duration': new_duration})
-            if parent and new_start_dt < parent.start_dt:
-                update_timetable_entry_object(parent, {'duration': parent.end_dt - new_start_dt})
-                update_timetable_entry(parent, {'start_dt': new_start_dt})
-            elif parent and (new_start_dt > parent.end_dt or new_end_dt > parent.end_dt):
-                update_timetable_entry_object(parent, {'duration': new_end_dt - parent.start_dt})
             if is_session_block:
                 self.entry.move(new_start_dt)
             if not is_session_block:
@@ -465,13 +457,6 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
             if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
                 raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
                                        "wouldn't fit."))
-        if self.event_new in changes and not self.event_new.can_manage(session.user):
-            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
-                                   "to manage the event."))
-        if (self.entry.parent and self.entry.parent.session_block in changes
-                and self.session and not self.session.can_manage_blocks(session.user)):
-            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
-                                   "to manage the event."))
         notifications = []
         for obj, change in changes.iteritems():
             if self.entry.object == obj:
