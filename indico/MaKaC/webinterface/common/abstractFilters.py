@@ -23,16 +23,14 @@ class ContribTypeSortingField(filters.SortingField):
     """
     _id = "type"
 
-    def compare( self, a1, a2 ):
-        """
-        """
-        if a1.getContribType() == None and a2.getContribType() == None:
+    def compare(self, a1, a2):
+        if a1.getContribType() is None and a2.getContribType() is None:
             return 0
-        elif a1.getContribType() == None:
+        elif a1.getContribType() is None:
             return -1
-        elif a2.getContribType() == None:
+        elif a2.getContribType() is None:
             return +1
-        return cmp( a1.getContribType().getName(), a2.getContribType().getName() )
+        return cmp(a1.getContribType().name, a2.getContribType().name)
 
 
 class SubmissionDateSortingField(filters.SortingField):
