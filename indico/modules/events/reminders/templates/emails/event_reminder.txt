@@ -1,20 +1,20 @@
 {% extends 'emails/base.txt' %}
 {% from 'events/reminders/emails/_agenda.txt' import render_agenda %}
 
-{% set address = event.getLocation().getAddress() if event.getLocation() %}
-{% set location = event.getLocation().getName() if event.getLocation() %}
-{% set room = event.getRoom().getName() if event.getRoom() %}
+{% set address = event.address %}
+{% set location = event.venue_name %}
+{% set room = event.room_name %}
 
 
 {% block subject -%}
-    [Event reminder] {{ event.getTitle() }} ({{ event.getAdjustedStartDate() | format_datetime('short', keep_tz=True) }} {{ event.getTimezone() }})
+    [Event reminder] {{ event.title }} ({{ event.start_dt | format_datetime('short', timezone=event.tzinfo) }} {{ event.timezone }})
 {%- endblock %}
 {% block header %}{% endblock %}
 {% block footer_url %}{{ url }}{% endblock %}
 
 
 {% block body -%}
-Please note that the event "{{ event.getTitle() }}" will start on {{ event.getAdjustedStartDate() | format_datetime(keep_tz=true) }} ({{ event.timezone }}).
+Please note that the event "{{ event.title }}" will start on {{ event.start_dt | format_datetime(timezone=event.tzinfo) }} ({{ event.timezone }}).
 
 {%- if location or room or address %}
 It will take place at {{ render_location() }}

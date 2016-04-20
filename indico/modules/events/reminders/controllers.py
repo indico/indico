@@ -148,6 +148,7 @@ class RHPreviewReminder(RHRemindersBase):
     """Previews the email for a reminder"""
 
     def _process(self):
-        tpl = make_reminder_email(self.event, request.form.get('include_summary') == '1', request.form.get('message'))
+        include_summary = request.form.get('include_summary') == '1'
+        tpl = make_reminder_email(self.event_new, include_summary, request.form.get('message'))
         html = render_template('events/reminders/preview.html', subject=tpl.get_subject(), body=tpl.get_body())
         return jsonify(html=html)

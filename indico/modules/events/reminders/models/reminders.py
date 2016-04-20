@@ -170,7 +170,7 @@ class EventReminder(db.Model):
 
     def send(self):
         """Sends the reminder to its recipients."""
-        event = self.event
+        event = self.event_new
         self.is_sent = True
         recipients = self.all_recipients
         if not recipients:
