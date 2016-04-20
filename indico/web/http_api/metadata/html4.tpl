@@ -5,7 +5,7 @@
   <ul class="indico_day_content">
     % for event in events:
     <li class="indico_event_entry" data-id="${event['id']}">
-      <span class="indico_event_time">${event['startDate'].time().strftime("%H:%M")}</span>
+      <span class="indico_event_time">${deserialize_date(event['startDate']).time().strftime("%H:%M")}</span>
       <span class="indico_event_category">${event['category']}</span>
       <a href="${event['url']}" title="${event['title']}">
         <span class="indico_event_tile">

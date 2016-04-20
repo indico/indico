@@ -14,16 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# python stdlib imports
 import os
 from collections import defaultdict
+from datetime import datetime
 from operator import itemgetter
 
-# module imports
-from indico.web.http_api.metadata.serializer import Serializer
+import dateutil.parser
+from pytz import timezone, utc
 
-# legacy indico imports
+from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.TemplateExec import render
+
+
+def _deserialize_date(date_dict):
+    if isinstance(date_dict, datetime):
+        return date_dict
+    dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
+                          dateutil.parser.parse(date_dict['time']).time())
+    return timezone(date_dict['tz']).localize(dt).astimezone(utc)
 
 
 class HTML4Serializer(Serializer):
@@ -38,7 +46,7 @@ class HTML4Serializer(Serializer):
 
         unorderedFossils = defaultdict(list)
         for fossil in results:
-            unorderedFossils[fossil['startDate'].date()].append(fossil)
+            unorderedFossils[_deserialize_date(fossil['startDate']).date()].append(fossil)
 
         # Sort top level (by date)
         orderedFossils = sorted(unorderedFossils.items(), key=itemgetter(0))
@@ -46,4 +54,4 @@ class HTML4Serializer(Serializer):
         for day, events in orderedFossils:
             events.sort(key=itemgetter('startDate'))
         return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
-                      {'fossils': orderedFossils, 'ts': fossils['ts']})
+                      {'fossils': orderedFossils, 'ts': fossils['ts'], 'deserialize_date': _deserialize_date})
