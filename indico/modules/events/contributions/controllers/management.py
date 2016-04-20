@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import json
 from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
@@ -59,7 +60,10 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 def _render_subcontribution_list(contrib):
     tpl = get_template_module('events/contributions/management/_subcontribution_list.html')
-    subcontribs = SubContribution.query.with_parent(contrib).options(undefer('attachment_count')).all()
+    subcontribs = (SubContribution.query.with_parent(contrib)
+                   .options(undefer('attachment_count'))
+                   .order_by(SubContribution.position)
+                   .all())
     return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
 
 
@@ -337,6 +341,15 @@ class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
         for subcontrib in self.subcontribs:
             delete_subcontribution(subcontrib)
         return jsonify_data(html=_render_subcontribution_list(self.contrib))
+
+
+class RHSortSubContributions(RHManageContributionBase):
+    def _process(self):
+        subcontrib_ids = map(int, request.form.getlist('subcontrib_ids'))
+        subcontribs = {s.id: s for s in self.contrib.subcontributions}
+        for position, subcontrib_id in enumerate(subcontrib_ids, 1):
+            if subcontrib_id in subcontribs:
+                subcontribs[subcontrib_id].position = position
 
 
 class RHContributionUpdateStartDate(RHManageContributionBase):
