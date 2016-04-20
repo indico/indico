@@ -1,11 +1,17 @@
 {% extends 'layout/conference_page_base.html' %}
 {% from 'forms/_form.html' import form_fieldset, form_rows, form_row, form_header, form_footer %}
 
+{% block title %}
+    {% trans %}Timetable{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans %}PDF Export{% endtrans %}
+{% endblock %}
+
 {% block content %}
     {{ form_header(form) }}
-    {% call form_fieldset(_('PDF Customisation')) %}
-        {{ form_rows(form, skip=form._pdf_options_fields) }}
-    {% endcall %}
+    {{ form_rows(form, skip=form._pdf_options_fields) }}
     {% call form_fieldset(_('PDF Options')) %}
         {{ form_rows(form, fields=form._pdf_options_fields) }}
     {% endcall %}
