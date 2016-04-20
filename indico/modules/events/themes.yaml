@@ -18,6 +18,7 @@ definitions:
   standard: &standard
     event_types: [conference, meeting]
     stylesheet: indico.scss
+    print_stylesheet: indico.scss
     template: indico/meeting.html
     title: Indico style
   standard_inline_minutes:

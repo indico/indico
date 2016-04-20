@@ -1,0 +1,63 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+$header-bg-color: white;
+$header-icon-color: black;
+$header-text-color: black;
+
+$tt-primary-color: black;
+$tt-secondary-color: black;
+$tt-secondary-pastel: black;
+$tt-nested-time-color: black;
+$tt-additional-text-color: black;
+
+$gray: black;
+
+@import 'themes/indico';
+
+%black-and-white {
+    background-color: white !important;
+    color: black !important;
+}
+
+body {
+    @extend %black-and-white;
+
+}
+
+.manage-button, .event-manage-button, #session-bar, .eventHeaderButtonBar, .js-go-to-day {
+    display: none !important;
+}
+
+.timetable-duration, .dayList .day {
+    @extend %black-and-white;
+}
+
+.timetable-time {
+    .start-time, .end-time {
+        @extend %black-and-white;
+    }
+}
+
+.timetable-item {
+    &.timetable-break .timetable-item-header {
+        background: transparent !important;
+        .timetable-title {
+            @extend %black-and-white;
+        }
+    }
+}

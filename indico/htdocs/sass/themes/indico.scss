@@ -23,6 +23,8 @@
  $tt-primary-color: #3875a8 !default;
  $tt-secondary-color: #05b3b3 !default;
  $tt-secondary-pastel: #a8dede !default;
+ $tt-nested-time-color: $gray !default;
+ $tt-additional-text-color: $light-black !default;
 
  @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
      div.event-header {
@@ -137,7 +139,7 @@
 }
 
 .speaker-list, .convener-list {
-    color: $light-black;
+    color: $tt-additional-text-color;
 }
 
 .details .address {
@@ -306,10 +308,10 @@ div.event-header {
 
     &.nested {
         margin-right: 0.5em;
-        border-right: 3px solid $gray;
+        border-right: 3px solid $tt-nested-time-color;
 
         .start-time {
-            background-color: $gray;
+            background-color: $tt-nested-time-color;
         }
     }
 
