@@ -494,13 +494,22 @@ def register_all_js(env):
 
 def register_theme_sass(env):
     for theme_id, data in theme_settings.themes.viewitems():
-        if data['stylesheet']:
+        stylesheet = data['stylesheet']
+        if stylesheet:
             bundle = Bundle('css/events/common.css',
-                            os.path.join('sass', 'themes', data['stylesheet']),
+                            os.path.join('sass', 'themes', stylesheet),
                             filters=("pyscss", "cssrewrite", "cssmin"),
                             output="sass/themes/{}_%(version)s.css".format(theme_id),
                             depends=SASS_BASE_MODULES)
             env.register('themes_{}_sass'.format(theme_id), bundle)
+
+            print_stylesheet = data.get('print_stylesheet')
+            if print_stylesheet:
+                print_bundle = Bundle(bundle, os.path.join('sass', 'themes', 'print', print_stylesheet),
+                                      filters=("pyscss", "cssrewrite", "cssmin"),
+                                      output="sass/themes/{}_print_%(version)s.css".format(theme_id),
+                                      depends=SASS_BASE_MODULES)
+                env.register('themes_{}_print_sass'.format(theme_id), print_bundle)
 
 
 def register_all_css(env, main_css_file):

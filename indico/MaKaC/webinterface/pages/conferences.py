@@ -613,6 +613,11 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                              "filterActive": self._params.get("filterActive",""),\
                             "dark": True } )
 
+    def getPrintCSSFiles(self):
+        theme_print_sass = (self._asset_env['themes_{}_print_sass'.format(self.theme_id)].urls()
+                            if self.theme['print_stylesheet'] else [])
+        return WPConferenceBase.getPrintCSSFiles(self) + theme_print_sass
+
     def getCSSFiles(self):
         theme_sass = self._asset_env['themes_{}_sass'.format(self.theme_id)].urls() if self.theme['stylesheet'] else []
 
