@@ -20,11 +20,12 @@
 
     .wrapper {
 
-        .typeahead-container,
-        .typeahead-field {
+        .typeahead__container,
+        .typeahead__field {
             display: inline-block;
             position: relative;
             float: left;
+            font-size: 1em;
 
             &.venue-container {
                 width: 40%;
@@ -39,11 +40,11 @@
                 }
             }
 
-            .typeahead-results {
+            .typeahead__result {
                 position: absolute;
                 left: 0;
 
-                .typeahead-list {
+                .typeahead__list {
                     @include box-shadow(none);
                     margin: 0;
                     padding: 0;

@@ -5,8 +5,8 @@
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
                value="{{ field._value() | tojson | forceescape }}" autofocus>
         <div class="wrapper">
-            <div class="typeahead-container venue-container">
-                <div class="typeahead-field">
+            <div class="typeahead__container venue-container">
+                <div class="typeahead__field">
                     <input id="location-venue-{{ field.id }}"
                            class="i-location-input-field"
                            type="text"
@@ -14,13 +14,13 @@
                            autocomplete="off">
                     <span class="keyword-highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
-                    <div class="typeahead-results">
+                    <div class="typeahead__result">
                         <div class="results-list-container" id="location-venue-{{ field.id }}-results"></div>
                     </div>
                 </div>
             </div>
-            <div class="typeahead-container room-container">
-                <div class="typeahead-field">
+            <div class="typeahead__container room-container">
+                <div class="typeahead__field">
                     <input id="location-room-{{ field.id }}"
                            class="i-location-input-field"
                            type="text"
@@ -28,7 +28,7 @@
                            autocomplete="off">
                     <span class="keyword-highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
-                    <div class="typeahead-results">
+                    <div class="typeahead__result">
                         <div class="results-list-container" id="location-room-{{ field.id }}-results"></div>
                     </div>
                 </div>
@@ -174,7 +174,7 @@
 
             function updateResultsList(node, resultHtmlList) {
                 /* Make sure the result dropdown is displayed just below the input field */
-                var resultsWrapper = node.siblings('.typeahead-results');
+                var resultsWrapper = node.siblings('.typeahead__result');
                 resultsWrapper.css('top', node.outerHeight() + 'px');
 
                 /* Create/delete the 'just-use' option based on the input */
@@ -196,19 +196,19 @@
                 }
 
                 /* Always mark the first option as active in order for the keyboard inputs to work */
-                var firstOption = resultHtmlList.find('li.typeahead-item').first();
+                var firstOption = resultHtmlList.find('li.typeahead__item').first();
                 if (!firstOption.length) {
                     node.parent().find('.just-use-option').addClass('active');
                 } else {
-                    resultHtmlList.find('li.typeahead-item').first().addClass('active');
+                    resultHtmlList.find('li.typeahead__item').first().addClass('active');
                 }
                 return resultHtmlList;
             }
 
             function scrollResultsList(inputField) {
                 var parent = inputField.parent();
-                var activeOption = parent.find('.typeahead-results').find('.typeahead-item.active');
-                var dropdownList = parent.find('.typeahead-list');
+                var activeOption = parent.find('.typeahead__result').find('.typeahead__item.active');
+                var dropdownList = parent.find('.typeahead__list');
                 if (activeOption.length != 0) {
                     if (activeOption.position().top + activeOption.outerHeight() > dropdownList.outerHeight()) {
                         delta = activeOption.position().top + activeOption.outerHeight() - dropdownList.outerHeight();
@@ -254,11 +254,11 @@
             }
 
             function toggleOpenResultsList(inputField) {
-                if (inputField.is(venueInput) && roomInput.closest('.typeahead-container').hasClass('result')) {
+                if (inputField.is(venueInput) && roomInput.closest('.typeahead__container').hasClass('result')) {
                     roomInput.trigger('typeahead:close-results-list');
                     venueInput.trigger('typeahead:close-results-list');
                     venueInput.trigger('typeahead:open-results-list');
-                } else if (inputField.is(roomInput) && venueInput.closest('.typeahead-container').hasClass('result')) {
+                } else if (inputField.is(roomInput) && venueInput.closest('.typeahead__container').hasClass('result')) {
                     venueInput.trigger('typeahead:close-results-list');
                     roomInput.trigger('typeahead:close-results-list');
                     roomInput.trigger('typeahead:open-results-list');
@@ -288,6 +288,9 @@
                     var activeItem = typeaheadField.find('.active');
                     if ((evt.keyCode == K.TAB || evt.keyCode == K.ENTER) && activeItem.length) {
                         preventGuessing = true;
+                        if(evt.keyCode == K.ENTER) {
+                            evt.preventDefault();
+                        }
                         evt.stopImmediatePropagation();
                         activeItem.find('a').click();
                     }
@@ -316,12 +319,13 @@
                 source: venues,
                 minLength: 0,
                 searchOnFocus: true,
-                resultContainer: '#' + venueInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
+                resultContainer: '#' + venueInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span id="location-venue-{{id}}">{{name}}</span>'{% endraw %},
                 // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
                 emptyTemplate: function() { return ''; },
                 display: 'name',
                 hint: true,
+                cancelButton: false,
                 callback: {
                     onInit: function(node) {
                         this.query = node.val();  // Updates the results dropdown on init
@@ -377,8 +381,9 @@
                 searchOnFocus: true,
                 group: true,
                 hint: true,
+                cancelButton: false,
                 maxItem: 0,
-                resultContainer: '#' + roomInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
+                resultContainer: '#' + roomInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span id="location-room-{{id}}">{{name}}</span>'{% endraw %},
                 emptyTemplate: function() { return ''; },
                 display: 'name',
