@@ -147,10 +147,6 @@ class EventPerson(PersonMixin, db.Model):
             return EmailPrincipal(self.email)
         return None
 
-    @property
-    def is_principal_pending(self):
-        return isinstance(self.principal, EmailPrincipal)
-
     @classmethod
     def create_from_user(cls, user, event):
         return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,

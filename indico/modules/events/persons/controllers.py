@@ -16,17 +16,22 @@
 
 from __future__ import unicode_literals
 
+import itertools
 from collections import defaultdict
 
 from flask import request, flash
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.sessions.models.principals import SessionPrincipal
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.persons.forms import EmailEventPersonsForm
-from indico.modules.events.persons.views import WPManagePersons, WPManagePendingPersons
+from indico.modules.events.persons.views import WPManagePersons
 from indico.util.i18n import ngettext, _
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.util import jsonify_form
@@ -35,63 +40,92 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 class RHPersonsList(RHConferenceModifBase):
     def _process(self):
-        event_persons_query = (self.event_new.persons
-                               .options(joinedload('event_links'), joinedload('contribution_links'),
-                                        joinedload('subcontribution_links'), joinedload('session_block_links'))
+        contribution_strategy = joinedload('contribution_links')
+        contribution_strategy.joinedload('contribution')
+        contribution_strategy.joinedload('person').joinedload('user')
+        subcontribution_strategy = joinedload('subcontribution_links')
+        subcontribution_strategy.joinedload('subcontribution')
+        subcontribution_strategy.joinedload('person').joinedload('user')
+        session_block_strategy = joinedload('session_block_links')
+        session_block_strategy.joinedload('session_block')
+        session_block_strategy.joinedload('person').joinedload('user')
+        event_strategy = joinedload('event_links')
+        event_strategy.joinedload('person').joinedload('user')
+
+        event_persons_query = (self.event_new.persons.options(event_strategy, contribution_strategy,
+                                                              subcontribution_strategy, session_block_strategy)
                                .all())
         persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict)})
+                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
+
+        event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
+                                 .filter(EventPrincipal.type == PrincipalType.email,
+                                         EventPrincipal.has_management_role('submit')))
+
+        contrib_principal_query = (ContributionPrincipal.find(Contribution.event_new == self.event_new,
+                                                              ContributionPrincipal.type == PrincipalType.email,
+                                                              ContributionPrincipal.has_management_role('submit'))
+                                   .join(Contribution)
+                                   .options(contains_eager('contribution')))
+
+        session_principal_query = (SessionPrincipal.find(Session.event_new == self.event_new,
+                                                         SessionPrincipal.type == PrincipalType.email,
+                                                         SessionPrincipal.has_management_role())
+                                   .join(Session).options(joinedload('session').joinedload('acl_entries')))
+
+        chairpersons = {link.person for link in self.event_new.person_links}
+
         for event_person in event_persons_query:
-            if event_person.is_principal_pending:
-                continue
-            data = persons[event_person]
+            data = persons[event_person.email or event_person.id]
+
+            data['person'] = event_person
+            data['roles']['chairperson'] = event_person in chairpersons
+
             for person_link in event_person.session_block_links:
+                if person_link.session_block.session.is_deleted:
+                    continue
+
                 data['session_blocks'][person_link.session_block_id] = {'title': person_link.session_block.full_title}
+                data['roles']['convener'] = True
+
             for person_link in event_person.contribution_links:
                 if not person_link.is_speaker:
                     continue
-                contribution = person_link.contribution
-                url = url_for('contributions.manage_contributions', self.event_new, selected=contribution.friendly_id)
-                data['contributions'][contribution.id] = {'title': contribution.title, 'url': url}
+                contrib = person_link.contribution
+                if contrib.is_deleted:
+                    continue
+
+                url = url_for('contributions.manage_contributions', self.event_new, selected=contrib.friendly_id)
+                data['contributions'][contrib.id] = {'title': contrib.title, 'url': url}
+                data['roles']['speaker'] = True
+
             for person_link in event_person.subcontribution_links:
-                subcontribution = person_link.subcontribution
-                data['subcontributions'][subcontribution.id] = {'title': subcontribution.title}
+                subcontrib = person_link.subcontribution
+                contrib = subcontrib.contribution
+                if subcontrib.is_deleted or contrib.is_deleted:
+                    continue
+
+                url = url_for('contributions.manage_contributions', self.event_new, selected=contrib.friendly_id)
+                data['subcontributions'][subcontrib.id] = {'title': '{} ({})'.format(contrib.title, subcontrib.title),
+                                                           'url': url}
+                data['roles']['speaker'] = True
+
+        # Some EventPersons will have no roles since they were connected to deleted things
+        persons = {email: data for email, data in persons.viewitems() if
+                   any(data['roles'].viewvalues())}
+
+        num_no_account = 0
+        for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
+            if principal.email not in persons:
+                continue
+            if not persons[principal.email].get('no_account'):
+                persons[principal.email]['roles']['no_account'] = True
+                num_no_account += 1
+
+        person_list = sorted(persons.viewvalues(), key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
+
         return WPManagePersons.render_template('management/person_list.html', self._conf, event=self.event_new,
-                                               persons=persons)
-
-
-class RHPendingPersonsList(RHConferenceModifBase):
-    def _process(self):
-        pending_persons = defaultdict(lambda: {'event_chairperson': False, 'contributions': {}, 'sessions': {},
-                                               'subcontributions': {}})
-        event_principals = (EventPrincipal.query.with_parent(self.event_new)
-                            .filter(EventPrincipal.type == PrincipalType.email,
-                                    EventPrincipal.has_management_role('submit')))
-        for event_principal in event_principals:
-            event_person = EventPerson.find_one(email=event_principal.principal.email)
-            pending_persons[event_person]['event_chairperson'] = True
-        for contribution in self.event_new.contributions:
-            for contrib_pr in contribution.person_links:
-                if contrib_pr.is_submitter and contrib_pr.person.is_principal_pending:
-                    url = url_for('contributions.manage_contributions', self.event_new,
-                                  selected=contribution.friendly_id)
-                    event_person = contrib_pr.person
-                    data = pending_persons[event_person]
-                    data['contributions'][contribution.id] = {'title': contribution.title, 'url': url}
-            for subc in contribution.subcontributions:
-                for link in subc.person_links:
-                    if link.person.is_principal_pending:
-                        event_person = link.person
-                        data = pending_persons[event_person]
-                        data['subcontributions'][subc.id] = {'title': subc.title}
-        for sess in self.event_new.sessions:
-            for sess_pr in sess.acl_entries:
-                sess_person = EventPerson.find_one(email=sess_pr.principal.email)
-                if sess_pr.has_management_role() and sess_person.is_principal_pending:
-                    data = pending_persons[sess_person]
-                    data['sessions'][sess.id] = {'title': sess.title}
-        return WPManagePendingPersons.render_template('management/pending_person_list.html', self._conf,
-                                                      event=self.event_new, pending_persons=pending_persons)
+                                               persons=person_list, num_no_account=num_no_account)
 
 
 class RHEmailEventPersons(RHConferenceModifBase):

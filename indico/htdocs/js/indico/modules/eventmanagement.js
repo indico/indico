@@ -38,14 +38,23 @@
             sortList: [[1, 0]]
         });
 
-        $('#persons-list .js-count-label').qbubble({
+        $('#persons-list .js-count-label:not(.no-role)').qbubble({
             show: {
                 event: 'mouseover'
+            },
+            hide: {
+                fixed: true,
+                delay: 100,
+                event: 'mouseleave'
+            },
+            position: {
+                my: 'left center',
+                at: 'right center'
             },
             content: {
                 text: function() {
                     var items = $(this).data('items');
-                    var html = $('<ul>');
+                    var html = $('<ul class="qbubble-item-list">');
 
                     $.each(items, function() {
                         var item = $('<li>');

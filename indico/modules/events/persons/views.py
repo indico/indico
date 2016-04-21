@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
@@ -24,8 +23,3 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 class WPManagePersons(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/persons/'
     sidemenu_option = 'lists'
-
-
-class WPManagePendingPersons(WPJinjaMixin, WPConferenceModifBase):
-    template_prefix = 'events/persons/'
-    sidemenu_option = 'pending_persons'

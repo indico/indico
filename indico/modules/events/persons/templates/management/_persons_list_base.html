@@ -9,7 +9,7 @@
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                     <ul class="dropdown">
                         <li>
-                            <a href="#" data-select-all="#persons-list input.select-row:visible">
+                            <a href="#" data-select-all="#persons-list input.select-row:visible:not(:disabled)">
                                 {% trans %}All{% endtrans %}
                             </a>
                         </li>
@@ -29,6 +29,9 @@
                        data-ajax-dialog>
                         {%- trans %}Send emails{% endtrans -%}
                     </a>
+                </div>
+                <div class="right">
+                    {% block filters %}{% endblock %}
                 </div>
             </div>
         </div>

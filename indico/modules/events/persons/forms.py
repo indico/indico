@@ -27,7 +27,7 @@ from indico.web.forms.widgets import CKEditorWidget
 
 
 class EmailEventPersonsForm(IndicoForm):
-    from_address = SelectField(_('From'), [DataRequired()], choices=[(1, 1)])
+    from_address = SelectField(_('From'), [DataRequired()])
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
     recipients = IndicoStaticTextField(_('Recipients'))

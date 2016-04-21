@@ -16,13 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.persons.controllers import RHPersonsList, RHPendingPersonsList, RHEmailEventPersons
+from indico.modules.events.persons.controllers import RHPersonsList, RHEmailEventPersons
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_template_folder='events/persons',
                       url_prefix='/event/<confId>/manage')
 
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
-_bp.add_url_rule('/persons/pending', 'pending_persons_list', RHPendingPersonsList)
 _bp.add_url_rule('/persons/email', 'email_event_persons', RHEmailEventPersons, methods=('POST',))
-
