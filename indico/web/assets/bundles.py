@@ -115,7 +115,6 @@ indico_management = rjs_bundle(
 
                'RoomBooking.js',
                'eventCreation.js',
-               'Timetable.js',
                'AbstractReviewing.js',
                'NotificationTPL.js',
                'Contributions.js',
@@ -143,24 +142,11 @@ indico_admin = rjs_bundle(
                'News.js',
                'Upcoming.js'))
 
-indico_timetable = rjs_bundle(
-    'indico_timetable',
-    *namespace('js/indico/Timetable',
-
-               'Filter.js',
-               'Layout.js',
-               'Undo.js',
-               'Base.js',
-               'DragAndDrop.js',
-               'Draw.js',
-               'Management.js'))
-
 indico_legacy = rjs_bundle(
     'indico_legacy',
     *namespace('js/indico/Legacy',
 
                'Widgets.js',
-               'Dialogs.js',
                'Util.js'))
 
 indico_common = rjs_bundle(
@@ -172,8 +158,6 @@ indico_common = rjs_bundle(
                'htmlparser.js'))
 
 indico_materialeditor = rjs_bundle('indico_materialeditor', 'js/indico/MaterialEditor/Editor.js')
-
-indico_display = rjs_bundle('indico_display', 'js/indico/Display/Dialogs.js')
 
 indico_jquery = rjs_bundle(
     'indico_jquery',
@@ -466,11 +450,9 @@ def register_all_js(env):
     env.register('indico_management', indico_management)
     env.register('indico_roombooking', indico_room_booking)
     env.register('indico_admin', indico_admin)
-    env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
     env.register('indico_materialeditor', indico_materialeditor)
-    env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_badges_js', indico_badges_js)

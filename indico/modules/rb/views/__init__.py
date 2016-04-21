@@ -14,27 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from MaKaC.webinterface.pages.main import WPMainBase
 
 from indico.util.i18n import _
 from indico.web.menu import render_sidemenu
 
 
-class WPRoomBookingHeadContentMixin:
-    def _getHeadContent(self):
-        try:
-            timestamp = os.stat(__file__).st_mtime
-        except OSError:
-            timestamp = 0
-        return """
-        <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
-        """ % (self._getBaseURL(), timestamp)
-
-
-class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
+class WPRoomBookingBase(WPMainBase):
 
     def _getTitle(self):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))

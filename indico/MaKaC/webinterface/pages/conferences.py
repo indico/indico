@@ -144,8 +144,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         return [theme_url] if theme_url else []
 
     def getJSFiles(self):
-        return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') +
-                self._includeJSPackage('MaterialEditor'))
+        return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor'))
 
     def _getFooter( self ):
         wc = wcomponents.WFooter()
@@ -632,7 +631,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         # anything inside the conference (sessions, ...)
         modules += (self._includeJSPackage('Management') +
                     self._includeJSPackage('MaterialEditor') +
-                    self._includeJSPackage('Display') +
                     self._asset_env['modules_vc_js'].urls() +
                     self._asset_env['modules_event_display_js'].urls() +
                     self._asset_env['clipboard_js'].urls())

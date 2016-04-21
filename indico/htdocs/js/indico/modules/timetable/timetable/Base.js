@@ -1545,13 +1545,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
          this.postDraw = IntervalTimeTableMixin.prototype.postDraw;
      });
 
-type("SessionManagementTimeTable", ["TopLevelManagementTimeTable"], {
-
-},
-     function(data, eventInfo, width, wrappingElement, historyBroker) {
-
-         this.TopLevelManagementTimeTable(data, eventInfo, width, wrappingElement, 'session', historyBroker, true);
-     });
 
 type("SessionDisplayTimeTable", ["TopLevelDisplayTimeTable"], {
 

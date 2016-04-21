@@ -1798,51 +1798,6 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
          this.ExclusivePopupWithButtons(title);
      });
 
-type("MaterialConversionHelper", [], {
-
-    setQtip: function(file) {
-        $("img#"+file['id']).parent().qtip({
-            content: {
-                text: format($T('Indico is currently performing the conversion to PDF of the file:<br>{fileName}<br>The conversion may take a few seconds.'),
-                        {fileName: file['name']})
-            },
-            position: {
-                target: 'mouse',
-                adjust: { mouse: true, x: 11, y: 13 }
-            }
-        });
-    },
-
-    poll: function(file, params, pdfImgURL) {
-        var endTime = new Date();
-        endTime.setDate(endTime.getDate() + 60);
-        (function conversionWorker() {
-            jsonRpc(Indico.Urls.JsonRpcService,
-                    'material.resources.list',
-                    params,
-                    function(response,error) {
-                        if (response) {
-                            for (var value in response){
-                                if (response[value].name == file['name'].split('.')[0] + '.pdf') {
-                                    var convertedImg = $("img#"+file['id']);
-                                    $(convertedImg).parent().qtip('destroy');
-                                    $(convertedImg).parent().attr('href',response[value].url);
-                                    $(convertedImg).parent().attr('title',response[value].name);
-                                    $(convertedImg).attr('src', pdfImgURL);
-                                    return;
-                                }
-                            }
-                            if (new Date() < endTime) {
-                                setTimeout(conversionWorker, CONVERSION_POLL_INTERVAL);
-                            }
-                        }
-                    });
-            })();
-    }
-
-},
-function() {});
-
 IndicoUI.Dialogs.Material = {
 
     add: function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode) {

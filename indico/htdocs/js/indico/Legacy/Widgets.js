@@ -23,29 +23,6 @@
     */
 IndicoUI.Widgets = {
     /**
-        * Places information about a room inside a DOM element (div/span...)
-        * @param {XElement} target The target element
-        * @param {Source} source The source of the room information
-        */
-    roomParamsShow: function(target, source){
-
-        /*    var checkInheritance = function(value, param) {
-        if (parent && value[param] == null) {
-        return Html.span({style:{color:'#9acd32', padding: pixels(2)}},"(inherited from parent)");
-        } else {
-        return value[param];
-        }
-    }
-*/
-
-        var info = source.get();
-
-        target.set([Html.div({}, Html.span("innerWidgetLabel", $T("Location: ")), info.get('location')),
-                    Html.div({}, Html.span("innerWidgetLabel", $T("Room: ")), info.get('room')),
-                    Html.div({}, Html.span("innerWidgetLabel", $T("Address: ")), info.get('address'))]);
-    },
-
-    /**
         * Creates a dynamic "keyword list".
         * The widget will have a Save button if the argument 'method' is not empty.
         * @param {Object} kindOfList How the list is displayed. Currently 2 are supported 'oneLineListItem' and 'multipleLinesListItem'.
@@ -144,107 +121,6 @@ IndicoUI.Widgets = {
         };
     },
 
-    tripleSelectWidget: function(name, selectBox, info, usingCRBS, parentInfo, roomStyler) {
-
-        var selectRadio;
-        var radioSet = new WatchValue();
-        var radios = [];
-        var radioMapping = {};
-        var formAction = Html.input("hidden",{'name': name+'Action'});
-
-        var addRadio = (usingCRBS||parentInfo)?function(key, elem, val) {
-            var radio = Html.radio({'name': Html.generateId()});
-            radios.push(radio);
-            radioMapping[key] = radio;
-
-            $B(elem.accessor("disabled"), radio, invert);
-
-            radio.observe(function(value) {
-                if (value) {
-                    formAction.set(val);
-                    bind.detach(info.accessor(name));
-                    if (key=='inherit') {
-                        info.accessor(name).set(null);
-                    } else if (key=='other') {
-                        $B(elem, info.accessor(name));
-                    }
-                }
-            });
-            return [radio, elem];
-        }:function(key, elem, val) {
-            formAction.set(val);
-
-            if (key=='inherit') {
-                info.accessor(name).set(null);
-            } else {
-                $B(elem, info.accessor(name));
-            }
-
-            return elem;
-        };
-
-        return IndicoUtil.waitLoad([
-            function(hook) {
-                var sBox;
-
-                if (usingCRBS) {
-                    sBox = selectBox(info,
-                                     function() {
-                                         radioSet.set('list');
-                                     }, roomStyler);
-                    sBox.returnValue.observe(function(_) {
-                        selectRadio = addRadio('list', sBox.returnValue.get(), 'set');
-                        hook.set(true);
-                    });
-                    sBox.run();
-                } else {
-                    hook.set(true);
-                }
-            }], function(retValue) {
-
-                var choices = [formAction];
-
-                radioSet.set('other');
-
-                if (usingCRBS) {
-                    choices.push(selectRadio);
-                }
-
-
-                var other = addRadio('other', Html.input("text", {'name':name+"Name"}), 'set');
-
-                if (usingCRBS||parentInfo) {
-                    other[1].set(info.get(name));
-                }
-
-                choices.push(other);
-
-                if (parentInfo) {
-                    var parentChoice = parentInfo.get(name);
-                    var withRadio = addRadio('inherit', Html.span({}, $T("Inherit from Parent") + " (" + parentChoice + ")"), 'inherit');
-                    choices.push(withRadio);
-
-                    if (info.get(name) === null) {
-                        radioSet.set('inherit');
-                    }
-                }
-
-                if (usingCRBS||parentInfo) {
-                    Logic.onlyOne(radios, false);
-
-
-                    var setRadios = function() {
-                        radioMapping[radioSet.get()].set(true);
-                    };
-
-                    radioSet.observe(setRadios);
-                    setRadios();
-                }
-
-                retValue.set(choices);
-            });
-    },
-
     /**
          @namespace Widgets that handle personal options
        */
@@ -322,103 +198,12 @@ IndicoUI.Widgets = {
             return button;
         },
 
-        sourceSelectionField: function(elem, source, options){
-            IndicoUI.Effect.mouseOver(elem.dom);
-
-            var context = new WidgetEditableContext();
-
-            $B(elem, [Widget.selectEditableClickable(options, source, context),
-                      Widget.text(" "),
-                      Widget.text($B(new Chooser({
-                          view: [Widget.link(command(context.edit, $T("(edit)")))],
-                          edit: [Widget.button(command(context.save, $T("Save"))), Widget.button(command(context.view, $T("Cancel")))]
-                      }),
-                                     context))]);
-        },
-
-
         selectionField: function(elem, method, attributes, options, cachedValue, observer){
             elem.set(new SelectEditWidget(method, attributes, options, cachedValue, observer).draw());
         },
 
-        sourceTextField: function(elem, source){
-
-            IndicoUI.Effect.mouseOver(elem.dom);
-
-            var context = new WidgetEditableContext();
-
-            var editable = new WidgetEditable(WidgetEditable.getClickableView(WidgetEditable.getTemplatedTextView(getBlankTemplate(Html.span({
-                style: {
-                    fontStyle: 'italic'
-                }
-            }, $T("None"))))), WidgetEditable.textEdit);
-
-            var chooser = new Chooser({
-                view: Widget.link(command(context.edit, $T("(edit)"))),
-                edit: Html.div({}, Widget.button(command(context.save, $T("Save"))), Widget.button(command(context.view, $T("Cancel"))))
-            });
-
-            $B(elem, Html.div({}, editable(source, context), Widget.text(" "), Widget.text($B(chooser, context))));
-        },
-
         textField: function(elem, method, attributes, cachedValue, observer){
             elem.set(new InputEditWidget(method, attributes, cachedValue, true, observer).draw());
-        },
-
-        richTextField: function(elem, method, attributes, width, height, cachedValue){
-
-            var context = new WidgetEditableContext();
-
-            extend(attributes, {
-                'value': elem.dom.innerHtml
-            });
-
-            var editable = new WidgetEditable(WidgetEditable.getClickableView(WidgetEditable.getTemplatedTextView(getBlankTemplate(Html.span({
-                style: {
-                    fontStyle: 'italic'
-                }
-            }, $T("None"))))), IndicoUI.Aux.RichTextEditor.getEditor(width, height));
-
-            $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), Widget.text($B(new Chooser({
-                view: [Widget.link(command(context.edit, $T("(edit)")))],
-                edit: [Widget.button(command(context.save, $T("Save"))), Widget.button(command(context.view, $T("Cancel")))]
-            }), context))]);
-
-        },
-
-        remoteSelectField: function(element, method, params, setter, accObj, accOldObj, onChange){
-
-            var options = new JsonRpcSource(method, params, Indico.Urls.JsonRpcService);
-
-            var thizz = this;
-
-            Control.remoteData(element, options, function(element, loadedItemsSrc){
-                var id = undefined;
-                var val = element.innerHTML;
-
-                $C(loadedItemsSrc.data).each(function(pair){
-                    if (pair.value == val) {
-                        id = pair.key;
-                    }
-                });
-                accObj.set(id);
-                accOldObj.set(id);
-
-                var result = Field.editable(element, accObj, selectEditor.bind({
-                    items: $H(loadedItemsSrc.data.get())
-                }), setter.bind($H(loadedItemsSrc.data.get())), null, null, onChange);
-
-                Binding.fieldObject(result, accObj);
-
-                // Dirty dirty dirty hack! Should not be extending this...
-                result.updateSource = function(key, value){
-                    options.setParam(key, value);
-                    options.update();
-                };
-
-                thizz.notifyEnd(result);
-            });
-            options.update();
         },
 
         /**
@@ -715,14 +500,6 @@ IndicoUI.Widgets = {
         },
 
         /**
-         * Very crude way of removing a calendar from an input field
-         * @param {XElement} elem : the input field where we want to remove the calendar
-         */
-        removeCalendar: function(elem) {
-            elem.dom.onclick = nothing;
-        },
-
-        /**
          * Creates an input text element with a calendar attached.
          * For this, it uses input2dateField.
          * @param {Boolean} showTime true to show hours and minutes, false for only date
@@ -828,10 +605,6 @@ IndicoUI.Widgets = {
             attributes.style = {width: '40px'};
             return Html.edit(attributes, defaultVal);
         },
-
-        applyForParticipationForm: function(conf) {
-            // TODO
-        }
     }// end of Generic namespace
 
 };

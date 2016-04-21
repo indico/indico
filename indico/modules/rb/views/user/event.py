@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.views import WPRoomBookingHeadContentMixin
 from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -26,7 +25,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 
 
-class WPRoomBookingEventBase(WPRoomBookingHeadContentMixin, WPConferenceModifBase):
+class WPRoomBookingEventBase(WPConferenceModifBase):
     sidemenu_option = 'room_booking'
 
     def getJSFiles(self):

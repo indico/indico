@@ -584,56 +584,6 @@ type("TimetableManagementActions", [], {
         });
     },
 
-    editSessionSlot: function(eventData) {
-        var self = this;
-
-        var params = this._addToSessionParams(eventData, 'SessionSlot');
-        params.parentType = 'Session';
-
-        //Get the days in which the conference is being held
-        var days = this.timetable.getDays();
-
-        each(eventData, function(value, key) {
-            if (key != "entries") {
-                params[key] = value;
-            }
-        });
-        each(params.args, function(value, key) {
-            params[key] = value;
-        });
-
-        var parentRoomInfo = this.eventInfo;
-
-        IndicoUI.Dialogs.addSessionSlot(
-            this.methods[params.type].edit,
-            this.methods.Event.dayEndDate,
-            params,
-            params.roomInfo,
-            $O(parentRoomInfo),
-            params.startDate,
-            params.selectedDay,
-            this.eventInfo.favoriteRooms,
-            days,
-            function(result) {
-                var aux = result.entry.entries;
-                self.timetable._updateEntry(result, result.id);
-                /* update the inner timetable!
-                 * You need to create the aux before doing the updateEntry because otherwise the subentries
-                 * in the session won't have the correct value
-                 */
-                self.timetable.data[result.day][result.id].entries = aux;
-                /* since the session title can be changed from this dialog, we need to set the
-                 * title of all the blocks contained in the timetable that belong to the same
-                 * session.
-                 */
-                self.timetable._updateSessionData(result.session.id, ['title'], [result.session.title])
-            },
-            true,
-            this.eventInfo.bookedRooms,
-            this.timetable
-        );
-    },
-
     /*
      * Moves entries up or down, according to the "arrows"
      */
