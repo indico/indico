@@ -134,9 +134,12 @@ class UserCategoryEventFetcher(IteratedDataFetcher):
     }
 
     def category_events(self, catIds):
-        idx = IndexesHolder().getById('categoryDateAll')
-        iters = itertools.chain(*(idx.iterateObjectsIn(catId, self._fromDT, self._toDT) for catId in catIds))
-        return self._process(iters)
+        from indico.modules.events import Event
+        query = (Event.query
+                 .filter(~Event.is_deleted,
+                         Event.category_chain.overlap(map(int, catIds)),
+                         Event.happens_between(self._fromDT, self._toDT)))
+        return self._process(x.as_legacy for x in query)
 
 
 class UserRelatedEventFetcher(IteratedDataFetcher):
