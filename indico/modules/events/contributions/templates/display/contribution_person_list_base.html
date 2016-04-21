@@ -6,6 +6,11 @@
 {% block page_class %}conference-page item-summary{% endblock %}
 
 {% macro _render_contribution_list(contribution_links, rendering) %}
+    {% if rendering == 'speakers' %}
+        {% set contribution_links = contribution_links|selectattr('is_speaker') %}
+    {% else %}
+        {% set contribution_links = contribution_links|selectattr('author_type') %}
+    {% endif %}
     <ul class="author-links">
         {% for link in contribution_links|sort(attribute='author_type.value') %}
             {% set contribution = link.contribution %}
@@ -62,7 +67,7 @@
     </div>
     <ul class="author-list speaker-list">
         {{ _render_person_list(person_list, rendering) }}
-    </li>
+    </ul>
 {% endmacro %}
 
 {% block content -%}
