@@ -25,6 +25,7 @@ from flask import request, jsonify, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
@@ -41,7 +42,7 @@ from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionE
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,
@@ -49,7 +50,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         delete_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
-                                                  reschedule_subsequent_entries)
+                                                  shift_following_entries)
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import format_time, iterdays, as_utc
 from indico.util.i18n import _
@@ -234,7 +235,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         if form.validate_on_submit():
             with track_time_changes():
                 if shift_later:
-                    updated_entries += reschedule_subsequent_entries(self.event_new, self.entry, form.start_dt.data)
+                    updated_entries += shift_following_entries(self.entry, form.start_dt.data, session_=self.session)
                 if self.entry.contribution:
                     update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
@@ -410,6 +411,81 @@ class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
         return entries
 
 
+class RHLegacyShiftTimetableEntries(RHManageTimetableEntryBase):
+    @property
+    def session_management_level(self):
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            return SessionManagementLevel.coordinate_with_blocks
+        else:
+            return SessionManagementLevel.coordinate
+
+    def _process(self):
+        new_start_dt = (self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('startDate')))
+                        .astimezone(utc))
+        is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
+        with track_time_changes(auto_extend=True, user=session.user):
+            shift_following_entries(self.entry, new_start_dt, session_=self.session)
+            if is_session_block:
+                self.entry.move(new_start_dt)
+            else:
+                update_timetable_entry(self.entry, {'start_dt': new_start_dt})
+        serializer = TimetableSerializer(management=True)
+        if self.session:
+            timetable = serializer.serialize_session_timetable(self.session)
+        else:
+            timetable = serializer.serialize_timetable(self.event_new)
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable)
+
+
+class RHLegacyTimetableMoveEntryUpDown(RHManageTimetableEntryBase):
+    def _process(self):
+        direction = request.form.get('direction')
+        with track_time_changes():
+            self._move_entry(direction)
+            return jsonify_data(flash=False, entry=TimetableSerializer(True).serialize_timetable(self.event_new))
+
+    def _move_entry(self, direction):
+        entries = (self.entry.parent.timetable_entries
+                   if self.entry.parent
+                   else self.event_new.timetable_entries.filter(TimetableEntry.parent_id.is_(None)))
+        tz = self.event_new.tzinfo
+        entries_on_day = (entries
+                          .filter(db.cast(TimetableEntry.start_dt.astimezone(tz),
+                                          db.Date) == self.entry.start_dt.astimezone(tz).date(),
+                                  TimetableEntry.id != self.entry.id)
+                          .order_by(TimetableEntry.start_dt.asc()))
+        if not entries_on_day:
+            return
+        if direction == 'up':
+            self._move_up(entries_on_day)
+        else:
+            self._move_down(entries_on_day)
+
+    def _move_up(self, entries_on_day):
+        earlier_entries = entries_on_day.filter(TimetableEntry.start_dt <= self.entry.start_dt).all()
+        if not earlier_entries:
+            for entry in entries_on_day:
+                entry.move(entry.start_dt - self.entry.duration)
+            new_start_dt = sorted(entries_on_day, key=attrgetter('end_dt'))[-1].end_dt
+        else:
+            closest_entry = sorted(earlier_entries, key=attrgetter('end_dt'))[-1]
+            new_start_dt = closest_entry.start_dt
+            closest_entry.move(new_start_dt + self.entry.duration)
+        self.entry.move(new_start_dt)
+
+    def _move_down(self, entries_on_day):
+        later_entries = entries_on_day.filter(TimetableEntry.start_dt >= self.entry.start_dt).all()
+        if not later_entries:
+            new_start_dt = sorted(entries_on_day, key=attrgetter('end_dt'))[0].start_dt
+            for entry in entries_on_day:
+                entry.move(entry.start_dt + self.entry.duration)
+        else:
+            closest_entry = sorted(later_entries, key=attrgetter('end_dt'))[0]
+            closest_entry.move(self.entry.start_dt)
+            new_start_dt = closest_entry.end_dt
+        self.entry.move(new_start_dt)
+
+
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
     """Changes the start_dt of a `TimetableEntry`"""
 
@@ -429,29 +505,16 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
         tzinfo = self.event_new.tzinfo
         if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
             raise UserValueError(_('Session block cannot span more than one day'))
-        with track_time_changes(auto_extend=True) as changes:
-            parent = self.entry.parent
-            if parent and new_start_dt < parent.start_dt:
-                update_timetable_entry_object(parent, {'duration': parent.end_dt - new_start_dt})
-                update_timetable_entry(parent, {'start_dt': new_start_dt})
-            elif parent and (new_start_dt > parent.end_dt or new_end_dt > parent.end_dt):
-                update_timetable_entry_object(parent, {'duration': new_end_dt - parent.start_dt})
+        with track_time_changes(auto_extend=True, user=session.user) as changes:
+            update_timetable_entry_object(self.entry, {'duration': new_duration})
             if is_session_block:
                 self.entry.move(new_start_dt)
-            update_timetable_entry_object(self.entry, {'duration': new_duration})
             if not is_session_block:
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
         if is_session_block and self.entry.children:
             if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
                 raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
                                        "wouldn't fit."))
-        if self.event_new in changes and not self.event_new.can_manage(session.user):
-            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
-                                   "to manage the event."))
-        if (self.entry.parent and self.entry.parent.session_block in changes
-                and self.session and not self.session.can_manage_blocks(session.user)):
-            raise UserValueError(_("Your action requires modification of event boundaries, but you are not authorized "
-                                   "to manage the event."))
         notifications = []
         for obj, change in changes.iteritems():
             if self.entry.object == obj:

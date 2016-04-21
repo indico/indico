@@ -172,7 +172,7 @@ type("TimetableManagementActions", [], {
         }
 
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entries.editDatetime, urlArgs),
+            url: build_url(Indico.Urls.Timetable.entries[reschedule ? 'shift' : 'editDatetime'], urlArgs),
             method: 'POST',
             data: info.getAll(),
             error: function(xhr) {
@@ -186,7 +186,19 @@ type("TimetableManagementActions", [], {
                 }
 
                 if (reschedule) {
-                    self.timetable._updateDay(data.entry);
+                    var entries;
+                    if (data.entry.slotEntry) {
+                        entries = data.timetable[self.timetable.currentDay][data.entry.slotEntry.id].entries;
+                    } else {
+                        entries = data.timetable[self.timetable.currentDay];
+                    }
+
+                    self.timetable._updateDay({
+                        day: self.timetable.currentDay,
+                        entry: entries,
+                        slotEntry: data.entry.slotEntry,
+                        session: data.entry.slotEntry
+                    });
                 } else {
                     self.timetable._updateEntry(data.entry, data.entry.id);
                 }
@@ -625,44 +637,37 @@ type("TimetableManagementActions", [], {
          */
 
         var self = this;
-
         var info = this._getLocatorParams(eventData);
 
-        info.set('scheduleEntry', eventData.scheduleEntryId);
-        info.set('conference', eventData.conferenceId);
-        info.set('sessionTimetable', this.isSessionTimetable);
-
-        var type = eventData.entryType;
+        info.set('direction', direction ? 'up' : 'down');
 
         if (exists(eventData.sessionId)) {
             info.set('session', eventData.sessionId);
             info.set('slot', eventData.sessionSlotId);
-
-            if (type != 'Session') {
-                type = 'Session' + eventData.entryType;
-            } else if (!self.isSessionTimetable){
-                type = 'SessionSlot';
-            }
         }
 
-        info.set('direction', direction);
+        var urlArgs = {
+            'confId': eventData.conferenceId,
+            'entry_id': eventData.scheduleEntryId
+        };
 
-        var killProgress = IndicoUI.Dialogs.Util.progress();
+        if (self.timetable.isSessionTimetable) {
+            urlArgs.session_id = self.timetable.contextInfo.sessionId || self.timetable.contextInfo.timetableSession.id;
+        }
 
-        indicoRequest(this.methods[type].moveUpDown,
-                      info,
-                      function(result, error){
-                          killProgress();
-                          if (error) {
-                              IndicoUtil.errorReport(error);
-                          } else {
-                              var key = keys(result)[0];
-                              var entry = {entry: result[key], id: key};
-
-                              self.timetable._updateDay(entry);
-                          }
-                      });
-
+        $.ajax({
+            url: build_url(Indico.Urls.Timetable.entries.moveUpDown, urlArgs),
+            method: 'POST',
+            data: info.getAll(),
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress(),
+            success: function(data) {
+                if (data) {
+                    self.timetable._updateDay({id: self.timetable.currentDay,
+                                               entry: data.entry[self.timetable.currentDay]});
+                }
+            }
+        });
     },
 
 
