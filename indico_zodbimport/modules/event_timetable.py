@@ -588,7 +588,7 @@ class TimetableMigration(object):
                 accepted_track = old_abstract._currentStatus._track
                 accepted_track_id = int(accepted_track.id) if accepted_track else None
 
-        abstract = Abstract(event_new=self.event, legacy_id=old_abstract._id,
+        abstract = Abstract(event_new=self.event, friendly_id=old_abstract._id,
                             description=description, type_id=type_id, accepted_track_id=accepted_track_id,
                             accepted_type_id=accepted_type_id)
 
@@ -596,7 +596,7 @@ class TimetableMigration(object):
             abstract.contribution = self.legacy_contribution_map[old_contribution]
 
         if not self.importer.quiet:
-            self.importer.print_info(cformat('%{cyan}Abstract%{reset} {}').format(abstract.legacy_id))
+            self.importer.print_info(cformat('%{cyan}Abstract%{reset} {}').format(abstract.friendly_id))
         # contribution/abstract fields
         abstract.field_values = list(self._migrate_abstract_field_values(old_abstract))
         abstract.judgments = list(self._migrate_abstract_judgments(old_abstract))

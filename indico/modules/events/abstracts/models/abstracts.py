@@ -29,7 +29,7 @@ class Abstract(DescriptionMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
-    __auto_table_args = (db.UniqueConstraint('legacy_id', 'event_id'),
+    __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
                          {'schema': 'event_abstracts'})
 
     description_wrapper = MarkdownText
@@ -43,7 +43,7 @@ class Abstract(DescriptionMixin, db.Model):
         primary_key=True
     )
     #: The legacy ID for the abstract, as stored in ZODB
-    legacy_id = db.Column(
+    friendly_id = db.Column(
         db.Integer,
         nullable=False
     )
@@ -113,11 +113,11 @@ class Abstract(DescriptionMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, abstractId=self.legacy_id, confId=self.event_id)
+        return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', legacy_id=self.legacy_id)
+        return format_repr(self, 'id', friendly_id=self.friendly_id)
 
     def get_field_value(self, field_id):
         return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
@@ -125,7 +125,7 @@ class Abstract(DescriptionMixin, db.Model):
     @property
     def as_legacy(self):
         amgr = self.event_new.as_legacy.getAbstractMgr()
-        return amgr.getAbstractById(str(self.legacy_id))
+        return amgr.getAbstractById(str(self.friendly_id))
 
     @property
     def accepted_track(self):

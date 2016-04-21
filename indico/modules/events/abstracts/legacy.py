@@ -408,7 +408,7 @@ class AbstractLegacyMixin(object):
     @classmethod
     @memoize_request
     def all_for_event(cls, event):
-        return {a.legacy_id: a for a in Abstract.find(event_new=event)}
+        return {a.friendly_id: a for a in Abstract.find(event_new=event)}
 
     @property
     @memoize_request
@@ -417,7 +417,7 @@ class AbstractLegacyMixin(object):
             return self.all_for_event(self.event)[int(self._id)]
         except KeyError:
             # then the abstract is new and has to be fetched from the DB
-            return Abstract.find_one(event_new=self.event, legacy_id=self._id)
+            return Abstract.find_one(event_new=self.event, friendly_id=self._id)
 
     @no_autoflush
     def _add_judgment(self, legacy_judgment):
@@ -491,7 +491,7 @@ class AbstractManagerLegacyMixin(object):
     """Adds methods necessary to the creation of abstracts, from the legacy code."""
 
     def _new_abstract(self, legacy_abstract, abstract_data):
-        Abstract(legacy_id=legacy_abstract.getId(), event_new=legacy_abstract.getConference().as_event)
+        Abstract(friendly_id=legacy_abstract.getId(), event_new=legacy_abstract.getConference().as_event)
         db.session.flush()
 
     def _remove_abstract(self, legacy_abstract):
