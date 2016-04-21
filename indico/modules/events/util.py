@@ -27,7 +27,7 @@ from tempfile import NamedTemporaryFile
 
 from flask import session, request, g, current_app
 from sqlalchemy import inspect
-from sqlalchemy.orm import load_only, noload
+from sqlalchemy.orm import load_only, noload, joinedload
 
 from indico.core import signals
 from indico.core.config import Config
@@ -49,7 +49,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
 
-def preload_events(ids, lightweight=True):
+def preload_events(ids, lightweight=True, persons=False):
     """Preload events so they are in SA's identity cache
 
     This is useful for legacy pages where we have to show large
@@ -58,12 +58,15 @@ def preload_events(ids, lightweight=True):
 
     :param ids: An iterable of IDs or Conference objects
     :param lightweight: Only load dates and title
+    :param persons: Also load the person links
     """
     cache = g.setdefault('_event_cache', {})
     ids = {int(getattr(id_, 'id', id_)) for id_ in ids} - cache.viewkeys()
     query = Event.find(Event.id.in_(ids))
     if lightweight:
         query = query.options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
+    if persons:
+        query = query.options(joinedload('person_links'))
     cache.update((e.id, e) for e in query)
 
 

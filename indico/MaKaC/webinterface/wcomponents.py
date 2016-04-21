@@ -1180,7 +1180,7 @@ class WConferenceList(WTemplated):
             prevMonthTS = utc_timestamp(maxDT.replace(day=1))
             present = index.values(prevMonthTS)
         numPast = self._categ.getNumConferences() - len(present) - len(future)
-        preload_events(itertools.chain(present, future))
+        preload_events(itertools.chain(present, future), persons=True)
         return present, future, len(future), numPast
 
     def getVars( self ):

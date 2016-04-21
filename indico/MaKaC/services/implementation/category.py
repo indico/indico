@@ -161,7 +161,7 @@ class GetPastEventsList(CategoryDisplayBase):
         pastEvents = {}
         num = 0
         events = list(islice(index.itervalues(), skip, self._lastIdx))
-        preload_events(events)
+        preload_events(events, persons=True)
         for event in events:
             sd = event.getStartDate()
             key = (sd.year, sd.month)

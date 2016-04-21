@@ -1,6 +1,7 @@
 <%page args="aw=None, lItem=None, conferenceDisplayURLGen=None"/>
 <%
 from datetime import datetime, timedelta
+from operator import attrgetter
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from indico.util.string import remove_tags
@@ -26,11 +27,10 @@ else:
 eventTitle = escape(remove_tags(lItem.getTitle().strip())) or "[no title]"
 
 if lItem.getType() == "simple_event":
-    if len(lItem.getChairList()) > 0:
-        speakerList=[]
-        for spk in lItem.getChairList():
-            speakerList.append(spk.getDirectFullName())
-        eventTitle = "%s, \"%s\"" % (", ".join(speakerList),eventTitle)
+    speakers = [x.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False, show_title=True)
+                for x in sorted(lItem.as_event.person_links, key=attrgetter('full_name'))]
+    if speakers:
+        eventTitle = '{}, "{}"'.format(', '.join(speakers), eventTitle)
 
 %>
 <li itemscope itemtype="http://data-vocabulary.org/Event">
