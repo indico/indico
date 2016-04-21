@@ -208,7 +208,8 @@ type("TimetableManagementActions", [], {
                         cornerMessage({
                             message: notification,
                             duration: 10000,
-                            class: 'highlight'
+                            class: 'highlight',
+                            actionLabel: $T.gettext('Close')
                         });
                     });
                 }

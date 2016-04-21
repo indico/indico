@@ -111,7 +111,7 @@
 
     &.highlight {
         @include progress($pastel-blue, $light-blue);
-        color: $dark-blue;
+        color: $light-black;
         background-color: $light-blue;
         border-color: $dark-blue;
     }
