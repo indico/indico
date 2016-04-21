@@ -74,7 +74,7 @@
     @extend %font-family-title;
     @include border-radius(2px);
     @include transition(background-color .5s, color .5s, border-color .5s, width .5s);
-    @include indico-animation(fadein, .5s, normal forwards ease-in-out);
+    @include indico-animation(fadein, .5s, normal forwards ease-in-out, 1);
     @include progress(darken($light-gray, 0.3*$color-variation), $light-gray);
 
     display: block;
