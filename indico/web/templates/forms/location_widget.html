@@ -1,3 +1,37 @@
+{#
+The location widget provides 3 core fields to describe the location; venue,
+room and address, plus a checkbox to force the location inheritance from the
+parent object. The key features and expected behaviour is the following:
+* Clicking on a location field expands a dropdown list of possible options. The
+  first item of the list is always active.
+* A "just use" option is available at the bottom of the dropdown list, in case
+  none of the available options satisfies the needs of the user.
+* Actions after selecting a venue option:
+    * Reordering the list of room options by pushing to the top of the list the
+      room options associated with the current venue.
+    * In case there is a room value and the associated venue is different that
+      the new selected venue, the room value will be cleared.
+* Actions after selecting a room option:
+    * In case there is a venue value, and the associated venue of the newly
+      selected room option is different, replace the former with the latter one.
+* Navigation:
+    * TAB: Fills in the field with the value of the active option and moves to
+      the next location field.
+    * ENTER/RIGHT: Fills in the field with the value of the active option and
+      keeps the focus on the field.
+    * UP/DOWN: Mark the previous/next option of the current active option as
+      active.
+    * ESC: Replace the field value with the latest selected value.
+    * Click outside while dropdown list is open: Assuming some characters have
+      been entered in the field, the widget will try to "guess" the location by
+      comparing the value of the field with the available options. If it doesn't
+      match with any, it will assume that a custom value was entered (faking a
+      click on the "just use" option). In the case of the room field, the widget
+      will compare the field value ONLY with the room options associated with
+      the current venue. This is to avoid clearing the venue field by accident
+      (see actions after selecting a room option).
+#}
+
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
