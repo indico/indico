@@ -29,7 +29,7 @@
             showFavoriteUsers: true,
             render: function(people) {},
             onAdd: function(people) {},
-            onRemove: function() {},
+            onRemove: function() {}
         },
 
         _create: function _create() {
@@ -51,10 +51,13 @@
 
             function cleanDuplicates(people) {
                 _.each(self.people, function(person) {
-                    people = _.without(people, _.findWhere(people, {
-                        _type: person._type,
-                        id: person.id
-                    }));
+                    var criteria;
+                    if (person.id) {
+                        criteria = {id: person.id, _type: person._type};
+                    } else {
+                        criteria = {email: person.email};
+                    }
+                    people = _.without(people, _.findWhere(people, criteria));
                 });
                 return people;
             }
