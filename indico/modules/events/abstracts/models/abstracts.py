@@ -21,6 +21,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.events.contributions.models.contributions import _get_next_friendly_id
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, MarkdownText
 
@@ -42,10 +43,11 @@ class Abstract(DescriptionMixin, db.Model):
         db.Integer,
         primary_key=True
     )
-    #: The legacy ID for the abstract, as stored in ZODB
+    #: The friendly ID for the abstract (same as the legacy id in ZODB)
     friendly_id = db.Column(
         db.Integer,
-        nullable=False
+        nullable=False,
+        default=_get_next_friendly_id
     )
     event_id = db.Column(
         db.Integer,

@@ -2849,9 +2849,6 @@ class Conference(CommonObjectBase, Locatable):
         """
         return str(self.__contribGenerator.newCount())
 
-    def genNewAbstractId(self):
-        return str(self.__contribGenerator.newCount())
-
     def getReviewManager(self, contrib):
         return self.getConfPaperReview().getReviewManager(contrib)
 

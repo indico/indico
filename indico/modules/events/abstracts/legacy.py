@@ -92,7 +92,8 @@ def contribution_from_abstract(abstract, sess):
 
     custom_fields_data = {'custom_{}'.format(field_val.contribution_field.id): field_val.data for
                           field_val in abstract.as_new.field_values}
-    contrib = create_contribution(event, {'title': abstract.getTitle(), 'duration': duration,
+    contrib = create_contribution(event, {'friendly_id': abstract.as_new.friendly_id,
+                                          'title': to_unicode(abstract.getTitle()), 'duration': duration,
                                           'person_link_data': {link: True for link in links}},
                                   custom_fields_data=custom_fields_data)
     contrib.abstract = abstract.as_new
@@ -490,9 +491,10 @@ class AbstractFieldContentWrapper(object):
 class AbstractManagerLegacyMixin(object):
     """Adds methods necessary to the creation of abstracts, from the legacy code."""
 
-    def _new_abstract(self, legacy_abstract, abstract_data):
-        Abstract(friendly_id=legacy_abstract.getId(), event_new=legacy_abstract.getConference().as_event)
+    def _new_abstract(self, event):
+        abstract = Abstract(event_new=event)
         db.session.flush()
+        return abstract
 
     def _remove_abstract(self, legacy_abstract):
         abstract = legacy_abstract.as_new

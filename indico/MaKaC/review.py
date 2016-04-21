@@ -34,16 +34,10 @@ from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
                                                     AbstractStatusAcceptedLegacyMixin)
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.util.string import safe_slice, safe_upper
-from indico.util.text import wordsCounter
 
 from MaKaC.common.Counter import Counter
-from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, NoReportError
-from MaKaC.fossils.abstracts import (IAbstractFieldFossil,
-                                     IAbstractSelectionFieldFossil,
-                                     IAbstractTextFieldFossil,
-                                     ISelectionFieldOptionFossil)
 from MaKaC.i18n import _
 from MaKaC.trashCan import TrashCanManager
 
@@ -549,6 +543,8 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
         return AbstractFieldManagerAdapter(self._owner.as_event)
 
     def clone(self, conference):
+        # XXX: Couldn't find any calls of this, but raise an exception just in case...
+        raise NotImplementedError('Abstract manager should never be cloned')
         amgr = AbstractMgr(conference)
         amgr.setAnnouncement(self.getAnnouncement())
 
@@ -690,25 +686,19 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
     def setAnnouncement(self, newAnnouncement):
         self._announcement = newAnnouncement.strip()
 
-    def _generateNewAbstractId(self):
-        """Returns a new unique identifier for the current conference
-            contributions
-        """
-        #instead of having a own counter, the abstract manager will request
-        #   abstract ids to the conference which will ensure a unique id
-        #   which will persist afterwards when an abstract is accepted
-        return str(self.getConference().genNewAbstractId())
-
     def _getOldAbstractCounter(self):
         return self.__abstractGenerator._getCount()
 
     def newAbstract(self, av, **data):
         """Creates a new abstract under this manager
         """
-        id = self._generateNewAbstractId()
-        a = Abstract(self, id, av, **data)
-        self._abstracts[id] = a
-        self._new_abstract(a, data)
+        from indico.modules.events.contributions import Contribution
+        new_abstract = self._new_abstract(self.getConference().as_event)
+        # sanity checks to avoid collisions
+        assert str(new_abstract.id) not in self._abstracts
+        assert not Contribution.query.with_parent(new_abstract.event_new).filter_by(friendly_id=new_abstract.id).count()
+        a = Abstract(self, str(new_abstract.friendly_id), av, **data)
+        self._abstracts[str(new_abstract.friendly_id)] = a
         for auth in a.getPrimaryAuthorList():
             self.indexAuthor(auth)
         return a
