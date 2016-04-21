@@ -193,7 +193,7 @@ $E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',
 $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': confFossile.supportInfo.caption, 'email': confFossile.supportInfo.email, 'telephone': confFossile.supportInfo.telephone}).draw());
 
 % if evtType == 'lecture':
-    $E('inPlaceEditOrganiserText').set(new InputEditWidget('event.main.changeOrganiserText',
+    $E('inPlaceEditOrganiserText').set(new TextAreaEditWidget('event.main.changeOrganiserText',
             {'conference':'${ conferenceId }'}, ${ jsonEncode(confObj.getOrgText()) }, true, null, null,
             null).draw());
 % endif

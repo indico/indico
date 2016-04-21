@@ -1163,7 +1163,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["eHour"] = str( self._conf.getAdjustedEndDate(tz).hour )
         vars["eMinute"] = str( self._conf.getAdjustedEndDate(tz).minute )
         vars["chairText"] = quoteattr( self._conf.getChairmanText() )
-        vars["orgText"] = quoteattr( self._conf.getOrgText() )
+        vars["orgText"] = self._conf.getOrgText()
         vars["visibility"] = self._getVisibilityHTML()
         vars["shortURLTag"] = quoteattr( self._conf.getUrlTag() )
         locName, locAddress, locRoom = "", "", ""

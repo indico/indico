@@ -52,7 +52,7 @@
         {% if conf.getOrgText() %}
             <tr>
                 <td class="leftCol">{% trans %}Organised by{% endtrans %}</td>
-                <td>{{ conf.getOrgText() }}</td>
+                <td>{{ conf.getOrgText() | markdown }}</td>
             </tr>
         {% endif %}
 

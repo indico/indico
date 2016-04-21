@@ -84,7 +84,7 @@ ${ additionalInfo }
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Organisers</span></td>
             <td bgcolor="white" width="100%">
-                <input type="text" name="orgText" value=${ orgText } size="50">
+                <textarea name="orgText" cols="50" rows="5">${ orgText }</textarea>
             </td>
         </tr>
         <tr>
