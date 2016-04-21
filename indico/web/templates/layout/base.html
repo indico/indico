@@ -3,7 +3,16 @@
         <header>
             <div class="title">
                 <div class="text">
-                    <h2>{% block title %}{% endblock %}</h2>
+                    <div class="title-with-actions">
+                        <h2>
+                            {%- block title %}{% endblock -%}
+                        </h2>
+                        {%- if self.title_actions -%}
+                            <div class="actions">
+                                {% block title_actions %}{% endblock %}
+                            </div>
+                        {%- endif -%}
+                    </div>
                     {% if self.subtitle() -%}
                         <h3>{% block subtitle %}{% endblock %}</h3>
                     {% endif %}

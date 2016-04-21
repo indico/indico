@@ -45,11 +45,23 @@
             display: flex;
             padding-bottom: $separator-margin;
 
-            .text {
+            > .text {
                 flex-grow: 1;
+
+                > .title-with-actions {
+                    h2 {
+                        display: inline;
+                        margin-right: 0;
+                    }
+
+                    .actions {
+                        display: inline;
+                        vertical-align: bottom;
+                    }
+                }
             }
 
-            .actions {
+            > .actions {
                 flex-grow: 0;
                 flex-shrink: 0;
                 white-space: nowrap;
