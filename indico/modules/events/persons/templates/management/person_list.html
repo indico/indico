@@ -1,65 +1,108 @@
 {% extends 'events/persons/management/_persons_list_base.html' %}
 
+{% from 'message_box.html' import message_box %}
+
 {% block title %}
-    {% trans %}Persons{% endtrans %}
+    {% trans %}Event Roles{% endtrans %}
+{% endblock %}
+
+{% block filters %}
+    <div id="person-filters" class="group i-selection">
+        <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+        <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
+        <label for="filter-chairpersons" class="i-button">{% trans %}Chairpersons{% endtrans %}</label>
+        <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+        <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+        <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
+        <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+        <span class="i-button label">{% trans %}or{% endtrans %}</span>
+        <input type="checkbox" id="filter-no-account" data-filter="no_account">
+        <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
+    </div>
 {% endblock %}
 
 {% block persons %}
-    <table class="i-table-widget tablesorter">
+
+    {% if num_no_account %}
+        {% call message_box('warning') %}
+            {% trans count = num_no_account -%}
+                There is one user with no Indico account. An Indico account may be needed to upload materials and/or
+                manage contents.
+            {%- pluralize -%}
+                There are {{ count }} users with no Indico account. An Indico account may be needed to upload materials
+                and/or manage contents.
+            {%- endtrans -%}
+        {% endcall %}
+    {% endif %}
+    <table id="person-list" class="i-table-widget tablesorter">
         <thead>
             <tr class="i-table">
                 <th class="i-table checkbox-column" data-sorter="false"></th>
                 <th class="i-table">{% trans %}Name{% endtrans %}</th>
                 <th class="i-table">{% trans %}Email{% endtrans %}</th>
-                <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
-                <th class="i-table">{% trans %}Speaker in contributions{% endtrans %}</th>
-                <th class="i-table">{% trans %}Speaker in subcontributions{% endtrans %}</th>
-                <th class="i-table">{% trans %}Convener in session blocks{% endtrans %}</th>
+                <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
+                <th class="i-table"></th>
+                <th class="i-table"></th>
+                <th class="i-table"></th>
+                <th class="i-table"></th>
+                <th class="i-table"></th>
             </tr>
         </thead>
         <tbody>
-            {% for person, person_data in persons.iteritems() -%}
-                <tr class="i-table">
-                    <td class="i-table">
+            {% for person_data in persons -%}
+                {% set person = person_data.person %}
+                <tr class="i-table" data-person-roles="{{ person_data.roles | tojson | forceescape }}">
+                    <td class="i-table checkbox-column">
                         <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id"
                                {{ 'disabled' if not person.email }}>
                     </td>
-                    <td class="i-table">{{ person.full_name }}</td>
+                    <td class="i-table">{{ person.get_full_name(last_name_first=true, last_name_upper=false,
+                                                                abbrev_first_name=false) }}</td>
                     <td class="i-contributiontable email-column">{{ person.email }}</td>
-                    <td class="i-table">{{ person.affiliation }}</td>
+                    <td class="i-table affiliation-column">{{ person.affiliation }}</td>
                     <td class="i-table">
-                        {% if person_data.contributions %}
-                            <span class="i-label js-count-label"
-                                  data-items="{{ person_data.contributions | tojson | forceescape }}">
-                                {% trans %}Contributions{% endtrans %}
-                                <span class="badge">
-                                    {{ person_data.contributions | length }}
-                                </span>
+                        <span class="i-label{{ ' no-role' if not person_data.roles.chairperson }}">
+                            {% trans %}Chairperson{% endtrans %}
+                        </span>
+                    </td>
+                    <td class="i-table">
+                        <span class="i-label js-count-label{{ ' no-role' if not person_data.contributions }}"
+                              data-items="{{ person_data.contributions | tojson | forceescape }}">
+                            {% trans %}Speaker{% endtrans %}
+                            <span class="badge">
+                                {{ person_data.contributions | length }}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="i-table">
+                        <span class="i-label js-count-label{{ ' no-role' if not person_data.subcontributions }}"
+                              data-items="{{ person_data.subcontributions | tojson | forceescape }}">
+                            {% trans %}Sub-contrib. Speaker{% endtrans %}
+                            <span class="badge">
+                                {{ person_data.subcontributions | length }}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="i-table">
+                        <span class="i-label js-count-label{{ ' no-role' if not person_data.session_blocks }}"
+                              data-items="{{ person_data.session_blocks | tojson | forceescape }}">
+                            {% trans %}Convener{% endtrans %}
+                            <span class="badge">
+                                {{ person_data.session_blocks | length }}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="i-table">
+                        {% if person_data.roles.no_account %}
+                            <span class="i-label warning icon-warning"
+                                   title="{% trans email=person.email %}This user seems to have no Indico
+                                   account. If they do have an account, they should add {{ email }} to their profile
+                                   {%- endtrans %}">
+                                {% trans %}No Indico account{% endtrans %}
                             </span>
                         {% endif %}
                     </td>
-                    <td class="i-table">
-                        {% if person_data.subcontributions %}
-                            <span class="i-label js-count-label"
-                                  data-items="{{ person_data.subcontributions | tojson | forceescape }}">
-                                {% trans %}Subcontributions{% endtrans %}
-                                <span class="badge">
-                                    {{ person_data.subcontributions | length }}
-                                </span>
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td class="i-table">
-                        {% if person_data.session_blocks %}
-                            <span class="i-label js-count-label"
-                                  data-items="{{ person_data.session_blocks | tojson | forceescape }}">
-                                {% trans %}Session blocks{% endtrans %}
-                                <span class="badge">
-                                    {{ person_data.session_blocks | length }}
-                                </span>
-                            </span>
-                        {% endif %}
-                    </td>
+
                 </tr>
             {%- else -%}
                 <tr class="i-table">
@@ -68,4 +111,30 @@
             {%- endfor %}
         </tbody>
     </table>
+
+    <script>
+        $(document).ready(function() {
+            function switch_to(what, $target) {
+                if (what == 'persons') {
+                    if ($('#filter-no-account').prop('checked')) {
+                        $('#filter-no-account').prop('checked', false);
+                    }
+                } else {
+                    $('#persons-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
+                }
+                refreshPersonFilters();
+            }
+
+            $('#persons-list [data-filter]:not(#filter-no-account)').on('change', function() {
+                var $target = $(this);
+                switch_to('persons', $target);
+            });
+            $('#filter-no-account').on('change', function() {
+                var $target = $(this);
+                if ($target.prop('checked')) {
+                    switch_to('no-account', $target);
+                }
+            });
+        });
+    </script>
 {% endblock %}

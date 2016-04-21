@@ -503,3 +503,24 @@ td.i-table i {
         margin-bottom: 10px;
     }
 }
+
+#person-list {
+    .affiliation-column {
+        max-width: 30em;
+    }
+
+    .no-role {
+        opacity: 0.25;
+        .badge {
+            background-color: $dark-gray;
+        }
+    }
+}
+
+.qbubble-item-list li {
+    padding: 0.15em 0;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid $pastel-gray;
+    }
+}

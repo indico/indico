@@ -29,6 +29,4 @@ def _sidemenu_items(sender, event, **kwargs):
     if event.type == 'lecture' or not event.can_manage(session.user, allow_key=True):
         return
 
-    yield SideMenuItem('lists', _('Persons'), url_for('persons.person_list', event), section='reports')
-    yield SideMenuItem('pending_persons', _('Pending persons'), url_for('persons.pending_persons_list', event),
-                       section='reports')
+    return SideMenuItem('lists', _('Roles'), url_for('persons.person_list', event), section='reports')
