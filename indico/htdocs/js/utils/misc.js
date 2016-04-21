@@ -109,11 +109,11 @@
                 if (disappearHandler) {
                     clearTimeout(disappearHandler);
                 }
-                text.remove();
                 if (options.actionCallback) {
                     var promise = options.actionCallback();
 
                     box.addClass('progress').text(options.progressMessage);
+                    text.remove();
 
                     promise.then(function() {
                         box.text(options.feedbackMessage);
