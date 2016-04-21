@@ -224,3 +224,23 @@
 .ttentryArrows, .ttentryArrowsBackground {
     display: none !important;
 }
+
+.bottomTip {
+    @include border-all();
+    @include border-radius();
+    background: $light-gray;
+    color: $light-black;
+    display: none;
+    padding: 10px;
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    text-align: center;
+
+    .circle {
+        float: left;
+        background: transparent image-url('../images/circle.png') scroll no-repeat;
+        width: 20px;
+        height: 14px;
+    }
+}

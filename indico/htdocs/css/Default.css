@@ -3217,36 +3217,6 @@ div.timetableContribution  {
         box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
 }
 
-div.bottomTip {
-    color: #888;
-    margin-left: 5px;
-    border: 1px solid #aaa;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    padding: 3px 5px 3px 5px;
-    box-shadow: inset 0 0 25px #e8e8e8, 0px 0px 2px rgba(220, 220, 200, 0.4);
-    display: none;
-    text-align: center;
-    padding: 10px;
-    background: #eee;
-    background: rgba(255,255,255,0.7);
-    position: fixed;
-    bottom: 15px;
-    right: 50px;
-
-}
-
-div.bottomTip .circle{
-    float: left;
-    background: transparent url(../images/circle.png) scroll no-repeat;
-    width: 20px;
-    height: 20px;
-    font-size: 20px;
-    color: #666;
-    vertical-align: middle;
-}
-
 div.ui-state-hightlight {
 }
 
