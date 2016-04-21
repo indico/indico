@@ -2822,7 +2822,6 @@ div.timetableHeader {
     font-size: 20px;
     color: rgb(68, 68, 68);
     background: white;
-    behavior: url(border-radius.htc);
 }
 
 div.timetableFullScreenHeader {
@@ -3347,7 +3346,6 @@ div.ui-dialog-titlebar {
 
 div.exclusivePopupTopBg {
     background-color: #F8F8F8;
-    behavior: url(border-radius.htc);
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
 }
@@ -3927,7 +3925,6 @@ div.timetableManagementInfoArea {
     box-shadow:2px 2px 2px #888888;
     margin-left: auto;
     margin-right: auto;
-    behavior: url(border-radius.htc);
     padding: 5px;
     font-size: 11px;
     position: relative;
@@ -4338,7 +4335,6 @@ div.popupButtonBar {
     -webkit-border-bottom-left-radius:10px;
     -moz-border-radius-bottomright: 10px;
     -webkit-border-bottom-right-radius:10px;
-    behavior: url(border-radius.htc);
 
 }
 
@@ -4493,7 +4489,6 @@ div.fitInnerTimetableDialog {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
-    behavior: url(border-radius.htc);
     overflow: hidden;
 }
 
@@ -4501,7 +4496,6 @@ div.fitInnerTimetableDialog {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
-    behavior: url(border-radius.htc);
     overflow: hidden;
     cursor: pointer;
 }
@@ -4602,7 +4596,6 @@ div.posterEntry {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
-    behavior: url(border-radius.htc);
     padding: 5px;
     margin-bottom: 5px;
     overflow: auto;
