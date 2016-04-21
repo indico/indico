@@ -213,13 +213,15 @@ class LocationWidget(JinjaWidget):
         else:
             rooms = {'data': []}
             venues = {'data': []}
-        parent = (self._get_parent_info(field.object_data['source'])
-                  if field.object_data and field.object_data.get('source')
+        parent = (self._get_parent_info(field.object_data['source'], field.object_data['inheriting'])
+                  if field.object_data and field.object_data.get('source') and field.allow_location_inheritance
                   else ('', ''))
         return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent,
-                                                    source=field.object_data.get('source'))
+                                                    source=field.object_data.get('source'),
+                                                    init_inheritance=field.object_data.get('inheriting'))
 
-    def _get_parent_info(self, parent):
+    def _get_parent_info(self, obj, inheriting):
+        parent = obj.location_parent if not inheriting else obj
         if isinstance(parent, db.m.Contribution):
             return 'Contribution', parent.title
         elif isinstance(parent, db.m.Break):

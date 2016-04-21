@@ -111,7 +111,7 @@
                 (clear them otherwise) */
                 if (!isInitStep) {
                     if (isChecked) {
-                        hiddenData = {{ (source.inherited_widget_location_data or {}) | tojson }};
+                        hiddenData = {{ (source.get_inherited_widget_location_data(init_inheritance) or {}) | tojson }};
                         hiddenData.inheriting = true;
                         initializeInputs();
                     } else {

@@ -70,7 +70,8 @@ class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
                 raise BadRequest
 
     def _get_form_defaults(self, **kwargs):
-        inherited_location = self.event_new.location_data
+        location_parent = kwargs.pop('location_parent', None)
+        inherited_location = location_parent.location_data if location_parent else self.event_new.location_data
         inherited_location['inheriting'] = True
         return FormDefaults(location_data=inherited_location, **kwargs)
 
@@ -92,7 +93,7 @@ class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
 
     def _process(self):
         colors = self._get_default_colors()
-        defaults = self._get_form_defaults(colors=colors)
+        defaults = self._get_form_defaults(colors=colors, location_parent=self.session_block)
         form = BreakEntryForm(obj=defaults, **self._get_form_params())
         if form.validate_on_submit():
             entry = create_break_entry(self.event_new, form.data, session_block=self.session_block)
@@ -104,7 +105,7 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
     session_management_level = SessionManagementLevel.manage
 
     def _process(self):
-        defaults = self._get_form_defaults()
+        defaults = self._get_form_defaults(location_parent=self.session_block)
         form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data, session_block=self.session_block)
@@ -124,7 +125,7 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
                 raise NotFound
 
     def _process(self):
-        defaults = self._get_form_defaults()
+        defaults = self._get_form_defaults(location_parent=self.session)
         form = SessionBlockEntryForm(obj=defaults, **self._get_form_params())
         if form.validate_on_submit():
             entry = create_session_block_entry(self.session, form.data)

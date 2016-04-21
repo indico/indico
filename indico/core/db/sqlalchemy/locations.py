@@ -301,6 +301,13 @@ class LocationMixin(object):
             'venue_id': location_data['venue'].id if location_data['venue'] else '',
         }
 
-    @property
-    def inherited_widget_location_data(self):
-        return self.location_parent.widget_location_data if self.location_parent else self.widget_location_data
+    def get_inherited_widget_location_data(self, init_inheritance):
+        """Determine whether to return the object's location or the parent's.
+
+        If the object inherits its location, then the location source object is
+        the object's parent, so return the source's location. If the object
+        doesn't inherit its location, then the location source object is the
+        object itself, so return the source's parent location.
+        """
+        return (self.location_parent.widget_location_data if not init_inheritance and self.location_parent
+                else self.widget_location_data)
