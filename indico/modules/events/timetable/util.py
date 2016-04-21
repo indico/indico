@@ -288,7 +288,7 @@ def shift_following_entries(entry, start_dt, session_=None):
     else:
         query = event.timetable_entries
     entries = (query.filter(db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
-                            TimetableEntry.start_dt >= entry.start_dt,
+                            TimetableEntry.start_dt >= entry.end_dt,
                             TimetableEntry.id != entry.id)).all()
     if not entries:
         return []
