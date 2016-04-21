@@ -21,6 +21,7 @@ from datetime import timedelta
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
@@ -189,7 +190,7 @@ class TimetableEntry(db.Model):
         elif value is not None:
             raise TypeError('Unexpected object: {}'.format(value))
 
-    @property
+    @hybrid_property
     def duration(self):
         return self.object.duration if self.object is not None else None
 
@@ -197,11 +198,38 @@ class TimetableEntry(db.Model):
     def duration(self, value):
         self.object.duration = value
 
-    @property
+    @duration.expression
+    def duration(cls):
+        from indico.modules.events.contributions import Contribution
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        from indico.modules.events.timetable.models.breaks import Break
+        return db.case({
+            TimetableEntryType.SESSION_BLOCK.value:
+                db.select([SessionBlock.duration])
+                .where(SessionBlock.id == cls.session_block_id)
+                .correlate_except(SessionBlock)
+                .as_scalar(),
+            TimetableEntryType.CONTRIBUTION.value:
+                db.select([Contribution.duration])
+                .where(Contribution.id == cls.contribution_id)
+                .correlate_except(Contribution)
+                .as_scalar(),
+            TimetableEntryType.BREAK.value:
+                db.select([Break.duration])
+                .where(Break.id == cls.break_id)
+                .correlate_except(Break)
+                .as_scalar(),
+        }, value=cls.type)
+
+    @hybrid_property
     def end_dt(self):
         if self.start_dt is None or self.duration is None:
             return None
         return self.start_dt + self.duration
+
+    @end_dt.expression
+    def end_dt(cls):
+        return cls.start_dt + cls.duration
 
     @locator_property
     def locator(self):
