@@ -26,7 +26,7 @@ from wtforms.widgets.html5 import NumberInput
 
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
-from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.util import find_next_start_dt
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
@@ -120,6 +120,15 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
     _entry_type = TimetableEntryType.SESSION_BLOCK
     _default_duration = timedelta(minutes=60)
     _display_fields = ('title', 'time', 'duration', 'person_links', 'location_data')
+
+    def validate_duration(self, field):
+        super(SessionBlockEntryForm, self).validate_duration(field)
+        if self.session_block:
+            entry = self.session_block.timetable_entry
+            end_dt = self.start_dt.data + field.data
+            query = TimetableEntry.query.with_parent(entry).filter(TimetableEntry.end_dt > end_dt)
+            if query.count():
+                raise ValidationError(_("This duration is too short to fit the entries within."))
 
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
