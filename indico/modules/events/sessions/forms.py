@@ -51,6 +51,7 @@ class SessionForm(IndicoForm):
         super(SessionForm, self).__init__(*args, **kwargs)
         if event.type != 'conference':
             del self.is_poster
+            del self.code
 
 
 class SessionProtectionForm(IndicoForm):
