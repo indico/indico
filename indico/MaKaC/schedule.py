@@ -35,6 +35,7 @@ from MaKaC.fossils.schedule import (IContribSchEntryDisplayFossil, IContribSchEn
                                     IAttachmentFossil, IFolderFossil)
 from MaKaC.common.cache import GenericCache
 from indico.util.decorators import classproperty
+from flask import g
 
 
 class Schedule:
@@ -1472,7 +1473,7 @@ class ScheduleToJson(object):
     @classproperty
     @classmethod
     def use_cache(cls):
-        return not ContextManager.get('offlineMode', False)
+        return not g.get('static_side')
 
     @staticmethod
     def bump_cache_version(cache, key):
@@ -1549,7 +1550,7 @@ class ScheduleToJson(object):
 
     @staticmethod
     def checkProtection(obj, aw):
-        if aw is None or ContextManager.get('offlineMode', False):
+        if aw is None or g.get('static_site'):
             return True
 
         from MaKaC.conference import SessionSlot

@@ -96,7 +96,7 @@ def _define_lookup():
                                 default_filters=['encode_if_unicode', 'str'],
                                 filesystem_checks=True,
                                 imports=FILTER_IMPORTS,
-                                cache_enabled=not ContextManager.get('offlineMode'))
+                                cache_enabled=True)
 
 
 mako = _define_lookup()

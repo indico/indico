@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
+from flask import g
 from sqlalchemy.event import listens_for
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.util.contextManager import ContextManager
 from indico.util.i18n import _
 from indico.util.string import return_ascii, slugify, text_to_repr, format_repr
 from indico.util.struct.enum import TitledIntEnum
@@ -60,7 +60,7 @@ class MenuEntryMixin(object):
             return self.link_url
         elif self.is_internal_link:
             data = self.default_data
-            if data.static_site and isinstance(data.static_site, basestring) and ContextManager.get('offlineMode'):
+            if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):
                 return data.static_site
             kwargs = {}
             if self.name == 'timetable':
@@ -125,7 +125,7 @@ class MenuEntryMixin(object):
             return False
 
         data = self.default_data
-        if not data.static_site and ContextManager.get('offlineMode'):
+        if not data.static_site and g.get('static_site'):
             return False
         return data.visible(self.event)
 

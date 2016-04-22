@@ -27,7 +27,7 @@ import sys
 import urlparse
 
 import pytz
-from flask import request, current_app
+from flask import current_app, g, has_app_context, request
 from werkzeug.urls import url_parse
 
 import MaKaC
@@ -861,31 +861,31 @@ class Config:
         return std
 
     def getImagesBaseURL(self):
-        if ContextManager.get('offlineMode', False):
+        if has_app_context() and g.get('static_site'):
             return "static/images"
         else:
             return url_parse("%s/images" % self.getBaseURL()).path
 
     def getImagesBaseSecureURL(self):
-        if ContextManager.get('offlineMode', False):
+        if has_app_context() and g.get('static_site'):
             return "static/images"
         else:
             return url_parse("%s/images" % self.getBaseSecureURL()).path
 
     def getCssBaseURL(self):
-        if ContextManager.get('offlineMode', False):
+        if has_app_context() and g.get('static_site'):
             return "static/css"
         else:
             return url_parse("%s/css" % self.getBaseURL()).path
 
     def getFontsBaseURL(self):
-        if ContextManager.get('offlineMode', False):
+        if g.get('static_site'):
             return "static/fonts"
         else:
             return url_parse("%s/fonts" % self.getBaseURL()).path
 
     def getScriptBaseURL(self):
-        if ContextManager.get('offlineMode', False):
+        if g.get('static_site'):
             return 'static/js'
         else:
             return url_parse('%s/js' % self.getBaseURL()).path

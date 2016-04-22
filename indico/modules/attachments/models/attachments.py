@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import posixpath
 
+from flask import g
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.config import Config
@@ -30,7 +31,6 @@ from indico.core.storage import VersionedResourceMixin, StoredFileMixin
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments
-from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii, strict_unicode
@@ -239,7 +239,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
 
         :param absolute: If the returned URL should be absolute.
         """
-        if ContextManager.get('offlineMode'):
+        if g.get('static_site'):
             return _offline_download_url(self)
         else:
             filename = self.file.filename if self.type == AttachmentType.file else 'go'

@@ -22,7 +22,7 @@ import re
 import time
 from importlib import import_module
 
-from flask import request, redirect, Blueprint
+from flask import Blueprint, g, redirect, request
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
@@ -33,7 +33,6 @@ from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, B
 from werkzeug.urls import url_parse
 
 from indico.util.caching import memoize
-from indico.util.contextManager import ContextManager
 from indico.util.fs import secure_filename
 from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
@@ -256,15 +255,13 @@ def url_for(endpoint, *targets, **values):
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    static_site_mode = bool(ContextManager.get('offlineMode'))
-
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
 
     url = _url_for(endpoint, **values)
-    if static_site_mode and not values.get('_external', False):
+    if g.get('static_site') and not values.get('_external'):
         # for static sites we assume all relative urls need to be
         # mangled to a filename
         # we should really fine a better way to handle anything

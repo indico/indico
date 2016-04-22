@@ -17,7 +17,7 @@
 import re
 import urlparse
 
-from flask import request, has_request_context
+from flask import g, has_request_context, request
 
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.timezoneUtils import nowutc
@@ -138,7 +138,7 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-        if not _ignore_static and ContextManager.get('offlineMode', False):
+        if not _ignore_static and g.get('static_site'):
             return URL(cls.getStaticURL(target, **params))
         return cls._getURL(**cls._getParams(target, params))
 
@@ -221,7 +221,7 @@ class UHConferenceOverview(URLHandler):
 
     @classmethod
     def getURL(cls, target):
-        if ContextManager.get('offlineMode', False):
+        if g.get('static_site'):
             return URL(UHConferenceDisplay.getStaticURL(target))
         return super(UHConferenceOverview, cls).getURL(target)
 

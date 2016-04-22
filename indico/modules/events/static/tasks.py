@@ -49,9 +49,7 @@ def build_static_site(static_site):
 
         g.rh = rh
         ContextManager.set('currentRH', rh)
-
         g.static_site = True
-        ContextManager.set('offlineMode', True)
 
         # Get event type
         wf = rh.getWebFactory()
@@ -64,7 +62,7 @@ def build_static_site(static_site):
         db.session.commit()
 
         logger.info('Building static site successful: %s', static_site)
-        ContextManager.set('offlineMode', False)
+        g.static_site = False
         ContextManager.set('currentRH', None)
         notify_static_site_success(static_site)
     except Exception:
@@ -73,7 +71,7 @@ def build_static_site(static_site):
         db.session.commit()
         raise
     finally:
-        ContextManager.set('offlineMode', False)
+        g.static_site = False
         ContextManager.set('currentRH', None)
 
 
