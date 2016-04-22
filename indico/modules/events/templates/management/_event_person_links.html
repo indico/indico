@@ -7,11 +7,6 @@
             {% endif %}
         </div>
     {% else %}
-        <span>
-            {% if event_type == 'lecture' %}
-                {% trans %}There are no speakers in this event.{% endtrans %}</span>
-            {% else %}
-                {% trans %}There are no chairpersons in this event.{% endtrans %}</span>
-            {% endif %}
+        <em>{% trans %}None{% endtrans %}</em>
     {% endfor %}
 {%- endmacro %}
