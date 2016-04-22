@@ -229,7 +229,11 @@ class TimetableEntry(db.Model):
 
     @end_dt.expression
     def end_dt(cls):
-        return cls.start_dt + cls.duration
+        # Cast to utcdatetime so comparisons use the utcdatetime logic on
+        # the other operand.  Otherwise we'd end up passing a tz-aware datetime
+        # to the database which would be a timestamptz instead of just timestamp
+        # and result in weird timezone conversions that should not happen.
+        return db.type_coerce(cls.start_dt + cls.duration, UTCDateTime)
 
     @locator_property
     def locator(self):
