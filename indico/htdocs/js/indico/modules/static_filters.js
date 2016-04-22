@@ -10,6 +10,7 @@
     function setState(state, visible, total) {
         state.html(formatState(visible, total));
         state.attr('title', $T.gettext("{0} out of {1} displayed").format(visible.length, total.length));
+        $('#total-duration').addClass('fade');
     }
 
     global.applySearchFilters = function applySearchFilters() {
@@ -26,6 +27,7 @@
         if (!term) {
             $items.show();
             setState($state, $items, $items);
+            $('#total-duration').removeClass('fade');
             return;
         }
 
