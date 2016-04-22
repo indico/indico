@@ -16,6 +16,9 @@
 
 import pytz
 from sqlalchemy import types, func
+from sqlalchemy.sql import operators
+from sqlalchemy.sql.sqltypes import Interval
+from sqlalchemy.util import memoized_property
 
 
 class UTCDateTime(types.TypeDecorator):
@@ -37,6 +40,20 @@ class UTCDateTime(types.TypeDecorator):
             tz = getattr(tz, 'zone', tz)
             return func.timezone(tz, func.timezone('UTC', self.expr))
     comparator_factory = Comparator
+
+    @memoized_property
+    def _expression_adaptations(self):
+        # this ensures that `UTCDateTime + Interval` returns another
+        # `UTCDateTime` and not just a `DateTime`
+        return {
+            operators.add: {
+                Interval: UTCDateTime
+            },
+            operators.sub: {
+                Interval: UTCDateTime,
+                UTCDateTime: Interval
+            }
+        }
 
     def process_bind_param(self, value, engine):
         if value is not None:
