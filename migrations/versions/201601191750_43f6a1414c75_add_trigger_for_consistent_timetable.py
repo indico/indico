@@ -138,6 +138,7 @@ def upgrade():
 
 
 def downgrade():
+    op.execute("DROP TRIGGER consistent_timetable ON events.events")
     op.execute("DROP TRIGGER consistent_timetable ON events.contributions")
     op.execute("DROP TRIGGER consistent_timetable ON events.breaks")
     op.execute("DROP TRIGGER consistent_timetable ON events.session_blocks")
