@@ -42,7 +42,7 @@ class EntryFormMixin(object):
     _default_duration = None
     _display_fields = None
 
-    time = TimeField(_("Time"), [InputRequired()])
+    time = TimeField(_("Start time"), [InputRequired()])
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               units=('minutes', 'hours'))
 
@@ -57,8 +57,6 @@ class EntryFormMixin(object):
                 defaults.duration = self._default_duration
                 kwargs['obj'] = defaults
         super(EntryFormMixin, self).__init__(*args, **kwargs)
-        self.time.description = _("Time when the {} will be scheduled.").format(self._entry_type.title.lower())
-        self.duration.description = _("The duration of the {}").format(self._entry_type.title.lower())
 
     @property
     def data(self):
@@ -98,11 +96,9 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
     _display_fields = ('title', 'description', 'time', 'duration', 'location_data', 'colors')
 
     title = StringField(_("Title"), [DataRequired()])
-    description = TextAreaField(_("Description"), description=_("Text describing the break."))
-    location_data = IndicoLocationField(_("Location"),
-                                        description=_("The physical location where the break takes place."))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors(),
-                                      description=_('Specify text and background colours for the break.'))
+    description = TextAreaField(_("Description"))
+    location_data = IndicoLocationField(_("Location"))
+    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
 
 
 class ContributionEntryForm(EntryFormMixin, ContributionForm):
