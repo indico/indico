@@ -1761,7 +1761,7 @@ type("URLPathEditWidget", ["InputEditWidget"],
                 if(value !=""){
                     content = Html.span({}, self.basePath + value);
                 } else{
-                    content = Html.em({}, $T("There is not any short url yet. Click \"edit\" to setup."));
+                    content = Html.em({}, $T("There is no short url yet."));
                 }
                 return content;
             }
