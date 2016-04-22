@@ -231,6 +231,15 @@ class TimetableEntry(db.Model):
     def end_dt(cls):
         return cls.start_dt + cls.duration
 
+    @property
+    def siblings(self):
+        parent = self.parent or self.event_new
+        day = self.start_dt.date()
+        tzinfo = self.event_new.tzinfo
+        criteria = (db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
+                    TimetableEntry.id != self.id)
+        return TimetableEntry.query.with_parent(parent).filter(*criteria)
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, entry_id=self.id)

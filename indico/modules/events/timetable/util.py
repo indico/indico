@@ -278,19 +278,11 @@ def get_session_block_entries(event, day):
 
 def shift_following_entries(entry, start_dt, session_=None):
     """Reschedules entries with start_dt > entry.start_dt"""
-    event = entry.event_new
-    tzinfo = event.tzinfo
-    day = entry.start_dt.astimezone(tzinfo).date()
-    if entry.parent:
-        query = TimetableEntry.query.with_parent(entry.parent)
-    elif session_:
-        query = event.timetable_entries.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
-                                               TimetableEntry.session_block.has(session_id=session_.id))
-    else:
-        query = event.timetable_entries
-    entries = (query.filter(db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
-                            TimetableEntry.start_dt >= entry.end_dt,
-                            TimetableEntry.id != entry.id)).all()
+    criteria = [TimetableEntry.start_dt >= entry.end_dt]
+    if session_ and not entry.parent:
+        criteria.append(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
+        criteria.append(TimetableEntry.session_block.has(session_id=session_.id))
+    entries = entry.siblings.filter(*criteria).all()
     if not entries:
         return []
     diff = start_dt - entry.start_dt
