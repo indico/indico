@@ -641,7 +641,12 @@ $(function() {
 
     $("body").one('timetable_ready', function() {
         var closeMenu = function() {
-            $('#tt_menu .group').dropdown('close');
+            var dropdown = $('#tt_menu .group');
+            if (dropdown) {
+                try {
+                    dropdown.dropdown('close');
+                } catch(e) {}
+            }
         };
 
         // initialize sticky headers
