@@ -5,7 +5,9 @@
         <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
             <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
                 <span class="value">
-                    <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                    <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                        {{ contrib.title }}
+                    </a>
                 </span>
             </div>
             {% if contrib.speakers -%}
@@ -40,7 +42,7 @@
                 {%- endif %}
             </div>
             {% if contrib.description -%}
-                <div class="description">
+                <div class="description js-mathjax">
                     {{ contrib.description|truncate(400) }}
                 </div>
             {%- endif %}

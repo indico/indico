@@ -16,7 +16,7 @@
             {% for contrib in contributions -%}
                 <tr>
                     <td>
-                        <a href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                        <a class="js-mathjax" href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
                     </td>
                     <td>
                         <div class="group right">

@@ -34,7 +34,9 @@
             {% for contrib in contribs -%}
                 <tr class="i-table">
                     <td class="i-table">
-                        <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                        <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                            {{ contrib.title }}
+                        </a>
                     </td>
                 </tr>
             {%- endfor %}

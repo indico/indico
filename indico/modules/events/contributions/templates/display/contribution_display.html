@@ -42,7 +42,7 @@
 {% endmacro %}
 
 {% block title -%}
-    {{ contribution.title }}
+    <span class="js-mathjax">{{ contribution.title }}</span>
 {%- endblock %}
 
 {% block info -%}
@@ -131,7 +131,7 @@
 
         {% if contribution.description %}
             <h3>{% trans %}Description{% endtrans %}</h3>
-            <div class="description">
+            <div class="description js-mathjax">
                 {{ contribution.description }}
             </div>
         {% endif %}
@@ -199,7 +199,7 @@
                     {% for subcontrib in contribution.subcontributions -%}
                         <li>
                             <span>
-                                <a href="{{ url_for('contributions.display_subcontribution', subcontrib) }}">
+                                <a class="js-mathjax" href="{{ url_for('contributions.display_subcontribution', subcontrib) }}">
                                     {{ subcontrib.title }}
                                 </a>
                             </span>

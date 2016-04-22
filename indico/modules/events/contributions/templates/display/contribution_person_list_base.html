@@ -24,7 +24,8 @@
                         {% trans %}Co-author in{% endtrans %}
                     {%- endif %}
                 </span>
-                <a class="contrib-title" href="{{ url_for('contributions.display_contribution', contribution) }}"
+                <a href="{{ url_for('contributions.display_contribution', contribution) }}"
+                   class="contrib-title js-mathjax"
                    data-searchable="{{ contribution.title | lower }}">
                     {{ contribution.title }}
                 </a>

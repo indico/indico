@@ -21,6 +21,7 @@
     $(document).ready(function() {
         setupActionLinks();
         setupConfirmPopup();
+        setupMathJax();
         setupSelectAllNone();
     });
 
@@ -186,5 +187,12 @@
             }
             confirmed.then(execute);
         });
+    }
+
+    function setupMathJax() {
+        var $elems = $('.js-mathjax');
+        if ($elems.length) {
+            $elems.mathJax();
+        }
     }
 })(window);

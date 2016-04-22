@@ -6,7 +6,7 @@
 {% block page_class %}conference-page item-summary{% endblock %}
 
 {% block title -%}
-    {{ subcontrib.title }}
+    <span class="js-mathjax">{{ subcontrib.title }}</span>
 {%- endblock %}
 
 {% block subtitle -%}
@@ -58,7 +58,7 @@
         </div>
         {% if subcontrib.description %}
             <h3>{% trans %}Description{% endtrans %}</h3>
-            <div class="description">
+            <div class="description js-mathjax">
                 {{ subcontrib.description }}
             </div>
         {% endif %}
