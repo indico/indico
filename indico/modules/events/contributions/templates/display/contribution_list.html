@@ -16,24 +16,27 @@
                 <span class="i-button label icon-search"></span>
                 <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
             </div>
+            {% if not g.static_site %}
+                <div class="group">
+                    <button class="i-button icon-filter js-dialog-action"
+                            data-href="{{ url_for('.customize_contribution_list', event) }}"
+                            data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                            data-dialog-classes="report-filter-dialog"
+                            data-update='{"html": "#display-contribution-list", "counter": "#counter"}'
+                            data-ajax-dialog
+                            title="{%- trans %}Filters{% endtrans -%}">
+                    </button>
+                </div>
+            {% endif %}
             <div class="group">
-                <button class="i-button icon-filter js-dialog-action"
-                        data-href="{{ url_for('.customize_contribution_list', event) }}"
-                        data-title="{% trans %}Contribution list configuration{% endtrans %}"
-                        data-dialog-classes="report-filter-dialog"
-                        data-update='{"html": "#display-contribution-list", "counter": "#counter"}'
-                        data-ajax-dialog
-                        title="{%- trans %}Filters{% endtrans -%}">
-                </button>
-            </div>
-            <div class="group">
-                <a href="{{ url_for('.contribution_list_pdf', event) }}"
+                <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
                    title="{% trans %}Export to PDF{% endtrans %}"
                    class="i-button icon-file-pdf"></a>
-               <button class="i-button icon-link js-static-url"
-                       data-href="{{ url_for('.contribution_list_static_url', event) }}"
-                       title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
-
+                {% if not g.static_site %}
+                   <button class="i-button icon-link js-static-url"
+                           data-href="{{ url_for('.contribution_list_static_url', event) }}"
+                           title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+                {% endif %}
             </div>
         </div>
     </div>

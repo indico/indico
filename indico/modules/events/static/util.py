@@ -20,12 +20,18 @@ import re
 
 
 _event_url_prefix_re = re.compile(r'^/event/\d+')
+_url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 
 
 def url_to_static_filename(url):
     # get rid of /event/1234
     url = _event_url_prefix_re.sub('', url)
-    # get rid of any other leading/trailing slash and replace slashes inside
-    url = url.strip('/').replace('/', '--')
+    # get rid of any other leading slash
+    url = url.strip('/')
+    if not url.startswith('assets/'):
+        # replace all remaining slashes
+        url = url.replace('/', '--')
     # it's not executed in a webserver, so we do need a .html extension
-    return url + '.html'
+    if not _url_has_extension_re.match(url):
+        url += '.html'
+    return url

@@ -287,11 +287,11 @@ def _offline_download_url(attachment):
         if isinstance(attachment.folder.object, db.m.Event):
             path = "events/conference"
         elif isinstance(attachment.folder.object, db.m.Session):
-            path = "agenda/%s-session".format(attachment.folder.session_id)
+            path = "agenda/{}-session".format(attachment.folder.session_id)
         elif isinstance(attachment.folder.object, db.m.Contribution):
-            path = "agenda/%s-contribution".format(attachment.folder.contribution_id)
+            path = "agenda/{}-contribution".format(attachment.folder.contribution_id)
         elif isinstance(attachment.folder.object, db.m.SubContribution):
-            path = "agenda/%s-subcontribution".format(attachment.folder.subcontribution_id)
+            path = "agenda/{}-subcontribution".format(attachment.folder.subcontribution_id)
         else:
             return ''
         return posixpath.join("files", path, str(attachment.id) + "-" + attachment.file.filename)

@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from io import BytesIO
-
 from flask import session, request, jsonify
 from pytz import timezone
 from sqlalchemy.orm import load_only, noload, joinedload
@@ -27,8 +25,8 @@ from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.contributions.util import (get_contributions_with_user_as_submitter,
-                                                      serialize_contribution_for_ical, ContributionDisplayReporter)
+from indico.modules.events.contributions.util import (ContributionDisplayReporter, get_contribution_ical_file,
+                                                      get_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
@@ -37,7 +35,6 @@ from indico.modules.events.paper_reviewing.legacy import get_reviewing_status
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
-from indico.web.http_api.metadata.serializer import Serializer
 
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.PDFinterface.conference import ContribToPDF, ContribsToPDF
@@ -100,6 +97,7 @@ class RHContributionList(RHDisplayProtectionBase):
     """Display list of event contributions"""
 
     MENU_ENTRY_NAME = 'contributions'
+    view_class = WPContributions
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
@@ -108,12 +106,14 @@ class RHContributionList(RHDisplayProtectionBase):
 
     def _process(self):
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
-        return WPContributions.render_template('display/contribution_list.html', self._conf, event=self.event_new,
+        return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event_new,
                                                timezone=tz, **self.reporter.get_contrib_report_kwargs())
 
 
 class RHContributionDisplay(RHContributionDisplayBase):
     """Display page with contribution details """
+
+    view_class = WPContributions
 
     def _process(self):
         if self.event_new.type == 'conference':
@@ -134,7 +134,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('subcontributions'),
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
-        return WPContributions.render_template('display/contribution_display.html', self._conf,
+        return self.view_class.render_template('display/contribution_display.html', self._conf,
                                                contribution=contrib,
                                                event=self.event_new,
                                                reviewing_status=reviewing_status,
@@ -148,20 +148,22 @@ class RHContributionDisplay(RHContributionDisplayBase):
 class RHAuthorList(RHDisplayProtectionBase):
 
     MENU_ENTRY_NAME = 'author_index'
+    view_class = WPAuthorList
 
     def _process(self):
         authors = _get_persons(self.event_new, ContributionPersonLink.author_type != AuthorType.none)
-        return WPAuthorList.render_template('display/author_list.html', self._conf,
+        return self.view_class.render_template('display/author_list.html', self._conf,
                                             authors=authors, event=self.event_new)
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
 
     MENU_ENTRY_NAME = 'speaker_index'
+    view_class = WPSpeakerList
 
     def _process(self):
         speakers = _get_persons(self.event_new, ContributionPersonLink.is_speaker)
-        return WPSpeakerList.render_template('display/speaker_list.html', self._conf,
+        return self.view_class.render_template('display/speaker_list.html', self._conf,
                                              speakers=speakers, event=self.event_new)
 
 
@@ -218,9 +220,7 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
     def _process(self):
         if not self.contrib.is_scheduled:
             raise NotFound('This contribution is not scheduled')
-        data = {'results': serialize_contribution_for_ical(self.contrib)}
-        serializer = Serializer.create('ics')
-        return send_file('contribution.ics', BytesIO(serializer(data)), 'text/calendar')
+        return send_file('contribution.ics', get_contribution_ical_file(self.contrib), 'text/calendar')
 
 
 class RHContributionReport(RHContributionList):
@@ -252,6 +252,7 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
             lambda self: self.subcontrib
         }
     }
+    view_class = WPContributions
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
@@ -263,5 +264,5 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):
-        return WPContributions.render_template('display/subcontribution_display.html', self._conf, event=self.event_new,
+        return self.view_class.render_template('display/subcontribution_display.html', self._conf, event=self.event_new,
                                                subcontrib=self.subcontrib)

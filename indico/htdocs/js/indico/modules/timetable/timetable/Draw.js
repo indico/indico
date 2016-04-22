@@ -673,39 +673,57 @@ function drawBalloon(self, evt, editable) {
     var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
 
-    timetableBlock.qbubble({
-        id: entryId.toString(),
-        content: {
-            text: function(evt, api) {
-                return loadBalloonContent(self, api, editable);
-            }
-        },
-        show: {
-            ready: true
-        },
-        hide: {
-            event: 'unfocus',
-            fixed: true
-        },
-        events: {
-            hide: function(evt, api) {
-                if (evt.originalEvent.type == 'mouseleave') {
-                    evt.preventDefault();
+    if (window.indicoOfflineSite) {
+        var url;
+        if (self.eventData.entryType == 'Session') {
+            url = build_url(Indico.Urls.Sessions.display_session, {
+                'confId': self.eventData.conferenceId,
+                'session_id': self.eventData.sessionId
+            });
+        } else if (self.eventData.entryType == 'Contribution') {
+            url = build_url(Indico.Urls.Contributions.display_contribution, {
+                'confId': self.eventData.conferenceId,
+                'contrib_id': self.eventData.contributionId}
+            );
+        } else {
+            return;
+        }
+        location.href = url;
+    } else {
+        timetableBlock.qbubble({
+            id: entryId.toString(),
+            content: {
+                text: function(evt, api) {
+                    return loadBalloonContent(self, api, editable);
                 }
+            },
+            show: {
+                ready: true
+            },
+            hide: {
+                event: 'unfocus',
+                fixed: true
+            },
+            events: {
+                hide: function(evt, api) {
+                    if (evt.originalEvent.type == 'mouseleave') {
+                        evt.preventDefault();
+                    }
+                }
+            },
+            position: {
+                at: 'top center',
+                my: 'bottom center',
+                target: [ evt.pageX, evt.pageY ],
+                adjust: {
+                    mouse: false
+                }
+            },
+            style: {
+                classes: 'balloon-qtip'
             }
-        },
-        position: {
-            at: 'top center',
-            my: 'bottom center',
-            target: [ evt.pageX, evt.pageY ],
-            adjust: {
-                mouse: false
-            }
-        },
-        style: {
-            classes: 'balloon-qtip'
-        },
-    });
+        });
+    }
 }
 
 type("TimetableBlockDisplayMixin",[],

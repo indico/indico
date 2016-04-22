@@ -296,3 +296,10 @@ def shift_following_entries(entry, start_dt, session_=None):
     for entr in entries:
         entr.move(entr.start_dt + diff)
     return entries
+
+
+def get_timetable_offline_pdf_generator(event):
+    from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
+    pdf_format = TimetablePDFFormat()
+    return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
+                          fontsize='normal')

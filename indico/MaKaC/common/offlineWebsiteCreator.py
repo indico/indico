@@ -14,37 +14,46 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 import errno
+import inspect
+import itertools
 import os
 import posixpath
 import re
-import requests
 import shutil
+
+import requests
 from bs4 import BeautifulSoup
+from flask import request
 from werkzeug.utils import secure_filename
 
+from MaKaC.common.contribPacker import ZIPFileHandler
+from MaKaC.common import timezoneUtils, HelperMaKaCInfo
+from MaKaC.PDFinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPBase
-from MaKaC.webinterface.pages.static import (WPStaticConferenceTimeTable, WPStaticConferenceProgram,
-                                             WPStaticContributionList, WPStaticCustomPage, WPStaticAuthorIndex,
-                                             WPStaticSpeakerIndex, WPStaticSessionDisplay, WPStaticContributionDisplay,
-                                             WPStaticSubContributionDisplay, WPStaticAuthorDisplay,
-                                             WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay,
-                                             WPStaticDisplayRegistrationParticipantList)
+from MaKaC.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay, WPStaticConferenceProgram,
+                                             WPStaticContributionDisplay, WPStaticContributionList, WPStaticCustomPage,
+                                             WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
+                                             WPStaticSpeakerList, WPStaticSubcontributionDisplay, WPStaticTimetable,
+                                             WPTPLStaticConferenceDisplay)
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.common.contribPacker import ZIPFileHandler
-from MaKaC.errors import MaKaCError
-from MaKaC.common import timezoneUtils, HelperMaKaCInfo
-from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, ContribsToPDF
 
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
+                                                                     RHContributionDisplay, RHContributionList,
+                                                                     RHSpeakerList, RHSubcontributionDisplay)
+from indico.modules.events.contributions.util import get_contribution_ical_file
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.registration.controllers.display import RHParticipantList
+from indico.modules.events.sessions.util import get_session_timetable_pdf, get_session_ical_file
+from indico.modules.events.sessions.controllers.display import RHDisplaySession
+from indico.modules.events.timetable.controllers.display import RHTimetable
+from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
 from indico.web.flask.util import url_for
@@ -94,6 +103,7 @@ class OfflineEventCreator(object):
     def __init__(self, rh, conf, event_type=""):
         self._rh = rh
         self._conf = conf
+        self._display_tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
         self.event = conf.as_event
         self._html = ""
         self._fileHandler = None
@@ -251,13 +261,12 @@ class OfflineEventCreator(object):
         return secure_filename(remove_tags(path))
 
     def _getAllMaterial(self):
-        event = self._conf.as_event
-        self._addMaterialFrom(event, "events/conference")
-        for contrib in event.contributions:
+        self._addMaterialFrom(self.event, "events/conference")
+        for contrib in self.event.contributions:
             self._addMaterialFrom(contrib, "agenda/%s-contribution" % contrib.id)
             for sc in contrib.subcontributions:
                 self._addMaterialFrom(sc, "agenda/%s-subcontribution" % sc.id)
-        for session in event.sessions:
+        for session in self.event.sessions:
             self._addMaterialFrom(session, "agenda/%s-session" % session.id)
 
     def _addMaterialFrom(self, target, categoryPath):
@@ -307,11 +316,14 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Those which are backed by a WP class get their name from that class;
         # the others are simply hardcoded.
         self._menu_offline_items = {'overview': None, 'abstracts_book': None}
-        wps = {WPStaticConferenceProgram, WPStaticConferenceTimeTable, WPStaticAuthorIndex, WPStaticSpeakerIndex,
-               WPStaticContributionList}
+        wps = {WPStaticConferenceProgram}
         for cls in wps:
             self._menu_offline_items[cls.menu_entry_name] = cls(self._rh, self._conf)
-        rhs = {RHParticipantList: WPStaticDisplayRegistrationParticipantList}
+        rhs = {RHParticipantList: WPStaticDisplayRegistrationParticipantList,
+               RHContributionList: WPStaticContributionList,
+               RHAuthorList: WPStaticAuthorList,
+               RHSpeakerList: WPStaticSpeakerList,
+               RHTimetable: WPStaticTimetable}
         for rh_cls, wp in rhs.iteritems():
             rh = rh_cls()
             rh.view_class = wp
@@ -325,18 +337,18 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Getting all menu items
         self._get_menu_items()
         # Getting conference timetable in PDF
-        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain,
-                     conf=self._conf, aw=self._rh._aw, legacy=True)
+        self._addPdf(self._conf, 'timetable.export_default_pdf',
+                     get_timetable_offline_pdf_generator(self.event))
         # Generate contributions in PDF
-        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ContribsToPDF, conf=self._conf,
-                     contribs=self._conf.getContributionList())
+        self._addPdf(self._conf, 'contributions.contribution_list_pdf', ContribsToPDF, conf=self._conf,
+                     contribs=self.event.contributions)
 
         # Getting specific pages for contributions
-        for cont in self._conf.getContributionList():
-            self._getContrib(cont)
+        for contrib in self.event.contributions:
+            self._getContrib(contrib)
             # Getting specific pages for subcontributions
-            for subCont in cont.getSubContributionList():
-                self._getSubContrib(subCont)
+            for subcontrib in contrib.subcontributions:
+                self._getSubContrib(subcontrib)
 
         for session in self._conf.getSessionList():
             self._getSession(session)
@@ -363,66 +375,86 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
         if entry.name == 'program':
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf, legacy=True)
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf)
 
     def _get_custom_page(self, page):
         html = WPStaticCustomPage.render_template('page.html', self._conf, page=page)
         self._addPage(html, 'event_pages.page_display', page)
 
-    def _addPage(self, html, uh_or_endpoint, target=None, **params):
+    def _getUrl(self, uh_or_endpoint, target, **params):
         if isinstance(uh_or_endpoint, basestring):
-            url = url_for(uh_or_endpoint, target, _external=False, **params)
+            return url_for(uh_or_endpoint, target, **params)
         else:
-            url = str(uh_or_endpoint.getStaticURL(target, **params))
+            return str(uh_or_endpoint.getStaticURL(target, **params))
+
+    def _addPage(self, html, uh_or_endpoint, target=None, **params):
+        url = self._getUrl(uh_or_endpoint, target, **params)
         fname = os.path.join(self._mainPath, url)
         html = self._get_static_files(html)
         self._fileHandler.addNewFile(fname, html)
 
+    def _add_from_rh(self, rh_class, view_class, params, url_for_target):
+        rh = rh_class()
+        rh.view_class = view_class
+        request.view_args = params
+        rh._checkParams(params)
+        html = rh._process()
+        self._addPage(html, rh.view_class.endpoint, url_for_target)
+
     def _getContrib(self, contrib):
-        html = WPStaticContributionDisplay(self._rh, contrib, 0).display()
-        self._addPage(html, urlHandlers.UHContributionDisplay, target=contrib)
-        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, contrib=contrib)
+        self._add_from_rh(RHContributionDisplay, WPStaticContributionDisplay,
+                          {'confId': self._conf.id, 'contrib_id': contrib.id},
+                          contrib)
+        self._addPdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
 
-        for author in contrib.getAuthorList():
+        for author in contrib.primary_authors:
             self._getAuthor(contrib, author)
-        for author in contrib.getCoAuthorList():
+        for author in contrib.secondary_authors:
             self._getAuthor(contrib, author)
 
-    def _getSubContrib(self, subContrib):
-        html = WPStaticSubContributionDisplay(self._rh, subContrib).display()
-        self._addPage(html, urlHandlers.UHSubContributionDisplay, target=subContrib)
+        if contrib.timetable_entry:
+            self._add_file(get_contribution_ical_file(contrib), 'contributions.export_ics', contrib)
+
+    def _getSubContrib(self, subcontrib):
+        self._add_from_rh(RHSubcontributionDisplay, WPStaticSubcontributionDisplay,
+                          {'confId': self._conf.id, 'contrib_id': subcontrib.contribution.id,
+                           'subcontrib_id': subcontrib.id}, subcontrib)
 
     def _getAuthor(self, contrib, author):
-        try:
-            html = WPStaticAuthorDisplay(self._rh, contrib, author.getId()).display()
-            self._addPage(html, urlHandlers.UHContribAuthorDisplay, target=contrib, authorId=author.getId())
-        except MaKaCError:
-            pass
+        rh = RHContributionAuthor()
+        params = {'confId': self._conf.id, 'contrib_id': contrib.id, 'person_id': author.id}
+        request.view_args = params
+        rh._checkParams(params)
+        html = rh._process()
+        self._addPage(html, 'contributions.display_author', self._conf, contrib_id=contrib.id, person_id=author.id)
 
     def _getSession(self, session):
-        html = WPStaticSessionDisplay(self._rh, session).display(activeTab="")
-        self._addPage(html, urlHandlers.UHSessionDisplay, target=session)
+        self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
+                          {'confId': self._conf.id, 'session_id': session.id}, session)
 
-        htmlContrib = WPStaticSessionDisplay(self._rh, session).display(activeTab="contribs")
-        sessionContribfile = os.path.join(self._mainPath,
-                                          'contribs-' + urlHandlers.UHSessionDisplay.getStaticURL(session))
-        htmlContrib = self._get_static_files(htmlContrib)
-        self._fileHandler.addNewFile(sessionContribfile, htmlContrib)
-        self._addPdf(session, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw,
-                     showSessions=[session.getId()], legacy=True)
+        pdf = get_session_timetable_pdf(session, tz=self._display_tz)
+        self._addPdf(session, 'sessions.export_session_timetable', pdf)
 
-    def _addPdf(self, event, pdfUrlHandler, generatorClass,
-                legacy=False, **generatorParams):
-        """
-        `legacy` specifies whether reportlab should be used instead of the
-        new LaTeX generation mechanism
-        """
-        tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
-        filename = os.path.join(self._mainPath, pdfUrlHandler.getStaticURL(event))
-        pdf = generatorClass(tz=tz, **generatorParams)
+        self._add_file(get_session_ical_file(session), 'sessions.export_ics', session)
 
-        if legacy:
-            self._fileHandler.addNewFile(filename, pdf.getPDFBin())
+    def _addPdf(self, target, uh_or_endpoint, generator_class_or_instance, **generatorParams):
+        if inspect.isclass(generator_class_or_instance):
+            pdf = generator_class_or_instance(tz=self._display_tz, **generatorParams)
+        else:
+            pdf = generator_class_or_instance
+
+        if hasattr(pdf, 'getPDFBin'):
+            # Got legacy reportlab PDF generator instead of the LaTex-based one
+            self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:
             with open(pdf.generate()) as f:
-                self._fileHandler.addNewFile(filename, f.read())
+                self._add_file(f, uh_or_endpoint, target)
+
+    def _add_file(self, file_like_or_str, uh_or_endpoint, target):
+        if isinstance(file_like_or_str, str):
+            content = file_like_or_str
+        else:
+            # FIXME: the FileHandler should accept a file-like object
+            content = file_like_or_str.read()
+        filename = os.path.join(self._mainPath, self._getUrl(uh_or_endpoint, target))
+        self._fileHandler.addNewFile(filename, content)

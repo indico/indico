@@ -93,6 +93,7 @@ def generate_global_file(config):
             },
 
             'Timetable': {
+                'default_pdf': url_rule_to_js('timetable.export_default_pdf'),
                 'pdf': url_rule_to_js('timetable.export_pdf'),
                 'reschedule': url_rule_to_js('timetable.reschedule'),
                 'breaks': {
@@ -123,6 +124,14 @@ def generate_global_file(config):
                         'manage': url_rule_to_js('timetable.entry_info_manage'),
                     },
                 }
+            },
+
+            'Contributions': {
+                'display_contribution': url_rule_to_js('contributions.display_contribution')
+            },
+
+            'Sessions': {
+                'display_session': url_rule_to_js('sessions.display_session')
             }
         },
 

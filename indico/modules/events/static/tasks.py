@@ -49,6 +49,8 @@ def build_static_site(static_site):
 
         g.rh = rh
         ContextManager.set('currentRH', rh)
+
+        g.static_site = True
         ContextManager.set('offlineMode', True)
 
         # Get event type

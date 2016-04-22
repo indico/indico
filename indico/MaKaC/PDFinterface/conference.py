@@ -1107,10 +1107,10 @@ class TimeTablePlain(PDFWithTOC):
 
 
 class SimplifiedTimeTablePlain(PDFBase):
-    def __init__(self, conf, aw, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
+    def __init__(self, event, aw, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
                  fontsize='normal', tz=None):
-        self._conf = conf
-        self._event = conf.as_event
+        self._conf = event.as_legacy
+        self._event = event
         self._tz = tz or self._conf.getTimezone()
         self._aw = aw
         self._showSessions = showSessions

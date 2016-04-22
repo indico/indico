@@ -87,21 +87,26 @@
         {% if contribution.can_manage(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans %}Edit contribution{% endtrans %}"
-               data-href="{{ url_for('.manage_update_contrib', contribution) }}"
+               data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
                data-ajax-dialog
                data-reload-after></a>
         {%- endif %}
         <div class="group">
-            <a href="{{ url_for('.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
             {% if contribution.timetable_entry -%}
-                <a id="exportIcal{{ contribution.id }}" href="#"
-                   class="i-button icon-calendar exportIcal"
-                   data-id="{{ contribution.id }}"></a>
+                {% if g.static_site %}
+                    <a href="{{ url_for('contributions.export_ics', contribution) }}"
+                       class="i-button icon-calendar"></a>
+                {% else %}
+                    <a id="exportIcal{{ contribution.id }}" href="#"
+                       class="i-button icon-calendar exportIcal"
+                       data-id="{{ contribution.id }}"></a>
+                {% endif %}
             {%- endif %}
         </div>
 
         {% if contribution.timetable_entry -%}
-            {% with item=contribution, ics_url=url_for('.export_ics', contribution) -%}
+            {% with item=contribution, ics_url=url_for('contributions.export_ics', contribution) -%}
                 {% include 'events/contributions/display/contribution_ical_export.html' %}
             {%- endwith %}
         {%- endif %}
@@ -194,14 +199,14 @@
                     {% for subcontrib in contribution.subcontributions -%}
                         <li>
                             <span>
-                                <a href="{{ url_for('.display_subcontribution', subcontrib) }}">
+                                <a href="{{ url_for('contributions.display_subcontribution', subcontrib) }}">
                                     {{ subcontrib.title }}
                                 </a>
                             </span>
                             {% if subcontrib.can_manage(session.user) -%}
                                 <span class="right group">
                                     <a href="#" class="icon-edit"
-                                       data-href="{{ url_for('.manage_edit_subcontrib', subcontrib) }}"
+                                       data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib) }}"
                                        data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
                                        data-ajax-dialog
                                        data-reload-after></a>

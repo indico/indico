@@ -62,6 +62,8 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
 
 
 class RHDisplaySession(RHDisplaySessionBase):
+    view_class = WPDisplaySession
+
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions', self.session)
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
@@ -78,7 +80,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .filter_by(id=self.session.id)
                 .options(contributions_strategy, blocks_strategy)
                 .one())
-        return WPDisplaySession.render_template('display/session_display.html', self._conf, sess=sess,
+        return self.view_class.render_template('display/session_display.html', self._conf, sess=sess,
                                                 event=self.event_new, timezone=tz, **ical_params)
 
 

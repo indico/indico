@@ -257,7 +257,6 @@ def url_for(endpoint, *targets, **values):
         values.update(locator)
 
     static_site_mode = bool(ContextManager.get('offlineMode'))
-    values.setdefault('_external', static_site_mode)
 
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
@@ -265,7 +264,7 @@ def url_for(endpoint, *targets, **values):
             values[key] = int(value)
 
     url = _url_for(endpoint, **values)
-    if static_site_mode and not values['_external']:
+    if static_site_mode and not values.get('_external', False):
         # for static sites we assume all relative urls need to be
         # mangled to a filename
         # we should really fine a better way to handle anything

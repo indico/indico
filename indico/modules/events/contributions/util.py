@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict, OrderedDict
 from datetime import timedelta
+from io import BytesIO
 
 from flask import flash, session
 from pytz import timezone
@@ -39,6 +40,7 @@ from indico.util.string import to_unicode
 from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
 from MaKaC.common.timezoneUtils import DisplayTZ
 
@@ -279,6 +281,12 @@ def serialize_contribution_for_ical(contrib):
         'speakers': [serialize_person_link(x) for x in contrib.speakers],
         'description': contrib.description
     }
+
+
+def get_contribution_ical_file(contrib):
+    data = {'results': serialize_contribution_for_ical(contrib)}
+    serializer = Serializer.create('ics')
+    return BytesIO(serializer(data))
 
 
 class ContributionDisplayReporter(ContributionReporter):

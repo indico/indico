@@ -13,13 +13,14 @@
                 <a class="i-button arrow" data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     {%- for attachment in folder.attachments -%}
+                        {% set previewable = (attachment.file and attachment.file.is_previewable and not g.static_site) or false %}
                         <li>
-                            <a data-previewable="{% if attachment.file %}{{ attachment.file.is_previewable | tojson }}{% else %}false{% endif %}"
+                            <a data-previewable="{{ previewable | tojson }}"
                                data-attachment-id="{{ attachment.id }}"
                                href="{{ attachment.download_url }}" target="_blank"
                                class="attachment {{ get_attachment_icon(attachment) }}
                                       {%- if attachment.is_self_protected %} is-protected{% endif %}
-                                      {%- if attachment.file.is_previewable %} js-preview-dialog{% endif %}">
+                                      {%- if previewable %} js-preview-dialog{% endif %}">
                                 {{- attachment.title -}}
                             </a>
                         </li>

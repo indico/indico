@@ -53,15 +53,19 @@
             </div>
         {%- endif %}
         <div class="group">
-            <a href="{{ url_for('.export_session_timetable', sess) }}" class="i-button icon-file-pdf"></a>
+            <a href="{{ url_for('sessions.export_session_timetable', sess) }}" class="i-button icon-file-pdf"></a>
             {% if sess.start_dt -%}
-                <a id="exportIcal{{ sess.id }}" href="#"
-                   class="i-button icon-calendar exportIcal"
-                   data-id="{{ sess.id }}"></a>
+                {% if g.static_site %}
+                    <a href="{{ url_for('sessions.export_ics', sess) }}" class="i-button icon-calendar"></a>
+                {% else %}
+                    <a id="exportIcal{{ sess.id }}" href="#"
+                       class="i-button icon-calendar exportIcal"
+                       data-id="{{ sess.id }}"></a>
+                {% endif %}
             {%- endif %}
         </div>
         {% if sess.start_dt -%}
-            {% with item=sess, ics_url=url_for('.export_ics', sess) -%}
+            {% with item=sess, ics_url=url_for('sessions.export_ics', sess) -%}
                 {% include 'events/sessions/display/session_ical_export.html' %}
             {%- endwith %}
         {%- endif %}

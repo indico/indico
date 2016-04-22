@@ -26,28 +26,30 @@
     {% endif %}
 {% endmacro %}
 
-<div class="infoline announcement">
-    <span class="icon icon-ticket"></span>
-    <div class="text">
-        <div class="label">{% trans %}Registration{% endtrans %}</div>
-        {% if user_has_registered %}
-            <div>{% trans %}You have registered for this event.{% endtrans %}</div>
-            <div class="toolbar right">
-                {{ _render_ticket_dropdown() }}
-                <a class="i-button next highlight"
-                   href="{{ url_for('event_registration.display_regform', regforms[0]) if regforms|length == 1 else
-                            url_for('event_registration.display_regform_list', event) }}">
-                    {% trans %}See details{% endtrans %}
-                </a>
-            </div>
-        {% else %}
-            <div>{% trans %}Registration for this event is currently open.{% endtrans %}</div>
-            <div class="toolbar right">
-                <a href="{{ url_for('event_registration.display_regform_list', event) }}"
-                   class="i-button next highlight">
-                    {% trans %}Register now{% endtrans %}
-                </a>
-            </div>
-        {% endif %}
+{% if not g.static_site %}
+    <div class="infoline announcement">
+        <span class="icon icon-ticket"></span>
+        <div class="text">
+            <div class="label">{% trans %}Registration{% endtrans %}</div>
+            {% if user_has_registered %}
+                <div>{% trans %}You have registered for this event.{% endtrans %}</div>
+                <div class="toolbar right">
+                    {{ _render_ticket_dropdown() }}
+                    <a class="i-button next highlight"
+                       href="{{ url_for('event_registration.display_regform', regforms[0]) if regforms|length == 1 else
+                                url_for('event_registration.display_regform_list', event) }}">
+                        {% trans %}See details{% endtrans %}
+                    </a>
+                </div>
+            {% else %}
+                <div>{% trans %}Registration for this event is currently open.{% endtrans %}</div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('event_registration.display_regform_list', event) }}"
+                       class="i-button next highlight">
+                        {% trans %}Register now{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
+{% endif %}

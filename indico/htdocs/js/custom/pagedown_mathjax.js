@@ -2,7 +2,9 @@
 
 // General MathJax configuration
 (function() {
-    MathJax.Ajax.config.root = Indico.Urls.Base + "/js/lib/mathjax";
+    if (!window.indicoOfflineSite) {
+        MathJax.Ajax.config.root = Indico.Urls.Base + "/js/lib/mathjax";
+    }
 })();
 
 (function() {

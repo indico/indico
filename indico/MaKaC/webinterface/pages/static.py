@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPSpeakerList
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.registration.views import WPDisplayRegistrationParticipantList
-from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable,
-                                                  WPConferenceProgram, WPContributionList, WPAuthorIndex,
-                                                  WPSpeakerIndex)
-from MaKaC.webinterface.pages.sessions import WPSessionDisplay
-from MaKaC.webinterface.pages.contributions import WPContributionDisplay
-from MaKaC.webinterface.pages.subContributions import WPSubContributionDisplay
+from indico.modules.events.sessions.views import WPDisplaySession
+from indico.modules.events.timetable.views import WPDisplayTimetable
 from MaKaC.webinterface.pages.authors import WPAuthorDisplay
+from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceProgram
 
 
 class WPStaticEventBase:
@@ -35,10 +33,6 @@ class WPStaticEventBase:
     def _getFooter(self):
         return ""
 
-    def getJSFiles(self):
-        return (self._asset_env['base_js'].urls() + self._asset_env['modules_event_display_js'].urls() +
-                self._asset_env['modules_attachments_js'].urls())
-
 
 class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
     pass
@@ -48,11 +42,9 @@ class WPStaticConferenceDisplay(WPStaticEventBase, WPConferenceDisplay):
     pass
 
 
-class WPStaticConferenceTimeTable(WPStaticEventBase, WPConferenceTimeTable):
-    endpoint = 'event.conferenceTimeTable'
-
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + self._includeJSPackage('Timetable')
+class WPStaticTimetable(WPStaticEventBase, WPDisplayTimetable):
+    endpoint = 'timetable.timetable'
+    menu_entry_name = 'timetable'
 
 
 class WPStaticConferenceProgram(WPStaticEventBase, WPConferenceProgram):
@@ -63,49 +55,39 @@ class WPStaticDisplayRegistrationParticipantList(WPStaticEventBase, WPDisplayReg
     endpoint = 'event_registration.participant_list'
 
 
-class WPStaticContributionList(WPStaticEventBase, WPContributionList):
-    endpoint = 'event.contributionListDisplay'
-
-    def _getBody(self, params):
-        from MaKaC.webinterface.rh.conferenceDisplay import RHContributionList
-        from MaKaC.webinterface.pages.conferences import WConfContributionList
-        # Getting an contribution list empty filter
-        filterCriteria = RHContributionList.create_filter(self._conf, params)
-        wc = WConfContributionList(self._getAW(), self._conf, filterCriteria, "")
-        return wc.getHTML()
+class WPStaticContributionList(WPStaticEventBase, WPContributions):
+    endpoint = 'contributions.contribution_list'
+    template_prefix = 'events/contributions/'
+    menu_entry_name = 'contributions'
 
 
 class WPStaticCustomPage(WPStaticEventBase, WPPage):
     pass
 
 
-class WPStaticAuthorIndex(WPStaticEventBase, WPAuthorIndex):
-    endpoint = 'event.confAuthorIndex'
-
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + WPAuthorIndex.getJSFiles(self) + self._includeJSPackage('authors')
-
-
-class WPStaticSpeakerIndex(WPStaticEventBase, WPSpeakerIndex):
-    endpoint = 'event.confSpeakerIndex'
-
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + WPSpeakerIndex.getJSFiles(self)
+class WPStaticAuthorList(WPStaticEventBase, WPAuthorList):
+    endpoint = 'contributions.author_list'
+    template_prefix = 'events/contributions/'
+    menu_entry_name = 'author_index'
 
 
-class WPStaticSessionDisplay(WPStaticEventBase, WPSessionDisplay):
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + self._includeJSPackage('Timetable')
+class WPStaticSpeakerList(WPStaticEventBase, WPSpeakerList):
+    endpoint = 'contributions.speaker_list'
+    template_prefix = 'events/contributions/'
+    menu_entry_name = 'speaker_index'
 
 
-class WPStaticContributionDisplay(WPStaticEventBase, WPContributionDisplay):
-    pass
+class WPStaticSessionDisplay(WPStaticEventBase, WPDisplaySession):
+    endpoint = 'sessions.display_session'
 
 
-class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay):
-    pass
+class WPStaticContributionDisplay(WPStaticEventBase, WPContributions):
+    endpoint = 'contributions.display_contribution'
+
+
+class WPStaticSubcontributionDisplay(WPStaticEventBase, WPContributions):
+    endpoint = 'contributions.display_subcontribution'
 
 
 class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + WPAuthorDisplay.getJSFiles(self)
+    pass
