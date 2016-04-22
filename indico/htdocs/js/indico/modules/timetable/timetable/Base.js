@@ -900,6 +900,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
             var sessionAdd = $('<a href="#"/>').text($T('Session block')).appendTo(ul).wrap("<li/>");
             sessionAdd.bind('menu_select', function() {
                 if (keys(self.eventInfo.sessions).length === 0) {
+                    $(this).closest('.group').dropdown('close');
                     self.managementActions.addSession();
                 } else {
                     self._openSessionMenu($(this).parent(), ul);
