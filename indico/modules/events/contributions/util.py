@@ -296,6 +296,7 @@ class ContributionDisplayReporter(ContributionReporter):
         total_entries = contrib_report_kwargs.pop('total_entries')
         contribs = contrib_report_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')
+        tpl_reports = get_template_module('events/management/_reports.html')
         tz = timezone(DisplayTZ(session.user, self.report_event.as_legacy).getDisplayTZ())
         return {'html': tpl.render_contribution_list(self.report_event, tz, contribs),
-                'counter': tpl.render_displayed_entries_fragment(len(contribs), total_entries)}
+                'counter': tpl_reports.render_displayed_entries_fragment(len(contribs), total_entries)}
