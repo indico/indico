@@ -32,19 +32,19 @@ from indico.web.forms.validators import UsedIf
 
 
 class SessionForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_('Title of the session'))
-    code = StringField(_('Session code'), description=_('Code of the session'))
-    description = TextAreaField(_('Description'), description=_('Text describing the session'))
+    title = StringField(_('Title'), [DataRequired()])
+    code = StringField(_('Session code'), description=_('The code that will identify the session in the Book of '
+                                                        'Abstracts.'))
+    description = TextAreaField(_('Description'))
     default_contribution_duration = TimeDeltaField(_('Default contribution duration'), units=('minutes', 'hours'),
-                                                   description=_('Specify the default duration of contributions '
-                                                                 'within the session'),
+                                                   description=_('Duration that a contribution created within this '
+                                                                 'session will have by default.'),
                                                    default=timedelta(minutes=20))
-    location_data = IndicoLocationField(_("Location"),
+    location_data = IndicoLocationField(_("Default location"),
                                         description=_("Default location for blocks inside the session."))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors(),
-                                      description=_('Specify text and background colours for the session.'))
+    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
     is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
-                             description=_('Whether the session is a poster session.'))
+                             description=_('Whether the session is a poster session or contains normal presentations.'))
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')

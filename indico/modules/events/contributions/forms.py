@@ -45,12 +45,10 @@ class ContributionForm(IndicoForm):
                                    allow_clear=False,
                                    description=_("Start date of the contribution"))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              default=timedelta(minutes=20), units=('minutes', 'hours'),
-                              description=_("The duration of the contribution"))
+                              default=timedelta(minutes=20), units=('minutes', 'hours'))
     type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
     person_link_data = ContributionPersonLinkListField(_("People"))
-    location_data = IndicoLocationField(_("Location"),
-                                        description=_("The physical location where the contribution takes place."))
+    location_data = IndicoLocationField(_("Location"))
     keywords = IndicoTagListField(_('Keywords'))
     references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
                                  description=_("Manage external resources for this contribution"))
@@ -100,8 +98,7 @@ class SubContributionForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     description = TextAreaField(_('Description'))
     duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              default=timedelta(minutes=20), units=('minutes', 'hours'),
-                              description=_('The duration of the subcontribution'))
+                              default=timedelta(minutes=20), units=('minutes', 'hours'))
     speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False,
                                                   description=_('The speakers of the subcontribution'))
     references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
@@ -140,8 +137,7 @@ class ContributionStartDateForm(IndicoForm):
 
 class ContributionDurationForm(IndicoForm):
     duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(days=1))],
-                              default=timedelta(minutes=20), units=('minutes', 'hours'),
-                              description=_('The duration of the contribution'))
+                              default=timedelta(minutes=20), units=('minutes', 'hours'))
 
     def __init__(self, *args, **kwargs):
         self.contrib = kwargs.pop('contrib')

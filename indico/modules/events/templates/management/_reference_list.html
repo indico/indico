@@ -1,7 +1,7 @@
 {% macro render_event_references_list(references) %}
     <div id="reference-list">
         {% if not references -%}
-            <p>{% trans %}There are no external IDs yet.{% endtrans %}</p>
+            <em>{% trans %}None{% endtrans %}</em>
         {%- else %}
             <ul>
                 {% for reference in references -%}
