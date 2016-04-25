@@ -20,10 +20,11 @@ from math import ceil
 
 from flask import jsonify, request
 
+from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
+from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from MaKaC.statistics import CategoryStatistics
 from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
 
 
@@ -44,47 +45,40 @@ def _plot_data(stats, tooltip=''):
 
 
 def _process_stats(stats, root=False):
-    if stats is None:
-        return
-
     # tooltip formatting is for ease of translation
     plots = [
         (_('Number of events'), _('The year is the one of the start date of the event.'),
-         _plot_data(stats.get('events', {}),
+         _plot_data(stats.get('events_by_year', {}),
                     tooltip=_('{value} events in {year}').format(value='', year=''))),
         (_('Number of contributions'), _('The year is the one of the start date of the contribution.'),
-         _plot_data(stats.get('contributions', {}),
+         _plot_data(stats.get('contribs_by_year', {}),
                     tooltip=_('{value} contributions in {year}').format(value='', year='')))
     ]
-    values = [(_('Number of attachments'), stats['files'])]
+    values = [(_('Number of attachments'), stats['attachments'])]
     if root:
-        values.append((_('Number of users'), stats.get('users', 0)))
+        values.append((_('Number of users'), _count_users()))
 
     return plots, values, stats['updated']
 
 
+def _count_users():
+    return User.find(is_deleted=False, is_pending=False).count()
+
+
 class RHCategoryStatistics(RHCategDisplayBase):
     def _process(self):
-        stats = CategoryStatistics(self._target).getStatistics()
-        if stats is not None:
-            stats = stats.copy()
+        stats = get_category_stats(int(self._target.getId()))
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
-            if stats is None:
-                stats = {'events': None, 'contributions': None, 'files': None, 'updated': None}
-            else:
-                stats = dict(stats)
-
-            if stats['updated']:
-                stats['updated'] = stats['updated'].isoformat()
-            return jsonify(stats)
+            data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
+                    'files': stats['attachments'], 'updated': stats['updated'].isoformat()}
+            if self._target.isRoot():
+                data['users'] = _count_users()
+            return jsonify(data)
         else:
-            if stats is not None:
-                plots, values, updated = _process_stats(stats, root=self._target.isRoot())
-            else:
-                plots = values = updated = None
+            plots, values, updated = _process_stats(stats, root=self._target.isRoot())
             return WPCategoryStatistics.render_template('category_statistics.html', self._target,
                                                         cat=self._target,
                                                         plots=plots,
                                                         values=values,
                                                         updated=updated,
-                                                        has_stats=(stats is not None))
+                                                        has_stats=True)
