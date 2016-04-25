@@ -313,6 +313,7 @@ class EventPersonListField(PrincipalListField):
     """
 
     def __init__(self, *args, **kwargs):
+        self.event_person_conversions = {}
         super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, serializable=False,
                                                    **kwargs)
 
@@ -325,10 +326,19 @@ class EventPersonListField(PrincipalListField):
 
     def _create_event_person(self, data):
         title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        return EventPerson(event_new=self.event, email=data['email'].lower(), _title=title,
-                           first_name=data.get('firstName'), last_name=data['familyName'],
-                           affiliation=data.get('affiliation'), address=data.get('address'),
-                           phone=data.get('phone'))
+        person = EventPerson(event_new=self.event, email=data['email'].lower(), _title=title,
+                             first_name=data.get('firstName'), last_name=data['familyName'],
+                             affiliation=data.get('affiliation'), address=data.get('address'),
+                             phone=data.get('phone'))
+        # Keep the original data to cancel the conversion if the person is not persisted to the db
+        self.event_person_conversions[person] = data
+        return person
+
+    def _get_event_person_for_user(self, user):
+        person = EventPerson.for_user(user, self.event)
+        # Keep a reference to the user to cancel the conversion if the person is not persisted to the db
+        self.event_person_conversions[person] = user
+        return person
 
     def _get_event_person(self, data):
         person_type = data.get('_type')
@@ -336,13 +346,12 @@ class EventPersonListField(PrincipalListField):
             email = data['email'].lower()
             user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
             if user:
-                return EventPerson.for_user(user, self.event)
+                return self._get_event_person_for_user(user)
             else:
                 person = self.event.persons.filter_by(email=email).first()
                 return person or self._create_event_person(data)
         elif person_type == 'Avatar':
-            user = self._convert_principal(data)
-            return EventPerson.for_user(user, self.event)
+            return self._get_event_person_for_user(self._convert_principal(data))
         elif person_type == 'EventPerson':
             return self.event.persons.filter_by(id=data['id']).one()
         elif person_type == 'PersonLink':
@@ -352,6 +361,12 @@ class EventPersonListField(PrincipalListField):
 
     def _serialize_principal(self, principal):
         from indico.modules.events.util import serialize_event_person
+        if principal.id is None:
+            # We created an EventPerson which has not been persisted to the
+            # database. Revert the conversion.
+            principal = self.event_person_conversions[principal]
+            if isinstance(principal, dict):
+                return principal
         if not isinstance(principal, EventPerson):
             return super(EventPersonListField, self)._serialize_principal(principal)
         return serialize_event_person(principal)
@@ -432,6 +447,8 @@ class PersonLinkListFieldBase(EventPersonListField):
     def _serialize_principal(self, principal):
         if not isinstance(principal, PersonLinkBase):
             return super(PersonLinkListFieldBase, self)._serialize_principal(principal)
+        if principal.id is None:
+            return super(PersonLinkListFieldBase, self)._serialize_principal(principal.person)
         else:
             return self._serialize_person_link(principal)
 
