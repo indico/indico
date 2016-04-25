@@ -222,7 +222,10 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
             self._redirect(url)
 
     def _createEvent(self, params):
-        c = self._target.newConference(self._getUser(), **UtilsConference.get_new_conference_kwargs(self._params))
+        kwargs = UtilsConference.get_new_conference_kwargs(self._params)
+        if kwargs['start_dt'] >= kwargs['end_dt']:
+            raise FormValuesError(_('The start date cannot be after the end date.'))
+        c = self._target.newConference(self._getUser(), **kwargs)
 
         UtilsConference.setValues(c, self._params)
 
