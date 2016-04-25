@@ -613,7 +613,7 @@ class GenericCache(object):
 
     def delete(self, key):
         self._connect()
-        Logger.get('GenericCache/%s' % self._namespace).debug('DEL %r' % key)
+        Logger.get('GenericCache/%s' % self._namespace).debug('DEL {!r}'.format(key))
         self._client.delete(self._makeKey(key))
 
     def delete_multi(self, keys):
