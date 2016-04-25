@@ -21,8 +21,7 @@ from collections import defaultdict
 from flask import session
 from sqlalchemy.orm import defaultload
 
-from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
-from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
