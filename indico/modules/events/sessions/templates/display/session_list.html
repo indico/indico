@@ -13,7 +13,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for sess in sessions %}
+            {% for sess in sessions|sort(attribute='title') %}
                 <tr>
                     <td>
                         <a href="{{ url_for('.display_session', sess) }}">
