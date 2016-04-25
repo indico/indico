@@ -18,6 +18,11 @@ from functools import wraps
 
 from flask import has_request_context, g, current_app
 
+from MaKaC.common.cache import GenericCache
+
+
+_notset = object()
+
 
 def make_hashable(obj):
     if isinstance(obj, list):
@@ -44,7 +49,7 @@ def memoize(obj):
 
 
 def memoize_request(f):
-    """Memoizes a function during the current request"""
+    """Memoize a function during the current request"""
     @wraps(f)
     def memoizer(*args, **kwargs):
         if not has_request_context() or current_app.config['TESTING'] or current_app.config.get('REPL'):
@@ -62,3 +67,47 @@ def memoize_request(f):
         return cache[key]
 
     return memoizer
+
+
+def memoize_redis(ttl):
+    """Memoize a function in redis
+
+    The cached value can be cleared by calling the method
+    ``clear_cached()`` of the decorated function with the same
+    arguments that were used during the function call.  To check
+    whether a value has been cached call ``is_cached()`` in the
+    same way.
+
+    :param ttl: How long the result should be cached.  May be a
+                timedelta or a number (seconds).
+    """
+    cache = GenericCache('memoize')
+
+    def decorator(f):
+        def _get_key(args, kwargs):
+            return f.__name__, make_hashable(args), make_hashable(kwargs)
+
+        def _clear_cached(*args, **kwargs):
+            cache.delete(_get_key(args, kwargs))
+
+        def _is_cached(*args, **kwargs):
+            return cache.get(_get_key(args, kwargs), _notset) is not _notset
+
+        @wraps(f)
+        def memoizer(*args, **kwargs):
+            if current_app.config['TESTING'] or current_app.config.get('REPL'):
+                # No memoization during tests or in the shell
+                return f(*args, **kwargs)
+
+            key = _get_key(args, kwargs)
+            value = cache.get(key, _notset)
+            if value is _notset:
+                value = f(*args, **kwargs)
+                cache.set(key, value, ttl)
+            return value
+
+        memoizer.clear_cached = _clear_cached
+        memoizer.is_cached = _is_cached
+        return memoizer
+
+    return decorator
