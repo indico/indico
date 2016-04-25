@@ -197,7 +197,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf),
             "logoURL": self.logo_url,
             "currentURL": request.url,
-            "nowHappening": drawer.getNowHappeningHTML(),
             "simpleTextAnnouncement": drawer.getSimpleText(),
             'active_menu_entry_id': self.sidemenu_option
         }

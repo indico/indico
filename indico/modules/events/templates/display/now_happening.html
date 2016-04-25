@@ -1,0 +1,45 @@
+<div id="now-happening" {{ text_color }} style="margin: 10px 0;">
+    <span id="now-happening-label" style="font-weight: bold;">
+        {% trans %}Now happening:{% endtrans %}
+    </span>
+    <span id="now-happening-entries">
+        {% for entry in entries %}
+            {% set obj = entry.object %}
+            {% if entry.type == 'CONTRIBUTION' %}
+                {% set url = url_for('contributions.display_contribution', obj) %}
+            {% elif entry.type == 'BREAK' %}
+                {% if entry.parent %}
+                    {% set url = url_for('sessions.display_session', entry.parent.object) %}
+                {% else %}
+                    {% set url = url_for('timetable.timetable', event) %}
+                {% endif %}
+            {% endif %}
+            <span class="now-happening-entry" style="display: none;">
+                <a href="{{ url }}">{{ obj.title }}</a>
+                {% if obj.room_name %} ({{ obj.room_name }}){% endif %}
+                <em>
+                    {{ entry.start_dt|format_time(timezone=event.timezone) }} - {{ entry.end_dt|format_time(timezone=event.timezone) }}
+                </em>
+            </span>
+        {% endfor %}
+    </span>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        var entries = $('#now-happening .now-happening-entry');
+        var index = 0;
+
+        function showNextEntry() {
+            index = index % entries.length;
+            entries.eq(index - 1).fadeOut(100);
+            entries.eq(index).fadeIn('slow');
+            index++;
+        }
+
+        showNextEntry();
+        setInterval(showNextEntry, 5000);
+    })();
+</script>

@@ -38,9 +38,7 @@ else:
                         <div class="place">${ confLocation }</div>
                         <div class="timezone">${ timezone } timezone</div>
                     </div>
-                    % if nowHappening:
-                        <div class="nowHappening" ${ textColorStyle }>${ nowHappening }</div>
-                    % endif
+                    ${ template_hook('now-happening', event=conf.as_event, text_color=textColorStyle) }
                     ${ template_hook('conference-header-subtitle', event=conf) }
                 </div>
             </div>

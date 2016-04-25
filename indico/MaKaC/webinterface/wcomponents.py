@@ -54,9 +54,10 @@ from indico.core.db import DBMgr
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import preload_events
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
-from indico.util.date_time import utc_timestamp, is_same_month, format_date
+from indico.util.date_time import utc_timestamp, is_same_month, format_date, format_time, now_utc
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
@@ -1799,80 +1800,9 @@ class WConfTickerTapeDrawer(WTemplated):
         self._conf = conf
         self._tz = tz
 
-    def getNowHappeningHTML( self, params=None ):
-        if not layout_settings.get(self._conf, 'show_banner'):
-            return None
-
-        html = WTemplated.getHTML( self, params )
-
-        if html == "":
-            return None
-
-        return html
-
     def getSimpleText( self ):
         if layout_settings.get(self._conf, 'show_announcement'):
             return layout_settings.get(self._conf, 'announcement')
-
-    def getVars(self):
-        vars = WTemplated.getVars( self )
-
-        vars["nowHappeningArray"] = None
-        #if layout_settings.get(self._conf, 'show_banner'):
-        #    vars["nowHappeningArray"] = self._getNowHappening()
-
-        return vars
-
-    def _getNowHappening( self ):
-        # This will contain a string formated for use in the template
-        # javascripts
-        nowHappeningArray = None
-
-        # currently happening:
-        n = nowutc()
-        entries = self._conf.getSchedule().getEntriesOnDate(n)
-        entryCaptions = []
-        for entry in entries:
-            if isinstance(entry, schedule.LinkedTimeSchEntry) and \
-                                  isinstance(entry.getOwner(), conference.SessionSlot):
-                ss=entry.getOwner()
-                ssEntries=ss.getSchedule().getEntriesOnDate(n)
-                if isinstance(ss.getSchedule(), schedule.PosterSlotSchedule):
-                    ssEntries=ss.getSchedule().getEntries()
-                for ssEntry in ssEntries:
-                    title=ssEntry.getTitle()
-                    if isinstance(ssEntry.getOwner(), conference.Contribution):
-                        title="""<a href=%s>%s</a>"""%( \
-                                quoteattr(str(urlHandlers.UHContributionDisplay.getURL(ssEntry.getOwner()))), title)
-                    else:
-                        title="""<a href=%s>%s</a>"""%( \
-                                quoteattr(str(urlHandlers.UHSessionDisplay.getURL(ssEntry.getOwner()))), title)
-                    if ssEntry.getOwnRoom() is not None:
-                        if self._conf.getRoom() is None or \
-                            ssEntry.getOwnRoom().getName().strip().lower() != self._conf.getRoom().getName().strip().lower():
-                                title="%s (%s)"%(title, ssEntry.getOwnRoom().getName().strip())
-                    entryCaptions.append("%s <em>%s-%s</em>" %(title,
-                        entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                        entry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
-            else:
-                title=entry.getTitle()
-                if isinstance(entry.getOwner(), conference.Contribution):
-                    title="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHContributionDisplay.getURL(entry.getOwner()))), title)
-                else:
-                    url=urlHandlers.UHConferenceTimeTable.getURL(self._conf)
-                    url.addParam("showDate",entry.getStartDate().strftime("%d-%B-%Y"))
-                    title="""<a href=%s>%s</a>"""%(quoteattr(str(url)), title)
-                    if entry.getOwnRoom() is not None:
-                        if self._conf.getRoom() is None or \
-                            entry.getOwnRoom().getName().strip().lower() != self._conf.getRoom().getName().strip().lower():
-                                title="%s (%s)"%(title, entry.getOwnRoom().getName().strip())
-                entryCaptions.append("%s <em>%s-%s</em>" %(title,
-                    entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                    entry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
-        if entryCaptions!=[]:
-            nowHappeningArray = """['%s']""" %("', '".join(entryCaptions))
-
-        return nowHappeningArray
 
 
 class WReportNumbersTable(WTemplated):

@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, render_template
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
 from indico.util.i18n import _
+from indico.util.date_time import now_utc, format_time
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -56,3 +58,17 @@ def _get_timetable_cloner(sender, **kwargs):
 def _render_session_timetable(session, **kwargs):
     from indico.modules.events.timetable.util import render_session_timetable
     return render_session_timetable(session, **kwargs)
+
+
+@template_hook('now-happening')
+def _render_now_happening_info(event, **kwargs):
+    from indico.modules.events.layout import layout_settings
+    if layout_settings.get(event, 'show_banner'):
+        current_dt = now_utc(exact=False)
+        entries = event.timetable_entries.filter(TimetableEntry.start_dt <= current_dt,
+                                                 TimetableEntry.end_dt > current_dt,
+                                                 TimetableEntry.type != TimetableEntryType.SESSION_BLOCK).all()
+        if not entries:
+            return
+        return render_template('events/display/now_happening.html', event=event, entries=entries,
+                               text_color=kwargs.get('text_color'))
