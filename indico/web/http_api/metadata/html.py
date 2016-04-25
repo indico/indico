@@ -14,16 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-from collections import defaultdict
 from datetime import datetime
+from itertools import groupby
 from operator import itemgetter
 
 import dateutil.parser
-from pytz import timezone, utc
+from flask import render_template
+from pytz import timezone
 
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.common.TemplateExec import render
 
 
 def _deserialize_date(date_dict):
@@ -31,27 +30,24 @@ def _deserialize_date(date_dict):
         return date_dict
     dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
                           dateutil.parser.parse(date_dict['time']).time())
-    return timezone(date_dict['tz']).localize(dt).astimezone(utc)
+    return timezone(date_dict['tz']).localize(dt)
 
 
 class HTML4Serializer(Serializer):
-
     schemaless = False
-    _mime = 'text/html'
+    _mime = 'text/html; charset=utf-8'
 
     def _execute(self, fossils):
         results = fossils['results']
-        if type(results) != list:
+        # XXX: is this actually needed?!
+        if not isinstance(results, list):
             results = [results]
 
-        unorderedFossils = defaultdict(list)
-        for fossil in results:
-            unorderedFossils[_deserialize_date(fossil['startDate']).date()].append(fossil)
-
-        # Sort top level (by date)
-        orderedFossils = sorted(unorderedFossils.items(), key=itemgetter(0))
-        # Sort day level (by date/time, actually only time because it's only a single day)
-        for day, events in orderedFossils:
-            events.sort(key=itemgetter('startDate'))
-        return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
-                      {'fossils': orderedFossils, 'ts': fossils['ts'], 'deserialize_date': _deserialize_date})
+        events = [{'id': int(e['id']),
+                   'start_dt': _deserialize_date(e['startDate']),
+                   'category': e['category'],
+                   'url': e['url'],
+                   'title': e['title'],
+                   'room': e['room']} for e in results]
+        events_by_date = groupby(sorted(events, key=itemgetter('start_dt')), key=lambda x: x['start_dt'].date())
+        return render_template('api/event_list.html', events_by_date=events_by_date, ts=fossils['ts'])
