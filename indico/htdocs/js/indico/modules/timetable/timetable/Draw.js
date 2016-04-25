@@ -595,6 +595,12 @@ function loadBalloonContent(self, api, editable) {
                 api.set('content.text', function(evt, api) {
                     loadBalloonContent(self, api, editable);
                 });
+            })
+            .on('ajaxDialog:loadError', '.js-move, .js-edit', function(evt, xhr) {
+                if (xhr.status == 404) {
+                    evt.preventDefault();
+                    handleErrorResponse(xhr);
+                }
             });
 
             $content.find('.js-switch-to-interval').on('click', function() {
@@ -641,11 +647,26 @@ function loadBalloonContent(self, api, editable) {
         });
         // Change the target of the qTip position in order to open it at the mouse position
         api.options.position.target = 'mouse';
-    }, function(xhr) {
-        handleAjaxError(xhr);
+    }, function(xhr, status, error) {
+        if (xhr.status == 404) {
+            handleErrorResponse(xhr);
+            api.set('content.text', $T.gettext('This timetable entry does not exist anymore. Please refresh the page.'));
+        }
     });
 
     return $T.gettext('Loading...');
+}
+
+function handleErrorResponse(xhr) {
+    cornerMessage({
+        message: $T.gettext('This timetable entry does not exist anymore. Please refresh the page.'),
+        actionLabel: $T.gettext('Refresh'),
+        actionCallback: function() {
+            location.reload();
+        },
+        duration: 10000,
+        class: 'error'
+    });
 }
 
 function drawBalloon(self, evt, editable) {
