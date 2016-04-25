@@ -36,6 +36,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.errors import UserValueError
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
@@ -420,6 +421,12 @@ class PersonLinkListFieldBase(EventPersonListField):
         if not person_link:
             person_link = self.person_link_cls(person=person)
         person_link.populate_from_dict(person_data)
+        email = data.get('email', '')
+        if email != person_link.email:
+            if not self.event.persons.filter_by(email=email).first():
+                person_link.person.email = email
+            else:
+                raise UserValueError(_('There is already a person with the email {}').format(email))
         return person_link
 
     def _serialize_principal(self, principal):
