@@ -1176,14 +1176,6 @@ class Category(CommonObjectBase):
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
 
-    def getStatistics(self):
-        try:
-            if self._statistics:
-                pass
-        except AttributeError, e:
-            self._statistics = {}
-        return self._statistics
-
     def notifyModification(self, raiseEvent=True):
         """Method called to notify the current category has been modified.
         """

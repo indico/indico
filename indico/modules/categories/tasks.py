@@ -30,7 +30,6 @@ from indico.util.redis import write_client as redis_write_client
 from indico.util.redis.suggestions import next_scheduled_check, suggest, unschedule_check
 from indico.util.suggestions import get_category_scores
 from MaKaC.conference import CategoryManager
-from MaKaC.statistics import CategoryStatistics
 
 
 # Minimum score for a category to be suggested
@@ -83,8 +82,3 @@ def category_cleanup():
                 DBMgr.getInstance().commit()
         db.session.commit()
         DBMgr.getInstance().commit()
-
-
-@celery.periodic_task(name='category_stats', run_every=crontab(minute='0', hour='0'))
-def category_stats(category_id='0'):
-    CategoryStatistics.updateStatistics(CategoryManager().getById(category_id), logger)
