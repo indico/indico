@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from io import BytesIO
+
 from lxml import html
 from lxml.etree import ParserError
 
@@ -24,7 +26,16 @@ import icalendar as ical
 from pyatom import AtomFeed
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.links import LinkType
+from indico.modules.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.sessions import Session
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
@@ -118,3 +129,88 @@ def serialize_category_atom(category, url, user, event_filter):
                  url=url_for('event.conferenceDisplay', confId=event.id, _external=True),
                  updated=event.start_dt)
     return BytesIO(feed.to_string().encode('utf-8'))
+
+
+def get_events_by_year(category_id=None):
+    """Get the number of events for each year.
+
+    :param category_id: The category ID to get statistics for. Events
+                        from subcategories are also included.
+    :return: An `OrderedDict` mapping years to event counts.
+    """
+    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    query = (db.session
+             .query(db.cast(db.extract('year', Event.start_dt), db.Integer).label('year'),
+                    db.func.count())
+             .filter(~Event.is_deleted,
+                     category_filter)
+             .order_by('year')
+             .group_by('year'))
+    return OrderedDict(query)
+
+
+def get_contribs_by_year(category_id=None):
+    """Get the number of contributions for each year.
+
+    :param category_id: The category ID to get statistics for.
+                        Contributions from subcategories are also
+                        included.
+    :return: An `OrderedDict` mapping years to contribution counts.
+    """
+    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    query = (db.session
+             .query(db.cast(db.extract('year', TimetableEntry.start_dt), db.Integer).label('year'),
+                    db.func.count())
+             .join(TimetableEntry.event_new)
+             .filter(TimetableEntry.type == TimetableEntryType.CONTRIBUTION,
+                     ~Event.is_deleted,
+                     category_filter)
+             .order_by('year')
+             .group_by('year'))
+    return OrderedDict(query)
+
+
+def get_attachment_count(category_id=None):
+    """Get the number of attachments in events in a category.
+
+    :param category_id: The category ID to get statistics for.
+                        Attachments from subcategories are also
+                        included.
+    :return: The number of attachments
+    """
+    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    subcontrib_contrib = db.aliased(Contribution)
+    query = (db.session
+             .query(db.func.count(Attachment.id))
+             .join(Attachment.folder)
+             .join(AttachmentFolder.event_new)
+             .outerjoin(AttachmentFolder.session)
+             .outerjoin(AttachmentFolder.contribution)
+             .outerjoin(AttachmentFolder.subcontribution)
+             .outerjoin(subcontrib_contrib, subcontrib_contrib.id == SubContribution.contribution_id)
+             .filter(AttachmentFolder.link_type != LinkType.category,
+                     ~Attachment.is_deleted,
+                     ~AttachmentFolder.is_deleted,
+                     ~Event.is_deleted,
+                     # we have exactly one of those or none if the attachment is on the event itself
+                     ~db.func.coalesce(Session.is_deleted, Contribution.is_deleted, SubContribution.is_deleted, False),
+                     # in case of a subcontribution we also need to check that the contrib is not deleted
+                     (subcontrib_contrib.is_deleted.is_(None) | ~subcontrib_contrib.is_deleted),
+                     category_filter))
+    return query.one()[0]
+
+
+@memoize_redis(86400)
+def get_category_stats(category_id=None):
+    """Get category statistics.
+
+    This function is mainly a helper so we can get and cache
+    all values at once and keep a last-update timestamp.
+
+    :param category_id: The category ID to get statistics for.
+                        Subcategories are also included.
+    """
+    return {'events_by_year': get_events_by_year(category_id),
+            'contribs_by_year': get_contribs_by_year(category_id),
+            'attachments': get_attachment_count(category_id),
+            'updated': now_utc()}
