@@ -93,7 +93,7 @@
 {%- endmacro %}
 
 {% macro render_event_time(event, timezone) -%}
-    <i class="icon-calendar header-data"></i>
+    <i class="icon-calendar header-data" title="{% trans %}Start/end date/time of the event{% endtrans %}"></i>
     <span class="event-time-data">
         {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
             {{ render_datetime('startDate', event.start_dt, timezone=timezone) }}

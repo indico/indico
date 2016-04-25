@@ -30,7 +30,8 @@
                 {% set chairpersons = event.person_links %}
                 {% if chairpersons %}
                     <div class="event-chairs">
-                        <i class="icon-user-chairperson header-data"></i>
+                        <i class="icon-user-chairperson header-data"
+                           title="{% trans count=chairpersons|length %}Chairperson{% pluralize %}Chairpersons{% endtrans %}"></i>
                         <span class="chairperson-list">
                             {{ render_users(chairpersons, span_class='author', title=false) }}
                         </span>
