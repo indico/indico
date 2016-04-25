@@ -1,0 +1,9 @@
+{% from 'events/management/_contribution_field_list.html' import render_contribution_field_list %}
+
+{{ render_contribution_field_list(fields) }}
+(<a href="#" class="js-dialog-action"
+    data-title="{% trans %}Manage fields{% endtrans %}"
+    data-href="{{ url_for('contributions.manage_fields', event) }}"
+    data-ajax-dialog>
+    {%- trans %}edit{% endtrans -%}
+</a>)

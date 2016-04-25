@@ -289,3 +289,10 @@ def _render_event_ical_export(event, **kwargs):
     return render_template('events/display/event_ical_export.html', item=event,
                            ics_url=url_for('events.export_event_ical', event),
                            **get_base_ical_parameters(session.user, event, 'events'))
+
+
+@template_hook('contribution-fields')
+def _render_contribution_fields(event, **kwargs):
+    from indico.modules.events.contributions.models.fields import ContributionField
+    return render_template('events/management/contribution_field_list.html', event=event,
+                           fields=event.contribution_fields)

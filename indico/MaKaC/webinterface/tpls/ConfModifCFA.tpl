@@ -104,9 +104,14 @@
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Abstract fields")}</span></td>
+        <td bgcolor="white" width="100%" class="blacktext">
+            ${ template_hook('contribution-fields', event=self_._conf.as_event) }
+        </td>
+    </tr>
 </table>
 
-<%include file="ConfModifCFAAddFieldTooltip.tpl"/>
 
 <script type="text/javascript">
 $(function() {

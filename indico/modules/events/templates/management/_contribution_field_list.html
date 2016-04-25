@@ -1,0 +1,14 @@
+{% macro render_contribution_field_list(fields) %}
+    <div id="contribution-field-list">
+        {% for field in fields %}
+            <div class="contribution-field">
+                <span class="field-title">{{ field.title }}</span>
+                {% if field.field_type %}
+                    <span class="field-type">({{ field.field.friendly_name }})</span>
+                {% endif %}
+            </div>
+        {% else %}
+            {% trans %}There are no fields defined yet.{% endtrans %}
+        {% endfor %}
+    </div>
+{% endmacro %}

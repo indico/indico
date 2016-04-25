@@ -524,3 +524,13 @@ td.i-table i {
         border-bottom: 1px solid $pastel-gray;
     }
 }
+
+#contribution-field-list {
+    .contribution-field {
+        margin-bottom: 5px;
+
+        .field-type {
+            font-weight: bold;
+        }
+    }
+}
