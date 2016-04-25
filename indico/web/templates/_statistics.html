@@ -1,6 +1,5 @@
 {% macro stats_box(title='', subtitle='', label='', label_tooltip='', classes='') %}
     <div class="i-box
-                {%- if title %} titled{% endif %}
                 {%- if classes %} {{classes}}{% endif %}">
         {%- if title or label %}
             <div class="i-box-header">
