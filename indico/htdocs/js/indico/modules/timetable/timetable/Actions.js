@@ -95,7 +95,13 @@ type("TimetableManagementActions", [], {
             url: build_url(Indico.Urls.Timetable.entries.delete, urlArgs),
             method: 'POST',
             complete: IndicoUI.Dialogs.Util.progress(),
-            error: handleAjaxError,
+            error: function(xhr) {
+                if (xhr.status == 404) {
+                    handleErrorResponse(xhr);
+                } else {
+                    handleAjaxError(xhr);
+                }
+            },
             success: function(data) {
                 if (data) {
                     var timetableData = self.timetable.getData();
