@@ -80,8 +80,8 @@ $i-label-color: $light-black;
 
     &.warning {
         @include border-all(darken($yellow, $light-color-variation));
-        background: $yellow;
-        color: #EFEFEF !important;
+        background: lighten($yellow, 8 * $light-color-variation);
+        color: darken($yellow, $light-color-variation) !important;
     }
     &.disabled {
         @include border-all(darken($pastel-gray, $light-color-variation));
