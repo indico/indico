@@ -40,7 +40,15 @@
         $('.js-go-to-day').dropdown({
             always_listen: true
         }).find('li a').on('menu_select', function() {
-            window.location = $(this).attr('href');
+            var anchor = $(this).attr('href');
+            $('body, html').animate({
+                'scrollTop': $(anchor).offset().top
+            }, {
+                duration: 700,
+                complete: function() {
+                    location.href = anchor;
+                }
+            });
             return false;
         });
 
