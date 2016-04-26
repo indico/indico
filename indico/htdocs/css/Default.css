@@ -3336,7 +3336,13 @@ div.exclusivePopup {
     background-color: white;
     display: block;
     min-width: 250px;
-    padding: 0.5em 1em;
+    padding: 0.5em 15px;
+}
+
+div.ui-dialog-titlebar {
+    padding: 0.4em 15px !important;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 div.exclusivePopupTopBg {

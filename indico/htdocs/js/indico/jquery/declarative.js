@@ -127,6 +127,7 @@
                         method: method,
                         data: params,
                         title: $this.data('title'),
+                        subtitle: $this.data('subtitle'),
                         dialogClasses: $this.data('dialog-classes'),
                         onClose: function(data, customData) {
                             if (data) {

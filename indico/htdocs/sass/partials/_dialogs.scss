@@ -122,3 +122,11 @@
         }
     }
 }
+
+.dialog-subtitle {
+    background-color: $light-gray;
+    border-bottom: 1px solid $pastel-gray;
+    padding: 5px 15px;
+    box-shadow: inset 0px 15px 20px -20px $gray;
+    color: $black;
+}

@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import json
 from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
