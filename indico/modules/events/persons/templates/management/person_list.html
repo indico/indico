@@ -38,7 +38,7 @@
         <thead>
             <tr class="i-table">
                 <th class="i-table checkbox-column" data-sorter="false"></th>
-                <th class="i-table">{% trans %}Name{% endtrans %}</th>
+                <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
                 <th class="i-table">{% trans %}Email{% endtrans %}</th>
                 <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
                 <th class="i-table"></th>
@@ -56,7 +56,7 @@
                         <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id"
                                {{ 'disabled' if not person.email }}>
                     </td>
-                    <td class="i-table">{{ person.get_full_name(last_name_first=true, last_name_upper=false,
+                    <td class="i-table name-column">{{ person.get_full_name(last_name_first=true, last_name_upper=false,
                                                                 abbrev_first_name=false) }}</td>
                     <td class="i-contributiontable email-column">{{ person.email }}</td>
                     <td class="i-table affiliation-column">{{ person.affiliation }}</td>

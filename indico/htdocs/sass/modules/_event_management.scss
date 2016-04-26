@@ -505,8 +505,8 @@ td.i-table i {
 }
 
 #person-list {
-    .affiliation-column {
-        max-width: 30em;
+    .affiliation-column, .name-column {
+        max-width: 20em;
     }
 
     .no-role {
