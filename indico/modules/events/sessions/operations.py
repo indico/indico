@@ -72,7 +72,7 @@ def _delete_session_timetable_entries(event_session):
 def delete_session(event_session):
     """Delete session from the event"""
     event_session.is_deleted = True
-    for contribution in event_session.contributions:
+    for contribution in event_session.contributions[:]:
         contribution.session = None
     _delete_session_timetable_entries(event_session)
     signals.event.session_deleted.send(event_session)
