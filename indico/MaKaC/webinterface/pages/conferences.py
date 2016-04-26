@@ -615,7 +615,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def getPrintCSSFiles(self):
         theme_print_sass = (self._asset_env['themes_{}_print_sass'.format(self.theme_id)].urls()
-                            if self.theme['print_stylesheet'] else [])
+                            if self.theme.get('print_stylesheet') else [])
         return WPConferenceBase.getPrintCSSFiles(self) + theme_print_sass
 
     def getCSSFiles(self):
