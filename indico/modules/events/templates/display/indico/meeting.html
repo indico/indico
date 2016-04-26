@@ -27,7 +27,7 @@
                         {{ render_location(event, class='header-data') }}
                     </div>
                 {% endif %}
-                {% set chairpersons = event.person_links %}
+                {% set chairpersons = event.person_links | sort(attribute='full_name') %}
                 {% if chairpersons %}
                     <div class="event-chairs">
                         <i class="icon-user-chairperson header-data"
