@@ -69,8 +69,6 @@ $(document).ready(function() {
             qtipHTMLContainer = $(this).data('qtip-html'),
             qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
 
-        var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
-
         if (!qtipHTML && !title) {
             return;
         }
