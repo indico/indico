@@ -1,28 +1,29 @@
 (function(global) {
     'use strict';
 
+    global.refreshPersonFilters = function refreshPersonFilters() {
+        var personRows = $('#persons-list tr[data-person-roles]');
+        var filters = $('#persons-list [data-filter]:checked').map(function() {
+            return $(this).data('filter');
+        }).get();
+
+        var visibleEntries = personRows.filter(function() {
+            var $this = $(this);
+
+            return _.any(filters, function(filterName) {
+                return $this.data('person-roles')[filterName];
+            });
+        });
+
+        personRows.hide();
+        visibleEntries.show();
+        $('#persons-list').trigger('indico:syncEnableIfChecked');
+    };
+
     global.setupEventPersonsList = function setupEventPersonsList() {
         enableIfChecked('#persons-list', '.select-row:visible', '#persons-list .js-requires-selected-row');
         $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
-
-        $('#persons-list [data-filter]').on('click', function() {
-            var personRows = $('#persons-list tr[data-person-roles]');
-            var filters = $('#persons-list [data-filter]:checked').map(function() {
-                return $(this).data('filter');
-            }).get();
-
-            var visibleEntries = personRows.filter(function() {
-                var $this = $(this);
-
-                return _.any(filters, function(filterName) {
-                    return $this.data('person-roles')[filterName];
-                });
-            });
-
-            personRows.hide();
-            visibleEntries.show();
-            $('#persons-list').trigger('indico:syncEnableIfChecked');
-        });
+        $('#persons-list [data-filter]').on('click', refreshPersonFilters);
 
         $('#persons-list td').on('mouseenter', function() {
             var $this = $(this);
