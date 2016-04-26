@@ -226,7 +226,8 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         item = self.entry.object
         tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
         form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
-                             event=self.event_new, entry=self.entry)
+                             event=self.event_new, entry=self.entry,
+                             session_block=self.entry.parent.object if self.entry.parent else None)
         data = form.data
         shift_later = data.pop('shift_later')
         updated_entries = []

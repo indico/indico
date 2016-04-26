@@ -554,7 +554,7 @@ function loadBalloonContent(self, api, editable) {
     var url = editable ? Indico.Urls.Timetable.entries.info.manage : Indico.Urls.Timetable.entries.info.display;
     var urlParams = {
        'confId': self.eventData.conferenceId,
-       'entry_id': entryId,
+       'entry_id': entryId
     };
     if (self.timetable.isSessionTimetable) {
         urlParams.session_id = self.eventData.sessionId;
