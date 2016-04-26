@@ -65,9 +65,10 @@ class NoteCloner(EventCloner):
                        LinkType.contribution: self._contrib_map,
                        LinkType.subcontribution: self._subcontrib_map}
             for old_note in self._query_notes():
-                if old_note.object.is_deleted:
+                obj = old_note.object
+                if obj.is_deleted or (isinstance(obj, db.m.SubContribution) and obj.contribution.is_deleted):
                     continue
-                self._clone_note(old_note, mapping[old_note.link_type][old_note.object])
+                self._clone_note(old_note, mapping[old_note.link_type][obj])
 
     def _clone_note(self, old_note, new_object):
         revision = old_note.current_revision

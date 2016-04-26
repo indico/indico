@@ -73,9 +73,10 @@ class AttachmentCloner(EventCloner):
                        LinkType.subcontribution: self._subcontrib_map}
             query = self._query_folders(self.old_event.all_attachment_folders, False)
             for old_folder in query:
-                if old_folder.object.is_deleted:
+                obj = old_folder.object
+                if obj.is_deleted or (isinstance(obj, db.m.SubContribution) and obj.contribution.is_deleted):
                     continue
-                self._clone_attachment_folder(old_folder, mapping[old_folder.link_type][old_folder.object])
+                self._clone_attachment_folder(old_folder, mapping[old_folder.link_type][obj])
 
     def _clone_attachment_folder(self, old_folder, new_object):
         folder_attrs = get_simple_column_attrs(AttachmentFolder) | {'acl'}
