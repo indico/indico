@@ -188,10 +188,10 @@
 
         var filterConfig = {
             itemHandle: 'tr',
-            listItems: $('#contribution-list tbody tr'),
-            term: $('#search-input'),
-            state: $('#filtering-state'),
-            placeholder: $('#filter-placeholder')
+            listItems: '#contribution-list tbody tr',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
         };
 
         $('.report-section [data-toggle=dropdown]').closest('.group').dropdown();

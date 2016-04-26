@@ -13,7 +13,7 @@
     }
 
     global.applySearchFilters = function applySearchFilters() {
-        var $contributions = $(searchBoxConfig.listItems),
+        var $items = $(searchBoxConfig.listItems),
             term = $(searchBoxConfig.term).val().trim(),
             $state = $(searchBoxConfig.state),
             $visibleEntries,
@@ -24,8 +24,8 @@
         $state.removeClass('active');
 
         if (!term) {
-            $contributions.show();
-            setState($state, $contributions, $contributions);
+            $items.show();
+            setState($state, $items, $items);
             return;
         }
 
@@ -33,20 +33,20 @@
         if ((m = term.match(/^#(\d+)$/))) {
             $visibleEntries = $('[data-friendly-id="' + m[1] + '"]');
         } else {
-            $visibleEntries = $contributions.find('[data-searchable*="' + term.toLowerCase() + '"]')
+            $visibleEntries = $items.find('[data-searchable*="' + term.toLowerCase() + '"]')
                                             .closest(searchBoxConfig.itemHandle);
         }
 
         if ($visibleEntries.length === 0) {
             $filterPlaceholder.text($T.gettext('There are no entries that match your search criteria.')).show();
             $state.addClass('active');
-        } else if ($visibleEntries.length !== $contributions.length) {
+        } else if ($visibleEntries.length !== $items.length) {
             $state.addClass('active');
         }
 
-        setState($state, $visibleEntries, $contributions);
+        setState($state, $visibleEntries, $items);
 
-        $contributions.hide();
+        $items.hide();
         $visibleEntries.show();
 
         // Needed because $(window).scroll() is not called when hiding elements
