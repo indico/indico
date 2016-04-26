@@ -24,8 +24,10 @@ from sqlalchemy.orm import load_only, contains_eager, noload, joinedload, subque
 
 from indico.core.db import db
 from indico.modules.events.models.events import Event
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.persons import SubContributionPersonLink
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_person_link, ReporterBase
 from indico.modules.attachments.util import get_attached_items
@@ -48,22 +50,42 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
     :param from_dt: The earliest event start time to look for
     :param to_dt: The latest event start time to look for
     """
-    query = (user.in_contribution_acls
-             .options(load_only('contribution_id', 'roles', 'full_access', 'read_access'))
-             .options(noload('*'))
-             .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
-             .join(Contribution)
-             .join(Event, Event.id == Contribution.event_id)
-             .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
+    def add_acl_data():
+        query = (user.in_contribution_acls
+                 .options(load_only('contribution_id', 'roles', 'full_access', 'read_access'))
+                 .options(noload('*'))
+                 .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
+                 .join(Contribution)
+                 .join(Event, Event.id == Contribution.event_id)
+                 .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
+        for principal in query:
+            roles = data[principal.contribution.event_id]
+            if 'submit' in principal.roles:
+                roles.add('contribution_submission')
+            if principal.full_access:
+                roles.add('contribution_manager')
+            if principal.read_access:
+                roles.add('contribution_access')
+
+    def add_contrib_data():
+        has_contrib = (EventPerson.contribution_links.any(
+            ContributionPersonLink.contribution.has(~Contribution.is_deleted)))
+        has_subcontrib = EventPerson.subcontribution_links.any(
+            SubContributionPersonLink.subcontribution.has(db.and_(
+                ~SubContribution.is_deleted,
+                SubContribution.contribution.has(~Contribution.is_deleted))))
+        query = (Event.query
+                 .options(load_only('id'))
+                 .options(noload('*'))
+                 .filter(~Event.is_deleted,
+                         Event.starts_between(from_dt, to_dt),
+                         Event.persons.any((EventPerson.user_id == user.id) & (has_contrib | has_subcontrib))))
+        for event in query:
+            data[event.id].add('contributor')
+
     data = defaultdict(set)
-    for principal in query:
-        roles = data[principal.contribution.event_id]
-        if 'submit' in principal.roles:
-            roles.add('contribution_submission')
-        if principal.full_access:
-            roles.add('contribution_manager')
-        if principal.read_access:
-            roles.add('contribution_access')
+    add_acl_data()
+    add_contrib_data()
     return data
 
 
