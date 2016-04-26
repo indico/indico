@@ -242,6 +242,9 @@ div.event-header {
     flex-direction: column;
     padding-bottom: 0.5rem;
 
+    /* Without the following IE11 doesn't correctly compute the width of the element. */
+    width: 100%;
+
     &:hover > .timetable-item-header .timetable-item-actions .manage-button .i-button,
     &:hover > .timetable-item-header .timetable-item-actions .manage-button:not(.selected) .i-button {
         opacity: 1;
