@@ -51,6 +51,7 @@
         options = $.extend({
             trigger: null, // element that opened the dialog
             title: null, // title of the dialog
+            subtitle: null, // subtitle of the dialog
             url: null, // url to get the form/dialog from
             method: 'GET', // http method to get the form/dialog
             data: null, // object or callable to add data when loading the form/dialog
@@ -127,6 +128,12 @@
 
             popup.draw = function() {
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
+                if(options.subtitle) {
+                    this.canvas.prepend($('<div>', {
+                        class: 'dialog-subtitle',
+                        text: options.subtitle
+                    }));
+                }
             };
 
             popup.postDraw = function() {
