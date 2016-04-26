@@ -85,7 +85,18 @@
                 cache: false, // IE caches GET AJAX requests. WTF.
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: function(xhr) {
-                    if (!options.onLoadError || options.onLoadError(xhr) !== false) {
+                    var handled = false;
+                    if (options.onLoadError && options.onLoadError(xhr) === false) {
+                        handled = true;
+                    }
+                    if (options.trigger) {
+                        var evt = $.Event('ajaxDialog:loadError');
+                        $(options.trigger).trigger(evt, [xhr]);
+                        if (evt.isDefaultPrevented()) {
+                            handled = true;
+                        }
+                    }
+                    if (!handled) {
                         handleAjaxError(xhr);
                     }
                 },
