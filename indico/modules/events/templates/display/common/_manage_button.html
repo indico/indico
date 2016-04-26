@@ -84,6 +84,17 @@
                     </a>
                 </li>
             {% endif %}
+            {% if session_.can_manage(session.user) %}
+                <li>
+                    <a href="#"
+                       data-href="{{ url_for('sessions.session_protection', session_) }}"
+                       data-title="{% trans %}Edit session protection{% endtrans %}"
+                       data-subtitle="{{ session_.title }}"
+                       data-ajax-dialog>
+                        {% trans %}Edit session protection{% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
         {% elif item_type == 'CONTRIBUTION' %}
             {% if item.can_manage_attachments(session.user) %}
                 {% if not item.has_note or show_note_operations %}
@@ -96,6 +107,15 @@
                                data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
                                data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
                         {% trans %}Edit Contribution{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href=""
+                       data-href="{{ url_for('contributions.manage_contrib_protection', item) }}"
+                       data-title="{% trans %}Manage contribution protection{% endtrans %}"
+                       data-subtitle="{{ item.title }}"
+                       data-ajax-dialog>
+                        {% trans %}Edit protection{% endtrans %}
                     </a>
                 </li>
             {% endif %}
