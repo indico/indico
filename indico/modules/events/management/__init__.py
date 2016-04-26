@@ -56,7 +56,6 @@ def _sidemenu_items(sender, event, **kwargs):
     cfa_enabled = event.as_legacy.hasEnabledSection('cfa')
 
     event_type = event.as_legacy.getType()
-    is_lecture = event_type == 'simple_event'
     is_conference = event_type == 'conference'
     paper_review = event.as_legacy.getConfPaperReview()
     is_review_staff = paper_review.isInReviewingTeam(session.avatar)
@@ -86,10 +85,6 @@ def _sidemenu_items(sender, event, **kwargs):
                                section='organization')
 
     if can_modify:
-        if not is_lecture:
-            yield SideMenuItem('lists', _('Lists'),
-                               url_for('event_mgmt.confModifListings-allSpeakers', event),
-                               section='reports')
         yield SideMenuItem('utilities', _('Utilities'),
                            url_for('event_mgmt.confModifTools', event),
                            section='advanced')
