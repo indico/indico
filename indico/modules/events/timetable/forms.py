@@ -71,6 +71,9 @@ class EntryFormMixin(object):
 
     def validate_duration(self, field):
         end_dt = self.start_dt.data + field.data
+        if self.session_block and end_dt > self.session_block.end_dt:
+            raise ValidationError(_("{} exceeds session block end time. Adjust start time or duration.")
+                                  .format(self._entry_type.title.capitalize()))
         if end_dt > self.event.end_dt:
             raise ValidationError(_("{} exceeds event end time. Adjust start time or duration.")
                                   .format(self._entry_type.title.capitalize()))
