@@ -10,13 +10,28 @@
 {% endblock %}
 
 {% block content %}
-    {{ form_header(form) }}
+    {{ form_header(form, id='timetable-pdf-export-form') }}
     {{ form_rows(form, skip=form._pdf_options_fields) }}
     {% call form_fieldset(_('PDF Options')) %}
         {{ form_rows(form, fields=form._pdf_options_fields) }}
     {% endcall %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Generate{% endtrans %}">
-        <button type="button" class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</button>
+        <a href="{{ back_url }}" class="i-button big">{% trans %}Back{% endtrans %}</a>
     {% endcall %}
+    <script>
+        var $form = $('#timetable-pdf-export-form');
+        $form.find('[name=document_settings][value=showCoverPage], [name=document_settings][value=showTableContents], ' +
+                   '[name=document_settings][value=showSessionTOC]').prop('checked', true);
+        $form.find('[name=contribution_info][value=showContribId], [name=contribution_info][value=showSpeakerTitle]')
+             .prop('checked', true);
+        $form.find('[name=session_info][value=useSessionColorCodes], [name=session_info][value=showSessionDescription]')
+             .prop('checked', true);
+        $form.find('[name=document_settings][value=showTableContents]').on('change', function() {
+            $form.find('[name=document_settings][value=showSessionTOC]').closest('.i-checkbox').toggle(this.checked);
+        }).trigger('change');
+        $form.find('[name=contribution_info][value=showAbstract]').on('change', function() {
+            $form.find('[name=contribution_info][value=dontShowPosterAbstract]').closest('.i-checkbox').toggle(this.checked);
+        }).trigger('change');
+    </script>
 {% endblock %}

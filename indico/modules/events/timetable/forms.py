@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 from pytz import utc
 from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, IntegerField
@@ -30,7 +31,8 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.modules.events.timetable.util import find_next_start_dt
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import TimeDeltaField, IndicoPalettePickerField, IndicoLocationField
+from indico.web.forms.fields import (TimeDeltaField, IndicoPalettePickerField, IndicoLocationField,
+                                     IndicoSelectMultipleCheckboxField)
 from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import MaxDuration, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
@@ -139,43 +141,37 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
         super(BaseEntryForm, self).__init__(*args, **kwargs)
 
 
+_DOCUMENT_SETTINGS_CHOICES = [('showCoverPage', _('Include cover page')),
+                              ('showTableContents', _('Include table of contents')),
+                              ('showSessionTOC', _('Show list of sessions in the table of contents'))]
+_CONTRIBUTION_CHOICES = [('showContribId', _('Print the ID of each contribution')),
+                         ('showAbstract', _('Print abstract content of all contributions')),
+                         ('dontShowPosterAbstract', _('Do not print the abstract content for poster sessions')),
+                         ('showLengthContribs', _('Include length of the contributions'))]
+_SESSION_CHOICES = [('newPagePerSession', _('Print each session on a separate page')),
+                    ('useSessionColorCodes', _('Use session color codes')),
+                    ('showSessionDescription', _('Include session description')),
+                    ('printDateCloseToSessions', _('Print the start date close to session title'))]
+_VISIBLE_ENTRIES_CHOICES = [('showContribsAtConfLevel', _('Include top-level contributions')),
+                            ('showBreaksAtConfLevel', _('Include top-level breaks'))]
+_OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
+                  ('showSpeakerAffiliation', _('Show speaker affiliation'))]
+
+
 class TimetablePDFExportForm(IndicoForm):
     _pdf_options_fields = {'pagesize', 'fontsize', 'firstPageNumber'}
 
     advanced = BooleanField(_("Advanced timetable"), widget=SwitchWidget(),
                             description=_("Advanced customization options"))
-    showCoverPage = BooleanField(_('Cover page'), [HiddenUnless('advanced')], default=True,
-                                 description=_('Whether to include cover page'))
-    showTableContents = BooleanField(_('Table of contents'), [HiddenUnless('advanced')], default=True,
-                                     description=_('Whether to include table of contents'))
-    showSessionTOC = BooleanField(_('Show sessions'), [HiddenUnless('showTableContents'),
-                                                       HiddenUnless('advanced')], default=True,
-                                  description=_('Whether to show the sessions inside the table of contents'))
-    showContribId = BooleanField(_('Contribution ID'), [HiddenUnless('advanced')], default=True,
-                                 description=_('Whether to print the ID of each contribution'))
-    showAbstract = BooleanField(_('Abstract content'), [HiddenUnless('advanced')],
-                                description=_('Print abstract content of all the contributions '))
-    dontShowPosterAbstract = BooleanField(_('Include abstract info'), [HiddenUnless('showAbstract')],
-                                          description=_('Do not print the abstract content for poster sessions'))
-    showLengthContribs = BooleanField(_('Contribution Length'), [HiddenUnless('advanced')],
-                                      description=_('Whether to include contribution length'))
-    showSpeakerTitle = BooleanField(_('Speaker title'), [HiddenUnless('advanced')], default=True,
-                                    description=_('Whether to include speaker title'))
-    showSpeakerAffiliation = BooleanField(_('Speaker affiliation'), [HiddenUnless('advanced')],
-                                          description=_('Whether to include speaker affiliation'))
-    newPagePerSession = BooleanField(_('New page for session'), [HiddenUnless('advanced')],
-                                     description=_('Print each session on separate page'))
-    useSessionColorCodes = BooleanField(_('Session colors'), [HiddenUnless('advanced')], default=True,
-                                        description=_('Whether to use session color codes'))
-    showSessionDescription = BooleanField(_('Session description'), [HiddenUnless('advanced')], default=True,
-                                          description=_("Whether to include session description"))
-    showContribsAtConfLevel = BooleanField(_('Top-level contribution'),
-                                           description=_("Whether to include contributions that are not inside any "
-                                                         "session"))
-    showBreaksAtConfLevel = BooleanField(_('Top-level breaks'),
-                                         description=_('Whether to include breaks that are not inside any session'))
-    printDateCloseToSessions = BooleanField(_('Start date'), [HiddenUnless('advanced')],
-                                            description=_('Print the start date close to session title'))
+    document_settings = IndicoSelectMultipleCheckboxField(_('Document settings'), [HiddenUnless('advanced')],
+                                                          choices=_DOCUMENT_SETTINGS_CHOICES)
+    contribution_info = IndicoSelectMultipleCheckboxField(_('Contributions related info'), [HiddenUnless('advanced')],
+                                                          choices=_CONTRIBUTION_CHOICES)
+    session_info = IndicoSelectMultipleCheckboxField(_('Sessions related info'), [HiddenUnless('advanced')],
+                                                     choices=_SESSION_CHOICES)
+    visible_entries = IndicoSelectMultipleCheckboxField(_('Breaks and contributions'), [HiddenUnless('advanced')],
+                                                        choices=_VISIBLE_ENTRIES_CHOICES)
+    other = IndicoSelectMultipleCheckboxField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
     fontsize = SelectField(_('Font size'), choices=[('xxx-small', _('xxx-small')), ('xx-small', _('xx-small')),
@@ -188,7 +184,8 @@ class TimetablePDFExportForm(IndicoForm):
     @property
     def data_for_format(self):
         if not self.advanced.data:
-            fields = ('showContribsAtConfLevel', 'showBreaksAtConfLevel')
+            fields = ('visible_entries',)
         else:
-            fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token'}
-        return {x: getattr(self, x).data for x in fields}
+            fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token',
+                                                                                                     'advanced'}
+        return defaultdict(bool, {option: True for field in fields for option in getattr(self, field).data})

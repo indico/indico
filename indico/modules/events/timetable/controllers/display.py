@@ -24,7 +24,7 @@ from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.timetable.util import render_entry_info_balloon, serialize_event_info
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -64,15 +64,17 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
     def _process(self):
         form = TimetablePDFExportForm()
         if form.validate_on_submit():
-            pdf_format = TimetablePDFFormat(form.data_for_format)
+            form_data = form.data_for_format
+            pdf_format = TimetablePDFFormat(form_data)
             if not form.advanced.data:
                 pdf_class = SimplifiedTimeTablePlain
                 additional_params = {}
             else:
                 pdf_class = TimeTablePlain
                 additional_params = {'firstPageNumber': form.firstPageNumber.data,
-                                     'showSpeakerAffiliation': form.showSpeakerAffiliation.data}
+                                     'showSpeakerAffiliation': form_data['showSpeakerAffiliation']}
             pdf = pdf_class(self._conf, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
                             pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
             return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
-        return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form)
+        return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form,
+                                                  back_url=url_for('.timetable', self.event_new))

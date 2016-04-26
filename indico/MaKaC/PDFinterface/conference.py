@@ -507,19 +507,19 @@ class TimetablePDFFormat:
             self.setValues(params)
 
     def setValues(self, params):
-        self.contribId = params.get('showContribId', True)
-        self.speakerTitle = params.get('showSpeakerTitle', True)
-        self.contribAbstract = params.get('showAbstract', False)
-        self.contribPosterAbstract = params.get('dontShowPosterAbstract', True)
-        self.newPagePerSession = params.get('newPagePerSession', False)
-        self.useSessionColorCodes = params.get('useSessionColorCodes', False)
-        self.showSessionTOC = params.get('showSessionTOC', False)
-        self.lengthContribs = params.get('showLengthContribs', False)
-        self.contribsAtConfLevel = params.get('showContribsAtConfLevel', False)
-        self.breaksAtConfLevel = params.get('showBreaksAtConfLevel', False)
-        self.dateCloseToSessions = params.get('printDateCloseToSessions', False)
-        self.coverPage = params.get('showCoverPage', True)
-        self.tableContents = params.get('showTableContents', True)
+        self.contribId = params['showContribId']
+        self.speakerTitle = params['showSpeakerTitle']
+        self.contribAbstract = params['showAbstract']
+        self.contribPosterAbstract = params['dontShowPosterAbstract']
+        self.newPagePerSession = params['newPagePerSession']
+        self.useSessionColorCodes = params['useSessionColorCodes']
+        self.showSessionTOC = params['showSessionTOC']
+        self.lengthContribs = params['showLengthContribs']
+        self.contribsAtConfLevel = params['showContribsAtConfLevel']
+        self.breaksAtConfLevel = params['showBreaksAtConfLevel']
+        self.dateCloseToSessions = params['printDateCloseToSessions']
+        self.coverPage = params['showCoverPage']
+        self.tableContents = params['showTableContents']
         self.logo = False
 
     def showContribId(self):
