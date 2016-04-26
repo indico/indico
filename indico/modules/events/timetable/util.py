@@ -37,6 +37,7 @@ from indico.modules.events.timetable.legacy import serialize_event_info
 from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.forms.colors import get_colors
 
 
 def is_visible_from(event, categ):
@@ -255,7 +256,8 @@ def render_entry_info_balloon(entry, editable=False, sess=None):
     elif entry.session_block:
         return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
                                can_manage_session=sess.can_manage(session.user) if sess else True,
-                               can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True)
+                               can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True,
+                               color_list=get_colors())
     else:
         raise ValueError("Invalid entry")
 

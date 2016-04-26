@@ -62,6 +62,18 @@
             </dl>
         {% endif %}
     </div>
+    {% if editable %}
+        <dl class="i-data-list thirty-seventy">
+            <dt>{% trans %}Color{% endtrans %}</dt>
+            <dd>
+                <a class="i-button icon-palette palette-picker palette-picker-trigger"
+                   style="{{ block.session.colors.css }}"
+                   data-palette={{ color_list | tojson }}
+                   data-initial-color={{ block.session.colors.css | tojson}}
+                   ></a>
+            </dd>
+        </dl>
+    {% endif %}
     <span class="hr"></span>
     <div class="attribute">
         <div class="attribute-title">

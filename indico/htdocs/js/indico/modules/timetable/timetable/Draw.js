@@ -644,6 +644,19 @@ function loadBalloonContent(self, api, editable) {
                     }
                 });
             });
+
+            var $picker = $content.find('.palette-picker');
+            $picker.palettepicker({
+                availableColors: $picker.data('palette'),
+                selectedColor: $picker.data('initial-color'),
+                onSelect: function(background, text) {
+                },
+                qtipConstructor: function(element, qtipOptions) {
+                    var qtipId = $picker.closest('.qtip').data('qtip-id');
+                    $('[data-hasqtip=' + qtipId + ']').qbubble('createNested', element, qtipOptions);
+                }
+            });
+
         }
         $content.find('.close-balloon').on('click', function() {
             timetableBlock.qtip('hide');
