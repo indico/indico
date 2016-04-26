@@ -1248,7 +1248,7 @@ class WCategoryDataModification(wcomponents.WTemplated):
             for theme_id, theme_data in themes.viewitems():
                 defStyle = self._categ.getDefaultStyle(evt_type)
                 if defStyle == "":
-                    defStyle = theme_settings.default_for(evt_type)
+                    defStyle = theme_settings.defaults[evt_type]
                 if theme_id == defStyle:
                     selected = "selected"
                 else:
