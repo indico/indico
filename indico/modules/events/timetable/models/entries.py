@@ -27,6 +27,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -232,6 +233,17 @@ class TimetableEntry(db.Model):
         return cls.start_dt + cls.duration
 
     @property
+    def session_siblings(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        if self.type == TimetableEntryType.SESSION_BLOCK:
+            session_id = self.session_block.session_id
+            return self.siblings.filter(TimetableEntry.session_block.has(SessionBlock.session_id == session_id))
+        elif self.parent:
+            return self.siblings
+        else:
+            return TimetableEntry.query.filter(False)
+
+    @property
     def siblings(self):
         tzinfo = self.event_new.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
@@ -290,6 +302,11 @@ class TimetableEntry(db.Model):
                 extended = True
             if extended:
                 self.parent.extend_parent(by_start=by_start, by_end=by_end)
+
+    def is_parallel(self, in_session=False):
+        query = self.siblings if not in_session else self.session_siblings
+        return query.filter(db_dates_overlap(
+            TimetableEntry, 'start_dt', self.start_dt, 'end_dt', self.end_dt)).count() != 0
 
     def move(self, start_dt):
         """Move the entry to start at a different time.
