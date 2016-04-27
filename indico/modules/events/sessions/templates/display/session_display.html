@@ -73,7 +73,7 @@
 {%- endblock %}
 
 {% block content -%}
-    {% if sess.blocks -%}
+    {% if sess.blocks and sess.conveners -%}
         <div class="item-text">
             <div class="infogrid condensed">
                 <div class="infoline">
