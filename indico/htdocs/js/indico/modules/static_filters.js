@@ -1,7 +1,7 @@
 (function(global) {
     'use strict';
 
-    var searchBoxConfig;
+    var searchBoxConfig, totalDurationDisplay;
 
     function formatState(visible, total) {
         return '{0} / {1}'.format('<strong>{0}</strong>'.format(visible.length), total.length);
@@ -10,7 +10,9 @@
     function setState(state, visible, total) {
         state.html(formatState(visible, total));
         state.attr('title', $T.gettext("{0} out of {1} displayed").format(visible.length, total.length));
-        $('#total-duration').addClass('fade');
+        if (!totalDurationDisplay) {
+            totalDurationDisplay = $('#total-duration').detach();
+        }
     }
 
     global.applySearchFilters = function applySearchFilters() {
@@ -27,7 +29,10 @@
         if (!term) {
             $items.show();
             setState($state, $items, $items);
-            $('#total-duration').removeClass('fade');
+            if (totalDurationDisplay) {
+                $state.after(totalDurationDisplay);
+                totalDurationDisplay = null;
+            }
             return;
         }
 

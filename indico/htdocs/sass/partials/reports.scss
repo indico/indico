@@ -204,12 +204,3 @@
         right: 0;
     }
 }
-
-#filter-statistics {
-    #total-duration {
-        &.fade {
-            color: $gray !important;
-            background-color: $light-gray;
-        }
-    }
-}
