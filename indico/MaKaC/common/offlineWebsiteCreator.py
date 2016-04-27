@@ -137,6 +137,9 @@ class OfflineEventCreator(object):
         for path in ie_compatibility.urls():
             self._addFileFromSrc(os.path.join(self._staticPath, path.lstrip('/')),
                                  os.path.join(config.getHtdocsDir(), path.lstrip('/')))
+        # Mathjax plugins can't be discovered by parsing the HTML
+        self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'lib', 'mathjax'),
+                               os.path.join(config.getHtdocsDir(), 'js', 'lib', 'mathjax'))
 
         # Getting all materials, static files (css, images, js and vars.js.tpl)
         self._getAllMaterial()
