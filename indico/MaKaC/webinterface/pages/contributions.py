@@ -47,27 +47,6 @@ class WPContributionBase(WPMainBase, WPConferenceBase):
         self._hideFull = hideFull
 
 
-class WPContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPContributionBase):
-
-    def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('Management') + \
-            self._includeJSPackage('MaterialEditor') + \
-            self._asset_env['contributions_js'].urls()
-
-    def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['contributions_sass'].urls()
-
-    def _getHeadContent(self):
-        return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
-            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
-                       for url in self._asset_env['mathjax_js'].urls()])
-
-    def __init__(self, rh, contribution, hideFull=0):
-        WPContributionBase.__init__(self, rh, contribution, hideFull)
-
-
 class WPContributionModifBase(WPConferenceModifBase):
 
     def __init__(self, rh, contribution, **kwargs):

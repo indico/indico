@@ -59,44 +59,6 @@ class WPSubContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSubC
                           for url in self._asset_env['mathjax_js'].urls()])
 
 
-class WSubContributionDisplayBase(wcomponents.WTemplated):
-    def __init__(self, aw, subContrib):
-        self._aw = aw
-        self._subContrib = subContrib
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["duration"] =(datetime(1900,1,1)+self._subContrib.getDuration()).strftime("%H:%M")
-        vars["SubContrib"] = self._subContrib
-        vars["accessWrapper"] = self._aw
-
-        return vars
-
-class WSubContributionDisplayFull(WSubContributionDisplayBase):
-    pass
-
-class WSubContributionDisplayMin(WSubContributionDisplayBase):
-    pass
-
-class WSubContributionDisplay:
-    def __init__(self, aw, subContrib):
-        self._aw=aw
-        self._subContrib=subContrib
-
-    def getHTML(self, params={}):
-        if self._subContrib.canAccess( self._aw ):
-            c = WSubContributionDisplayFull( self._aw, self._subContrib)
-            return c.getHTML( params )
-        if self._subContrib.canView( self._aw ):
-            c = WSubContributionDisplayMin( self._aw, self._subContrib)
-            return c.getHTML( params )
-        return ""
-
-class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
-    def _getBody(self, params):
-        wc=WSubContributionDisplay(self._getAW(),self._subContrib)
-        return wc.getHTML()
-
 class WPSubContributionModifBase( WPConferenceModifBase ):
 
     def __init__(self, rh, subContribution, **kwargs):
