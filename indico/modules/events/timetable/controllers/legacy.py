@@ -21,7 +21,7 @@ from datetime import timedelta
 from operator import attrgetter
 
 import dateutil.parser
-from flask import request, jsonify, session
+from flask import flash, request, jsonify, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -48,6 +48,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         delete_timetable_entry)
 from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
+                                                  get_time_changes_notifications,
                                                   shift_following_entries)
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import iterdays, as_utc
@@ -352,8 +353,11 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
         rescheduler = Rescheduler(self.event_new, RescheduleMode[request.json['mode']], self.day,
                                   session=sess, session_block=self.session_block, fit_blocks=request.json['fit_blocks'],
                                   gap=timedelta(minutes=request.json['gap']))
-        with track_time_changes():
+        with track_time_changes(auto_extend='end', user=session.user) as changes:
             rescheduler.run()
+        notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo)
+        for notification in notifications:
+            flash(notification, 'highlight')
         return jsonify_data(flash=False)
 
 
