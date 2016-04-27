@@ -14,20 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceDisplay, sessionDisplay
+from MaKaC.webinterface.rh import conferenceDisplay
 from indico.web.flask.blueprints.event.display import event
 
 
 # Program
 event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
 event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
-
-# TODO: remove with the old legacy code
-# # Timetable
-# event.add_url_rule('/timetable-old/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
-# event.add_url_rule('/timetable-old/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
-# event.add_url_rule('/timetable-old/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
-#                    methods=('GET', 'POST'))
 
 # TODO: remove with the old legacy code
 # # Sessions

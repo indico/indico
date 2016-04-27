@@ -83,9 +83,6 @@ class WebFactory(WebFactory):
     def getConfModifSchedule (rh, conf):
         return WPMConfModifSchedule(rh, conf)
 
-    @staticmethod
-    def getTimeTableCustomizePDF(rh, conf, view):
-        return WPMTimeTableCustomizePDF(rh, conf, view)
 
 ############# Subcontribution Display##########################################
 
@@ -540,41 +537,3 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
 
     def _getBody(self, params):
         raise NotImplementedError
-
-
-class WPMTimeTableCustomizePDF(WPMeetingDisplay):
-
-    def __init__(self, rh, conf, view):
-        WPMeetingDisplay.__init__(self, rh, conf)
-        # We keep track of the view so that we can return to the meeting
-        # display page with the same layout when cancelling the pdf export
-        self._view = view
-        # An hack to make sure that the background is the same as the header
-        self._extraCSS.append("body { background: #424242; } ")
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
-
-    def _getBody( self, params ):
-        wc = WMTimeTableCustomizePDF( self._conf, self._view )
-        return wc.getHTML(params)
-
-
-class WMTimeTableCustomizePDF(wcomponents.WTemplated):
-
-    def __init__(self, conf, view):
-        self._conf = conf
-        self._view = view
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars['showDays'] = vars.get('showDays', 'all')
-        vars['showSessions'] = vars.get('showSessions', 'all')
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
-        # Add the view as a parameter so we can keep track of it
-        # when the pdf export is cancelled.
-        url.addParam("view", self._view)
-        vars["getPDFURL"]=quoteattr(str(url))
-        return vars

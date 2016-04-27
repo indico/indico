@@ -73,7 +73,6 @@ class NESpeakerIndex( NavigationEntry ):
 
 
 class NEConferenceTimeTable( NavigationEntry ):
-    _url = urlHandlers.UHConferenceTimeTable
     _title = "Timetable"
 
 
@@ -137,8 +136,3 @@ class NEAuthorDisplay( NavigationEntry ):
     _url = urlHandlers.UHContribAuthorDisplay
     _parent = NEAuthorIndex
     _title = "Author Display"
-
-class NETimeTableCustomizePDF( NavigationEntry ):
-    _url = urlHandlers.UHConfTimeTableCustomizePDF
-    _parent = NEConferenceTimeTable
-    _title = "Customize PDF"

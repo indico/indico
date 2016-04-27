@@ -726,42 +726,6 @@ class WPConferenceProgram(WPConferenceDefaultDisplayBase):
         return wc.getHTML()
 
 
-class WConferenceTimeTable(WConfDisplayBodyBase):
-
-    _linkname = 'timetable'
-
-    def __init__(self, conference, aw):
-        self._conf = conference
-        self._aw = aw
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
-        eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
-        eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        wvars['eventInfo'] = eventInfo
-        wvars['timetableLayout'] = wvars.get('ttLyt', '')
-        return wvars
-
-
-class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEConferenceTimeTable
-    menu_entry_name = 'timetable_old'
-
-    def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Timetable')
-
-    def _getHeadContent(self):
-        content = WPConferenceDefaultDisplayBase._getHeadContent(self)
-        return content + '<link rel="stylesheet" type="text/css" href="{}/css/timetable.css">'.format(
-            self._getBaseURL())
-
-    def _getBody( self, params ):
-        wc = WConferenceTimeTable( self._conf, self._getAW()  )
-        return wc.getHTML(params)
-
-
 class WPMeetingTimeTable( WPTPLConferenceDisplay ):
 
     def getJSFiles(self):
@@ -3334,33 +3298,6 @@ class WPModAbstractBook(WPConferenceModifAbstractBase):
                        for url in self._asset_env['mathjax_js'].urls()])
 
 
-class WTimeTableCustomizePDF(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        url = urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
-        vars["getPDFURL"] = quoteattr(str(url))
-        vars["showDays"] = vars.get("showDays", "all")
-        vars["showSessions"] = vars.get("showSessions", "all")
-
-        wc = WConfCommonPDFOptions(self._conf)
-        vars["commonPDFOptions"] = wc.getHTML()
-
-        return vars
-
-
-class WPTimeTableCustomizePDF(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NETimeTableCustomizePDF
-    menu_entry_name = 'timetable'
-
-    def _getBody(self, params):
-        wc = WTimeTableCustomizePDF(self._conf)
-        return wc.getHTML(params)
-
-
 class WConfModifPendingQueuesList(wcomponents.WTemplated):
 
     def __init__(self, url, title, target, list, pType):
@@ -3964,48 +3901,6 @@ class WPConfModifBadgeDesign(WPBadgeBase):
     def _getTabContent(self, params):
         wc = WConfModifBadgeDesign(self._conf, self.__templateId, self.__new)
         return wc.getHTML()
-
-##------------------------------------------------------------------------------------------------------------
-"""
-Common PDF Options classes
-"""
-class WConfCommonPDFOptions( wcomponents.WTemplated ):
-    """ This class corresponds to a section of options
-        that are common to each PDF in Indico.
-    """
-
-    def __init__( self, conference, user=None ):
-        self.__conf = conference
-        self._user=user
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        pagesizeNames = PDFSizes().PDFpagesizes.keys()
-        pagesizeNames.sort()
-        pagesizeOptions = []
-        for pagesizeName in pagesizeNames:
-            pagesizeOptions.append('<option ')
-            if pagesizeName == 'A4':
-                pagesizeOptions.append('selected="selected"')
-            pagesizeOptions.append('>')
-            pagesizeOptions.append(pagesizeName)
-            pagesizeOptions.append('</option>')
-
-        vars['pagesizes'] = "".join(pagesizeOptions)
-
-        fontsizeOptions = []
-        for fontsizeName in PDFSizes().PDFfontsizes:
-            fontsizeOptions.append('<option ')
-            if fontsizeName == 'normal':
-                fontsizeOptions.append('selected="selected"')
-            fontsizeOptions.append('>')
-            fontsizeOptions.append(fontsizeName)
-            fontsizeOptions.append('</option>')
-
-        vars['fontsizes'] = "".join(fontsizeOptions)
-
-        return vars
 
 
 # ============================================================================

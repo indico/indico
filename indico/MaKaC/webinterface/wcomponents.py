@@ -574,15 +574,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("fr", "no")
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
-
-
-        urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
-        urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
-        urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
-        # Add the view as a parameter to keep track of the current layout
-        # when exporting a pdf
-        urlCustPDF.addParam("view", vars["currentView"])
-
         return vars
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):

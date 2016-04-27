@@ -1012,28 +1012,6 @@ class UHConferenceProgramPDF(URLHandler):
         return "files/generatedPdf/Programme.pdf"
 
 
-class UHConferenceTimeTable(URLHandler):
-    _endpoint = 'event.conferenceTimeTable'
-
-
-class UHConfTimeTablePDF(URLHandler):
-    _endpoint = 'event.conferenceTimeTable-pdf'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params = target.getLocator()
-            from MaKaC import conference
-
-            if isinstance(target, conference.Conference):
-                return "files/generatedPdf/Conference.pdf"
-            if isinstance(target, conference.Contribution):
-                return "files/generatedPdf/%s-Contribution.pdf" % (params["contribId"])
-            elif isinstance(target, conference.Session) or isinstance(target, conference.SessionSlot):
-                return "files/generatedPdf/%s-Session.pdf" % (params["sessionId"])
-        return cls._getURL()
-
-
 class UHConferenceCFA(URLHandler):
     _endpoint = 'event.conferenceCFA'
 
@@ -1447,14 +1425,6 @@ class UHContribAuthorDisplay(URLHandler):
         if target is not None:
             return "contribs-%s-authorDisplay-%s.html" % (target.getId(), params.get("authorId", ""))
         return cls._getURL()
-
-
-class UHConfTimeTableCustomizePDF(URLHandler):
-    _endpoint = 'event.conferenceTimeTable-customizePdf'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return "files/generatedPdf/Conference.pdf"
 
 
 class UHConfModifPendingQueues(URLHandler):
