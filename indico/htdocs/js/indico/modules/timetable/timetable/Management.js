@@ -199,7 +199,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             error: handleAjaxError,
             success: function(data) {
                 self.close();
-                self.successFunc(data);
+                self.callback(data);
             }
         });
     },
@@ -267,16 +267,13 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
          }
      },
-     function(method, timeStartMethod, args, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit, canCreateNew) {
+     function(args, timetable, callback, canCreateNew) {
          var self = this;
          this.newArgs = Array.prototype.slice.call(arguments, 0);
          this.args = args;
-         this.selectedDay = dayStartDate;
-         this.days = days;
-         this.successFunc = successFunc;
+         this.selectedDay = args.get('selectedDay');
+         this.callback = callback;
          this.timetable = timetable;
-         this.isCFAEnabled = isCFAEnabled;
          this.canCreateNew = canCreateNew || false;
 
          this.PreLoadHandler(
@@ -284,7 +281,6 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              function() {
                  self.open();
              });
-
      });
 
 type("AddNewContributionDialog", [],
@@ -306,346 +302,20 @@ type("AddNewContributionDialog", [],
                 title: $T.gettext("Add contribution"),
                 onClose: function(data) {
                     if (data) {
-                        self.successFunc(data);
+                        self.callback(data);
                     }
                 }
             });
         },
     },
 
-    function(method, timeStartMethod, args, parentRoomData, confStartDate, dayStartDate, isConference, favoriteRooms,
-             days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
+    function(args, timetable, callback) {
         var self = this;
         this.args = clone(args);
         this.timetable = timetable;
-        this.successFunc = successFunc;
-        this.favoriteRooms = favoriteRooms;
-        this.bookedRooms = bookedRooms;
-        this.isEdit = isEdit;
+        this.callback = callback;
     }
 );
-
-
-/**
- * Creates a dialog that allows a break to be added
- * to the schedule
- * @param {String} method The name of the JSON-RPC method
- *        that will be called for the break to be added
- * @param {String} timeStartMethod The JSON-RPC method that
- *        will be called in order to know what the default date/time for
- *        the start of the break will be
- * @param {Object} args the arguments that will be passed to the
- *        JSON-RPC methods, in order to identify the event the break
- *        will be added to
- * @param {Object} roomInfo The object that contains the default room information
- *        for the dialog (inherited from the parent, normally)
- * @param {String} confStartDate A string representing the start date/time of the
- *        parent event (DD/MM/YYY HH:MM)
- * @param {String} dayStartDate A string representing the date of the day the
- *        calendar is currently pointing to (DD/MM/YYYY)
- */
-
-type("ChangeEditDialog", // silly name!
-     ["ServiceDialogWithButtons", "PreLoadHandler"],
-     {
-         _preload: [
-             function(hook) {
-
-                 var self = this;
-                 //change timestartmethod
-                 // Get "end date" for container, so that the break be added after the rest
-
-                 indicoRequest(this.timeStartMethod, this.dateArgs , function(result, error){
-                     if (error) {
-                         self.killProgress();
-                         IndicoUtil.errorReport(error);
-                     }
-                     else {
-                         var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
-
-                         /*
-                          * If suggested start time is later the 23h then set the suggested
-                          * time to latest possible: 23:00 - 23:59.
-                          */
-                         if (startDate.getHours() >= 23) {
-                             startDate.setHours(23);
-                             startDate.setMinutes(0);
-                         }
-                         self.startTimeField.set(Util.formatDateTime(startDate,
-                                                                     IndicoDateTimeFormats.Server).substr(11,5));
-
-                         self.info.set('startDate', Util.formatDateTime(startDate,
-                                             IndicoDateTimeFormats.Server));
-                         hook.set(true);
-                     }
-                 });
-             }
-         ],
-
-         _submitInfo: function(){
-             var self = this;
-
-             each(self.args, function(value, key) {
-                 self.info.set(key, value);
-             });
-             if (self.parameterManager.check()) {
-                 var killProgress = IndicoUI.Dialogs.Util.progress();
-                 indicoRequest(self.method, self.info, function(result, error){
-                     killProgress();
-                     if (error) {
-                         IndicoUtil.errorReport(error);
-                     }
-                     else {
-                         self.close();
-                         self.successFunc(result);
-                     }
-                 });
-             }
-         }
-
-     },
-     function(method, args, title, successFunc) {
-         var self = this;
-
-         this.successFunc = successFunc;
-
-         this.killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-         this.PreLoadHandler(
-             this._preload,
-             function() {
-                 self.killProgress();
-                 self.open();
-             });
-
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, title);
-                            });
-
-
-type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
-        {
-
-            getChosenValue: function() {
-                var radios = document.getElementsByName("rbID");
-                for ( var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) {
-                        return radios[i].value;
-                    }
-                }
-                return false;
-            },
-
-            // draw a tab with radiobuttons for each day
-            _drawMoveEntryDay: function(timetableItems, currentDay) {
-                var moveEntryTable = Html.ul( {
-                    className: 'list',
-                    style: {
-                        overflow: 'auto',
-                        height: '250px'
-                    }
-                });
-
-                // list of all radiobuttons
-                var radioButtons = [];
-
-
-                // Construct a 2d array to sort items by startTime
-                var sortedByTime = [];
-                translate(timetableItems, function(value, key) {
-                    // consider only sessions
-                    if (key.slice(0,1) == "s") {
-                        sortedByTime.push( [ value.startDate.time, key ]);
-                    }
-                });
-
-                // Sorting the 2d array by startTime
-                for ( var i = 0; i < sortedByTime.length; i++) {
-                    var temp = sortedByTime[i].splice(0, 1);
-                    sortedByTime[i].unshift(temp);
-                }
-                sortedByTime.sort();
-
-                // add top timetable radio button
-                var rb = Html.radio( {
-                    name : "rbID",
-                    style: {verticalAlign: 'middle'}
-                });
-                rb.dom.value = "conf:" + currentDay;
-
-                // disable the radio button where the item already belongs to
-                if (!this.inSession && Util.formatDateTime(this.eventData.startDate, IndicoDateTimeFormats.Ordinal) == currentDay) {
-                    rb.dom.disabled = 'disabled';
-                }
-
-                moveEntryTable.append(Html.li(
-                    {},rb,
-                    (Html.label( {style: {verticalAlign: 'middle', marginLeft: '5px', fontWeight: 'normal'}},
-                                 $T("Top level timetable")))));
-
-                radioButtons.push(rb);
-
-                // building the radio buttons
-                for ( i = 0; i < sortedByTime.length; i++) {
-                    var value = timetableItems[sortedByTime[i][1]];
-                    // disable the radio button where the item already belongs to
-                    rb = Html.radio( {
-                        name : 'rbID',
-                        style: {verticalAlign: 'middle'}
-                    });
-                    rb.dom.value = value.sessionId + ':' + value.sessionSlotId;
-
-                    if (this.inSession && value.sessionId == this.eventData.sessionId && value.sessionSlotId == this.eventData.sessionSlotId) {
-                        rb.dom.disabled = 'disabled';
-                    }
-
-                    radioButtons.push(rb);
-
-                    var colorSquare = Html.div(
-                        {
-                            style : {
-                                width: '15px',
-                                height: '15px',
-                                backgroundColor: this.timetable.getById("s"+value.sessionId).color,
-                                cssFloat: 'right',
-                                marginRight: '10px'
-
-                            }
-                        });
-                    var slotTitle = value.slotTitle? " (" + Util.truncate(value.slotTitle, 20) + ")":"";
-
-                    moveEntryTable.append(Html.li(
-                        {}, colorSquare, rb,
-                        Html.label( {
-                            style : {
-                                marginLeft: '5px',
-                                verticalAlign: 'middle',
-                                fontWeight: 'normal'
-                            }
-                        }, Util.truncate(value.title, 20) + slotTitle, Html.span(
-                            {style: {
-                                fontSize: '10px',
-                                marginLeft: '5px',
-                                color: '#999'
-                            }}, " ", value.startDate.time.slice(0,5) + "-" + value.endDate.time.slice(0,5)))));
-                }
-
-                // Ensure that only 1 radio button will be selected at a given time
-                Logic.onlyOne(radioButtons, false);
-
-                return moveEntryTable;
-            },
-
-            _getButtons: function() {
-                var self = this;
-                return [
-                    [$T('Move Entry'), function() {
-                        var value = self.getChosenValue();
-
-                        // if nothing has been selected yet
-                        if (!value) {
-                            return;
-                        }
-
-                        var value = self.getChosenValue();
-                        self.managementActions.moveToSession(self.eventData, value, 'drop').done(
-                            function() {
-                                self.close();
-                            });
-                    }],
-                    [$T('Cancel'), function() {
-                        self.close();
-                    }]
-                ];
-            },
-
-            draw: function() {
-                var self = this;
-
-                if (this.eventData.sessionId === null && this.eventData.slotId === null) {
-                    this.inSession = false;
-                }
-                // populate the tabslist
-                var tabData = this.topLevelTimetableData;
-
-                // sort tabs according to days
-                var dateKeys = $L(keys(tabData));
-                dateKeys.sort();
-
-                this.tabWidget = new JTabWidget(
-                    translate(dateKeys,
-                              function(key) {
-                                  return [
-                                      $T(self._titleTemplate(key)),
-                                      self._drawMoveEntryDay(tabData[key], key)
-                                  ];
-                              }), 400, 200, self._titleTemplate(self.currentDay));
-                this.tabWidget.makeScrollable();
-
-                // define where the contribution is (display purpose)
-                var contribLocation = null;
-                if (this.inSession) {
-                    contribLocation = self.topLevelTimetableData[this.currentDay]
-                    ['s' + this.eventData.sessionId + 'l' + this.eventData.sessionSlotId].title +
-                        " (interval #" + self.slotId + ")";
-                } else {
-                    contribLocation = Html.span({style:{fontWeight: 'bold'}},
-                                                $T("Top-level timetable"));
-                }
-
-                // define if contrib is of type Contribution or Break (display purpose)
-                var span1 = Html.span({}, this.eventData.entryType == "Contribution"?
-                                      $T("This contribution currently located at: "):
-                                      $T("This break is currently located at: "),
-                                      contribLocation);
-
-                var span2 = Html.div({
-                    style: {
-                        marginTop: '10px',
-                        marginBottom: '15px',
-                        fontStyle: 'italic'
-                    }
-                },
-                    $T("Please select the place where you want to move it to."));
-
-                var content = Widget.block([Html.div({}, span1, span2), this.tabWidget.draw(), Html.br()]);
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
-            },
-
-            /*
-        * Translates the keys used in the data dictionary into titles
-        * displayed in the tab control
-        */
-            _titleTemplate: function(text) {
-                if (text == 'all') {
-                    return 'All days';
-                }
-
-                var nDate = Util.parseJSDateTime(text, IndicoDateTimeFormats.Ordinal);
-
-                return Indico.Data.WeekDays[nDate.getDay()].substring(0,3) + ' ' + nDate.getDate() + '/' + (nDate.getMonth() + 1);
-            },
-
-            postDraw: function(){
-                this.tabWidget.postDraw();
-                this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
-            }
-        },
-     function(managementActions, timetable, eventData, currentDay) {
-         this.managementActions = managementActions;
-         this.timetableData = timetable.getData();
-         this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
-         this.timetable = timetable;
-         this.currentDay = currentDay;
-         this.eventData = eventData;
-
-         this.inSession = (eventData.sessionId != null) && (eventData.sessionSlotId != null);
-
-         var self = this;
-
-         this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
-            function() {
-                self.close();
-            });
-     });
 
 
 /**
