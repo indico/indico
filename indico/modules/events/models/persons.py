@@ -36,6 +36,12 @@ class PersonLinkDataMixin(object):
     @person_link_data.setter
     @no_autoflush
     def person_link_data(self, value):
+        # Revoke submission rights for removed persons
+        for person_link in set(self.person_links) - value.viewkeys():
+            principal = person_link.person.principal
+            if principal:
+                self.update_principal(principal, del_roles={'submit'})
+        # Update person links
         self.person_links = value.keys()
         for person_link, is_submitter in value.iteritems():
             person = person_link.person
