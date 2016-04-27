@@ -1265,14 +1265,6 @@ class UHConfModCFANotifTplDown(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-notifTplDown'
 
 
-class UHConfAuthorIndex(URLHandler):
-    _endpoint = 'event.confAuthorIndex'
-
-
-class UHConfSpeakerIndex(URLHandler):
-    _endpoint = 'event.confSpeakerIndex'
-
-
 class UHContribModWithdraw(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-withdraw'
 
@@ -1415,16 +1407,6 @@ class UHAnnouncementSave(URLHandler):
 
 class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
-
-
-class UHContribAuthorDisplay(URLHandler):
-    _endpoint = 'event.contribAuthorDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            return "contribs-%s-authorDisplay-%s.html" % (target.getId(), params.get("authorId", ""))
-        return cls._getURL()
 
 
 class UHConfModifPendingQueues(URLHandler):

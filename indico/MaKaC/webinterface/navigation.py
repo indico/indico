@@ -63,44 +63,6 @@ class NEContributionList( NavigationEntry ):
     _url = urlHandlers.UHContributionList
     _title = "Contribution List"
 
-class NEAuthorIndex( NavigationEntry ):
-    _url = urlHandlers.UHConfAuthorIndex
-    _title = "Author Index"
-
-class NESpeakerIndex( NavigationEntry ):
-    _url = urlHandlers.UHConfSpeakerIndex
-    _title = "Speaker Index"
-
-
-class NEConferenceTimeTable( NavigationEntry ):
-    _title = "Timetable"
-
-
-class NESessionDisplay( NavigationEntry ):
-    _url = urlHandlers.UHSessionDisplay
-    _parent = NEConferenceTimeTable
-    _title = "Session details"
-
-class NEContributionDisplay( NavigationEntry ):
-    _url = urlHandlers.UHContributionDisplay
-    _parent = {"session": NESessionDisplay, \
-               "event": NEConferenceTimeTable}
-    _title = "Contribution details"
-
-    def getParent(cls, target):
-        nextPage = None
-        if target is not None:
-            parent = target.getOwner()
-            if isinstance(parent, conference.Session):
-                nextPage = cls._parent["session"]()
-            elif isinstance(parent, conference.Conference):
-                nextPage = cls._parent["event"]()
-        return nextPage
-    getParent = classmethod( getParent )
-
-class NESubContributionDisplay(NavigationEntry):
-    _url = urlHandlers.UHSubContributionDisplay
-    _title = "SubContribution details"
 
 class NEMyStuff( NavigationEntry ):
     _url = urlHandlers.UHConfMyStuff
@@ -121,18 +83,8 @@ class NEAbstractRecovery( NavigationEntry ):
     _parent = NEAbstractDisplay
     _title = "Recovery"
 
-class NEMeetingSessionDisplay(NavigationEntry):
-    _url = urlHandlers.UHSessionDisplay
-    _title = "Session details"
-
 
 class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _url = urlHandlers.UHAbstractSubmissionConfirmation
     _parent = NEConferenceCFA
     _title = "Abstract submission confirmation"
-
-
-class NEAuthorDisplay( NavigationEntry ):
-    _url = urlHandlers.UHContribAuthorDisplay
-    _parent = NEAuthorIndex
-    _title = "Author Display"

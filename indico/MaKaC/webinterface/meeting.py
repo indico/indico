@@ -20,9 +20,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.contributions as contributions
-import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.pages.sessions as sessions
-import MaKaC.webinterface.navigation as navigation
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
@@ -83,19 +81,6 @@ class WebFactory(WebFactory):
     def getConfModifSchedule (rh, conf):
         return WPMConfModifSchedule(rh, conf)
 
-
-############# Subcontribution Display##########################################
-
-    def getSubContributionDisplay(rh, subcontrib):
-        return WPMSubContributionDisplay(rh, subcontrib)
-    getSubContributionDisplay = staticmethod(getSubContributionDisplay)
-
-############# Contribution Display #############################################
-
-    def getContributionDisplay(rh, contrib, hideFull = 0 ):
-        return WPMContributionDisplay(rh,contrib, hideFull)
-    getContributionDisplay = staticmethod(getContributionDisplay)
-
 ############# Contribution modification #########################################
     def getContributionModification(rh, contrib):
         return WPMContributionModification(rh,contrib)
@@ -120,12 +105,6 @@ class WebFactory(WebFactory):
     def getContribAddSC(rh, contrib):
         return WPMContribAddSC(rh,contrib)
     getContribAddSC = staticmethod(getContribAddSC)
-
-########## Session Display###########################################
-
-    def getSessionDisplay(rh,session):
-        return WPMSessionDisplay (rh,session)
-    getSessionDisplay = staticmethod(getSessionDisplay)
 
 ############Session Modificiations###########################################
 
@@ -177,193 +156,6 @@ class WMeetingCreation(category.WConferenceCreation):
         vars["event_type"] = WebFactory.getId()
         return vars
 
-################# Subcontribution Display ##############################
-
-class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WMConfDisplayFrame( self._getAW(), self._conf )
-        frameParams = {\
-              "logoURL": self.logo_url, \
-                      }
-        if self.event.has_logo:
-            frameParams["logoURL"] = self.logo_url
-
-        confTitle = self._conf.getTitle()
-        colspan=""
-        imgOpen=""
-        padding=""" style="padding:0px" """
-
-        body = i18nformat("""
-                <td class="confBodyBox" %s %s>
-                    %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" width="95%%">
-                        <tr>
-                            <td class="formTitle" width="100%%"> _("SubContribution View") - %s</td>
-                        </tr>
-                        <tr>
-                            <td align="left" valign="middle" width="100%%">
-                                <b><br>%s</b>
-                            </td>
-                       </tr>
-                    </table>
-                     <!--Main body-->
-                    %s
-                </td>""")%(colspan,padding,imgOpen,confTitle,
-                        self._getNavigationBarHTML(),
-                        body)
-        return frame.getHTML( body, frameParams)
-
-    def _getBody(self,params):
-        wc=WMSubContributionDisplay(self._getAW(),self._subContrib)
-        return wc.getHTML()
-
-
-class WMSubContributionDisplayBase(subContributions.WSubContributionDisplayBase):
-    def getVars( self ):
-        vars = subContributions.WSubContributionDisplayBase.getVars( self )
-        vars["modifyIcon"] = Config.getInstance().getSystemIconURL( "modify" )
-        vars ["modifyURL"]= urlHandlers.UHSubContributionModification.getURL(self._subContrib)
-        return vars
-
-class WMSubContributionDisplay(subContributions.WSubContributionDisplay):
-    def getHTML(self,params={}):
-        if self._subContrib.canModify( self._aw ):
-            c = WMSubContributionDisplayFull( self._aw, self._subContrib)
-            return c.getHTML( params )
-        if self._subContrib.canView( self._aw ):
-            c = WMSubContributionDisplayMin( self._aw, self._subContrib)
-            return c.getHTML( params )
-        return ""
-
-class WMSubContributionDisplayFull(WMSubContributionDisplayBase):
-    pass
-
-class WMSubContributionDisplayMin (WMSubContributionDisplayBase):
-    pass
-
-
-################# Contribution Display ################################
-
-class WPMContributionDisplay(contributions.WPContributionDisplay):
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WMConfDisplayFrame( self._getAW(), self._conf )
-        frameParams = {\
-              "logoURL": self.logo_url, \
-                      }
-        if self.event.has_logo:
-            frameParams["logoURL"] = self.logo_url
-
-        confTitle = self._conf.getTitle()
-        colspan=""
-        imgOpen=""
-        padding=""
-        padding=""" style="padding:0px" """
-
-        body =  i18nformat("""
-                <td class="confBodyBox" %s %s>
-                    %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" valign="top" width="95%%">
-                        <tr>
-                            <td class="formTitle" width="100%%">%s</td>
-                        </tr>
-                        <tr>
-                            <td align="left" valign="middle" width="100%%">
-                                <b><br>%s</b>
-                            </td>
-                       </tr>
-                    </table>
-                     <!--Main body-->
-                    %s
-                </td>""")%(colspan,padding,imgOpen,confTitle,
-                        self._getNavigationBarHTML(),
-                        body)
-        return frame.getHTML( body, frameParams)
-
-    def _getBody(self,params):
-        wc=WMContributionDisplay(self._getAW(),self._contrib)
-        return wc.getHTML()
-
-
-class WMContributionDisplay(contributions.WContributionDisplay):
-    def getHTML(self,params={}):
-        if self._contrib.canAccess( self._aw ):
-            c = WMContributionDisplayFull( self._aw, self._contrib)
-            return c.getHTML( params )
-        if self._contrib.canView( self._aw ):
-            c = WMContributionDisplayMin( self._aw, self._contrib)
-            return c.getHTML( params )
-        return ""
-
-class WMContributionDisplayBase(contributions.WContributionDisplayBase):
-    def getVars( self ):
-        vars = contributions.WContributionDisplayBase.getVars( self )
-        return vars
-
-class WMContributionDisplayFull(WMContributionDisplayBase):
-    pass
-
-class WMContributionDisplayMin (WMContributionDisplayBase):
-    pass
-
-#################Session Display ######################################
-
-class WPMSessionDisplay(sessions.WPSessionDisplay):
-    navigationEntry =  navigation.NEMeetingSessionDisplay
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WMConfDisplayFrame( self._getAW(), self._conf )
-        frameParams = {\
-              "logoURL": self.logo_url, \
-                      }
-        if self.event.has_logo:
-            frameParams["logoURL"] = self.logo_url
-
-        confTitle = self._conf.getTitle()
-        colspan=""
-        imgOpen=""
-        padding=""
-        padding=""" style="padding:0px" """
-
-        body =  i18nformat("""
-                <td class="confBodyBox" %s %s>
-                    %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" valign="top" width="95%%">
-                        <tr>
-                            <td class="formTitle" width="100%%"> _("Session View") - %s</td>
-                        </tr>
-                        <tr>
-                            <td align="left" valign="middle" width="100%%">
-                                <b><br>%s</b>
-                            </td>
-                       </tr>
-                    </table>
-                     <!--Main body-->
-                    %s
-                </td>""")%(colspan,padding,imgOpen,confTitle,
-                        self._getNavigationBarHTML(),
-                        body)
-        return frame.getHTML( body, frameParams)
-
-    def _getBody(self, params):
-        wc = WMSessionDisplay(self._getAW(), self._session)
-        return wc.getHTML()
-
-class WMSessionDisplay(sessions.WSessionDisplay):
-    def getHTML(self):
-        if self._session.canAccess( self._aw ):
-            c = WMSessionDisplayFull(self._aw,self._session)
-            return c.getHTML()
-        return ""
-
-
-
-class WMSessionDisplayBase(sessions.WSessionDisplayBase):
-    pass
-
-class WMSessionDisplayFull(WMSessionDisplayBase):
-    pass
 
 #################Contribution Modification##############################
 

@@ -19,7 +19,6 @@ from indico.modules.events.layout.views import WPPage
 from indico.modules.events.registration.views import WPDisplayRegistrationParticipantList
 from indico.modules.events.sessions.views import WPDisplaySession
 from indico.modules.events.timetable.views import WPDisplayTimetable
-from MaKaC.webinterface.pages.authors import WPAuthorDisplay
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceProgram
 
 
@@ -87,7 +86,3 @@ class WPStaticContributionDisplay(WPStaticEventBase, WPContributions):
 
 class WPStaticSubcontributionDisplay(WPStaticEventBase, WPContributions):
     endpoint = 'contributions.display_subcontribution'
-
-
-class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
-    pass

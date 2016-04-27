@@ -1,1 +1,0 @@
-<%inherit file="SubContributionDisplayMin.tpl"/>

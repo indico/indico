@@ -35,7 +35,6 @@ from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat, ngettext
 
 from indico.util import json
-import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.common.TemplateExec import render
@@ -50,76 +49,6 @@ class WPSessionBase(WPConferenceBase):
         self._session = session
         WPConferenceBase.__init__(self, rh, self._session.getConference())
 
-
-class WPSessionDisplayBase(WPSessionBase):
-    pass
-
-
-class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDisplayBase):
-
-    def __init__(self, rh, session):
-        WPSessionDisplayBase.__init__(self, rh, session)
-
-
-class WSessionDisplayBase(WICalExportBase):
-
-    def __init__(self,aw,session):
-        self._aw = aw
-        self._session = session
-        self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        slotConveners = []
-        for entry in self._session.getSchedule().getEntries():
-            slot = entry.getOwner()
-            conveners = []
-            for convener in slot.getOwnConvenerList():
-                conveners.append({'fullName': convener.getFullName(), 'email': convener.getEmail() if self._aw.getUser() else "", 'affiliation' : convener.getAffiliation()})
-            if conveners:
-                slotConveners.append({'title': slot.getTitle(), 'startDate': slot.getAdjustedStartDate(self._tz), 'endDate': slot.getAdjustedEndDate(self._tz), 'conveners': conveners})
-        vars["slotConveners"] = slotConveners
-
-        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz = self._tz)
-        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz = self._tz)
-        vars["eventInfo"]= eventInfo
-
-        vars["session"] = vars["target"] = self._session
-        vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
-        vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
-                                              (self._session.getConference().getId(), self._session.getId())))
-        vars["conf"] = self._session.getConference()
-        vars["contributions"] = sorted(self._session.getContributionList(), key=lambda contrib: contrib.getTitle())
-        return vars
-
-
-class WSessionDisplayFull(WSessionDisplayBase):
-    pass
-
-
-class WSessionDisplay:
-
-    def __init__(self, aw, session):
-        self._aw = aw
-        self._session = session
-
-    def getHTML(self):
-        c = WSessionDisplayFull(self._aw, self._session)
-        return c.getHTML()
-
-
-class WPSessionDisplay( WPSessionDefaultDisplayBase ):
-    navigationEntry = navigation.NESessionDisplay
-
-    def _getBody(self, params):
-        wc = WSessionDisplay(self._getAW(), self._session)
-        return wc.getHTML()
-
-    def getJSFiles(self):
-        return WPSessionDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('MaterialEditor') + \
-               self._includeJSPackage('Timetable')
 
 class WPSessionModifBase(WPConferenceModifBase):
     sidemenu_option = 'timetable_old'

@@ -329,26 +329,6 @@ class RHContributionList( RHConferenceBaseDisplay ):
         return p.display(filterCrit = self._filterCrit, filterText=self._filterText)
 
 
-class RHAuthorIndex(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConfAuthorIndex
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-
-    def _process(self):
-        p=conferences.WPAuthorIndex(self,self._target)
-        return p.display()
-
-class RHSpeakerIndex(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConfSpeakerIndex
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-
-    def _process(self):
-        p=conferences.WPSpeakerIndex(self,self._target)
-        return p.display()
-
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuff
 

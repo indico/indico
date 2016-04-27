@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import collections
 from flask import session, render_template, request
 import os
 import posixpath
@@ -26,7 +25,6 @@ from xml.sax.saxutils import quoteattr
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
-import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML
@@ -3050,112 +3048,6 @@ class WConfContributionList (WConfDisplayBodyBase):
         wvars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
         wvars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
         return wvars
-
-
-class WConfAuthorIndex(WConfDisplayBodyBase):
-
-    _linkname = 'author_index'
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["body_title"] = self._getTitle()
-        wvars["items"] = dict(enumerate(self._getItems()))
-        return wvars
-
-    def _getItems(self):
-        res = []
-
-        for key, authors in self._conf.getAuthorIndex().iteritems():
-            # get the first identity that matches the author
-            if len(authors) == 0:
-                continue
-            else:
-                auth = next((x for x in authors if x.getContribution() and x.getContribution().getConference()), None)
-                if auth is None:
-                    continue
-
-            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(), authorId=auth.getId())
-            contribs = []
-            res.append({'fullName': auth.getFullNameNoTitle(),
-                        'affiliation': auth.getAffiliation(),
-                        'authorURL': authorURL,
-                        'contributions': contribs})
-
-            for auth in authors:
-                contrib = auth.getContribution()
-                if contrib is not None and contrib.getConference() is not None:
-                    contribs.append({
-                        'title': contrib.getTitle(),
-                        'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
-                        'attached_items': contrib.attached_items
-                    })
-        return res
-
-
-class WPAuthorIndex(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEAuthorIndex
-    menu_entry_name = 'author_index'
-
-    def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._asset_env['indico_authors'].urls()
-
-    def _getBody(self, params):
-        wc = WConfAuthorIndex(self._conf)
-        return wc.getHTML()
-
-
-class WConfSpeakerIndex(WConfDisplayBodyBase):
-
-    _linkname = 'speaker_index'
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        res = collections.defaultdict(list)
-        for index, key in enumerate(self._conf.getSpeakerIndex().getParticipationKeys()):
-            pl = self._conf.getSpeakerIndex().getById(key)
-            try:
-                speaker = pl[0]
-            except IndexError:
-                continue
-            res[index].append({'fullName': speaker.getFullNameNoTitle(), 'affiliation': speaker.getAffiliation()})
-            for speaker in pl:
-                if isinstance(speaker, conference.SubContribParticipation):
-                    participation = speaker.getSubContrib()
-                    if participation is None:
-                        continue
-                    url = urlHandlers.UHSubContributionDisplay.getURL(participation)
-                else:
-                    participation = speaker.getContribution()
-                    if participation is None:
-                        continue
-                    url = urlHandlers.UHContributionDisplay.getURL(participation)
-                if participation.getConference() is not None:
-                    res[index].append({'title': participation.getTitle(),
-                                       'url': str(url),
-                                       'attached_items': participation.getContribution().attached_items})
-        wvars["body_title"] = self._getTitle()
-        wvars["items"] = res
-        return wvars
-
-
-class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NESpeakerIndex
-    menu_entry_name = 'speaker_index'
-
-    def _getBody(self, params):
-        wc=WConfSpeakerIndex(self._conf)
-        return wc.getHTML()
-
-    def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._asset_env['indico_authors'].urls()
 
 
 class WConfMyContributions(wcomponents.WTemplated):
