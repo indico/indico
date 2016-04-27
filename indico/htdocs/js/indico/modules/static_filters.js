@@ -38,7 +38,7 @@
 
         // quick search of contribution by ID
         if ((m = term.match(/^#(\d+)$/))) {
-            $visibleEntries = $('[data-friendly-id="' + m[1] + '"]');
+            $visibleEntries = $items.filter('[data-friendly-id="' + m[1] + '"]');
         } else {
             $visibleEntries = $items.find('[data-searchable*="' + term.toLowerCase() + '"]')
                                             .closest(searchBoxConfig.itemHandle);
