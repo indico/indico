@@ -67,7 +67,6 @@ endpointMap = {
     "user": importModule('MaKaC.services.implementation.user'),
     "contribution": importModule('MaKaC.services.implementation.contribution'),
     "session": importModule('MaKaC.services.implementation.session'),
-    "schedule": importModule('MaKaC.services.implementation.schedule'),
     "search": importModule('MaKaC.services.implementation.search'),
     "material": importModule('MaKaC.services.implementation.material'),
     "reviewing": importModule('MaKaC.services.implementation.reviewing'),
