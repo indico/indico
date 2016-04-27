@@ -1,5 +1,5 @@
 {% macro render_event_person_links(event_type, event_person_links) -%}
-    {% for event_person_link in event_person_links %}
+    {% for event_person_link in event_person_links | sort(attribute='full_name') %}
         <div class="person-link-info">
             <span>{{ event_person_link.full_name }}</span>
             {% if event_person_link.is_submitter %}
