@@ -448,8 +448,6 @@ class Category(CommonObjectBase):
         self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
-        self._statistics = {"events": None, "contributions": None, "files": None,
-                            "users": None, "updated": None}
         self._icon = None
         self._timezone = ""
         self._notifyCreationList = ""
