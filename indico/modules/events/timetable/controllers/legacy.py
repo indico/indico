@@ -225,8 +225,8 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
 
     def _process(self):
         item = self.entry.object
-        tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
-        form = BaseEntryForm(obj=FormDefaults(item, time=tt_entry_dt.time()), day=tt_entry_dt.date(),
+        entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
+        form = BaseEntryForm(obj=FormDefaults(item, time=entry_dt.time()), day=entry_dt.date(),
                              event=self.event_new, entry=self.entry,
                              session_block=self.entry.parent.object if self.entry.parent else None)
         data = form.data
@@ -236,7 +236,9 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         if form.validate_on_submit():
             with track_time_changes():
                 if shift_later:
-                    updated_entries += shift_following_entries(self.entry, form.start_dt.data, session_=self.session)
+                    new_end_dt = form.start_dt.data + form.duration.data
+                    shift = new_end_dt - self.entry.end_dt
+                    updated_entries += shift_following_entries(self.entry, shift, session_=self.session)
                 if self.entry.contribution:
                     update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
@@ -426,8 +428,9 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
     def _process(self):
         new_start_dt = (self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('startDate')))
                         .astimezone(utc))
+        shift = new_start_dt - self.entry.start_dt
         with track_time_changes(auto_extend=True, user=session.user):
-            shift_following_entries(self.entry, new_start_dt, session_=self.session)
+            shift_following_entries(self.entry, shift, session_=self.session)
             self.entry.move(new_start_dt)
         serializer = TimetableSerializer(management=True)
         if self.session:
