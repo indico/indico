@@ -3016,57 +3016,6 @@ _("You can now close this window.")</b>
 """)
 
 
-class WPContributionList( WPConferenceDefaultDisplayBase ):
-    navigationEntry = navigation.NEContributionList
-    menu_entry_name = 'contributions'
-
-    def _getBody( self, params ):
-        wc = WConfContributionList( self._getAW(), self._conf, params["filterCrit"], params.get("filterText",""))
-        return wc.getHTML()
-
-
-class WConfContributionList (WConfDisplayBodyBase):
-
-    _linkname = 'contributions'
-
-    def __init__(self, aw, conf, filterCrit, filterText):
-        self._aw = aw
-        self._conf = conf
-        self._filterCrit = filterCrit
-        self._filterText = filterText
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-
-        wvars["body_title"] = self._getTitle()
-        wvars["contributions"] = self._conf.getContributionListSorted(includeWithdrawn=False, key="title")
-        wvars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
-        wvars["conf"] = self._conf
-        wvars["accessWrapper"] = self._aw
-        wvars["filterCriteria"] = self._filterCrit
-        wvars["filterText"] = self._filterText
-        wvars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
-        wvars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
-        return wvars
-
-
-class WConfMyContributions(wcomponents.WTemplated):
-
-    def __init__(self, aw, conf):
-        self._aw=aw
-        self._conf=conf
-
-    def getHTML(self, params):
-        return wcomponents.WTemplated.getHTML(self, params)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["User"] = self._aw.getUser()
-        vars["Conference"] = self._conf
-        vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
-        return vars
-
-
 class WConfMyStuffMyTracks(WConfDisplayBodyBase):
 
     _linkname = 'my_tracks'
@@ -3082,7 +3031,6 @@ class WConfMyStuffMyTracks(WConfDisplayBodyBase):
         if len(lt) <= 0:
             return ""
         res = []
-        iconURL = Config.getInstance().getSystemIconURL("conf_edit")
         for t in lt:
             modURL = urlHandlers.UHTrackModifAbstracts.getURL(t)
             res.append("""

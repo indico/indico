@@ -20,7 +20,6 @@ import os
 import pytz
 from werkzeug.exceptions import Forbidden
 
-import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
@@ -28,29 +27,23 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPError404
-import MaKaC.conference as conference
 from indico.core.config import Config
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-import MaKaC.common.filters as filters
-import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
-from MaKaC.PDFinterface.conference import TimeTablePlain, AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
+from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.PDFinterface.conference import AbstractBook
 import zipfile
 from cStringIO import StringIO
 from MaKaC.i18n import _
 
 import MaKaC.common.timezoneUtils as timezoneUtils
-from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core import signals
-from indico.modules.events.api import CategoryEventHook
-from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
-from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file
 
 
@@ -260,75 +253,6 @@ class RHConferenceProgramPDF(RHConferenceBaseDisplay):
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
-class _HideWithdrawnFilterField(filters.FilterField):
-    """
-    """
-    _id = "hide_withdrawn"
-
-    def __init__(self,conf,values):
-        pass
-
-    def satisfies(self,contribution):
-        """
-        """
-        return not isinstance(contribution.getCurrentStatus(),conference.ContribStatusWithdrawn)
-
-
-class ContributionsFilterCrit(filters.FilterCriteria):
-    _availableFields = { \
-        contribFilters.TypeFilterField.getId():contribFilters.TypeFilterField, \
-        contribFilters.TrackFilterField.getId():contribFilters.TrackFilterField, \
-        contribFilters.SessionFilterField.getId():contribFilters.SessionFilterField, \
-        _HideWithdrawnFilterField.getId(): _HideWithdrawnFilterField
-                }
-
-
-class RHContributionList( RHConferenceBaseDisplay ):
-    _uh = urlHandlers.UHContributionList
-
-    @staticmethod
-    def create_filter(conf, params, filterUsed=False):
-        filter = {"hide_withdrawn": True}
-        ltypes = ltracks = lsessions = []
-        if not filterUsed:
-            for ctype in conf.as_event.contribution_types:
-                ltypes.append( ctype.id )
-            for track in conf.getTrackList():
-                ltracks.append( track.getId() )
-            for session in conf.getSessionList():
-                lsessions.append( session.getId() )
-
-        filter["type"] = params.get("selTypes", ltypes)
-        filter["track"] = params.get("selTracks", ltracks)
-        filter["session"] = params.get("selSessions", lsessions)
-        return ContributionsFilterCrit(conf,filter)
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-
-        # Filtering
-        filterUsed = params.get("filter","no") == "yes"
-        self._filterText =  params.get("filterText","")
-        self._filterCrit = self.create_filter(self._conf, params, filterUsed)
-
-        typeShowNoValue, trackShowNoValue, sessionShowNoValue = True, True, True
-        if filterUsed:
-            if self._conf.as_event.contribution_types:
-                typeShowNoValue =  params.has_key("typeShowNoValue")
-            if self._conf.getTrackList():
-                trackShowNoValue =  params.has_key("trackShowNoValue")
-            if self._conf.getSessionList():
-                sessionShowNoValue =  params.has_key("sessionShowNoValue")
-        self._filterCrit.getField("type").setShowNoValue( typeShowNoValue )
-        self._filterCrit.getField("track").setShowNoValue( trackShowNoValue )
-        self._filterCrit.getField("session").setShowNoValue( sessionShowNoValue )
-
-
-    def _process( self ):
-        p = conferences.WPContributionList( self, self._target )
-        return p.display(filterCrit = self._filterCrit, filterText=self._filterText)
-
-
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuff
 
@@ -354,27 +278,6 @@ class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
         else:
             p = conferences.WPConfMyStuffMyTracks(self, self._target)
             return p.display()
-
-class RHContributionListToPDF(RHConferenceBaseDisplay):
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        contribIds = self._normaliseListParam( params.get("contributions", []) )
-        self._contribs = []
-        for id in contribIds:
-            contrib = self._conf.getContributionById(id)
-            if contrib.canAccess(self.getAW()):
-                self._contribs.append(contrib)
-
-    def _process( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        filename = "Contributions.pdf"
-        if not self._contribs:
-            return "No contributions to print"
-        from MaKaC.PDFinterface.conference import ContribsToPDF
-        pdf = ContribsToPDF(self._conf, self._contribs)
-
-        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractBook(RHConferenceBaseDisplay):

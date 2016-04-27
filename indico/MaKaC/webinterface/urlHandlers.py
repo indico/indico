@@ -1213,18 +1213,6 @@ class UHSessionModContribListEditContrib(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-editContrib'
 
 
-class UHContributionList(URLHandler):
-    _endpoint = 'event.contributionListDisplay'
-
-
-class UHContributionListToPDF(URLHandler):
-    _endpoint = 'event.contributionListDisplay-contributionsToPDF'
-
-    @classmethod
-    def getStaticURL(cls, target=None, **params):
-        return "files/generatedPdf/Contributions.pdf"
-
-
 class UHConfModAbstractPropToAcc(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-propToAcc'
 

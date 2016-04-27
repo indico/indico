@@ -59,10 +59,6 @@ class NEAbstractDisplay( NavigationEntry ):
     _parent = NEUserAbstracts
     _title = "Abstract details"
 
-class NEContributionList( NavigationEntry ):
-    _url = urlHandlers.UHContributionList
-    _title = "Contribution List"
-
 
 class NEMyStuff( NavigationEntry ):
     _url = urlHandlers.UHConfMyStuff
