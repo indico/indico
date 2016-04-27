@@ -385,8 +385,10 @@ def track_time_changes(auto_extend=False, user=None):
     If the code running inside the ``with`` block of this context
     manager raises an exception, no signals will be triggered.
 
-    :param auto_extend: Whether entry parents will get their end_dt
-                        automatically extended or not.
+    :param auto_extend: Whether entry parents will get their boundaries
+                        automatically extended or not. Passing ``'start'`` will
+                        extend only start datetime, ``'end'`` to extend only
+                        end datetime.
     :param user: The `User` that will trigger time changes.
     """
     if auto_extend:
@@ -402,11 +404,13 @@ def track_time_changes(auto_extend=False, user=None):
         raise
     else:
         if auto_extend:
+            by_start = auto_extend in (True, 'start')
+            by_end = auto_extend in (True, 'end')
             initial_changes = set(g.old_times)
             # g.old_times changes during iteration
             for obj in list(g.old_times):
                 if not isinstance(obj, Event):
-                    obj.extend_parent()
+                    obj.extend_parent(by_start=by_start, by_end=by_end)
             cascade_changes = set(g.old_times) - initial_changes
             for obj in cascade_changes:
                 if isinstance(obj, Event):

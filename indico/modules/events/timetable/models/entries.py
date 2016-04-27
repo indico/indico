@@ -254,30 +254,33 @@ class TimetableEntry(db.Model):
             raise ValueError("New end_dt is before current end_dt.")
         self.duration += diff
 
-    def extend_parent(self):
+    def extend_parent(self, by_start=True, by_end=True):
         """Extend start/end of parent objects if needed.
 
         No extension if performed for entries crossing a day boundary in the
         event timezone.
+
+        :param by_start: Extend parent by start datetime.
+        :param by_end: Extend parent by end datetime.
         """
         tzinfo = self.event_new.tzinfo
         if self.start_dt.astimezone(tzinfo).date() != self.end_dt.astimezone(tzinfo).date():
             return
         if self.parent is None:
-            if self.start_dt < self.event_new.start_dt:
+            if by_start and self.start_dt < self.event_new.start_dt:
                 self.event_new.start_dt = self.start_dt
-            if self.end_dt > self.event_new.end_dt:
+            if by_end and self.end_dt > self.event_new.end_dt:
                 self.event_new.end_dt = self.end_dt
         else:
             extended = False
-            if self.start_dt < self.parent.start_dt:
+            if by_start and self.start_dt < self.parent.start_dt:
                 self.parent.start_dt = self.start_dt
                 extended = True
-            if self.end_dt > self.parent.end_dt:
+            if by_end and self.end_dt > self.parent.end_dt:
                 self.parent.extend_end_dt(self.end_dt)
                 extended = True
             if extended:
-                self.parent.extend_parent()
+                self.parent.extend_parent(by_start=by_start, by_end=by_end)
 
     def move(self, start_dt):
         """Move the entry to start at a different time.
