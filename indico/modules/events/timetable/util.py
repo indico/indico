@@ -32,7 +32,8 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.legacy import serialize_event_info
-from indico.util.date_time import get_day_end, iterdays
+from indico.util.date_time import format_time, get_day_end, iterdays
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 
 
@@ -303,3 +304,35 @@ def get_timetable_offline_pdf_generator(event):
     pdf_format = TimetablePDFFormat()
     return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
                           fontsize='normal')
+
+
+def get_time_changes_notifications(changes, tzinfo, entry=None):
+    notifications = []
+    for obj, change in changes.iteritems():
+        if entry:
+            if entry.object == obj:
+                continue
+            if not isinstance(obj, Event) and obj.timetable_entry in entry.children:
+                continue
+        msg = None
+        if isinstance(obj, Event):
+            if 'start_dt' in change:
+                new_time = change['start_dt'][1]
+                msg = _("Event start time changed to {}")
+            elif 'end_dt' in change:
+                new_time = change['end_dt'][1]
+                msg = _("Event end time changed to {}")
+            else:
+                raise ValueError("Invalid change in event.")
+        elif isinstance(obj, SessionBlock):
+            if 'start_dt' in change:
+                new_time = change['start_dt'][1]
+                msg = _("Session block start time changed to {}")
+            elif 'end_dt' in change:
+                new_time = change['end_dt'][1]
+                msg = _("Session block end time changed to {}")
+            else:
+                raise ValueError("Invalid change in session block.")
+        if msg:
+            notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
+    return notifications

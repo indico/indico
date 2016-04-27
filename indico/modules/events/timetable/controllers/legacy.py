@@ -29,7 +29,6 @@ from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
 from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
-from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -51,7 +50,7 @@ from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMo
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   shift_following_entries)
 from indico.modules.events.util import get_random_color, track_time_changes
-from indico.util.date_time import format_time, iterdays, as_utc
+from indico.util.date_time import iterdays, as_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -463,31 +462,5 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
             if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
                 raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
                                        "wouldn't fit."))
-        notifications = []
-        for obj, change in changes.iteritems():
-            if self.entry.object == obj:
-                continue
-            if not isinstance(obj, Event) and obj.timetable_entry in self.entry.children:
-                continue
-            msg = None
-            if isinstance(obj, Event):
-                if 'start_dt' in change:
-                    new_time = change['start_dt'][1]
-                    msg = _("Event start time changed to {}")
-                elif 'end_dt' in change:
-                    new_time = change['end_dt'][1]
-                    msg = _("Event end time changed to {}")
-                else:
-                    raise ValueError("Invalid change in event.")
-            elif isinstance(obj, SessionBlock):
-                if 'start_dt' in change:
-                    new_time = change['start_dt'][1]
-                    msg = _("Session block start time changed to {}")
-                elif 'end_dt' in change:
-                    new_time = change['end_dt'][1]
-                    msg = _("Session block end time changed to {}")
-                else:
-                    raise ValueError("Invalid change in session block.")
-            if msg:
-                notifications.append(msg.format(format_time(new_time, timezone=self.event_new.tzinfo)))
+        notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), notifications=notifications)
