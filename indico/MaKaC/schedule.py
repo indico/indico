@@ -26,17 +26,11 @@ from MaKaC.common import utils
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
-from indico.util.date_time import iterdays
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.schedule import (IContribSchEntryDisplayFossil, IContribSchEntryMgmtFossil,
                                     IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil,
-                                    ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil,
-                                    IAttachmentFossil, IFolderFossil)
-from MaKaC.common.cache import GenericCache
-from indico.util.decorators import classproperty
-from flask import g
-
+                                    ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil)
 
 class Schedule:
     """base schedule class. Do NOT instantiate
@@ -191,7 +185,6 @@ class TimeSchedule(Schedule, Persistent):
         self._entries.append(entry)
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
-        self._cleanCache(entry)
         self._p_changed = 1
 
     def _setEntryDuration(self,entry):
@@ -207,22 +200,11 @@ class TimeSchedule(Schedule, Persistent):
         return result
 
     def _removeEntry(self,entry):
-        self._cleanCache(entry)
         self._entries.remove(entry)
         entry.setSchedule(None,"")
         entry.setStartDate(None)
         entry.delete()
         self._p_changed = 1
-
-    def _cleanCache(self, entry):
-        if isinstance(entry, ContribSchEntry):
-            entry.getOwner().cleanCache()
-            self.getOwner().cleanCache()
-        elif isinstance(entry, BreakTimeSchEntry):
-            self.getOwner().cleanCache()
-            ScheduleToJson.cleanCache(entry, False)
-        else:
-            entry.getOwner().cleanCache()
 
     def removeEntry(self,entry):
         if entry is None or not self.hasEntry(entry):
@@ -1415,7 +1397,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     def notifyModification(self, cleanCache = True):
         IndTimeSchEntry.notifyModification(self)
         if cleanCache and self.getOwner() and not ContextManager.get('clean%s'%self.getUniqueId(), False):
-            ScheduleToJson.cleanCache(self)
             ContextManager.set('clean%s'%self.getUniqueId(), True)
 
 
@@ -1458,187 +1439,3 @@ class ContribSchEntry(LinkedTimeSchEntry):
 
     def getOwnLocation(self):
         return self.getOwner().getOwnLocation()
-
-
-class ScheduleToJson(object):
-
-    _cacheEntries = GenericCache("ConfTTEntries")
-    _cache = GenericCache("ConfTT")
-
-    @staticmethod
-    def get_versioned_key(cache, key, timezone):
-        num = int(cache.get('_version-%s' % key, 0))
-        return '%s.%d.%s' % (key, num, timezone)
-
-    @classproperty
-    @classmethod
-    def use_cache(cls):
-        return not g.get('static_side')
-
-    @staticmethod
-    def bump_cache_version(cache, key):
-        vkey = '_version-%s' % key
-        cache.set(vkey, int(cache.get(vkey, 0)) + 1)
-
-    @classmethod
-    def obtainFossil(cls, entry, tz, fossilInterface=None, mgmtMode=False, useAttrCache=False):
-
-        if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().getAccessController().isFullyPublic()):
-        # We check if it is fully public because it could be some material protected
-        # that would create a security hole if we cache it
-            result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
-        else:
-            cache_key = cls.get_versioned_key(cls._cacheEntries, entry.getUniqueId(), tz)
-
-            result = cls._cacheEntries.get(cache_key) if cls.use_cache else None
-
-            if result is None:
-                result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
-                if cls.use_cache:
-                    cls._cacheEntries.set(cache_key, result, timedelta(minutes=5))
-
-        return result
-
-    @staticmethod
-    def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
-
-        fossil_mgmt_dict = {
-            BreakTimeSchEntry: IBreakTimeSchEntryMgmtFossil,
-            ContribSchEntry: IContribSchEntryMgmtFossil,
-            LinkedTimeSchEntry: ILinkedTimeSchEntryMgmtFossil
-        }
-
-        if mgmtMode:
-            entry = ScheduleToJson.obtainFossil(obj, tz, fossil_mgmt_dict, mgmtMode, useAttrCache)
-        else:
-            # the fossils used for the display of entries
-            # will be taken by default, since they're first
-            # in the list of their respective Fossilizable
-            # objects
-            entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
-
-        genId = entry['id']
-
-        # sessions that are no poster sessions will be expanded
-        if entry['entryType'] == 'Session':
-
-            sessionSlot = obj.getOwner()
-
-            # get session content
-            entries = {}
-            for contrib in sessionSlot.getSchedule().getEntries():
-                if ScheduleToJson.checkProtection(contrib, aw):
-                    if mgmtMode:
-                        if isinstance(contrib, ContribSchEntry):
-                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
-                        elif isinstance(contrib, BreakTimeSchEntry):
-                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
-                        else:
-                            contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
-                    else:
-                        # the fossils used for the display of entries
-                        # will be taken by default, since they're first
-                        # in the list of their respective Fossilizable
-                        # objects
-                        contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
-
-                    entries[contribData['id']] = contribData
-
-            entry['entries'] = entries
-
-        return genId, entry
-
-    @staticmethod
-    def checkProtection(obj, aw):
-        if aw is None or g.get('static_site'):
-            return True
-
-        from MaKaC.conference import SessionSlot
-
-        canBeDisplayed = False
-        if isinstance(obj, BreakTimeSchEntry):
-            canBeDisplayed = True
-        else: #contrib or session slot
-            owner = obj.getOwner()
-            if isinstance(owner, SessionSlot) and owner.canView(aw):
-                canBeDisplayed = True
-            elif not owner.isProtected() or owner.canAccess(aw): #isProtected avoids checking access if public
-                canBeDisplayed = True
-
-        return canBeDisplayed
-
-    @staticmethod
-    def isOnlyWeekend(days):
-        """
-        It checks if the event takes place only during the weekend
-        """
-        # If there are more than 2 days, there is at least one day that is not part of the weekend
-        if len(days) > 2:
-            return False
-
-        for day in days:
-            if (datetime.strptime(day, "%Y%m%d").weekday() not in [5, 6]):
-                return False
-        return True
-
-    @classmethod
-    def process(cls, schedule, tz, aw, days=None, mgmtMode=False, useAttrCache=False, hideWeekends=False):
-        scheduleDict = {}
-
-        if cls.use_cache and not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
-            scheduleDict = cls._cache.get(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz))
-
-        if not scheduleDict:
-            scheduleDict={}
-            fullTT = False # This flag is used to indicate that we must save the general cache (not entries). When
-            if not days:   # asking only one day, we don't need to cache (it can generate issues)
-                fullTT = True
-                days = iterdays(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
-
-            dates = [d.strftime("%Y%m%d") for d in days]
-
-            # Generating the days dictionnary
-            for d in dates:
-                scheduleDict[d] = {}
-
-            # Filling the day dictionnary with entries
-            for obj in schedule.getEntries():
-
-                if ScheduleToJson.checkProtection(obj, aw):
-                    day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
-                    # verify that start date is in dates
-                    if day in dates:
-                        genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
-                        scheduleDict[day][genId] = resultData
-            if cls.use_cache and fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
-                cls._cache.set(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz), scheduleDict,
-                               timedelta(minutes=5))
-
-        if hideWeekends and not ScheduleToJson.isOnlyWeekend(scheduleDict.keys()):
-            for entry in scheduleDict.keys():
-                weekDay = datetime.strptime(entry, "%Y%m%d").weekday()
-                if scheduleDict[entry] == {} and (weekDay == 5 or weekDay == 6):
-                    del scheduleDict[entry]
-
-        return scheduleDict
-
-    @staticmethod
-    def sort_dict(dict):
-        new_dict = {}
-        sorted_keys = dict.keys()
-        sorted_keys.sort()
-
-        for key in sorted_keys:
-            new_dict[key] = dict[key]
-
-        return new_dict
-
-    @classmethod
-    def cleanCache(cls, obj, cleanConferenceCache=True):
-        cls.bump_cache_version(cls._cacheEntries, obj.getUniqueId())
-        if cleanConferenceCache:
-            cls.cleanConferenceCache(obj.getOwner().getConference())
-
-    @classmethod
-    def cleanConferenceCache(cls, obj):
-        cls.bump_cache_version(cls._cache, obj.getUniqueId())

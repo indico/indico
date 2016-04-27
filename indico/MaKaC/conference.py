@@ -93,7 +93,6 @@ from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Updates
-from MaKaC.schedule import ScheduleToJson
 
 from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
@@ -1935,11 +1934,6 @@ class Conference(CommonObjectBase, Locatable):
     def setOrgText( self, org="" ):
         self._orgText = org
 
-    def cleanCache( self ):
-        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
-            ScheduleToJson.cleanConferenceCache(self)
-            ContextManager.set('clean%s'%self.getUniqueId(), True)
-
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getAccessController().updateNonInheritingChildren(elem, delete)
 
@@ -2195,7 +2189,6 @@ class Conference(CommonObjectBase, Locatable):
         if raiseEvent and self.id:
             signals.event.data_changed.send(self, attr=None, old=None, new=None)
 
-        self.cleanCache()
         self._p_changed=1
 
     def getModificationDate( self ):
@@ -3876,9 +3869,6 @@ class Session(CommonObjectBase, Locatable):
         parent = self.getConference()
         if parent:
             parent.setModificationDate(date)
-        if cleanCache:
-            for slot in self.getSlotList():
-                slot.cleanCache()
         self._p_changed=1
 
     def getModificationDate( self ):
@@ -5285,17 +5275,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
 
     def notifyModification( self, cleanCache = True, cleanCacheEntries = False):
         self.getSession().notifyModification(cleanCache = False)
-        if cleanCache:
-            self.cleanCache(cleanCacheEntries)
         self._p_changed = 1
-
-    def cleanCache(self, cleanCacheEntries = False):
-        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
-            ScheduleToJson.cleanCache(self)
-            ContextManager.set('clean%s'%self.getUniqueId(), True)
-            if cleanCacheEntries:
-                for entry in self.getSchedule().getEntries():
-                    entry.getOwner().cleanCache(cleanConference = False)
 
     def getLocator( self ):
         l=self.getSession().getLocator()
@@ -6414,19 +6394,10 @@ class Contribution(CommonObjectBase, Locatable):
         # if raiseEvent:
         #     signals.event.contribution_data_changed.send(self)
 
-        if cleanCache:
-            self.cleanCache()
-
         parent = self.getParent()
         if parent:
             parent.setModificationDate()
         self._p_changed = 1
-
-    def cleanCache(self, cleanConference = True):
-        # Do not clean cache if already cleaned
-        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
-            ScheduleToJson.cleanCache(self)
-            ContextManager.set('clean%s'%self.getUniqueId(), cleanConference)
 
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()

@@ -737,17 +737,6 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
-        sf = schedule.ScheduleToJson.process(self._conf.getSchedule(),
-                                             tz, self._aw,
-                                             useAttrCache=True,
-                                             hideWeekends=True)
-        # TODO: Move to beginning of file when proved useful
-        try:
-            import ujson
-            jsonf = ujson.encode
-        except ImportError:
-            jsonf = json.dumps
-        wvars["ttdata"] = jsonf(sf)
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         wvars['eventInfo'] = eventInfo
@@ -1224,9 +1213,6 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         # Fermi timezone awareness(end) #
         #################################
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
-
-        vars['ttdata'] = schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
-                                                         days = None, mgmtMode = True)
 
         vars['customLinks'] = self._customLinks
 

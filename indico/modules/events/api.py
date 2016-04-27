@@ -54,8 +54,7 @@ from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.conference import ConferenceHolder
-from MaKaC.schedule import ScheduleToJson
+
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))

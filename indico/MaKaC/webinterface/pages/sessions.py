@@ -83,7 +83,6 @@ class WSessionDisplayBase(WICalExportBase):
 
         eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz = self._tz)
         eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz = self._tz)
-        vars["ttdata"]= schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False)
         vars["eventInfo"]= eventInfo
 
         vars["session"] = vars["target"] = self._session
@@ -360,10 +359,6 @@ class WSessionModifSchedule(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         tz = self._session.getTimezone()
         vars["timezone"]= tz
-
-        vars['ttdata'] = json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
-                                                                           None, days = None, mgmtMode = True))
-
         eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=tz)
         eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._session.getConference().getAbstractMgr().isActive()
