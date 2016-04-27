@@ -246,7 +246,10 @@ class EventPerson(PersonMixin, db.Model):
     def has_role(self, role, obj):
         """Whether the person has a role in the ACL list of a given object"""
         principals = [x for x in obj.acl_entries if x.has_management_role(role, explicit=True)]
-        return any(x for x in principals if self.user_id == x.user_id or self.email == x.email)
+        return any(x
+                   for x in principals
+                   if ((self.user_id is not None and self.user_id == x.user_id) or
+                       (self.email is not None and self.email == x.email)))
 
 
 class PersonLinkBase(PersonMixin, db.Model):
