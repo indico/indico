@@ -292,7 +292,10 @@ class OfflineEventCreator(object):
         for root, subfolders, files in os.walk(srcPath):
             for filename in files:
                 src_filepath = os.path.join(root, filename)
-                dst_dirpath = os.path.join(dstPath, root.strip(srcPath))
+                if root.startswith(srcPath):
+                    dst_dirpath = os.path.join(dstPath, root[len(srcPath):].strip('/'))
+                else:
+                    dst_dirpath = dstPath
                 dst_filepath = os.path.join(dst_dirpath, filename)
                 self._fileHandler.addDir(dst_dirpath)
                 if not self._fileHandler.hasFile(dst_filepath):
