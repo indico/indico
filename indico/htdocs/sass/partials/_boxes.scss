@@ -332,7 +332,9 @@ $i-box-padding: 10px;
     > li {
         border-top: 1px solid lighten($gray, $color-variation);
         display: block;
-        margin: 5px 0;
+        margin-left: -10px;
+        margin-right: -10px;
+        padding: 10px 10px;
         position: relative;
         overflow: hidden;
     }
