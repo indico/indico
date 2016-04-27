@@ -86,13 +86,10 @@ def upgrade():
         print 'Updating friendly contribution ID to avoid collision', event_id, contrib_id, friendly_id
         conn.execute("UPDATE events.contributions SET friendly_id = %s WHERE id = %s", (friendly_id, contrib_id))
     # Assign new friendly IDs to contributions with no abstract that have friendly IDs colliding with abstracts
-    # We skip events 0 and 1 since they have contributions not linked to abstracts but we don't want to update
-    # IDs of those ancient events.
     query = """
         SELECT c.id, c.event_id
         FROM events.contributions c
         WHERE
-            c.event_id > 1 AND
             EXISTS (
                 SELECT 1
                 FROM event_abstracts.abstracts a
