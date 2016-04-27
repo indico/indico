@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import session
 
 from xml.sax.saxutils import quoteattr
 import urllib
@@ -22,7 +21,6 @@ from pytz import timezone
 from MaKaC.common.search import get_authors_from_author_index
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
 import MaKaC.review as review
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPConferenceModifAbstractBase
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
@@ -30,14 +28,14 @@ from indico.core.config import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util.date_time import format_time, format_date
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.common.TemplateExec import render
 
-from indico.util.string import render_markdown, natural_sort_key
+from indico.util.string import natural_sort_key
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
@@ -156,7 +154,6 @@ class WConfCFA(WConfDisplayBodyBase):
 
 
 class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
-    navigationEntry = navigation.NEConferenceCFA
     menu_entry_name = 'call_for_abstracts'
 
     def _getBody(self, params):
@@ -165,8 +162,7 @@ class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
 
 
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
-    navigationEntry = navigation.NEAbstractSubmission
-    menu_entry_name = 'abstract_submission'
+    menu_entry_name ='abstract_submission'
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -234,8 +230,7 @@ class WUserAbstracts(WConfDisplayBodyBase):
 
 
 class WPUserAbstracts( WPConferenceDefaultDisplayBase ):
-    navigationEntry = navigation.NEUserAbstracts
-    menu_entry_name = 'user_abstracts'
+    menu_entry_name ='user_abstracts'
 
     def _getBody( self, params ):
         wc = WUserAbstracts( self._getAW(), self._conf )
@@ -296,8 +291,6 @@ class WAbstractSubmissionConfirmation(wcomponents.WTemplated):
 
 
 class WPAbstractSubmissionConfirmation(WPAbstractDisplayBase):
-    navigationEntry = navigation.NEAbstractSubmissionConfirmation
-
     def _getBody(self, params):
         wc = WAbstractSubmissionConfirmation(self._getAW(), self._abstract)
         return wc.getHTML()
@@ -372,8 +365,6 @@ class WAbstractDisplay(wcomponents.WTemplated):
 
 
 class WPAbstractDisplay(WPAbstractDisplayBase):
-    navigationEntry = navigation.NEAbstractDisplay
-
     def _getHeadContent(self):
         return WPAbstractDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
             '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
@@ -444,8 +435,6 @@ class WAbstractDataModification(WConfDisplayBodyBase):
 
 
 class WPAbstractModify(WPAbstractDisplayBase):
-    navigationEntry = navigation.NEAbstractModify
-
     def _getHeadContent(self):
         return WPAbstractDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
             '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
@@ -478,8 +467,6 @@ class WAbstractWithdraw(wcomponents.WTemplated):
 
 
 class WPAbstractWithdraw( WPAbstractDisplayBase ):
-    navigationEntry = navigation.NEAbstractWithdraw
-
     def _getBody( self, params ):
         wc = WAbstractWithdraw( self._abstract )
         return wc.getHTML()
@@ -498,8 +485,6 @@ class WAbstractRecovery( wcomponents.WTemplated ):
 
 
 class WPAbstractRecovery( WPAbstractDisplayBase ):
-    navigationEntry = navigation.NEAbstractRecovery
-
     def _getBody( self, params ):
         wc = WAbstractRecovery( self._abstract )
         return wc.getHTML()

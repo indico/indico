@@ -16,12 +16,10 @@
 from xml.sax.saxutils import quoteattr
 from datetime import datetime
 from flask import session
-from pytz import timezone
 
 import MaKaC.conference as conference
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
 from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
@@ -29,14 +27,12 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import AvatarHolder
-from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util.date_time import format_datetime
 from indico.web.flask.util import url_for
 
 from MaKaC.common.TemplateExec import render

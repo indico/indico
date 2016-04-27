@@ -19,10 +19,8 @@ from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
-from indico.core.config import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
@@ -95,8 +93,6 @@ class WSubContributionDisplay:
         return ""
 
 class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
-    navigationEntry=navigation.NESubContributionDisplay
-
     def _getBody(self, params):
         wc=WSubContributionDisplay(self._getAW(),self._subContrib)
         return wc.getHTML()

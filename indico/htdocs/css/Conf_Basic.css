@@ -251,12 +251,7 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 }
 
-.breadcrumps {
-    display: none;
-	font-weight: bold;
-}
-
-	/* This is for if someday you have more than one column in content */
+/* This is for if someday you have more than one column in content */
 
 .mainContent {
 	width:100%;

@@ -24,7 +24,6 @@ from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
 import MaKaC.conference as conference
 import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML
@@ -45,7 +44,7 @@ from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from indico.util.i18n import i18nformat, _, ngettext
-from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util.date_time import format_date, format_datetime
 from indico.util.string import safe_upper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
@@ -133,7 +132,6 @@ class WPConferenceDisplayBase(WPConferenceBase):
 
 
 class WPConferenceDefaultDisplayBase( WPConferenceBase):
-    navigationEntry = None
     menu_entry_plugin = None
     menu_entry_name = None
 
@@ -172,20 +170,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         if entry:
             return entry.id
 
-    def _getNavigationBarHTML(self):
-        item=None
-        if self.navigationEntry:
-            item = self.navigationEntry()
-        itemList = []
-        while item is not None:
-            if itemList == []:
-                itemList.insert(0, wcomponents.WTemplated.htmlText(item.getTitle()) )
-            else:
-                itemList.insert(0, """<a href=%s>%s</a>"""%( quoteattr(str(item.getURL(self._navigationTarget))), wcomponents.WTemplated.htmlText(item.getTitle()) ) )
-            item = item.getParent(self._navigationTarget)
-        itemList.insert(0, i18nformat("""<a href=%s> _("Home")</a>""")%quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))) )
-        return " &gt; ".join(itemList)
-
     def _applyConfDisplayDecoration( self, body ):
         drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
         frame = WConfDisplayFrame( self._getAW(), self._conf )
@@ -199,21 +183,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         }
         if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
-
-        body = """
-            <div class="confBodyBox clearfix">
-
-                                    <div>
-                                        <div></div>
-                                        <div class="breadcrumps">%s</div>
-                                    </div>
-                <!--Main body-->
-                                    <div class="mainContent">
-                                        <div class="col2">
-                                        %s
-                                        </div>
-                                  </div>
-            </div>""" % (self._getNavigationBarHTML(), body)
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
@@ -3061,7 +3030,6 @@ class WConfMyStuffMyTracks(WConfDisplayBodyBase):
         return wvars
 
 class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEMyStuff
     menu_entry_name = 'my_tracks'
 
     def _getBody(self,params):
@@ -3084,7 +3052,6 @@ class WConfMyStuff(WConfDisplayBodyBase):
 
 
 class WPMyStuff(WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NEMyStuff
     menu_entry_name = 'my_conference'
 
     def _getBody(self,params):

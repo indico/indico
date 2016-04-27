@@ -19,11 +19,9 @@ from datetime import datetime,timedelta
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
-import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
-    WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
+    WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
