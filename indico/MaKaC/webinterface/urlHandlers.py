@@ -864,20 +864,6 @@ class UHConferenceCFA(URLHandler):
     _endpoint = 'event.conferenceCFA'
 
 
-class UHSessionDisplay(URLHandler):
-    _endpoint = 'event.sessionDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params.update(target.getLocator())
-        return "%s-session.html" % params["sessionId"]
-
-
-class UHSessionToiCal(URLHandler):
-    _endpoint = 'event.sessionDisplay-ical'
-
-
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
 
@@ -1532,7 +1518,6 @@ class UHHelper(object):
         "Category": UHCategoryModification,
         "Conference": UHConferenceModification,
         "DefaultConference": UHConferenceModification,
-        "Session": UHSessionModification,
         "Track": UHTrackModification,
         "Abstract": UHAbstractModify
     }
@@ -1543,7 +1528,6 @@ class UHHelper(object):
         "CategoryOverview": UHCategoryOverview,
         "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
-        "Session": UHSessionDisplay,
         "Abstract": UHAbstractDisplay
     }
 

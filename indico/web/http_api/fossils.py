@@ -377,10 +377,10 @@ class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
         pass
     getId.produce = lambda ss: "{0}-{1}".format(ss.getSession().getId(), ss.getId())
 
-    def getLocator(self):
-        pass
-    getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
-    getLocator.name = 'url'
+    # def getLocator(self):
+    #     pass
+    # getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
+    # getLocator.name = 'url'
 
     def getFullTitle(self):
         pass

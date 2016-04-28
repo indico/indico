@@ -256,8 +256,6 @@ class _PendingManagerNotification(_PendingNotification):
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
                 participations+="""\t\t\t\t - "Session" \"%s\"\n"""%(session.getTitle())
-                accessURL = urlHandlers.UHSessionDisplay.getURL(session)
-                participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
 
@@ -332,8 +330,6 @@ class _PendingCoordinatorNotification(_PendingNotification):
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
                 participations+="""\t\t\t\t - "Session" \"%s\"\n"""%(session.getTitle())
-                accessURL = urlHandlers.UHSessionDisplay.getURL(session)
-                participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
 

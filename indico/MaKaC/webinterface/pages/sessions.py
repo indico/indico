@@ -917,19 +917,3 @@ class WPModParticipantList( WPSessionModifBase ):
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
         params = {"urlDisplayGroup":urlHandlers.UHSessionModParticipantList.getURL(self._session)}
         return wc.getHTML(params)
-
-
-class WSessionICalExport(WICalExportBase):
-
-    def __init__(self, session, user):
-        self._session = session
-        self._user = user
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["target"] = vars["session"] = vars["item"] = self._session
-        vars["urlICSFile"] =  urlHandlers.UHSessionToiCal.getURL(self._session)
-
-        vars.update(self._getIcalExportParams(self._user, '/export/event/%s/session/%s.ics' % \
-                                              (self._session.getConference().getId(), self._session.getId())))
-        return vars

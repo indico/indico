@@ -344,11 +344,6 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
 
-    def getURL(self):
-        """ Entry Display URL """
-    getURL.produce = lambda s: str(urlHandlers.UHSessionDisplay.getURL(s.getOwner()))
-    getURL.name = "url"
-
     def getPDF(self):
         """ Entry PDF URL """
     getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))

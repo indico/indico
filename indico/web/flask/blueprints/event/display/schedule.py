@@ -21,10 +21,3 @@ from indico.web.flask.blueprints.event.display import event
 # Program
 event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
 event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
-
-# TODO: remove with the old legacy code
-# # Sessions
-# event.add_url_rule('/session-old/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
-# event.add_url_rule('/session-old/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
-# event.add_url_rule('/session-old/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
-#                    conferenceDisplay.RHTimeTablePDF)
