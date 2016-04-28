@@ -17,7 +17,6 @@
 import MaKaC.conference as conference
 import MaKaC.errors as errors
 import MaKaC.domain as domain
-from MaKaC.paperReviewing import reviewing_factory_get
 from MaKaC.i18n import _
 
 
@@ -37,7 +36,6 @@ class CategoryWebLocator:
                 self._categList.append(ch.getById(id))
             except KeyError:
                 continue
-
 
     def getObjectList( self ):
         return self._categList
@@ -64,23 +62,14 @@ class DomainWebLocator:
 
 
 class WebLocator:
-
     def __init__(self):
         self.__categId = None
         self.__confId = None
-        self.__sessionId = None
-        self.__contribId = None
-        self.__subContribId = None
-        self.__reviewId = None
         self.__materialId = None
         self.__resId = None
         self.__trackId = None
         self.__abstractId = None
-        self.__contribTypeId = None
-        self.__slotId = None
         self.__notifTplId = None
-        self.__location = None
-        self.__roomID = None
 
     def setCategory( self, params, mustExist=1 ):
         if not ("categId" in params.keys()) or params["categId"].strip()=="":
@@ -112,13 +101,6 @@ class WebLocator:
         else:
             self.__notifTplId = params["notifTplId"]
 
-    def setContribType( self, params ):
-        self.setConference(params)
-        if not ("contribTypeId" in params.keys()) or params["contribTypeId"].strip=="":
-            raise errors.MaKaCError( _("contribType id not set"))
-        else:
-            self.__contribTypeId = params["contribTypeId"]
-
     def setAbstract( self, params, mustExist=1  ):
         self.setConference( params )
         if not ("abstractId" in params.keys()) or \
@@ -137,110 +119,23 @@ class WebLocator:
         else:
             self.__trackId = params["trackId"]
 
-    def setSession( self, params, mustExist=1 ):
-        self.setConference( params )
-        if not ("sessionId" in params.keys()) or \
-           params["sessionId"] == None or \
-           params["sessionId"].strip()=="":
-            if not ("session" in params.keys()) or \
-                params["session"] == None or \
-                params["session"].strip()=="":
-                if mustExist:
-                    raise errors.MaKaCError( _("session id not set"))
-            else:
-                self.__sessionId = params["session"]
-        else:
-            self.__sessionId = params["sessionId"]
+    def setMaterial(self, params, mustExist=1):
+        if "confId" in params and params["confId"] is not None and "abstractId" in params:
+            self.setAbstract(params, mustExist)
 
-    def setSlot( self, params, mustExist=1 ):
-        self.setSession( params, mustExist )
-        if not ("slotId" in params.keys()) or \
-           params["slotId"].strip()=="":
-            if not ("sessionSlotId" in params.keys()) or \
-                params["sessionSlotId"].strip()=="":
-                if not ("slot" in params.keys()) or \
-                    params["slot"].strip()=="":
-                    if mustExist:
-                        raise errors.MaKaCError( _("slot id not set"))
-                else:
-                    self.__slotId = params["slot"]
-            else:
-                self.__slotId = params["sessionSlotId"]
-        else:
-            self.__slotId = params["slotId"]
-
-    def setContribution( self, params, mustExist=1 ):
-        #self.setSession( params, 0 )
-        #self.setConference( params )
-        self.setSlot( params, 0)
-
-        if not ("contribId" in params.keys()) or \
-           params["contribId"] == None or \
-           params["contribId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("contribution id not set"))
-        else:
-            self.__contribId = params["contribId"]
-
-
-    def setSubContribution( self, params, mustExist=1 ):
-
-        self.setContribution( params, 0 )
-
-        #self.setConference( params )
-        if not ("subContId" in params.keys()) or \
-               params["subContId"] == None or \
-               params["subContId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("sub contribution id not set"))
-        else:
-            self.__subContribId = params["subContId"]
-
-    def setReview(self, params, mustExist=1):
-
-        self.setContribution( params, 0 )
-
-        if not ("reviewId" in params.keys()) or \
-            params["reviewId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("review id not set"))
-        else:
-            self.__reviewId = params["reviewId"]
-
-    def setMaterial( self, params, mustExist=1 ):
-        if "confId" in params.keys() and params["confId"] != None:
-            if "reviewId" in params.keys():
-                self.setReview(params, 0)
-            elif "abstractId" in params.keys():
-                self.setAbstract(params, mustExist)
-                return
-            else:
-                self.setSubContribution( params, 0 )
-
-        else:
-            self.setCategory( params )
-        if not ("materialId" in params.keys()) or \
-           params["materialId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("material id not set"))
-        else:
-            self.__materialId = params["materialId"]
-
-    def setResource( self, params, mustExist=1 ):
-        if not ("resId" in params.keys()) and "resourceId" in params.keys():
+    def setResource(self, params, mustExist=1):
+        if "resId" not in params and "resourceId" in params:
             params["resId"] = params["resourceId"]
 
-        if not ("resId" in params.keys()) or params["resId"].strip()=="":
-            self.setMaterial( params, mustExist )
+        if not params.get("resId", '').strip():
+            self.setMaterial(params, mustExist)
             if mustExist:
-                raise errors.MaKaCError( _("material id not set"))
+                raise errors.MaKaCError(_("material id not set"))
         else:
-            self.setMaterial( params, 1 )
+            self.setMaterial(params, 1)
             self.__resId = params["resId"]
 
-    def getObject( self ):
-        """
-        """
+    def getObject(self):
         if self.__categId:
             if not conference.CategoryManager().hasKey(self.__categId):
                 raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
@@ -250,47 +145,20 @@ class WebLocator:
             return obj
         if not self.__confId:
             return None
-        obj = conference.ConferenceHolder().getById( self.__confId )
+        obj = conference.ConferenceHolder().getById(self.__confId)
         if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
         if self.__notifTplId:
             obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
             return obj
         if self.__trackId:
-            obj = obj.getTrackById( self.__trackId )
-            return obj
-        if self.__contribTypeId:
-            obj = obj.getContribTypeById(self.__contribTypeId)
+            obj = obj.getTrackById(self.__trackId)
             return obj
         if self.__abstractId:
-            obj = obj.getAbstractMgr().getAbstractById( self.__abstractId )
+            obj = obj.getAbstractMgr().getAbstractById(self.__abstractId)
             if obj == None:
                 raise errors.NoReportError("The abstract you are trying to access does not exist or has been deleted")
             if self.__resId:
-                return obj.getAttachmentById( self.__resId )
-        if self.__sessionId:
-            obj = obj.getSessionById( self.__sessionId )
-            if obj == None:
-                raise errors.NoReportError("The session you are trying to access does not exist or has been deleted")
-        if self.__slotId:
-            obj = obj.getSlotById( self.__slotId )
-        if self.__contribId:
-            obj = obj.getContributionById( self.__contribId )
-            if obj == None:
-                raise errors.NoReportError(_("The contribution you are trying to access does not exist or has been deleted"))
-        if self.__reviewId:
-            #obj must be a Contribution
-            obj = obj.getReviewManager().getReviewById(self.__reviewId)
-            if obj == None:
-                raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
-        if self.__subContribId and self.__contribId:
-            obj = obj.getSubContributionById( self.__subContribId )
-            if obj == None:
-                raise errors.NoReportError("The subcontribution you are trying to access does not exist or has been deleted")
+                return obj.getAttachmentById(self.__resId)
         if not self.__materialId:
             return obj
-        assert self.__materialId == 'reviewing'
-        mat = reviewing_factory_get(obj)
-        if mat is None or self.__resId is None:
-            return mat
-        return mat.getResourceById(self.__resId)

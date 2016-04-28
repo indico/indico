@@ -21,7 +21,6 @@ from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 
 from indico.core.config import Config
-from indico.core.db import db
 from indico.modules.events.paper_reviewing.legacy import ConferencePaperReviewLegacyMixin
 
 import conference
@@ -1131,18 +1130,3 @@ class Status(Persistent, Fossilizable):
 
     def setEditable(self, value):
         self._editable = value
-
-
-def reviewing_factory_get(owner):
-    if isinstance(owner, conference.Contribution):
-        return owner.getReviewing()
-    else:
-        # we supposed that it is a Review object
-        return owner.getMaterialById(0)
-
-
-def reviewing_factory_create(target):
-    m = conference.Reviewing()
-    m.setTitle('Reviewing')
-    target.setReviewing(m)
-    return m
