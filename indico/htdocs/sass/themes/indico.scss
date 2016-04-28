@@ -370,6 +370,7 @@ div.event-header {
 }
 
 .note-area-wrapper .note-area{
+    @extend %font-family-modern-body;
     margin-top: 10px;
 }
 
