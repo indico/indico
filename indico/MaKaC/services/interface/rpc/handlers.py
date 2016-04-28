@@ -77,6 +77,5 @@ endpointMap = {
     "abstractReviewing": importModule('MaKaC.services.implementation.abstractReviewing'),
     "abstract": importModule('MaKaC.services.implementation.abstract'),
     "abstracts": importModule('MaKaC.services.implementation.abstracts'),
-    "admin": importModule('MaKaC.services.implementation.admin'),
-    "reportNumbers": importModule('MaKaC.services.implementation.reportNumbers')
+    "admin": importModule('MaKaC.services.implementation.admin')
 }

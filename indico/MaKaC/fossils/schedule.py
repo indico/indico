@@ -267,10 +267,6 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
         """ Entry fields """
     getFields.produce = lambda x: x.getOwner().getFields(valueonly=True)
 
-    def getReportNumbers(self):
-        """ Entry report numbers """
-    getReportNumbers.produce = lambda x: Conversion.getReportNumbers(x.getOwner())
-
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):
 

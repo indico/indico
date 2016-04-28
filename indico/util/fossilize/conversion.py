@@ -222,11 +222,6 @@ class Conversion(object):
                 'name': name}
 
     @classmethod
-    def getReportNumbers(cls, obj):
-        from MaKaC.common import utils
-        return utils.getReportNumberItems(obj)
-
-    @classmethod
     def allowedList(cls, obj):
         allowed_emails = []
         allowed_groups = []

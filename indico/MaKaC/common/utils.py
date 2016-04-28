@@ -18,14 +18,11 @@ import os
 import re
 import time
 from datetime import datetime
-from random import randint
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date, format_time
 
 from MaKaC import errors
-from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate, isTomorrow
 
 
 # fcntl is only available for POSIX systems
@@ -427,17 +424,3 @@ def getProtectionText(target):
         else:
             return getProtectionText(target.getOwner())
     return "", None
-
-
-def getReportNumberItems(obj):
-    rns = obj.getReportNumberHolder().listReportNumbers()
-    reportCodes = []
-
-    for rn in rns:
-        key = rn[0]
-        if key in Config.getInstance().getReportNumberSystems().keys():
-            number = rn[1]
-            reportNumberId="s%sr%s"%(key, number)
-            name = Config.getInstance().getReportNumberSystems()[key]["name"]
-            reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
-    return reportCodes

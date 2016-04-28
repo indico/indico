@@ -331,7 +331,6 @@ class WContribModifMain(wcomponents.WTemplated):
         vars["withdrawDisabled"] = False
         if isinstance(self._contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
             vars["withdrawDisabled"] = True
-        vars["reportNumbersTable"] = wcomponents.WReportNumbersTable(self._contrib, "contribution").getHTML()
         vars["keywords"] = self._contrib.getKeywords()
         if self._contrib.getSession():
             vars["sessionType"] = self._contrib.getSession().getScheduleType()

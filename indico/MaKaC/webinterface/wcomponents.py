@@ -15,13 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 import itertools
 import os
-import types
 import exceptions
 import urllib
 import pkg_resources
 import binascii
-import uuid
-from collections import OrderedDict
 from flask import session, g
 from lxml import etree
 from pytz import timezone
@@ -32,7 +29,6 @@ from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
 from MaKaC import conference
-from MaKaC import schedule
 from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
@@ -54,10 +50,9 @@ from indico.core.db import DBMgr
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import preload_events
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
-from indico.util.date_time import utc_timestamp, is_same_month, format_date, format_time, now_utc
+from indico.util.date_time import utc_timestamp, is_same_month, format_date
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
@@ -1722,47 +1717,6 @@ class WConfTickerTapeDrawer(WTemplated):
     def getSimpleText( self ):
         if layout_settings.get(self._conf, 'show_announcement'):
             return layout_settings.get(self._conf, 'announcement')
-
-
-class WReportNumbersTable(WTemplated):
-
-    def __init__(self, target, type="event"):
-        self._target=target
-        self._type=type
-
-    def _getCurrentItems(self):
-        rns = self._target.getReportNumberHolder().listReportNumbers()
-        reportCodes = []
-
-        for rn in rns:
-            key = rn[0]
-            if key in Config.getInstance().getReportNumberSystems().keys():
-                number = rn[1]
-                reportNumberId="s%sr%s"%(key, number)
-                name=Config.getInstance().getReportNumberSystems()[key]["name"]
-                reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
-        return reportCodes
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["params"] = {"confId": self._target.getConference().getId()}
-
-        if self._type == "event":
-            vars["addAction"] = "reportNumbers.conference.addReportNumber"
-            vars["deleteAction"] = "reportNumbers.conference.removeReportNumber"
-        elif self._type == "contribution":
-            vars["params"]["contribId"] = self._target.getId()
-            vars["addAction"] = "reportNumbers.contribution.addReportNumber"
-            vars["deleteAction"] = "reportNumbers.contribution.removeReportNumber"
-        else:
-            vars["params"]["contribId"] = self._target.getContribution().getId()
-            vars["params"]["subcontribId"] = self._target.getId()
-            vars["addAction"] = "reportNumbers.subcontribution.addReportNumber"
-            vars["deleteAction"] = "reportNumbers.subcontribution.removeReportNumber"
-        vars["items"]=self._getCurrentItems()
-        systems = Config.getInstance().getReportNumberSystems()
-        vars["reportNumberSystems"]= dict([(system, systems[system]["name"]) for system in systems])
-        return vars
 
 
 class WUtils:

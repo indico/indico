@@ -1620,89 +1620,6 @@ class SubmitterIndex(Persistent):
                 del self._getIdxEmail()[email]
 
 
-class ReportNumberHolder(Persistent):
-
-    def __init__(self, owner):
-        self._owner=owner
-        self._reports={}
-
-    def getOwner(self):
-        return self._owner
-
-    def addReportNumber(self, system, number):
-        if system in self.getReportNumberKeys() or system in Config.getInstance().getReportNumberSystems().keys():
-            try:
-                if not number in self._reports[system]:
-                    self._reports[system].append(number)
-            except:
-                self._reports[system]=[ number ]
-            self.notifyModification()
-
-    def removeReportNumber(self, system, number):
-        if self.hasReportNumbersBySystem(system):
-            if number in self._reports[system]:
-                self._reports[system].remove(number)
-                self.notifyModification()
-
-    def removeReportNumberById(self, id):
-        try:
-            rn = self.listReportNumbers()[int(id)]
-            self.removeReportNumber(rn[0], rn[1])
-        except:
-            pass
-
-    def hasReportNumbersBySystem(self, system):
-        return self._reports.has_key(system)
-
-    def getReportNumbersBySystem(self, system):
-        if self.hasReportNumbersBySystem(system):
-            return self._reports[system]
-        return None
-
-    def getReportNumberKeys(self):
-        return self._reports.keys()
-
-    def listReportNumbersOnKey(self, key):
-        reports=[]
-        if key in self._reports.keys():
-            # compatibility with previous versions
-            if type(self._reports[key]) is str:
-                self._reports[key] = [ self._reports[key] ]
-            for number in self._reports[key]:
-                reports.append([key, number])
-        return reports
-
-    def hasReportNumberOnSystem(self, system, number):
-        if self.hasReportNumbersBySystem(system):
-            if number in self._reports[system]:
-                return True
-        return False
-
-    def listReportNumbers(self):
-        reports=[]
-        keys = self._reports.keys()
-        keys.sort()
-        for key in keys:
-            # compatibility with previous versions
-            if type(self._reports[key]) is str:
-                self._reports[key] = [ self._reports[key] ]
-            for number in self._reports[key]:
-                reports.append([key, number])
-        return reports
-
-    def clone(self, owner):
-        newR=ReportNumberHolder(owner)
-        for key in self._reports.keys():
-            for number in self._reports[key]:
-                newR.addReportNumber(key, number)
-        return newR
-
-    def notifyModification(self):
-        self._p_changed=1
-        if self.getOwner() != None:
-            self.getOwner().notifyModification()
-
-
 class Conference(CommonObjectBase, Locatable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
@@ -1765,7 +1682,6 @@ class Conference(CommonObjectBase, Locatable):
         self._visibility = 999
         self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
         self._sections = []
-        self._reportNumberHolder=ReportNumberHolder(self)
         self._enableSessionSlots = False
         self._enableSessions = False
         self._autoSolveConflict = True
@@ -3479,17 +3395,6 @@ class Conference(CommonObjectBase, Locatable):
         o2 = c2.getTitle().lower().strip()
         return cmp( o1, o2 )
     _cmpTitle=staticmethod(_cmpTitle)
-
-    def getReportNumberHolder(self):
-        try:
-            if self._reportNumberHolder:
-                pass
-        except AttributeError, e:
-            self._reportNumberHolder=ReportNumberHolder(self)
-        return self._reportNumberHolder
-
-    def setReportNumberHolder(self, rnh):
-        self._reportNumberHolder=rnh
 
     def getBadgeTemplateManager(self):
         try:
@@ -6344,7 +6249,6 @@ class Contribution(CommonObjectBase, Locatable):
         if self.getOwnRoom() is not None:
             cont.setRoom(self.getOwnRoom().clone())
         cont.setBoardNumber(self.getBoardNumber())
-        cont.setReportNumberHolder(self.getReportNumberHolder().clone(self))
 
         cont.setStatus(self.getCurrentStatus())
 
@@ -7647,17 +7551,6 @@ class Contribution(CommonObjectBase, Locatable):
     def getAccessController(self):
         return self.__ac
 
-    def getReportNumberHolder(self):
-        try:
-            if self._reportNumberHolder:
-                pass
-        except AttributeError, e:
-            self._reportNumberHolder=ReportNumberHolder(self)
-        return self._reportNumberHolder
-
-    def setReportNumberHolder(self, rnh):
-        self._reportNumberHolder=rnh
-
     @classmethod
     def contributionStartDateForSort(cls, contribution):
         """ Function that can be used as "key" argument to sort a list of contributions by start date
@@ -8192,7 +8085,6 @@ class SubContribution(CommonObjectBase, Locatable):
         hours = dur.seconds / 3600
         minutes = (dur.seconds % 3600) / 60
         sCont.setDuration(hours, minutes)
-        sCont.setReportNumberHolder(self.getReportNumberHolder().clone(self))
 
         # There is no _order attribute in this class
 
@@ -8460,16 +8352,6 @@ class SubContribution(CommonObjectBase, Locatable):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def getReportNumberHolder(self):
-        try:
-            if self._reportNumberHolder:
-                pass
-        except AttributeError, e:
-            self._reportNumberHolder=ReportNumberHolder(self)
-        return self._reportNumberHolder
-
-    def setReportNumberHolder(self, rnh):
-        self._reportNumberHolder=rnh
 
 class Material(CommonObjectBase):
     """This class represents a set of electronic documents (resources) which can
