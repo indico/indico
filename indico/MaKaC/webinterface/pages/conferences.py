@@ -347,8 +347,7 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
         wc = WConfDetails(self._getAW(), self._conf)
         pars = {"modifyURL": urlHandlers.UHConferenceModification.getURL(self._conf),
                 "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL,
-                "contribModifyURLGen": urlHandlers.UHContributionModification.getURL,
-                "subContribModifyURLGen": urlHandlers.UHSubContribModification.getURL}
+                "contribModifyURLGen": urlHandlers.UHContributionModification.getURL}
         return wc.getHTML(pars)
 
     def _getFooter(self):
@@ -439,8 +438,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
         "cloneURL": urlHandlers.UHConfClone.getURL( self._conf ), \
         "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
-        "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
-        "subContribModifyURLGen": urlHandlers.UHSubContribModification.getURL}
+        "contribModifyURLGen": urlHandlers.UHContributionModification.getURL}
 
         pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
         return pars

@@ -16,25 +16,17 @@
 
 from cStringIO import StringIO
 
-from flask import session
-
-
-from indico.modules.events.logs import EventLogRealm, EventLogKind
-from indico.util.string import to_unicode
 from indico.web.flask.util import send_file
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.contributions as contributions
-import MaKaC.conference as conference
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
-from MaKaC.errors import FormValuesError
-from MaKaC.i18n import _
 
 
 
@@ -201,153 +193,6 @@ class RHContributionAC(RHContribModifBaseSpecialSesCoordRights):
                 p = wf.getContribModifAC(self, self._target)
         return p.display(**params)
 
-
-class RHContributionSC(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
-    _uh = urlHandlers.UHContribModifSubCont
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-
-    def _process(self):
-        params = self._getRequestParams()
-        p = contributions.WPContribModifSC(self, self._target)
-        wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getContribModifSC(self, self._target)
-        return p.display(**params)
-
-class RHSubContribActions(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHSubContribActions
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._confirm = params.has_key("confirm")
-        self._scIds = self._normaliseListParam(params.get("selSubContribs", []))
-        self._action=None
-        if "cancel" in params:
-            return
-        self._action=[]
-        for id in self._scIds:
-            sc = self._target.getSubContributionById(id)
-            self._action.append(_ActionSubContribDelete(self, self._target, sc))
-        if params.has_key("oldpos") and params["oldpos"]!='':
-            self._action = _ActionSubContribMove(self, params['newpos'+params['oldpos']], params['oldpos'])
-
-    def _process(self):
-        if self._action is not None:
-            if isinstance(self._action, list):
-                for act in self._action:
-                    act.perform()
-            else:
-                self._action.perform()
-        self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
-class _ActionSubContribDelete:
-
-    def __init__(self, rh, target, sc):
-        self._rh = rh
-        self._target = target
-        self._sc = sc
-
-    def perform(self):
-        self._target.removeSubContribution(self._sc)
-
-class _ActionSubContribMove:
-
-    def __init__(self, rh, newpos, oldpos):
-        self._rh = rh
-        self._newpos = int(newpos)
-        self._oldpos = int(oldpos)
-
-    def perform(self):
-        scList = self._rh._target.getSubContributionList()
-        order = 0
-        movedsubcontrib = scList[self._oldpos]
-        del scList[self._oldpos]
-        scList.insert(self._newpos, movedsubcontrib)
-        self._rh._target.notifyModification()
-
-        #for sc in scList:
-        #    sc.setOrder(scList.index(sc))
-
-#-------------------------------------------------------------------------------------
-
-class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribAddSubCont
-
-    def _process(self):
-        p = contributions.WPContribAddSC(self, self._target)
-        params = self._getRequestParams()
-
-        wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getContribAddSC(self, self._target)
-
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-
-        return p.display(**params)
-
-
-#-------------------------------------------------------------------------------------
-
-class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribCreateSubCont
-
-    def _process(self):
-
-        params = self._getRequestParams()
-
-        from MaKaC.services.interface.rpc import json
-        presenters = json.decode(params.get("presenters", "[]"))
-
-        sc = self._target
-        """self._target - contribution owning new subcontribution"""
-
-        if ("ok" in params):
-            sc = self._target.newSubContribution()
-            sc.setTitle( params.get("title", "") )
-            sc.setDescription( params.get("description", "") )
-            sc.setKeywords( params.get("keywords", "") )
-            try:
-                durationHours = int(params.get("durationHours",""))
-            except ValueError:
-                raise FormValuesError(_("Please specify a valid hour format (0-23)."))
-            try:
-                durationMinutes = int(params.get("durationMinutes",""))
-            except ValueError:
-                raise FormValuesError(_("Please specify a valid minutes format (0-59)."))
-
-            sc.setDuration( durationHours, durationMinutes )
-            sc.setSpeakerText( params.get("speakers", "") )
-            sc.setParent(self._target)
-
-            for presenter in presenters:
-                spk = self._newSpeaker(presenter)
-                sc.newSpeaker(spk)
-
-            self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
-                                             u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
-                                             session.user, data=sc.getLogInfo())
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-        else:
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
-    def _newSpeaker(self, presenter):
-        spk = conference.SubContribParticipation()
-        spk.setTitle(presenter["title"])
-        spk.setFirstName(presenter["firstName"])
-        spk.setFamilyName(presenter["familyName"])
-        spk.setAffiliation(presenter["affiliation"])
-        spk.setEmail(presenter["email"])
-        spk.setAddress(presenter["address"])
-        spk.setPhone(presenter["phone"])
-        spk.setFax(presenter["fax"])
-        return spk
 
 #-------------------------------------------------------------------------------------
 

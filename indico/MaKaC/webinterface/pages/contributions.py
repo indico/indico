@@ -469,55 +469,7 @@ class WPContribModifAC(WPContributionModifBase):
         return wc.getHTML()
 
 
-class WPContribModifSC(WPContributionModifBase):
-
-    def _setActiveTab(self):
-        self._tabSubCont.setActive()
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WContribModifSC(self._target)
-        pars = {
-            'moveSubContribURL': urlHandlers.UHSubContribActions.getURL(self._contrib),
-            'addSubContURL': urlHandlers.UHContribAddSubCont.getURL(self._contrib),
-            'subContModifURL': urlHandlers.UHSubContribModification.getURL  # the () are NOT missing
-        }
-        return wc.getHTML(pars)
-
 #-----------------------------------------------------------------------------
-
-
-class WSubContributionCreation(wcomponents.WTemplated):
-
-    def __init__(self, target):
-        self.__owner = target
-        self._contribution = target
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["title"] = vars.get("title", "")
-        vars["description"] = vars.get("description", "")
-        vars["durationHours"] = vars.get("durationHours", "0")
-        vars["durationMinutes"] = vars.get("durationMinutes", "15")
-        vars["keywords"] = vars.get("keywords", "")
-        vars["locator"] = self.__owner.getLocator().getWebForm()
-        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._contribution.getConference(), 10))
-        vars["eventType"] = self._contribution.getConference().getType()
-        return vars
-
-
-class WPContribAddSC(WPContributionModifBase):
-
-    def _setActiveTab(self):
-        self._tabSubCont.setActive()
-
-    def _getTabContent(self, params):
-        wc = WSubContributionCreation(self._target)
-        pars = {"postURL": urlHandlers.UHContribCreateSubCont.getURL(self._contrib)}
-        params.update(pars)
-        return wc.getHTML(params)
-
-
-#---------------------------------------------------------------------------
 
 
 class WContributionDataModificationBoard(wcomponents.WTemplated):

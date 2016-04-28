@@ -80,30 +80,10 @@ class ContributionRemoveReportNumber(ReportNumberRemove, ContributionModifBase):
         ReportNumberRemove._checkParams(self)
 
 
-class SubContributionAddReportNumber(ReportNumberAdd, ContributionModifBase):
-
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-        ReportNumberAdd._checkParams(self)
-        subContId = self._pm.extract("subcontribId", pType=str, allowEmpty=False)
-        self._target = self._contribution.getSubContributionById(subContId)
-
-
-class SubContributionRemoveReportNumber(ReportNumberRemove, ContributionModifBase):
-
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-        ReportNumberRemove._checkParams(self)
-        subContId = self._pm.extract("subcontribId", pType=str, allowEmpty=False)
-        self._target = self._contribution.getSubContributionById(subContId)
-
-
 methodMap = {
     "get": GetReportNumberSystems,
     "conference.addReportNumber": ConferenceAddReportNumber,
     "conference.removeReportNumber": ConferenceRemoveReportNumber,
     "contribution.addReportNumber": ContributionAddReportNumber,
     "contribution.removeReportNumber": ContributionRemoveReportNumber,
-    "subcontribution.addReportNumber": SubContributionAddReportNumber,
-    "subcontribution.removeReportNumber": SubContributionRemoveReportNumber,
 }

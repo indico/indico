@@ -77,24 +77,6 @@ class RHSessionBase( RHConferenceSite ):
         self._conf = self._session.getConference()
 
 
-class RHContributionBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setContribution( params )
-        self._contrib = self._target = l.getObject()
-        self._conf = self._contrib.getConference()
-
-class RHSubContributionBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setSubContribution( params )
-        self._subContrib = self._target = l.getObject()
-        self._contrib = self._subContrib.getParent()
-        self._conf = self._contrib.getConference()
-
-
 class RHFileBase(RHConferenceSite):
 
     def _checkParams(self, params):

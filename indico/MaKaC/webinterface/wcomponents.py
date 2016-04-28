@@ -808,84 +808,12 @@ class WTrackBannerModif(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 
-
 class WContribModifTool(WTemplated):
     pass
 
 
 class WContributionDeletion(WTemplated):
     pass
-
-
-class WContribModifSC(WTemplated):
-
-    def __init__(self, contrib):
-        self._contrib = contrib
-        self._conf = self._contrib.getConference()
-
-    def getSubContItems(self, SCModifURL):
-        temp = []
-        scList = self._contrib.getSubContributionList()
-        for sc in scList:
-            id = sc.getId()
-            selbox = """<select name="newpos%s" onChange="this.form.oldpos.value='%s';this.form.submit();">""" % (scList.index(sc), scList.index(sc))
-            for i in range(1, len(scList) + 1):
-                if i == scList.index(sc) + 1:
-                    selbox += "<option selected value='%s'>%s" % (i - 1, i)
-                else:
-                    selbox += "<option value='%s'>%s" % (i - 1, i)
-            selbox += """
-                </select>"""
-            temp.append("""
-                <tr>
-                    <td>
-                        <input type="checkbox" name="selSubContribs" value="%s">
-                        %s
-                        &nbsp;<a href="%s">%s</a>
-                    </td>
-                </tr>""" % (id, selbox,SCModifURL(sc), escape(sc.getTitle())))
-        html = """
-                <input type="hidden" name="oldpos">
-                <table align="center">%s
-                </table>""" % "".join(temp)
-        return html
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["subContList"] = self.getSubContItems(vars["subContModifURL"])
-        vars["confId"] = self._contrib.getConference().getId()
-        vars["contribId"] = self._contrib.getId()
-        vars["deleteItemsURL"] = vars["moveSubContribURL"]
-
-        return vars
-###ness##################################################################################
-#     def __getSubCategoryItems( self, sl, modifURLGen ):
-#        temp = []
-#        for categ in sl:
-#            id = categ.getId()
-#            selbox = """<select name="newpos%s" onChange="this.form.oldpos.value='%s';this.form.submit();">""" % (sl.index(categ),sl.index(categ))
-#            for i in range (1,len(sl)+1):
-#                if i==sl.index(categ)+1:
-#                    selbox += "<option selected value='%s'>%s" % (i-1,i)
-#                else:
-#                    selbox += "<option value='%s'>%s" % (i-1,i)
-#            selbox += """
-#                </select>"""
-#            temp.append("""
-#                <tr>
-#                    <td>
-#                        <input type="checkbox" name="selectedCateg" value="%s">
-#                        %s
-#                        &nbsp;<a href="%s">%s</a>
-#                    </td>
-#                </tr>"""%(id, selbox,modifURLGen( categ ), categ.getName()))
-#        html = """
-#                <input type="hidden" name="oldpos">
-#                <table align="center">%s
-#                </table>"""%"".join( temp )
-#        return html
-##ness##############################################################################
-
 
 
 class WConferenceModifFrame(WTemplated):

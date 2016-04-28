@@ -86,10 +86,6 @@ class WebFactory(WebFactory):
         return WPMContributionModification(rh,contrib)
     getContributionModification = staticmethod(getContributionModification)
 
-    def getContribModifSC(rh,contrib):
-        return WPMContributionModifSC(rh,contrib)
-    getContribModifSC = staticmethod(getContribModifSC)
-
     def getContribModifAC(rh, contrib):
         return WPMContribModifAC(rh,contrib)
     getContribModifAC = staticmethod(getContribModifAC)
@@ -101,10 +97,6 @@ class WebFactory(WebFactory):
     def getContributionEditData(rh, contrib):
         return WPMContribEditData(rh, contrib)
     getContributionEditData = staticmethod (getContributionEditData)
-
-    def getContribAddSC(rh, contrib):
-        return WPMContribAddSC(rh,contrib)
-    getContribAddSC = staticmethod(getContribAddSC)
 
 ############Session Modificiations###########################################
 
@@ -170,8 +162,6 @@ class WPMContributionModification(contributions.WPContributionModification):
 class WPMContribEditData(contributions.WPEditData):
     pass
 
-class WPMContributionModifSC(contributions.WPContribModifSC):
-    pass
 
 class WPMContribModifAC(contributions.WPContribModifAC):
     pass
@@ -180,9 +170,6 @@ class WPMContributionModifTools(contributions.WPContributionModifTools):
     pass
 #    def _getBody( self, params ):
 #        return ContribModifTabsFrame._getBody(self, params)
-
-class WPMContribAddSC(contributions.WPContribAddSC):
-    pass
 
 
 class WMConfDisplayFrame(conferences.WConfDisplayFrame):

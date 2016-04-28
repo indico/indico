@@ -21,7 +21,6 @@ from flask import g, has_request_context, request
 
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
 
@@ -655,22 +654,6 @@ class UHContribModifAddMaterials(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-materialsAdd'
 
 
-class UHContribModifSubCont(URLHandler):
-    _endpoint = 'event_mgmt.contributionModifSubCont'
-
-
-class UHContribAddSubCont(URLHandler):
-    _endpoint = 'event_mgmt.contributionModifSubCont-add'
-
-
-class UHContribCreateSubCont(URLHandler):
-    _endpoint = 'event_mgmt.contributionModifSubCont-create'
-
-
-class UHSubContribActions(URLHandler):
-    _endpoint = 'event_mgmt.contributionModifSubCont-actionSubContribs'
-
-
 class UHContribModifTools(URLHandler):
     _endpoint = 'event_mgmt.contributionTools'
 
@@ -940,22 +923,6 @@ class UHContributionDelete(URLHandler):
     _endpoint = 'event_mgmt.contributionTools-delete'
 
 
-class UHSubContributionDataModification(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-data'
-
-
-class UHSubContributionDataModif(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-modifData'
-
-
-class UHSubContributionDelete(URLHandler):
-    _endpoint = 'event_mgmt.subContributionTools-delete'
-
-
-class UHSubContribModifTools(URLHandler):
-    _endpoint = 'event_mgmt.subContributionTools'
-
-
 class UHSessionModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification'
 
@@ -994,10 +961,6 @@ class UHSessionDeletion(URLHandler):
 
 class UHContributionModification(URLHandler):
     _endpoint = 'event_mgmt.contributionModification'
-
-
-class UHSubContribModification(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification'
 
 
 class UHConferenceProgram(URLHandler):
@@ -1039,21 +1002,6 @@ class UHContributionDisplay(URLHandler):
             params = target.getLocator()
             return "%s-contrib.html" % (params["contribId"])
         return cls.getURL(target, _ignore_static=True, **params)
-
-
-class UHSubContributionDisplay(URLHandler):
-    _endpoint = 'event.subContributionDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params = target.getLocator()
-            return "%s-subcontrib.html" % (params["subContId"])
-        return cls.getURL(target, _ignore_static=True, **params)
-
-
-class UHSubContributionModification(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification'
 
 
 class UHErrorReporting(URLHandler):
@@ -1765,7 +1713,6 @@ class UHHelper(object):
         "Contribution": UHContributionModification,
         "AcceptedContribution": UHContributionModification,
         "Session": UHSessionModification,
-        "SubContribution": UHSubContributionModification,
         "Track": UHTrackModification,
         "Abstract": UHAbstractModify
     }

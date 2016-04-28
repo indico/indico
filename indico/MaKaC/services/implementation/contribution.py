@@ -14,28 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session
-
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.search import make_participation_from_obj
 
 import MaKaC.conference as conference
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
-from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil
 
 
@@ -76,85 +69,6 @@ class ContributionModifBase(ProtectedModificationService, ContributionBase):
             if self._target.getSession().canCoordinate(self.getAW(), "modifContribs"):
                 return
         ProtectedModificationService._checkProtection(self)
-
-
-class ContributionAddSubContribution(ContributionModifBase):
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-
-        # "presenters" and "keywords" are not required. they can be empty
-        self._presenters = self._pm.extract("presenters", pType=list, allowEmpty=True)
-        self._keywords = self._pm.extract("keywords", pType=list, allowEmpty=True)
-        self._description = self._pm.extract("description", pType=str, allowEmpty=True, defaultValue="")
-        self._reportNumbers = self._pm.extract("reportNumbers", pType=list, allowEmpty=True, defaultValue=[])
-        self._materials = self._pm.extract("materials", pType=dict, allowEmpty=True)
-
-        # these are required
-        self._duration = self._pm.extract("duration", pType=int)
-        self._title = self._pm.extract("title", pType=str)
-
-    def __addPresenters(self, subcontrib):
-
-        # add each presenter
-        for presenterValues in self._presenters:
-
-            # magically update a new ContributionParticipation with JSON data, using the DictPickler
-            presenter = conference.SubContribParticipation()
-            DictPickler.update(presenter, presenterValues)
-
-            subcontrib.newSpeaker(presenter)
-
-    def __addMaterials(self, subcontrib):
-        subcontrib.attach_links(self._materials)
-
-    def __addReportNumbers(self, subcontrib):
-        if self._reportNumbers:
-            for reportTuple in self._reportNumbers:
-                for recordNumber in reportTuple[1]:
-                    subcontrib.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
-
-    def _getAnswer(self):
-        # create the sub contribution
-        sc = self._target.newSubContribution()
-
-        sc.setTitle( self._title )
-        sc.setDescription( self._description )
-        # separate the keywords using newlines
-        sc.setKeywords('\n'.join(self._keywords))
-        sc.setDuration( self._duration / 60, \
-                         self._duration % 60 )
-
-        self.__addMaterials(sc)
-        self.__addReportNumbers(sc)
-        self.__addPresenters(sc)
-
-        # log the event
-        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
-                                         u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
-                                         session.user, data=sc.getLogInfo())
-
-
-class ContributionDeleteSubContribution(ContributionModifBase):
-
-    # contribution.deleteSubContribution
-
-    _asyndicoDoc = {
-        'summary':  'Deletes a subcontribution, given the conference, contribution and subcontribution IDs.',
-        'params': [{'name': 'conference', 'type': 'str'},
-                   {'name': 'contribution', 'type': 'str'},
-                   {'name': 'subcontribution', 'type': 'str'}],
-        'return': None
-        }
-
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-
-        subContId = self._pm.extract("subcontribution", pType=str, allowEmpty=False)
-
-        self._subContribution = self._contribution.getSubContributionById(subContId)
-
-    def _getAnswer(self):
-        self._subContribution.getOwner().removeSubContribution(self._subContribution)
 
 
 class ContributionProtectionUserList(ContributionModifBase):
@@ -511,142 +425,6 @@ class ContributionReorderAuthorList(ContributionModifBase):
 
         return True
 
-class SubContributionParticipantsBase(ContributionModifBase):
-
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-        self._pm = ParameterManager(self._params)
-        subContribId = self._pm.extract("subContribId", pType=str, allowEmpty=False)
-        self._subContrib = None
-        for subContrib in self._contribution.getSubContributionList():
-            if subContribId == subContrib.getId():
-                self._subContrib = subContrib
-        if self._subContrib == None:
-            raise ServiceError("ERR-SC0", _("Invalid subcontribution id."))
-
-    def _isEmailAlreadyUsed(self, email):
-        for part in self._subContrib.getSpeakerList():
-            if email == part.getEmail():
-                return True
-        return False
-
-
-class SubContributionAddNewParticipant(SubContributionParticipantsBase):
-
-    def _checkParams(self):
-        SubContributionParticipantsBase._checkParams(self)
-        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
-        email = self._userData.get("email", "")
-        if email != "" and self._isEmailAlreadyUsed(email):
-            raise ServiceAccessError(_("The email address is already used by another participant or the user is already added to the list. Participant not added."))
-
-    def _newParticipant(self):
-        spk = conference.SubContribParticipation()
-        spk.setTitle(self._userData.get("title", ""))
-        spk.setFirstName(self._userData.get("firstName", ""))
-        spk.setFamilyName(self._userData.get("familyName", ""))
-        spk.setAffiliation(self._userData.get("affiliation", ""))
-        spk.setEmail(self._userData.get("email", ""))
-        spk.setAddress(self._userData.get("address", ""))
-        spk.setPhone(self._userData.get("phone", ""))
-        spk.setFax(self._userData.get("fax", ""))
-        self._subContrib.newSpeaker(spk)
-
-
-    def _getAnswer(self):
-        self._newParticipant()
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
-
-class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
-
-    def _checkParams(self):
-        SubContributionParticipantsBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
-        # Check if there is already a user with the same email
-        for user in self._userList:
-            if user["email"] != "" and self._isEmailAlreadyUsed(user["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another participant or the user is already added to the list. Participant(s) not added.") % user["email"])
-
-    def _getAnswer(self):
-        for user in self._userList:
-            spk = conference.SubContribParticipation()
-            if user["_type"] == "Avatar":
-                spk.setDataFromAvatar(User.get(int(user['id'])).as_avatar)
-            elif user["_type"] == "ContributionParticipation":
-                author_index_author_id = "{} {} {}".format(user['familyName'], user['firstName'], user['email']).lower()
-                author = self._conf.getAuthorIndex().getById(author_index_author_id)[0]
-                spk = make_participation_from_obj(author, contrib_participation=spk)
-            self._subContrib.newSpeaker(spk)
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
-
-class SubContributionRemoveParticipant(SubContributionParticipantsBase):
-
-    def _checkParams(self):
-        SubContributionParticipantsBase._checkParams(self)
-        self._participant = self._subContrib.getSpeakerById(self._pm.extract("userId", pType=str, allowEmpty=False))
-        if self._participant == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
-
-    def _getAnswer(self):
-        self._subContrib.removeSpeaker(self._participant)
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
-
-class SubContributionAddAuthorAsPresenter(SubContributionAddExistingParticipant):
-
-    def _newSpeaker(self, author):
-        spk = conference.SubContribParticipation()
-        spk.setTitle(author.getTitle())
-        spk.setFirstName(author.getFirstName())
-        spk.setFamilyName(author.getFamilyName())
-        spk.setAffiliation(author.getAffiliation())
-        spk.setEmail(author.getEmail())
-        spk.setAddress(author.getAddress())
-        spk.setPhone(author.getPhone())
-        spk.setFax(author.getFax())
-        self._subContrib.newSpeaker(spk)
-
-    def _getAnswer(self):
-        for author in self._userList:
-            self._newSpeaker(self._contribution.getAuthorById(author["id"]))
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
-
-class SubContributionEditParticipantData(SubContributionParticipantsBase):
-
-    def _checkParams(self):
-        SubContributionParticipantsBase._checkParams(self)
-        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
-        self._userId = self._userData.get("id")
-        self._participant = self._subContrib.getSpeakerById(self._userId)
-        if self._participant == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
-        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
-            raise ServiceAccessError(_("The email address is already used by another participant. Participant not modified."))
-
-    def _isEmailAlreadyUsed(self):
-        for auth in self._subContrib.getSpeakerList():
-            # check if the email is already used by other different speaker
-            if self._userData.get("email", "") == auth.getEmail() and self._userId != str(auth.getId()):
-                return True
-        return False
-
-    def _editParticipant(self):
-        self._participant.setTitle(self._userData.get("title", ""))
-        self._participant.setFirstName(self._userData.get("firstName", ""))
-        self._participant.setFamilyName(self._userData.get("familyName", ""))
-        self._participant.setEmail(self._userData.get("email", ""))
-        self._participant.setAffiliation(self._userData.get("affiliation", ""))
-        self._participant.setAddress(self._userData.get("address", ""))
-        self._participant.setPhone(self._userData.get("phone", ""))
-        self._participant.setFax(self._userData.get("fax", ""))
-
-    def _getAnswer(self):
-        self._editParticipant()
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
 
 class ContributionSubmittersBase(ContributionModifBase):
 
@@ -857,8 +635,6 @@ class ContributionProtectionToggleDomains(ContributionModifBase):
 
 
 methodMap = {
-    "addSubContribution": ContributionAddSubContribution,
-    "deleteSubContribution": ContributionDeleteSubContribution,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,
@@ -873,12 +649,6 @@ methodMap = {
     "participants.changeSubmissionRights": ContributionChangeSubmissionRights,
     "participants.updateAuthorList": ContributionUpdateAuthorList,
     "participants.reorderAuthorList": ContributionReorderAuthorList,
-
-    "participants.subContribution.addNewParticipant": SubContributionAddNewParticipant,
-    "participants.subContribution.addExistingParticipant": SubContributionAddExistingParticipant,
-    "participants.subContribution.editParticipantData": SubContributionEditParticipantData,
-    "participants.subContribution.removeParticipant": SubContributionRemoveParticipant,
-    "participants.subContribution.addAuthorAsPresenter": SubContributionAddAuthorAsPresenter,
 
     "protection.submissionControl.addExistingSubmitter": ContributionAddExistingSubmitter,
     "protection.submissionControl.removeSubmitter": ContributionRemoveSubmitter,
