@@ -71,10 +71,6 @@ class WebFactory(WebFactory):
     def getConfClone(rh, conf):
         return WPMConfClone(rh, conf)
 
-    @staticmethod
-    def getConfModifSchedule (rh, conf):
-        return WPMConfModifSchedule(rh, conf)
-
 
 MeetingWebFactory = WebFactory
 
@@ -167,11 +163,6 @@ class WPMConfClone(conferences.WPConfClone):
         return p.getHTML(pars)
 
 
-##TimeTable view##
-class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
-    pass
-
-######################################################################
 class WPMeetingDisplay( WPConferenceDisplayBase ):
 
     def _getNavigationDrawer(self):

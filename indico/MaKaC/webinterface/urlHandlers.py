@@ -563,10 +563,6 @@ class UHTrackAbstractModIntComments(UHTrackAbstractBase):
     _endpoint = 'event_mgmt.trackAbstractModif-comments'
 
 
-class UHConfModifSchedule(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule'
-
-
 class UHConfModifAC(URLHandler):
     _endpoint = 'event_mgmt.confModifAC'
 
@@ -1027,10 +1023,6 @@ class UHAbstractReviewingSetup(URLHandler):
 
 class UHAbstractReviewingTeam(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-reviewingTeam'
-
-
-class UHConfModScheduleDataEdit(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule-edit'
 
 
 class UHUpdateNews(URLHandler):
