@@ -183,6 +183,15 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         }
         if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
+        body = '''
+            <div class="confBodyBox clearfix">
+                <div class="mainContent">
+                    <div class="col2">
+                        {}
+                    </div>
+                </div>
+            </div>
+        '''.format(body)
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
