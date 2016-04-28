@@ -993,16 +993,6 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
         return fossilize(self._conf.getRegistrarList())
 
 
-class ConferenceGetChildrenProtected(ConferenceModifBase):
-
-    def _getAnswer(self):
-        return fossilize(self._conf.getAccessController().getProtectedChildren())
-
-class ConferenceGetChildrenPublic(ConferenceModifBase):
-
-    def _getAnswer(self):
-        return fossilize(self._conf.getAccessController().getPublicChildren())
-
 class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
 
     def _checkParams(self):
@@ -1060,7 +1050,5 @@ methodMap = {
     "protection.removeManager": ConferenceProtectionRemoveManager,
     "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
     "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
-    "protection.getProtectedChildren": ConferenceGetChildrenProtected,
-    "protection.getPublicChildren": ConferenceGetChildrenPublic,
     "api.getExportURLs": ConferenceExportURLs,
 }

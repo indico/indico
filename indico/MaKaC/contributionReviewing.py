@@ -547,9 +547,6 @@ class Review(ReviewLegacyMixin, Persistent, Fossilizable):
         """
         self._p_changed = 1
 
-    def updateNonInheritingChildren(self, element, delete=False):
-        pass
-
     def getId(self):
         """ Returns the id of this Review, which is the same as its version number
         """

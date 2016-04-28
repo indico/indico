@@ -497,9 +497,6 @@ class Category(CommonObjectBase):
     def getAccessController(self):
         return self.__ac
 
-    def updateNonInheritingChildren(self, elem, delete=False):
-        pass
-
     def getNotifyCreationList(self):
         """ self._notifyCreationList is a string containing the list of
         email addresses to send an email to when a new event is created"""
@@ -1849,9 +1846,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def setOrgText( self, org="" ):
         self._orgText = org
-
-    def updateNonInheritingChildren(self, elem, delete=False):
-        self.getAccessController().updateNonInheritingChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -3746,15 +3740,9 @@ class Session(CommonObjectBase, Locatable):
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
-    def updateNonInheritingChildren(self, elem, delete=False, propagate=True):
-        self.getAccessController().updateNonInheritingChildren(elem, delete)
-        if propagate == True:
-            self.notify_protection_to_owner(elem, delete)
-
     def notify_protection_to_owner(self, elem, delete=False):
         """ This methods notifies the owner that the protection has been changed,
             so it can update its list of non inheriting children """
-        self.getOwner().updateNonInheritingChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -4539,10 +4527,6 @@ class Session(CommonObjectBase, Locatable):
         self.contributions[newContrib.getId()]=newContrib
         newContrib.setSession(self)
 
-        self.updateNonInheritingChildren(newContrib)
-        for child in newContrib.getAccessController().getNonInheritingChildren():
-            self.updateNonInheritingChildren(child)
-
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -4560,10 +4544,6 @@ class Session(CommonObjectBase, Locatable):
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
         self._p_changed = True
-
-        self.updateNonInheritingChildren(contrib, delete=True, propagate=False)
-        for child in contrib.getAccessController().getNonInheritingChildren():
-            self.updateNonInheritingChildren(child, delete=True, propagate=False)
 
         contrib.setSession(None)
 
@@ -6049,12 +6029,8 @@ class Contribution(CommonObjectBase, Locatable):
     def getTimezone(self):
         return self.getConference().getTimezone()
 
-    def updateNonInheritingChildren(self, elem, delete=False):
-        self.getAccessController().updateNonInheritingChildren(elem, delete)
-        self.notify_protection_to_owner(elem, delete)
-
     def notify_protection_to_owner(self, elem, delete=False):
-        self.getOwner().updateNonInheritingChildren(elem, delete)
+        pass
 
     def getKeywords(self):
         try:
@@ -8042,9 +8018,6 @@ class SubContribution(CommonObjectBase, Locatable):
     def note(self):
         warnings.warn('note of legacy objects is not available anymore; returning None', DeprecationWarning, 2)
 
-    def updateNonInheritingChildren(self, elem, delete=False):
-        self.getOwner().updateNonInheritingChildren(elem, delete)
-
     def getAccessController(self):
         return self.getOwner().getAccessController()
 
@@ -8401,14 +8374,8 @@ class Material(CommonObjectBase):
                 return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
-    def updateNonInheritingChildren(self, elem, delete=False):
-        # We do not want to store the inherited children in a Category because the funcionallity is not used
-        if not isinstance(self.getOwner(), Category):
-            self.getAccessController().updateNonInheritingChildren(elem, delete)
-            self.notify_protection_to_owner(elem, delete)
-
     def notify_protection_to_owner(self, elem, delete=False):
-        self.getOwner().updateNonInheritingChildren(elem, delete)
+        pass
 
     def setValues( self, params ):
         """Sets all the values of the current material object from a diccionary
@@ -9003,10 +8970,7 @@ class Resource(CommonObjectBase):
         return False
 
     def notify_protection_to_owner(self, delete=False):
-        # Resources can be attached to other objects (e.g. Registrant),
-        # but we wish to trigger the notification only when attached to materials (except paper reviewing)
-        if isinstance(self.getOwner(), Material) and not isinstance(self.getOwner(), Reviewing):
-            self.getOwner().updateNonInheritingChildren(self, delete)
+        pass
 
     @Updates (['MaKaC.conference.Link',
                'MaKaC.conference.LocalFile'],'protection', lambda(x): int(x))

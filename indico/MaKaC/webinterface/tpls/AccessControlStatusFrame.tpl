@@ -104,29 +104,6 @@ from MaKaC import conference as cmod
     </td>
 </tr>
 <script type="text/javascript">
-% if target.getAccessController().getNonInheritingChildren():
-    $(".see_children").click(function(e){
-        var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching..."));
-        jsonRpc(Indico.Urls.JsonRpcService, $(self).data("url") ,
-                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }'
-                % if type != 'Event':
-                    , 'confId' : '${ target.getConference().getId() }'
-                % endif
-                },
-                function(result, error){
-                    if (exists(error)) {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    } else {
-                        killProgress();
-                        new ChildrenProtectionPopup($(self).data("type") + $T(" elements"), result).open();
-                    }
-                });
-            e.preventDefault();
-        });
-% endif
-
 % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
     % if isinstance(target, (cmod.Category, cmod.Conference)):
         new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');

@@ -15,43 +15,14 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
-from functools import wraps
 
 from persistent import Persistent
 
 from indico.core import signals
-from MaKaC.common import info
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
+from MaKaC.common import info
 from MaKaC.common.contextManager import ContextManager
-
-
-LEGACY_MATERIALS = {'Material', 'Resource', 'Minutes', 'Paper', 'Slides', 'Video', 'Poster', 'LocalFile', 'Link'}
-
-
-def isFullyAccess(level):
-    def wrap(func):
-        @wraps(func)
-        def decorator(*args):
-            # if protected and checking for fully public OR
-            # if not protected and checking for full private
-            if (args[0].isProtected() and level == - 1) or (not args[0].isProtected() and level == 1):
-                return False
-            for child in args[0].getNonInheritingChildren():
-                if child.getAccessController().getAccessProtectionLevel() != level:
-                    return False
-            return True
-        return decorator
-    return wrap
-
-def getChildren(level):
-    def wrap(func):
-        @wraps(func)
-        def decorator(*args):
-            return [child for child in args[0].getNonInheritingChildren()
-                    if child.getAccessController().getAccessProtectionLevel() != level]
-        return decorator
-    return wrap
 
 
 class AccessController(Persistent):
@@ -87,7 +58,6 @@ class AccessController(Persistent):
         self.accessKey = ""
         self.owner = owner
         self.contactInfo = ""
-        self.nonInheritingChildren = set()
 
     def getOwner(self):
         return self.owner
@@ -382,41 +352,6 @@ class AccessController(Persistent):
 
     def setContactInfo(self, info):
         self.contactInfo = info
-
-    def addNonInheritingChildren(self, obj):
-        self.nonInheritingChildren.add(obj)
-        self._p_changed = 1
-
-    def removeNonInheritingChildren(self, obj):
-        self.nonInheritingChildren.discard(obj)
-        self._p_changed = 1
-
-    def getNonInheritingChildren(self):
-        return [elem for elem in getattr(self, 'nonInheritingChildren', [])
-                if elem.__class__.__name__ not in LEGACY_MATERIALS]
-
-    def updateNonInheritingChildren(self, elem, delete=False):
-        if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
-            self.removeNonInheritingChildren(elem)
-        else:
-            self.addNonInheritingChildren(elem)
-        self._p_changed = 1
-
-    @isFullyAccess(-1)
-    def isFullyPublic(self):
-        pass
-
-    @isFullyAccess(1)
-    def isFullyPrivate(self):
-        pass
-
-    @getChildren(-1)
-    def getProtectedChildren(self):
-        pass
-
-    @getChildren(1)
-    def getPublicChildren(self):
-        pass
 
 
 class AccessWrapper:
