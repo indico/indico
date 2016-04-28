@@ -643,20 +643,8 @@ class UHAdminSwitchNewsActive(URLHandler):
     _endpoint = 'admin.adminList-switchNewsActive'
 
 
-class UHAdminsStyles(URLHandler):
-    _endpoint = 'admin.adminLayout-styles'
-
-
 class UHAdminsConferenceStyles(URLHandler):
     _endpoint = 'admin.adminConferenceStyles'
-
-
-class UHAdminsAddStyle(URLHandler):
-    _endpoint = 'admin.adminLayout-addStyle'
-
-
-class UHAdminsDeleteStyle(URLHandler):
-    _endpoint = 'admin.adminLayout-deleteStyle'
 
 
 class UHAdminsSystem(URLHandler):
