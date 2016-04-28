@@ -306,6 +306,16 @@ class PrincipalListField(HiddenField):
         return sorted(self.data) if self.data else []
 
 
+class AccessControlListField(PrincipalListField):
+    widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True, acl=True)
+
+    def __init__(self, *args, **kwargs):
+        self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
+        self.acl_url = kwargs.pop('acl_url')(kwargs['_form'])
+        self.inherited_acl_count = len(self.protected_object.get_access_list(skip_managers=True, skip_self_acl=True))
+        super(AccessControlListField, self).__init__(*args, **kwargs)
+
+
 class EventPersonListField(PrincipalListField):
     """"A field that lets you select a list Indico user and EventPersons
 
