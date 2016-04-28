@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from datetime import datetime
 from MaKaC.review import AbstractStatusAccepted, AbstractStatusProposedToAccept
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from indico.util.date_time import format_date
@@ -150,74 +148,4 @@ class AbstractListToExcel:
                     excelGen.addValue(format_date(abstract.getModificationDate(), format="short"))
 
             excelGen.newLine()
-        return excelGen.getExcelContent()
-
-
-class ContributionsListToExcel:
-
-    def __init__(self, conf,contribList=None, tz=None):
-        self._conf = conf
-        self._contribList = contribList
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-
-    def getExcelFile(self):
-        excelGen=ExcelGenerator()
-        excelGen.addValue("Id")
-        excelGen.addValue("Date")
-        excelGen.addValue("Duration")
-        excelGen.addValue("Type")
-        excelGen.addValue("Title")
-        excelGen.addValue("Presenter")
-        excelGen.addValue("Session")
-        excelGen.addValue("Track")
-        excelGen.addValue("Status")
-        excelGen.addValue("Material")
-        excelGen.newLine()
-
-        for contrib in self._contribList:
-            excelGen.addValue(contrib.getId())
-            startDate = contrib.getAdjustedStartDate(self._tz)
-            if startDate:
-                excelGen.addValue(startDate.strftime("%A %d %b %Y at %H:%M"))
-            else:
-                excelGen.addValue("")
-            excelGen.addValue((datetime(1900,1,1)+contrib.getDuration()).strftime("%Hh%M'"))
-            type = contrib.getType()
-            if type:
-                excelGen.addValue(type.getName())
-            else:
-                excelGen.addValue("")
-            excelGen.addValue(contrib.getTitle())
-            listSpeaker = []
-            for speaker in contrib.getSpeakerList():
-                listSpeaker.append(speaker.getFullName())
-            excelGen.addValue("\n".join(listSpeaker))
-            session = contrib.getSession()
-            if session:
-                excelGen.addValue(session.getTitle())
-            else:
-                excelGen.addValue("")
-            track = contrib.getTrack()
-            if track:
-                excelGen.addValue(track.getTitle())
-            else:
-                excelGen.addValue("")
-            status=contrib.getCurrentStatus()
-            excelGen.addValue(ContribStatusList().getCaption(status.__class__))
-
-            resource_list = []
-
-            for attachment in contrib.attached_items.get('files', []):
-                resource_list.append(attachment.absolute_download_url)
-
-            for folder in contrib.attached_items.get('folders', []):
-                for attachment in folder.attachments:
-                    resource_list.append(attachment.absolute_download_url)
-
-            excelGen.addValue("\n".join(resource_list))
-            excelGen.newLine()
-
         return excelGen.getExcelContent()

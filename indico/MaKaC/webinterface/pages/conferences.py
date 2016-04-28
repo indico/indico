@@ -19,7 +19,7 @@ import os
 import posixpath
 import re
 
-from datetime import timedelta, datetime
+from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -32,7 +32,6 @@ import MaKaC.review as review
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
-from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.PDFinterface.base import PDFSizes
@@ -43,27 +42,22 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
-from indico.util.i18n import i18nformat, _, ngettext
+from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
 from indico.util.string import safe_upper
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IConferenceEventInfoFossil
-from MaKaC.common.Conversion import Conversion
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.TemplateExec import render, mako_call_template_hook
 
-from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.users.util import get_user_by_email
-from indico.util import json
-from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
