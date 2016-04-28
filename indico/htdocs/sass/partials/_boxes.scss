@@ -319,6 +319,27 @@ $i-box-padding: 10px;
 // Boxed group lists
 // ============================================================================
 
+.i-box.just-group-list {
+    padding-bottom: 0;
+    padding-top: 0;
+
+    .i-box-header {
+        margin-bottom: 0;
+    }
+
+    ul.group-list {
+        > li{
+            &:first-child {
+                border-top: 0;
+            }
+
+            &[class*="icon-"]:not(:empty):before {
+                margin-right: 0.5em;
+            }
+        }
+    }
+}
+
 .i-box ul.group-list {
     color: $light-black;
     list-style: outside none none;
