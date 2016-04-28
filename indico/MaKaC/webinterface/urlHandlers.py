@@ -953,18 +953,6 @@ class UHTrackModContribList(URLHandler):
     _endpoint = 'event_mgmt.trackModContribList'
 
 
-class UHTrackModContributionAction(URLHandler):
-    _endpoint = 'event_mgmt.trackModContribList-contribAction'
-
-
-class UHTrackModParticipantList(URLHandler):
-    _endpoint = 'event_mgmt.trackModContribList-participantList'
-
-
-class UHTrackModToPDF(URLHandler):
-    _endpoint = 'event_mgmt.trackModContribList-contribsToPDF'
-
-
 class UHConfMyStuff(URLHandler):
     _endpoint = 'event.myconference'
 

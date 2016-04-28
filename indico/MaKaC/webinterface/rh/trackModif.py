@@ -27,8 +27,6 @@ from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.PDFinterface.conference import TrackManagerAbstractToPDF, TrackManagerAbstractsToPDF
 import MaKaC.common.filters as filters
-from MaKaC.PDFinterface.conference import ContribsToPDF
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
@@ -585,8 +583,6 @@ class RHAbstractsActions:
     def _process(self):
         if self._pdf:
             return RHAbstractsToPDF().process(self._params)
-        elif self._mail:
-            return RHAbstractSendNotificationMail().process(self._params)
         elif self._tplPreview:
             return RHAbstractTPLPreview().process(self._params)
         elif self._participant:
@@ -635,35 +631,6 @@ class AbstractNotification:
         dict["submitter_title"] = self._abstract.getSubmitter().getTitle()
         dict["abstract_URL"] = str(urlHandlers.UHAbstractDisplay.getURL(self._abstract))
         return dict
-
-
-class RHAbstractSendNotificationMail(RHTrackModification):
-
-    def _checkParams( self, params ):
-        RHTrackModification._checkParams( self, params )
-        notifTplId = params.get("notifTpl", "")
-        self._notifTpl = self._conf.getAbstractMgr().getNotificationTplById(notifTplId)
-        self._abstractIds = normaliseListParam( params.get("abstracts", []) )
-        self._abstracts = []
-        abMgr = self._conf.getAbstractMgr()
-        for id in self._abstractIds:
-            self._abstracts.append(abMgr.getAbstractById(id))
-
-    def _process( self ):
-        count = 0
-        for abstract in self._abstracts:
-            dict = AbstractNotification(self._conf, abstract).getDict()
-            s = self._notifTpl.getTplSubject()
-            b = self._notifTpl.getTplBody()
-            maildata = { "fromAddr": self._notifTpl.getFromAddr(), "toList": [abstract.getSubmitter().getEmail()], "subject": s%dict, "body": text }
-            GenericMailer.send(GenericNotification(maildata))
-            self._conf.newSentMail(abstract.getSubmitter(), mail.getSubject(), b%dict)
-            count += 1
-
-        #self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
-
-        p = conferences.WPAbstractSendNotificationMail(self, self._conf, count )
-        return p.display()
 
 
 class RHAbstractsToPDF(RHTrackAbstractsBase):
@@ -818,114 +785,3 @@ class RHContribList(RHTrackAbstractsBase):
 
     def _process(self):
         return tracks.WPModContribList(self, self._track).display()
-
-
-class RHContribsActions:
-    """
-    class to select the action to do with the selected contributions
-    """
-    def process(self, params):
-        if 'PDF' in params:
-            return RHContribsToPDF().process(params)
-        elif 'AUTH' in params:
-            return RHContribsParticipantList().process(params)
-        return "no action to do"
-
-class RHContribsToPDF(RHTrackAbstractsBase):
-
-    def _checkProtection(self):
-        RHTrackAbstractsBase._checkProtection(self, False)
-
-    def _checkParams( self, params ):
-        RHTrackAbstractsBase._checkParams( self, params )
-        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
-        self._contribs = []
-        for id in self._contribIds:
-            self._contribs.append(self._conf.getContributionById(id))
-
-    def _process(self):
-        tz = self._conf.getTimezone()
-        if not self._contribs:
-            return "No contributions to print"
-        pdf = ContribsToPDF(self._conf, self._contribs, tz)
-        return send_file('Contributions.pdf', pdf.generate(), 'PDF')
-
-
-class RHContribsParticipantList(RHTrackAbstractsBase):
-
-    def _checkProtection( self ):
-        if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-            RHTrackAbstractsBase._checkProtection( self )
-
-    def _checkParams( self, params ):
-        RHTrackAbstractsBase._checkParams( self, params )
-        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
-        self._displayedGroups = self._normaliseListParam( params.get("displayedGroups", []) )
-        self._clickedGroup = params.get("clickedGroup","")
-
-    def _setGroupsToDisplay(self):
-        if self._clickedGroup in self._displayedGroups:
-            self._displayedGroups.remove(self._clickedGroup)
-        else:
-            self._displayedGroups.append(self._clickedGroup)
-
-    def _process( self ):
-        if not self._contribIds:
-            return "<table align=\"center\" width=\"100%%\"><tr><td>There are no contributions</td></tr></table>"
-
-        speakers = OOBTree()
-        primaryAuthors = OOBTree()
-        coAuthors = OOBTree()
-        speakerEmails = set()
-        primaryAuthorEmails = set()
-        coAuthorEmails = set()
-
-        self._setGroupsToDisplay()
-        for contribId in self._contribIds:
-            contrib = self._conf.getContributionById(contribId)
-            #Primary authors
-            for pAut in contrib.getPrimaryAuthorList():
-                if pAut.getFamilyName().lower().strip() == "" and pAut.getFirstName().lower().strip() == "" and pAut.getEmail().lower().strip() == "":
-                    continue
-                keyPA = "%s-%s-%s"%(pAut.getFamilyName().lower(), pAut.getFirstName().lower(), pAut.getEmail().lower())
-                if contrib.isSpeaker(pAut):
-                    speakers[keyPA] = pAut
-                    speakerEmails.add(pAut.getEmail())
-                primaryAuthors[keyPA] = pAut
-                primaryAuthorEmails.add(pAut.getEmail())
-            #Co-authors
-            for coAut in contrib.getCoAuthorList():
-                if coAut.getFamilyName().lower().strip() == "" and coAut.getFirstName().lower().strip() == "" and coAut.getEmail().lower().strip() == "":
-                    continue
-                keyCA = "%s-%s-%s"%(coAut.getFamilyName().lower(), coAut.getFirstName().lower(), coAut.getEmail().lower())
-                if contrib.isSpeaker(coAut):
-                    speakers[keyCA] = coAut
-                    speakerEmails.add(coAut.getEmail())
-                coAuthors[keyCA] = coAut
-                coAuthorEmails.add(coAut.getEmail())
-        emailList = {"speakers":{},"primaryAuthors":{},"coAuthors":{}}
-        emailList["speakers"]["tree"] = speakers
-        emailList["primaryAuthors"]["tree"] = primaryAuthors
-        emailList["coAuthors"]["tree"] = coAuthors
-        emailList["speakers"]["emails"] = speakerEmails
-        emailList["primaryAuthors"]["emails"] = primaryAuthorEmails
-        emailList["coAuthors"]["emails"] = coAuthorEmails
-        p = tracks.WPModParticipantList(self, self._target, emailList, self._displayedGroups, self._contribIds )
-        return p.display()
-
-
-
-class RHContribQuickAccess(RHTrackAbstractsBase):
-
-    def _checkProtection(self):
-        RHTrackAbstractsBase._checkProtection(self, False)
-
-    def _checkParams(self,params):
-        RHTrackAbstractsBase._checkParams(self,params)
-        self._contrib=self._target.getConference().getContributionById(params.get("selContrib",""))
-
-    def _process(self):
-        url=urlHandlers.UHTrackModContribList.getURL(self._target)
-        if self._contrib is not None:
-            url=urlHandlers.UHContributionModification.getURL(self._contrib)
-        self._redirect(url)

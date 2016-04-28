@@ -20,7 +20,6 @@ from urllib import quote
 from flask import render_template
 
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
-from MaKaC.webinterface.pages.conferences import WContribParticipantList
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import wcomponents
 from MaKaC import review
@@ -1100,18 +1099,3 @@ class WPModContribList(WPTrackModifBase):
     def _getTabContent(self, params):
         contributions = [contrib for contrib in self._conf.as_event.contributions if contrib.track == self._track]
         return render_template('events/contributions/mako_compat/track_contributions.html', contributions=contributions)
-
-
-class WPModParticipantList( WPTrackModifBase ):
-
-    def __init__(self, rh, conf, emailList, displayedGroups, contribs):
-        WPTrackModifBase.__init__(self, rh, conf)
-        self._emailList = emailList
-        self._displayedGroups = displayedGroups
-        self._contribs = contribs
-
-    def _getBody( self, params ):
-        WPTrackModifBase._getBody(self, params)
-        wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
-        params = {"urlDisplayGroup":urlHandlers.UHTrackModParticipantList.getURL(self._track)}
-        return wc.getHTML(params)

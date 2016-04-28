@@ -82,12 +82,3 @@ event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/commen
 # Track: contributions
 event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/', 'trackModContribList', trackModif.RHContribList,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/perform-action', 'trackModContribList-contribAction',
-                        trackModif.RHContribsActions, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/direct-access',
-                        'trackModContribList-contribQuickAccess', trackModif.RHContribQuickAccess,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/contributions.pdf',
-                        'trackModContribList-contribsToPDF', trackModif.RHContribsToPDF, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/participants', 'trackModContribList-participantList',
-                        trackModif.RHContribsParticipantList, methods=('POST',))
