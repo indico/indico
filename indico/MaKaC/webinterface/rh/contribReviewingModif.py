@@ -23,7 +23,6 @@ import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.errors import FormValuesError, MaKaCError
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.contribMod import (RCContributionEditor,
                                               RCContributionReferee,
                                               RCContributionReviewer,

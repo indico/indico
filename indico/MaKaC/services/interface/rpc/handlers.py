@@ -65,7 +65,6 @@ methodMap = {
 endpointMap = {
     "event": importModule("MaKaC.services.implementation.conference"),
     "user": importModule('MaKaC.services.implementation.user'),
-    "contribution": importModule('MaKaC.services.implementation.contribution'),
     "session": importModule('MaKaC.services.implementation.session'),
     "search": importModule('MaKaC.services.implementation.search'),
     "material": importModule('MaKaC.services.implementation.material'),

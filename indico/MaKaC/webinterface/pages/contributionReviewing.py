@@ -14,10 +14,120 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.util import url_for
+from flask import session
 
-import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.webinterface.pages.contributions import WPContributionModifBase
+from indico.web.flask.util import url_for
+from MaKaC.common.TemplateExec import render
+from MaKaC.i18n import _
+from MaKaC.webinterface import wcomponents
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+
+
+class WPContributionModifBase(WPConferenceModifBase):
+    def __init__(self, rh, contribution, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, contribution.event_new.as_legacy, **kwargs)
+        self._contrib = self._target = contribution
+        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
+        self._isPRM = RCPaperReviewManager.hasRights(rh)
+        self._canModify = self._contrib.can_manage(session.user)
+
+    def _getEnabledControls(self):
+        return False
+
+    def _getNavigationDrawer(self):
+        pars = {"target": self._conf, "isModif": True}
+        return wcomponents.WNavigationDrawer(pars, bgColor="white")
+
+    def _createTabCtrl(self):
+        review_manager = self._conf.getReviewManager(self._contrib)
+
+        self._tabCtrl = wcomponents.TabControl()
+
+        hasReviewingEnabled = self._conf.hasEnabledSection('paperReviewing')
+        paperReviewChoice = self._conf.getConfPaperReview().getChoice()
+
+        if hasReviewingEnabled and paperReviewChoice != 1:
+            if self._canModify or self._isPRM or review_manager.isReferee(self._rh._getUser()):
+                self._subtabReviewing = self._tabCtrl.newTab(
+                    "reviewing", _("Paper Reviewing"), url_for('event_mgmt.contributionReviewing', self._target))
+            else:
+                if review_manager.isEditor(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab(
+                        "reviewing", _("Paper Reviewing"), url_for('event_mgmt.confListContribToJudge-asEditor',
+                                                                   self._target))
+                elif review_manager.isReviewer(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab(
+                        "reviewing", _("Paper Reviewing"), url_for('event_mgmt.confListContribToJudge-asReviewer',
+                                                                   self._target))
+
+            if self._canModify or self._isPRM or review_manager.isReferee(self._rh._getUser()):
+                self._subTabAssign = self._subtabReviewing.newSubTab(
+                    "assign", _("Assign Team"), url_for('event_mgmt.contributionReviewing', self._target))
+                if review_manager.isReferee(self._rh._getUser()) and paperReviewChoice not in (1, 3):
+                    self._subTabJudgements = self._subtabReviewing.newSubTab(
+                        "referee", _("Referee Assessment"), url_for('event_mgmt.confListContribToJudge', self._target))
+                else:
+                    self._subTabJudgements = self._subtabReviewing.newSubTab(
+                        "Assessments", _("Assessments"), url_for('event_mgmt.confListContribToJudge', self._target))
+
+            if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
+                    review_manager.isEditor(self._rh._getUser()) and \
+                    not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabJudgeEditing = self._subtabReviewing.newSubTab(
+                    "editing", _("Assess Layout"), url_for('event_mgmt.contributionEditingJudgement', self._target))
+
+            if (paperReviewChoice == 2 or paperReviewChoice == 4) and \
+                    review_manager.isReviewer(self._rh._getUser()) and \
+                    not review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabGiveAdvice = self._subtabReviewing.newSubTab(
+                    "advice", _("Assess Content"), url_for('event_mgmt.contributionGiveAdvice', self._target))
+
+            if self._canModify or \
+                    self._isPRM or \
+                    review_manager.isReferee(self._rh._getUser()) or \
+                            len(review_manager.getVersioning()) > 1 or \
+                    review_manager.getLastReview().getRefereeJudgement().isSubmitted():
+                self._subTabReviewingHistory = self._subtabReviewing.newSubTab(
+                    "reviewing_history", _("History"), url_for('event_mgmt.contributionReviewing-reviewingHistory',
+                                                               self._target))
+
+        self._setActiveTab()
+        self._setupTabCtrl()
+
+    def _setActiveTab(self):
+        pass
+
+    def _setupTabCtrl(self):
+        pass
+
+    @property
+    def sidemenu_option(self):
+        return 'timetable' if self._target.timetable_entry else 'contributions'
+
+    def _getPageContent(self, params):
+        self._createTabCtrl()
+        banner = ""
+        if self._canModify or self._isPRM:
+            if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
+            if self._conf.getConfPaperReview().isReviewerContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
+            if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
+
+        body = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+        return banner + body
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+               '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()])
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['abstracts_js'].urls()
 
 
 class WPContributionReviewing( WPContributionModifBase ):

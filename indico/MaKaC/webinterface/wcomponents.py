@@ -803,14 +803,6 @@ class WTrackBannerModif(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 
-class WContribModifTool(WTemplated):
-    pass
-
-
-class WContributionDeletion(WTemplated):
-    pass
-
-
 class WConferenceModifFrame(WTemplated):
 
     def __init__( self, conference, aw,):

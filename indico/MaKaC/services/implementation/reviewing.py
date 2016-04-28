@@ -19,17 +19,17 @@ from flask import session
 
 from MaKaC import user
 from MaKaC.common.fossilize import fossilize
+from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
 from MaKaC.paperReviewing import ConferencePaperReview
 from MaKaC.services.implementation.base import (DateTimeModificationBase, HTMLModificationBase, ListModificationBase,
                                                 ParameterManager, ProtectedModificationService, TextModificationBase)
 from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.services.implementation.contribution import ContributionBase
 from MaKaC.services.interface.rpc.common import HTMLSecurityError, NoReportError, ServiceError
 from MaKaC.webinterface.rh.contribMod import RCContributionEditor, RCContributionReferee, RCContributionReviewer
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
-
+from indico.modules.events.contributions import Contribution
 from indico.util.i18n import _
 
 
@@ -726,10 +726,25 @@ class ConferenceReviewingRemoveTeamReviewer(ConferenceReviewingPRMBase, UserModi
 #####################################
 ###  Contribution reviewing classes
 #####################################
-class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
+class ContributionReviewingBase(ProtectedModificationService):
 
     def _checkParams(self):
-        ContributionBase._checkParams(self)
+        try:
+            self._target = self._conf = ConferenceHolder().getById(self._params["conference"]);
+        except:
+            try:
+                self._target = self._conf = ConferenceHolder().getById(self._params["confId"]);
+            except:
+                raise ServiceError("ERR-E4", "Invalid conference id.")
+
+        if self._conf == None:
+            raise Exception("Conference id not specified.")
+
+        contrib_id = int(self._params.get('contribId', self._params.get('contribution')))
+        self._target = self._contribution = self.contrib = Contribution.get_one(contrib_id)
+
+        # create a parameter manager that checks the consistency of passed parameters
+        self._pm = ParameterManager(self._params)
         self._current = self._params.get("current", None)
 
     def _checkProtection(self):

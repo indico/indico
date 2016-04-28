@@ -19,7 +19,6 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.pages.sessions as sessions
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
@@ -81,23 +80,6 @@ class WebFactory(WebFactory):
     def getConfModifSchedule (rh, conf):
         return WPMConfModifSchedule(rh, conf)
 
-############# Contribution modification #########################################
-    def getContributionModification(rh, contrib):
-        return WPMContributionModification(rh,contrib)
-    getContributionModification = staticmethod(getContributionModification)
-
-    def getContribModifAC(rh, contrib):
-        return WPMContribModifAC(rh,contrib)
-    getContribModifAC = staticmethod(getContribModifAC)
-
-    def getContributionModifTools(rh, contrib):
-        return WPMContributionModifTools (rh,contrib)
-    getContributionModifTools = staticmethod(getContributionModifTools)
-
-    def getContributionEditData(rh, contrib):
-        return WPMContribEditData(rh, contrib)
-    getContributionEditData = staticmethod (getContributionEditData)
-
 ############Session Modificiations###########################################
 
     def getSessionDataModification(self, session):
@@ -147,29 +129,6 @@ class WMeetingCreation(category.WConferenceCreation):
         vars = category.WConferenceCreation.getVars( self )
         vars["event_type"] = WebFactory.getId()
         return vars
-
-
-#################Contribution Modification##############################
-
-
-class WPMContributionModification(contributions.WPContributionModification):
-
-    def _getTabContent( self, params ):
-        from MaKaC.webinterface.pages.contributions import WContribModifMain
-        wc = WContribModifMain(self._contrib, eventType="meeting")
-        return wc.getHTML()
-
-class WPMContribEditData(contributions.WPEditData):
-    pass
-
-
-class WPMContribModifAC(contributions.WPContribModifAC):
-    pass
-
-class WPMContributionModifTools(contributions.WPContributionModifTools):
-    pass
-#    def _getBody( self, params ):
-#        return ContribModifTabsFrame._getBody(self, params)
 
 
 class WMConfDisplayFrame(conferences.WConfDisplayFrame):
