@@ -35,10 +35,6 @@ class WebFactory(WebFactory):
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
 
-    def getConferenceDisplayPage( rh, conf, params):
-        return WPSimpleEventDisplay( rh, conf )
-    getConferenceDisplayPage = staticmethod( getConferenceDisplayPage )
-
     def getEventCreationPage( rh, targetCateg ):
         return WPSimpleEventCreation( rh, targetCateg )
     getEventCreationPage = staticmethod( getEventCreationPage )

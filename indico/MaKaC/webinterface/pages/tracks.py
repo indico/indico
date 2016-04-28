@@ -16,15 +16,16 @@
 
 from xml.sax.saxutils import quoteattr, escape
 from urllib import quote
-from datetime import datetime,timedelta
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase
+
+from flask import render_template
+
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.pages.conferences import WContribParticipantList
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import wcomponents
 from MaKaC import review
 from indico.core.config import Config
 from MaKaC.common import filters
-from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
@@ -1086,103 +1087,20 @@ class WPModAbstractIntCommentEdit(WPModAbstractIntComments):
         return wc.getHTML(p)
 
 
-class WTrackModContribList(wcomponents.WTemplated):
-
-    def __init__(self,track,filterCrit, sortingCrit, order):
-        self._track=track
-        self._conf=self._track.getConference()
-        self._filterCrit=filterCrit
-        self._sortingCrit=sortingCrit
-        self._order = order
-        self._totaldur =timedelta(0)
-
-    def _getURL( self ):
-        #builds the URL to the contribution list page
-        #   preserving the current filter and sorting status
-        url = urlHandlers.UHTrackModContribList.getURL(self._track)
-        if self._filterCrit.getField("type"):
-            l=[]
-            for t in self._filterCrit.getField("type").getValues():
-                if t!="":
-                    l.append(t)
-            url.addParam("types",l)
-            if self._filterCrit.getField("type").getShowNoValue():
-                url.addParam("typeShowNoValue","1")
-
-        if self._filterCrit.getField("session"):
-            url.addParam("sessions",self._filterCrit.getField("session").getValues())
-            if self._filterCrit.getField("session").getShowNoValue():
-                url.addParam("sessionShowNoValue","1")
-
-        if self._filterCrit.getField("status"):
-            url.addParam("status",self._filterCrit.getField("status").getValues())
-
-        if self._sortingCrit.getField():
-            url.addParam("sortBy",self._sortingCrit.getField().getId())
-            url.addParam("order","down")
-        url.addParam("OK","1")
-        return url
-
-    def _getTypeItemsHTML(self):
-        checked=""
-        if self._filterCrit.getField("type").getShowNoValue():
-            checked=" checked"
-        res=[ i18nformat("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
-        for t in self._conf.getContribTypeList():
-            checked=""
-            if t.getId() in self._filterCrit.getField("type").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="types" value=%s%s> %s"""%(quoteattr(str(t.getId())),checked,self.htmlText(t.getName())))
-        return "<br>".join(res)
-
-    def _getSessionItemsHTML(self):
-        checked=""
-        if self._filterCrit.getField("session").getShowNoValue():
-            checked=" checked"
-        res=[ i18nformat("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
-        for s in self._conf.getSessionListSorted():
-            checked=""
-            if s.getId() in self._filterCrit.getField("session").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="sessions" value=%s%s> (%s) %s"""%(quoteattr(str(s.getId())),checked,self.htmlText(s.getCode()),self.htmlText(s.getTitle())))
-        return "<br>".join(res)
-
-    def _getStatusItemsHTML(self):
-        res=[]
-        for st in ContribStatusList().getList():
-            id=ContribStatusList().getId(st)
-            checked=""
-            if id in self._filterCrit.getField("status").getValues():
-                checked=" checked"
-            code=ContribStatusList().getCode(st)
-            caption=ContribStatusList().getCaption(st)
-            res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
-        return "<br>".join(res)
-
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["contributions"] = [contrib for contrib in self._conf.as_event.contributions
-                                  if contrib.track == self._track]
-        return wvars
-
-
 class WPModContribList(WPTrackModifBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         conf = self._track.getConference()
-        if not conf.canModify( self._getAW() ):
+        if not conf.canModify(self._getAW()):
             self._tabMain.disable()
             self._tabCoordination.disable()
             self._hidingTrackTabs = True
         self._tabContribs.setActive()
 
-    def _getTabContent( self, params ):
-        filterCrit=params.get("filterCrit",None)
-        sortingCrit=params.get("sortingCrit",None)
-        order = params.get("order","down")
-        wc=WTrackModContribList(self._track,filterCrit, sortingCrit, order)
-        return wc.getHTML()
+    def _getTabContent(self, params):
+        contributions = [contrib for contrib in self._conf.as_event.contributions if contrib.track == self._track]
+        return render_template('events/contributions/mako_compat/track_contributions.html', contributions=contributions)
+
 
 class WPModParticipantList( WPTrackModifBase ):
 

@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.common.filters as filters
-from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from indico.util.string import natural_sort_key
 
 
@@ -105,41 +104,6 @@ class PosterFilterField (filters.FilterField):
             return contribution.getSession() and contribution.getSession().getScheduleType() == "poster"
         else: #contribution must not be a poster
             return not contribution.getSession() or contribution.getSession().getScheduleType() != "poster"
-
-
-class StatusFilterField(filters.FilterField):
-    """
-    """
-    _id = "status"
-
-    def satisfies(self,contribution):
-        """
-        """
-        if len(ContribStatusList().getList()) == len(self._values):
-            return True
-        stKlass=contribution.getCurrentStatus().__class__
-        return ContribStatusList().getId(stKlass) in self._values
-
-
-class AuthorFilterField( filters.FilterField ):
-    """
-    """
-    _id = "author"
-
-    def satisfies(self,contribution):
-        """
-        """
-        queryText = ""
-        if len(self._values) > 0:
-            queryText = str(self._values[0]) #The first value is the query text
-        query=queryText.strip().lower()
-        if query=="":
-            return True
-        for auth in contribution.getPrimaryAuthorList():
-            key="%s %s"%(auth.getFamilyName(),auth.getFirstName())
-            if key.lower().find(query)!=-1:
-                return True
-        return False
 
 
 class RefereeFilterField( filters.FilterField ):

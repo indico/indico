@@ -16,7 +16,6 @@
 
 
 from BTrees.OOBTree import OOBTree
-from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.tracks as tracks
 import MaKaC.webinterface.pages.conferences as conferences
@@ -27,16 +26,11 @@ from MaKaC.webinterface.rh.conferenceBase import RHTrackBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.PDFinterface.conference import TrackManagerAbstractToPDF, TrackManagerAbstractsToPDF
-from indico.core.config import Config
 import MaKaC.common.filters as filters
-import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.PDFinterface.conference import ContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
-from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from indico.web.flask.util import send_file
@@ -817,71 +811,14 @@ class RHAbstractsParticipantList(RHTrackAbstractsBase):
         return p.display()
 
 
-class ContribFilterCrit(filters.FilterCriteria):
-    _availableFields = { \
-        contribFilters.TypeFilterField.getId():contribFilters.TypeFilterField, \
-        contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField, \
-        contribFilters.AuthorFilterField.getId():contribFilters.AuthorFilterField, \
-        contribFilters.SessionFilterField.getId():contribFilters.SessionFilterField }
-
-class ContribSortingCrit(filters.SortingCriteria):
-    _availableFields={\
-        contribFilters.NumberSF.getId():contribFilters.NumberSF,
-        contribFilters.DateSF.getId():contribFilters.DateSF,
-        contribFilters.ContribTypeSF.getId():contribFilters.ContribTypeSF,
-        contribFilters.TrackSF.getId():contribFilters.TrackSF,
-        contribFilters.SpeakerSF.getId():contribFilters.SpeakerSF,
-        contribFilters.BoardNumberSF.getId():contribFilters.BoardNumberSF,
-        contribFilters.SessionSF.getId():contribFilters.SessionSF,
-        contribFilters.TitleSF.getId():contribFilters.TitleSF
-    }
-
-
 class RHContribList(RHTrackAbstractsBase):
-
-    def _checkProtection(self):
-        RHTrackAbstractsBase._checkProtection(self, False)
-
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         RHTrackAbstractsBase._checkParams(self,params)
-        self._conf=self._track.getConference()
-        filterUsed=params.has_key("OK")
-        #sorting
-        self._sortingCrit=ContribSortingCrit([params.get("sortBy","number").strip()])
-        self._order = params.get("order","down")
-        #filtering
-        filter = {"author":params.get("authSearch","")}
-        ltypes = []
-        if not filterUsed:
-            for type in self._conf.getContribTypeList():
-                ltypes.append(type.id)
-        else:
-            for id in self._normaliseListParam(params.get("types",[])):
-                ltypes.append(id)
-        filter["type"]=ltypes
-        lsessions= []
-        if not filterUsed:
-            for session in self._conf.getSessionList():
-                lsessions.append( session.id )
-        filter["session"]=self._normaliseListParam(params.get("sessions",lsessions))
-        lstatus=[]
-        if not filterUsed:
-            for status in ContribStatusList().getList():
-                lstatus.append(ContribStatusList().getId(status))
-        filter["status"]=self._normaliseListParam(params.get("status",lstatus))
-        self._filterCrit=ContribFilterCrit(self._conf,filter)
-        typeShowNoValue,sessionShowNoValue=True,True
-        if filterUsed:
-            typeShowNoValue =  params.has_key("typeShowNoValue")
-            sessionShowNoValue =  params.has_key("sessionShowNoValue")
-        self._filterCrit.getField("type").setShowNoValue(typeShowNoValue)
-        self._filterCrit.getField("session").setShowNoValue(sessionShowNoValue)
+        self._conf = self._track.getConference()
 
+    def _process(self):
+        return tracks.WPModContribList(self, self._track).display()
 
-
-    def _process( self ):
-        p = tracks.WPModContribList(self,self._track)
-        return p.display( filterCrit= self._filterCrit, sortingCrit=self._sortingCrit, order=self._order )
 
 class RHContribsActions:
     """

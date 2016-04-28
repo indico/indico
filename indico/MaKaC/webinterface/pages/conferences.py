@@ -643,17 +643,6 @@ class WPConferenceProgram(WPConferenceDefaultDisplayBase):
         return wc.getHTML()
 
 
-class WPMeetingTimeTable( WPTPLConferenceDisplay ):
-
-    def getJSFiles(self):
-        return WPXSLConferenceDisplay.getJSFiles(self) + \
-               self._includeJSPackage('Timetable')
-
-    def _getBody( self, params ):
-        wc = WConferenceTimeTable( self._conf, self._getAW()  )
-        return wc.getHTML(params)
-
-
 class WPConferenceModifBase(main.WPMainBase):
 
     _userData = ['favorite-user-ids']
@@ -1081,7 +1070,6 @@ class WConfModifACSessionCoordinatorRights(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
-        url = urlHandlers.UHConfModifCoordinatorRights.getURL(self._conf)
         html=[]
         scr = conference.SessionCoordinatorRights()
         for rightKey in scr.getRightKeys():
@@ -1444,7 +1432,6 @@ class WTrackCreation( wcomponents.WTemplated ):
         vars['title'] = ''
         vars['description'] = ''
         return vars
-
 
 
 class WPConfAddTrack( WPConfModifProgram ):

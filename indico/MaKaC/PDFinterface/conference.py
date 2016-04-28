@@ -52,8 +52,6 @@ from MaKaC.webinterface.pages.tracks import (
     _ASTrackViewAcceptedForOther
 )
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
-import MaKaC.common.filters as filters
-import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import NoReportError
 from reportlab.lib.pagesizes import landscape, A4
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
@@ -1272,12 +1270,6 @@ class SimplifiedTimeTablePlain(PDFBase):
             for entry in dayEntries:
                 story.append(entry)
             currentDay += timedelta(days=1)
-
-
-class FilterCriteria(filters.FilterCriteria):
-    _availableFields = {
-        contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField
-                }
 
 
 class RegistrantToPDF(PDFBase):

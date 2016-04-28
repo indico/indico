@@ -47,10 +47,6 @@ class WebFactory(WebFactory):
         return WPMeetingEventCreation( rh, targetCateg )
 
     @staticmethod
-    def getConferenceDisplayPage( rh, conference, params ):
-        return conferences.WPMeetingTimeTable(rh,conference, "static", "meeting", {})
-
-    @staticmethod
     def getIconURL():
         return WebFactory.iconURL
 
