@@ -470,17 +470,6 @@ class RHAddContribs(RHSessionModUnrestrictedContribMngCoordBase):
             p=sessions.WPModAddContribs(self,self._target)
             return p.display()
 
-class RHContribQuickAccess(RHSessionModifBase):
-
-    def _checkParams(self,params):
-        RHSessionModifBase._checkParams(self,params)
-        self._contrib=self._target.getConference().getContributionById(params.get("selContrib",""))
-
-    def _process(self):
-        url=urlHandlers.UHSessionModContribList.getURL(self._target)
-        if self._contrib is not None:
-            url=urlHandlers.UHContributionModification.getURL(self._contrib)
-        self._redirect(url)
 
 class RHContribsActions:
     """
@@ -527,19 +516,6 @@ class RHContribsToPDF(RHSessionModUnrestrictedContribMngCoordBase):
             return "No contributions to print"
         pdf = ContribsToPDF(self._conf, self._contribs, tz)
         return send_file('Contributions.pdf', pdf.generate(), 'PDF')
-
-
-class RHContribQuickAccess(RHSessionModCoordinationBase):
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        self._contrib=self._target.getConference().getContributionById(params.get("selContrib",""))
-
-    def _process(self):
-        url=urlHandlers.UHSessionModContribList.getURL(self._target)
-        if self._contrib is not None:
-            url=urlHandlers.UHContributionModification.getURL(self._contrib)
-        self._redirect(url)
 
 
 class RHContribsParticipantList(RHSessionModUnrestrictedContribMngCoordBase):

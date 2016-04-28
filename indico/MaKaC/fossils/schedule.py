@@ -189,16 +189,6 @@ class IFolderFossil(IFossil):
 
 class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
 
-    def getURL(self):
-        """ Entry Display URL """
-    getURL.produce = lambda s: str(urlHandlers.UHContributionDisplay.getURL(s.getOwner()))
-    getURL.name = "url"
-
-    def getPDF(self):
-        """ Entry PDF URL """
-    getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
-    getPDF.name = "pdf"
-
     def getAttachments(self):
         """ Entry Material """
     getAttachments.produce = lambda s: s.getOwner().attached_items

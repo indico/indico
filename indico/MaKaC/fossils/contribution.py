@@ -81,10 +81,6 @@ class IContributionFossil(IFossil):
     getAddress.produce = lambda s: s.getLocation()
     getAddress.convert = Conversion.locationAddress
 
-    def getProtectionURL(self):
-        """Contribution protection URL"""
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHContribModifAC.getURL(s))
-
 
 class IContributionParticipationTTDisplayFossil(IFossil):
     """

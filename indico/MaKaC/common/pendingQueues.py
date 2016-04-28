@@ -183,8 +183,6 @@ class _PendingSubmitterNotification(_PendingNotification):
                 elif contrib.isSpeaker(ps):
                     typeAuthor="Speaker"
                 participations+="""\t\t\t\t - "Contribution" \"%s\" (%s)\n"""%(contrib.getTitle(), typeAuthor)
-                accessURL = urlHandlers.UHContributionDisplay.getURL(contrib)
-                participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
 

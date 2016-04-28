@@ -301,10 +301,10 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFo
         pass
     getType.convert = lambda t: t and t.getName()
 
-    def getLocator(self):
-        pass
-    getLocator.convert = Conversion.url(urlHandlers.UHContributionDisplay)
-    getLocator.name = 'url'
+    # def getLocator(self):
+    #     pass
+    # getLocator.convert = Conversion.url(urlHandlers.UHContributionDisplay)
+    # getLocator.name = 'url'
 
     def getKeywords(self):
         pass

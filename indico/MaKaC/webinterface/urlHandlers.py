@@ -589,81 +589,12 @@ class UHConfModifSchedule(URLHandler):
     _endpoint = 'event_mgmt.confModifSchedule'
 
 
-class UHContribConfSelectionAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-contribsActions'
-
-
-class UHContribsConfManagerDisplayMenuPDF(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-contribsToPDFMenu'
-
-
-class UHContribsConfManagerDisplayParticipantList(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-participantList'
-
-
 class UHSessionClose(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-close'
 
 
 class UHSessionOpen(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-open'
-
-
-class UHContribToXMLConfManager(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-xml'
-
-
-class UHContribToXML(URLHandler):
-    _endpoint = 'event.contributionDisplay-xml'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return ""
-
-
-class UHContribToiCal(URLHandler):
-    _endpoint = 'event.contributionDisplay-ical'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return ""
-
-
-class UHContribToPDFConfManager(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-pdf'
-
-
-class UHContribToPDF(URLHandler):
-    _endpoint = 'event.contributionDisplay-pdf'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            return "files/generatedPdf/%s-Contribution.pdf" % target.getId()
-
-
-class UHContribModifAC(URLHandler):
-    _endpoint = 'event_mgmt.contributionAC'
-
-
-class UHContributionSetVisibility(URLHandler):
-    _endpoint = 'event_mgmt.contributionAC-setVisibility'
-
-
-class UHContribModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-materialsAdd'
-
-
-class UHContribModifTools(URLHandler):
-    _endpoint = 'event_mgmt.contributionTools'
-
-
-class UHContributionDataModif(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-modifData'
-
-
-class UHContributionDataModification(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-data'
 
 
 class UHConfModifAC(URLHandler):
@@ -919,10 +850,6 @@ class UHGeneralInfoPerformModification(URLHandler):
     _endpoint = 'admin.generalInfoModification-update'
 
 
-class UHContributionDelete(URLHandler):
-    _endpoint = 'event_mgmt.contributionTools-delete'
-
-
 class UHSessionModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification'
 
@@ -959,10 +886,6 @@ class UHSessionDeletion(URLHandler):
     _endpoint = 'event_mgmt.sessionModifTools-delete'
 
 
-class UHContributionModification(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification'
-
-
 class UHConferenceProgram(URLHandler):
     _endpoint = 'event.conferenceProgram'
 
@@ -993,17 +916,6 @@ class UHSessionToiCal(URLHandler):
     _endpoint = 'event.sessionDisplay-ical'
 
 
-class UHContributionDisplay(URLHandler):
-    _endpoint = 'event.contributionDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params = target.getLocator()
-            return "%s-contrib.html" % (params["contribId"])
-        return cls.getURL(target, _ignore_static=True, **params)
-
-
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
 
@@ -1014,18 +926,6 @@ class UHAbstractWithdraw(URLHandler):
 
 class UHAbstractRecovery(URLHandler):
     _endpoint = 'event.abstractWithdraw-recover'
-
-
-class UHConfModifContribList(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList'
-
-
-class UHContribModSetTrack(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-setTrack'
-
-
-class UHContribModSetSession(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-setSession'
 
 
 class UHTrackModMoveUp(URLHandler):
@@ -1201,10 +1101,6 @@ class UHConfModCFANotifTplDown(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-notifTplDown'
 
 
-class UHContribModWithdraw(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-withdraw'
-
-
 class UHTrackModContribList(URLHandler):
     _endpoint = 'event_mgmt.trackModContribList'
 
@@ -1221,28 +1117,12 @@ class UHTrackModToPDF(URLHandler):
     _endpoint = 'event_mgmt.trackModContribList-contribsToPDF'
 
 
-class UHConfModContribQuickAccess(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-contribQuickAccess'
-
-
-class UHSessionModContribQuickAccess(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-contribQuickAccess'
-
-
-class UHTrackModContribQuickAccess(URLHandler):
-    _endpoint = 'event_mgmt.trackModContribList-contribQuickAccess'
-
-
 class UHConfMyStuff(URLHandler):
     _endpoint = 'event.myconference'
 
 
 class UHConfMyStuffMyTracks(URLHandler):
     _endpoint = 'event.myconference-myTracks'
-
-
-class UHConfModMoveContribsToSession(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-moveToSession'
 
 
 class UHConfAbstractBook(URLHandler):
@@ -1710,8 +1590,6 @@ class UHHelper(object):
         "Category": UHCategoryModification,
         "Conference": UHConferenceModification,
         "DefaultConference": UHConferenceModification,
-        "Contribution": UHContributionModification,
-        "AcceptedContribution": UHContributionModification,
         "Session": UHSessionModification,
         "Track": UHTrackModification,
         "Abstract": UHAbstractModify
@@ -1723,8 +1601,6 @@ class UHHelper(object):
         "CategoryOverview": UHCategoryOverview,
         "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
-        "Contribution": UHContributionDisplay,
-        "AcceptedContribution": UHContributionDisplay,
         "Session": UHSessionDisplay,
         "Abstract": UHAbstractDisplay
     }

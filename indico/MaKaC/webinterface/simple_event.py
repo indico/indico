@@ -147,10 +147,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
 
     def _getBody( self, params ):
         wc = WSimpleEventDisplay( self._getAW(), self._conf )
-        pars = { \
-    "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
-    "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
-    "contribModifyURLGen": urlHandlers.UHContributionModification.getURL}
+        pars = {"modifyURL": urlHandlers.UHConferenceModification.getURL(self._conf)}
         return wc.getHTML( pars )
 
 
