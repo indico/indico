@@ -143,18 +143,20 @@ parent object. The key features and expected behaviour is the following:
 
                 /* Prefill the disabled inputs with the inherited location when the default location is checked
                 (clear them otherwise) */
-                if (!isInitStep) {
-                    if (isChecked) {
-                        hiddenData = {{ (source.get_inherited_widget_location_data(init_inheritance) or {}) | tojson }};
-                        hiddenData.inheriting = true;
-                        initializeInputs();
-                    } else {
-                        clearField(venueInput);
-                        address.val('');
-                        delete hiddenData.address;
+                {% if source %}
+                    if (!isInitStep) {
+                        if (isChecked) {
+                            hiddenData = {{ (source.get_inherited_widget_location_data(init_inheritance) or {}) | tojson }};
+                            hiddenData.inheriting = true;
+                            initializeInputs();
+                        } else {
+                            clearField(venueInput);
+                            address.val('');
+                            delete hiddenData.address;
+                        }
+                        field.val(JSON.stringify(hiddenData)).trigger('change');
                     }
-                    field.val(JSON.stringify(hiddenData)).trigger('change');
-                }
+                {% endif %}
             }
 
             function reorderCategories(venueName) {
