@@ -22,6 +22,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.protection import render_acl
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
@@ -183,6 +184,13 @@ class RHSessionProtection(RHManageSessionBase):
                                                                                                explicit=True)}
         return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
                 'acl': acl}
+
+
+class RHSessionACL(RHManageSessionBase):
+    """Display the ACL of the session"""
+
+    def _process(self):
+        return render_acl(self.session)
 
 
 class RHManageSessionBlock(RHManageSessionBase):

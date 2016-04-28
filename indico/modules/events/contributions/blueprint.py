@@ -54,7 +54,8 @@ from indico.modules.events.contributions.controllers.management import (RHContri
                                                                         RHDeleteContributionField,
                                                                         RHSortContributionFields,
                                                                         RHManageDescriptionField,
-                                                                        RHSortSubContributions)
+                                                                        RHSortSubContributions,
+                                                                        RHContributionACL)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -94,6 +95,7 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/start-date', 'manage_st
                  RHContributionUpdateStartDate, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/duration', 'manage_duration', RHContributionUpdateDuration,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/acl', 'acl', RHContributionACL)
 
 # Subcontributions
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/', 'manage_subcontributions',

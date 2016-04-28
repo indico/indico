@@ -23,10 +23,11 @@ from wtforms.validators import DataRequired
 
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (IndicoPalettePickerField, TimeDeltaField, IndicoLocationField, PrincipalListField,
-                                     IndicoProtectionField)
+                                     IndicoProtectionField, AccessControlListField)
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import UsedIf
 
@@ -56,11 +57,12 @@ class SessionForm(IndicoForm):
 
 class SessionProtectionForm(IndicoForm):
     protection_mode = IndicoProtectionField(_('Protection mode'))
-    acl = PrincipalListField(_('Access control list'), [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                             serializable=False, groups=True,
-                             description=_('List of users allowed to access the session. If the protection mode '
-                                           'is set to inheriting, these users have access in addition to the users '
-                                           'who can access the parent object.'))
+    acl = AccessControlListField(_('Access control list'),
+                                 [UsedIf(lambda form, field: form.protected_object.is_protected)],
+                                 serializable=False, groups=True,
+                                 protected_object=lambda form: form.protected_object,
+                                 acl_url=lambda form: url_for('sessions.acl', form.protected_object),
+                                 description=_('List of users allowed to access the session.'))
     managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
                                   description=_('List of users allowed to modify the session'))
     coordinators = PrincipalListField(_('Coordinators'), serializable=False, groups=True)

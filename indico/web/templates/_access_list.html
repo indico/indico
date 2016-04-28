@@ -1,12 +1,12 @@
 <div class="i-box-group vert">
-    {% if users or groups %}
+    {% if acl %}
         <div class="i-box just-group-list">
             <div class="i-box-content">
                 <ul class="group-list">
-                    {% for user in users %}
-                        <li class="icon-user">{{ user.full_name }}</li>
+                    {% for user in acl | rejectattr('is_group') | sort(attribute='name') %}
+                        <li class="icon-user">{{ user.name }}</li>
                     {% endfor %}
-                    {% for group in groups %}
+                    {% for group in acl | selectattr('is_group') | sort(attribute='name') %}
                         <li class="icon-users">{{ group.name }}</li>
                     {% endfor %}
                 </ul>

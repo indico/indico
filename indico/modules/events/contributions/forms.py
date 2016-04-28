@@ -28,9 +28,10 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
-                                     IndicoDateTimeField, IndicoTagListField)
+                                     IndicoDateTimeField, IndicoTagListField, AccessControlListField)
 from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
@@ -88,11 +89,12 @@ class ContributionForm(IndicoForm):
 
 class ContributionProtectionForm(IndicoForm):
     protection_mode = IndicoProtectionField(_('Protection mode'))
-    acl = PrincipalListField(_('Access control list'), [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                             serializable=False, groups=True,
-                             description=_('List of users allowed to access the contribution. If the protection mode '
-                                           'is set to inheriting, these users have access in addition to the users '
-                                           'who can access the parent object.'))
+    acl = AccessControlListField(_('Access control list'),
+                                 [UsedIf(lambda form, field: form.protected_object.is_protected)],
+                                 serializable=False, groups=True,
+                                 protected_object=lambda form: form.protected_object,
+                                 acl_url=lambda form: url_for('contributions.acl', form.protected_object),
+                                 description=_('List of users allowed to access the contribution'))
     managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
                                   description=_('List of users allowed to modify the contribution'))
     submitters = PrincipalListField(_('Submitters'), serializable=False, groups=True,

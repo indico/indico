@@ -27,7 +27,7 @@ from indico.modules.events.sessions.controllers.management.sessions import (RHSe
                                                                             RHExportSessionsCSV, RHExportSessionsExcel,
                                                                             RHExportSessionsPDF, RHSessionREST,
                                                                             RHSessionPersonList, RHSessionProtection,
-                                                                            RHManageSessionBlock)
+                                                                            RHManageSessionBlock, RHSessionACL)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -48,6 +48,8 @@ _bp.add_url_rule('/manage/sessions/<int:session_id>/protection', 'session_protec
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/blocks/<int:block_id>', 'manage_session_block',
                  RHManageSessionBlock, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/<int:session_id>/acl', 'acl', RHSessionACL)
+
 
 _bp.add_url_rule('/manage/sessions/coordinator-privs/', 'coordinator_privs_rest', RHSessionCoordinatorPrivs)
 _bp.add_url_rule('/manage/sessions/coordinator-privs/<priv>', 'coordinator_privs_rest', RHSessionCoordinatorPrivs,

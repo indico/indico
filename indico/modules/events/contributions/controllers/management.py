@@ -23,6 +23,7 @@ from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import render_acl
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -217,6 +218,13 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
         return jsonify_data(**self.reporter.render_contrib_report())
+
+
+class RHContributionACL(RHManageContributionBase):
+    """Display the ACL of the contribution"""
+
+    def _process(self):
+        return render_acl(self.contrib)
 
 
 class RHContributionREST(RHManageContributionBase):

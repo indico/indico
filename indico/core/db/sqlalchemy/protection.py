@@ -31,6 +31,7 @@ from indico.util.caching import memoize_request
 from indico.util.signals import values_from_signal
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.user import iter_acl
+from indico.web.util import jsonify_template
 from MaKaC.accessControl import AccessWrapper
 
 
@@ -438,3 +439,7 @@ def _resolve_principal(principal):
     if isinstance(principal, EmailPrincipal):
         return principal.user or principal
     return principal
+
+
+def render_acl(obj):
+    return jsonify_template('_access_list.html', acl=obj.get_access_list(skip_managers=True, skip_self_acl=True))
