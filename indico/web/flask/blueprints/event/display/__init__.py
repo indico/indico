@@ -21,5 +21,5 @@ event = IndicoBlueprint('event', __name__, url_prefix='/event/<confId>')
 import indico.web.flask.blueprints.event.display.main
 import indico.web.flask.blueprints.event.display.abstracts
 import indico.web.flask.blueprints.event.display.paperreviewing
-import indico.web.flask.blueprints.event.display.schedule
+import indico.web.flask.blueprints.event.display.program
 import indico.web.flask.blueprints.event.display.misc
