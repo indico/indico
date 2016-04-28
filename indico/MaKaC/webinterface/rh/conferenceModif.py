@@ -1665,64 +1665,6 @@ class RHModifSessionCoordRights( RHConferenceModifBase ):
             self._redirect( "%s#sessionCoordinatorRights"%urlHandlers.UHConfModifAC.getURL( self._conf) )
 
 
-class RHConfAbstractFields( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAOptFld
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldId = params.get("fieldId", "")
-        if self._fieldId.strip()!="":
-            if not self._conf.getAbstractMgr().getAbstractFieldsMgr().hasField(self._fieldId):
-                raise MaKaCError( _("The field that you are trying to enable/disable does not exist"))
-
-    def _process( self ):
-        if self._fieldId.strip() != "":
-            if self._conf.getAbstractMgr().hasEnabledAbstractField(self._fieldId):
-                self._conf.getAbstractMgr().disableAbstractField(self._fieldId)
-            else:
-                self._conf.getAbstractMgr().enableAbstractField(self._fieldId)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
-
-
-class RHConfRemoveAbstractField( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFARemoveOptFld
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldIds = []
-        if params.get("fieldId","") != "":
-            self._fieldIds = self._normaliseListParam( params["fieldId"] )
-
-    def _process( self ):
-        for id in self._fieldIds:
-            self._conf.getAbstractMgr().removeAbstractField(id)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
-
-class RHConfMoveAbsFieldUp( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAAbsFieldUp
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldId = params.get("fieldId", "")
-
-    def _process( self ):
-        if self._fieldId != "":
-            self._conf.getAbstractMgr().moveAbsFieldUp(self._fieldId)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
-
-class RHConfMoveAbsFieldDown( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAAbsFieldDown
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldId = params.get("fieldId", "")
-
-    def _process( self ):
-        if self._fieldId != "":
-            self._conf.getAbstractMgr().moveAbsFieldDown(self._fieldId)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
-
-
 # ============================================================================
 # === Badges related =========================================================
 # ============================================================================

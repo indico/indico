@@ -75,46 +75,8 @@ class RemoveLateSubmissionAuthUser(ConferenceModifBase):
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
-class SetField(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self.params = {}
-
-        self.params["type"] = pm.extract("type", pType=str, allowEmpty=False, defaultValue="text")
-        self.params["id"] = pm.extract("id", pType=str, allowEmpty=True)
-        self.params["caption"] = pm.extract("caption", pType=str, allowEmpty=False)
-        self.params["isMandatory"] = pm.extract("isMandatory", pType=bool, allowEmpty=True, defaultValue=False)
-
-        if self.params["type"] == "textarea" or self.params["type"] == "input":
-            self.params["maxLength"] = pm.extract("maxLength", pType=int, allowEmpty=True, defaultValue=0)
-            self.params["limitation"] = pm.extract("limitation", pType=str, allowEmpty=True, defaultValue="chars")
-        elif self.params["type"] == "selection":
-            self.params["options"] = pm.extract("options", pType=list, allowEmpty=False)
-
-    def _getAnswer(self):
-        self._conf.getAbstractMgr().setAbstractField(self.params)
-
-
-class GetField(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self.fieldId = pm.extract("id", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        field = self._conf.getAbstractMgr().getAbstractFieldsMgr().getFieldById(self.fieldId)
-        if field is None:
-            raise ServiceError("ERR-U0", _("Field '%s' does not exist for this conference.") % self.fieldId)
-        return fossilize(field)
-
-
 methodMap = {
     "changeSubmitter": ChangeAbstractSubmitter,
     "lateSubmission.addExistingLateAuthUser": AddLateSubmissionAuthUser,
-    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser,
-    "fields.setField": SetField,
-    "fields.getField": GetField
+    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser
 }

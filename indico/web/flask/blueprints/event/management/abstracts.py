@@ -27,16 +27,6 @@ event_mgmt.add_url_rule('/call-for-abstracts/setup/modify', 'confModifCFA-modify
 event_mgmt.add_url_rule('/call-for-abstracts/setup/modify/save', 'confModifCFA-performModifyData',
                         conferenceModif.RHCFAPerformDataModification, methods=('POST',))
 
-# Setup: fields
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/toggle', 'confModifCFA-abstractFields',
-                        conferenceModif.RHConfAbstractFields)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/down', 'confModifCFA-absFieldDown',
-                        conferenceModif.RHConfMoveAbsFieldDown)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/up', 'confModifCFA-absFieldUp',
-                        conferenceModif.RHConfMoveAbsFieldUp, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/remove', 'confModifCFA-removeAbstractField',
-                        conferenceModif.RHConfRemoveAbstractField, methods=('POST',))
-
 # Setup: misc options
 event_mgmt.add_url_rule('/call-for-abstracts/setup/options/attach-files', 'confModifCFA-switchAttachFiles',
                         conferenceModif.RHConfModifCFASwitchAttachFiles)

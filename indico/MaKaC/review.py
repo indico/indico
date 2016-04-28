@@ -924,12 +924,6 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
         res = self._getPrimAuthIndex().match(query)
         return [self.getAbstractById(id) for id in res]
 
-    def setAbstractField(self, params):
-        return self.getAbstractFieldsMgr().setField(params)
-
-    def removeAbstractField(self, id):
-        self.getAbstractFieldsMgr().removeField(id)
-
     def hasAnyEnabledAbstractField(self):
         return self.getAbstractFieldsMgr().hasAnyActiveField()
 

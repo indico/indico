@@ -318,22 +318,6 @@ class UHConfPerformDataModif(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-dataPerform'
 
 
-class UHConfModifCFAOptFld(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-abstractFields'
-
-
-class UHConfModifCFARemoveOptFld(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-removeAbstractField'
-
-
-class UHConfModifCFAAbsFieldUp(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-absFieldUp'
-
-
-class UHConfModifCFAAbsFieldDown(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-absFieldDown'
-
-
 class UHConfModifProgram(URLHandler):
     _endpoint = 'event_mgmt.confModifProgram'
 

@@ -1268,77 +1268,6 @@ class WConfModifCFA(wcomponents.WTemplated):
     def __init__(self, conference):
         self._conf = conference
 
-    def _getAbstractFieldsHTML(self, vars):
-        abMgr = self._conf.getAbstractMgr()
-        enabledText = _("Click to disable")
-        disabledText = _("Click to enable")
-        laf = []
-        urlRemove = str(urlHandlers.UHConfModifCFARemoveOptFld.getURL(self._conf))
-        laf.append("""<form action="" method="POST">""")
-        for af in abMgr.getAbstractFieldsMgr().getFields():
-            urlUp = urlHandlers.UHConfModifCFAAbsFieldUp.getURL(self._conf)
-            urlUp.addParam("fieldId", af.getId())
-            urlDown = urlHandlers.UHConfModifCFAAbsFieldDown.getURL(self._conf)
-            urlDown.addParam("fieldId", af.getId())
-            if af.isMandatory():
-                mandatoryText = _("mandatory")
-            else:
-                mandatoryText = _("optional")
-            maxCharText = ""
-            if af.getType() in ('textarea', 'input'):
-                maxCharText = " - "
-                if int(af.getMaxLength()) != 0:
-                    maxCharText += _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
-                else:
-                    maxCharText += _("not limited")
-            addInfo = "(%s%s)" % (mandatoryText, maxCharText)
-            url = urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
-            url.addParam("fieldId", af.getId())
-            url = quoteattr("%s#optional" % str(url))
-            if self._conf.getAbstractMgr().hasEnabledAbstractField(af.getId()):
-                icon = vars["enablePic"]
-                textIcon = enabledText
-            else:
-                icon = vars["disablePic"]
-                textIcon = disabledText
-            if af.getId() == "content":
-                removeButton = ""
-            else:
-                removeButton = "<input type=\"checkbox\" name=\"fieldId\" value=\"%s\">" % af.getId()
-            laf.append("""
-                            <tr>
-                                <td>
-                                  <a href=%s><img src=%s alt="%s" class="imglink"></a>&nbsp;<a href=%s><img src=%s border="0" alt=""></a><a href=%s><img src=%s border="0" alt=""></a>
-                                </td>
-                                <td width="1%%">%s</td>
-                                <td>
-                                  &nbsp;<a class="edit-field" href="#" data-id=%s data-fieldType=%s>%s</a> %s
-                                </td>
-                            </tr>
-                            """ % (
-                                url,
-                                icon,
-                                textIcon,
-                                quoteattr(str(urlUp)),
-                                quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),
-                                quoteattr(str(urlDown)),
-                                quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),
-                                removeButton,
-                                af.getId(),
-                                af.getType(),
-                                af.getCaption(),
-                                addInfo))
-        laf.append(i18nformat("""
-    <tr>
-      <td align="right" colspan="3">
-        <input type="submit" value="_("remove")" onClick="this.form.action='%s';" class="btn">
-        <input id="add-field-button" type="submit" value="_("add")" class="btn">
-      </td>
-    </tr>
-    </form>""") % urlRemove)
-        laf.append("</form>")
-        return "".join(laf)
-
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
@@ -1401,7 +1330,6 @@ class WConfModifCFA(wcomponents.WTemplated):
             vars["notification"] = ""
         vars["enablePic"] = quoteattr(str(Config.getInstance().getSystemIconURL("enabledSection")))
         vars["disablePic"] = quoteattr(str(Config.getInstance().getSystemIconURL("disabledSection")))
-        vars["abstractFields"] = self._getAbstractFieldsHTML(vars)
         vars["addNotifTplURL"] = urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
         vars["remNotifTplURL"] = urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         vars["confId"] = self._conf.getId()
