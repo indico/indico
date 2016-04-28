@@ -321,14 +321,18 @@ parent object. The key features and expected behaviour is the following:
                 node.on('keydown', function(evt) {
                     var $this = $(this);
                     var typeaheadField = $this.parent();
+                    var resultsAreOpen = typeaheadField.parent().hasClass('result');
                     var activeItem = typeaheadField.find('.active');
-                    if ((evt.keyCode == K.TAB || evt.keyCode == K.ENTER) && activeItem.length) {
+                    if ((evt.keyCode == K.TAB || evt.keyCode == K.ENTER) && activeItem.length && resultsAreOpen) {
                         preventGuessing = true;
                         if(evt.keyCode == K.ENTER) {
                             evt.preventDefault();
                         }
                         evt.stopImmediatePropagation();
                         activeItem.find('a').click();
+                    }
+                    else if (evt.keyCode == K.TAB && node.val()) {
+                        evt.stopImmediatePropagation();
                     }
                     else if (evt.keyCode == K.ESCAPE) {
                         evt.preventDefault();
