@@ -100,7 +100,7 @@ def delete_session_block(session_block):
     for contribution in session_block.contributions[:]:
         contribution.session_block = None
         delete_timetable_entry(contribution.timetable_entry, log=False)
-    for entry in session_block.timetable_entry.children:
+    for entry in session_block.timetable_entry.children[:]:
         delete_timetable_entry(entry, log=False)
     delete_timetable_entry(session_block.timetable_entry, log=False)
     signals.event.session_block_deleted.send(session_block)
