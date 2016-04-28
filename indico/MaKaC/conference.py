@@ -143,7 +143,7 @@ class CommonObjectBase(CoreObject, Fossilizable):
 
         return list(av_set)
 
-    def getRecursiveAllowedToAccessList(self):
+    def getRecursiveAllowedToAccessList(self, skip_managers=False, skip_self_acl=False):
         """Returns a set of Avatar resp. Group objects for those people resp.
         e-groups allowed to access this object as well as all parent objects.
         """
@@ -163,8 +163,11 @@ class CommonObjectBase(CoreObject, Fossilizable):
         # If this object is protected "all by itself", then get the list of
         # people/groups allowed to access it, plus managers of owner(s)
         elif apl == 1:
-            al = self.getAllowedToAccessList() + self.getManagerList() + \
-                self.getOwner().getRecursiveManagerList()
+            al = None
+            if not skip_self_acl:
+                al = self.getAllowedToAccessList()
+            if not skip_managers:
+                al = al + self.getManagerList() + self.getOwner().getRecursiveManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
@@ -173,7 +176,11 @@ class CommonObjectBase(CoreObject, Fossilizable):
         elif apl == 0 and self.isProtected():
             # If event is protected, then get list of people/groups allowed
             # to access, and add that to the set of avatars.
-            al = self.getAllowedToAccessList() + self.getManagerList()
+            al = None
+            if not skip_self_acl:
+                al = self.getAllowedToAccessList()
+            if not skip_managers:
+                al = al + self.getManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
@@ -181,7 +188,7 @@ class CommonObjectBase(CoreObject, Fossilizable):
             # Add list of avatars/groups allowed to access parents objects.
             owner = self.getOwner()
             if owner is not None:
-                owner_al = owner.getRecursiveAllowedToAccessList()
+                owner_al = owner.getRecursiveAllowedToAccessList(skip_managers=skip_managers)
                 if owner_al is not None:
                     for av in owner_al:
                         av_set.add(av)
