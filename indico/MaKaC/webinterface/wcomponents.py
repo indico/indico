@@ -727,33 +727,6 @@ class WBannerModif(WTemplated):
 
         return WTemplated.getHTML(self, {"type" : self._type, "path": self._path, "title": self._title})
 
-class WTimetableBannerModif(WBannerModif):
-
-    def __init__(self, aw, target):
-        ## PATH
-        # Iterate till conference is reached
-        conf = target.getConference()
-        path = self._getOwnerBasePath(target)
-        # TITLE AND TYPE
-        itemType = type(target).__name__
-        title = target.getTitle()
-        WBannerModif.__init__(self, path, itemType, title)
-
-    def _getOwnerBasePath(self, target):
-        path = []
-        obj = target
-        while obj:
-            obj = obj.getOwner()
-            if type(obj) != Conference and type(obj) != conference.Category:
-                path.append({"url": urlHandlers.UHHelper.getModifUH(type(obj)).getURL(obj),
-                             "title": truncateTitle(obj.getTitle(), 30),
-                             "type": type(obj).__name__})
-                if type(obj) == conference.Session:
-                    path[-1]["sessionTimetableURL"] =  urlHandlers.UHSessionModifSchedule.getURL(obj)
-                    path[-1]["sessionContributionsURL"] =  urlHandlers.UHSessionModContribList.getURL(obj)
-            else:
-                break
-        return path
 
 class WListOfPapersToReview(WBannerModif):
 

@@ -335,9 +335,6 @@ class ISessionFossil(ISessionBasicFossil):
     def getTextColor(self):
         """ Session Text Color """
 
-    def getProtectionURL(self):
-        """Session protection URL"""
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHSessionModifAC.getURL(s))
 
 class ISessionSlotFossil(IFossil):
 

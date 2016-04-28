@@ -29,7 +29,6 @@ from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
@@ -38,28 +37,22 @@ from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.core.config import Config
-from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
+from MaKaC.errors import MaKaCError, FormValuesError
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 import MaKaC.common.filters as filters
 from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker
-from MaKaC.common import pendingQueues
-from MaKaC.export.excel import AbstractListToExcel, ContributionsListToExcel
+from MaKaC.export.excel import AbstractListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
-from indico.modules.events import notify_pending
 from indico.modules.events.requests.util import is_request_manager
-from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
-from MaKaC.fossils.conference import ISessionBasicFossil
 
-from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.util import json
-from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 
@@ -300,11 +293,7 @@ class RHConfModifSchedule(RHConferenceModifBase):
 
             session = self._target.getSessionById(params['sessions'][0])
 
-            p = sessions.WPSessionModifSchedule( self, session )
-
             wf=self.getWebFactory()
-            if wf is not None:
-                p=wf.getSessionModifSchedule( self, session )
             return p.display(**params)
 
 class RHScheduleDataEdit(RHConferenceModifBase):
@@ -363,13 +352,6 @@ class RHScheduleDataEdit(RHConferenceModifBase):
             return
         p=conferences.WPModScheduleDataEdit(self,self._target)
         return p.display()
-
-
-class RConferenceGetSessions(RHConferenceModifBase):
-
-    def _process(self):
-        from MaKaC.common.fossilize import fossilize
-        return json.dumps(fossilize(self._conf.getSessionList(), ISessionBasicFossil))
 
 
 #-------------------------------------------------------------------------------------
@@ -1840,48 +1822,6 @@ class RHConfMoveAbsFieldDown( RHConfModifCFABase ):
         if self._fieldId != "":
             self._conf.getAbstractMgr().moveAbsFieldDown(self._fieldId)
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
-
-
-class RHReschedule(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._cancel=params.has_key("CANCEL")
-        self._ok=params.has_key("OK")
-        self._hour=params.get("hour","")
-        self._minute=params.get("minute","")
-        self._action=params.get("action","duration")
-        self._fit= params.get("fit","noFit") == "doFit"
-        self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
-        self._sessionId = params.get("sessionId", "")
-        if self._targetDay is None:
-            raise MaKaCError( _("Error while rescheduling timetable: not target day"))
-        else:
-            self._day=timezone(self._conf.getTimezone()).localize(datetime(int(params["targetDay"][0:4]),
-                                                                           int(params["targetDay"][4:6]),
-                                                                           int(params["targetDay"][6:8])))
-        if self._ok:
-            if self._hour.strip() == "" or self._minute.strip() == "":
-                raise FormValuesError( _("Please write the time with the format HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
-            try:
-                if int(self._hour) or int(self._hour):
-                    pass
-            except ValueError, e:
-                raise FormValuesError( _("Please write a number to specify the time HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
-
-    def _process(self):
-        if not self._cancel:
-            if not self._ok:
-                return ''
-            else:
-                t = timedelta(hours=int(self._hour), minutes=int(self._minute))
-        if self._sessionId:
-            self._conf.getSessionById(self._sessionId).getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
-            self._redirect("%s#%s" % (urlHandlers.UHSessionModifSchedule.getURL(self._conf.getSessionById(self._sessionId)), self._targetDay))
-        else :
-            self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
-            self._redirect("%s#%s" % (urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
-
 
 
 # ============================================================================

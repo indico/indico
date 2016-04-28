@@ -567,14 +567,6 @@ class UHConfModifSchedule(URLHandler):
     _endpoint = 'event_mgmt.confModifSchedule'
 
 
-class UHSessionClose(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-close'
-
-
-class UHSessionOpen(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-open'
-
-
 class UHConfModifAC(URLHandler):
     _endpoint = 'event_mgmt.confModifAC'
 
@@ -812,42 +804,6 @@ class UHGeneralInfoPerformModification(URLHandler):
     _endpoint = 'admin.generalInfoModification-update'
 
 
-class UHSessionModification(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification'
-
-
-class UHSessionDataModification(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-modify'
-
-
-class UHSessionModifSchedule(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifSchedule'
-
-
-class UHSessionModifAC(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifAC'
-
-
-class UHSessionSetVisibility(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifAC-setVisibility'
-
-
-class UHSessionModifTools(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifTools'
-
-
-class UHSessionModifComm(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifComm'
-
-
-class UHSessionModifCommEdit(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifComm-edit'
-
-
-class UHSessionDeletion(URLHandler):
-    _endpoint = 'event_mgmt.sessionModifTools-delete'
-
-
 class UHConferenceProgram(URLHandler):
     _endpoint = 'event.conferenceProgram'
 
@@ -1001,14 +957,6 @@ class UHAbstractDelete(URLHandler):
     _endpoint = 'event_mgmt.abstractTools-delete'
 
 
-class UHSessionModContribList(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-contribList'
-
-
-class UHSessionModContribListEditContrib(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-editContrib'
-
-
 class UHConfModAbstractPropToAcc(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-propToAcc'
 
@@ -1023,22 +971,6 @@ class UHConfModAbstractPropToRej(URLHandler):
 
 class UHConfModAbstractWithdraw(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-withdraw'
-
-
-class UHSessionModAddContribs(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-addContribs'
-
-
-class UHSessionModContributionAction(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-contribAction'
-
-
-class UHSessionModParticipantList(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-participantList'
-
-
-class UHSessionModToPDF(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-contribsToPDF'
 
 
 class UHConfModCFANotifTplUp(URLHandler):

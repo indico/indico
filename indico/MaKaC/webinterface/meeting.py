@@ -19,7 +19,6 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.sessions as sessions
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
@@ -69,46 +68,12 @@ class WebFactory(WebFactory):
         return WPMConfModifAC(rh, conf)
 
     @staticmethod
-    def getConfModifListings(rh, conf):
-        return WPMConfModifListings(rh, conf)
-
-    @staticmethod
     def getConfClone(rh, conf):
         return WPMConfClone(rh, conf)
 
     @staticmethod
     def getConfModifSchedule (rh, conf):
         return WPMConfModifSchedule(rh, conf)
-
-############Session Modificiations###########################################
-
-    def getSessionDataModification(self, session):
-        return WPMSessionDataModification (self,session)
-    getSessionDataModification = staticmethod(getSessionDataModification)
-
-    def getSessionModification(rh,session):
-        return WPMSessionModification(rh,session)
-    getSessionModification = staticmethod(getSessionModification)
-
-    def getSessionModifAC(rh, session):
-        return WPMSessionModifAC(rh,session)
-    getSessionModifAC = staticmethod(getSessionModifAC)
-
-    def getSessionModifTools(rh, session):
-        return WPMSessionModifTools(rh,session)
-    getSessionModifTools = staticmethod(getSessionModifTools)
-
-    def getSessionModifComm(rh, session):
-        return WPMSessionModifComm(rh,session)
-    getSessionModifComm = staticmethod(getSessionModifComm)
-
-    def getSessionModifCommEdit(rh, session):
-        return WPMSessionModifCommEdit(rh,session)
-    getSessionModifCommEdit = staticmethod(getSessionModifCommEdit)
-
-    def getSessionModifSchedule(rh,session):
-        return WPMSessionModifSchedule(rh,session)
-    getSessionModifSchedule = staticmethod(getSessionModifSchedule)
 
 
 MeetingWebFactory = WebFactory
@@ -204,37 +169,6 @@ class WPMConfClone(conferences.WPConfClone):
 
 ##TimeTable view##
 class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
-    pass
-
-######################### Session View #######################
-
-##TabControl####
-class WPMSessionDataModification(sessions.WPSessionDataModification):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionModification( sessions.WPSessionModification ):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-
-class WPMSessionModifAC(sessions.WPSessionModifAC):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionModifTools(sessions.WPSessionModifTools):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionModifComm(sessions.WPSessionModifComm):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionModifCommEdit(sessions.WPSessionCommEdit):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionModifSchedule(sessions.WPSessionModifSchedule):
     pass
 
 ######################################################################
