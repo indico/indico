@@ -189,17 +189,6 @@ class WPMConfModifAC(conferences.WPConfModifAC):
     pass
 
 
-class WPMConfModifListings (conferences.WPConfModifListings):
-
-    def _getTabContent( self, params ):
-        wc = WMConfModifListings( self._conf )
-        return wc.getHTML()
-
-
-class WMConfModifListings (conferences.WConfModifListings):
-    pass
-
-
 class WPMConfClone(conferences.WPConfClone):
 
     def _getPageContent(self, params):

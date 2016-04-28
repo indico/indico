@@ -24,7 +24,3 @@ event.add_url_rule('/my-conference/tracks', 'myconference-myTracks', conferenceD
 
 # Other views
 event.add_url_rule('/other-view', 'conferenceOtherViews', conferenceDisplay.RHConferenceOtherViews)
-
-# EMail form
-event.add_url_rule('/email', 'EMail', conferenceDisplay.RHConferenceEmail, methods=('GET', 'POST'))
-event.add_url_rule('/email/send', 'EMail-send', conferenceDisplay.RHConferenceSendEmail, methods=('POST',))

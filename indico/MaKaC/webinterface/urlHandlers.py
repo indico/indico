@@ -225,28 +225,6 @@ class UHConferenceOverview(URLHandler):
         return super(UHConferenceOverview, cls).getURL(target)
 
 
-class UHConferenceEmail(URLHandler):
-    _endpoint = 'event.EMail'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            return "mailto:%s" % str(target.getEmail())
-        return cls.getURL(target)
-
-
-class UHConferenceSendEmail(URLHandler):
-    _endpoint = 'event.EMail-send'
-
-
-class UHConvenersSendEmail(URLHandler):
-    _endpoint = 'event_mgmt.EMail-sendconvener'
-
-
-class UHContribParticipantsSendEmail(URLHandler):
-    _endpoint = 'event_mgmt.EMail-sendcontribparticipants'
-
-
 class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
 
@@ -631,22 +609,6 @@ class UHConfClone(URLHandler):
 
 class UHConfPerformCloning(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-performCloning'
-
-
-class UHConfAllSessionsConveners(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-allSessionsConveners'
-
-
-class UHConfAllSessionsConvenersAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-allSessionsConvenersAction'
-
-
-class UHConfAllSpeakers(URLHandler):
-    _endpoint = 'event_mgmt.confModifListings-allSpeakers'
-
-
-class UHConfAllSpeakersAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
 
 class UHConfUser(URLHandler):
@@ -1223,26 +1185,6 @@ class UHAnnouncementSave(URLHandler):
 
 class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
-
-
-class UHConfModifPendingQueues(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues'
-
-
-class UHConfModifPendingQueuesActionConfSubm(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfSubmitters'
-
-
-class UHConfModifPendingQueuesActionSubm(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionSubmitters'
-
-
-class UHConfModifPendingQueuesActionMgr(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionManagers'
-
-
-class UHConfModifPendingQueuesActionCoord(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionCoordinators'
 
 
 class UHCategoryCalendarOverview(URLHandler):
