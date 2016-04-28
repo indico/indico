@@ -234,8 +234,8 @@ class TimetableEntry(db.Model):
     @property
     def siblings(self):
         parent = self.parent or self.event_new
-        day = self.start_dt.date()
         tzinfo = self.event_new.tzinfo
+        day = self.start_dt.astimezone(tzinfo).date()
         criteria = (db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
                     TimetableEntry.id != self.id)
         return TimetableEntry.query.with_parent(parent).filter(*criteria)

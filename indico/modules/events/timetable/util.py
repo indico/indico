@@ -278,15 +278,15 @@ def get_session_block_entries(event, day):
 
 def shift_following_entries(entry, shift, session_=None):
     """Reschedules entries starting after the given entry by the given shift."""
-    criteria = [TimetableEntry.start_dt >= entry.end_dt]
+    query = entry.siblings.filter(TimetableEntry.start_dt >= entry.end_dt)
     if session_ and not entry.parent:
-        criteria.append(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
-        criteria.append(TimetableEntry.session_block.has(session_id=session_.id))
-    entries = entry.siblings.filter(*criteria).all()
+        query.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
+                     TimetableEntry.session_block.has(session_id=session_.id))
+    entries = query.all()
     if not entries:
         return []
-    for entr in entries:
-        entr.move(entr.start_dt + shift)
+    for sibling in entries:
+        sibling.move(sibling.start_dt + shift)
     return entries
 
 
