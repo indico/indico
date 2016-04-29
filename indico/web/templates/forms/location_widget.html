@@ -98,6 +98,7 @@ parent object. The key features and expected behaviour is the following:
             var usingDefault = $('#location-inheritance-{{ field.id }}');
             var venues = {{ venues | tojson }};
             var venueNames = {{ venues.data | map(attribute='name') | list | tojson }};
+            var venueMap = {{ venueMap | tojson }};
             var rooms = {{ rooms | tojson }};
             var hiddenData = field.val() ? JSON.parse(field.val()) : {};  // Contains all location related data sent to
                                                                           // the server
@@ -176,8 +177,9 @@ parent object. The key features and expected behaviour is the following:
                 /* Override the venue based on the room selection */
                 if (item.venue_id != hiddenData.venue_id) {
                     venueJustChanged = true;
-                    var data = {item_name: item.group, venue_id: item.venue_id, room_id: item.id};
-                    venueInput.val(item.group).trigger('typeahead:click-on-option', data);
+                    var venueName = item.group || venueMap[item.venue_id];
+                    var data = {item_name: venueName, venue_id: item.venue_id, room_id: item.id};
+                    venueInput.val(venueName).trigger('typeahead:click-on-option', data);
                 }
             }
 
@@ -201,9 +203,9 @@ parent object. The key features and expected behaviour is the following:
             }
 
             function clearField(field) {
-                if (field.is(venueInput)) {
+                if (field[0].id == venueInput[0].id) {
                     clearVenue();
-                } else if (field.is(roomInput)) {
+                } else if (field[0].id == roomInput[0].id) {
                     clearRoom();
                 }
             }
@@ -264,9 +266,9 @@ parent object. The key features and expected behaviour is the following:
 
             function postSelectionActions(inputField, value) {
                 field.val(JSON.stringify(hiddenData)).trigger('change');
-                if (inputField.is(venueInput)) {
+                if (inputField[0].id == venueInput[0].id) {
                     latestVenueValue = value;
-                } else if (inputField.is(roomInput)) {
+                } else if (inputField[0].id == roomInput[0].id) {
                     latestRoomValue = value;
                 }
             }
@@ -290,25 +292,21 @@ parent object. The key features and expected behaviour is the following:
             }
 
             function toggleOpenResultsList(inputField) {
-                if (inputField.is(venueInput) && roomInput.closest('.typeahead__container').hasClass('result')) {
+                if (inputField[0].id == venueInput[0].id && roomInput.closest('.typeahead__container').hasClass('result')) {
                     roomInput.trigger('typeahead:close-results-list');
+                } else if (inputField[0].id == roomInput[0].id && venueInput.closest('.typeahead__container').hasClass('result')) {
                     venueInput.trigger('typeahead:close-results-list');
-                    venueInput.trigger('typeahead:open-results-list');
-                } else if (inputField.is(roomInput) && venueInput.closest('.typeahead__container').hasClass('result')) {
-                    venueInput.trigger('typeahead:close-results-list');
-                    roomInput.trigger('typeahead:close-results-list');
-                    roomInput.trigger('typeahead:open-results-list');
                 }
             }
 
             function resetSelectedOption() {
-                if (latestUsedField.is(venueInput)) {
+                if (latestUsedField[0].id == venueInput[0].id) {
                     validVenue = true;
                     venueInput.val(latestVenueValue);
                     if (hiddenData.venue_id) {
                         highlightOption(venueInput, latestVenueValue)
                     }
-                } else if (latestUsedField.is(roomInput)) {
+                } else if (latestUsedField[0].id == roomInput[0].id) {
                     validRoom = true;
                     roomInput.val(latestRoomValue);
                     if (hiddenData.room_id) {
@@ -368,7 +366,7 @@ parent object. The key features and expected behaviour is the following:
                 cancelButton: false,
                 callback: {
                     onInit: function(node) {
-                        this.query = node.val();  // Updates the results dropdown on init
+                        this.query = this.rawQuery = node.val();  // Updates the results dropdown on init
                         handleKeystrokes(node);
                     },
                     onClickBefore: function() {
@@ -388,6 +386,7 @@ parent object. The key features and expected behaviour is the following:
                         this.query = cleanQuery(query);
                     },
                     onShowLayout: function() {
+                        toggleOpenResultsList(this.node);
                         venueInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
@@ -401,10 +400,15 @@ parent object. The key features and expected behaviour is the following:
                                 return venue.name.toUpperCase() == venueValue.toUpperCase();
                             });
                             if (result.length) {
-                                $('#location-venue-' + result[0].id).parent().click();
+                                venueInput.trigger('typeahead:click-on-option', {
+                                    item_name: result[0].name,
+                                    venue_id: result[0].id
+                                });
                             } else {
                                 venueInput.trigger('typeahead:click-on-custom-option', {item_name: venueValue});
                             }
+                        } else if (!node.val()) {
+                            clearField(venueInput);
                         }
                         preventGuessing = false;
                         validVenue = false;
@@ -429,21 +433,14 @@ parent object. The key features and expected behaviour is the following:
                 display: 'name',
                 callback: {
                     onInit: function(node) {
-                        this.query = node.val();
+                        this.query = this.rawQuery = node.val();
                         handleKeystrokes(node);
                     },
                     onClickBefore: function() {
                         validRoom = true;
                     },
                     onClickAfter: function(node, a, item) {
-                        updateVenueOnRoomChange(item);
-
-                        hiddenData.room_id = item.id;
-                        delete hiddenData.room_name;
-
-                        postSelectionActions(roomInput, item.name);
-                        highlightOption(roomInput, item.name);
-                        roomInput.attr('title', item.name);
+                        roomInput.trigger('typeahead:click-on-option', item);
                     },
                     onLayoutBuiltBefore: function(node, query, result, resultHtmlList) {
                         return updateResultsList(node, resultHtmlList);
@@ -452,6 +449,7 @@ parent object. The key features and expected behaviour is the following:
                         this.query = cleanQuery(query);
                     },
                     onShowLayout: function() {
+                        toggleOpenResultsList(this.node);
                         roomInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
@@ -468,10 +466,12 @@ parent object. The key features and expected behaviour is the following:
                                 }
                             }
                             if (result.length) {
-                                $('#location-room-' + result[0].id).parent().trigger('click');
+                                roomInput.trigger('typeahead:click-on-option', result[0]);
                             } else {
                                 roomInput.trigger('typeahead:click-on-custom-option', {item_name: roomValue});
                             }
+                        } else if (!node.val()) {
+                            clearField(roomInput);
                         }
                         preventGuessing = false;
                         validRoom = false;
@@ -507,7 +507,14 @@ parent object. The key features and expected behaviour is the following:
                 venueInput.trigger('typeahead:close-results-list');
             });
 
-            roomInput.on('typeahead:click-on-custom-option', function(e, data) {
+            roomInput.on('typeahead:click-on-option', function(e, data) {
+                updateVenueOnRoomChange(data);
+                hiddenData.room_id = data.id;
+                delete hiddenData.room_name;
+                postSelectionActions(roomInput, data.name);
+                highlightOption(roomInput, data.name);
+                roomInput.attr('title', data.name);
+            }).on('typeahead:click-on-custom-option', function(e, data) {
                 delete hiddenData.room_id;
                 hiddenData.room_name = data.item_name;
                 postSelectionActions(roomInput, data.item_name);
@@ -526,17 +533,16 @@ parent object. The key features and expected behaviour is the following:
                 /* In case the input is cleared, this ensures that the results dropdown will contain all available
                 options. */
                 var $this = $(this);
-                if (roomJustCleared && $this.is(roomInput)) {
+                if (roomJustCleared && $this[0].id == roomInput[0].id) {
                     $this.trigger('input.typeahead');
                     roomJustCleared = false;
                 }
-                if (venueJustChanged && $this.is(venueInput)) {
+                if (venueJustChanged && $this[0].id == venueInput[0].id) {
                     $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
                 field.closest('.ui-dialog-content').css('overflow', 'inherit');  // Make sure the results dropdown are
                                                                                  // displayed above the dialog.
-                toggleOpenResultsList($this);
                 latestUsedField = $(this);
             })
             .on('keydown', function(evt) {
@@ -549,8 +555,9 @@ parent object. The key features and expected behaviour is the following:
             .on('click', function() {
                 /* Since focus remains on the field after selection, we need special handling for the click event in
                 order to reopen the results list */
-                global.Typeahead["#" + this.id].showLayout();
-                $(this).trigger('input');
+                if (!$(this).closest('.typeahead__container').hasClass('result')) {
+                    $(this).trigger('focus.typeahead').trigger('input');
+                }
             });
 
             $('#{{ field.id }}-wrapper .toggle-results-list').on('click', function() {
