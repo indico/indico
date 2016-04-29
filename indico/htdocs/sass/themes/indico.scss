@@ -190,6 +190,11 @@ div.event-header {
         color: $black;
     }
 
+    ul {
+        margin-bottom: 0.5em;
+    }
+
+    @extend %font-family-modern-body;
     color: $light-black;
 }
 
