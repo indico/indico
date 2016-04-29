@@ -36,7 +36,7 @@ from markupsafe import Markup
 from speaklater import _LazyString
 
 
-BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
+BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br']
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
