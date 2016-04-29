@@ -361,7 +361,6 @@ class Config:
                   'weeks.html',
                   os.path.join("meetings", "Weeks.css")),
 
-        "xml":              ("Simple xml", "XML.xsl", None),
         "jacow":            ("JACoW XML", "JACoW.xsl", None),
         "text":             ("Simple text", "Text.tpl", None),
     }

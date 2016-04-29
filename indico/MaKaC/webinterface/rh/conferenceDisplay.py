@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from flask import flash, request, session
 import os
 import pytz
+from datetime import datetime
+from flask import Response, flash, request, session
 from werkzeug.exceptions import Forbidden
 
 import MaKaC.webinterface.rh.base as base
@@ -42,6 +42,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
+from indico.modules.events.legacy import XMLEventSerializer
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
@@ -162,8 +163,13 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
         if not self._reqParams.has_key("detailLevel"):
             self._reqParams["detailLevel"] = "contribution"
 
-        p = self.render_meeting_page(self._conf, self._reqParams.get("view"), self._reqParams.get('fr') == 'no')
-        return p.display()
+        view = self._reqParams.get('view')
+        if view == 'xml':
+            serializer = XMLEventSerializer(self.event_new, session.user)
+            return Response(serializer.serialize_event(), mimetype='text/xml')
+        else:
+            p = self.render_meeting_page(self._conf, view, self._reqParams.get('fr') == 'no')
+            return p.display()
 
 
 class RHConferenceProgram(RHConferenceBaseDisplay):
