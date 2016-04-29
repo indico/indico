@@ -105,7 +105,7 @@ def inject_meeting_body(event, **kwargs):
         if entry.type == TimetableEntryType.CONTRIBUTION and (detail_level != 'contribution' or show_session != 'all'):
             continue
         elif (entry.type == TimetableEntryType.SESSION_BLOCK and show_session != 'all' and
-                unicode(entry.object.session.id) != show_session):
+                unicode(entry.object.session.friendly_id) != show_session):
             continue
 
         if entry.type == TimetableEntryType.BREAK:
