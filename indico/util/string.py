@@ -552,4 +552,4 @@ class MarkdownText(Markup):
     """unicode/Markup class that renders markdown."""
 
     def __html__(self):
-        return render_markdown(unicode(self), extensions=('nl2br',))
+        return render_markdown(unicode(self), extensions=('nl2br', 'tables'))
