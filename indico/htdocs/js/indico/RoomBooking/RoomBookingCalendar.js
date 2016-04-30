@@ -23,7 +23,7 @@ var START_H = 6;
 // Width of the calendar
 var DAY_WIDTH_PX = 35 * 12 * 2;
 // Room types, used for selecting proper CSS classes
-var barClasses = ['barBlocked', 'barPreB', 'barPreConc', 'barUnaval', 'barCand', 'barPreC', 'barConf'];
+var barClasses = ['barBlocked', 'barPreB', 'barPreConc', 'barUnaval', 'barCand', 'barPreC', 'barConf', 'barOutOfRange'];
 
 var calendarLegend = Html.div({style:{clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", borderRadius: pixels(2)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
@@ -33,7 +33,8 @@ var calendarLegend = Html.div({style:{clear: 'both', padding: pixels(5), marginB
         Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
         Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
         Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')),
-        Html.div( {className:'barLegend barBlocked'}, $T('Blocked')));
+        Html.div( {className:'barLegend barBlocked'}, $T('Blocked')),
+        Html.div( {className:'barLegend barOutOfRange'}, $T('Too early to book')));
 
 
 function compare_alphanum(elem1, elem2) {
@@ -86,6 +87,7 @@ type ("RoomBookingRoom", [],
             this.location_name = roomData.location_name;
             this.name = roomData.name;
             this.type = roomData.kind;
+            this.max_advance_days = roomData.max_advance_days;
             this.details_url = roomData.details_url;
             this.bookingUrl = build_url(roomData.booking_url, {
                 start_date: date
@@ -112,9 +114,11 @@ type ("RoomBookingCalendarBar", [],
                 this.owner = barInfo.forReservation.bookedForName;
                 this.url = barInfo.forReservation.bookingUrl;
                 this.inDB = barInfo.forReservation.id !== null;
-            } else if (barInfo.type == 0) {
+            } else if (barInfo.type == 0 && barInfo.blocking_data == 'blocking') {
                 this.url = barInfo.blocking_data.blocking_url;
                 this.inDB = true
+            } else if (barInfo.type == 0 && barInfo.blocking_data == 'nonbookable') {
+                this.inDB = false
             } else {
                 this.inDB = false;
             }
@@ -256,9 +260,15 @@ type ("RoomBookingCalendarDrawer", [],
                         resvInfo = $T('This bar indicates the time which will be booked.');
                     }
                 } else if (bar.type == "barBlocked") {
-                    resvInfo = $T("Room blocked by") + ":<br/>" +
-                                  bar.blocking.creator + "<br/>" +
-                                  $T('Reason') + ': ' + bar.blocking.reason;
+                    resvInfo = (bar.blocking.type == 'nonbookable') ? [] : [
+                        $T("Room blocked by"),
+                        ':<br/>',
+                        bar.blocking.creator,
+                        '<br/>'
+                    ];
+                    resvInfo = [].concat.apply([], [resvInfo, [$T('Reason'), ': ', bar.blocking.reason]]);
+                } else if (bar.type == 'barOutOfRange') {
+                    resvInfo = $T('Booking not allowed for this period.<br>This room can only be booked {0} days in advance.').format(bar.room.max_advance_days)
                 } else {
                     resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" +
@@ -328,6 +338,17 @@ type ("RoomBookingCalendarDrawer", [],
                     return $(this).find('.barBlocked').length;
                 }).get());
 
+                var outOfRange = _.any($('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
+                    return $(this).find('.barOutOfRange').length;
+                }).get());
+
+                if (outOfRange) {
+                    this._setDialog("search-again");
+                    $('#booking-dialog-content').html($T("This room cannot booked more than {0} days in advance.").format(bar.room.max_advance_days));
+                    $('#booking-dialog').dialog("open");
+                    return;
+                }
+
                 var any_conflict = _.any(conflicts);
                 var all_conflicts = conflicts.length && _.every(conflicts, function(e) { return !!e; });
 
@@ -353,7 +374,9 @@ type ("RoomBookingCalendarDrawer", [],
 
                 indicoRequest("roomBooking.room.bookingPermission", {
                     room_id: room_id,
-                    blocking_id: blocking_id
+                    blocking_id: blocking_id,
+                    start_dt: bar.resvStartDT.print('%H:%M %Y-%m-%d'),
+                    end_dt: bar.resvEndDT.print('%H:%M %Y-%m-%d')
                 }, function(result, error) {
                     if (!error && !exists(result.error)) {
                         if (!result.can_book) {
@@ -373,7 +396,9 @@ type ("RoomBookingCalendarDrawer", [],
                             $('.barDefault.barCand' + flexibility).addClass('barConf');
                             self._setDialog("search-again");
                             $('#booking-dialog-content').html(
-                                $T("This room is blocked on this date and you don't have permissions to book it.")
+                                (result.blocking_type === 'blocking')
+                                    ? $T("This room is blocked on this date and you don't have permissions to book it.")
+                                    : $T("This room is not available on this date.")
                             );
                             $('#booking-dialog').dialog("open");
                         }
