@@ -269,6 +269,7 @@ class Image(platypus.Image):
 
 class PageBreak(platypus.PageBreak):
     def __init__(self, part=""):
+        platypus.PageBreak.__init__(self)
         self._part = part
 
     def setPart(self, part):
@@ -476,10 +477,11 @@ class PDFBase:
         return height
 
     def _drawLogo(self, c, drawTitle = True):
-        logo = self._conf.getLogo()
+        from indico.modules.events.util import create_event_logo_tmp_file
+        logo = self._conf.as_event.logo
         imagePath = ""
         if logo:
-            imagePath = logo.getFilePath()
+            imagePath = create_event_logo_tmp_file(self._conf.as_event).name
         if imagePath:
             try:
                 img = PILImage.open(imagePath)
