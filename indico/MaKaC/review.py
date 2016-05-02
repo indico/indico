@@ -3319,7 +3319,7 @@ class NotifTplCondition(Persistent):
 
 class NotifTplCondAccepted(NotifTplCondition):
 
-    def __init__(self,track="--any--",contribType="--any--"):
+    def __init__(self, track="--any--", contribType="--any--"):
         NotifTplCondition.__init__(self)
         self._track = track
         self._contrib_type_id = contribType if isinstance(contribType, basestring) else contribType.id
@@ -3396,14 +3396,62 @@ class NotifTplCondRejected(NotifTplCondition):
         ntcr.includeInTpl(template)
         return ntcr
 
-class NotifTplCondMerged(NotifTplCondition):
 
-    def satisfies(self,abs):
-        return isinstance(abs.getCurrentStatus(),AbstractStatusMerged)
+class NotifTplCondMerged(NotifTplCondition):
+    def __init__(self, track=None, contrib_type=None):
+        NotifTplCondition.__init__(self)
+        self._track = track
+        self._contrib_type_id = contrib_type if isinstance(contrib_type, basestring) else contrib_type.id
+
+    def satisfies(self, abstract):
+        if not isinstance(abstract.getCurrentStatus(), AbstractStatusMerged):
+            return False
+        else:
+            return self._satisfiesContribType(abstract) and self._satisfiesTrack(abstract)
+
+    def _satisfiesContribType(self, abs_wrap):
+        if self._contrib_type_id == '--any--':
+            return True
+        else:
+            abstract_type = abs_wrap.getCurrentStatus().getAbstract().as_new.type
+            if self._contrib_type_id == '--none--':
+                return not abstract_type
+            if not abstract_type:
+                return False
+            # TODO: use ids in db, instead of objects!
+            return abstract_type.id == int(self._contrib_type_id)
+
+    def _satisfiesTrack(self, abs_wrap):
+        target_track = self.getTrack()
+
+        if target_track == "--any--":
+            return True
+        else:
+            tracks = abs_wrap.getCurrentStatus().getAbstract().getTrackListSorted()
+            if not target_track or target_track == '--none--':
+                return not tracks
+            return target_track in tracks
+
+    def getTrack(self):
+        return self._track
+
+    def getContribType(self):
+        # Ugly, but only way to handle '--any--'
+        return (ContributionType.get(self._contrib_type_id) if isinstance(self._contrib_type_id, int)
+                else self._contrib_type_id)
 
     def clone(self, conference, template):
         ntcm = NotifTplCondMerged()
-        ntcm.includeInTpl(newTpl, newId)
+        for newtrack in conference.getTrackList():
+            if newtrack.getTitle() == self.getTrack().getTitle():
+                ntcm.setTrack(newtrack)
+                break
+        for newtype in conference.as_event.contribution_types:
+            if newtype.name == self.getContribType():
+                ntcm.setContribType(newtype)
+                break
+        return ntcm
+
 
 class NotificationLog(Persistent):
 
