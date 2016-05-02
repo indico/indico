@@ -425,15 +425,17 @@ class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
     def addCondition(cls,tpl,**data):
         tpl.addCondition(cls._klass())
 
-class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
 
-    _id="merged"
-    _label= _("MERGED")
-    _klass=review.NotifTplCondMerged
+class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
+    _id = "merged"
+    _label = _("MERGED")
+    _klass = review.NotifTplCondMerged
 
     @classmethod
-    def addCondition(cls,tpl,**data):
-        tpl.addCondition(cls._klass())
+    def addCondition(cls, tpl, **data):
+        contribution_type = data.get("contribType", "--any--")
+        track = data.get("track", "--any--")
+        tpl.addCondition(cls._klass(track=track, contrib_type=contribution_type))
 
 
 class NotifTplConditionsFactory:
@@ -468,7 +470,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         res=[]
         for cond in self._notifTpl.getConditionList():
             caption=""
-            if isinstance(cond,review.NotifTplCondAccepted):
+            if isinstance(cond, (review.NotifTplCondAccepted, review.NotifTplCondMerged)):
                 track=cond.getTrack()
                 if track is None or track=="":
                     track="--none--"
@@ -479,11 +481,10 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
                     cType="--none--"
                 elif cType not in ["--none--","--any--"]:
                     cType=cType.name
-                caption= _("""ACCEPTED - type: %s - track: %s""")%(self.htmlText(cType),self.htmlText(track))
+                cond_type = _('MERGED') if isinstance(cond, review.NotifTplCondMerged) else _('ACCEPTED')
+                caption= _("""%s - type: %s - track: %s""")%(cond_type, self.htmlText(cType),self.htmlText(track))
             elif isinstance(cond,review.NotifTplCondRejected):
                 caption= _("""REJECTED""")
-            elif isinstance(cond,review.NotifTplCondMerged):
-                caption= _("""MERGED""")
             res.append(""" <input type="image" src="%s" onclick="javascript:this.form.selCond.value = '%s'; this.form.submit();return false;"> %s"""%(Config.getInstance().getSystemIconURL( "remove" ), cond.getId(), caption))
         return "<br>".join(res)
 
