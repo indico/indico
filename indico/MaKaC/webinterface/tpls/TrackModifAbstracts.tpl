@@ -81,7 +81,7 @@
             <a name="abstracts"></a>
             <table width="100%" cellspacing="0" border="0" style="padding-left:2px">
                 <tr>
-                    <td colspan="7" style="border-bottom: 2px solid #777777; padding-bottom: 3px;" valign="bottom" align="left">
+                    <td colspan="8" style="border-bottom: 2px solid #777777; padding-bottom: 3px;" valign="bottom" align="left">
                       % if canModify:
                           <a href="${ allAbstractsURL }" style="float:right; margin-top: 15px;">${ _("Go to all abstracts")}</a>
                       % endif
@@ -106,7 +106,7 @@
                     <td style="padding:15px 0px 15px 15px;"><span class="italic">${_("There are no abstracts with the filters criteria selected")}</span></td>
                 % else:
                 <tr>
-                    <td colspan="7" style="padding: 5px 0px 10px;" nowrap>${ _("Select: ") }<a style="color: #0B63A5;" id="selectAll">${ _("All") }</a>, <a style="color: #0B63A5;" id="deselectAll">${ _("None") }</a></td>
+                    <td colspan="8" style="padding: 5px 0px 10px;" nowrap>${ _("Select: ") }<a style="color: #0B63A5;" id="selectAll">${ _("All") }</a>, <a style="color: #0B63A5;" id="deselectAll">${ _("None") }</a></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -114,6 +114,7 @@
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF">${ _("Title")}</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ typeSortingURL }">${ _("Type")}</a> ${ typeImg }</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ statusSortingURL }">${ _("Status")}</a><b> ${ statusImg }</td>
+                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ ratingSortingURL }">${ _("Rating")}</a><b> ${ ratingImg }</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${ _("Acc. Type")}</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ dateSortingURL }"> ${ _("Submission date")}</a> ${ dateImg }</td>
                 </tr>
@@ -123,7 +124,7 @@
                     ${ abstracts }
                 </tbody>
                 <tr>
-                    <td colspan="7" style="border-top:2px solid #777777;" valign="bottom" align="left">
+                    <td colspan="8" style="border-top:2px solid #777777;" valign="bottom" align="left">
                         <table align="left">
                             <tr>
                                 <td nowrap valign="bottom" align="left">

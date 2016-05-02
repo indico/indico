@@ -464,6 +464,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         comments = ""
         if abstract.getComments():
             comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
+        abstract_rating = abstract.getRating() if abstract.getRating() is not None else '-'
         html = """
         <tr id="abstracts%s" class="abstract">
             <td align="right" width="3%%" valign="top"><input type="checkbox" name="abstracts" value="%s"%s></td>
@@ -473,6 +474,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             <td valign="top" class="CRLabstractDataCell">%s</td>
             <td nowrap valign="top" class="CRLabstractDataCell">%s %s</td>
             <td valign="top" class="CRLabstractDataCell">%s</td>
+            <td valign="top" class="CRLabstractDataCell">%s</td>
             <td nowrap valign="top" class="CRLabstractDataCell">%s</td>
         </tr>
                 """ % (abstract.getId(), \
@@ -480,7 +482,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
                 self.htmlText(abstract.getId()),comments,\
                 str(url),self.htmlText(abstract.getTitle()),\
                 self.htmlText(contribTypeName),icon, \
-                label,self.htmlText(accType),\
+                label, abstract_rating, self.htmlText(accType),\
                 abstract.getSubmissionDate().strftime("%d %B %Y"))
         return html
 
@@ -591,7 +593,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         sortingField = self._sortingCrit.getField()
         vars["currentSorting"] = ""
 
-        for crit in ["type", "status", "number", "date"]:
+        for crit in ["type", "status", "number", "date", "rating"]:
             url = self._getURL()
 
             vars["%sImg" % crit] = ""
