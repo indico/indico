@@ -24,6 +24,7 @@
             \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Book of Abstracts")}}
             \fancyhead[R]{}
 
+            \phantomsection
             \addcontentsline{toc}{chapter}{${contrib.title | latex_escape} ${('{0}').format(contrib.id) if conf.getBOAConfig().getShowIds() else ''}
             }
 

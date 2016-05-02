@@ -31,6 +31,7 @@
         \newpage
         \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{80pt} / ${title}}
         \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.title | latex_escape}}{150pt}}
+        \phantomsection
         \addcontentsline{toc}{section}{${item.title | latex_escape}}
 
         % if doc_type == 'abstract':
