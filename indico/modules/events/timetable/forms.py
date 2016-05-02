@@ -68,10 +68,13 @@ class EntryFormMixin(object):
 
     @generated_data
     def start_dt(self):
-        dt = datetime.combine(self.day, self.time.data)
-        return self.event.tzinfo.localize(dt).astimezone(utc)
+        if self.time.data:
+            dt = datetime.combine(self.day, self.time.data)
+            return self.event.tzinfo.localize(dt).astimezone(utc)
 
     def validate_duration(self, field):
+        if not self.start_dt.data:
+            return
         end_dt = self.start_dt.data + field.data
         if self.session_block and end_dt > self.session_block.end_dt:
             raise ValidationError(_("{} exceeds session block end time. Adjust start time or duration.")
@@ -84,6 +87,8 @@ class EntryFormMixin(object):
                                   .format(self._entry_type.title.capitalize()))
 
     def validate_time(self, field):
+        if not field.data:
+            return
         if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
             raise ValidationError(_("{} can't be scheduled earlier than the event start time.")
                                   .format(self._entry_type.title.capitalize()))
