@@ -247,9 +247,9 @@ class TimetableEntry(db.Model):
     def siblings(self):
         tzinfo = self.event_new.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
-        criteria = [db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day,
-                    TimetableEntry.id != self.id,
-                    TimetableEntry.parent == self.parent]
+        criteria = (TimetableEntry.id != self.id,
+                    TimetableEntry.parent == self.parent,
+                    db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day)
         return TimetableEntry.query.with_parent(self.event_new).filter(*criteria)
 
     @locator_property
