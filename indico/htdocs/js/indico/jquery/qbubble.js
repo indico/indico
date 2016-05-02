@@ -41,8 +41,29 @@
             var self = this;
             var classes = self.options.style ? self.options.style.classes : '';
 
+            var originalHideCallback = self.options.events && self.options.events.hide;
+            var originalFocusCallback = self.options.events && self.options.events.focus;
+            function hideCallback(evt, api) {
+                if (self._hasNestedOpen) {
+                    evt.preventDefault();
+                } else if (originalHideCallback) {
+                    originalHideCallback(evt, api);
+                }
+            }
+            function focusCallback(evt, api) {
+                if (self._hasNestedOpen) {
+                    evt.preventDefault();
+                } else if (originalFocusCallback) {
+                    originalFocusCallback(evt, api);
+                }
+            }
+
             self.element.qtip($.extend(true, {}, self.defaultQtipOptions, self.options, {
-                style: {classes: 'qbubble ' + classes}
+                style: {classes: 'qbubble ' + classes},
+                events: $.extend(true, self.options.events, {
+                    hide: hideCallback,
+                    focus: focusCallback
+                })
             }));
 
             this._on({
@@ -70,6 +91,33 @@
         option: function(entry, value) {
             var self = this;
             self.element.qtip('option', entry, value);
+        },
+
+        createNested: function(elem, nestedQtipOptions) {
+            var self = this;
+            var originalHideCallback = nestedQtipOptions.events && nestedQtipOptions.events.hide;
+            var originalShowCallback = nestedQtipOptions.events && nestedQtipOptions.events.show;
+            $.extend(true, nestedQtipOptions, {
+                events: {
+                    show: function(evt, api) {
+                        if (originalShowCallback) {
+                            originalShowCallback(evt, api);
+                        }
+                        if (!evt.defaultPrevented) {
+                            self._hasNestedOpen = true;
+                        }
+                    },
+                    hide: function(evt, api) {
+                        if (originalHideCallback) {
+                            originalHideCallback(evt, api);
+                        }
+                        if (!evt.defaultPrevented) {
+                            self._hasNestedOpen = false;
+                        }
+                    }
+                }
+            });
+            elem.qbubble(nestedQtipOptions);
         }
     });
 })(jQuery);
