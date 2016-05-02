@@ -240,17 +240,24 @@ class _DateSF( _TrackAbstractsSortingField ):
     _id = "date"
 
     def compare( self, a1, a2 ):
-
         return cmp( a2.getSubmissionDate(), a1.getSubmissionDate() )
+
+
+class _RatingSF(_TrackAbstractsSortingField):
+    _id = 'rating'
+
+    def compare(self, a1, a2):
+        return cmp(a2.getRating(), a1.getRating())
 
 
 class TrackAbstractsSortingCrit( filters.SortingCriteria ):
     """
     """
-    _availableFields = { _ContribTypeSF.getId(): _ContribTypeSF, \
-                        _StatusSF.getId(): _StatusSF, \
-                        _NumberSF.getId(): _NumberSF, \
-                        _DateSF.getId(): _DateSF }
+    _availableFields = {_ContribTypeSF.getId(): _ContribTypeSF,
+                        _StatusSF.getId(): _StatusSF,
+                        _NumberSF.getId(): _NumberSF,
+                        _DateSF.getId(): _DateSF,
+                        _RatingSF.getId(): _RatingSF}
 
 
     def __init__( self, track, crit=[] ):
