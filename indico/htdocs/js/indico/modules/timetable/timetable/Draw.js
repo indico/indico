@@ -657,7 +657,10 @@ function loadBalloonContent(self, api, editable) {
                         dataType: 'json',
                         contentType: 'application/json',
                         error: handleAjaxError,
-                        complete: IndicoUI.Dialogs.Util.progress()
+                        complete: function() {
+                            self.setColors(text, background);
+                            killProgress();
+                        }
                     });
                 },
                 qtipConstructor: function(element, qtipOptions) {
