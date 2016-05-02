@@ -22,7 +22,8 @@
             availableColors: [],
             onSelect: null,
             numColumns: 5,
-            selectedColor: null
+            selectedColor: null,
+            qtipConstructor: null
         },
 
         _create: function() {
@@ -83,7 +84,7 @@
                 element.qtip('hide');
             });
 
-            element.qtip({
+            var qtipOptions = {
                 prerender: false,
                 overwrite: false,
                 style: {
@@ -111,7 +112,12 @@
                 events: {
                     show: self._updateSelection.bind(self)
                 }
-            });
+            }
+            if (self.options.qtipConstructor) {
+                self.options.qtipConstructor(element, qtipOptions);
+            } else {
+                element.qtip(qtipOptions);
+            }
         },
 
         _createTableRow: function() {
