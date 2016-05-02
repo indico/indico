@@ -650,6 +650,15 @@ function loadBalloonContent(self, api, editable) {
                 availableColors: $picker.data('palette'),
                 selectedColor: $picker.data('initial-color'),
                 onSelect: function(background, text) {
+                    $.ajax({
+                        url: $picker.data('href'),
+                        method: $picker.data('method'),
+                        data: JSON.stringify({'colors': {'text': text, 'background': background}}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        complete: IndicoUI.Dialogs.Util.progress()
+                    });
                 },
                 qtipConstructor: function(element, qtipOptions) {
                     var qtipId = $picker.closest('.qtip').data('qtip-id');

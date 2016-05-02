@@ -68,6 +68,8 @@
             <dd>
                 <a class="i-button icon-palette palette-picker palette-picker-trigger"
                    style="{{ block.session.colors.css }}"
+                   data-method="PATCH"
+                   data-href="{{ url_for('sessions.session_rest', block.session) }}"
                    data-palette={{ color_list | tojson }}
                    data-initial-color={{ block.session.colors.css | tojson}}
                    ></a>
