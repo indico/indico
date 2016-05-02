@@ -746,6 +746,9 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
     def _setActiveTab(self):
         pass
 
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['mathjax_js'].urls()
+
 
 class WConfModifMainData(wcomponents.WTemplated):
 
