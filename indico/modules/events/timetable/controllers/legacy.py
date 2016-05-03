@@ -234,7 +234,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         updated_entries = []
 
         if form.validate_on_submit():
-            with track_time_changes():
+            with track_time_changes(auto_extend='end', user=session.user) as changes:
                 if shift_later:
                     new_end_dt = form.start_dt.data + form.duration.data
                     shift = new_end_dt - self.entry.end_dt
@@ -246,10 +246,10 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
                     update_break_entry(item, data)
                 elif self.entry.session_block:
                     update_session_block(item, data)
-
+            notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo)
             updated_entries.append(item.timetable_entry)
             return jsonify_data(entries=[serialize_entry_update(entry) for entry in updated_entries], flash=False,
-                                shift_later=shift_later)
+                                shift_later=shift_later, notifications=notifications)
         self.commit = False
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
