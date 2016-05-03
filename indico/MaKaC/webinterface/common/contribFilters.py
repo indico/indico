@@ -31,7 +31,7 @@ class TypeFilterField( filters.FilterField ):
         elif contribution.type is None:
             return self._showNoValue
         else:
-            return contribution.type.id in self._values
+            return str(contribution.type.id) in self._values
 
 
 class TrackFilterField( filters.FilterField ):
@@ -77,7 +77,7 @@ class SessionFilterField( filters.FilterField ):
         if len(self._conf.sessions) == len(self._values) and contribution.session:
             return True
         elif contribution.session:
-            if contribution.session.id in self._values:
+            if str(contribution.session.id) in self._values:
                 return True
         else:
             return self._showNoValue
