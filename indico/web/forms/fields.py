@@ -436,7 +436,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         if not person_link:
             person_link = self.person_link_cls(person=person)
         person_link.populate_from_dict(person_data)
-        email = data.get('email', '')
+        email = data.get('email', '').lower()
         if email != person_link.email:
             if not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
