@@ -207,7 +207,7 @@ def generate_spreadsheet_from_contributions(contributions):
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
     rows = []
     for c in contributions:
-        contrib_data = {'Id': c.id, 'Title': c.title, 'Description': c.description,
+        contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
                         'Duration': format_human_timedelta(c.duration),
                         'Date': format_date(c.timetable_entry.start_dt) if c.timetable_entry else None,
                         'Type': c.type.name if c.type else None,
