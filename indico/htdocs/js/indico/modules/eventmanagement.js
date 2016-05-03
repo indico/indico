@@ -86,4 +86,11 @@
             class: 'warning'
         });
     };
+
+
+    global.handleRowSelection = function handleRowSelection() {
+        $('table.i-table input.select-row').on('change', function() {
+            $(this).closest('tr').toggleClass('selected', this.checked);
+        }).trigger('change');
+    };
 })(window);

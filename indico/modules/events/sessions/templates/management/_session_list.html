@@ -52,7 +52,9 @@
                                 </span>
                             </td>
                             <td class="i-table">
-                                <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}">
+                                <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}"
+                                      data-title="{% trans title=sess.title %}Blocks of the '{{ title }}'{% endtrans %}"
+                                      data-href="{{ url_for('sessions.session_blocks', sess) }}">
                                     {%- trans %}Session blocks {% endtrans -%}
                                     <span class="badge">{{ sess.blocks | length }}</span>
                                 </span>
@@ -92,38 +94,6 @@
                                 </div>
                             </td>
                         </tr>
-                        {% for block in sess.blocks -%}
-                            <tr class="i-table session-blocks-row" style="display: none;">
-                                <td class="i-table" colspan="9">
-                                    <table class="i-table no-margin">
-                                        <colgroup>
-                                            <col span="2">
-                                            <col span="8">
-                                        </colgroup>
-                                        <tr class="i-table content">
-                                            <td class="i-table caption">
-                                                {% trans %}Title{% endtrans %}
-                                            </td>
-                                            <td class="i-table value">{{ block.title }}</td>
-                                        </tr>
-                                        <tr class="i-table content">
-                                            <td class="i-table caption">
-                                                {% trans %}Duration{% endtrans %}
-                                            </td>
-                                            <td class="i-table value">{{ block.duration }}</td>
-                                        </tr>
-                                        <tr class="i-table content">
-                                            <td class="i-table caption">
-                                                {% trans %}Number of contributions{% endtrans %}
-                                            </td>
-                                            <td class="i-table value">
-                                                {{ block.contribution_count }}
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        {%- endfor %}
                     {%- endfor %}
                 </tbody>
             </table>

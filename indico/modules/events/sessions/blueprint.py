@@ -27,7 +27,8 @@ from indico.modules.events.sessions.controllers.management.sessions import (RHSe
                                                                             RHExportSessionsCSV, RHExportSessionsExcel,
                                                                             RHExportSessionsPDF, RHSessionREST,
                                                                             RHSessionPersonList, RHSessionProtection,
-                                                                            RHManageSessionBlock, RHSessionACL)
+                                                                            RHManageSessionBlock, RHSessionBlocks,
+                                                                            RHSessionACL)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -42,6 +43,7 @@ _bp.add_url_rule('/manage/sessions/sessions.csv', 'export_csv', RHExportSessions
 _bp.add_url_rule('/manage/sessions/sessions.xlsx', 'export_excel', RHExportSessionsExcel, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/sessions.pdf', 'export_pdf', RHExportSessionsPDF, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/<int:session_id>', 'session_rest', RHSessionREST, methods=('PATCH', 'DELETE'))
+_bp.add_url_rule('/manage/sessions/<int:session_id>/blocks', 'session_blocks', RHSessionBlocks)
 _bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/person-list/', 'person_list', RHSessionPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/protection', 'session_protection', RHSessionProtection,

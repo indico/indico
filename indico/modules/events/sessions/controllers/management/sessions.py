@@ -224,3 +224,8 @@ class RHManageSessionBlock(RHManageSessionBase):
         defaults.update((name, getattr(self.session, name[8:])) for name in fields if name.startswith('session_'))
         defaults.update((name, getattr(self.session_block, name[6:])) for name in fields if name.startswith('block_'))
         return defaults
+
+
+class RHSessionBlocks(RHManageSessionBase):
+    def _process(self):
+        return jsonify_template('events/sessions/management/session_blocks.html', sess=self.session)

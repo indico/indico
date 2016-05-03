@@ -45,6 +45,7 @@
         enableIfChecked('#sessions-wrapper', '.select-row', '#sessions .js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
+        handleRowSelection();
         setupSearchBox(filterConfig);
 
         $('#sessions .toolbar').on('click', '.disabled', function(evt) {
@@ -56,11 +57,13 @@
             setupTableSorter();
             setupPalettePickers();
             applySearchFilters();
+            handleRowSelection();
         }).on('click', '.show-session-blocks', function() {
             var $this = $(this);
-            if ($this.data('count')) {
-                $this.closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
-            }
+            ajaxDialog({
+                title: $this.data('title'),
+                url: $this.data('href')
+            });
         }).on('attachments:updated', function(evt) {
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
