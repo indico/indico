@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from pytz import timezone
 
 from flask import session
 from sqlalchemy.orm import defaultload
@@ -26,6 +27,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 from MaKaC.common.fossilize import fossilize
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 
@@ -204,7 +206,10 @@ class TimetableSerializer(object):
                 'textColor': '#' + obj.text_color}
 
     def _get_date_data(self, entry):
-        tzinfo = entry.event_new.tzinfo
+        if self.management:
+            tzinfo = entry.event_new.tzinfo
+        else:
+            tzinfo = timezone(entry.event_new.as_legacy.tz)
         return {'startDate': self._get_entry_date_dt(entry.start_dt, tzinfo),
                 'endDate': self._get_entry_date_dt(entry.end_dt, tzinfo)}
 
