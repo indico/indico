@@ -22,7 +22,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
 from indico.util.i18n import _
-from indico.util.date_time import now_utc, format_time
+from indico.util.date_time import now_utc
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem

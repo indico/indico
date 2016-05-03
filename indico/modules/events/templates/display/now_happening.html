@@ -18,7 +18,7 @@
                 <a href="{{ url }}">{{ obj.title }}</a>
                 {% if obj.room_name %} ({{ obj.room_name }}){% endif %}
                 <em>
-                    {{ entry.start_dt|format_time(timezone=event.timezone) }} - {{ entry.end_dt|format_time(timezone=event.timezone) }}
+                    {{ entry.start_dt|format_time(timezone=event.as_legacy.tz) }} - {{ entry.end_dt|format_time(timezone=event.as_legacy.tz) }}
                 </em>
             </span>
         {% endfor %}
