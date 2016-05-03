@@ -392,10 +392,11 @@ class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
 
     def _process_POST(self):
         self.serializer = TimetableSerializer(True)
-        with track_time_changes():
+        with track_time_changes(auto_extend=True, user=session.user) as changes:
             entry_data = self._move_entry(request.json)
         rv = dict(serialize_entry_update(self.entry), **entry_data)
-        return jsonify_data(flash=False, entry=rv)
+        notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
+        return jsonify_data(flash=False, entry=rv, notifications=notifications)
 
     def _move_entry(self, data):
         rv = {}

@@ -152,8 +152,6 @@ def move_timetable_entry(entry, parent=None, day=None):
     contrib_update_data = {}
     if day:
         new_start_dt = entry.start_dt.replace(day=day.day, month=day.month)
-        if new_start_dt < entry.event_new.start_dt:
-            raise UserValueError(_('You cannot move the block before event start date'))
         updates['start_dt'] = new_start_dt
         updates['parent'] = None
         contrib_update_data = {'session_id': None, 'session_block_id': None}

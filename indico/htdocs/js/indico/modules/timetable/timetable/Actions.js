@@ -169,6 +169,17 @@ type("TimetableManagementActions", [], {
                 }
 
                 self.timetable._updateMovedEntry(data.entry, data.entry.old.id);
+
+                if (data.notifications) {
+                    _.each(data.notifications, function(notification) {
+                        cornerMessage({
+                            message: notification,
+                            duration: 10000,
+                            class: 'highlight',
+                            actionLabel: $T.gettext('Close')
+                        });
+                    });
+                }
             }
         });
     },
