@@ -1,0 +1,20 @@
+<table class="i-table-widget">
+    <thead>
+        <tr class="i-table">
+            <th class="i-table">{% trans %}Title{% endtrans %}</th>
+            <th class="i-table">{% trans %}Start date{% endtrans %}</th>
+            <th class="i-table">{% trans %}Duration{% endtrans %}</th>
+            <th class="i-table">{% trans %}Contributions{% endtrans %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for block in sess.blocks %}
+            <tr class="i-table">
+                <td class="i-table">{{ block.title }}</td>
+                <td class="i-table">{{ block.start_dt|format_date }}</td>
+                <td class="i-table">{{ block.duration|format_human_timedelta }}</td>
+                <td class="i-table">{{ block.contribution_count }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
