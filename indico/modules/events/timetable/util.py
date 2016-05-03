@@ -247,7 +247,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 def render_entry_info_balloon(entry, editable=False, sess=None):
     if entry.break_:
         return render_template('events/timetable/balloons/break.html', break_=entry.break_, editable=editable,
-                               can_manage_event=entry.event_new.can_manage(session.user))
+                               can_manage_event=entry.event_new.can_manage(session.user), color_list=get_colors())
     elif entry.contribution:
         return render_template('events/timetable/balloons/contribution.html', contrib=entry.contribution,
                                editable=editable,

@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, MarkdownText
 
 
@@ -80,6 +81,10 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
+
+    @locator_property
+    def locator(self):
+        return dict(self.timetable_entry.event_new.locator, break_id=self.id)
 
 
 Break.register_location_events()

@@ -20,6 +20,7 @@ import dateutil.parser
 from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
@@ -32,6 +33,7 @@ from indico.modules.events.timetable.operations import (create_timetable_entry, 
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import track_time_changes
+from indico.web.forms.colors import get_colors
 
 
 class RHManageTimetable(RHManageTimetableBase):
@@ -145,3 +147,22 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
     def _process(self):
         html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
         return jsonify(html=html)
+
+
+class RHBreakREST(RHManageTimetableBase):
+    """RESTful operations for managing breaks."""
+
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        entry = self.event_new.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
+        self.break_ = entry.break_
+
+    def _process_PATCH(self):
+        data = request.json
+        if data.viewkeys() > {'colors'}:
+            raise BadRequest
+        if 'colors' in data:
+            colors = ColorTuple(**data['colors'])
+            if colors not in get_colors():
+                raise BadRequest
+            self.break_.colors = colors

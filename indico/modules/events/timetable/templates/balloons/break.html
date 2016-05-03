@@ -1,4 +1,4 @@
-{% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location %}
+{% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location, render_palette_picker %}
 
 <div class="balloon">
     <div class="title-container">
@@ -22,4 +22,7 @@
     </div>
     <div class="description">{{ break_.description }}</div>
     {{ render_time_and_location(break_, editable) }}
+    {% if editable %}
+        {{ render_palette_picker(break_, 'timetable.break_rest', color_list) }}
+    {% endif %}
 </div>

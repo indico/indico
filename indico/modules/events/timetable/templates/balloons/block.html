@@ -1,5 +1,5 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
-{% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location %}
+{% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location, render_palette_picker %}
 
 <div class="balloon">
     <div class="title-container session-block">
@@ -63,18 +63,7 @@
         {% endif %}
     </div>
     {% if editable %}
-        <dl class="i-data-list thirty-seventy">
-            <dt>{% trans %}Color{% endtrans %}</dt>
-            <dd>
-                <a class="i-button icon-palette palette-picker palette-picker-trigger"
-                   style="{{ block.session.colors.css }}"
-                   data-method="PATCH"
-                   data-href="{{ url_for('sessions.session_rest', block.session) }}"
-                   data-palette={{ color_list | tojson }}
-                   data-initial-color={{ block.session.colors.css | tojson}}
-                   ></a>
-            </dd>
-        </dl>
+        {{ render_palette_picker(block.session, 'sessions.session_rest', color_list) }}
     {% endif %}
     <span class="hr"></span>
     <div class="attribute">

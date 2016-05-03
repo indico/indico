@@ -33,3 +33,18 @@
         {% endif %}
     </dl>
 {% endmacro %}
+
+{% macro render_palette_picker(obj, endpoint, color_list) %}
+    <dl class="i-data-list thirty-seventy">
+        <dt>{% trans %}Color{% endtrans %}</dt>
+        <dd>
+            <a class="i-button icon-palette palette-picker palette-picker-trigger"
+               style="{{ obj.colors.css }}"
+               data-method="PATCH"
+               data-href="{{ url_for(endpoint, obj) }}"
+               data-palette="{{ color_list | tojson | forceescape }}"
+               data-initial-color="{{ obj.colors.css }}"
+               ></a>
+        </dd>
+    </dl>
+{% endmacro %}
