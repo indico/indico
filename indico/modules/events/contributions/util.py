@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from io import BytesIO
+from operator import attrgetter
 
 from flask import flash, session
 from pytz import timezone
@@ -34,7 +35,7 @@ from indico.modules.events.contributions.models.principals import ContributionPr
 from indico.modules.events.util import serialize_person_link, ReporterBase
 from indico.modules.attachments.util import get_attached_items
 from indico.util.caching import memoize_request
-from indico.util.date_time import format_human_timedelta, format_date
+from indico.util.date_time import format_human_timedelta, format_datetime
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.util.user import iter_acl
@@ -206,10 +207,10 @@ def generate_spreadsheet_from_contributions(contributions):
 
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
     rows = []
-    for c in contributions:
+    for c in sorted(contributions, key=attrgetter('friendly_id')):
         contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
                         'Duration': format_human_timedelta(c.duration),
-                        'Date': format_date(c.timetable_entry.start_dt) if c.timetable_entry else None,
+                        'Date': format_datetime(c.timetable_entry.start_dt) if c.timetable_entry else None,
                         'Type': c.type.name if c.type else None,
                         'Session': c.session.title if c.session else None,
                         'Track': c.track.title if c.track else None,
