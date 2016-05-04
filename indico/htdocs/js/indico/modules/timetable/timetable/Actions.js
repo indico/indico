@@ -326,6 +326,23 @@ type("TimetableManagementActions", [], {
             trigger: this,
             url: build_url(Indico.Urls.Timetable.sessionBlocks.add, urlArgs),
             title: $T.gettext("Add session block"),
+            onLoadError: function(xhr) {
+                if (xhr.status == 404) {
+                    handleErrorResponse(xhr);
+                } else {
+                    handleAjaxError(xhr);
+                }
+
+                return false;
+            },
+            onError: function(xhr) {
+                if (xhr.status == 404) {
+                    handleErrorResponse(xhr);
+                    $(this).trigger('ajaxDialog:close');
+                } else {
+                    handleAjaxError(xhr);
+                }
+            },
             onClose: function(data) {
                 if (data) {
                     self.timetable._updateEntry(data.entry);

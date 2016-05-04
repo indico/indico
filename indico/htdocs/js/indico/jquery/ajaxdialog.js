@@ -63,6 +63,7 @@
             onOpen: null,  // callback to invoke after opening the dialog.
             onLoadError: null,  // callback to invoke when loading the dialog fails.  receives the jqxhr object as an
                                 // argument.  if the function returns false, the default error handler is not invoked.
+            onError: null, // callback to invoke after triggering ajaxDialog:close event
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
             confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
             dialogClasses: '',  // extra classes to add to the dialog canvas
@@ -236,8 +237,12 @@
                     if (killProgress) {
                         killProgress();
                     }
-                    handleAjaxError(xhr);
                     e.preventDefault();
+                    if ($.isFunction(options.onError)) {
+                        options.onError.call($this, xhr);
+                    } else {
+                        handleAjaxError(xhr);
+                    }
                 }).on('ajaxDialog:success', function(e, data) {
                     if (killProgress) {
                         killProgress();
