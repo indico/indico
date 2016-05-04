@@ -446,7 +446,7 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
 
 
     _parseDayInterval: function(hash) {
-        var m = hash.match(/#(\d{8}|all)(?:\.((?:s\d+l\d+)|detailed))?/);
+        var m = hash.match(/#(\d{8}|all)(?:\.((?:s\d+)|detailed))?/);
 
         if (m) {
             return [m[1],m[2]];
