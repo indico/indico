@@ -17,6 +17,11 @@
 
 .ui-corner-all {
     @include border-radius();
+
+    .ui-dialog-content {
+        /* For some reason the dialogs don't get their bottom corners rounded without this. */
+        @include border-bottom-radius();
+    }
 }
 
 .ui-dialog {
