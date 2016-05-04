@@ -140,6 +140,8 @@
 
     table.i-table {
         table-layout: auto;
+        min-width: 360px;
+        margin-bottom: 1.5em;
 
         th, td {
             white-space: normal;
