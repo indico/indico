@@ -342,7 +342,7 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False, safe=True):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True):
     """Sends a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -350,8 +350,9 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     `mimetype` SHOULD be a proper MIME type such as image/png. It may also be an indico-style file type such as JPG.
     `last_modified` may contain a unix timestamp or datetime object indicating the last modification of the file.
     `no_cache` can be set to False to disable no-cache headers.
-    `inline` SHOULD be set to false only when you want to force the user's browser to download the file. Usually it is
-    much nicer if e.g. a PDF file can be displayed inline so don't disable it unless really necessary.
+    `inline` defaults to true except for certain filetypes like XML and CSV. It SHOULD be set to false only when you
+    want to force the user's browser to download the file. Usually it is much nicer if e.g. a PDF file can be displayed
+    inline so don't disable it unless really necessary.
     `conditional` is very useful when sending static files such as CSS/JS/images. It will allow the browser to retrieve
     the file only if it has been modified (based on mtime and size).
     `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
@@ -359,6 +360,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     """
 
     name = secure_filename(name, 'file')
+    if inline is None:
+        inline = mimetype not in ('XML', 'CSV')
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
