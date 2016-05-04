@@ -14,6 +14,10 @@ div.meetingEventBody {
     border-bottom-right-radius: 0.2em;
 }
 
+.dayList .day {
+    color: #555 !important;
+}
+
 body, html {
     height: auto;
 }
