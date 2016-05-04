@@ -126,8 +126,8 @@ class ContributionReporter(ReporterBase):
                        'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
             ('type', {'title': _('Type'),
                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            # TODO: Handle contribution status
-            ('status', {'title': _('Status'), 'filter_choices': {}})
+            ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
+                                                                 'unscheduled': _('Not scheduled')}})
         ])
 
         self.report_config = self._get_config()
@@ -148,7 +148,15 @@ class ContributionReporter(ReporterBase):
         if not filters.get('items'):
             return query
         criteria = []
-        # TODO: Handle contribution status
+        if 'status' in filters['items']:
+            filtered_statuses = filters['items']['status']
+            status_criteria = []
+            if 'scheduled' in filtered_statuses:
+                status_criteria.append(Contribution.is_scheduled)
+            if 'unscheduled' in filtered_statuses:
+                status_criteria.append(~Contribution.is_scheduled)
+            criteria.append(db.or_(*status_criteria))
+
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,
                        'type': Contribution.type_id}
