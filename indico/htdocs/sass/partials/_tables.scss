@@ -79,7 +79,6 @@ tr.i-table {
 
 td.i-table, th.i-table {
     @include box-sizing(border-box);
-    border-left: 2px solid transparent;
     overflow: hidden;
     padding: 5px 3px 5px 3px;
     text-overflow: ellipsis;
@@ -89,10 +88,6 @@ td.i-table, th.i-table {
     &.empty {
         color: $dark-gray;
         font-style: italic;
-    }
-
-    & ~ td.i-table {
-        border-left: none !important;
     }
 
     &.checkbox-column {
