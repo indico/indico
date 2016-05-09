@@ -17,6 +17,7 @@
 
 $i-form-height: 2.5em;
 $i-form-line-height: 1.5;
+$i-form-button-line-height: 1.8;
 
 %form-field-block {
     padding-left: 1em;
@@ -214,6 +215,11 @@ $i-form-line-height: 1.5;
     input[type="button"],
     input[type="submit"] {
         @extend %form-field-button;
+    }
+
+    a.i-button {
+        @extend %form-field-button;
+        line-height: $i-form-button-line-height;
     }
 
     .i-has-action.i-synced-input.i-form-field-fixed-width {
