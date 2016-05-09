@@ -99,14 +99,13 @@ class ContributionField(db.Model):
     # - abstract_values (AbstractFieldValue.contribution_field)
     # - contribution_values (ContributionFieldValue.contribution_field)
 
-    @property
-    def field(self):
+    def get_field(self, management=False):
         from indico.modules.events.contributions import get_contrib_field_types
         try:
             impl = get_contrib_field_types()[self.field_type]
         except KeyError:
             return None
-        return impl(self)
+        return impl(self, management)
 
     @return_ascii
     def __repr__(self):
