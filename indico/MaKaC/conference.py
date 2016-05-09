@@ -61,7 +61,6 @@ from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AccessWrapper
 from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
 from MaKaC.trashCan import TrashCanManager
-from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
@@ -1260,7 +1259,6 @@ class Conference(CommonObjectBase, Locatable):
         self._modifKey=""
         self._closed = False
         self._visibility = 999
-        self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
         self._sections = []
         self._enableSessionSlots = False
         self._enableSessions = False
@@ -2823,19 +2821,6 @@ class Conference(CommonObjectBase, Locatable):
                         break
         return sessions
 
-    def getManagedSession( self, av ):
-        ls = []
-        for session in self.getSessionList():
-            pending = False
-            if av != None:
-                for email in av.getEmails():
-                    if email in session.getAccessController().getModificationEmail():
-                        pending = True
-                        break
-            if av in session.getManagerList() or pending:
-                ls.append(session)
-        return ls
-
     def addSessionCoordinator(self,session,av):
         """Makes a user become coordinator for a session.
         """
@@ -2900,14 +2885,6 @@ class Conference(CommonObjectBase, Locatable):
         # available for the time being, but we keep the previous code for
         # further improvements
         return True
-
-    def getPendingQueuesMgr(self):
-        try:
-            if self._pendingQueuesMgr:
-                pass
-        except AttributeError, e:
-            self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
-        return self._pendingQueuesMgr
 
     def getAccessController(self):
         return self.__ac
@@ -3047,9 +3024,6 @@ class SessionChair(ConferenceParticipation):
         return False
 
     def isSessionCoordinator(self):
-        # pendings coordinators
-        if self.getEmail() in self._session.getConference().getPendingQueuesMgr().getPendingCoordinatorsKeys():
-            return True
         # coordinator list
         for coord in self._session.getCoordinatorList():
             if self.getEmail() == coord.getEmail():
