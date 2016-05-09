@@ -713,15 +713,7 @@ class ContributionFetcher(SessionContribFetcher):
     }
 
     def contribution(self, idlist):
-        event = Event.find(id=self._eventId, is_deleted=False).first()
-
-        def _iterate_objs(objIds):
-            for objId in objIds:
-                obj = event.contributions.filter_by(id=objId).one()
-                if obj is not None:
-                    yield obj
-
-        return self._process(_iterate_objs(idlist))
+        raise ServiceUnavailable
 
 
 class EventSearchFetcher(IteratedDataFetcher):
