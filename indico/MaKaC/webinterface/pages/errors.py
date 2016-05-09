@@ -183,7 +183,7 @@ class WAccessKeyError( WTemplated ):
         self._msg = msg
 
     def getVars( self ):
-        from MaKaC.conference import Conference,Material, Resource
+        from MaKaC.conference import Conference
         vars = WTemplated.getVars( self )
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"

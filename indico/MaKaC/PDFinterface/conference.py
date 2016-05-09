@@ -563,21 +563,6 @@ class TimetablePDFFormat:
         return self.tableContents
 
 
-def sortEntries(x,y):
-    if cmp(x.getStartDate(), y.getStartDate()):
-        return cmp(x.getStartDate(), y.getStartDate())
-    elif isinstance(x.getOwner(), conference.SessionSlot) and \
-            isinstance(y.getOwner(), conference.SessionSlot):
-        val = cmp(x.getOwner().getSession().getCode(), y.getOwner().getSession().getCode())
-
-        if val:
-            return val
-        else:
-            return cmp(x.getOwner().getSession().getTitle(), y.getOwner().getSession().getTitle())
-    else:
-        return cmp(x.getTitle(), y.getTitle())
-
-
 class TimeTablePlain(PDFWithTOC):
     def __init__(self, event, aw, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
                  pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False, tz=None):

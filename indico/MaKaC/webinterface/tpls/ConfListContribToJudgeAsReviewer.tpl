@@ -1,6 +1,5 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.timezoneUtils import nowutc %>
-<% from MaKaC.conference import ContribStatusNone %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
 

@@ -25,19 +25,7 @@ from indico.util.decorators import smart_decorator
 
 
 def uniqueId(obj):
-    from MaKaC import conference
-
-    # legacy objects
-    if isinstance(obj, conference.Contribution):
-        return '{}.{}'.format(obj.getConference().getId(), obj.getId())
-    elif isinstance(obj, conference.SubContribution):
-        return '{}.{}.{}'.format(obj.getConference().getId(), obj.getContribution().getId(), obj.getId())
-    elif isinstance(obj, conference.Session):
-        return '{}.s{}'.format(obj.getConference().getId(), obj.getId())
-    elif isinstance(obj, conference.SessionSlot):
-        return '{}.s{}.{}'.format(obj.getConference().getId(), obj.getSession().getId(), obj.getId())
-    # new objects
-    elif isinstance(obj, db.m.Contribution):
+    if isinstance(obj, db.m.Contribution):
         return '{}.{}'.format(obj.event_id, obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.id)
     elif isinstance(obj, db.m.SubContribution):
         return '{}.{}.{}'.format(

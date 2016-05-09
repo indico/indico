@@ -15,10 +15,6 @@
                             <div style="float: left;">${ _("in ")} ${elem['type']}:</div>
                             <div style="display: table-cell; vertical-align:middle; padding-bottom: 5px">
                                 <div style="float: left; padding: 0px 5px 0px 5px;"><a class="title" href="${elem['url']}">${elem['title']}</a></div>
-                                % if elem['type'] == "Session":
-                                    <div title="${ _("Session contributions")}" class="iconContribGoTo icon-list" aria-hidden="true" onclick="window.location='${elem['sessionContributionsURL']}'"></div>
-                                    <div title="${ _("Session timetable")}" class="iconContribGoTo icon-grid" aria-hidden="true" onclick="window.location='${elem['sessionTimetableURL']}'"></div>
-                                % endif
                             </div>
                         % else:
                             ${ _("Go back to:")}

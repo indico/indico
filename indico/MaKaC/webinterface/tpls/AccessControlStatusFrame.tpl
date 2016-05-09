@@ -1,11 +1,7 @@
 <%page args="parentName=None, privacy=None, parentPrivacy=None, statusColor=None, parentStatusColor=None, locator=None"/>
 <%
 termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName':'category'},
-            'Event':    {'name':'event', 'paramsKey': 'confId', 'parentName':'category'},
-            'Session':  {'name':'session', 'paramsKey': 'sessionId', 'parentName':'event'},
-            'Contribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'event'},
-            'InSessionContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'session'},
-            'SubContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'contribution'}
+            'Event':    {'name':'event', 'paramsKey': 'confId', 'parentName':'category'}
           }
 from MaKaC import conference as cmod
 %>

@@ -40,8 +40,7 @@ from indico.util.string import fix_broken_string, return_ascii, is_legacy_id, to
 
 import os
 import stat
-import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import session, request, has_request_context
 
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -293,10 +292,6 @@ class CommonObjectBase(CoreObject, Fossilizable):
             return get_attached_items(self, include_empty=False, include_hidden=False)
         elif isinstance(self, Conference):
             return get_attached_items(self.as_event, include_empty=False, include_hidden=False, preload_event=True)
-        elif isinstance(self, (Contribution, Session, SubContribution)):
-            warnings.warn('attached_items of legacy objects is not available anymore; returning empty list',
-                          DeprecationWarning, 2)
-            return {}
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
@@ -2203,20 +2198,6 @@ class Conference(CommonObjectBase, Locatable):
     def getReviewManager(self, contrib):
         return self.getConfPaperReview().getReviewManager(contrib)
 
-    def hasSomethingOnWeekend(self, day):
-        """Checks if the event has a session or contribution on the weekend indicated by `day`.
-
-        `day` must be either a saturday or a sunday"""
-        if day.weekday() == 5:
-            weekend = (day, day + timedelta(days=1))
-        elif day.weekday() == 6:
-            weekend = (day, day - timedelta(days=1))
-        else:
-            raise ValueError('day must be on a weekend')
-        return (any(c.startDate.date() in weekend and not isinstance(c.getCurrentStatus(), ContribStatusWithdrawn)
-                    for c in self.contributions.itervalues() if c.startDate is not None) or
-                any(s.startDate.date() in weekend for s in self.sessions.itervalues() if s.startDate is not None))
-
     def getProgramDescription(self):
         try:
             return self.programDescription
@@ -2728,58 +2709,6 @@ class ConferenceHolder( ObjectHolder ):
             raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(id),
                                 title=_("Event not found"))
         return event
-
-
-class Session(CommonObjectBase, Locatable):
-    pass
-
-
-class SessionSlot(Persistent, Fossilizable, Locatable):
-    pass
-
-
-class ContributionParticipation(Persistent, Fossilizable):
-    pass
-
-
-class Contribution(CommonObjectBase, Locatable):
-    pass
-
-
-class AcceptedContribution(Contribution):
-    pass
-
-
-class ContribStatus(Persistent):
-    pass
-
-
-class ContribStatusWithdrawn(ContribStatus):
-    pass
-
-
-class ContribStatusNone(ContribStatus):
-    pass
-
-
-class SubContribParticipation(Persistent, Fossilizable):
-    pass
-
-
-class SubContribution(CommonObjectBase, Locatable):
-    pass
-
-
-class Material(CommonObjectBase):
-    pass
-
-
-class BuiltinMaterial(Material):
-    pass
-
-
-class Reviewing(BuiltinMaterial):
-    pass
 
 
 class Resource(CommonObjectBase):

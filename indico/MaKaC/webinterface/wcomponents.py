@@ -956,12 +956,6 @@ class WDomainControlFrame(WTemplated):
         if isinstance(self._target, conference.Conference):
             tpl_vars['method'] = 'event.protection.toggleDomains'
             event = self._target
-        elif isinstance(self._target, conference.Contribution):
-            tpl_vars['method'] = 'contribution.protection.toggleDomains'
-            event = self._target.getConference()
-        elif isinstance(self._target, conference.Session):
-            tpl_vars['method'] = 'session.protection.toggleDomains'
-            event = self._target.getConference()
         else:
             tpl_vars['method'] = 'category.protection.toggleDomains'
             event = None
