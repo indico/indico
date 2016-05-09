@@ -28,10 +28,13 @@ from indico.web.flask.util import url_for
 
 
 class XMLEventSerializer(object):
-    def __init__(self, event, user=None):
+    def __init__(self, event, user=None, include_timetable=False, event_tag_name='event', include_announcer_email=None):
         self._user = user
         self._include_email = event.can_manage(user)
         self._event = event
+        self._event_tag_name = event_tag_name
+        self._include_timetable = include_timetable
+        self._include_announcer_email = include_announcer_email
 
     def serialize_event(self):
         xml = self._serialize_event(self._event)
@@ -95,7 +98,7 @@ class XMLEventSerializer(object):
         xml.text = tzinfo.zone
         return xml
 
-    def _serialize_user(self, user):
+    def _serialize_user(self, user, include_email=None):
         xml = Element('user')
         SubElement(xml, 'title').text = unicode(user.title)  # _LazyString not supported by lxml
         SubElement(xml, 'name', {
@@ -103,7 +106,7 @@ class XMLEventSerializer(object):
             'last': user.last_name
         })
         SubElement(xml, 'organization').text = user.affiliation
-        if self._include_email:
+        if include_email or (include_email is None and self._include_email):
             SubElement(xml, 'email').text = user.email
         SubElement(xml, 'emailHash').text = md5(user.email).hexdigest()
         SubElement(xml, 'userid').text = str(user.id)
@@ -130,7 +133,7 @@ class XMLEventSerializer(object):
             self._tz = timezone(self._user.settings.get('timezone'))
         else:
             self._tz = event.tzinfo
-        xml = Element('iconf')
+        xml = Element(self._event_tag_name)
         SubElement(xml, '_deprecated').text = 'True'
         SubElement(xml, 'ID').text = str(event.id)
         SubElement(xml, 'category').text = event.category.name
@@ -139,7 +142,8 @@ class XMLEventSerializer(object):
             SubElement(xml, 'modifyLink').text = self._url_for('event_mgmt.conferenceModification', event)
             SubElement(xml, 'cloneLink').text = self._url_for('event_mgmt.confModifTools-clone', event)
         SubElement(xml, 'iCalLink').text = self._url_for('events.export_event_ical', event)
-        SubElement(xml, 'announcer').append(self._serialize_user(event.creator))
+        SubElement(xml, 'announcer').append(self._serialize_user(event.creator,
+                                                                 include_email=self._include_announcer_email))
         xml.append(self._serialize_support_info(event.as_legacy.getSupportInfo()))
         SubElement(xml, 'title').text = event.title
         SubElement(xml, 'description').text = event.description
@@ -150,8 +154,9 @@ class XMLEventSerializer(object):
         SubElement(xml, 'creationDate').text = self._format_date(event.as_legacy.getCreationDate())
         SubElement(xml, 'modificationDate').text = self._format_date(event.as_legacy.getModificationDate())
         xml.append(self._serialize_timezone(self._tz))
-        for entry in event.timetable_entries.filter(TimetableEntry.parent == None):
-            xml.append(self._serialize_timetable_entry(entry))
+        if self._include_timetable:
+            for entry in event.timetable_entries.filter(TimetableEntry.parent == None):
+                xml.append(self._serialize_timetable_entry(entry))
         return xml
 
     def _serialize_session_block(self, session_block):

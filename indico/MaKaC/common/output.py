@@ -40,6 +40,7 @@ from MaKaC.common.TemplateExec import escapeHTMLForJS
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.legacy import XMLEventSerializer
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
@@ -110,7 +111,7 @@ class outputGenerator(object):
         xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
         if not os.path.exists(stylesheet):
             self.text = _("Cannot find stylesheet")
-        if os.path.basename(stylesheet) == "xml.xsl":
+        if os.path.basename(stylesheet) == 'XML.xsl':
             self.text = xml
         else:
             # instanciate the XSL tool
@@ -137,13 +138,8 @@ class outputGenerator(object):
         """
         conf: conference object
         """
-        if not out:
-            out = self._XMLGen
-        #out.initXml()
-        out.openTag("iconf")
-        self._confToXML(conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution, out=out)
-        out.closeTag("iconf")
-        return out.getXml()
+        serializer = XMLEventSerializer(conf.as_event, include_timetable=includeContribution, event_tag_name='iconf')
+        return serializer.serialize_event()
 
     def _userToXML(self, obj, user, out):
         out.openTag("user")

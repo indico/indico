@@ -165,7 +165,8 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
 
         view = self._reqParams.get('view')
         if view == 'xml':
-            serializer = XMLEventSerializer(self.event_new, session.user)
+            serializer = XMLEventSerializer(self.event_new, user=session.user, include_timetable=True,
+                                            event_tag_name='iconf')
             return Response(serializer.serialize_event(), mimetype='text/xml')
         else:
             p = self.render_meeting_page(self._conf, view, self._reqParams.get('fr') == 'no')
@@ -265,22 +266,13 @@ class RHAbstractBook(RHConferenceBaseDisplay):
 
 
 class RHConferenceToXML(RHConferenceBaseDisplay):
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._xmltype = params.get("xmltype","standard")
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
 
     def _process(self):
         filename = "%s - Event.xml" % self._target.getTitle()
-        from MaKaC.common.xmlGen import XMLGen
-        from MaKaC.common.output import outputGenerator
-        xmlgen = XMLGen()
-        xmlgen.initXml()
-        outgen = outputGenerator(self.getAW(), xmlgen)
-        xmlgen.openTag("event")
-        outgen.confToXML(self._target.getConference(),0,0,1)
-        xmlgen.closeTag("event")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
+        serializer = XMLEventSerializer(self.event_new, user=session.user, include_announcer_email=True)
+        return send_file(filename, StringIO(serializer.serialize_event()), 'XML')
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
