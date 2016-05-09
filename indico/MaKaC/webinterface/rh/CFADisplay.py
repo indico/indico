@@ -33,6 +33,7 @@ from MaKaC.errors import MaKaCError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.string import to_unicode
 from indico.web.flask.util import send_file
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
@@ -182,7 +183,7 @@ class _AbstractSubmissionNotification:
         msg.append("")
         msg.append(i18nformat("""_("Comments"): %s""") % self._abstract.getComments())
         msg.append("")
-        return "\n".join(msg)
+        return "\n".join(map(to_unicode, msg))
 
     def getBody(self):
         msg = self.getMsg()
