@@ -13,21 +13,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import session, has_request_context
 
-from pytz import timezone, all_timezones
-from datetime import datetime, timedelta
 import calendar
 import time
+from datetime import datetime
+
+from flask import session, has_request_context
+from pytz import timezone, all_timezones
+
 from indico.core.config import Config
 
 
 def nowutc():
     return timezone('UTC').localize(datetime.utcnow())
 
+
 def server2utc(date):
     servertz = Config.getInstance().getDefaultTimezone()
     return timezone(servertz).localize(date).astimezone(timezone('UTC'))
+
 
 def utc2server(date, naive=True):
     date = date.replace(tzinfo=None)
@@ -36,6 +40,7 @@ def utc2server(date, naive=True):
     if naive:
         return servertime.replace(tzinfo=None)
     return servertime
+
 
 def date2utctimestamp(date):
     """ Note by DavidMC: I believe this implementation is flawed. At least in my PC
@@ -46,11 +51,13 @@ def date2utctimestamp(date):
     """
     return int(time.mktime(date.utctimetuple()))
 
+
 def utctimestamp2date(ts):
     """ Note by DavidMC: This function returns a naive datetime.
         You should use timezoneUtils.unixTimeToDatetime instead.
     """
     return datetime.utcfromtimestamp(ts)
+
 
 def isTimezoneAware(datetime):
     """ Takes a datetime object and returns True if it is timezone-aware (has tzinfo)
@@ -74,6 +81,7 @@ def naive2local(naiveDateTime, localTimezone):
     localDateTime = utcDateTime.astimezone(timezone(localTimezone))
     return localDateTime
 
+
 def setAdjustedDate(date, object=None, tz=None):
     # Localizes a date to the timezone tz
     # tz can be a string (preferred) or a pytz.timezone object
@@ -85,6 +93,7 @@ def setAdjustedDate(date, object=None, tz=None):
     if tz.zone not in all_timezones:
         tz = timezone('UTC')
     return tz.localize(date).astimezone(timezone('UTC'))
+
 
 def getAdjustedDate(date, object=None, tz=None):
     # Returns a date adjusted to the timezone tz
@@ -98,44 +107,6 @@ def getAdjustedDate(date, object=None, tz=None):
         tz = timezone('UTC')
     return date.astimezone(tz)
 
-def isToday(date, tz):
-    """ Returns if a date is inside the current day (given a timezone)
-        date: a timezone-aware datetime
-    """
-    today = getAdjustedDate(nowutc(), None, tz).date()
-    day = getAdjustedDate(date, None, tz).date()
-    return today == day
-
-def isTomorrow(date, tz):
-    """ Returns if a date is inside the day tomorrow (given a timezone)
-        date: a timezone-aware datetime
-    """
-    tomorrow = getAdjustedDate(nowutc(), None, tz).date() + timedelta(days=1)
-    day = getAdjustedDate(date, None, tz)
-    return tomorrow == day
-
-def isYesterday(date, tz):
-    """ Returns if a date is inside the day yesterday (given a timezone)
-        date: a timezone-aware datetime
-    """
-    yesterday = getAdjustedDate(nowutc(), None, tz).date() - timedelta(days=1)
-    day = getAdjustedDate(date, None, tz)
-    return yesterday == day
-
-def isSameDay(date1, date2, tz):
-    """ Returns if 2 datetimes occur the same day (given a timezone)
-    """
-    return getAdjustedDate(date1, None, tz).date() == getAdjustedDate(date2, None, tz).date()
-
-def dayDifference(date1, date2, tz):
-    """ Returns the difference in datetimes between 2 dates: date1 - date2 (given a timezone).
-        For example the following 2 UTC dates: 25/07 21:00 and 26/07 03:00 may be on a different day in Europe,
-        but they wouldn't be in Australia, for example
-        date1, date2: timezone-aware datetimes.
-    """
-    day1 = getAdjustedDate(date1, None, tz).date()
-    day2 = getAdjustedDate(date2, None, tz).date()
-    return (day1 - day2).days
 
 def datetimeToUnixTime(t):
     """ Gets a datetime object
@@ -143,11 +114,13 @@ def datetimeToUnixTime(t):
     """
     return calendar.timegm(t.utctimetuple()) + t.microsecond / 1000000.0
 
+
 def datetimeToUnixTimeInt(t):
     """ Gets a datetime object
         Returns an int with the number of seconds from the UNIX epoch
     """
     return calendar.timegm(t.utctimetuple())
+
 
 def unixTimeToDatetime(seconds, tz='UTC'):
     """ Gets a float (or an object able to be turned into a float) representing the seconds from the UNIX epoch,
@@ -156,15 +129,6 @@ def unixTimeToDatetime(seconds, tz='UTC'):
     """
     return datetime.fromtimestamp(float(seconds), timezone(tz))
 
-def maxDatetime():
-    """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
-    """
-    return setAdjustedDate(datetime.max, tz='UTC')
-
-def minDatetime():
-    """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
-    """
-    return setAdjustedDate(datetime.min, tz='UTC')
 
 class DisplayTZ:
 
