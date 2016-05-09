@@ -41,11 +41,12 @@ from indico.util.string import fix_broken_string, return_ascii, is_legacy_id, to
 import os
 import stat
 from datetime import datetime
-from flask import session, request, has_request_context
+from operator import methodcaller
 
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
+from flask import session, request, has_request_context
 from pytz import timezone
 from pytz import all_timezones
 
@@ -795,13 +796,12 @@ class Category(CommonObjectBase):
             sortType=3--> Alphabetically - Reversed
         """
 
-        res = sorted(self.conferences, cmp=Conference._cmpByDate)
+        res = sorted(self.conferences, key=methodcaller('getStartDate'))
 
         if sortType == 2:
-            res.sort(Conference._cmpTitle)
+            res.sort(key=lambda x: x.getTitle().lower().strip())
         elif sortType == 3:
-            res.sort(Conference._cmpTitle)
-            res = reversed(res)
+            res.sort(key=lambda x: x.getTitle().lower().strip(), reversed=True)
         return res
 
     def iterConferences(self):
@@ -1345,14 +1345,6 @@ class Conference(CommonObjectBase, Locatable):
     @memoize_request
     def has_feature(self, feature):
         return self.as_event.has_feature(feature)
-
-    @staticmethod
-    def _cmpByDate(self, toCmp):
-        res = cmp(self.getStartDate(), toCmp.getStartDate())
-        if res != 0:
-            return res
-        else:
-            return cmp(self, toCmp)
 
     def __cmp__(self, toCmp):
         if isinstance(toCmp, Conference):
@@ -2628,12 +2620,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def getAccessController(self):
         return self.__ac
-
-    @staticmethod
-    def _cmpTitle(c1, c2):
-        o1 = c1.getTitle().lower().strip()
-        o2 = c2.getTitle().lower().strip()
-        return cmp(o1, o2)
 
     def getBadgeTemplateManager(self):
         try:
