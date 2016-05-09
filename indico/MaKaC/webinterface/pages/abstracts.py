@@ -31,7 +31,6 @@ from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.common.TemplateExec import render
 
@@ -319,7 +318,7 @@ class WAbstractDisplay(wcomponents.WTemplated):
         vars["withdrawURL"] = str(urlHandlers.UHAbstractWithdraw.getURL(self._abstract))
         vars["recoverURL"] = str(urlHandlers.UHAbstractRecovery.getURL(self._abstract))
 
-        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["attachments"] = self._abstract.getAttachments().values()
         vars["abstract"] = self._abstract
 
         vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
@@ -429,8 +428,6 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         vars["attachedFilesAllowed"] = cfaMgr.canAttachFiles()
         vars["showSelectAsSpeaker"] = cfaMgr.showSelectAsSpeaker()
         vars["isSelectSpeakerMandatory"] = cfaMgr.isSelectSpeakerMandatory()
-        #TODO: In case of error we will lose the attached files, we should keep them somehow
-        vars["attachments"] = fossilize(vars.get("attachments", []), ILocalFileAbstractMaterialFossil)
         return vars
 
 
@@ -794,7 +791,7 @@ class WAbstractManagment(wcomponents.WTemplated):
             vars["rating"] = "%.2f" % rating
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
-        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["attachments"] = self._abstract.getAttachments().values()
         vars["confId"] = self._conf.getId()
         vars["confTitle"] = self._conf.getTitle()
         vars["submitterFullName"] = self._abstract.getSubmitter().getFullName()

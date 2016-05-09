@@ -77,12 +77,12 @@
                             </ul>
                         </div>
                     % endif
-                    % if len(attachments) != 0:
+                    % if attachments:
                         <div class="column files">
                             <h2>${_("Attached files")}</h2>
                             <ul>
                                 % for file in attachments:
-                                    <li class="icon-file"><a href="${file['url']}">${ file["file"]["fileName"] }</a></li>
+                                    <li class="icon-file"><a href="${ url_for('event.abstractDisplay-getAttachedFile', file) }">${ file.getFileName() }</a></li>
                                 % endfor
                             </ul>
                         </div>

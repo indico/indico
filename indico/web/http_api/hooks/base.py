@@ -389,9 +389,7 @@ class IteratedDataFetcher(DataFetcher):
         return fossil
 
     def _makeFossil(self, obj, iface):
-        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
-                         filters={'access': self._userAccessFilter},
-                         mapClassType={'AcceptedContribution': 'Contribution'})
+        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ, filters={'access': self._userAccessFilter})
 
     def _process(self, iterator, filter=None, iface=None):
         if iface is None:

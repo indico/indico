@@ -27,7 +27,6 @@ import StringIO
 from lxml import etree
 
 import MaKaC.conference as conference
-import MaKaC.schedule as schedule
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xmlGen import XMLGen
 import os

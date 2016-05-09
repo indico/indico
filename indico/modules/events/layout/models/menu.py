@@ -66,9 +66,9 @@ class MenuEntryMixin(object):
             if self.name == 'timetable':
                 from indico.modules.events. layout import layout_settings
                 if layout_settings.get(self.event, 'timetable_by_room'):
-                    kwargs['ttLyt'] = 'room'
+                    kwargs['layout'] = 'room'
                 if layout_settings.get(self.event, 'timetable_detailed'):
-                    start_date = self.event.getSchedule().getAdjustedStartDate()
+                    start_date = self.event.getAdjustedStartDate()
                     kwargs['_anchor'] = start_date.strftime('%Y%m%d.detailed')
             return url_for(data.endpoint, self.event, _external=False, **kwargs)
         elif self.is_plugin_link:

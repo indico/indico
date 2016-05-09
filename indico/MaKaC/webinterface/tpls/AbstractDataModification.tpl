@@ -259,7 +259,7 @@ function onsubmitDisplayActions() {
 
 % if attachedFilesAllowed:
 // attached files
-var initialFiles = ${ attachments | n,j };
+var initialFiles = ${ [{'name': f.getFileName(), 'url': url_for('event.abstractDisplay-getAttachedFile', f)} for f in attachments] | n,j };
 var attachedFilesManager = new AbstractFilesManager($E('inPlaceMaterial'), $E('inPlaceExistingMaterial'), $E('uploadFileLink'), $E('sizeError'), initialFiles);
 % endif
 

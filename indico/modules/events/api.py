@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import fnmatch
-import itertools
 import re
 import pytz
 from datetime import datetime
@@ -40,15 +39,10 @@ from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
-
 from indico.web.flask.util import url_for
-from indico.web.http_api.fossils import (IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil,
-                                         IConferenceMetadataWithSubContribsFossil,
-                                         IConferenceMetadataWithSessionsFossil, IPeriodFossil,
-                                         ICategoryMetadataFossil, ICategoryProtectedMetadataFossil,
-                                         ISessionMetadataWithContributionsFossil,
-                                         ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,
-                                         IContributionMetadataWithSubContribsFossil)
+from indico.web.http_api.fossils import (IConferenceMetadataFossil, IPeriodFossil,
+                                         ICategoryMetadataFossil, ICategoryProtectedMetadataFossil)
+from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
@@ -407,13 +401,6 @@ class SerializerBase(object):
 
 
 class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
-    DETAIL_INTERFACES = {
-        'events': IConferenceMetadataFossil,
-        'contributions': IConferenceMetadataWithContribsFossil,
-        'subcontributions': IConferenceMetadataWithSubContribsFossil,
-        'sessions': IConferenceMetadataWithSessionsFossil
-    }
-
     def __init__(self, aw, hook):
         super(CategoryEventFetcher, self).__init__(aw, hook)
         self._eventType = hook._eventType
@@ -457,30 +444,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         path.append({"visibility": {"name": visibilityName}})
         return path
 
-    @staticmethod
-    def _eventDaysIterator(conf):
-        """
-        Iterates over the daily times of an event
-        """
-        sched = conf.getSchedule()
-        for day in iterdays(conf.getStartDate(), conf.getEndDate()):
-            # ignore days that have no occurrences
-            if sched.getEntriesOnDay(day):
-                startDT = sched.calculateDayStartDate(day)
-                endDT = sched.calculateDayEndDate(day)
-                if startDT != endDT:
-                    yield Period(startDT, endDT)
-
-    def _addOccurrences(self, fossil, obj, startDT, endDT):
-        if self._occurrences:
-            (startDT, endDT) = (startDT or MIN_DATETIME,
-                                endDT or MAX_DATETIME)
-            # get occurrences in the date interval
-            fossil['occurrences'] = fossilize(itertools.ifilter(
-                lambda x: x.startDT >= startDT and x.endDT <= endDT, self._eventDaysIterator(obj)),
-                {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
-        return fossil
-
     def _calculate_occurrences(self, event, from_dt, to_dt, tz):
         start_dt = max(from_dt, event.start_dt) if from_dt else event.start_dt
         end_dt = min(to_dt, event.end_dt) if to_dt else event.end_dt
@@ -488,13 +451,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             first_start, last_end = find_event_day_bounds(event, day.date())
             if first_start is not None:
                 yield Period(first_start, last_end)
-
-    def _makeFossil(self, obj, iface):
-        legacy_obj = obj.as_legacy if isinstance(obj, Event) else obj
-        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
-                         filters={'access': self._userAccessFilter},
-                         canModify=legacy_obj.canModify(self._aw),
-                         mapClassType={'AcceptedContribution': 'Contribution'})
 
     def _get_query_options(self, detail_level):
         acl_user_strategy = joinedload('acl_entries').joinedload('user')
@@ -658,11 +614,6 @@ class SessionHook(SessionContribHook):
 
 
 class SessionFetcher(SessionContribFetcher, SerializerBase):
-    DETAIL_INTERFACES = {
-        'contributions': ISessionMetadataWithContributionsFossil,
-        'subcontributions': ISessionMetadataWithSubContribsFossil,
-    }
-
     def __init__(self, aw, hook):
         super(SessionFetcher, self).__init__(aw, hook)
         self.user = getattr(aw.getUser(), 'user', None)
@@ -707,11 +658,6 @@ class ContributionHook(SessionContribHook):
 
 
 class ContributionFetcher(SessionContribFetcher):
-    DETAIL_INTERFACES = {
-        'contributions': IContributionMetadataFossil,
-        'subcontributions': IContributionMetadataWithSubContribsFossil,
-    }
-
     def contribution(self, idlist):
         raise ServiceUnavailable
 

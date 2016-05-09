@@ -28,7 +28,6 @@ from MaKaC.common import filters
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
 from MaKaC.common.TemplateExec import render
 
@@ -879,7 +878,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["lastJudgementComment"] = self._getLastJudgementComment()
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
-        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["attachments"] = self._abstract.getAttachments().values()
         vars["showAcceptButton"] = self._abstract.getConference().getConfAbstractReview().canReviewerAccept()
         vars["acceptURL"] = quoteattr(str(urlHandlers.UHTrackAbstractAccept.getURL(self._track, self._abstract)))
         vars["rejectURL"] = quoteattr(str(urlHandlers.UHTrackAbstractReject.getURL(self._track, self._abstract)))

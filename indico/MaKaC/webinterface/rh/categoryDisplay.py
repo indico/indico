@@ -523,15 +523,9 @@ class UtilsConference:
 
 
 class RHCategoryGetIcon(RHCategDisplayBase):
-
-    def _checkProtection( self ):
-        # Since the object of the request is the icon, and not
-        # the conference, we do a first check for the icon
-        icon = self._target.getIcon()
-        if icon.canAccess( self.getAW() ):
-            return
-        else:
-            RHCategDisplayBase._checkProtection(self)
+    def _checkProtection(self):
+        # icons were always set to fully public during upload, so no need for an access check
+        pass
 
     def _process(self):
         icon = self._target.getIcon()

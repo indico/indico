@@ -45,7 +45,7 @@ class RHTimetable(RHConferenceBaseDisplay):
             event_info = serialize_event_info(self.event_new)
             timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
             return self.view_class.render_template('display.html', self._conf, event_info=event_info,
-                                                      timetable_data=timetable_data, timetable_layout=self.layout)
+                                                   timetable_data=timetable_data, timetable_layout=self.layout)
         else:
             page = WPTPLConferenceDisplay(self, self._conf, view=self.event_new.theme, type='meeting', params={})
             return page.display()

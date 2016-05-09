@@ -346,10 +346,6 @@ class UHConfCFAAllowAttachFiles(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-switchAttachFiles'
 
 
-class UHAbstractAttachmentFileAccess(URLHandler):
-    _endpoint = 'event.abstractDisplay-getAttachedFile'
-
-
 class UHConfCFAShowSelectAsSpeaker(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-switchShowSelectSpeaker'
 

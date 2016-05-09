@@ -70,7 +70,7 @@
         </td>
         <td bgcolor="white" valign="top">
             % for file in attachments:
-                <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                <div style="padding-bottom:3px;"><a href=${ url_for('event.abstractDisplay-getAttachedFile', file) }">${ file.getFileName() }</a></div>
             % endfor
         </td>
     </tr>

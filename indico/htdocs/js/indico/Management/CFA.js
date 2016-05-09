@@ -736,7 +736,7 @@ type("AbstractFilesManager", [],
     _buildExistingElement: function(pos) {
         var file = this.initialMaterial[pos];
         var div = Html.div({id: 'divExFile_' + pos, className: 'existingAttachment'});
-        var a = Html.a({href: file['url']}, file['file']['fileName']);
+        var a = Html.a({href: file['url']}, file['name']);
         var fileId = this._extractFileIdFromUrl(file['url']);
         div.append(a);
         var imageRemove = this._getImageRemove(pos);

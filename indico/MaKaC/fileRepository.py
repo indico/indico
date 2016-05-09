@@ -128,43 +128,18 @@ class MaterialLocalRepository(Persistent):
             conf = newFile.getConference()
 
             abstract = None
-            session = None
-            cont = None
-            subcont = None
-            registrant = None
 
-            if (isinstance(newFile.getOwner(), Abstract)):
+            if isinstance(newFile.getOwner(), Abstract):
                 abstract = newFile.getOwner()
-            else:
-                session = newFile.getSession()
-                cont = newFile.getContribution()
-                subcont = newFile.getSubContribution()
 
             try:
                 year = str(conf.getCreationDate().year)
             except:
                 year= str(datetime.datetime.now().year)
             interPath = os.path.join(year, "C%s"%conf.getId())
-            if cont:
-                #the file is in a contribution, then create a directory for the contribution
-
-                interPath = os.path.join( interPath, "c%s"%cont.getId())
-
-                if subcont:
-                    #the file is in a subcontribution, then create a directory for the subcontribution
-                    interPath = os.path.join( interPath, "sc%s"%subcont.getId())
-            elif session:
-                #the file is attach to a session, but not to a contribution. Then create a directory for the session
-                interPath = os.path.join( interPath, "s%s"%session.getId())
-            elif abstract:
-                #the file is attach to an abstract. Then create a directory for the abstract
-                interPath = os.path.join( interPath, "abs%s"%abstract.getId())
-            elif registrant:
-                #the file is attach to a a registrant. Then create a directory for the registrant
-                interPath = os.path.join( interPath, "reg%s"%registrant.getId())
-            else:
-                #the file is attach directly to the conference, then don't add directory
-                pass
+            if abstract:
+                # the file is attach to an abstract. Then create a directory for the abstract
+                interPath = os.path.join(interPath, "abs%s" % abstract.getId())
         from MaKaC.common import info
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()

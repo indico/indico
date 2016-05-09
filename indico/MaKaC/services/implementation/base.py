@@ -320,9 +320,6 @@ class ProtectedModificationService(ProtectedService):
         """
 
         target = self._target
-        if (type(target) == conference.SessionSlot):
-            target = target.getSession()
-
         if not target.canModify( self.getAW() ):
             if target.getModifKey() != "":
                 raise ServiceAccessError("You don't have the rights to modify this object")

@@ -1227,7 +1227,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         self.getAttachments()[file.getId()] = file
         self._notifyModification()
 
-
     def saveFiles(self, files):
         cfg = Config.getInstance()
         from MaKaC.conference import LocalFile

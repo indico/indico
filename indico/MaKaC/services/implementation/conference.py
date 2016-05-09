@@ -121,20 +121,6 @@ class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
         ProtectedModificationService._checkParams(self)
 
 
-class ConferenceScheduleModifBase(ConferenceModifBase):
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        if not self._params.has_key("scheduleEntry"):
-            raise ServiceError("ERR-E4", "No scheduleEntry id set.")
-        self._schEntry = self._conf.getSchedule().getEntryById(self._params["scheduleEntry"])
-        if self._schEntry is None:
-            raise NoReportError(_("It seems that the entry has been deleted or moved, please refresh the page"))
-
-    def _checkProtection(self):
-        self._target = self._schEntry.getOwner()
-        ConferenceModifBase._checkProtection(self)
-
-
 class ConferenceDisplayBase(ProtectedDisplayService, ConferenceBase):
 
     def _checkParams(self):
@@ -467,40 +453,6 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
             return self._params.get('value')
 
 
-class ConferenceListSessions (ConferenceListModificationBase):
-    """ Returns a dictionary of all the Sessions within the current Conference,
-        ordered by index only """
-
-    def _getAnswer(self):
-        sessions = self._conf.getSessionList()
-        result = {}
-
-        for sess in sessions:
-            for slot in sess.getSortedSlotList():
-                time = " (" + formatDateTime(slot.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
-                result["s"+sess.getId()+"l"+slot.getId()] = sess.getTitle() + (" - " + slot.getTitle() if slot.getTitle() else "") + time
-
-        return result
-
-
-class ConferenceListContributions (ConferenceListModificationBase):
-    """ Returns a dictionary of all the Contributions within the current Conference,
-        if the Contribution is part of a Session, the Session name is appended
-        to the name of the Contribution in parenthesis """
-
-    def _getAnswer(self):
-        contributions = self._conf.getContributionList()
-        result = {}
-        for cont in contributions:
-            if not cont.isScheduled():
-                continue
-            session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
-            time = " (" + formatDateTime(cont.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
-            result[cont.getId()] = cont.getTitle() + session + time
-
-        return result
-
-
 class ConferenceListContributionsReview (ConferenceListModificationBase):
     """ Returns a list of all contributions of a conference, ordered by id
     """
@@ -572,27 +524,6 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
 
         return [_serialize_contribution(contrib) for contrib in contributions]
 
-
-class ConferenceDeleteContributions (ConferenceModifBase):
-    """ Deletes a list of all contributions of a conference
-    """
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._selectedContributions = self._params.get('contributions', [])
-
-    def _getAnswer(self):
-        for contribId in self._selectedContributions:
-            contrib = self._conf.getContributionById(contribId)
-            if not contrib:
-                Logger.get().warning('Contribution {} in event {} was not deleted: Could not be found'.format(contribId, self._conf.getId()))
-                continue
-            if contrib.getSession() is not None and contrib.getSession().isClosed():
-                msg = _("""The contribution "{}" cannot be deleted because it is inside of the session "{}" that """
-                        """is closed""").format(contrib.getId(), contrib.getSession().getTitle())
-                raise ServiceAccessError(msg)
-            contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
-            contrib.delete()
 
 #########################
 # Contribution filtering
@@ -1033,10 +964,7 @@ methodMap = {
     "main.sendEmailData": ConferenceSendEmailData,
     "main.changeSubmissionRights": ConferenceChangeSubmissionRights,
     "program.changeDescription": ConferenceProgramDescriptionModification,
-    "contributions.list" : ConferenceListContributionsReview,
-    "contributions.listAll" : ConferenceListContributions,
-    "contributions.delete": ConferenceDeleteContributions,
-    "sessions.listAll" : ConferenceListSessions,
+    "contributions.list": ConferenceListContributionsReview,
     "showConcurrentEvents": ShowConcurrentEvents,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
