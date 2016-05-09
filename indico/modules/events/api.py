@@ -40,8 +40,7 @@ from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
-from indico.web.http_api.fossils import (IConferenceMetadataFossil, IPeriodFossil,
-                                         ICategoryMetadataFossil, ICategoryProtectedMetadataFossil)
+from indico.web.http_api.fossils import IPeriodFossil, ICategoryMetadataFossil, ICategoryProtectedMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
@@ -663,10 +662,6 @@ class ContributionFetcher(SessionContribFetcher):
 
 
 class EventSearchFetcher(IteratedDataFetcher):
-    DETAIL_INTERFACES = {
-        'events': IConferenceMetadataFossil,
-    }
-
     def event(self, query):
         def _iterate_objs(query_string):
             query = Event.find(Event.title_matches(to_unicode(query_string)), ~Event.is_deleted)

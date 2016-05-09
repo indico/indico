@@ -81,15 +81,13 @@ class ConferenceRoom:
     getValue = classmethod (getValue)
 
 class ConferenceChairperson:
+    @classmethod
     def getArgumentType(cls):
         return Conference
-    getArgumentType = classmethod (getArgumentType)
 
+    @classmethod
     def getValue(cls, conf):
-        list = conf.as_event.person_links
-        return list
-
-    getValue = classmethod (getValue)
+        return conf.as_event.person_links
 
 
 class PosterDesignConfiguration:

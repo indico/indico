@@ -1193,14 +1193,6 @@ class CustomRoom(Persistent):
         return self.fullName
 
 
-class ConferenceParticipation(Persistent, Fossilizable):
-    pass
-
-
-class ConferenceChair(ConferenceParticipation, Fossilizable):
-    pass
-
-
 class Conference(CommonObjectBase, Locatable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
@@ -1216,17 +1208,12 @@ class Conference(CommonObjectBase, Locatable):
         self.rooms = []
         self._screenStartDate = None
         self._screenEndDate = None
-        self.contactInfo =""
+        self.contactInfo = ""
         self.chairmanText = ""
-        self.chairmans = []
-        self._chairGen=Counter()
-        self._chairs=[]
         self.sessions = {}
         self.__sessionGenerator = Counter() # Provides session unique
                                             #   identifiers for this conference
         self.contributions = {}
-        self.__contribGenerator = Counter() # Provides contribution unique
-                                            #   identifiers for this conference
         self.programDescription = ""
         self.program = []
         self.__programGenerator = Counter() # Provides track unique
@@ -2117,7 +2104,9 @@ class Conference(CommonObjectBase, Locatable):
     def setSupportInfo(self, supportInfo):
         self._supportInfo = supportInfo
 
-    def getChairmanText( self ):
+    def getChairmanText(self):
+        # this is only used in legacy data and not settable for new events
+        # TODO: check whether we can get rid of it at some point
         try:
             if self.chairmanText:
                 pass
@@ -2127,89 +2116,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def setChairmanText( self, newText ):
         self.chairmanText = newText.strip()
-
-    def appendChairmanText( self, newText ):
-        self.setChairmanText( "%s, %s"%(self.getChairmanText(), newText.strip()) )
-        self._chairGen=Counter()
-        self._chairs=[]
-
-    def _resetChairs(self):
-        try:
-            if self._chairs:
-                return
-        except AttributeError:
-            self._chairs=[]
-            for oc in self.chairmans:
-                newChair=ConferenceChair()
-                newChair.setDataFromAvatar(oc)
-                self._addChair(newChair)
-
-    def getChairList(self):
-        """Method returning a list of the conference chairmans (Avatars)
-        """
-        self._resetChairs()
-        return self._chairs
-
-    def _addChair(self,newChair):
-        for chair in self._chairs:
-            if newChair.getEmail() != "" and newChair.getEmail() == chair.getEmail():
-                return
-        try:
-            if self._chairGen:
-                pass
-        except AttributeError:
-            self._chairGen=Counter()
-        id = newChair.getId()
-        if id == "":
-            id=int(self._chairGen.newCount())
-        if isinstance(newChair,ConferenceChair):
-            newChair.includeInConference(self,id)
-        self._chairs.append(newChair)
-        if isinstance(newChair, AvatarUserWrapper):
-            newChair.linkTo(self, "chair")
-        self.notifyModification()
-
-    def addChair(self,newChair):
-        """includes the specified user in the list of conference
-            chairs"""
-        self._resetChairs()
-        self._addChair(newChair)
-
-    def removeChair(self,chair):
-        """removes the specified user from the list of conference
-            chairs"""
-        self._resetChairs()
-        if chair not in self._chairs:
-            return
-        self._chairs.remove(chair)
-        if isinstance(chair, AvatarUserWrapper):
-            chair.unlinkTo(self, "chair")
-        chair.delete()
-        self.notifyModification()
-
-    def recoverChair(self, ch):
-        self.addChair(ch)
-        ch.recover()
-
-    def getChairById(self,id):
-        id=int(id)
-        for chair in self._chairs:
-            if chair.getId()==id:
-                return chair
-        return None
-
-    def getAllSessionsConvenerList(self) :
-        dictionary = {}
-        for session in self.getSessionList() :
-            for convener in session.getConvenerList() :
-                key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                dictionary.setdefault(key, set()).add(convener)
-            for slot in session.getSlotList():
-                for convener in slot.getConvenerList() :
-                    key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                    dictionary.setdefault(key, set()).add(convener)
-
-        return dictionary
 
     def getContactInfo(self):
         return self.contactInfo
@@ -2245,13 +2151,6 @@ class Conference(CommonObjectBase, Locatable):
             happen
         """
         return self.places
-
-    def getFavoriteRooms(self):
-        roomList = []
-        roomList.extend(self.getRoomList())
-        #roomList.extend(map(lambda x: x._getName(), self.getBookedRooms()))
-
-        return roomList
 
     def addLocation(self, newPlace):
         self.places.append( newPlace )
@@ -2294,15 +2193,6 @@ class Conference(CommonObjectBase, Locatable):
             return None
         return self.as_event.get_session(friendly_id=int(sessionId))
 
-    def getRoomList(self):
-        roomList =[]
-        for session in self.sessions.values():
-            if session.getRoom()!=None:
-                roomname = session.getRoom().getName()
-                if roomname not in roomList:
-                    roomList.append(roomname)
-        return roomList
-
     def getSessionList( self ):
         """Retruns a list of the conference session objects
         """
@@ -2312,12 +2202,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def getNumberOfSessions(self):
         return len(self.as_event.sessions)
-
-    def _generateNewContributionId(self):
-        """Returns a new unique identifier for the current conference
-            contributions
-        """
-        return str(self.__contribGenerator.newCount())
 
     def getReviewManager(self, contrib):
         return self.getConfPaperReview().getReviewManager(contrib)
@@ -2539,7 +2423,7 @@ class Conference(CommonObjectBase, Locatable):
         """
         if not av:
             return False
-        if (av in self.getChairList()) or (self.__ac.canUserAccess( av )) or (self.canUserModify( av )):
+        if self.__ac.canUserAccess(av) or self.canUserModify(av):
             return True
 
         # if the conference is not protected by itself
@@ -2668,10 +2552,8 @@ class Conference(CommonObjectBase, Locatable):
         else:
             confRegistry = OOBTree.OOBTree()
             db_root["webfactoryregistry"] = confRegistry
-        meeting=False
         # if the event is a meeting or a lecture
         if confRegistry.get(str(self.getId()), None) is not None :
-            meeting=True
             confRegistry[str(conf.getId())] = confRegistry[str(self.getId())]
         # if it's a conference, no web factory is needed
         # Tracks in a conference
@@ -2970,114 +2852,6 @@ class ConferenceHolder( ObjectHolder ):
                                 title=_("Event not found"))
         return event
 
-
-class SessionChair(ConferenceParticipation):
-
-    def __init__(self):
-        self._session=None
-        self._id=""
-        ConferenceParticipation.__init__(self)
-
-    def _notifyModification( self ):
-        if self._session != None:
-            self._session.notifyModification()
-
-    def clone(self):
-        chair = SessionChair()
-        chair.setValues(self.getValues())
-        return chair
-
-    def getSession(self):
-        return self._session
-
-    def getConference(self):
-        s=self.getSession()
-        if s is None:
-            return None
-        return s.getConference()
-
-    def includeInSession(self,session,id):
-        if self.getSession()==session and self.getId()==id.strip():
-            return
-        self._session=session
-        self._id=id
-
-    def delete( self ):
-        self._session=None
-        ConferenceParticipation.delete(self)
-
-    def getLocator(self):
-        if self.getSession() is None:
-            return None
-        loc=self.getSession().getLocator()
-        loc["convId"]=self.getId()
-        return loc
-
-    def isSessionManager(self):
-        # pendings managers
-        if self.getEmail() in self._session.getAccessController().getModificationEmail():
-            return True
-        # managers list
-        for manager in self._session.getManagerList():
-            if self.getEmail() == manager.getEmail():
-                return True
-        return False
-
-    def isSessionCoordinator(self):
-        # coordinator list
-        for coord in self._session.getCoordinatorList():
-            if self.getEmail() == coord.getEmail():
-                return True
-        return False
-
-
-class SlotChair(ConferenceParticipation):
-
-    def __init__(self):
-        self._slot=None
-        self._id=""
-        ConferenceParticipation.__init__(self)
-
-    def _notifyModification( self ):
-        if self._slot != None:
-            self._slot.notifyModification()
-
-    def clone(self):
-        chair = SlotChair()
-        chair.setValues(self.getValues())
-        return chair
-
-    def getSlot(self):
-        return self._slot
-
-    def getSession(self):
-        s=self.getSlot()
-        if s is None:
-            return None
-        return s.getSession()
-
-    def getConference(self):
-        s=self.getSlot()
-        if s is None:
-            return None
-        return s.getConference()
-
-    def includeInSlot(self,slot,id):
-        if self.getSlot()==slot and self.getId()==id.strip():
-            return
-        self._slot=slot
-        self._id=id
-
-    def delete( self ):
-        self._slot=None
-        ConferenceParticipation.delete(self)
-
-    def getLocator(self):
-        if self.getSlot() is None:
-            return None
-        loc=self.getSlot().getLocator()
-        loc["convId"]=self.getId()
-        return loc
 
 class SessionCoordinatorRights:
 

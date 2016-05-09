@@ -35,7 +35,7 @@ from MaKaC import domain, conference as conference
 
 from MaKaC.common import indexes, filters
 from MaKaC.common.Conversion import Conversion
-from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
+from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
@@ -50,16 +50,14 @@ from MaKaC.webinterface.common import contribFilters
 from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
                                                 ProtectedDisplayService, ServiceBase, TextModificationBase,
                                                 HTMLModificationBase, ExportToICalBase)
-from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning,
-                                                 ServiceAccessError, ServiceError, TimingNoReportError, Warning)
+from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning, ServiceError,
+                                                 TimingNoReportError, Warning)
 
 
 # indico imports
-from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.util import track_time_changes
-from indico.modules.users.util import get_user_by_email
 from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
@@ -667,193 +665,6 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
         return self._target.getAccessController().getContactInfo()
 
 
-class ConferenceChairPersonBase(ConferenceModifBase):
-    def _getChairPersonsList(self):
-        result = fossilize(self._conf.getChairList())
-        for chair in result:
-            user = get_user_by_email(chair['email'])
-            chair['showManagerCB'] = True
-            chair['showSubmitterCB'] = True
-            email_submitters = {x.email for x in self._conf.as_event.acl_entries
-                                if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)}
-            if chair['email'] in email_submitters or (user and self._conf.as_event.can_manage(user, 'submit',
-                                                                                              explicit_role=True)):
-                chair['showSubmitterCB'] = False
-            email_managers = {x.email for x in self._conf.as_event.acl_entries
-                              if x.type == PrincipalType.email and x.has_management_role()}
-            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, explicit_role=True)):
-                chair['showManagerCB'] = False
-        return result
-
-    def _isEmailAlreadyUsed(self, email):
-        for chair in self._conf.getChairList():
-            if email == chair.getEmail():
-                return True
-        return False
-
-class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
-
-    def _checkParams(self):
-        ConferenceChairPersonBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-        self._submissionRights = pm.extract("presenter-grant-submission", pType=bool, allowEmpty=False)
-        # Check if there is already a user with the same email
-        for person in self._userList:
-            if self._isEmailAlreadyUsed(person["email"]):
-                raise ServiceAccessError(_("A user with the email address %s is already in the Chairpersons list. Chairperson(s) not added.") % person["email"])
-
-    def _newChair(self, av):
-        chair = conference.ConferenceChair()
-        chair.setTitle(av.getTitle())
-        chair.setFirstName(av.getFirstName())
-        chair.setFamilyName(av.getSurName())
-        chair.setAffiliation(av.getAffiliation())
-        chair.setEmail(av.getEmail())
-        chair.setAddress(av.getAddress())
-        chair.setPhone(av.getTelephone())
-        chair.setFax(av.getFax())
-        self._conf.addChair(chair)
-        if self._submissionRights:
-            self._conf.as_event.update_principal(av.user, add_roles={'submit'})
-
-    def _getAnswer(self):
-        for person in self._userList:
-            self._newChair(principal_from_fossil(person, allow_pending=True))
-
-        return self._getChairPersonsList()
-
-
-class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
-
-    def _checkParams(self):
-        ConferenceChairPersonBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed(self._userData.get("email", "")):
-            raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not added."))
-
-    def _newChair(self):
-        chair = conference.ConferenceChair()
-        chair.setTitle(self._userData.get("title", ""))
-        chair.setFirstName(self._userData.get("firstName", ""))
-        chair.setFamilyName(self._userData.get("familyName", ""))
-        chair.setAffiliation(self._userData.get("affiliation", ""))
-        chair.setEmail(self._userData.get("email", ""))
-        chair.setAddress(self._userData.get("address", ""))
-        chair.setPhone(self._userData.get("phone", ""))
-        chair.setFax(self._userData.get("fax", ""))
-        self._conf.addChair(chair)
-        #If the chairperson needs to be given management rights
-        email = self._userData.get('email')
-        if self._userData.get('manager') and email:
-            self._conf.as_event.update_principal(EmailPrincipal(email), full_access=True)
-
-        #If the chairperson needs to be given submission rights
-        if self._userData.get("submission", False):
-            if not email:
-                raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
-            self._conf.as_event.update_principal(EmailPrincipal(email), add_roles={'submit'})
-
-    def _getAnswer(self):
-        self._newChair()
-        return self._getChairPersonsList()
-
-
-class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
-
-    def _checkParams(self):
-        ConferenceChairPersonBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._chairId = pm.extract("userId", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        chair = self._conf.getChairById(self._chairId)
-
-        if chair is None:
-            raise NoReportError(_('Someone may have deleted this chairperson meanwhile. Please refresh the page.'))
-
-        self._conf.removeChair(chair)
-        email = chair.getEmail()
-        if email:
-            # XXX: this doesn't remove managerment permissions. probably because we don't know
-            # they were granted before or when adding him as a chairperson?
-            self._conf.as_event.update_principal(EmailPrincipal(email), del_roles={'submit'})
-        return self._getChairPersonsList()
-
-
-class ConferenceEditChairPerson(ConferenceChairPersonBase):
-
-    def _checkParams(self):
-        ConferenceChairPersonBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        self._chairId = pm.extract("userId", pType=str, allowEmpty=False)
-        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
-            raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not modified."))
-
-    def _isEmailAlreadyUsed(self):
-        for chair in self._conf.getChairList():
-            # check if the email is already used by other different chairperson
-            if self._userData.get("email", "") == chair.getEmail() and self._chairId != str(chair.getId()):
-                return True
-        return False
-
-    def _editChair(self, chair):
-        chair.setTitle(self._userData.get("title", ""))
-        chair.setFirstName(self._userData.get("firstName", ""))
-        chair.setFamilyName(self._userData.get("familyName", ""))
-        chair.setAffiliation(self._userData.get("affiliation", ""))
-        if self._userData.get("email", "").lower().strip() != chair.getEmail().lower().strip():
-            self._conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), del_roles={'submit'})
-        chair.setEmail(self._userData.get("email", ""))
-        chair.setAddress(self._userData.get("address", ""))
-        chair.setPhone(self._userData.get("phone", ""))
-        chair.setFax(self._userData.get("fax", ""))
-        #If the chairperson needs to be given management rights
-        email = self._userData.get('email')
-        if self._userData.get('manager') and email:
-            self._conf.as_event.update_principal(EmailPrincipal(email), full_access=True)
-        #If the chairperson needs to be given submission rights because the checkbox is selected
-        if self._userData.get("submission", False):
-            if not email:
-                raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
-            self._conf.as_event.update_principal(EmailPrincipal(email), add_roles={'submit'})
-
-    def _getAnswer(self):
-        chair = self._conf.getChairById(self._chairId)
-        self._editChair(chair)
-        return self._getChairPersonsList()
-
-
-class ConferenceSendEmailData(ConferenceChairPersonBase):
-        def _getAnswer(self):
-            pm = ParameterManager(self._params)
-            self._chairperson = self._conf.getChairById(pm.extract("userId", pType=str, allowEmpty=False))
-            return {"confTitle": self._conf.getTitle(),
-                    "email": self._chairperson.getEmail()
-                    }
-
-
-class ConferenceChangeSubmissionRights(ConferenceChairPersonBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._chairperson = self._conf.getChairById(pm.extract("userId", pType=str, allowEmpty=False))
-        if self._chairperson == None:
-            raise ServiceAccessError(_("The user that you are trying to delete does not exist."))
-        if self._chairperson.getEmail() == "":
-            raise ServiceAccessError(_("It is not possible to grant submission rights to a participant without an email address. Please set an email address."))
-        self._action = pm.extract("action", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        if self._action == "grant":
-            self._conf.as_event.update_principal(EmailPrincipal(self._chairperson.getEmail()), add_roles={'submit'})
-        elif self._action == "remove":
-            self._conf.as_event.update_principal(EmailPrincipal(self._chairperson.getEmail()), del_roles={'submit'})
-        return self._getChairPersonsList()
-
 class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
     """
     Conference program description modification
@@ -957,12 +768,6 @@ methodMap = {
     "main.changeShortURL": ConferenceShortURLModification,
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
-    "main.addExistingChairPerson": ConferenceAddExistingChairPerson,
-    "main.addNewChairPerson": ConferenceAddNewChairPerson,
-    "main.removeChairPerson": ConferenceRemoveChairPerson,
-    "main.editChairPerson": ConferenceEditChairPerson,
-    "main.sendEmailData": ConferenceSendEmailData,
-    "main.changeSubmissionRights": ConferenceChangeSubmissionRights,
     "program.changeDescription": ConferenceProgramDescriptionModification,
     "contributions.list": ConferenceListContributionsReview,
     "showConcurrentEvents": ShowConcurrentEvents,

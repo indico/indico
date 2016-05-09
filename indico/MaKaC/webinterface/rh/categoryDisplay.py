@@ -31,7 +31,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
-from MaKaC.conference import ConferenceChair
 from indico.core import signals
 from indico.core.config import Config
 from MaKaC.i18n import _
@@ -41,7 +40,6 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -238,8 +236,8 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         elif eventAccessProtection == "public" :
             c.getAccessController().setProtection(-1)
 
-        avatars, newUsers, editedAvatars, allowedAvatars = self._getPersons()
-        UtilPersons.addToConf(avatars, newUsers, editedAvatars, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
+        allowedAvatars = self._getPersons()
+        UtilPersons.addToConf(allowedAvatars, c)
 
         # Add EventPersonLinks to the Event
         person_links = self.get_event_person_links_data(c.as_event)
@@ -260,16 +258,9 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         return form.person_link_data.data
 
     def _getPersons(self):
-        cpAvatars, cpNewUsers, cpEditedAvatars , auAvatars, auNewUsers, auEditedAvatars = [], [], [] , [] , [] , []
         from MaKaC.services.interface.rpc import json
-        chairpersonDict = json.decode(self._params.get("chairperson") or "[]") or []
         allowedUsersDict = json.decode(self._params.get("allowedUsers") or "[]") or []
-        if chairpersonDict:
-            cpAvatars, cpNewUsers, cpEditedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
-        if allowedUsersDict :
-            auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
-
-        return cpAvatars, cpNewUsers, cpEditedAvatars, auAvatars
+        return UserListModificationBase.retrieveUsers({"userList": allowedUsersDict})[0] if allowedUsersDict else []
 
     def alertCreation(self, confs):
         conf = confs[0]
@@ -282,12 +273,10 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
             type = "meeting"
         else:
             type = "lecture"
-        chair = ""
-        if conf.getChairmanText() != "":
+        if conf.getChairmanText():
             chair = conf.getChairmanText()
         else:
-            for c in conf.getChairList():
-                chair += c.getFullName() + "; "
+            chair = '; '.join(x.full_name.encode('utf-8') for x in conf.as_event.person_links)
         subject = "New %s in indico (%s)" % (type,conf.getId())
         if conf.getRoom() != None:
             room = conf.getRoom().getName()
@@ -337,54 +326,11 @@ _Access%s_
 class UtilPersons:
 
     @staticmethod
-    def addToConf(avatars, newUsers, editedAvatars, accessingAvatars, conf, grantManager, grantSubmission):
-
-        if newUsers:
-            for newUser in newUsers:
-                person = ConferenceChair()
-                person.setFirstName(newUser.get("firstName",""))
-                person.setFamilyName(newUser.get("familyName",""))
-                person.setEmail(newUser.get("email",""))
-                person.setAffiliation(newUser.get("affiliation",""))
-                person.setAddress(newUser.get("address",""))
-                person.setPhone(newUser.get("phone",""))
-                person.setTitle(newUser.get("title",""))
-                person.setFax(newUser.get("fax",""))
-                UtilPersons._addChair(conf, person, grantManager, grantSubmission)
-
-        if avatars:
-            for selected in avatars:
-                if isinstance(selected, AvatarUserWrapper):
-                    person = ConferenceChair()
-                    person.setDataFromAvatar(selected)
-                    UtilPersons._addChair(conf, person, grantManager, grantSubmission)
-
-        if editedAvatars:
-            for edited_avatar in editedAvatars:
-                person = ConferenceChair()
-                person.setFirstName(edited_avatar[1].get("firstName", ""))
-                person.setFamilyName(edited_avatar[1].get("familyName", ""))
-                person.setEmail(edited_avatar[1].get("email", ""))
-                person.setAffiliation(edited_avatar[1].get("affiliation", ""))
-                person.setAddress(edited_avatar[1].get("address", ""))
-                person.setPhone(edited_avatar[1].get("phone", ""))
-                person.setTitle(edited_avatar[1].get("title", ""))
-                person.setFax(edited_avatar[1].get("fax", ""))
-
-                UtilPersons._addChair(conf, person, grantManager, grantSubmission)
-
+    def addToConf(accessingAvatars, conf):
         if accessingAvatars:
             for person in accessingAvatars:
                 if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
                     conf.grantAccess(person)
-
-    @staticmethod
-    def _addChair(conf, chair, grantManager, grantSubmission):
-        conf.addChair(chair)
-        if grantManager and chair.getEmail():
-            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), full_access=True)
-        if grantSubmission and chair.getEmail():
-            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), add_roles={'submit'})
 
 
 class UtilsConference:

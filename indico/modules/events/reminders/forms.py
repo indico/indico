@@ -79,7 +79,7 @@ class ReminderForm(IndicoForm):
         support = self.event.getSupportInfo()
         emails[support.getEmail()] = support.getCaption() or support.getEmail()
         # Chairs
-        emails.update((x.getEmail(), x.getDirectFullName()) for x in self.event.getChairList())
+        emails.update((pl.email, pl.full_name) for pl in self.event.as_event.person_links if pl.email)
         # Current email to avoid destructive modifications
         emails.setdefault(self.reply_to_address.object_data, self.reply_to_address.object_data)
         # Sanitize and format emails

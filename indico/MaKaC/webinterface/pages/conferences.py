@@ -754,22 +754,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         self._ct = ct
         self._rh = rh
 
-    def _getChairPersonsList(self):
-        result = fossilize(self._conf.getChairList())
-        for chair in result:
-            user = get_user_by_email(chair['email'])
-            chair['showManagerCB'] = True
-            chair['showSubmitterCB'] = True
-            email_submitters = {x.email for x in self._conf.as_event.acl_entries
-                                if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)}
-            if chair['email'] in email_submitters or (user and self._conf.as_event.can_manage(user, 'submit',
-                                                                                              explicit_role=True)):
-                chair['showSubmitterCB'] = False
-            email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
-            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, explicit_role=True)):
-                chair['showManagerCB'] = False
-        return result
-
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
@@ -842,7 +826,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars['rbActive'] = Config.getInstance().getIsRoomBookingActive()
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
-        vars["chairpersons"] = self._getChairPersonsList()
 
         loc = self._conf.getLocation()
         room = self._conf.getRoom()

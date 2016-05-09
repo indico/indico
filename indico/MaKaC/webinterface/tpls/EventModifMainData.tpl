@@ -32,11 +32,7 @@ visibilityList[999] = 'Everywhere'
 
 numRows = 11
 
-
-favoriteRooms = confObj.getFavoriteRooms()
-
 additionalInfo = confObj.getContactInfo()
-
 %>
 
 <tr>

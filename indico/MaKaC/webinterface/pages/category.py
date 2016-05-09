@@ -15,6 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from copy import copy
+from operator import attrgetter
+
 from flask import session
 from datetime import timedelta, datetime
 from time import mktime, strptime
@@ -365,17 +367,13 @@ class WOverviewConfBase( wcomponents.WTemplated ):
         self._startTime = startTime
         self._data = data
 
-
     def _getChairText( self ):
-        l = []
-        if self._conf.getChairmanText()!="":
-            l.append( self._conf.getChairmanText() )
-        for av in self._conf.getChairList():
-            l.append( "%s"%av.getFullName() )
-        chairs = ""
-        if len(l)>0:
-            chairs = "(%s)"%"; ".join(l)
-        return chairs
+        items = []
+        if self._conf.getChairmanText():
+            items.append(self._conf.getChairmanText())
+        for p in sorted(self._conf.as_event.person_links, key=attrgetter('full_name')):
+            items.append(p.full_name.encode('utf-8'))
+        return '({})'.format('; '.join(items)) if items else ''
 
     def _getDetails(self):
         if self._details == "conference":
