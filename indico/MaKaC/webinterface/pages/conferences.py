@@ -1046,29 +1046,6 @@ class WPConfDataModif( WPConferenceModification ):
         return p.getHTML( pars )
 
 
-class WConfModifACSessionCoordinatorRights(wcomponents.WTemplated):
-
-    def __init__(self,conf):
-        self._conf = conf
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        html=[]
-        scr = conference.SessionCoordinatorRights()
-        for rightKey in scr.getRightKeys():
-            url = urlHandlers.UHConfModifCoordinatorRights.getURL(self._conf)
-            url.addParam("rightId", rightKey)
-            if self._conf.hasSessionCoordinatorRight(rightKey):
-                imgurl=Config.getInstance().getSystemIconURL("tick")
-            else:
-                imgurl=Config.getInstance().getSystemIconURL("cross")
-            html.append("""
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=%s><img class="imglink" src=%s></a> %s
-                        """%(quoteattr(str(url)), quoteattr(str(imgurl)), scr.getRight(rightKey)))
-        vars["optionalRights"]="<br>".join(html)
-        return vars
-
-
 class WConfModifAC:
 
     def __init__(self, conference, eventType, user):

@@ -1649,22 +1649,6 @@ class RHAbstractBookToogleShowIds( RHConfModifCFABase ):
         self._redirect( urlHandlers.UHConfModAbstractBook.getURL( self._conf ) )
 
 
-class RHModifSessionCoordRights( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfPerformDataModif
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._rightId = params.get("rightId", "")
-
-    def _process( self ):
-        if self._rightId != "":
-            if self._conf.hasSessionCoordinatorRight(self._rightId):
-                self._conf.removeSessionCoordinatorRight(self._rightId)
-            else:
-                self._conf.addSessionCoordinatorRight(self._rightId)
-            self._redirect( "%s#sessionCoordinatorRights"%urlHandlers.UHConfModifAC.getURL( self._conf) )
-
-
 # ============================================================================
 # === Badges related =========================================================
 # ============================================================================

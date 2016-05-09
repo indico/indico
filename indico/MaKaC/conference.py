@@ -1238,8 +1238,6 @@ class Conference(CommonObjectBase, Locatable):
         self.___contribTypeGenerator = Counter()
         self._authorIdx=AuthorIndex()
         self._speakerIdx=AuthorIndex()
-        self._sessionCoordinators=SCIndex()
-        self._sessionCoordinatorRights = []
         self._boa=BOAConfig(self)
         self._bookings = {}
         self._registrantGenerator = Counter()
@@ -2690,49 +2688,6 @@ class Conference(CommonObjectBase, Locatable):
         if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
             self.getSpeakerIndex().unindex(auth)
 
-    def getCoordinatedSessions( self, av ):
-        """Returns a list with the sessions for which a user is coordinator.
-        """
-        try:
-            if self._sessionCoordinators:
-                pass
-        except AttributeError:
-            self._sessionCoordinators = SCIndex()
-        sessions = self._sessionCoordinators.getSessions( av )
-        for session in self.getSessionList():
-            if session not in sessions and av != None:
-                for email in av.getEmails():
-                    if email in session.getCoordinatorEmailList():
-                        sessions.append(session)
-                        break
-        return sessions
-
-    def addSessionCoordinator(self,session,av):
-        """Makes a user become coordinator for a session.
-        """
-        try:
-            if self._sessionCoordinators:
-                pass
-        except AttributeError:
-            self._sessionCoordinators = SCIndex()
-        if self.sessions.has_key(session.getId()):
-            session.addCoordinator(av)
-            self._sessionCoordinators.index(av,session)
-            session._addCoordinatorEmail(av.getEmail())
-
-    def removeSessionCoordinator( self, session, av ):
-        """Removes a user as coordinator for a session.
-        """
-        try:
-            if self._sessionCoordinators:
-                pass
-        except AttributeError:
-            self._sessionCoordinators = SCIndex()
-        if self.sessions.has_key(session.getId()):
-            session.removeCoordinator( av )
-            self._sessionCoordinators.unindex(av,session)
-            session.removeCoordinatorEmail(av.getEmail())
-
     def getBOAConfig(self):
         try:
             if self._boa:
@@ -2740,28 +2695,6 @@ class Conference(CommonObjectBase, Locatable):
         except AttributeError:
             self._boa=BOAConfig(self)
         return self._boa
-
-    def getSessionCoordinatorRights(self):
-        try:
-            if self._sessionCoordinatorRights:
-                pass
-        except AttributeError, e:
-            self._sessionCoordinatorRights = []
-            self.notifyModification()
-        return self._sessionCoordinatorRights
-
-    def hasSessionCoordinatorRight(self, right):
-        return right in self.getSessionCoordinatorRights()
-
-    def addSessionCoordinatorRight(self, right):
-        if SessionCoordinatorRights().hasRight(right) and not self.hasSessionCoordinatorRight(right):
-            self._sessionCoordinatorRights.append(right)
-        self.notifyModification()
-
-    def removeSessionCoordinatorRight(self, right):
-        if SessionCoordinatorRights().hasRight(right) and self.hasSessionCoordinatorRight(right):
-            self._sessionCoordinatorRights.remove(right)
-        self.notifyModification()
 
     def hasEnabledSection(self, section):
         # This hack is there since there is no more enable/disable boxes
@@ -2775,11 +2708,11 @@ class Conference(CommonObjectBase, Locatable):
     def getAccessController(self):
         return self.__ac
 
-    def _cmpTitle( c1, c2 ):
+    @staticmethod
+    def _cmpTitle(c1, c2):
         o1 = c1.getTitle().lower().strip()
         o2 = c2.getTitle().lower().strip()
-        return cmp( o1, o2 )
-    _cmpTitle=staticmethod(_cmpTitle)
+        return cmp(o1, o2)
 
     def getBadgeTemplateManager(self):
         try:
@@ -2855,83 +2788,6 @@ class ConferenceHolder( ObjectHolder ):
             raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(id),
                                 title=_("Event not found"))
         return event
-
-
-class SessionCoordinatorRights:
-
-    def __init__(self):
-        self._rights = {"modifContribs": "Modify the contributions",
-                        "unrestrictedSessionTT": "Unrestricted session timetable management"
-                        }
-
-    def hasRight(self, r):
-        return self._rights.has_key(r)
-
-    def getRights(self):
-        return self._rights
-
-    def getRightList(self, sort=False):
-        l=self._rights.values()
-        if sort:
-            l.sort()
-        return l
-
-    def getRightKeys(self):
-        return self._rights.keys()
-
-    def getRight(self, id):
-        if self._rights.has_key(id):
-            return self._rights[id]
-        return None
-
-class SCIndex(Persistent):
-    """Index for conference session coordinators.
-
-        This class allows to index conference session coordinators so the owner
-        can answer optimally to the query if a user is coordinating
-        any conference session.
-        It is implemented by simply using a BTree where the Avatar id is used
-        as key (because it is unique and non variable) and a list of
-        coordinated sessions is kept as keys. It is the responsability of the
-        index owner (conference) to keep it up-to-date i.e. notify session
-        coordinator additions and removals.
-    """
-
-    def __init__( self ):
-        self._idx=OOBTree()
-
-
-    def getSessions(self,av):
-        """Gives a list with the sessions a user is coordinating.
-        """
-        if av == None:
-            return []
-        return self._idx.get(av.getId(),[])
-
-    def index(self,av,session):
-        """Registers in the index a coordinator of a session.
-        """
-        if av == None or session == None:
-            return
-        if not self._idx.has_key(av.getId()):
-            l=[]
-            self._idx[av.getId()]=l
-        else:
-            l=self._idx[av.getId()]
-        if session not in l:
-            l.append(session)
-        self.notifyModification()
-
-    def unindex(self,av,session):
-        if av==None or session==None:
-            return
-        l=self._idx.get(av.getId(),[])
-        if session in l:
-            l.remove(session)
-            self.notifyModification()
-
-    def notifyModification(self):
-        self._idx._p_changed=1
 
 
 class Session(CommonObjectBase, Locatable):

@@ -563,10 +563,6 @@ class UHConfGrantModificationToAllConveners(URLHandler):
     _endpoint = 'event_mgmt.confModifAC-grantModificationToAllConveners'
 
 
-class UHConfModifCoordinatorRights(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-modifySessionCoordRights'
-
-
 class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 

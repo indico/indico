@@ -22,8 +22,6 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 event_mgmt.add_url_rule('/access/', 'confModifAC', conferenceModif.RHConfModifAC)
 event_mgmt.add_url_rule('/access/visibility', 'confModifAC-setVisibility', conferenceModif.RHConfSetVisibility,
                         methods=('POST',))
-event_mgmt.add_url_rule('/access/session-coordinators', 'confModifAC-modifySessionCoordRights',
-                        conferenceModif.RHModifSessionCoordRights)
 event_mgmt.add_url_rule('/access/grant/modification/conveners', 'confModifAC-grantModificationToAllConveners',
                         conferenceModif.RHConfGrantModificationToAllConveners, methods=('POST',))
 event_mgmt.add_url_rule('/access/grant/submission/speakers', 'confModifAC-grantSubmissionToAllSpeakers',
