@@ -124,7 +124,7 @@ def test_render_html(note, dummy_user):
 
 def test_render_markdown(note, dummy_user):
     note.create_revision(RenderMode.markdown, '**test**\n*foo*', dummy_user)
-    assert note.html == note.current_revision.html == '<p><strong>test</strong><br />\n<em>foo</em></p>'
+    assert note.html == note.current_revision.html == '<p><strong>test</strong><br>\n<em>foo</em></p>'
 
 
 def test_get_for_linked_object(note, dummy_user, create_event):
