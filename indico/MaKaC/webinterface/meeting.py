@@ -88,45 +88,6 @@ class WMeetingCreation(category.WConferenceCreation):
         return vars
 
 
-class WMConfDisplayFrame(conferences.WConfDisplayFrame):
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["logo"] = ""
-        if self.event.has_logo:
-            vars["logoURL"] = self.event.logo_url
-            vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
-        vars["confTitle"] = self._conf.getTitle()
-        vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
-        #################################
-        # Fermi timezone awareness      #
-        #################################
-        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""")%(format_date(self._conf.getStartDate(), format='long'), format_date(self._conf.getEndDate(), format='long'))
-        if self._conf.getStartDate().strftime("%d%B%Y") == \
-                self._conf.getEndDate().strftime("%d%B%Y"):
-            vars["confDateInterval"] = format_date(self._conf.getStartDate(), format='long')
-        elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-            vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, format_date(self._conf.getStartDate(), format='MMMM yyyy'))
-        #################################
-        # Fermi timezone awareness(end) #
-        #################################
-        vars["body"] = self._body
-        vars["confLocation"] = ""
-        if self._conf.getLocationList():
-            vars["confLocation"] =  self._conf.getLocationList()[0].getName()
-            vars["supportEmail"] = ""
-        if self._conf.getSupportInfo().hasEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] =  _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>""")%(mailto,
-                                                        Config.getInstance().getSystemIconURL("mail"),
-                                                        self._conf.getSupportInfo().getCaption())
-        return vars
-
-    def getHTML( self, body, params ):
-        self._body = body
-        return wcomponents.WTemplated.getHTML( self, params )
-
-
 #################Conference Modification#############################
 
 ##Main##

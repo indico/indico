@@ -243,12 +243,6 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         person_links = self.get_event_person_links_data(c.as_event)
         update_event(c.as_event, {'person_link_data': person_links})
 
-        if params.get("sessionSlots",None) is not None :
-            if params["sessionSlots"] == "enabled" :
-                c.enableSessionSlots()
-            else :
-                c.disableSessionSlots()
-
         return c
 
     def get_event_person_links_data(self, event):

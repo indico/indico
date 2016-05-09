@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy.orm import lazyload, joinedload, noload
+from sqlalchemy.orm import lazyload, joinedload
 
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
@@ -501,9 +501,6 @@ class Category(CommonObjectBase):
             for cat in categ:
                 cat.setDefaultStyle(type, style, subcatsStyle)
 
-    ##################################
-    # Fermi timezone awareness       #
-    ##################################
     def getTimezone(self):
         try:
             if self._timezone not in all_timezones:
@@ -519,10 +516,6 @@ class Category(CommonObjectBase):
     def changeConfTimezones(self, tz):
         for conference in self.getConferenceList():
             conference.moveToTimezone(tz)
-
-    ##################################
-    # Fermi timezone awareness(end)  #
-    ##################################
 
     def getOrder(self):
         try:
@@ -887,9 +880,6 @@ class Category(CommonObjectBase):
             dbRoot["local_repositories"]["main"] = fr
         return fr
 
-    def removeResource(self, res):
-        pass
-
     def setIcon(self, iconFile):
         iconFile.setOwner(self)
         iconFile.setId("icon")
@@ -1207,41 +1197,24 @@ class Conference(CommonObjectBase, Locatable):
         self.contactInfo = ""
         self.chairmanText = ""
         self.sessions = {}
-        self.__sessionGenerator = Counter() # Provides session unique
-                                            #   identifiers for this conference
-        self.contributions = {}
         self.programDescription = ""
         self.program = []
-        self.__programGenerator = Counter() # Provides track unique
-                                            #   identifiers for this conference
+        self.__programGenerator = Counter()
         self.__ac = AccessController(self)
-        self.materials = {}
-        self.__materialGenerator = Counter() # Provides material unique
-                                            # identifiers for this conference
-        self.paper = None
-        self.slides = None
-        self.video = None
-        self.poster = None
         self.__owners = []
         self._modificationDS = self._creationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
-        self._trackCoordinators = TCIndex() #index for the track coordinators
+        self._trackCoordinators = TCIndex()
         self._supportInfo = SupportInfo(self, "Support")
         self._contribTypes = {}
         self.___contribTypeGenerator = Counter()
-        self._boa=BOAConfig(self)
-        self._bookings = {}
-        self._registrantGenerator = Counter()
-        self._accessKey=""
-        self._modifKey=""
+        self._boa = BOAConfig(self)
+        self._accessKey = ""
+        self._modifKey = ""
         self._closed = False
         self._visibility = 999
-        self._sections = []
-        self._enableSessionSlots = False
-        self._enableSessions = False
-        self._autoSolveConflict = True
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._keywords = ""
@@ -1250,8 +1223,6 @@ class Conference(CommonObjectBase, Locatable):
         self._orgText = ""
         self._comments = ""
         self._sortUrlTag = ""
-
-        self._observers = []
 
     @return_ascii
     def __repr__(self):
@@ -1409,15 +1380,6 @@ class Conference(CommonObjectBase, Locatable):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    # Room booking related ===================================================
-
-    def getRoomBookingList(self):
-        """Returns list of bookings for this conference."""
-        # In case anyone wonders why this method is still here: Various fossils expect/use it.
-        return self.as_event.reservations.options(noload('created_by_user'), noload('booked_for_user')).all()
-
-    # ========================================================================
-
     def getType( self ):
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
@@ -1434,40 +1396,6 @@ class Conference(CommonObjectBase, Locatable):
         if type == "simple_event":
             type = "lecture"
         return type.capitalize()
-
-
-    def getEnableSessionSlots(self):
-        #try :
-        #    if self._enableSessionSlots  :
-        #        pass
-        #except AttributeError :
-        #    self._enableSessionSlots = True
-        #if self.getType() == "conference":
-        #    return True
-        #return self._enableSessionSlots
-        return True
-
-    def getEnableSessions(self):
-        try :
-            if self._enableSessions  :
-                pass
-        except AttributeError :
-            self._enableSessions = True
-        if self.getType() == "conference":
-            return True
-        return self._enableSessions
-
-    def enableSessionSlots(self):
-        self._enableSessionSlots = True
-
-    def disableSessionSlots(self):
-        self._enableSessionSlots = False
-
-    def enableSessions(self):
-        self._enableSessions = True
-
-    def disableSessions(self):
-        self._enableSessions = False
 
     def setValues(self, confData):
         """
@@ -1586,9 +1514,6 @@ class Conference(CommonObjectBase, Locatable):
             dbRoot["local_repositories"]["main"] = fr
         return fr
 
-    def removeResource( self, res ):
-        pass
-
     def getURL(self):
         cid = self.getUrlTag()
         if not cid:
@@ -1607,38 +1532,12 @@ class Conference(CommonObjectBase, Locatable):
     def getLogo( self ):
         return self._logo
 
-    def getLogoURL( self ):
-        try:
-            if self._logo == None:
-                return ""
-            return self._logo.getURL()
-        except AttributeError:
-            self._logo = None
-            return ""
-
     def removeLogo(self):
         if self._logo is None:
             return
         self._logo.delete()
         self._logo = None
         self.notifyModification()
-
-    def recoverLogo(self, logo):
-        logo.setOwner(self)
-        if self._logo != None:
-            self._logo.delete()
-        self._logo = logo
-        logo.recover()
-        self.notifyModification()
-
-    def getSession(self):
-        return None
-
-    def getContribution(self):
-        return None
-
-    def getSubContribution(self):
-        return None
 
     def getAbstractMgr(self):
         return self.abstractMgr
@@ -1706,16 +1605,6 @@ class Conference(CommonObjectBase, Locatable):
             owner = owner.getOwner()
         return l
 
-    def getOwnerById( self, key ):
-        """Returns one specific category which contains the conference.
-           Params:
-             - key: The "id" of the category.
-        """
-        for owner in self.__owners:
-            if key == owner.getId():
-                return owner
-        return None
-
     def addOwner( self, newOwner ):
         if newOwner == None:
             return
@@ -1733,20 +1622,10 @@ class Conference(CommonObjectBase, Locatable):
     def getCategoriesPath(self):
         return [self.getOwnerList()[0].getCategoryPath()]
 
-    def notifyContributions(self):
-        pass
-        # for c in self.getContributionList():
-        #     # take care of subcontributions
-        #     for sc in c.getSubContributionList():
-        #         signals.event.subcontribution_deleted.send(sc, parent=c)
-        #     signals.event.contribution_deleted.send(c, parent=self)
-
     def delete(self, user=None):
         """deletes the conference from the system.
         """
         signals.event.deleted.send(self, user=user)
-
-        self.notifyContributions()
 
         # will have to remove it from all the owners (categories) and the
         #   conference registry
@@ -1765,11 +1644,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def getConference( self ):
         return self
-
-    def getObservers(self):
-        if not hasattr(self, "_observers"):
-            self._observers = []
-        return self._observers
 
     def setDates( self, sDate, eDate=None, check=1, moveEntries=0, enforce_constraints=True):
         """
@@ -1827,16 +1701,10 @@ class Conference(CommonObjectBase, Locatable):
             raise MaKaCError("date should be timezone aware")
         if sDate == self.getStartDate():
             return
-        ###################################
-        # Fermi timezone awareness        #
-        ###################################
         if not indexes.BTREE_MIN_UTC_DATE <= sDate <= indexes.BTREE_MAX_UTC_DATE:
             raise FormValuesError(_("The start date must be between {} and {}.").format(
                 format_datetime(indexes.BTREE_MIN_UTC_DATE),
                 format_datetime(indexes.BTREE_MAX_UTC_DATE)))
-        ###################################
-        # Fermi timezone awareness        #
-        ###################################
         if check != 0:
             self.verifyStartDate(sDate)
         oldSdate = self.getStartDate()
@@ -1885,20 +1753,12 @@ class Conference(CommonObjectBase, Locatable):
     def getUnixStartDate(self):
         return datetimeToUnixTimeInt(self.startDate)
 
-    ###################################
-    # Fermi timezone awareness        #
-    ###################################
-
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
         if tz not in all_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
-
-    ###################################
-    # Fermi timezone awareness(end)   #
-    ###################################
 
     def setScreenStartDate(self, date):
         if date == self.getStartDate():
@@ -1962,14 +1822,9 @@ class Conference(CommonObjectBase, Locatable):
         self.verifyEndDate(self.endDate)
         self.notifyModification()
 
-
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
         return self.endDate
-
-    ##################################
-    # Fermi timezone awareness       #
-    ##################################
 
     def getAdjustedEndDate(self,tz=None):
         if not tz:
@@ -1977,10 +1832,6 @@ class Conference(CommonObjectBase, Locatable):
         if tz not in all_timezones:
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
-
-    ##################################
-    # Fermi timezone awareness(end)  #
-    ##################################
 
     def setScreenEndDate(self, date):
         if date == self.getEndDate():
@@ -2003,26 +1854,13 @@ class Conference(CommonObjectBase, Locatable):
             tz = self.getTimezone()
         return self.getScreenEndDate().astimezone(timezone(tz))
 
-    def isEndDateAutoCal( self ):
-        """Says whether the end date has been explicitely set for the session
-            or it must be calculated automatically
-        """
-        return self._endDateAutoCal
-
-    ####################################
-    # Fermi timezone awareness         #
-    ####################################
     def setTimezone(self, tz):
-        try:
-            oldTimezone = self.timezone
-        except AttributeError:
-            oldTimezone = tz
         self.timezone = tz
 
     def getTimezone(self):
         try:
             return self.timezone
-        except:
+        except AttributeError:
             return 'UTC'
 
     def moveToTimezone(self, tz):
@@ -2047,12 +1885,6 @@ class Conference(CommonObjectBase, Locatable):
         self.setDates( sDate.astimezone(timezone('UTC')), \
                        eDate.astimezone(timezone('UTC')),
                        moveEntries=1)
-
-
-
-    ####################################
-    # Fermi timezone awareness(end)    #
-    ####################################
 
     def getTitle(self):
         """returns (String) the title of the conference"""
@@ -2129,17 +1961,6 @@ class Conference(CommonObjectBase, Locatable):
     def getRoom( self ):
         return self.getOwnRoom()
 
-    def getLocationList(self):
-        """Method returning a list of "location" objects which contain the
-            information about the different places the conference is gonna
-            happen
-        """
-        return self.places
-
-    def addLocation(self, newPlace):
-        self.places.append( newPlace )
-        self.notifyModification()
-
     def setAccessKey(self, accessKey=""):
         """sets the access key of the conference"""
         self._accessKey = accessKey
@@ -2163,11 +1984,6 @@ class Conference(CommonObjectBase, Locatable):
         except AttributeError:
             self._modifKey = ""
             return self._modifKey
-
-    def __generateNewSessionId( self ):
-        """Returns a new unique identifier for the current conference sessions
-        """
-        return str(self.__sessionGenerator.newCount())
 
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
@@ -2476,12 +2292,6 @@ class Conference(CommonObjectBase, Locatable):
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
-    def addMaterial( self, newMat ):
-        newMat.setId( str(self.__materialGenerator.newCount()) )
-        newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat
-        self.notifyModification()
-
     def getDefaultStyle(self):
         return self.as_event.theme
 
@@ -2501,11 +2311,6 @@ class Conference(CommonObjectBase, Locatable):
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
-        for loc in self.getLocationList():
-            if loc is not None:
-                conf.addLocation(loc.clone())
-        if self.getRoom() is not None:
-            conf.setRoom(self.getRoom().clone())
         startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
@@ -2765,9 +2570,7 @@ class Resource(CommonObjectBase):
         return
 
     def delete(self):
-        if self._owner is not None:
-            self._owner.removeResource(self)
-            self._owner = None
+        self._owner = None
 
 
 class LocalFile(Resource):

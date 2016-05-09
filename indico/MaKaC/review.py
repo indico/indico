@@ -1262,12 +1262,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         del self.getAttachments()[key]
         self._notifyModification()
 
-    def removeResource(self, res):
-        """Necessary because LocalFile.delete (see _deleteFile) is calling this method.
-        In our case, nothing to do.
-        """
-        pass
-
     def _setOwner( self, owner ):
         self._owner = owner
 
