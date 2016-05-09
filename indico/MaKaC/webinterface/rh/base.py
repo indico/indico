@@ -551,18 +551,6 @@ class RH(RequestHandlerBase):
         return WErrorWSGI((message, explanation)).getHTML()
 
     @jsonify_error
-    def _processParentTimingError(self, e):
-        """Treats timing errors occured during the process of a RH."""
-
-        return errors.WPParentTimingError(self, e).display()
-
-    @jsonify_error
-    def _processEntryTimingError(self, e):
-        """Treats timing errors occured during the process of a RH."""
-
-        return errors.WPEntryTimingError(self, e).display()
-
-    @jsonify_error
     def _processFormValuesError(self, e):
         """Treats user input related errors occured during the process of a RH."""
 

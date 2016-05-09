@@ -114,18 +114,6 @@ class TimingError(MaKaCError):
     fossilizes(IErrorNoReportFossil)
 
 
-class ParentTimingError(TimingError):
-    """
-    """
-    pass
-
-
-class EntryTimingError(TimingError):
-    """
-    """
-    pass
-
-
 class NotLoggedError(MaKaCError):
     """
     """

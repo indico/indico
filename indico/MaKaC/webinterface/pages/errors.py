@@ -251,11 +251,6 @@ class WTimingError( WTemplated ):
         vars["urlbase"] = Config.getInstance().getBaseURL()
         return vars
 
-class WParentTimingError( WTimingError ):
-    pass
-
-class WEntryTimingError( WTimingError ):
-    pass
 
 class WPTimingError( WPDecorated ):
 
@@ -267,17 +262,6 @@ class WPTimingError( WPDecorated ):
         wc = WTimingError( self._rh, self._msg )
         return wc.getHTML()
 
-class WPParentTimingError( WPTimingError ):
-
-    def _getBody( self, params ):
-        wc = WParentTimingError( self._rh, self._msg )
-        return wc.getHTML()
-
-class WPEntryTimingError( WPTimingError ):
-
-    def _getBody( self, params ):
-        wc = WEntryTimingError( self._rh, self._msg )
-        return wc.getHTML()
 
 class WModificationError( WTemplated ):
 
