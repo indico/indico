@@ -13,13 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 import itertools
 import os
 import exceptions
 import urllib
 import pkg_resources
 import binascii
-from flask import session, g
+from flask import session
 from lxml import etree
 from pytz import timezone
 from speaklater import _LazyString
@@ -39,7 +40,6 @@ from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
 from MaKaC.common import utils
 from MaKaC.errors import MaKaCError
 from MaKaC.common.ContextHelp import ContextHelp
-from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
@@ -1338,62 +1338,6 @@ class WAbstractModNewIntComment(WTemplated):
         return vars
 
 
-class WSessionModifComm(WTemplated):
-    def __init__(self, aw,session):
-        self._aw = aw
-        self._session = session
-        self._conf = session.getConference()
-
-    def _getHTML(self,editCommentsURLGen):
-        try:
-            comment =self._session.getComments()
-            if comment=="":
-               comment= _("No Session Comment Entered")
-        except:
-            comment = _("No Session Comment Entered")
-            self._session.setComments("")
-
-        modifButton=""
-        if self._conf.canModify(self._aw):
-
-            modifButton =  i18nformat("""<form action=%s method="POST">
-                    <td align="center">
-                        <input type="submit" class="btn" value="_("modify")">
-                    </td>
-                    </form>
-                        """)%quoteattr(str(editCommentsURLGen(self._session)))
-        return ( i18nformat("""
-        <table width="50%%" align="center" style="border-left: 1px solid #777777">
-        <tr>
-            <td class="groupTitle"> _("Session comment")</td>
-        </tr>
-        <tr>
-            <td>
-                %s
-            </td>
-        </tr>
-        <tr>
-            %s
-        </tr>
-        </table> """)%(comment,modifButton))
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["comment"]=self._getHTML(vars["editCommentsURLGen"])
-        return vars
-
-
-
-class WSessionModifCommEdit(WTemplated):
-
-    def __init__(self,comment):
-        self._comment=comment
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["comment"]=self.htmlText(self._comment)
-        return vars
-
 class WAbstractModIntComments(WTemplated):
 
     def __init__(self,aw,abstract):
@@ -1473,140 +1417,6 @@ class WAbstractModUnMarkAsDup(WTemplated):
         vars=WTemplated.getVars(self)
         vars["unduplicateURL"]=quoteattr(str(vars["unduplicateURL"]))
         vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        return vars
-
-
-class WSessionModEditDataCode(WTemplated):
-
-    def __init__(self):
-        pass
-
-    def getVars( self ):
-        vars=WTemplated.getVars(self)
-        vars["code"]=quoteattr(str(vars.get("code","")))
-        return vars
-
-class WSessionModEditDataType(WTemplated):
-
-    def __init__(self):
-        pass
-
-    def getVars( self ):
-        vars=WTemplated.getVars(self)
-        l=[]
-        currentTTType=vars.get("tt_type",conference.SlotSchTypeFactory.getDefaultId())
-        for i in conference.SlotSchTypeFactory.getIdList():
-            sel=""
-            if i==currentTTType:
-                sel=" selected"
-            l.append("""<option value=%s%s>%s</option>"""%(quoteattr(str(i)),
-                        sel,self.htmlText(i)))
-        vars["tt_types"]="".join(l)
-        return vars
-
-class WSessionModEditDataColors(WTemplated):
-
-    def __init__(self):
-        pass
-
-    def getVars( self ):
-        vars=WTemplated.getVars(self)
-        return vars
-
-class WSessionModEditData(WTemplated):
-
-    def __init__(self, targetConf, aw, pageTitle="", targetDay=None):
-        self._conf = targetConf
-        self._title = pageTitle
-        self._targetDay = targetDay
-        self._aw = aw
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["conference"] = self._conf
-        vars["eventId"] = "s" + vars["sessionId"]
-        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
-        vars["pageTitle"] = self.htmlText(self._title)
-        vars["postURL"] = quoteattr(str(vars["postURL"]))
-        vars["title"] = quoteattr(str(vars.get("title", "")))
-        vars["description"] = self.htmlText(vars.get("description", ""))
-        vars["durHour"] = quoteattr(str(vars.get("durHour", 0)))
-        vars["durMin"] = quoteattr(str(vars.get("durMin", 20)))
-        vars["defaultInheritPlace"] = "checked"
-        vars["defaultDefinePlace"] = ""
-
-        if vars.get("convenerDefined", None) is None:
-            sessionId = vars["sessionId"]
-            session = self._conf.getSessionById(sessionId)
-            html = []
-            for convener in session.getConvenerList():
-                text = """
-                 <tr>
-                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                     <td>&nbsp;%s</td>
-                 </tr>""" % ("convener", convener.getId(), convener.getFullName())
-                html.append(text)
-            vars["definedConveners"] = """
-                                         """.join(html)
-        if vars.get("locationAction", "") == "define":
-            vars["defaultInheritPlace"] = ""
-            vars["defaultDefinePlace"] = "checked"
-        vars["confPlace"] = ""
-        confLocation = self._conf.getConference().getLocation()
-        if confLocation:
-            vars["confPlace"] = self.htmlText(confLocation.getName())
-        vars["locationName"] = quoteattr(str(vars.get("locationName", "")))
-        vars["locationAddress"] = self.htmlText(
-            vars.get("locationAddress", ""))
-        vars["defaultInheritRoom"] = ""
-        vars["defaultDefineRoom"] = ""
-        vars["defaultExistRoom"] = ""
-        if vars.get("roomAction", "") == "inherit":
-            vars["defaultInheritRoom"] = "checked"
-            roomName = ""
-        elif vars.get("roomAction", "") == "define":
-            vars["defaultDefineRoom"] = "checked"
-            roomName = vars.get(
-                "bookedRoomName") or vars.get("roomName", "")
-        elif vars.get("roomAction", "") == "exist":
-            vars["defaultExistRoom"] = "checked"
-            roomName = vars.get("exists", "") or vars.get("roomName", "")
-        else:
-            vars["defaultInheritRoom"] = "checked"
-            roomName = ""
-
-        vars["confRoom"] = ""
-        rx = []
-        roomsexist = self._conf.getRoomList()
-        roomsexist.sort()
-        for room in roomsexist:
-            sel = ""
-            if room == roomName:
-                sel = "selected=\"selected\""
-            rx.append(
-                """<option value=%s %s>%s</option>""" % (quoteattr(str(room)),
-                                                         sel, self.htmlText(room)))
-        vars["roomsexist"] = "".join(rx)
-        confRoom = self._conf.getConference().getRoom()
-        if confRoom:
-            vars["confRoom"] = self.htmlText(confRoom.getName())
-        vars["roomName"] = quoteattr(str(roomName))
-
-        import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        wf = wr.getFactory(self._conf)
-        if wf is not None:
-            type = wf.getId()
-        else:
-            type = "conference"
-        if type == "conference":
-            vars["Type"] = WSessionModEditDataType().getHTML(vars)
-            vars["Colors"] = WSessionModEditDataColors().getHTML(vars)
-            vars["code"] = WSessionModEditDataCode().getHTML(vars)
-        else:
-            vars["Type"] = ""
-            vars["Colors"] = ""
-            vars["code"] = ""
         return vars
 
 
