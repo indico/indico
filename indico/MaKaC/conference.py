@@ -1236,8 +1236,6 @@ class Conference(CommonObjectBase, Locatable):
         self._supportInfo = SupportInfo(self, "Support")
         self._contribTypes = {}
         self.___contribTypeGenerator = Counter()
-        self._authorIdx=AuthorIndex()
-        self._speakerIdx=AuthorIndex()
         self._boa=BOAConfig(self)
         self._bookings = {}
         self._registrantGenerator = Counter()
@@ -2630,64 +2628,6 @@ class Conference(CommonObjectBase, Locatable):
             self._trackCoordinators.unindexCoordinator( av, track )
             self.notifyModification()
 
-    def _rebuildAuthorIndex(self):
-        self._authorIdx=AuthorIndex()
-        for contrib in self.getContributionList():
-            if not isinstance(contrib.getCurrentStatus(),ContribStatusWithdrawn):
-                for auth in contrib.getAuthorList():
-                    self._authorIdx.index(auth)
-
-    def getAuthorIndex(self):
-        try:
-            if self._authorIdx:
-                pass
-        except AttributeError:
-            self._rebuildAuthorIndex()
-        return self._authorIdx
-
-    def indexAuthor(self,auth):
-        c=auth.getContribution()
-        if c.isAuthor(auth):
-            if not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
-                self.getAuthorIndex().index(auth)
-                if c.isPrimaryAuthor(auth):
-                    self._getPrimAuthIndex().index(auth)
-
-    def unindexAuthor(self,auth):
-        c=auth.getContribution()
-        if c.isAuthor(auth):
-            self.getAuthorIndex().unindex(auth)
-            if c.isPrimaryAuthor(auth):
-                self._getPrimAuthIndex().unindex(auth)
-
-    def _rebuildSpeakerIndex(self):
-        self._speakerIdx=AuthorIndex()
-        for contrib in self.getContributionList():
-            if not isinstance(contrib.getCurrentStatus(),ContribStatusWithdrawn):
-                for auth in contrib.getSpeakerList():
-                    self._speakerIdx.index(auth)
-                for subcontrib in contrib.getSubContributionList():
-                    for auth in subcontrib.getSpeakerList():
-                        self._speakerIdx.index(auth)
-
-    def getSpeakerIndex(self):
-        try:
-            if self._speakerIdx:
-                pass
-        except AttributeError:
-            self._rebuildSpeakerIndex()
-        return self._speakerIdx
-
-    def indexSpeaker(self,auth):
-        c=auth.getContribution()
-        if not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
-            self.getSpeakerIndex().index(auth)
-
-    def unindexSpeaker(self,auth):
-        c=auth.getContribution()
-        if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
-            self.getSpeakerIndex().unindex(auth)
-
     def getBOAConfig(self):
         try:
             if self._boa:
@@ -2799,14 +2739,6 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
 
 
 class ContributionParticipation(Persistent, Fossilizable):
-    pass
-
-
-class AuthorIndex(Persistent):
-    pass
-
-
-class _AuthIdx(Persistent):
     pass
 
 

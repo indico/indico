@@ -14,13 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
-
-from flask import session
-
 from MaKaC.user import AvatarHolder
-from MaKaC.conference import ContributionParticipation
-from indico.modules.users.util import get_user_by_email
 
 
 def searchUsers(surName="", name="", organisation="", email="", exactMatch=True, searchExt=False):
@@ -61,25 +55,3 @@ def get_authors_from_author_index(event, limit):
     #     authors.append(user.as_avatar if user else author)
     # return authors
     return []
-
-
-def make_participation_from_obj(obj, contrib_participation=None):
-    """Convert a user-like object to a ContributionParticipation
-
-    :param obj: The object to take the values of the ContributionParticipation
-                from
-    :param contrib_participation: In case the return object has been initialised
-                                  outside of the function
-    :return: a ContributionParticipation object
-    """
-    if contrib_participation is None:
-        contrib_participation = ContributionParticipation()
-    contrib_participation.setTitle(obj.getTitle())
-    contrib_participation.setFirstName(obj.getName())
-    contrib_participation.setFamilyName(obj.getSurName())
-    contrib_participation.setEmail(obj.getEmail())
-    contrib_participation.setAddress(obj.getAddress())
-    contrib_participation.setFax(obj.getFax())
-    contrib_participation.setAffiliation(obj.getAffiliation())
-    contrib_participation.setPhone(obj.getPhone())
-    return contrib_participation
