@@ -30,7 +30,7 @@ def test_markdown():
     # basic markdown
     assert markdown('**hi**') == u'<p><strong>hi</strong></p>'
     # nl2br extension
-    assert markdown('hello\nworld') == u'<p>hello<br />\nworld</p>'
+    assert markdown('hello\nworld') == u'<p>hello<br>\nworld</p>'
     # unicode
     val = u'm\xf6p'
     utfval = val.encode('utf-8')

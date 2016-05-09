@@ -36,7 +36,9 @@ from markupsafe import Markup
 from speaklater import _LazyString
 
 
-BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br']
+BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr',
+                                             'td', 'img', 'hr']
+BLEACH_ALLOWED_ATTRIBUTES = dict(bleach.ALLOWED_ATTRIBUTES, img=['src', 'alt'])
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
@@ -225,7 +227,8 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
 
     if md is None:
-        result = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
+        result = bleach.clean(markdown.markdown(text, **kwargs), tags=BLEACH_ALLOWED_TAGS,
+                              attributes=BLEACH_ALLOWED_ATTRIBUTES)
     else:
         result = md(text, **kwargs)
 

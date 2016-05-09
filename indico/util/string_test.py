@@ -20,7 +20,8 @@ import pytest
 from enum import Enum
 
 from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number, sanitize_email)
+                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number, render_markdown,
+                                sanitize_email)
 
 
 def test_seems_html():
@@ -186,3 +187,23 @@ def test_normalize_phone_number(input, output):
 ))
 def test_sanitize_email(input, output):
     assert sanitize_email(input) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('*coconut*', '<p><em>coconut</em></p>'),
+    ('**swallow**', '<p><strong>swallow</strong></p>'),
+    ('<span>Blabla **strong text**</span>', '<p>&lt;span&gt;Blabla <strong>strong text</strong>&lt;/span&gt;</p>'),
+    ('[Python](http://www.google.com/search?q=holy+grail&ln=fr)',
+     '<p><a href="http://www.google.com/search?q=holy+grail&amp;ln=fr">Python</a></p>'),
+    ("<script>alert('I'm evil!')</script>", "&lt;script&gt;alert('I'm evil!')&lt;/script&gt;"),
+    ("Name|Colour\n---|---\nLancelot|Blue",
+     '<table>\n<thead>\n<tr>\n<th>Name</th>\n<th>Colour</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Lancelot</td>\n'
+     '<td>Blue</td>\n</tr>\n</tbody>\n</table>'),
+    ("**$2 * 2 * 2 > 7$**", "<p><strong>$2 * 2 * 2 > 7$</strong></p>"),
+    ("Escaping works just fine! $ *a* $", "<p>Escaping works just fine! $ *a* $</p>"),
+    ('![Just a cat](http://myserver.example.com/cat.png)', '<p><img alt="Just a cat" '
+     'src="http://myserver.example.com/cat.png"></p>'),
+    ("<https://indico.github.io>", '<p><a href="https://indico.github.io">https://indico.github.io</a></p>')
+))
+def test_markdown(input, output):
+    assert render_markdown(input,  extensions=('tables',)) == output
