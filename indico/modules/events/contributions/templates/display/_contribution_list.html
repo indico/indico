@@ -6,6 +6,7 @@
             <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
                 <span class="value">
                     <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                        <span class="contrib-id">{{ contrib.friendly_id }}.</span>
                         {{ contrib.title }}
                     </a>
                 </span>
