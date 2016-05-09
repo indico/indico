@@ -22,6 +22,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
+from indico.modules.events import Event
 from indico.modules.events.cloning import EventCloner
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -44,14 +45,12 @@ def _extend_event_management_menu(sender, event, **kwargs):
     return SideMenuItem('reminders', _('Reminders'), url_for('event_reminders.list', event), section='organization')
 
 
-@signals.event.data_changed.connect
-def _event_data_changed(event, **kwargs):
+@signals.event.times_changed.connect_via(Event)
+def _event_times_changed(sender, obj, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
-    query = EventReminder.find(EventReminder.event_id == int(event.id),
-                               EventReminder.is_relative,
-                               ~EventReminder.is_sent)
-    for reminder in query:
-        new_dt = event.getStartDate() - reminder.event_start_delta
+    event = obj
+    for reminder in event.reminders.filter(EventReminder.is_relative, ~EventReminder.is_sent):
+        new_dt = event.start_dt - reminder.event_start_delta
         if reminder.scheduled_dt != new_dt:
             logger.info('Changing start time of %s to %s', reminder, new_dt)
             reminder.scheduled_dt = new_dt
