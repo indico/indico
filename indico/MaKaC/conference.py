@@ -27,6 +27,7 @@ from MaKaC.common.PickleJar import Updates
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.events.sessions import session_settings
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
@@ -2572,8 +2573,11 @@ class Conference(CommonObjectBase, Locatable):
                                                full_access=entry.full_access, roles=entry.roles, quiet=True)
             for user in self.getAllowedToAccessList():
                 conf.grantAccess(user)
-            for right in self.getSessionCoordinatorRights():
-                conf.addSessionCoordinatorRight(right)
+            session_settings_data = session_settings.get_all(self)
+            session_settings.set_multi(conf, {
+                'coordinators_manage_contributions': session_settings_data['coordinators_manage_contributions'],
+                'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
+            })
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
         conf.notifyModification()
