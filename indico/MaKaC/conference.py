@@ -3529,8 +3529,6 @@ class Track(CoreObject):
         self.id = "not assigned"
         self.title = ""
         self.description = ""
-        self.subTracks = {}
-        self.__SubTrackGenerator = Counter()
         self._abstracts = OOBTree()
         self._coordinators = []
         self._contributions = OOBTree()
@@ -3553,13 +3551,8 @@ class Track(CoreObject):
         tr.setTitle(self.getTitle())
         tr.setCode(self.getCode())
         tr.setDescription(self.getDescription())
-
-        for co in self.getCoordinatorList() :
+        for co in self.getCoordinatorList():
             tr.addCoordinator(co)
-
-        for subtr in self.getSubTrackList() :
-            tr.addSubTrack(subtr.clone())
-
         return tr
 
 
@@ -3667,50 +3660,6 @@ class Track(CoreObject):
 
     def setCode(self,newCode):
         self._code=str(newCode).strip()
-
-    def __generateNewSubTrackId( self ):
-        return str(self.__SubTrackGenerator.newCount())
-
-    def addSubTrack( self, newSubTrack ):
-        """Registers the contribution passed as parameter within the session
-            assigning it a unique id.
-        """
-        if newSubTrack in self.subTracks.values():
-            return
-        subTrackId = newSubTrack.getId()
-        if subTrackId == "not assigned":
-            subTrackId = self.__generateNewSubTrackId()
-        self.subTracks[subTrackId] = newSubTrack
-        newSubTrack.setTrack( self )
-        newSubTrack.setId( subTrackId )
-        self.notifyModification()
-
-    def removeSubTrack( self, subTrack ):
-        """Removes the indicated contribution from the session
-        """
-        if subTrack in self.subTracks.values():
-            del self.subTracks[ subTrack.getId() ]
-            self._p_changed = True
-            subTrack.setTrack( None )
-            subTrack.delete()
-            self.notifyModification()
-
-    def recoverSubTrack(self, subTrack):
-        self.addSubTrack(subTrack)
-        subTrack.recover()
-
-    def newSubTrack( self ):
-        st = SubTrack()
-        self.addSubTrack( st )
-        return st
-
-    def getSubTrackById( self, id ):
-        if self.subTracks.has_key( id ):
-            return self.subTracks[ id ]
-        return None
-
-    def getSubTrackList( self ):
-        return self.subTracks.values()
 
     def getAbstractList( self ):
         """
@@ -3893,82 +3842,6 @@ class Track(CoreObject):
 
     def canUserCoordinate( self, av ):
         return self.isCoordinator( av ) or self.canUserModify( av )
-
-
-class SubTrack(CoreObject):  # XXX seems to be unused
-
-    def __init__( self ):
-        self.track = None
-        self.id = "not assigned"
-        self.title = ""
-        self.description = ""
-
-    def clone(self):
-        sub = SubTrack()
-        sub.setDescription(self.getDescription())
-        sub.setTitle(self.getTitle())
-
-        return sub
-
-
-    def delete(self):
-        TrashCanManager().add(self)
-
-    def recover(self):
-        TrashCanManager().remove(self)
-
-    def canModify(self, aw_or_user):
-        return self.track.canModify(aw_or_user)
-
-    def canView( self, aw ):
-        return self.track.canView( aw )
-
-    def notifyModification( self ):
-        parent = self.getTrack()
-        if parent:
-            parent.setModificationDate()
-        self._p_changed = 1
-
-    def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator
-            object for the session instance
-        """
-        if self.track == None:
-            return Locator()
-        lconf = self.track.getLocator()
-        lconf["subTrackId"] = self.getId()
-        return lconf
-
-    def setTrack(self, track):
-        self.track = track
-        if track == None:
-            return
-
-    def getTrack( self ):
-        return self.track
-
-    def getOwner( self ):
-        return self.getTrack()
-
-    def setId( self, newId ):
-        self.id = str(newId)
-
-    def getId( self ):
-        return self.id
-
-    def setTitle( self, newTitle ):
-        self.title = newTitle
-        self.notifyModification()
-
-    def getTitle( self ):
-        return self.title
-
-    def setDescription(self, newDescription ):
-        self.description = newDescription
-        self.notifyModification()
-
-    def getDescription(self):
-        return self.description
 
 
 class BOAConfig(Persistent):

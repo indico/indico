@@ -37,24 +37,19 @@ from indico.web.flask.util import url_for
 class WPTrackModifBase(WPConferenceModifBase):
     sidemenu_option = 'program'
 
-    def __init__(self, rh, track, subTrack=None):
+    def __init__(self, rh, track):
         WPConferenceModifBase.__init__(self, rh, track.getConference())
         self._track = track
-        self._subTrack = subTrack
 
     def _getNavigationDrawer(self):
-        if self._subTrack:
-            target = self._subTrack
-        else:
-            target = self._track
+        target = self._track
         pars = {"target": target, "isModif": True}
-        return wcomponents.WNavigationDrawer( pars, bgColor="white" )
+        return wcomponents.WNavigationDrawer(pars, bgColor="white")
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHTrackModification.getURL( self._track ) )
-        self._tabSubTrack = None
         self._tabCoordination= self._tabCtrl.newTab( "cc", \
                  _("Coordination control"), \
                 urlHandlers.UHTrackModifCoordination.getURL( self._track ) )

@@ -9,9 +9,6 @@
         <td>${ coordinators }</td>
     </tr>
     <tr>
-        <td>${ subtracks }</td>
-    </tr>
-    <tr>
         <td><br></td>
     </tr>
 </table>

@@ -76,9 +76,6 @@ class RHTrackBase( RHConferenceSite ):
         l.setTrack( params )
         self._track = self._target = l.getObject()
         self._conf = self._track.getConference()
-        self._subTrack = None
-        if params.has_key("subTrackId"):
-            self._subTrack = self._track.getSubTrackById(params["subTrackId"])
 
 
 class RHAbstractBase( RHConferenceSite ):
