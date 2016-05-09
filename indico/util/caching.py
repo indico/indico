@@ -18,8 +18,6 @@ from functools import wraps
 
 from flask import has_request_context, g, current_app
 
-from MaKaC.common.cache import GenericCache
-
 
 _notset = object()
 
@@ -81,6 +79,7 @@ def memoize_redis(ttl):
     :param ttl: How long the result should be cached.  May be a
                 timedelta or a number (seconds).
     """
+    from MaKaC.common.cache import GenericCache
     cache = GenericCache('memoize')
 
     def decorator(f):
