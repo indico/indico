@@ -421,9 +421,9 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         self._location = hook._location
         self._room = hook._room
         self.user = getattr(aw.getUser(), 'user', None)
-
-    def _postprocess(self, obj, fossil, iface):
-        return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
+        self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'], 'events')
+        if self._detail_level not in ('events', 'contributions', 'subcontributions', 'sessions'):
+            raise HTTPAPIError('Invalid detail level: {}'.format(self._detail_level), 400)
 
     @classmethod
     def getCategoryPath(cls, idList, aw):
@@ -516,7 +516,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         return options
 
     def category(self, idlist):
-        self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
         query = (Event.query
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
@@ -526,7 +525,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
 
     def event(self, idlist):
-        self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
         query = (Event.find(Event.id.in_(idlist),
                             ~Event.is_deleted,
                             Event.happens_between(self._fromDT, self._toDT))
