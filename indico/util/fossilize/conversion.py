@@ -72,34 +72,6 @@ class Conversion(object):
             return None
 
     @classmethod
-    def roomName(cls, room):
-        if room:
-            return room.getName()
-        else:
-            return ''
-
-    @classmethod
-    def roomFullName(cls, room):
-        if room:
-            return room.getFullName()
-        else:
-            return ''
-
-    @classmethod
-    def locationName(cls, loc):
-        if loc:
-            return loc.getName()
-        else:
-            return ''
-
-    @classmethod
-    def locationAddress(cls, loc):
-        if loc:
-            return loc.getAddress()
-        else:
-            return ''
-
-    @classmethod
     def reservationsList(cls, resvs):
         res = defaultdict(list)
         for resv in resvs:

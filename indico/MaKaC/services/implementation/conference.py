@@ -61,7 +61,6 @@ from indico.modules.events.util import track_time_changes
 from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
-from indico.core.config import Config
 
 
 def _serialize_contribution(contrib):
@@ -196,65 +195,6 @@ class ConferenceTypeModification(ConferenceTextModificationBase):
 
     def _handleGet(self):
         return self._target.getType()
-
-
-class ConferenceBookingModification(ConferenceTextModificationBase):
-    """
-    Conference location name modification
-    """
-    def _handleSet(self):
-        changed = False
-        room = self._target.getRoom()
-        loc = self._target.getLocation()
-
-        old_data = {'location': loc.name if loc else '',
-                    'address': loc.address if loc else '',
-                    'room': room.name if room else ''}
-
-        newLocation = self._value.get('location')
-        newRoom = self._value.get('room')
-
-        if room is None:
-            room = conference.CustomRoom()
-            self._target.setRoom(room)
-
-        if room.getName() != newRoom:
-            room.setName(newRoom)
-
-            if Config.getInstance().getIsRoomBookingActive():
-                room.retrieveFullName(newLocation)
-            else:
-                # invalidate full name, as we have no way to know it
-                room.fullName = None
-            changed = True
-
-        if loc is None:
-            loc = conference.CustomLocation()
-            self._target.setLocation(loc)
-
-        if loc.getName() != newLocation:
-            loc.setName(newLocation)
-            changed = True
-
-        if loc.getAddress() != self._value['address']:
-            loc.setAddress(self._value['address'])
-            changed = True
-
-        if changed:
-            new_data = {'location': loc.name,
-                        'address': loc.address,
-                        'room': room.name}
-            if old_data != new_data:
-                signals.event.data_changed.send(self._target, attr='location', old=old_data, new=new_data)
-
-    def _handleGet(self):
-
-        loc = self._target.getLocation()
-        room = self._target.getRoom()
-
-        return {'location': loc.getName() if loc else "",
-                'room': room.name if room else "",
-                'address': loc.getAddress() if loc else ""}
 
 
 class ConferenceShortURLModification(ConferenceTextModificationBase):
@@ -763,8 +703,6 @@ methodMap = {
     "main.changeDescription": ConferenceDescriptionModification,
     "main.changeAdditionalInfo": ConferenceAdditionalInfoModification,
     "main.changeDates": ConferenceStartEndDateTimeModification,
-    "main.changeBooking": ConferenceBookingModification,
-    "main.displayBooking": ConferenceBookingModification,
     "main.changeShortURL": ConferenceShortURLModification,
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,

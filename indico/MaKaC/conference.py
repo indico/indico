@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.orm import joinedload
 
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
@@ -30,12 +30,11 @@ from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.sessions import session_settings
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.events.util import track_time_changes
-from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import L_
-from indico.util.string import fix_broken_string, return_ascii, is_legacy_id, to_unicode
+from indico.util.string import return_ascii, is_legacy_id, to_unicode
 
 
 import os
@@ -106,91 +105,6 @@ class CoreObject(Persistent):
             return utc_timestamp(self.getStartDate())
         else:
             return None
-
-
-@memoize_request
-def _get_room_mapping():
-    return {(r.location.name, r.name): r for r in Room.query.options(lazyload(Room.owner), joinedload(Room.location))}
-
-
-class Locatable:
-    """
-    Inherited by objects that imply a physical location:
-    * Conferences
-    * Sessions
-    * SessionSlots
-    * Contributions
-    * SubContributions
-    """
-
-    @property
-    def rb_room(self):
-        if not self.getLocation() or not self.getRoom():
-            return None
-
-        location = self.getLocation().getName()
-        room = self.getRoom().getName()
-
-        if not location or not room:
-            return None
-
-        key = fix_broken_string(location, True), fix_broken_string(room, True)
-        return _get_room_mapping().get(key)
-
-    def getLocationParent(self):
-        """
-        Returns the object the location info should be inherited from
-        (Overridden)
-        """
-        raise Exception("Unimplemented method")
-
-    def getLocation(self):
-        if self.getOwnLocation():
-            return self.getOwnLocation()
-        return self.getInheritedLocation()
-
-    def getOwnLocation(self):
-        if len(self.places) > 0:
-            return self.places[0]
-        return None
-
-    def getInheritedLocation(self):
-        return self.getLocationParent().getLocation()
-
-    def getOwnRoom(self):
-        if len(self.rooms) > 0:
-            return self.rooms[0]
-        return None
-
-    def getRoom(self):
-        if self.getOwnRoom():
-            return self.getOwnRoom()
-        return self.getInheritedRoom()
-
-    def getInheritedRoom(self):
-        return self.getLocationParent().getRoom()
-
-    def setLocation(self, newLocation):
-        oldLocation = self.getOwnLocation()
-        if newLocation is None:
-            if len(self.places) > 0:
-                del self.places[0]
-        elif len(self.places) > 0:
-            self.places[0] = newLocation
-        else:
-            self.places.append(newLocation)
-        self.notifyModification()
-
-    def setRoom(self, newRoom):
-        oldRoom = self.getOwnRoom()
-        if newRoom is None:
-            if len(self.rooms) > 0:
-                del self.rooms[0]
-        elif len(self.rooms) > 0:
-            self.rooms[0] = newRoom
-        else:
-            self.rooms.append(newRoom)
-        self.notifyModification()
 
 
 class CommonObjectBase(CoreObject, Fossilizable):
@@ -1088,98 +1002,7 @@ class Category(CommonObjectBase):
         self._p_changed = 1
 
 
-class CustomLocation(Persistent):
-
-    def __init__(self, **locationData):
-        self.name = ""
-        self.address = ""
-        self.room = ""
-
-    def setValues(self, data):
-        self.setName(data.get("name", ""))
-        self.setAddress(data.get("address", ""))
-        self.setRoom(data.get("room", ""))
-
-    def getValues(self):
-        d = {}
-        d["name"] = self.getName()
-        d["address"] = self.getAddress()
-        d["room"] = self.getRoom()
-        return d
-
-    def clone(self):
-        newCL = CustomLocation()
-        newCL.setValues(self.getValues())
-        return newCL
-
-    def setName(self, newName):
-        self.name = newName
-
-    def getName(self):
-        return self.name
-
-    def setAddress(self, newAddress):
-        self.address = newAddress
-
-    def getAddress(self):
-        return self.address
-
-    def setRoom(self, newRoom):
-        self.room = newRoom
-
-    def getRoom(self):
-        return self.room
-
-
-class CustomRoom(Persistent):
-
-    def __init__(self):
-        self.name = ""
-        self.fullName = None
-
-    def setValues(self, data):
-        self.setName(data.get("name", ""))
-        self.setFullName(data.get("fullName"))
-
-    def getValues(self):
-        d = {}
-        d["name"] = self.getName()
-        d["fullName"] = self.getFullName()
-        return d
-
-    def getId(self):
-        return "Custom"
-
-    def clone(self):
-        newCR = CustomRoom()
-        newCR.setValues(self.getValues())
-        return newCR
-
-    def setName(self, newName):
-        self.name = newName.strip()
-
-    def getName(self):
-        return self.name
-
-    def retrieveFullName(self, location):
-        if not location:
-            return
-        key = fix_broken_string(location, True), fix_broken_string(self.name, True)
-        room = _get_room_mapping().get(key)
-        full_name = room.full_name if room else None
-        if getattr(self, 'fullName', None) != full_name:
-            self.fullName = full_name
-
-    def setFullName(self, newFullName):
-        self.fullName = newFullName
-
-    def getFullName(self):
-        if not hasattr(self, 'fullName'):
-            self.fullName = None
-        return self.fullName
-
-
-class Conference(CommonObjectBase, Locatable):
+class Conference(CommonObjectBase):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
@@ -1421,26 +1244,6 @@ class Conference(CommonObjectBase, Locatable):
         self.setDescription(confData.get("description", ""))
         self.getSupportInfo().setEmail(confData.get("supportEmail", ""))
         self.setContactInfo(confData.get("contactInfo", ""))
-        if confData.get("locationName", "").strip() == "":
-            self.setLocation(None)
-        else:
-            #if the location name is defined we must set a new location (or
-            #   modify the existing one) for the conference
-            loc = self.getLocation()
-            if not loc:
-                loc = CustomLocation()
-            self.setLocation(loc)
-            loc.setName(confData["locationName"])
-            loc.setAddress(confData.get("locationAddress", ""))
-        #same as for the location
-        if confData.get("roomName", "").strip() == "":
-                self.setRoom(None)
-        else:
-            room = self.getRoom()
-            if not room:
-                room = CustomRoom()
-            self.setRoom(room)
-            room.setName(confData["roomName"])
         self.notifyModification()
 
     def getVisibility ( self ):
@@ -1939,27 +1742,6 @@ class Conference(CommonObjectBase, Locatable):
     def setContactInfo(self, contactInfo):
         self.contactInfo = contactInfo
         self.notifyModification()
-
-    def getLocationParent( self ):
-        """
-        Returns the object from which the room/location
-        information should be inherited.
-        For Conferences, it's None, since they can't inherit
-        from anywhere else.
-        """
-        return None
-
-    def getLocation( self ):
-        return self.getOwnLocation()
-
-    def getAddress( self ):
-        if self.getOwnLocation():
-            return self.getOwnLocation().getAddress()
-        else:
-            return None
-
-    def getRoom( self ):
-        return self.getOwnRoom()
 
     def setAccessKey(self, accessKey=""):
         """sets the access key of the conference"""

@@ -19,14 +19,19 @@ from __future__ import unicode_literals, division
 
 from operator import attrgetter
 
+from sqlalchemy.orm import lazyload, joinedload
+
 from indico.modules.events.models.events import Event
-from indico.modules.rb import Location
+from indico.modules.rb import Location, Room
 from indico.util.console import verbose_iterator
 from indico.util.string import fix_broken_string
 from indico.util.struct.iterables import committing_iterator
-from MaKaC.conference import _get_room_mapping
 
 from indico_zodbimport import Importer, convert_to_unicode
+
+
+def _get_room_mapping():
+    return {(r.location.name, r.name): r for r in Room.query.options(lazyload(Room.owner), joinedload(Room.location))}
 
 
 class EventLocationsImporter(Importer):

@@ -756,7 +756,6 @@ class WConfModifMainData(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        type = vars["type"]
         vars["defaultStyle"] = self._conf.as_event.theme
         vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
@@ -768,27 +767,11 @@ class WConfModifMainData(wcomponents.WTemplated):
         else:
             vars["description"] = ""
 
-        ###################################
-        # Fermi timezone awareness        #
-        ###################################
         tz = self._conf.getTimezone()
         vars["timezone"] = tz
         vars["startDate"]=formatDateTime(self._conf.getAdjustedStartDate())
         vars["endDate"]=formatDateTime(self._conf.getAdjustedEndDate())
-        ###################################
-        # Fermi timezone awareness(end)   #
-        ###################################
         vars["chairText"] = self.htmlText(self._conf.getChairmanText())
-        place=self._conf.getLocation()
-
-        vars["locationName"]=vars["locationAddress"]=""
-        if place:
-            vars["locationName"]=self.htmlText(place.getName())
-            vars["locationAddress"]=self.htmlText(place.getAddress())
-        room=self._conf.getRoom()
-        vars["locationRoom"]=""
-        if room:
-            vars["locationRoom"]=self.htmlText(room.getName())
         if isStringHTML(self._conf.getContactInfo()):
             vars["contactInfo"]=self._conf.getContactInfo()
         else:
@@ -827,13 +810,8 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
 
-        loc = self._conf.getLocation()
-        room = self._conf.getRoom()
         vars['styleOptions'] = {tid: data['title'] for tid, data in
                                 theme_settings.get_themes_for(self._conf.getType()).viewitems()}
-        vars["currentLocation"] = { 'location': loc.getName() if loc else "",
-                                    'room': room.name if room else "",
-                                    'address': loc.getAddress() if loc else "" }
         return vars
 
 class WPConferenceModificationClosed( WPConferenceModifBase ):
@@ -1010,18 +988,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["orgText"] = self._conf.getOrgText()
         vars["visibility"] = self._getVisibilityHTML()
         vars["shortURLTag"] = quoteattr( self._conf.getUrlTag() )
-        locName, locAddress, locRoom = "", "", ""
-        location = self._conf.getLocation()
-        if location:
-            locName = location.getName()
-            locAddress = location.getAddress()
-        room = self._conf.getRoom()
-        if room:
-            locRoom = room.getName()
         vars["locator"] = self._conf.getLocator().getWebForm()
-
-        vars["locationAddress"] = locAddress
-
         vars["supportCaption"] = quoteattr(self._conf.getSupportInfo().getCaption())
         vars["supportEmail"] = quoteattr( self._conf.getSupportInfo().getEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()

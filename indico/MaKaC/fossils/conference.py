@@ -46,23 +46,6 @@ class IConferenceFossil(IConferenceMinimalFossil):
     def getDescription(self):
         """Conference description"""
 
-    def getLocation(self):
-        """ Location (CERN/...) """
-    getLocation.convert = lambda l: l and l.getName()
-
-    def getRoom(self):
-        """ Room (inside location) """
-    getRoom.convert = lambda r: r and r.getName()
-
-    def getAddress(self):
-        """ Address of the event """
-    getAddress.produce = lambda s: s.getLocation().getAddress() if s.getLocation() is not None else None
-
-    def getRoomBookingList(self):
-        """ Reservations """
-    getRoomBookingList.convert = Conversion.reservationsList
-    getRoomBookingList.name = "bookedRooms"
-
     def getStartDate(self):
         """ Start Date """
     getStartDate.convert = Conversion.datetime
@@ -93,19 +76,6 @@ class IConferenceEventInfoFossil(IConferenceMinimalFossil):
     in the timetable operations
     """
 
-    def getAddress(self):
-        """ Address """
-    getAddress.produce = lambda s: s.getLocation()
-    getAddress.convert = Conversion.locationAddress
-
-    def getLocation(self):
-        """ Location (CERN/...) """
-    getLocation.convert = Conversion.locationName
-
-    def getRoom(self):
-        """ Room (inside location) """
-    getRoom.convert = Conversion.roomName
-
     def getAdjustedStartDate(self):
         """ Start Date """
     getAdjustedStartDate.convert = Conversion.datetime
@@ -119,11 +89,3 @@ class IConferenceEventInfoFossil(IConferenceMinimalFossil):
     def isConference(self):
         """ Is this event a conference ? """
     isConference.produce = lambda s: s.getType() == 'conference'
-
-    def getFavoriteRooms(self):
-        """ Favorite Rooms """
-
-    def getRoomBookingList(self):
-        """ Reservations """
-    getRoomBookingList.convert = Conversion.reservationsList
-    getRoomBookingList.name = "bookedRooms"

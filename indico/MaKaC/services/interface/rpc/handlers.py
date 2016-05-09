@@ -23,7 +23,6 @@ from indico.modules.rb import services as rb_services
 from indico.modules.rb.services import (
     aspects as rb_aspect_services,
     blockings as rb_blocking_services,
-    locations as rb_location_services,
     rooms as rb_room_services
 )
 
@@ -40,12 +39,8 @@ methodMap = {
     'resources.timezones.getAll': resources.GetTimezones,
     # rb base
     'roomBooking.getDateWarning': rb_services.GetDateWarning,
-    # rb locations
-    'roomBooking.locations.list': rb_location_services.RoomBookingListLocations,
     # rb rooms
-    'roomBooking.rooms.list': rb_room_services.RoomBookingListRooms,
     'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
-    'roomBooking.rooms.fullNameList': rb_room_services.RoomBookingFullNameListRooms,
     'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,
     'roomBooking.room.bookingPermission': rb_room_services.BookingPermission,
     # rb aspects

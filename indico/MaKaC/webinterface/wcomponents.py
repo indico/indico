@@ -623,6 +623,7 @@ class WEventFooter(WFooter):
     def __init__(self, conf, tpl_name = None, isFrontPage = False):
         WFooter.__init__(self, tpl_name, isFrontPage)
         self._conf = conf
+        self._event = conf.as_event
 
     def _gCalDateFormat(self, dtime):
         return dtime.strftime("%Y%m%dT%H%M%SZ")
@@ -631,10 +632,9 @@ class WEventFooter(WFooter):
         v = WFooter.getVars(self)
 
         cid = self._conf.getUrlTag().strip() or self._conf.getId()
-        location = self._conf.getLocation().getName() if self._conf.getLocation() else ''
-
-        if self._conf.getRoom() and self._conf.getRoom().getName():
-            location = "%s (%s)" % (self._conf.getRoom().getName(), location)
+        location = self._event.venue_name
+        if self._event.room_name:
+            location = '{} ({})'.format(self._event.room_name, location)
 
         description = self._conf.getDescription()
 
@@ -656,7 +656,7 @@ class WEventFooter(WFooter):
             'trp': False,
             'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
                       'name:indico']
-            })
+        })
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         app_data = minfo.getSocialAppConfig()

@@ -17,10 +17,10 @@
         ${conf.getAdjustedEndDate(tz).strftime("%A %d %B %Y")}
     \end{center}
 
-    % if conf.getLocation():
+    % if conf.venue_name:
         \begin{center}
             \Large
-            ${conf.getLocation().getName()}
+            ${conf.venue_name}
         \end{center}
     % endif
 

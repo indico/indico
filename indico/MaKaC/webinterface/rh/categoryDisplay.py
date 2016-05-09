@@ -272,10 +272,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         else:
             chair = '; '.join(x.full_name.encode('utf-8') for x in conf.as_event.person_links)
         subject = "New %s in indico (%s)" % (type,conf.getId())
-        if conf.getRoom() != None:
-            room = conf.getRoom().getName()
-        else:
-            room = ""
+        room = conf.as_event.room_name
         text = """
 _Category_
 %s

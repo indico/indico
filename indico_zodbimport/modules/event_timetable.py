@@ -25,7 +25,7 @@ from operator import attrgetter, itemgetter
 from uuid import uuid4
 
 import click
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload, undefer, lazyload
 from sqlalchemy.orm.attributes import set_committed_value
 
 from indico.core.db import db
@@ -57,7 +57,7 @@ from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.rb import Location
+from indico.modules.rb import Location, Room
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.models.users import UserTitle
@@ -65,8 +65,6 @@ from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import as_utc
 from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
 from indico.util.struct.iterables import committing_iterator
-
-from MaKaC.conference import _get_room_mapping, CustomLocation, CustomRoom
 
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import convert_principal, patch_default_group_provider
@@ -95,6 +93,10 @@ AVATAR_PERSON_INFO_MAP = {
     'getFamilyName': 'last_name',
     'getPhone': 'phone'
 }
+
+
+def _get_room_mapping():
+    return {(r.location.name, r.name): r for r in Room.query.options(lazyload(Room.owner), joinedload(Room.location))}
 
 
 class TimetableMigration(object):

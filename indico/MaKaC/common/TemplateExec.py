@@ -30,7 +30,6 @@ from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import format_number, format_datetime, format_date, format_time, format_human_timedelta
 from indico.util.i18n import ngettext
-from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
 from indico.util.string import safe_upper
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -353,18 +352,9 @@ def registerHelpers(objDict):
         objDict['Config'] = Config
     if not 'jsBoolean' in objDict:
         objDict['jsBoolean'] = jsBoolean
-    if not 'jsonDescriptor' in objDict:
-        from MaKaC.services.interface.rpc.offline import jsonDescriptor
-        objDict['jsonDescriptor'] = jsonDescriptor
-    if not 'jsonDescriptorType' in objDict:
-        from MaKaC.services.interface.rpc.offline import jsonDescriptorType
-        objDict['jsonDescriptorType'] = jsonDescriptorType
     if not 'jsonEncode' in objDict:
         from MaKaC.services.interface.rpc.json import encode as jsonEncode
         objDict['jsonEncode'] = jsonEncode
-    if not 'roomInfo' in objDict:
-        from MaKaC.services.interface.rpc.offline import roomInfo
-        objDict['roomInfo'] = roomInfo
     if not 'roomBookingActive' in objDict:
         objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:

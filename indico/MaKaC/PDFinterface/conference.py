@@ -97,6 +97,7 @@ class ProgrammeToPDF(PDFBase):
 
     def __init__(self, conf, doc=None, story=None, tz=None):
         self._conf = conf
+        self._event = conf.as_event
         if not tz:
             self._tz = self._conf.getTimezone()
         else:
@@ -117,9 +118,9 @@ class ProgrammeToPDF(PDFBase):
         height -= 2 * cm
 
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
-        if self._conf.getLocation():
+        if self._event.venue_name:
             height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH/2.0, height, escape(self._conf.getLocation().getName()))
+            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name.encode('utf-8')))
         c.setFont('Times-Bold', 30)
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
@@ -865,7 +866,7 @@ class TimeTablePlain(PDFWithTOC):
                               ("TOPPADDING", (0, 0), (-1, -1), 0),
                               ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
                               ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
-        entries = (self._conf.as_event.timetable_entries
+        entries = (self._event.timetable_entries
                    .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day.date(),
                            TimetableEntry.parent_id.is_(None))
                    .order_by(TimetableEntry.start_dt))
@@ -2049,6 +2050,7 @@ class TicketToPDF(PDFBase):
 
     def __init__(self, conf, registration, doc=None, story=None):
         self._conf = conf
+        self._event = conf.as_event
         self._registration = registration
         PDFBase.__init__(self, doc, story)
 
@@ -2072,11 +2074,11 @@ class TicketToPDF(PDFBase):
             size=15)
 
         # Conference location
-        if self._conf.getLocation():
+        if self._event.venue_name:
             height -= 0.7*cm
             self._drawWrappedString(
                 c,
-                escape(self._conf.getLocation().getName()),
+                escape(self._event.venue_name),
                 height=height, width=width, size=15, align="left",
                 font="Times-Italic")
 
