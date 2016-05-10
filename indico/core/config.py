@@ -271,163 +271,6 @@ class Config:
                      "link": "link.png"
                      }
 
-    # default values - Administrators can update this list from the Indico
-    # administration web interface
-    __styles = {
-        # Lecture styles
-        "lecture":          ("Lecture",
-                             'lecture.html',
-                             os.path.join("lectures", "IndicoLecture.css")),
-        "egee_lecture":     ("EGEE lecture",
-                             'lecture.html',
-                             os.path.join("lectures", "EGEELecture.css")),
-        "event":            ("Event",
-                             'lecture.html',
-                             os.path.join("lectures", "IndicoLecture.css")),
-
-        # Administrative styles (black on white, centered)
-        "administrative":   ("Administrative style",
-                             'administrative.html',
-                             os.path.join("meetings", "administrative", "Administrative.css")),
-        "administrative2":  ("Administrative style (with time)",
-                             'administrative_time.html',
-                             os.path.join("meetings", "administrative", "AdministrativeWithTime.css")),
-        "administrative4":  ("Administrative style (all material)",
-                             'administrative_material.html',
-                             os.path.join("meetings", "administrative", "AdministrativeAllMaterial.css")),
-        "pf":               ("Pension Fund",
-                             'pension_fund.html',
-                             os.path.join("meetings", "administrative", "PensionFund.css")),
-        "cern_committees":    ("CERN committee",
-                               'cern_committees.html',
-                              os.path.join("meetings", "administrative", "CernCommittee.css")),
-        "sa":               ("Staff Association",
-                             'staff_association.html',
-                             os.path.join("meetings", "administrative", "StaffAssociation.css")),
-
-        # More or less standardly looking meeting styles
-        "standard":         ("Indico style",
-                             'meeting.html',
-                             os.path.join("meetings", "IndicoMeeting.css")),
-        "standard_inline_minutes":
-                            ("Indico style - inline minutes",
-                             'meeting.html',
-                             os.path.join("meetings", "IndicoMeetingWithMinutes.css")),
-        "ilc":              ("ILC style",
-                             'meeting.html',
-                             os.path.join("meetings", "ILC.css")),
-        "alice_meeting":    ("ALICE meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "ALICE.css")),
-        "atlas":            ("ATLAS meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "ATLAS.css")),
-        "totem_meeting":    ("TOTEM meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "TOTEM.css")),
-        "sa2":              ("Staff Association (with time)",
-                             'meeting.html',
-                             os.path.join("meetings", "StaffAssociation.css")),
-        "lcg":              ("LCG style",
-                             'meeting.html',
-                             os.path.join("meetings", "LCG.css")),
-        "lhcb_meeting":     ("LHCb meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "LHCb.css")),
-        "egee_meeting":     ("EGEE meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "EGEE.css")),
-        "cms":              ("CMS meeting",
-                             'meeting.html',
-                             os.path.join("meetings", "CMS.css")),
-        "endotofpet":       ("EndoTOFPET",
-                             'openlab.html',
-                             os.path.join("meetings", "EndoTOFPET.css")),
-        "crystal_clear":    ("Crystal Clear",
-                             'openlab.html',
-                             os.path.join("meetings", "CrystalClear.css")),
-        "openlab":          ("Openlab",
-                             'openlab.html',
-                             os.path.join("meetings", "Openlab.css")),
-
-        # Standard conference style
-        "static":           ("Parallel", None, None),
-
-        # Other meeting styles
-        "nicecompact":      ("Compact style",
-                             'compact.html',
-                             os.path.join("meetings", "Compact.css")),
-        "weeks": ("Compact weeks",
-                  'weeks.html',
-                  os.path.join("meetings", "Weeks.css")),
-
-        "jacow":            ("JACoW XML", "JACoW.xsl", None),
-        "text":             ("Simple text", "Text.tpl", None),
-    }
-
-    # default values - Administrators can update this list from the Indico
-    # administration web interface
-    __eventStylesheets = {
-        "conference": [
-            "administrative",
-            "cdsagenda",
-            "cdsagenda_inline_minutes",
-            "cdsagenda_olist",
-            "egee_meeting",
-            "jacow",
-            "lhcb_meeting",
-            "nicecompact",
-            "weeks",
-            "standard",
-            "static",
-            "text",
-            "xml"],
-        "simple_event": [
-            "cdsagenda",
-            "static",
-            "lecture",
-            "egee_lecture",
-            "jacow",
-            "xml",
-            "event"],
-        "meeting": [
-            "administrative",
-            "administrative2",
-            "administrative4",
-            "alice_meeting",
-            "atlas",
-            "cdsagenda",
-            "cdsagenda_inline_minutes",
-            "cdsagenda_olist",
-            "cms",
-            "crystal_clear",
-            "egee_meeting",
-            "endotofpet",
-            "ilc",
-            "lcg",
-            "lhcb_meeting",
-            "cern_committee",
-            "nicecompact",
-            "weeks",
-            "openlab",
-            "pf",
-            "sa",
-            "sa2",
-            "standard",
-            "standard_inline_minutes",
-            "static",
-            "text",
-            "totem_meeting",
-            "xml"]
-        }
-
-    # default values - Administrators can update this list from the Indico
-    # administration web interface
-    __defaultEventStylesheet = {
-            "conference": "static",
-            "simple_event": "lecture",
-            "meeting": "standard" }
-
     default_values = {
         'DBConnectionParams'        : ("localhost", 9675),
         'DBUserName'                : '',
@@ -568,8 +411,6 @@ class Config:
             'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
             'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
             'SystemIcons'               : self.__systemIcons,
-            'Styles'                    : self.__styles,
-            'EventStylesheets'          : self.__eventStylesheets,
             'TempDir'                   : self.getUploadedFilesTempDir(),
             'UploadedFilesSharedTempDir': self.getSharedTempDir(),
             'RoomPhotosDir'             : os.path.join(self.getHtdocsDir(), 'images', "rooms", "large_photos"),
@@ -577,7 +418,6 @@ class Config:
             'CssDir'                    : "%s/css/" % (self.getHtdocsDir()),
             'CssBaseURL'                : self.getCssBaseURL(),
             'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
-            'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
             'TPLDir'                    : os.path.abspath(os.path.join(webinterface_dir, 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
@@ -585,7 +425,6 @@ class Config:
             'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : MaKaC.__version__,
         })
-
 
     def __readConfigFile(self):
         """initializes configuration parameters (Search order: indico.conf, default_values)
