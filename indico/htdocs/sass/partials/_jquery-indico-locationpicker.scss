@@ -125,6 +125,10 @@
             &::-ms-clear {
                 display: none;
             }
+
+            &:-ms-input-placeholder {
+                color: $gray;
+            }
         }
 
         .toggle-results-list {
@@ -156,6 +160,10 @@
 
             &.disabled {
                 @extend %tilted-strips-bg;
+            }
+
+            &:-ms-input-placeholder {
+                color: $gray;
             }
         }
     }
