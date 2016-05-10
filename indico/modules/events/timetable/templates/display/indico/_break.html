@@ -8,10 +8,6 @@
             {{ render_time(item, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
 
-        {% if not item.inherit_location and item.has_location_info -%}
-            {{ render_location(item, parent=parent) }}
-        {%- endif %}
-
         <div class="timetable-item-body">
             <div class="timetable-item-header">
                 <span class="timetable-title {{ 'top-level' if not nested }} break">
@@ -23,6 +19,11 @@
                         {{ item.duration | format_human_timedelta(narrow=true) }}
                     </span>
                 {%- endif %}
+
+                {% if not item.inherit_location and item.has_location_info -%}
+                    {{ render_location(item, parent=parent) }}
+                {%- endif %}
+
             </div>
             {% if item.description %}
                 {{ render_description(item, class='break-description') }}
