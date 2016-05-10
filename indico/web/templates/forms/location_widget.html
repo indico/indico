@@ -504,6 +504,7 @@ parent object. The key features and expected behaviour is the following:
                 venueInput.val(data.item_name);
                 validVenue = true;
                 venueInput.attr('title', data.item_name);
+                venueInput.focus();
                 venueInput.trigger('typeahead:close-results-list');
             });
 
@@ -521,6 +522,7 @@ parent object. The key features and expected behaviour is the following:
                 roomInput.val(data.item_name);
                 validRoom = true;
                 roomInput.attr('title', data.item_name);
+                roomInput.focus();
                 roomInput.trigger('typeahead:close-results-list');
             });
 
