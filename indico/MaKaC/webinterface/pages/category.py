@@ -101,7 +101,6 @@ class WCategoryDisplay(WICalExportBase):
 
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
-        vars["img"] = self._target.getIconURL()
         vars["categ"] = vars["target"] = self._target
         vars["urlICSFile"] = url_for('category.categoryDisplay-ical', self._target)
         vars["isRootCategory"] = isRootCategory

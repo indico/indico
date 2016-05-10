@@ -811,11 +811,6 @@ class Category(CommonObjectBase):
             self._icon = None
         return self._icon
 
-    def getIconURL(self):
-        if self.getIcon() is None:
-            return ""
-        return self._icon.getURL()
-
     def removeIcon(self):
         if self.getIcon() is None:
             return
