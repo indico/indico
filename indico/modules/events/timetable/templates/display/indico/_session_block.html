@@ -24,7 +24,7 @@
                         {{- session_.title | safe -}}
                     {%- endif -%}
                 </span>
-                {% if not block.inherit_location and block.has_location_info -%}
+                {% if not (block.inherit_location and block.session.inherit_location) and block.has_location_info -%}
                     {{ render_location(block, parent=event) }}
                 {%- endif %}
                 <div class="timetable-item-actions">
