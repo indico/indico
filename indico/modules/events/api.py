@@ -251,7 +251,7 @@ class SerializerBase(object):
 
     fossils_mapping = {
         'event': {
-            None: 'conferenceMetadata',
+            'events': 'conferenceMetadata',
             'contributions': 'conferenceMetadataWithContribs',
             'subcontributions': 'conferenceMetadataWithSubContribs',
             'sessions': 'conferenceMetadataWithSessions'
@@ -262,7 +262,7 @@ class SerializerBase(object):
             'sessions': 'contributionMetadataWithSubContribs'
         },
         'block': {
-            None: 'sessionMetadata',
+            'sessions': 'sessionMetadata',
             'contributions': 'sessionMetadataWithContributions'
         },
         'person': {
@@ -308,7 +308,7 @@ class SerializerBase(object):
     def _serialize_session_block(self, block, serialized_session, session_access_list, can_manage):
         block_data = {
             '_type': 'SessionSlot',
-            '_fossil': self.fossils_mapping['block'].get(self._detail_level, None),
+            '_fossil': self.fossils_mapping['block'].get(self._detail_level),
             'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
             'conference': self._build_session_event_api_data(block.event_new),
             'startDate': self._serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
@@ -345,7 +345,7 @@ class SerializerBase(object):
         can_manage = self.user is not None and contrib.can_manage(self.user)
         data = {
             '_type': 'Contribution',
-            '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
+            '_fossil': self.fossils_mapping['contribution'].get(self._detail_level),
             'id': (contrib.legacy_mapping.legacy_contribution_id
                    if contrib.legacy_mapping else unicode(contrib.friendly_id)),
             'db_id': contrib.id,
@@ -529,7 +529,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         can_manage = self.user is not None and event.can_manage(self.user)
         data = self._build_event_api_data_base(event)
         data.update({
-            '_fossil': self.fossils_mapping['event'].get(self._detail_level, None),
+            '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': unicode(event.category_id),
             'category': event.category.getTitle(),
             'note': build_note_api_data(event.note),
