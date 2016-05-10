@@ -19,7 +19,7 @@
     <div class="time-data">
         <span class="time-info icon-time">
             {% if sess.start_dt -%}
-                {{ sess.start_dt|format_datetime }}
+                {{ sess.start_dt|format_datetime(timezone=sess.event_new.display_tzinfo) }}
             {%- else -%}
                 {% trans %}Not scheduled{% endtrans %}
             {%- endif %}

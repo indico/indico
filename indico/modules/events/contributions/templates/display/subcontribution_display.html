@@ -19,7 +19,7 @@
     <div class="time-data">
         <span class="time-info icon-time">
             {% if subcontrib.timetable_entry -%}
-                {{ subcontrib.timetable_entry.start_dt|format_datetime }}
+                {{ subcontrib.timetable_entry.start_dt|format_datetime(timezone=subcontrib.event_new.display_tzinfo) }}
             {%- else -%}
                 {% trans %}Not scheduled{% endtrans %}
             {%- endif %}
