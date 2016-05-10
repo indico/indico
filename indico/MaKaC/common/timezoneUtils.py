@@ -139,15 +139,15 @@ class DisplayTZ:
             sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
             if useServerTZ == 0 and conf is not None:
-                sessTimezone = conf.getTimezone()
+                sessTimezone = getattr(conf, 'timezone', 'UTC')
             else:
                 sessTimezone = Config.getInstance().getDefaultTimezone()
         self._displayTZ = sessTimezone
         if not self._displayTZ:
             self._displayTZ = Config.getInstance().getDefaultTimezone()
 
-    def getDisplayTZ(self):
-        return self._displayTZ
+    def getDisplayTZ(self, as_timezone=False):
+        return timezone(self._displayTZ) if as_timezone else self._displayTZ
 
 
 class SessionTZ:

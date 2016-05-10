@@ -371,6 +371,12 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return pytz.timezone(self.timezone)
 
     @property
+    def display_tzinfo(self):
+        """The tzinfo of the event as preferred by the current user"""
+        from MaKaC.common.timezoneUtils import DisplayTZ
+        return DisplayTZ(conf=self).getDisplayTZ(as_timezone=True)
+
+    @property
     @contextmanager
     def logging_disabled(self):
         """Temporarily disables event logging
