@@ -578,53 +578,6 @@ type("SpecialRemovePopup", ["ExclusivePopupWithButtons"],
 );
 
 
-/**
- * Utility function to display a three buttons popup.
- * The difference with ConfirmButton is the existence of a third button.
- * Apart from the title and close button, the three buttons display Save, Don't Save and Cancel
- * @param {Html or String} title The title of the error popup.
- * @param {Element} content Anything you want to put inside.
- * @param {function} handler A function that will be called with an Integer as argument:
- *                   1 if the user press "Save", 2 for "Don't Save", 0 for "Cancel"
- */
-type("SaveConfirmPopup", ["ExclusivePopupWithButtons"],
-    {
-        draw: function() {
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.content);
-        },
-
-        _getButtons: function() {
-            var self = this;
-            return [
-                [$T('Save'), function() {
-                    self.close();
-                    self.handler(1);
-                }, true],
-                [$T('Don\'t Save'), function() {
-                    self.close();
-                    self.handler(2);
-                }],
-                [$T('Cancel'), function() {
-                    self.close();
-                    self.handler(0);
-                }]
-            ];
-        }
-    },
-
-    function(title, content, handler) {
-        var self = this;
-
-        this.content = content;
-        this.handler = handler;
-        this.ExclusivePopupWithButtons(title, function(){
-            self.handler(0);
-            return true;
-        });
-    }
-);
-
-
 type("WarningPopup", ["AlertPopup"],
     {
         _formatLine: function(line) {
@@ -812,45 +765,5 @@ type("ContributionsPopup", ["ExclusivePopup"], {
          this.width = 500;
 
          this.ExclusivePopup(title, closeHandler, true, true);
-     }
-    );
-
-type("ChildrenProtectionPopup", ["ExclusivePopup"], {
-
-    draw: function() {
-        var self = this;
-        var container = $("<table/>").attr("cellspacing", 0).css("margin-bottom", "5px");
-        each(this.elementList, function(element) {
-            var className = (self.elementList.length.get() != self.elementList.indexOf(element) + 1)?"CRLabstractDataCell":"CRLLastDataCell";
-            var row = $("<tr/>").css("color","#444444");
-            var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"));
-
-            var type = {
-                "AttachmentWrapper": $T.gettext("Attachment"),
-                "FolderWrapper": $T.gettext("Folder")
-            }[element._type] || element._type;
-
-            row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(type));
-            row.append($("<td/>").addClass(className).css({
-                'width': "50%",
-                'max-width': '200px',
-                'text-overflow': 'ellipsis',
-                'overflow': 'hidden'}).html(element.title));
-            row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
-            container.append(row);
-        });
-        return this.ExclusivePopup.prototype.draw.call(this, container, {margin: pixels(5), minWidth: pixels(300), maxWidth: pixels(this.width),  maxHeight: pixels(this.height)});
-    },
-    postDraw: function(){
-        this.ExclusivePopup.prototype.postDraw.call(this);
-    }
-    },
-     function(title, elementList) {
-
-         this.elementList = $L(elementList);
-         this.title = title;
-         this.width = 450;
-         this.height = window.innerHeight*0.8;
-         this.ExclusivePopup(this.title, null, true, true);
      }
     );

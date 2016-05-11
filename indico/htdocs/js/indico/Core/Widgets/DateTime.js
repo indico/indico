@@ -149,9 +149,6 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
      });
 
-type("DateSelector", ["DateTimeSelector"], { }, function(args, format, mandatory) {
-    return this.DateTimeSelector(args, format, mandatory, true);
-});
 
 type("StartEndDateWidget", ["InlineEditWidget"],
      {
@@ -269,95 +266,6 @@ type("StartEndDateWidget", ["InlineEditWidget"],
      function(method, attributes, initValue, showShiftOption) {
          this.showShiftOption = showShiftOption;
          this.InlineEditWidget(method, attributes, initValue);
-     });
-
-
-/*
- * A widget that contains a DateTimeSelector and a duration field
- */
-type("DateTimeDurationWidget", ["IWidget"],
-     {
-         draw: function() {
-             this.dateTimeField = new DateTimeSelector({});
-
-             $B(this.dateTimeField, this.data.accessor('dateTime'));
-
-             return Html.div(
-                 {},
-                 Html.label("fieldLabel", this.dateTimeLabel),
-                 this.dateTimeField.draw(),
-                 Html.span({style:{marginLeft: pixels(10)}},""),
-                 Html.label("fieldLabel", this.durationLabel),
-                 $B(IndicoUI.Widgets.Generic.durationField(),
-                    this.data.accessor('duration')));
-         },
-         set: function(property, value) {
-             this.data.set(property, value);
-         },
-         accessor: function(property) {
-             return this.data.accessor(property);
-         }
-     },
-
-     /*
-      * There are 2 optional labels:
-      * - One before the date/time field.
-      * - One before the duration field.
-      * All 4 element (the 2 fields and the 2 labels) appear in a line.
-      * @param {String} defaultDateTime Date formatted like %d/%m/%Y %H:%M (python format)
-      * @param {String} defaultDur a duration (for ex: 20)
-      * @param {String} dateTimeLabel
-      * @param {String} durationLabel
-      */
-     function(defaultDateTime, defaultDur, dateTimeLabel, durationLabel) {
-         this.dateTimeLabel = dateTimeLabel || $T("Date/Time:");
-         this.durationLabel = durationLabel || $T("Duration(min):");
-
-         this.data = new WatchObject();
-         this.data.set('dateTime', defaultDateTime);
-         this.data.set('duration', defaultDur);
-     });
-
-/*
- * A DateTimeSelector that keeps its data saved in hidden fields
- * (ideal for form submissions, etc...)
- */
-type("DateTimeSelectorWFields", ["DateTimeSelector"],
-     {
-         _setHiddenFields: function(value) {
-             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server);
-
-             if (!dtValue) {
-                 // in case the value can't be parsed, set it to empty
-                 each(this._fields, function(fname) {
-                     $E(fname).set('');
-                 });
-                 return;
-             }
-
-             $E(this._fields[0]).set(dtValue.getDate());
-             $E(this._fields[1]).set(dtValue.getMonth() + 1);
-             $E(this._fields[2]).set(dtValue.getFullYear());
-
-             if (!this._dateOnly) {
-                 $E(this._fields[3]).set(dtValue.getHours());
-                 $E(this._fields[4]).set(dtValue.getMinutes());
-             }
-         }
-     },
-     // fields : array: d m y [H M]
-     // dateOnly: true if no hour is to be passed
-     function(args, format, mandatory, dateOnly, fields) {
-         this.DateTimeSelector(args, format, mandatory);
-         this._fields = fields;
-         this._dateOnly = dateOnly;
-
-         var self = this;
-
-         // on change, update hidden fields
-         this.observe(function(value) {
-             self._setHiddenFields(value)
-         });
      });
 
 

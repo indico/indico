@@ -15,28 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-
-type("CategoryEventSelectionWidget", ["IWidget"],
-     {
-         draw: function() {
-             var categoryChooser = new CategoryChooser({id: '0'},
-                 function(categ) {
-                     alert(Json.write(categ));
-                 });
-             return Widget.link(command(function() {
-                 categoryChooser.open();
-             }, "choose..."));
-         }
-
-     },
-     function() {
-     });
-
-FUTURE: use category selector (need to be browsable first)
-
-*/
-
 type("UpcomingEventFavoritesList", ["RemoteListWidget"],
      {
          _removeElem: function(elemType, elemId) {

@@ -50,14 +50,6 @@ type("WatchValue", ["WatchAccessor"], {
 );
 
 
-function watchSetter(init) {
-	var accessor = new WatchValue(init);
-	return mixinInstance(function(value) {
-		accessor.set(value);
-		return this;
-	}, accessor, WatchAccessor);
-}
-
 type("WatchPair", ["WatchValue"], {
 	key: null
 },

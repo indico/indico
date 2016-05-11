@@ -116,10 +116,8 @@ indico_management = rjs_bundle(
                'eventCreation.js',
                'AbstractReviewing.js',
                'NotificationTPL.js',
-               'Sessions.js',
                'CFA.js',
-               'RoomBookingMapOfRooms.js',
-               'EventUsers.js'))
+               'RoomBookingMapOfRooms.js'))
 
 indico_room_booking = rjs_bundle(
     'indico_room_booking',

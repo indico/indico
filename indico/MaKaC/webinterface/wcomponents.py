@@ -1665,27 +1665,3 @@ class WFilterCriteria(WTemplated):
         vars["content"] =  list((name, self._drawFieldOptions(name, form))
                                 for (name, form) in self._options)
         return vars
-
-class WDateField(WTemplated):
-
-    def __init__(self, name, date, format, isDisabled=False, isMandatory=False):
-        self._withTime = format.find('%H') >= 0
-        self._name = name
-        self._format = format
-        self._isMandatory = isMandatory
-        self._date = date
-        self._isDisabled = isDisabled
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars['name'] = self._name
-        vars['date'] = self._date
-        if self._date:
-            vars['dateDisplay'] = datetime.strftime(self._date, self._format)
-        else:
-            vars['dateDisplay'] = ''
-        vars['isDisabled'] = self._isDisabled
-        vars['withTime'] = self._withTime
-        vars['isMandatory'] = self._isMandatory
-        vars['format'] = self._format
-        return vars

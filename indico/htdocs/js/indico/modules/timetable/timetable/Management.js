@@ -15,12 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-function nullRoomInfo(info) {
-
-    return (!info) ||
-        (!exists(info.get('location'))) ||
-        (!exists(info.get('room')));
-}
 
 type("UnscheduledContributionList", ["SelectableListWidget"],
      {
