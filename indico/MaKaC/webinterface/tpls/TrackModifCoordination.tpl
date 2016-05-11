@@ -25,7 +25,7 @@
 </table>
 <script>
 
-var trackCoordinatorListManager = new ListOfUsersManager('${ confId }',
+var trackCoordinatorListManager = new ListOfUsersManager(null,
         {'addExisting': 'abstractReviewing.team.addReviewer', 'remove': 'abstractReviewing.team.removeReviewer'},
         {confId: '${ confId }', track: '${ trackId }'}, $E('inPlaceTrackCoordinators'), "track coordinator", "item-user", false, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ coordinators | n,j});

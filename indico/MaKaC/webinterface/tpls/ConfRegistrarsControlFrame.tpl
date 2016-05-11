@@ -27,7 +27,7 @@ var methods = {'addExisting': 'event.protection.addExistingRegistrar',
 
 var params = {confId: '${ confId }'};
 
-var registrationControlManager = new ListOfUsersManager('${ confId }',
+var registrationControlManager = new ListOfUsersManager(null,
         methods, params, $E('inPlaceRegistrars'), "manager", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ registrars | n,j});
 
