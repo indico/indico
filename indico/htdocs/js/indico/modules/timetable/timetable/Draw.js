@@ -581,16 +581,9 @@ function loadBalloonContent(self, api, editable) {
                     }
                 },
                 onClose: function(data) {
+                    handleNotifications(data);
                     if (data && data.entries) {
                         self.managementActions._addEntries(data.entries);
-                        _.each(data.notifications, function(notification) {
-                            cornerMessage({
-                                message: notification,
-                                duration: 10000,
-                                class: 'highlight',
-                                actionLabel: $T.gettext('Close')
-                            });
-                        });
                     }
                 }
             });

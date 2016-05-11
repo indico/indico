@@ -63,6 +63,19 @@
         }
     };
 
+    global.handleNotifications = function handleNotifications(data) {
+        if (data && data.notifications) {
+            _.each(data.notifications, function(notification) {
+                cornerMessage({
+                    message: notification,
+                    duration: 10000,
+                    class: 'highlight',
+                    actionLabel: $T.gettext('Close')
+                });
+            });
+        }
+    };
+
     global.cornerMessage = function cornerMessage(options) {
         // Create nice message in bottom right corner
 
