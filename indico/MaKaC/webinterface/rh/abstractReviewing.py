@@ -91,7 +91,7 @@ class RHCFANotifTplNew(RHCFANotifTplBase):
         if self._save:
             self._tplCondition = params.get("condType", None)
             # If the condition is accepted, get the contribution type id and the track id parameters, otherwise set them by default
-            if self._tplCondition == "accepted":
+            if self._tplCondition != "rejected":
                 cTypeId = params.get("contribType", "")
                 track = params.get("track", "--any--")
             else:
@@ -221,7 +221,7 @@ class RHNotifTplConditionNew(RHNotificationTemplateModifBase):
             self._action = "CANCEL"
         self._condType = params.get("condType", None)
         # If the condition is accepted, get the contribution type id and the track id parameters, otherwise set them by default
-        if self._condType == "accepted":
+        if self._condType != "rejected":
             cTypeId = params.get("contribType", "")
             track = params.get("track", "--any--")
         else:

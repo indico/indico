@@ -123,7 +123,7 @@ $E('cancelButton').observeClick(function() {
 });
 
 function checkSelectCondition() {
-    if ($E('condTypeSelect').dom.value != 'accepted') {
+    if ($E('condTypeSelect').dom.value == 'rejected') {
         $E('contribTypeSelect').dom.style.display = 'none';
         $E('trackSelect').dom.style.display = 'none';
     } else {

@@ -20,6 +20,7 @@ from wtforms.validators import DataRequired
 
 from indico.web.forms.widgets import SwitchWidget
 from wtforms.fields import BooleanField, StringField, TextAreaField
+from wtforms.validators import Optional, DataRequired
 
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.util.i18n import _
@@ -47,6 +48,15 @@ class ContribFieldConfigForm(IndicoForm):
 class ContribField(BaseField):
     config_form_base = ContribFieldConfigForm
     common_settings = ('title', 'description', 'is_required', 'is_active')
+
+    def __init__(self, obj, management=True):
+        super(ContribField, self).__init__(obj)
+        self.management = management
+
+    def required_validator(self):
+        if self.management:
+            return Optional()
+        return DataRequired()
 
 
 class ContribTextField(TextField, ContribField):

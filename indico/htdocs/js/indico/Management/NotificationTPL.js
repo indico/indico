@@ -163,7 +163,7 @@ type("NotificationTemplateManager", [],
 
              // Check the condition of the select in the 3rd step
              checkSelectCondition: function(mainSelect, elem1, elem2) {
-                 if (mainSelect.dom.value != 'accepted') {
+                 if (mainSelect.dom.value == 'rejected') {
                      elem1.dom.style.display = 'none';
                      elem2.dom.style.display = 'none';
                  } else {

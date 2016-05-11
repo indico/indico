@@ -16,6 +16,8 @@
 
 from datetime import timedelta
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -274,7 +276,7 @@ class SelectedFieldOptionWrapper(object):
 
     def __init__(self, option):
         self.id = option['id']
-        self.deleted = option['is_deleted']
+        self.deleted = option.get('is_deleted', False)
         self.value = option['option']
 
     def __eq__(self, other):
@@ -394,7 +396,10 @@ class AbstractLegacyMixin(object):
         if field_id == 'content':
             return AbstractDescriptionValue(self.as_new)
         else:
-            field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
+            try:
+                field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
+            except NoResultFound:
+                field = self.event.contribution_fields.filter_by(id=field_id).one()
             fval = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
             if fval:
                 return fval

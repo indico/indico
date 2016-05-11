@@ -431,7 +431,7 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
         new_start_dt = (self.event_new.tzinfo.localize(dateutil.parser.parse(request.form.get('startDate')))
                         .astimezone(utc))
         shift = new_start_dt - self.entry.start_dt
-        with track_time_changes(auto_extend=True, user=session.user):
+        with track_time_changes(auto_extend=True, user=session.user) as changes:
             shift_following_entries(self.entry, shift, session_=self.session)
             self.entry.move(new_start_dt)
         serializer = TimetableSerializer(management=True)
@@ -439,7 +439,9 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
             timetable = serializer.serialize_session_timetable(self.session)
         else:
             timetable = serializer.serialize_timetable(self.event_new)
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable)
+        notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
+        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable,
+                            notifications=notifications)
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):

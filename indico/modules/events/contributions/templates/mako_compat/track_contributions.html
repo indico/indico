@@ -52,7 +52,7 @@
                         {% if contrib.is_scheduled %}
                             {% if not contrib.session_block %}
                                 <a href="#" class="icon-calendar js-contrib-start-date"
-                                   data-href="{{ url_for('.manage_start_date', contrib) }}">
+                                   data-href="{{ url_for('contributions.manage_start_date', contrib) }}">
                                 </a>
                             {% else %}
                                 <i class="icon-calendar text-superfluous"

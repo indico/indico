@@ -525,7 +525,8 @@ class TimetableMigration(object):
                                board_number=convert_to_unicode(getattr(old_contrib, '_boardNumber', '')),
                                keywords=self._process_keywords(old_contrib._keywords),
                                is_deleted=(status_class == 'ContribStatusWithdrawn'))
-
+        if old_contrib._track is not None:
+            contrib.track_id = int(old_contrib._track.id)
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
         self.legacy_contribution_map[old_contrib] = contrib
