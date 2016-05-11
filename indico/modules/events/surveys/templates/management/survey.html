@@ -131,7 +131,7 @@
         <td>
             <a href="{{ url_for('.display_submission', submission) }}">{{ submission.id }}</a>
         </td>
-        <td>{{ submission.submitted_dt|format_datetime }}</td>
+        <td>{{ submission.submitted_dt|format_datetime(timezone=submission.survey.event_new.tzinfo) }}</td>
         <td>
             {% if submission.user %}
                 {{ submission.user.full_name }}

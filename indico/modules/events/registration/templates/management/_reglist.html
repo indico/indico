@@ -49,7 +49,7 @@
                                 {% for item in basic_columns %}
                                     {% if item.id == 'reg_date' %}
                                         <td class="i-table" data-text="{{ registration.submitted_dt }}">
-                                            {{- registration.submitted_dt | format_datetime -}}
+                                            {{- registration.submitted_dt | format_datetime(timezone=registration.event_new.tzinfo) -}}
                                         </td>
                                     {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
@@ -65,7 +65,7 @@
                                     {% elif item.id == 'checked_in_date' %}
                                         <td class="i-table" data-text="{{ registration.checked_in_dt }}">
                                             {%- if registration.checked_in_dt %}
-                                                {{- registration.checked_in_dt | format_datetime -}}
+                                                {{- registration.checked_in_dt | format_datetime(timezone=registration.event_new.tzinfo) -}}
                                             {%- endif %}
                                         </td>
                                     {% else %}

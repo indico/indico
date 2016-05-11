@@ -47,7 +47,7 @@
                             {% for site in static_sites %}
                                 <tr>
                                     <td>{{ site.creator.full_name }}</td>
-                                    <td>{{ site.requested_dt|format_datetime }}</td>
+                                    <td>{{ site.requested_dt|format_datetime(timezone=site.event_new.tzinfo) }}</td>
                                     <td>
                                         <span class="i-label {{ label_mapping.get(site.state.name, 'disabled') }}">
                                             {{ site.state.title }}

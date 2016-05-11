@@ -24,8 +24,8 @@
                             {{ survey.title }}
                         {% endif %}
                     </td>
-                    <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
-                    <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
+                    <td>{{ survey.start_dt | format_datetime(timezone=event.as_event.display_tzinfo) if survey.start_dt else _('Not started') }}</td>
+                    <td>{{ survey.end_dt | format_datetime(timezone=event.as_event.display_tzinfo) if survey.end_dt else _('No deadline') }}</td>
                     <td class="survey-actions">
                         {% if was_survey_submitted(survey) %}
                             <a class="i-button highlight disabled"

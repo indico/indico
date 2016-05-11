@@ -3,7 +3,7 @@
     <dt>{% trans %}Amount{% endtrans %}</dt>
     <dd>{{ transaction.amount }} {{ transaction.currency }}</dd>
     <dt>{% trans %}Payment date{% endtrans %}</dt>
-    <dd>{{ transaction.timestamp | format_datetime }}</dd>
+    <dd>{{ transaction.timestamp | format_datetime(timezone=transaction.registration.event_new.tzinfo) }}</dd>
     {% if plugin %}
         <dt>{% trans %}Paid with{% endtrans %}</dt>
         <dd>{{ plugin.title }}</dd>

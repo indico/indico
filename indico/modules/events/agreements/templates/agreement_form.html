@@ -1,19 +1,21 @@
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_footer %}
 
+{% set tzinfo = agreement.event_new.display_tzinfo %}
+
 <h2 class="page-title">
     {{ agreement.definition.title }}
 </h2>
 
 {% if agreement.accepted %}
     {% call message_box('success') %}
-        {% trans dt=agreement.signed_dt|format_datetime -%}
+        {% trans dt=agreement.signed_dt|format_datetime(timezone=tzinfo) -%}
             Accepted on {{ dt }}
         {%- endtrans %}
     {% endcall %}
 {% elif agreement.rejected %}
     {% call message_box('error') %}
-        {% trans dt=agreement.signed_dt|format_datetime -%}
+        {% trans dt=agreement.signed_dt|format_datetime(timezone=tzinfo) -%}
             Rejected on {{ dt }}
         {%- endtrans %}
     {% endcall %}
@@ -45,7 +47,7 @@
                 </div>
                 <div class="info-event-details">
                     <i class="icon-time"></i>
-                    {{ agreement.event_new.start_dt | format_datetime }}
+                    {{ agreement.event_new.start_dt | format_datetime(timezone=tzinfo) }}
                 </div>
                 {% if agreement.event_new.venue_name %}
                     <div class="info-event-details">

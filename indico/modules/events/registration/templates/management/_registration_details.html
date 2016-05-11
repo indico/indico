@@ -30,7 +30,7 @@
                             <div class="checkbox-with-text">
                                 <div class="payment-conditions-agreement">
                                     {%- trans updated_by=registration.transaction.data.changed_by_name,
-                                             timestamp=registration.transaction.timestamp | format_date -%}
+                                             timestamp=registration.transaction.timestamp | format_date(timezone=registration.event_new.tzinfo) -%}
                                         Last updated by {{ updated_by }} on {{ timestamp }}.
                                     {% endtrans -%}
                                 </div>
@@ -141,7 +141,7 @@
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
         </div>
-        {% trans submitted=registration.submitted_dt|format_date %}
+        {% trans submitted=registration.submitted_dt|format_date(timezone=registration.event_new.tzinfo) %}
             Submitted: {{ submitted }}
         {% endtrans %}
     </div>
@@ -174,7 +174,7 @@
                 <div class="label">
                     {% trans %}Checked in{% endtrans %}
                 </div>
-                {% trans checked_in_dt=registration.checked_in_dt|format_date -%}
+                {% trans checked_in_dt=registration.checked_in_dt|format_date(timezone=registration.event_new.tzinfo) -%}
                     Checked in: {{ checked_in_dt }}
                 {%- endtrans %}
                 (<a href="#"

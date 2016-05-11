@@ -15,7 +15,7 @@
         {%- endtrans %}
     {% endif %}
     <br>
-    {% trans submission_dt=submission.submitted_dt | format_datetime -%}
+    {% trans submission_dt=submission.submitted_dt | format_datetime(timezone=survey.event_new.tzinfo) -%}
         Date of submission: {{ submission_dt }}
     {%- endtrans %}
 {% endblock %}

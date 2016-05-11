@@ -65,7 +65,7 @@
                             (Phone: {{ req.created_by_user.phone }})
                         {% endif %}
                     {% endcall %}
-                    {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
+                    {{ form_row_static(_('Created at'), req.created_dt | format_datetime(timezone=req.event_new.tzinfo)) }}
                 {% endif %}
                 {{ form_rows(form) }}
             {% endblock %}
@@ -102,7 +102,7 @@
                 {{ form_row_static(_('Processed by'), req.processed_by_user.full_name) }}
             {% endif %}
             {% if req.processed_dt %}
-                {{ form_row_static(_('Processed at'), req.processed_dt | format_datetime) }}
+                {{ form_row_static(_('Processed at'), req.processed_dt | format_datetime(timezone=req.event_new.tzinfo)) }}
             {% endif %}
             {% block manager_form %}
                 {{ form_rows(manager_form, skip=manager_form.action_buttons) }}

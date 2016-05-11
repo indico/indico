@@ -44,7 +44,7 @@
                         <li>
                             <a href="{{ url_for('event_mgmt.conferenceModification', clone) }}"
                                title="{{ clone.title }}" data-qtip-position="left">
-                                {{ clone.start_dt | format_date }}
+                                {{ clone.start_dt | format_date(timezone=clone.tzinfo) }}
                             </a>
                         </li>
                     {% endfor %}
