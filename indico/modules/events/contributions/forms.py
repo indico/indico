@@ -43,7 +43,7 @@ class ContributionForm(IndicoForm):
     start_dt = IndicoDateTimeField(_("Start date"),
                                    [DataRequired(),
                                     DateTimeRange(earliest=lambda form, field: form._get_earliest_start_dt(),
-                                                  latest=lambda form, field: form.event.end_dt)],
+                                                  latest=lambda form, field: form._get_latest_start_dt())],
                                    allow_clear=False,
                                    description=_("Start date of the contribution"))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
@@ -72,6 +72,9 @@ class ContributionForm(IndicoForm):
 
     def _get_earliest_start_dt(self):
         return self.session_block.start_dt if self.session_block else self.event.start_dt
+
+    def _get_latest_start_dt(self):
+        return self.session_block.end_dt if self.session_block else self.event.end_dt
 
     def validate_duration(self, field):
         start_dt = self.start_dt.data if self.start_dt else None
