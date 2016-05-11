@@ -240,6 +240,7 @@ type("TimetableManagementActions", [], {
             $O(params),
             this.timetable,
             function(result) {
+                handleNotifications(result);
                 self._addEntries(result.entries);
             },
             canCreateNew);
@@ -266,6 +267,7 @@ type("TimetableManagementActions", [], {
             title: $T.gettext("Add break"),
             onClose: function(data) {
                 if (data) {
+                    handleNotifications(data);
                     self.timetable._updateEntry(data.entry);
                 }
             }
@@ -281,6 +283,7 @@ type("TimetableManagementActions", [], {
             title: $T.gettext("Add session"),
             onClose: function(data) {
                 if (data) {
+                    handleNotifications(data);
                     self.timetable.eventInfo.sessions[data.session.id] = data.session;
 
                     if (data.success) {
@@ -325,6 +328,7 @@ type("TimetableManagementActions", [], {
             },
             onClose: function(data) {
                 if (data) {
+                    handleNotifications(data);
                     self.timetable._updateEntry(data.entry);
                 }
             }

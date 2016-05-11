@@ -615,6 +615,7 @@ function loadBalloonContent(self, api, editable) {
                     url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, urlParams, extraParams)),
                     title: $(this).data('title'),
                     onClose: function(data) {
+                        handleNotifications(data);
                         if (data && data.entries) {
                             self.managementActions._addEntries(data.entries);
                         }
@@ -1686,6 +1687,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                             url: build_url(Indico.Urls.Timetable.entries.edit, urlArgs),
                             title: $this.data('title'),
                             onClose: function(data) {
+                                handleNotifications(data);
                                 if (data && data.entries) {
                                     self.managementActions._addEntries(data.entries);
                                 }

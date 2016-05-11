@@ -300,7 +300,7 @@ type("AddNewContributionDialog", [],
                     }
                 }
             });
-        },
+        }
     },
 
     function(args, timetable, callback) {

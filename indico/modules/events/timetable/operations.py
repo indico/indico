@@ -54,7 +54,7 @@ def create_break_entry(event, data, session_block=None):
                   'start_dt': data.pop('start_dt')}
     break_.populate_from_dict(data)
     parent = session_block.timetable_entry if session_block else None
-    return create_timetable_entry(event, entry_data, parent=parent)
+    return create_timetable_entry(event, entry_data, parent=parent, extend_parent=True)
 
 
 def update_break_entry(break_, data):
@@ -70,10 +70,10 @@ def create_session_block_entry(session_, data):
     start_dt = data.pop('start_dt')
     block = create_session_block(session_=session_, data=data)
     entry_data = {'object': block, 'start_dt': start_dt}
-    return create_timetable_entry(session_.event_new, entry_data)
+    return create_timetable_entry(session_.event_new, entry_data, extend_parent=True)
 
 
-def create_timetable_entry(event, data, parent=None):
+def create_timetable_entry(event, data, parent=None, extend_parent=False):
     entry = TimetableEntry(event_new=event, parent=parent)
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
@@ -83,17 +83,20 @@ def create_timetable_entry(event, data, parent=None):
     entry.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
                         "Entry for {} '{}' created".format(object_type, object_title), session.user,
                         data={'Time': format_datetime(entry.start_dt)})
+    if extend_parent:
+        entry.extend_parent()
     return entry
 
 
-def schedule_contribution(contribution, start_dt, session_block=None):
+def schedule_contribution(contribution, start_dt, session_block=None, extend_parent=False):
     data = {'object': contribution, 'start_dt': start_dt}
     parent = None
     if session_block:
         contribution.session = session_block.session
         contribution.session_block = session_block
         parent = session_block.timetable_entry
-    return create_timetable_entry(contribution.event_new, data, parent=parent)
+    entry = create_timetable_entry(contribution.event_new, data, parent=parent, extend_parent=extend_parent)
+    return entry
 
 
 def update_timetable_entry(entry, data):

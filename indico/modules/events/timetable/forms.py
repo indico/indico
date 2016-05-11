@@ -76,24 +76,8 @@ class EntryFormMixin(object):
         if not self.start_dt.data:
             return
         end_dt = self.start_dt.data + field.data
-        if self.session_block and end_dt > self.session_block.end_dt:
-            raise ValidationError(_("{} exceeds session block end time. Adjust start time or duration.")
-                                  .format(self._entry_type.title.capitalize()))
-        if end_dt > self.event.end_dt:
-            raise ValidationError(_("{} exceeds event end time. Adjust start time or duration.")
-                                  .format(self._entry_type.title.capitalize()))
         if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
             raise ValidationError(_("{} exceeds current day. Adjust start time or duration.")
-                                  .format(self._entry_type.title.capitalize()))
-
-    def validate_time(self, field):
-        if not field.data:
-            return
-        if self.session_block and self.start_dt.data < self.session_block.start_dt:
-            raise ValidationError(_("{} can't be scheduled earlier than the session block start time.")
-                                  .format(self._entry_type.title.capitalize()))
-        if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
-            raise ValidationError(_("{} can't be scheduled earlier than the event start time.")
                                   .format(self._entry_type.title.capitalize()))
 
     def _get_default_time(self):

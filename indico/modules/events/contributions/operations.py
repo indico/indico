@@ -63,12 +63,12 @@ def _set_custom_fields(contrib, custom_fields_data):
         contrib.set_custom_field(custom_field_id, custom_field_value)
 
 
-def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None):
+def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(contrib_data)
     if start_dt is not None:
-        schedule_contribution(contrib, start_dt=start_dt, session_block=session_block)
+        schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     if custom_fields_data:
         _set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
