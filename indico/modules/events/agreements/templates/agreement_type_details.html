@@ -116,7 +116,7 @@
             </div>
         {% endif %}
 
-        <div class="agreement-list i-box">
+        <div class="agreement-list i-box{% if not (not_sent or pending) %} titled{% endif %}">
             {% if not_sent %}
                 <div class="toolbar">
                     <div class="group">
