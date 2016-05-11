@@ -172,12 +172,13 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
 
     def _process(self):
         form = None
+        parent_session_block = self.entry.parent.object if self.entry.parent else None
         if self.entry.contribution:
             contrib = self.entry.contribution
             tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
             form = ContributionEntryForm(obj=FormDefaults(contrib, time=tt_entry_dt.time()),
                                          event=self.event_new, contrib=contrib, to_schedule=False,
-                                         day=tt_entry_dt.date())
+                                         day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
                 with track_time_changes():
                     update_contribution(contrib, *_get_field_values(form.data))
@@ -187,8 +188,8 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
         elif self.entry.break_:
             break_ = self.entry.break_
             tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
-            form = BreakEntryForm(event=self.event_new, day=tt_entry_dt.date(),
-                                  obj=FormDefaults(break_, time=tt_entry_dt.time()))
+            form = BreakEntryForm(obj=FormDefaults(break_, time=tt_entry_dt.time()), event=self.event_new,
+                                  day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
                 with track_time_changes():
                     update_break_entry(break_, form.data)

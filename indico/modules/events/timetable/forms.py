@@ -89,6 +89,9 @@ class EntryFormMixin(object):
     def validate_time(self, field):
         if not field.data:
             return
+        if self.session_block and self.start_dt.data < self.session_block.start_dt:
+            raise ValidationError(_("{} can't be scheduled earlier than the session block start time.")
+                                  .format(self._entry_type.title.capitalize()))
         if self.day == self.event.start_dt_local.date() and field.data < self.event.start_dt_local.time():
             raise ValidationError(_("{} can't be scheduled earlier than the event start time.")
                                   .format(self._entry_type.title.capitalize()))
