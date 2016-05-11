@@ -39,9 +39,10 @@ from indico.util.i18n import _
 class ContributionForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    start_dt = IndicoDateTimeField(_("Start date"), [DataRequired(),
-                                                     DateTimeRange(earliest=lambda form, field: form.event.start_dt,
-                                                                   latest=lambda form, field: form.event.end_dt)],
+    start_dt = IndicoDateTimeField(_("Start date"),
+                                   [DataRequired(),
+                                    DateTimeRange(earliest=lambda form, field: form._get_earliest_start_dt(),
+                                                  latest=lambda form, field: form.event.end_dt)],
                                    allow_clear=False,
                                    description=_("Start date of the contribution"))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
@@ -56,6 +57,7 @@ class ContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.contrib = kwargs.pop('contrib', None)
+        self.session_block = kwargs.get('session_block')
         self.timezone = self.event.timezone
         to_schedule = kwargs.pop('to_schedule', False)
         super(ContributionForm, self).__init__(*args, **kwargs)
@@ -67,10 +69,17 @@ class ContributionForm(IndicoForm):
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
             del self.start_dt
 
+    def _get_earliest_start_dt(self):
+        return self.session_block.start_dt if self.session_block else self.event.start_dt
+
     def validate_duration(self, field):
-        start_dt = self.start_dt
-        if start_dt and start_dt.data and start_dt.data + field.data > self.event.end_dt:
-            raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
+        start_dt = self.start_dt.data if self.start_dt else None
+        if start_dt:
+            end_dt = start_dt + field.data
+            if self.session_block and end_dt > self.session_block.end_dt:
+                raise ValidationError(_("With the current duration the contribution exceeds the block end date"))
+            if end_dt > self.event.end_dt:
+                raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
     @property
     def custom_field_names(self):

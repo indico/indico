@@ -191,9 +191,11 @@ class RHEditContribution(RHManageContributionBase):
     def _process(self):
         contrib_form_class = make_contribution_form(self.event_new)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.contrib.field_values}
+        parent_session_block = (self.contrib.timetable_entry.parent.session_block
+                                if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
                                                    **custom_field_values),
-                                  event=self.event_new, contrib=self.contrib)
+                                  event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
             with track_time_changes():
                 update_contribution(self.contrib, *_get_field_values(form.data))
