@@ -549,7 +549,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
             title = session_.title
             if len(title) > 60:
                 title = title[0:40] + "..."
-            sessions.append(""" <option value="%s" %s>%s</option> """%(session_.id, selected, title))
+            sessions.append(""" <option value="%s" %s>%s</option> """%(session_.friendly_id, selected, title))
         vars["sessionsMenu"] = "".join(sessions);
 
         # Handle hide/show contributions option
