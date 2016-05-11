@@ -6,7 +6,7 @@
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
         {% if acl and field.inherited_acl_count %}
-            <div class="action-box message-only for-form highlight" style="display: block;">
+            <div class="action-box message-only for-form highlight inheriting-acl-message" style="display: block;">
                 <div class="section">
                     <div class="text">
                         <div>
@@ -70,6 +70,10 @@
                 {{ (field.event is none)|tojson }},
                 addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }}
             );
+
+            $('#{{ field.id }}').parent().find('.inheriting-acl-message').on('protection:inheriting', function(evt, isInheriting) {
+                $(this).toggle(isInheriting);
+            });
 
             $E('userGroupList-{{ field.id }}').set(widget.draw());
         })();

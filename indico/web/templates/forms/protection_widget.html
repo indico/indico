@@ -22,6 +22,8 @@
                     $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
 
                     toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
+
+                    $this.closest('form').find('.inheriting-acl-message').trigger('protection:inheriting', [$this.val() === 'inheriting']);
                 }
             });
 
