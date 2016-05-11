@@ -545,12 +545,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
             selectedSession = "all"
         sessions = [ i18nformat(""" <option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
         for session_ in self._conf.as_event.sessions:
-            selected = "selected" if str(session_.id) == selectedSession else ''
+            selected = "selected" if unicode(session_.friendly_id) == selectedSession else ''
             title = session_.title
             if len(title) > 60:
                 title = title[0:40] + "..."
             sessions.append(""" <option value="%s" %s>%s</option> """%(session_.friendly_id, selected, title))
-        vars["sessionsMenu"] = "".join(sessions);
+        vars["sessionsMenu"] = "".join(sessions)
 
         # Handle hide/show contributions option
         hideContributions = None;
