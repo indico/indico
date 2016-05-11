@@ -845,7 +845,7 @@ class ContributionReviewingCommentsModification(ContributionReviewingHTMLModific
 
     def process(self):
         try:
-            return super(ContributionReviewingCommentsModification, self).process()
+            return ContributionReviewingHTMLModificationBase.process(self)
         except HTMLSecurityError as e:
             raise NoReportError(e.message)
 
