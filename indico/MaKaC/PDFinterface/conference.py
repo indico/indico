@@ -867,7 +867,7 @@ class TimeTablePlain(PDFWithTOC):
                               ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
                               ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
         entries = (self._event.timetable_entries
-                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day.date(),
+                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
                    .order_by(TimetableEntry.start_dt))
         for entry in entries:
@@ -1068,8 +1068,9 @@ class TimeTablePlain(PDFWithTOC):
             story.append(p)
             story.append(Spacer(1, 0.4 * inch))
 
-        current_day = self._event.start_dt
-        while current_day <= self._event.end_dt:
+        current_day = self._event.start_dt.date()
+        end_day = self._event.end_dt.date()
+        while current_day <= end_day:
             if self._showDays and current_day.strftime("%d-%B-%Y") not in self._showDays:
                 current_day += timedelta(days=1)
                 continue
@@ -1146,7 +1147,7 @@ class SimplifiedTimeTablePlain(PDFBase):
         lastSessions = []  # this is to avoid checking if the slots have titles for all the slots
         res = []
         entries = (self._event.timetable_entries
-                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day.date(),
+                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
                    .order_by(TimetableEntry.start_dt))
         for entry in entries:
@@ -1226,15 +1227,16 @@ class SimplifiedTimeTablePlain(PDFBase):
         if not story:
             story = self._story
 
-        currentDay = self._event.start_dt
-        while currentDay <= self._event.end_dt:
-            if len(self._showDays) > 0 and currentDay.strftime("%d-%B-%Y") not in self._showDays:
-                currentDay += timedelta(days=1)
+        current_day = self._event.start_dt.date()
+        end_day = self._event.end_dt.date()
+        while current_day <= end_day:
+            if len(self._showDays) > 0 and current_day.strftime("%d-%B-%Y") not in self._showDays:
+                current_day += timedelta(days=1)
                 continue
 
-            dayEntries = self._processDayEntries(currentDay, story)
-            if not dayEntries:
-                currentDay += timedelta(days=1)
+            day_entries = self._processDayEntries(current_day, story)
+            if not day_entries:
+                current_day += timedelta(days=1)
                 continue
             if self._event.end_dt.astimezone(timezone(self._tz)).month != self._conf.getAdjustedEndDate(self._tz).month:
                 text = "%s - %s-%s" % (escape(self._event.title), escape(format_date(self._event.start_dt,
@@ -1249,13 +1251,13 @@ class SimplifiedTimeTablePlain(PDFBase):
             text = "%s" % text
             p = Paragraph(text, self._styles["title"])
             story.append(p)
-            text2 = i18nformat(""" _("Daily Programme"): %s""") % escape(currentDay.strftime("%A %d %B %Y"))
+            text2 = i18nformat("_('Daily Programme'): {}").format(escape(current_day.strftime("%A %d %B %Y")))
             p2 = Paragraph(text2, self._styles["day"])
             story.append(p2)
             story.append(Spacer(1, 0.4 * inch))
-            for entry in dayEntries:
+            for entry in day_entries:
                 story.append(entry)
-            currentDay += timedelta(days=1)
+            current_day += timedelta(days=1)
 
 
 class RegistrantToPDF(PDFBase):
