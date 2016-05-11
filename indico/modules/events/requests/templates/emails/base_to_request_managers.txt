@@ -12,9 +12,9 @@
 {% macro event_details(event) -%}
     Name:     {{ event.title }}
     {% if event.start_dt.date() == event.end_dt.date() -%}
-    Date:     {{ event.start_dt | format_date }}, {{ event.start_dt | format_time }}
+    Date:     {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }}
     {%- else -%}
-    Dates:    {{ event.start_dt | format_date }}, {{ event.start_dt | format_time }} - {{ event.end_dt | format_date }}, {{ event.end_dt | format_time }}
+    Dates:    {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }} - {{ event.end_dt | format_date(timezone=event.tzinfo) }}, {{ event.end_dt | format_time(timezone=event.tzinfo) }}
     {%- endif %}
     Location: {% if event.venue_name %}{{ event.venue_name }}: {% endif %}{{ event.room_name }}
     Details:  {{ url_for('event.conferenceDisplay', event, _external=True) }}
