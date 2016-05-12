@@ -154,8 +154,8 @@ class RHBreakREST(RHManageTimetableBase):
 
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        entry = self.event_new.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
-        self.break_ = entry.break_
+        self.entry = self.event_new.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
+        self.break_ = self.entry.break_
 
     def _process_PATCH(self):
         data = request.json

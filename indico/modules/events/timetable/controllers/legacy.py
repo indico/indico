@@ -29,12 +29,13 @@ from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
 from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
-from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession
+from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession, RHSessionREST
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import delete_session_block, update_session_block, update_session
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
+from indico.modules.events.timetable.controllers.manage import RHBreakREST
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm)
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
@@ -488,3 +489,16 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
                                        "wouldn't fit."))
         notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
         return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), notifications=notifications)
+
+
+class RHLegacyTimetableEditSession(RHSessionREST):
+    def _process_PATCH(self):
+        RHSessionREST._process_PATCH(self)
+        return jsonify_data(entries=[serialize_entry_update(block.timetable_entry) for block in self.session.blocks],
+                            flash=False)
+
+
+class RHLegacyTimetableBreakREST(RHBreakREST):
+    def _process_PATCH(self):
+        RHBreakREST._process_PATCH(self)
+        return jsonify_data(entries=[serialize_entry_update(self.entry)], flash=False)

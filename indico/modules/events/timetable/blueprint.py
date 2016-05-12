@@ -30,10 +30,11 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableEditEntryTime,
                                                                 RHLegacyTimetableMoveEntry,
                                                                 RHLegacyTimetableEditEntryDateTime,
-                                                                RHLegacyTimetableShiftEntries)
+                                                                RHLegacyTimetableShiftEntries,
+                                                                RHLegacyTimetableEditSession,
+                                                                RHLegacyTimetableBreakREST)
 from indico.modules.events.timetable.controllers.manage import (RHManageTimetable, RHManageSessionTimetable,
-                                                                RHTimetableREST, RHManageTimetableEntryInfo,
-                                                                RHBreakREST)
+                                                                RHTimetableREST, RHManageTimetableEntryInfo)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -45,11 +46,14 @@ _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
-_bp.add_url_rule('/manage/timetable/break/<int:break_id>', 'break_rest', RHBreakREST, methods=('PATCH',))
 
 # Timetable legacy operations
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/timetable/break/<int:break_id>', 'legacy_break_rest', RHLegacyTimetableBreakREST,
+                 methods=('PATCH',))
 with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/manage/timetable'):
+    _bp.add_url_rule('/', 'session_rest', RHLegacyTimetableEditSession,
+                     methods=('PATCH',))
     _bp.add_url_rule('/entry/<int:entry_id>/info', 'entry_info_manage', RHManageTimetableEntryInfo)
     _bp.add_url_rule('/entry/<int:entry_id>/delete', 'delete_entry', RHLegacyTimetableDeleteEntry, methods=('POST',))
     _bp.add_url_rule('/entry/<int:entry_id>/move', 'move_entry', RHLegacyTimetableMoveEntry,

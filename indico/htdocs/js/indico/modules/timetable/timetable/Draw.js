@@ -656,10 +656,10 @@ function loadBalloonContent(self, api, editable) {
                         data: JSON.stringify({'colors': {'text': text, 'background': background}}),
                         dataType: 'json',
                         contentType: 'application/json',
+                        complete: IndicoUI.Dialogs.Util.progress(),
                         error: handleAjaxError,
-                        complete: function() {
-                            self.setColors(text, background);
-                            killProgress();
+                        success: function(data) {
+                            self.managementActions._addEntries(data.entries);
                         }
                     });
                 },
