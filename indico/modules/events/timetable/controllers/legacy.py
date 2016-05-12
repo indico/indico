@@ -250,7 +250,7 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
         updated_entries = []
 
         if form.validate_on_submit():
-            with track_time_changes(auto_extend='end', user=session.user) as changes:
+            with track_time_changes(auto_extend=True, user=session.user) as changes:
                 if shift_later:
                     new_end_dt = form.start_dt.data + form.duration.data
                     shift = new_end_dt - self.entry.end_dt
