@@ -116,7 +116,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
     def validate_duration(self, field):
         super(SessionBlockEntryForm, self).validate_duration(field)
-        if self.session_block:
+        if self.session_block and self.start_dt.data:
             entry = self.session_block.timetable_entry
             end_dt = self.start_dt.data + field.data
             query = TimetableEntry.query.with_parent(entry).filter(TimetableEntry.end_dt > end_dt)
