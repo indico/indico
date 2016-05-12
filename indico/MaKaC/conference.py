@@ -1435,7 +1435,7 @@ class Conference(CommonObjectBase):
         # will have to remove it from all the owners (categories) and the
         #   conference registry
         ConferenceHolder().remove(self)
-        for owner in self.__owners:
+        for owner in self.__owners[:]:
             owner.removeConference(self, notify=False)
 
         # Remove all links in redis
@@ -1444,8 +1444,8 @@ class Conference(CommonObjectBase):
 
         # Remote short URL mappings
         ShortURLMapper().remove(self)
-
         TrashCanManager().add(self)
+        self._p_changed = True
 
     def getConference( self ):
         return self
