@@ -389,7 +389,7 @@ def build_registrations_api_data(event):
     for regform in query:
         for registration in regform.active_registrations:
             registration_info = _build_base_registration_info(registration)
-            registration_info['checkin_secret'] = registration.uuid
+            registration_info['checkin_secret'] = registration.ticket_uuid
             api_data.append(registration_info)
     return api_data
 
@@ -399,7 +399,7 @@ def _build_base_registration_info(registration):
     return {
         'registrant_id': str(registration.id),
         'checked_in': registration.checked_in,
-        'checkin_secret': registration.uuid,
+        'checkin_secret': registration.ticket_uuid,
         'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name),
         'personal_data': personal_data
     }
