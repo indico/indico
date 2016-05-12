@@ -133,13 +133,19 @@ def unixTimeToDatetime(seconds, tz='UTC'):
 class DisplayTZ:
 
     def __init__(self, aw=None, conf=None, useServerTZ=0):
+        from MaKaC.conference import Category
         if not has_request_context():
             sessTimezone = 'LOCAL'
         else:
             sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
             if useServerTZ == 0 and conf is not None:
-                sessTimezone = getattr(conf, 'timezone', 'UTC')
+                if isinstance(conf, Category):
+                    # categories.. in an argument called `conf`..
+                    sessTimezone = conf.getTimezone()
+                else:
+                    # this covers both Event and Conference objects
+                    sessTimezone = getattr(conf, 'timezone', 'UTC')
             else:
                 sessTimezone = Config.getInstance().getDefaultTimezone()
         self._displayTZ = sessTimezone
