@@ -44,7 +44,6 @@ type("TimetableBlockBase", [],
          openPopup: function(event) {
              var self = this;
              self.popupActive = true;
-             self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
              self._drawPopup(event);
          },
