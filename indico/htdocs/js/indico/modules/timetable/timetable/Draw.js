@@ -567,6 +567,8 @@ function loadBalloonContent(self, api, editable) {
         api.set('content.text', content.html);
         var $content = api.elements.content;
         if (editable) {
+            var qtipId = $content.closest('.qtip').data('qtip-id');
+            var $balloonQtip = $('[data-hasqtip=' + qtipId + ']');
             $content.find('.js-edit-time').ajaxqbubble({
                 url: build_url(Indico.Urls.Timetable.entries.editTime, urlParams),
                 qBubbleOptions: {
@@ -576,8 +578,10 @@ function loadBalloonContent(self, api, editable) {
                     position: {
                         at: 'top center',
                         my: 'bottom center',
-                        target: timetableBlock
                     }
+                },
+                qtipConstructor: function(element, qtipOptions) {
+                    $balloonQtip.qbubble('createNested', element, qtipOptions);
                 },
                 onClose: function(data) {
                     handleNotifications(data);

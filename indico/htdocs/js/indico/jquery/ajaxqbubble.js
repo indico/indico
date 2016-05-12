@@ -32,8 +32,9 @@
             method: 'GET',
             cache: false,
             success: null,
-            onClose: null // callback to invoke after closing the qtip by submitting the inner form. the argument
+            onClose: null, // callback to invoke after closing the qtip by submitting the inner form. the argument
                           // is null if closed manually, otherwise the JSON returned by the server.
+            qtipConstructor: null
         },
 
         _create: function() {
@@ -42,7 +43,7 @@
             var ajaxOptions = _.omit(self.options, 'qBubbleOptions');
             var returnData = null;
 
-            self.element.qbubble($.extend(true, {}, qBubbleOptions, {
+            var options = $.extend(true, {}, qBubbleOptions, {
                 events: {
                     show: function(evt, api) {
                         $.ajax($.extend(true, {}, ajaxOptions, {
@@ -120,7 +121,12 @@
                         api.get('content.text').remove();
                     }
                 }
-            }));
+            });
+            if (self.options.qtipConstructor) {
+                self.options.qtipConstructor(self.element, options);
+            } else {
+                self.element.qbubble(options);
+            }
         }
     });
 })(jQuery);
