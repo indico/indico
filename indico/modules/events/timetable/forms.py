@@ -68,7 +68,7 @@ class EntryFormMixin(object):
 
     @generated_data
     def start_dt(self):
-        if self.time.data:
+        if self.time.data is not None:
             dt = datetime.combine(self.day, self.time.data)
             return self.event.tzinfo.localize(dt).astimezone(utc)
 
