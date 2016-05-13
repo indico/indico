@@ -569,6 +569,7 @@ function loadBalloonContent(self, api, editable) {
         if (editable) {
             var qtipId = $content.closest('.qtip').data('qtip-id');
             var $balloonQtip = $('[data-hasqtip=' + qtipId + ']');
+            var closeBalloon = false;
             $content.find('.js-edit-time').ajaxqbubble({
                 url: build_url(Indico.Urls.Timetable.entries.editTime, urlParams),
                 qBubbleOptions: {
@@ -578,6 +579,13 @@ function loadBalloonContent(self, api, editable) {
                     position: {
                         at: 'top center',
                         my: 'bottom center',
+                    },
+                    events: {
+                        hidden: function() {
+                            if (closeBalloon) {
+                                $balloonQtip.qbubble('hide');
+                            }
+                        }
                     }
                 },
                 qtipConstructor: function(element, qtipOptions) {
@@ -587,6 +595,9 @@ function loadBalloonContent(self, api, editable) {
                     handleNotifications(data);
                     if (data && data.entries) {
                         self.managementActions._addEntries(data.entries);
+                        /* Since the entry update creates a new div we can't
+                         * easily reposition the balloon on the timetable entry. */
+                        closeBalloon = true;
                     }
                 }
             });
