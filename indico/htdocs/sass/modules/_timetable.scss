@@ -158,61 +158,147 @@
 }
 
 #move-timetable-entry-dialog {
-    .days {
-        float: left;
+    width: 800px;
+    height: 440px;
 
-        ul.days-list {
-            @include base-list-properties();
+    .section-title {
+        font-size: 1.2em;
+        color: $black;
+        margin-bottom: 5px;
+        margin-top: 10px;
+    }
+
+    .days {
+        display: flex;
+        align-items: center;
+
+        &.scrollable-container {
+            height: 70px;
         }
 
-        width: 130px;
-        padding: 0 5px;
-        display: inline-block;
-        max-height: 200px;
-        overflow-y: auto;
-        border-right: 1px solid $separator-color;
+        .scroll-btn {
+            @include icon-before('icon-next');
+            font-size: 1.2em;
+            color: $light-black;
+            cursor: pointer;
+
+            &:hover {
+                color: $black;
+            }
+
+            &.scroll-left {
+               @include rotate(180deg);
+               margin-right: 10px;
+            }
+
+            &.scroll-right {
+                margin-left: 10px;
+            }
+        }
+    }
+
+    .days-container {
+        overflow-x: auto;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+
+        &.scrollable {
+            padding: 5px;
+        }
+
+        .day:not(:last-child) {
+            margin-right: 0.5em;
+        }
+    }
+
+    .days-container-wrapper {
+        max-width: 730px;
+        position: relative;
+    }
+
+    .fader {
+        position: absolute;
+        width: 6%;
+        top: 0;
+        bottom: 0;
+        pointer-events: none;
+        display: none;
+
+        &.fader-right {
+            background: linear-gradient(to left, white 0%, rgba(251, 251, 251, 0.5) 40%, rgba(251, 251, 251, 0.0) 100%);
+            right: 0;
+        }
+
+        &.fader-left {
+            background: linear-gradient(to right, white 0%, rgba(251, 251, 251, 0.5) 40%, rgba(251, 251, 251, 0.0) 100%);
+            left: 0;
+        }
+
+        &.visible {
+            display: block;
+        }
     }
 
     .blocks {
-        width: 400px;
+        max-height: 300px;
+        overflow: auto;
+        overflow-y: auto;
+    }
 
-        ul.blocks-list {
-            @include base-list-properties();
+    .item {
+        display: flex;
+        align-items: center;
 
-            li.item {
-                &.disabled {
-                    @extend %tilted-strips-bg;
+        &:not(.selected) {
+            cursor: pointer;
+        }
 
-                    cursor: auto;
-                }
+        &.selected {
+            border-left: 4px solid $blue;
+        }
 
-                .title {
-                    display: inline-block;
-                    width: 250px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+        .icon {
+            font-size: 22px;
 
-                .start-dt {
-                    font-size: 10px;
-                    color: $dark-gray;
-                    vertical-align: super;
-                }
-
-                .color {
-                    float: right;
-                    height: 15px;
-                    width: 15px;
-                    display: inline-block;
-                }
+            &:before {
+                margin-right: 10px;
             }
         }
 
-        overflow-y: auto;
-        display: inline-block;
-        padding: 0 15px;
-        max-height: 200px;
+        .item-icon {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 15px;
+            margin-right: 10px;
+        }
+
+        .title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .start-dt {
+            flex-shrink: 0;
+            margin-left: auto;
+            color: $dark-gray;
+        }
+
+        .move-btn {
+            position: relative;
+            padding-left: 10px;
+            max-height: 22px; // Workaround to avoid jQuery "jumping" effect
+
+            &:not(.active) {
+                display: none;
+            }
+
+            button {
+                white-space: nowrap;
+            }
+        }
     }
 }
 

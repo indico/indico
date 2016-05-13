@@ -18,7 +18,8 @@
                 {% endif %}
                 {% if can_manage_event %}
                     <a class="icon-transmission i-button-icon close-balloon js-move"
-                       title="{% trans %}Move contribution{% endtrans %}"></a>
+                       title="{% trans %}Move contribution{% endtrans %}"
+                       data-subtitle="{% trans %}Contribution{% endtrans %}: {{ contrib.title }}"></a>
                 {% endif %}
                 {% if contrib.event_new.type == 'conference' %}
                     <a class="icon-remove i-button-icon close-balloon js-delete"

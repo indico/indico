@@ -635,6 +635,7 @@ function loadBalloonContent(self, api, editable) {
                     url: build_url(Indico.Urls.Timetable.entries.move, urlArgs),
                     data: {'day': self.timetable.currentDay},
                     title: $T.gettext("Move entry"),
+                    subtitle: $(this).data('subtitle'),
                     trigger: this,
                     onClose: function(data) {
                         if (data) {

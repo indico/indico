@@ -10,7 +10,8 @@
                    data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>
                 {% if can_manage_event %}
                     <a class="icon-transmission i-button-icon close-balloon js-move"
-                       title="{% trans %}Move break{% endtrans %}"></a>
+                       title="{% trans %}Move break{% endtrans %}"
+                       data-subtitle="{% trans %}Break{% endtrans %}: {{ break_.title }}"></a>
                 {% endif %}
                 <a class="icon-remove i-button-icon close-balloon js-delete"
                    title="{% trans %}Delete break{% endtrans %}"

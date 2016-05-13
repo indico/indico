@@ -1,75 +1,152 @@
-<div class="action-box highlight">
-    <div class="section">
-        <div class="text">
-            {% if parent_entry %}
-                {% trans title=parent_entry.session_block.full_title,
-                         entry_title=timetable_entry.object.title %}
-                    This entry <strong>({{ entry_title }})</strong> is currently located inside <strong>{{ title }}</strong><br>
-                    Please select the place where you want to move it to.
-                {% endtrans %}
-            {% else %}
-                {% trans entry_title=timetable_entry.object.title %}
-                    This entry <strong>({{ entry_title }})</strong> is currently at the <strong>top-level timetable</strong><br>
-                    Please select the place where you want to move it to.
-                {% endtrans %}
+<div id="move-timetable-entry-dialog">
+    <div class="section-title">{% trans %}Choose day:{% endtrans %}</div>
+    <div class="days {%- if top_level_entries | length > 6 %} scrollable-container{% endif %}">
+        {% if top_level_entries | length > 6 %}
+            <span class="scroll-btn scroll-left"></span>
+        {% endif %}
+        <div class="days-container-wrapper">
+            <div class="days-container {%- if top_level_entries | length > 6 %} scrollable{% endif %}">
+                {% for day, entries in top_level_entries.iteritems() | sort %}
+                        <button class="i-button big day {%- if day == current_day %} highlight{% endif %}"
+                                data-day="{{ day }}">
+                            {{- day | format_date(format='EEE, d MMM') -}}
+                        </button>
+                {% endfor %}
+            </div>
+            {% if top_level_entries | length > 6 %}
+                <div class="fader fader-left"></div>
+                <div class="fader fader-right visible"></div>
             {% endif %}
+        </div>
+        {% if top_level_entries | length > 6 %}
+            <span class="scroll-btn scroll-right"></span>
+        {% endif %}
+    </div>
+    <div class="section-title">{% trans %}Move to:{% endtrans %}</div>
+    <div class="i-box just-group-list with-hover-effect blocks">
+        <div class="i-box-content">
+            {% for day, tt_entries in top_level_entries.iteritems() %}
+                <ul class="group-list blocks-list" data-show-for="{{ day }}">
+                    <li class="item top-level {%- if parent_entry is none and day == current_day %} selected{% endif %}"
+                        data-title="{% trans %}Move entry{% endtrans %}"
+                        data-item-id="{{ day }}-top-level">
+                        <span class="item-icon"></span>
+                        <span class="title"><strong>{% trans %}Top level timetable{% endtrans %}</strong></span>
+                        <span class="start-dt">
+                            {%- if parent_entry is none and day == current_day %}
+                                {%- trans %}Currently at this level{% endtrans %}
+                            {% endif -%}
+                        </span>
+                        <span class="move-btn">
+                            <button class="i-button highlight
+                                           {%- if parent_entry is none and day == current_day %} active{% endif %}">
+                                {% trans %}Move here{% endtrans %}
+                            </button>
+                        </span>
+                    </li>
+                    {% for tt_entry in tt_entries %}
+                        {% set block = tt_entry.session_block %}
+                        <li class="item block {%- if tt_entry == parent_entry %} selected{% endif %}"
+                            data-entry-id="{{ tt_entry.id }}"
+                            data-item-id="{{ tt_entry.id }}"
+                            data-title="{% trans %}Move entry{% endtrans %}">
+                            <span class="item-icon color"
+                                  style="background: #{{ block.session.colors.background }}"></span>
+                            <span class="title">{{ block.full_title }}</span>
+                            <span class="start-dt">
+                                {%- if tt_entry == parent_entry %}
+                                    ({%- trans %}Currently at this level{% endtrans %})
+                                {% endif -%}
+                                {{ tt_entry.start_dt | format_time(timezone=event.timezone) }} -
+                                {{ tt_entry.end_dt | format_time(timezone=event.timezone) }}
+                            </span>
+                            <span class="move-btn">
+                                <button class="i-button highlight {%- if tt_entry == parent_entry %} active{% endif %}">
+                                    {% trans %}Move here{% endtrans %}
+                                </button>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
         </div>
     </div>
 </div>
-<div id="move-timetable-entry-dialog">
-    <div class="days">
-        <ul class="days-list">
-            {% for day, entries in top_level_entries.iteritems()|sort %}
-                <li class="item {% if day == current_day %}selected{% endif %}"
-                    data-day="{{ day }}">{{ day|format_date }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="blocks">
-        {% for day, tt_entries in top_level_entries.iteritems() %}
-            <ul class="blocks-list" data-show-for="{{ day }}">
-                <li class="item {% if parent_entry is none and day == current_day %}disabled{% endif %}">
-                    {% trans %}Top level timetable{% endtrans %}
-                </li>
-                {% for tt_entry in tt_entries %}
-                    {% set block = tt_entry.session_block %}
-                    <li class="item {% if tt_entry == parent_entry %}disabled{% endif %}"
-                        data-entry-id="{{ tt_entry.id }}">
-                        <span class="title">
-                            {{ block.full_title }}
-                        </span>
-                        <span class="start-dt">
-                            ({{ tt_entry.start_dt|format_time(timezone=event.timezone) }} -
-                             {{ tt_entry.end_dt|format_time(timezone=event.timezone) }})
-                        </span>
-                        <span class="color" style="background: #{{ block.session.colors.background }}"></span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    </div>
-
-    <input id="move-entry-data" type="hidden">
-</div>
 
 <script>
-    $('.days [data-day]').on('click', function() {
-        var $this = $(this);
+    (function() {
+        'use strict';
 
-        $('[data-show-for]').hide();
-        $('[data-show-for="{0}"]'.format($this.data('day'))).show();
-        $('.days [data-day]').removeClass('selected');
-        $this.addClass('selected');
-    });
+        var $initiallySelected = $('#move-timetable-entry-dialog .selected');
+        var $selected = $('#move-timetable-entry-dialog .selected');
+        var $selectedDay;
 
-    $('.blocks ul.blocks-list li').on('click', function() {
-        var $this = $(this);
-
-        if (!$this.hasClass('disabled')) {
-            var data = {'parent_id': $this.data('entry-id'), 'day': $this.closest('ul').data('show-for')};
-            $this.trigger('ajaxDialog:close', [data]);
+        function toggleMoveButton(item) {
+            item.toggleClass('selected');
+            if (item.data('item-id') != $initiallySelected.data('item-id')) {
+                item.find('.move-btn').toggle('slide', {direction: 'right'}, 200);
+            }
         }
-    });
 
-    $('#move-timetable-entry-dialog .days li.selected').trigger('click');
+        function newSelectionActions(newSelection) {
+            toggleMoveButton($selected);
+            toggleMoveButton(newSelection);
+            $selected = newSelection;
+        }
+
+        $('#move-timetable-entry-dialog .days [data-day]').on('click', function() {
+            var $this = $(this);
+            if (!$selectedDay || $this.data('day') != $selectedDay.data('day')) {
+
+                // Reset the selected item to the initial one before switching day view
+                if ($selected && $selected.data('item-id') != $initiallySelected.data('item-id')) {
+                    newSelectionActions($initiallySelected);
+                }
+
+                // Make the switch to the new day
+                $('[data-show-for]').hide();
+                $('[data-show-for="{0}"]'.format($this.data('day'))).show();
+                $('.days [data-day]').removeClass('highlight');
+                $this.addClass('highlight');
+                $selectedDay = $this;
+
+                // Make sure the selected day is always visible
+                var positionDelta = $this.position().left + $this.outerWidth() + 30 - $this.parent().width();
+                $this.parent().animate({scrollLeft: "+=" + positionDelta}, 100);
+            }
+        });
+
+        $('#move-timetable-entry-dialog .blocks ul.blocks-list li').on('click', function() {
+            var $this = $(this);
+            if ($this.data('item-id') != $selected.data('item-id')) {
+                newSelectionActions($this);
+            }
+        });
+
+        $('#move-timetable-entry-dialog .move-btn').on('click', function() {
+            var $item = $(this).parent();
+            var data = {'parent_id': $item.data('entry-id'), 'day': $item.closest('ul').data('show-for')};
+            $item.trigger('ajaxDialog:close', [data]);
+        })
+
+        $('#move-timetable-entry-dialog .scroll-btn').on('click', function() {
+            var $this = $(this);
+            var $days = $this.parent().find('.days-container');
+            var daysContainerWidth = $days.width();
+            var currentPos = $days.scrollLeft();
+            var positionDelta = $this.hasClass('scroll-left') ? -daysContainerWidth : daysContainerWidth;
+            $days.animate({scrollLeft: currentPos + positionDelta}, 100);
+        });
+
+        $('#move-timetable-entry-dialog .days-container.scrollable').on('scroll', function() {
+            var $this = $(this);
+            var scrollingEnd = $this.outerWidth() + $this.scrollLeft() == $this[0].scrollWidth;
+            $this.parent().find('.fader-left').toggleClass('visible', $this.scrollLeft() > 0);
+            $this.parent().find('.fader-right').toggleClass('visible', !scrollingEnd);
+        })
+
+        _.defer(function(){
+            $('#move-timetable-entry-dialog .days .day.highlight').trigger('click');
+        });
+    })();
 </script>
