@@ -338,6 +338,12 @@ $i-box-padding: 10px;
             }
         }
     }
+
+    &.with-hover-effect {
+        ul.group-list > li:hover {
+            background-color: $light-gray;
+        }
+    }
 }
 
 .i-box ul.group-list {
