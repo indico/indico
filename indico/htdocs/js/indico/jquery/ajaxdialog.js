@@ -52,6 +52,8 @@
             trigger: null, // element that opened the dialog
             title: null, // title of the dialog
             subtitle: null, // subtitle of the dialog
+            closeButton: undefined, // include a close button at the bottom of the dialog. the inner text of the button
+                                    // is configurable
             url: null, // url to get the form/dialog from
             method: 'GET', // http method to get the form/dialog
             data: null, // object or callable to add data when loading the form/dialog
@@ -140,10 +142,18 @@
 
             popup.draw = function() {
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
-                if(options.subtitle) {
+                if (options.subtitle) {
                     this.canvas.prepend($('<div>', {
                         class: 'dialog-subtitle',
                         text: options.subtitle
+                    }));
+                }
+                if (options.closeButton !== undefined) {
+                    this.contentContainer.append($('<button>', {
+                        'class': 'i-button big right',
+                        'type': 'button',
+                        'text': options.closeButton || $T("Close"),
+                        'data-button-back': ''
                     }));
                 }
             };

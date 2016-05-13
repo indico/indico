@@ -3336,6 +3336,7 @@ div.exclusivePopup {
     display: block;
     min-width: 250px;
     padding: 0.5em 15px;
+    overflow: hidden;
 }
 
 div.ui-dialog-titlebar {
