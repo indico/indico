@@ -29,10 +29,15 @@
 
     > .section {
         @include clearfix();
+        display: flex;
+        align-items: center;
 
         > .toolbar {
             margin: 0;
-            padding 0;
+            padding: 0;
+            flex-shrink: 0;
+            margin-left: auto;
+
             &.right {
                 padding-left: 0.5em;
             }
@@ -40,47 +45,29 @@
             a:not(.i-button) {
                 line-height: 2.2em;
             }
+
+            > .group {
+                margin-bottom: 0;
+            }
         }
 
-        + .section:before {
-            background-color: $gray;
-            box-shadow: 1px 1px 1px $light-gray;
-            content: '';
-            display: block;
-            height: 1px;
-            margin: 10px 0;
+        &:not(:first-child) {
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid $gray;
         }
     }
 
     > .section > .text {
-        display: inline-block;
-        vertical-align: top;
-
         > .label {
             font-weight: bold;
         }
-
     }
 
     > .section > .icon {
-        display: inline-block;
         font-size: 2rem;
         padding-right: 0.5rem;
-        margin-bottom: -1em;
-    }
-
-    &.message-only {
-        > .section {
-            > .icon {
-                float: left;
-            }
-
-            > .text {
-                overflow: hidden;
-                width: auto;
-                display: inherit;
-            }
-        }
+        flex-shrink: 0;
     }
 
     &.for-form {

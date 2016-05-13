@@ -3335,7 +3335,7 @@ div.exclusivePopup {
     background-color: white;
     display: block;
     min-width: 250px;
-    padding: 0.5em 15px;
+    padding: 15px;
     overflow: hidden;
 }
 

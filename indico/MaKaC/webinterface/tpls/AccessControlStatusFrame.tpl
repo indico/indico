@@ -34,7 +34,7 @@ from MaKaC import conference as cmod
         % if not isinstance(target, cmod.Category):
             <% non_inheriting = target.as_event.get_non_inheriting_objects() %>
             % if non_inheriting:
-                <div class="action-box message-only for-form highlight">
+                <div class="action-box for-form highlight">
                     <div class="section">
                         <div class="icon icon-shield"></div>
                         <div class="text">
