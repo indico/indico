@@ -101,8 +101,11 @@
                                 updateContent(data);
                             }
                         }));
+                        if (qBubbleOptions.events && qBubbleOptions.events.show) {
+                            qBubbleOptions.events.show(evt, api);
+                        }
                     },
-                    hide: function(evt) {
+                    hide: function(evt, api) {
                         var originalEvent = evt.originalEvent;
 
                         if (self.options.onClose) {
@@ -115,10 +118,16 @@
                             return false;
                         }
 
+                        if (qBubbleOptions.events && qBubbleOptions.events.hide) {
+                            qBubbleOptions.events.hide(evt, api);
+                        }
                         return true;
                     },
                     hidden: function(evt, api) {
                         api.get('content.text').remove();
+                        if (qBubbleOptions.events && qBubbleOptions.events.hidden) {
+                            qBubbleOptions.events.hidden(evt, api);
+                        }
                     }
                 }
             });
