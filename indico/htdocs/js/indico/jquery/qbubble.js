@@ -41,29 +41,8 @@
             var self = this;
             var classes = self.options.style ? self.options.style.classes : '';
 
-            var originalHideCallback = self.options.events && self.options.events.hide;
-            var originalFocusCallback = self.options.events && self.options.events.focus;
-            function hideCallback(evt, api) {
-                if (self._hasNestedOpen) {
-                    evt.preventDefault();
-                } else if (originalHideCallback) {
-                    originalHideCallback(evt, api);
-                }
-            }
-            function focusCallback(evt, api) {
-                if (self._hasNestedOpen) {
-                    evt.preventDefault();
-                } else if (originalFocusCallback) {
-                    originalFocusCallback(evt, api);
-                }
-            }
-
             self.element.qtip($.extend(true, {}, self.defaultQtipOptions, self.options, {
-                style: {classes: 'qbubble ' + classes},
-                events: $.extend(true, self.options.events, {
-                    hide: hideCallback,
-                    focus: focusCallback
-                })
+                style: {classes: 'qbubble ' + classes}
             }));
 
             this._on({
@@ -105,6 +84,7 @@
                         }
                         if (!evt.defaultPrevented) {
                             self._hasNestedOpen = true;
+                            self.element.qtip('disable');
                         }
                     },
                     hide: function(evt, api) {
@@ -113,6 +93,7 @@
                         }
                         if (!evt.defaultPrevented) {
                             self._hasNestedOpen = false;
+                            self.element.qtip('enable');
                         }
                     }
                 }
