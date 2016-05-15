@@ -42,7 +42,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            % if field._type == 'selection':
+            % if field.getType() == 'selection':
                 ${md_convert(abstract.getField(field.getId()))}
             % else:
                 ${md_convert(unicode(abstract.getField(field.getId()).value or ''))}
@@ -55,9 +55,9 @@
 
 \vspace{1.5em}
 
-<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=abstract.getPrimaryAuthorsList()" />
-<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=abstract.getCoAuthorList()" />
-<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=abstract.getSpeakerList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Primary author(s)'), list=abstract.getPrimaryAuthorsList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Co-author(s)'), list=abstract.getCoAuthorList()" />
+<%include file="person_list_abstract.tpl" args="caption=_('Presenter(s)'), list=abstract.getSpeakerList()" />
 
 \vspace{0.5em}
 
