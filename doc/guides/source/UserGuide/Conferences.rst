@@ -1603,7 +1603,7 @@ Once you have created the spacer, the result will look as following in the event
 Images
 ^^^^^^
 
-In this tab you can upload iamges. This will give you a link for the given
+In this tab you can upload images. This will give you a link for the given
 image. When you need to make use of this image, copy and paste this link.
 Clicking on it will redirect you to the image.
 
