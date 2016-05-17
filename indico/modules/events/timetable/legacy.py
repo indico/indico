@@ -116,6 +116,7 @@ class TimetableSerializer(object):
         return data
 
     def serialize_contribution_entry(self, entry):
+        from indico.modules.events.api import SerializerBase
         block = entry.parent.session_block if entry.parent else None
         contribution = entry.contribution
         data = {}
@@ -141,7 +142,8 @@ class TimetableSerializer(object):
                      'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
-                     'friendlyId': contribution.friendly_id})
+                     'friendlyId': contribution.friendly_id,
+                     'references': map(SerializerBase.serialize_reference, contribution.references)})
         return data
 
     def serialize_break_entry(self, entry, management=False):
