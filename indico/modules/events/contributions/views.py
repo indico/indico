@@ -35,7 +35,7 @@ class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/contributions/'
 
     def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+        return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
 
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
