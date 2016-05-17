@@ -43,7 +43,7 @@ class RHTimetable(RHConferenceBaseDisplay):
     def _process(self):
         if self.event_new.theme == 'static':
             event_info = serialize_event_info(self.event_new)
-            timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
+            timetable_data = TimetableSerializer().serialize_timetable(self.event_new, hide_empty_days=True)
             return self.view_class.render_template('display.html', self._conf, event_info=event_info,
                                                    timetable_data=timetable_data, timetable_layout=self.layout)
         else:
