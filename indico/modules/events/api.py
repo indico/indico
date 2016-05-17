@@ -341,6 +341,16 @@ class SerializerBase(object):
         return [self._serialize_session_block(b, serialized_session, session_access_list, can_manage)
                 for b in session_.blocks]
 
+    @staticmethod
+    def serialize_reference(reference):
+        """Return the data for a reference"""
+        return {
+            'type': reference.reference_type.name,
+            'value': reference.value,
+            'url': reference.url,
+            'urn': reference.urn
+        }
+
     def _serialize_contribution(self, contrib, include_subcontribs=True):
         can_manage = self.user is not None and contrib.can_manage(self.user)
         data = {
@@ -372,6 +382,7 @@ class SerializerBase(object):
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
+            'references': map(self.serialize_reference, contrib.references)
         }
         if include_subcontribs:
             data['subContributions'] = map(self._serialize_subcontribution, contrib.subcontributions)
@@ -394,7 +405,8 @@ class SerializerBase(object):
             'material': build_material_legacy_api_data(subcontrib),
             'folders': build_folders_api_data(subcontrib),
             'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
-                                                can_manage=can_manage)
+                                                can_manage=can_manage),
+            'references': map(self.serialize_reference, subcontrib.references)
         }
         return data
 
