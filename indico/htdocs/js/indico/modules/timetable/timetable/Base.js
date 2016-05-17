@@ -551,8 +551,17 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
              if (exists(data[todayStr])) {
                  initialTab = todayStr;
              } else {
-                 // otherwise use the default
-                 initialTab = this.sortedKeys[0];
+                 // look for the first non-empty day
+                 for (var day in this.data) {
+                     if (Object.getOwnPropertyNames(this.data[day]).length > 0) {
+                         initialTab = day;
+                         break;
+                     }
+                 }
+                 if (initialTab === null) {
+                     // otherwise show the first day
+                     initialTab = this.sortedKeys[0];
+                 }
              }
          }
 
