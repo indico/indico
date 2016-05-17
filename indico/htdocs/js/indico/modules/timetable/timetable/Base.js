@@ -1400,7 +1400,15 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     },
 
     getTTMenu: function() {
-        return null;
+        if (this.isSessionTimetable) {
+            var goBackLink = $('<a>', {
+                'class': 'icon-arrow-up i-button',
+                'href': build_url(Indico.Urls.Timetable.management, {'confId': this.eventInfo.id})
+            }).text($T('Go to event timetable'));
+            return $('<div>', {'class': 'group right'}).append(goBackLink);
+        } else {
+            return null;
+        }
     },
 
     _retrieveHistoryState: function(hash) {
