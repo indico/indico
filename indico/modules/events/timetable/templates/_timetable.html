@@ -44,9 +44,13 @@
                 new BrowserHistoryBroker()
             ].concat(extraArgs);
 
-            var timetable = new (Function.prototype.bind.apply(timetableClass, timetableArgs));
-            $('#timetable').html(timetable.draw());
-            timetable.postDraw();
+            if (Object.getOwnPropertyNames(timetableArgs[1]).length > 0) {
+                var timetable = new (Function.prototype.bind.apply(timetableClass, timetableArgs));
+                $('#timetable').html(timetable.draw());
+                timetable.postDraw();
+            } else {
+                $('#timetable').html($T("The timetable has not been filled yet."));
+            }
         });
     </script>
 {% endmacro %}
