@@ -14,7 +14,6 @@
                         <th class="i-table">{% trans %}Title{% endtrans %}</th>
                         <th class="i-table">{% trans %}Code{% endtrans %}</th>
                         <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
-                        <th class="i-table" data-sorter="false">{% trans %}Colour{% endtrans %}</th>
                         <th class="i-table" data-sorter="false">{% trans %}Blocks{% endtrans %}</th>
                         <th class="i-table">{% trans %}Material{% endtrans %}</th>
                         <th data-sorter="false"></th>
@@ -53,17 +52,6 @@
                                 </span>
                             </td>
                             <td class="i-table">
-                                <div class="group">
-                                    <a class="i-button icon-palette palette-picker-trigger"
-                                       style="{{ sess.colors.css }}"
-                                       data-method="PATCH"
-                                       data-href="{{ url_for('.session_rest', sess) }}"
-                                       data-colors="{{ default_colors | tojson | forceescape }}"
-                                       data-color="{{ sess.colors | tojson | forceescape }}">
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="i-table">
                                 <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}">
                                     {%- trans %}Session blocks {% endtrans -%}
                                     <span class="badge">{{ sess.blocks | length }}</span>
@@ -72,6 +60,13 @@
                             {{ render_attachment_info(sess) }}
                             <td class="i-table">
                                 <div class="group right entry-action-buttons vertical-aligner">
+                                    <a class="i-button color-button palette-picker-trigger"
+                                       style="{{ sess.colors.css }}"
+                                       data-method="PATCH"
+                                       data-href="{{ url_for('.session_rest', sess) }}"
+                                       data-colors="{{ default_colors | tojson | forceescape }}"
+                                       data-color="{{ sess.colors | tojson | forceescape }}"
+                                       title="{% trans %}Change colour{% endtrans %}"></a>
                                     <a href="#" class="icon-edit highlight edit-session i-button-icon"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
