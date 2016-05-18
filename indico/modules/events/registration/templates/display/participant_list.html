@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block subtitle %}
-    {% if num_participants > 1 %}
-        {%- trans num=num_participants %}{{ num }} participants{% endtrans -%}
+    {% if num_participants %}
+        {%- trans num=num_participants %}1 participant{% pluralize %}{{ num }} participants{% endtrans -%}
     {% endif %}
 {% endblock %}
 
