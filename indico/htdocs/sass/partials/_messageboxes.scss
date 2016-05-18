@@ -43,6 +43,10 @@
         p:last-child {
             margin-bottom: 0;
         }
+
+        &.normal-size {
+            font-size: 1em;
+        }
     }
 
     .message-box-footer {
