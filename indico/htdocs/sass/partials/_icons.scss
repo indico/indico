@@ -61,6 +61,35 @@ i[class^="icon-"]:before {
     opacity: 0.15;
 }
 
+/* How to add icons
+ *
+ *  1. Login into icomoon app https://icomoon.io/app/
+ *  2. Remove any existing project (Top-left hamburger icon, "Manage projects", "Remove" button)
+ *  3. Import "selection.json" from Indico repository (Top-left hamburger icon, "Import project",
+ *     choose 'indico/htdocs/static/fonts/icomoon/selection.json'
+ *  4. Load the project (it should be named "Untitled Project")
+ *  5. Deselect all icons (Top-left hamburger icon, "Clear selection")
+ *  6. Add the IcoMoon Ultimate pack (Click on "Library" button then on "Add)
+ *  7. Search for the icon you want to add using the search box
+ *  8. Select the icons to add with the selection tool
+ *  9. Add the new icons to our set (Click the hamburger icon to the right of our set that
+ *     should be displayed as "icomoon" and select "Copy selection to set")
+ * 10. Clear the search box
+ * 11. Remove all icons sets except ours (Click the hamburger icon to the right of the set to remove
+ *     and choose "Remove set")
+ * 12. Reorder the icons in alphabetical order:
+ *      - Click the hamburger icon to the right of our project
+ *      - Choose "Select all".
+ *      - Click that hamburger icon again and choose "Rearrange icons".
+ *      - Choose "Order by name" and "Rearrange
+ * 13. Click on the "Generate font" tab at the bottom of the screen
+ * 14. Click on "Download" at the bottom right of the screen
+ * 15. Copy files:
+ *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/htdocs/static/fonts/icomoon/
+ *      - icomoon.zip/selection.json to indico/htdocs/static/fonts/icomoon/
+ *      - Replace the icon definitions between the comments below with the ones found in icomoon.zip/style.css
+ */
+
 /* Icomoon's icon definitions */
 .icon-agreement:before {
     content: "\e605";
