@@ -111,6 +111,11 @@ select {
         color: transparent !important;
         text-shadow: 0 0 0 $black !important;
     }
+
+    option[disabled] {
+        color: #888;
+        background-color: #eee;
+    }
 }
 
 select, ul {
