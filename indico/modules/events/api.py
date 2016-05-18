@@ -471,13 +471,13 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         # acl_user_strategy.noload('_affiliation')
         creator_strategy = joinedload('creator')
         contributions_strategy = subqueryload('contributions')
-        subcontributions_strategy = subqueryload('contributions').subqueryload('subcontributions')
+        contributions_strategy.subqueryload('references')
+        if detail_level in {'subcontributions', 'sessions'}:
+            contributions_strategy.subqueryload('subcontributions').subqueryload('references')
         sessions_strategy = subqueryload('sessions')
         options = [acl_user_strategy, creator_strategy]
-        if detail_level == 'contributions':
+        if detail_level in {'contributions', 'subcontributions', 'sessions'}:
             options.append(contributions_strategy)
-        if detail_level in {'subcontributions', 'sessions'}:
-            options.append(subcontributions_strategy)
         if detail_level == 'sessions':
             options.append(sessions_strategy)
         return options
