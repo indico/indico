@@ -38,7 +38,10 @@ class TimetableSerializer(object):
         for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
             date_str = day.strftime('%Y%m%d')
             timetable[date_str] = {}
-        query_options = (defaultload('contribution').subqueryload('person_links'),
+        contributions_strategy = defaultload('contribution')
+        contributions_strategy.subqueryload('person_links')
+        contributions_strategy.subqueryload('references')
+        query_options = (contributions_strategy,
                          defaultload('session_block').subqueryload('person_links'))
         query = (TimetableEntry.query.with_parent(event)
                  .options(*query_options)
