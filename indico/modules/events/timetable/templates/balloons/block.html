@@ -38,6 +38,7 @@
             <div class="group right entry-action-buttons">
                 {% if editable %}
                     {% if can_manage_session %}
+                        {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
                         <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                            title="{% trans %}Edit session{% endtrans %}"
                            data-extra-params='{"edit_session": 1}'
@@ -62,9 +63,6 @@
             </dl>
         {% endif %}
     </div>
-    {% if editable %}
-        {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
-    {% endif %}
     <span class="hr"></span>
     <div class="attribute">
         <div class="attribute-title">

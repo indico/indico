@@ -35,13 +35,11 @@
 {% endmacro %}
 
 {% macro render_palette_picker(obj, endpoint, color_list) %}
-    <a class="i-button icon-palette palette-picker palette-picker-trigger"
+    <a class="i-button color-button palette-picker palette-picker-trigger"
        style="{{ obj.colors.css }}"
        data-method="PATCH"
        data-href="{{ url_for(endpoint, obj) }}"
        data-palette="{{ color_list | tojson | forceescape }}"
        data-initial-color="{{ obj.colors | tojson | forceescape }}"
-       >
-        {% trans %}Colour{% endtrans %}
-    </a>
+       title="{% trans %}Change colour{% endtrans %}"></a>
 {% endmacro %}

@@ -361,6 +361,14 @@ a.i-button-icon {
     }
 }
 
+.i-button.color-button {
+    @include icon-before(icon-text-color);
+
+    padding: 1px;
+    border-radius: 50%;
+    vertical-align: baseline;
+}
+
 /* Remove special border added in Firefox */
 button::-moz-focus-inner,
 input[type="button"]::-moz-focus-inner,

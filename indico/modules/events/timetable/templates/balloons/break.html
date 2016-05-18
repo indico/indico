@@ -5,6 +5,7 @@
         <div class="title">{{ break_.title }}</div>
         {% if editable %}
             <div class="group right entry-action-buttons">
+                {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list) }}
                 <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
                    title="{% trans %}Edit break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>
@@ -22,7 +23,4 @@
     </div>
     <div class="description">{{ break_.description }}</div>
     {{ render_time_and_location(break_, editable) }}
-    {% if editable %}
-        {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list) }}
-    {% endif %}
 </div>
