@@ -430,6 +430,9 @@ i[class^="icon-"]:before {
 .icon-tag:before {
     content: "\e0b9";
 }
+.icon-text-color:before {
+    content: "\e900";
+}
 .icon-textarea:before {
     content: "\e000";
 }
@@ -441,6 +444,9 @@ i[class^="icon-"]:before {
 }
 .icon-time:before {
     content: "\e004";
+}
+.icon-transmission:before {
+    content: "\ee46";
 }
 .icon-type:before {
     content: "\2a";
@@ -471,9 +477,6 @@ i[class^="icon-"]:before {
 }
 .icon-wrench:before {
     content: "\77";
-}
-.icon-transmission:before {
-    content: "\ee46";
 }
 /* End of icomoon's icon definitions */
 
