@@ -1258,7 +1258,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         // it is a slot && slot exists in timetable
         if (result.entry.entryType == "Session" && data[this.currentDay][result.id]) {
             var slot = data[this.currentDay][result.id];
-            oldStartDate = slot.startDate.date.replaceAll('-','');
+            oldStartDate = slot.startDate.date.replace(/-/g, '');
         } else {
             // Contribution or break - event timetable limits
             oldStartDate = this.currentDay;
@@ -1307,9 +1307,9 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
 
         // Check if the result overflows the conference ending time
-        if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
-            (result.entry.endDate.time.replaceAll(':','') >
-             this.eventInfo.endDate.time.replaceAll(':',''))) {
+        if ((result.day == this.eventInfo.endDate.date.replace(/-/g, '')) &&
+            (result.entry.endDate.time.replace(/:/g, '') >
+             this.eventInfo.endDate.time.replace(/:/g,''))) {
             this.eventInfo.endDate.time = result.entry.endDate.time;
         }
 
@@ -1348,13 +1348,13 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         var latestTime = null;
 
         for (var key in result.entry) {
-            if(!latestTime || result.entry[key].endDate.time.replaceAll(':','') > latestTime.replaceAll(':','')) {
+            if(!latestTime || result.entry[key].endDate.time.replace(/:/g, '') > latestTime.replace(/:/g, '')) {
                 latestTime = result.entry[key].endDate.time;
             }
         }
-        if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
-            (latestTime.replaceAll(':','') >
-             this.eventInfo.endDate.time.replaceAll(':',''))) {
+        if ((result.day == this.eventInfo.endDate.date.replace(/-/g, '')) &&
+            (latestTime.replace(/:/g, '') >
+             this.eventInfo.endDate.time.replace(/:/g, ''))) {
             this.eventInfo.endDate.time = latestTime;
         }
 

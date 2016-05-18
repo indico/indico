@@ -325,15 +325,6 @@ function $D(source, template) {
         return bind.toDictionary(new WatchOrderedDict(), source, template);
 }
 
-String.prototype.replaceAll = Browser.Gecko?
-    function(pattern, replace) {
-        return this.replace(pattern, replace, 'g');
-    }:
-    function(pattern, replace) {
-        return this.replace( new RegExp( pattern, "g" ), replace );
-    };
-
-
 Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
     return function() {
         var res = Html[elemType].apply(this, arguments);
