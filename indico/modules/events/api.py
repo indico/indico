@@ -285,7 +285,8 @@ class SerializerBase(object):
             'room': event.get_room_name(full=False),
             'location': event.venue_name,
             'address': event.address,
-            'type': event.as_legacy.getType()
+            'type': event.as_legacy.getType(),
+            'references': map(self.serialize_reference, event.references)
         }
 
     def _build_session_event_api_data(self, event):
