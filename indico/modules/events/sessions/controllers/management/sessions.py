@@ -193,6 +193,15 @@ class RHSessionACL(RHManageSessionBase):
         return render_acl(self.session)
 
 
+class RHSessionACLMessage(RHManageSessionBase):
+    """Render the inheriting ACL message"""
+
+    def _process(self):
+        if request.args.get('inheriting') == '1':
+            return jsonify_template('events/sessions/forms/_inherited_acl_message.html', session_=self.session)
+        return jsonify_data(html='')
+
+
 class RHManageSessionBlock(RHManageSessionBase):
     """Manage a block of a session"""
 

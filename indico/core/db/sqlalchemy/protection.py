@@ -442,4 +442,4 @@ def _resolve_principal(principal):
 
 
 def render_acl(obj):
-    return jsonify_template('_access_list.html', acl=obj.get_access_list(skip_managers=True, skip_self_acl=True))
+    return jsonify_template('_access_list.html', acl=obj.protection_parent.get_access_list(skip_managers=True))

@@ -309,12 +309,6 @@ class PrincipalListField(HiddenField):
 class AccessControlListField(PrincipalListField):
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True, acl=True)
 
-    def __init__(self, *args, **kwargs):
-        self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
-        self.acl_url = kwargs.pop('acl_url')(kwargs['_form'])
-        self.inherited_acl_count = len(self.protected_object.get_access_list(skip_managers=True, skip_self_acl=True))
-        super(AccessControlListField, self).__init__(*args, **kwargs)
-
 
 class EventPersonListField(PrincipalListField):
     """"A field that lets you select a list Indico user and EventPersons
@@ -848,6 +842,9 @@ class IndicoProtectionField(IndicoEnumRadioField):
     radio_widget = JinjaWidget('forms/radio_buttons_widget.html', orientation='horizontal', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
+        self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
+        if 'acl_message_url' in kwargs:
+            self.acl_message_url = kwargs.pop('acl_message_url')(kwargs['_form'])
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):

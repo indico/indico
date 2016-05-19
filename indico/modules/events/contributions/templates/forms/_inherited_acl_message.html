@@ -1,0 +1,12 @@
+{% extends '_inherited_acl_message_base.html' %}
+
+{% block link %}
+    <a href="#" class="i-button highlight"
+       data-href="{{ url_for('contributions.acl', contrib) }}"
+       data-title="{% trans %}Inherited access list{% endtrans %}"
+       data-subtitle="{{ contrib.title }}"
+       data-close-button
+       data-ajax-dialog>
+        {% trans %}View list{% endtrans %}
+    </a>
+{% endblock %}

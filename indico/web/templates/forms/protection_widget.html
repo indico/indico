@@ -22,8 +22,16 @@
                     $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
 
                     toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
-
-                    $this.closest('form').find('.inheriting-acl-message').trigger('protection:inheriting', [$this.val() === 'inheriting']);
+                    {% if field.acl_message_url %}
+                        $.ajax({
+                            url: {{ field.acl_message_url | tojson }},
+                            data: {inheriting: $this.val() === 'inheriting' ? 1 : 0},
+                            error: handleAjaxError,
+                            success: function(data) {
+                                $this.closest('form').find('.inheriting-acl-message').html(data.html);
+                            }
+                        });
+                    {% endif %}
                 }
             });
 

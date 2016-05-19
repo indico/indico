@@ -4,26 +4,8 @@
 {% block html %}
     {% set value_json = field._value() | tojson %}
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
-        {% if acl and field.inherited_acl_count %}
-            <div class="action-box for-form highlight inheriting-acl-message" style="display: block;">
-                <div class="section">
-                    <div class="text">
-                        <div>
-                            {% trans %}Since the protection mode is set to <em>inheriting</em>, users from the <strong>inherited access control list</strong> will also have access.{% endtrans %}
-                        </div>
-                    </div>
-                    <div class="toolbar right">
-                        <a href="#" class="i-button highlight"
-                           data-href="{{ field.acl_url }}"
-                           data-title="{% trans %}Inherited access list{% endtrans %}"
-                           data-subtitle="{{ field.protected_object.title }}"
-                           data-close-button
-                           data-ajax-dialog>
-                            {% trans %}View list{% endtrans %}
-                        </a>
-                    </div>
-                </div>
-            </div>
+        {% if acl %}
+            <div class="inheriting-acl-message"></div>
         {% endif %}
         <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}"

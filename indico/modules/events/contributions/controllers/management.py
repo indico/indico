@@ -230,6 +230,15 @@ class RHContributionACL(RHManageContributionBase):
         return render_acl(self.contrib)
 
 
+class RHContributionACLMessage(RHManageContributionBase):
+    """Render the inheriting ACL message"""
+
+    def _process(self):
+        if request.args.get('inheriting') == '1':
+            return jsonify_template('events/contributions/forms/_inherited_acl_message.html', contrib=self.contrib)
+        return jsonify_data(html='')
+
+
 class RHContributionREST(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)

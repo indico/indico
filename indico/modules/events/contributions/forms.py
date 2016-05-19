@@ -91,12 +91,12 @@ class ContributionForm(IndicoForm):
 
 
 class ContributionProtectionForm(IndicoForm):
-    protection_mode = IndicoProtectionField(_('Protection mode'))
+    protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
+                                            acl_message_url=lambda form: url_for('contributions.acl_message',
+                                                                                 form.protected_object))
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                  serializable=False, groups=True,
-                                 protected_object=lambda form: form.protected_object,
-                                 acl_url=lambda form: url_for('contributions.acl', form.protected_object),
                                  description=_('List of users allowed to access the contribution'))
     managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
                                   description=_('List of users allowed to modify the contribution'))

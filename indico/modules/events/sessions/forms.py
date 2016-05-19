@@ -56,12 +56,12 @@ class SessionForm(IndicoForm):
 
 
 class SessionProtectionForm(IndicoForm):
-    protection_mode = IndicoProtectionField(_('Protection mode'))
+    protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
+                                            acl_message_url=lambda form: url_for('sessions.acl_message',
+                                                                                 form.protected_object))
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                  serializable=False, groups=True,
-                                 protected_object=lambda form: form.protected_object,
-                                 acl_url=lambda form: url_for('sessions.acl', form.protected_object),
                                  description=_('List of users allowed to access the session.'))
     managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
                                   description=_('List of users allowed to modify the session'))
