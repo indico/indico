@@ -2,7 +2,7 @@
     <table border="0" cellpadding="0" cellspacing="0"
         class="regform-field"
         ng-class="{disabled: !field.isEnabled, 'billable-disabled': field.billableDisabled, editable: editMode}">
-        <tr ng-attr-title="{{ field.billableDisabled ? ('This option could trigger a price change and has been locked.' | i18n) : undefined }}">
+        <tr>
             <td ng-if="editMode" class="field-sortable-handle"/>
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
@@ -38,7 +38,8 @@
                     title="{{ 'Configure field' | i18n }}"/>
             </td>
 
-            <td ng-if="field.billableDisabled" class="icon-lock billable-disabled-warning">
+            <td ng-if="field.billableDisabled" class="icon-lock billable-disabled-warning"
+                title="{{ 'This option is locked since changing it could trigger a price change.' | i18n }}{{ regMetadata.manager ? (' ' + ('But as a manager you can still modify it.' | i18n)) : '' }}">
             </td>
         </tr>
     </table>
