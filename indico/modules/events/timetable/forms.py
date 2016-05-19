@@ -29,6 +29,7 @@ from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.util import find_next_start_dt
+from indico.util.date_time import format_human_timedelta
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (TimeDeltaField, IndicoPalettePickerField, IndicoLocationField,
@@ -129,8 +130,17 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
                                description=_("Shift down everything else that starts after this"))
 
     def __init__(self, *args, **kwargs):
-        self._entry_type = kwargs.pop('entry').type
+        self.entry = kwargs.pop('entry')
+        self._entry_type = self.entry.type
         super(BaseEntryForm, self).__init__(*args, **kwargs)
+
+    def validate_duration(self, field):
+        super(BaseEntryForm, self).validate_duration(field)
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+            needed_duration = max(x.end_dt for x in self.entry.children) - min(x.start_dt for x in self.entry.children)
+            if field.data < needed_duration:
+                raise ValidationError(_("The duration must be at least {duration} to fit the entries within.")
+                                      .format(duration=format_human_timedelta(needed_duration, 'minutes')))
 
 
 _DOCUMENT_SETTINGS_CHOICES = [('showCoverPage', _('Include cover page')),
