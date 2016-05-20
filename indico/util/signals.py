@@ -46,7 +46,9 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
     for func, value in signal_response:
         plugin = getattr(func, 'indico_plugin', None)
         if not single_value and isinstance(value, multi_value_types):
-            values.extend(izip_longest([plugin], value, fillvalue=plugin))
+            value_list = list(value)
+            if value_list:
+                values.extend(izip_longest([plugin], value_list, fillvalue=plugin))
         else:
             values.append((plugin, value))
     if skip_none:
