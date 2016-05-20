@@ -31,6 +31,11 @@
           data-qtip-style="warning"
           title="{{ 'Options that could trigger a price change have been blocked.' | i18n }}">
     </span>
+    <span ng-if="regMetadata.manager && regMetadata.paid && !field.billableDisabled && hasBillableOptions(field)"
+          class="icon-warning billable-items-warning"
+          data-qtip-style="warning"
+          title="{{ 'Changing this option might trigger a price change.' | i18n }}">
+    </span>
     <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
         <span ng-if="showExtraSlotsInput(item, userdata[fieldName], input==item.id, getPlacesLeft(item))">
             <select id="extraSlotsSelect-{{ item.id }}"
