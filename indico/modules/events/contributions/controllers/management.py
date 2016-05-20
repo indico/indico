@@ -592,7 +592,7 @@ class RHEditContributionField(RHManageContributionFieldBase):
         form = field_class.create_config_form(obj=FormDefaults(self.contrib_field, **self.contrib_field.field_data))
         if form.validate_on_submit():
             old_title = self.contrib_field.title
-            self.contrib_field.field.update_object(form.data)
+            self.contrib_field.get_field(management=True).update_object(form.data)
             db.session.flush()
             self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                                'Modified field: {}'.format(old_title), session.user)

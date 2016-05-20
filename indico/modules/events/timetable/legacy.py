@@ -209,7 +209,7 @@ class TimetableSerializer(object):
         if self.management:
             tzinfo = entry.event_new.tzinfo
         else:
-            tzinfo = timezone(entry.event_new.as_legacy.tz)
+            tzinfo = entry.event_new.display_tzinfo
         return {'startDate': self._get_entry_date_dt(entry.start_dt, tzinfo),
                 'endDate': self._get_entry_date_dt(entry.end_dt, tzinfo)}
 

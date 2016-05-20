@@ -155,7 +155,8 @@ class ContributionReporter(ReporterBase):
                 status_criteria.append(Contribution.is_scheduled)
             if 'unscheduled' in filtered_statuses:
                 status_criteria.append(~Contribution.is_scheduled)
-            criteria.append(db.or_(*status_criteria))
+            if status_criteria:
+                criteria.append(db.or_(*status_criteria))
 
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,

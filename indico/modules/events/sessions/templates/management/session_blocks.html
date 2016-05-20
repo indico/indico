@@ -11,7 +11,7 @@
         {% for block in sess.blocks %}
             <tr class="i-table">
                 <td class="i-table">{{ block.title }}</td>
-                <td class="i-table">{{ block.start_dt|format_date }}</td>
+                <td class="i-table">{{ block.start_dt|format_datetime }}</td>
                 <td class="i-table">{{ block.duration|format_human_timedelta }}</td>
                 <td class="i-table">{{ block.contribution_count }}</td>
             </tr>

@@ -53,10 +53,9 @@ class ContribField(BaseField):
         super(ContribField, self).__init__(obj)
         self.management = management
 
+    @property
     def required_validator(self):
-        if self.management:
-            return Optional()
-        return DataRequired()
+        return Optional() if self.management else DataRequired()
 
 
 class ContribTextField(TextField, ContribField):

@@ -105,7 +105,7 @@ class ContributionField(db.Model):
             impl = get_contrib_field_types()[self.field_type]
         except KeyError:
             return None
-        return impl(self, management)
+        return impl(self, management=management)
 
     @return_ascii
     def __repr__(self):
