@@ -53,7 +53,7 @@
                             </td>
                             <td class="i-table">
                                 <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}"
-                                      data-title="{% trans title=sess.title %}Blocks of the '{{ title }}'{% endtrans %}"
+                                      data-title="{% trans title=sess.title %}Blocks within '{{ title }}'{% endtrans %}"
                                       data-href="{{ url_for('sessions.session_blocks', sess) }}">
                                     {%- trans %}Session blocks {% endtrans -%}
                                     <span class="badge">{{ sess.blocks | length }}</span>
