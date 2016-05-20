@@ -58,6 +58,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
         event_info['timetableSession'] = serialize_session(self.session)
         timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
         management_rights = {
+            'can_manage_event': self.event_new.can_manage(session.user),
             'can_manage_session': self.session.can_manage(session.user),
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
             'can_manage_contributions': self.session.can_manage_contributions(session.user)

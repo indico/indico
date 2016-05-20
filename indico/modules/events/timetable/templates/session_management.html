@@ -7,8 +7,9 @@
 {% endblock %}
 
 {% block content %}
-    {{ render_timetable(timetable_data, event_info, management=true, is_session=True,
+    {{ render_timetable(timetable_data, event_info, management=true, is_session=true,
                         can_manage_session=can_manage_session,
                         can_manage_blocks=can_manage_blocks,
-                        can_manage_contributions=can_manage_contributions) }}
+                        can_manage_contributions=can_manage_contributions,
+                        can_manage_event=can_manage_event) }}
 {% endblock %}

@@ -1029,13 +1029,14 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
 },
      function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks,
-              canManageSession, canManageBlocks, canManageContribs) {
+              canManageSession, canManageBlocks, canManageContribs, canManageEvent) {
          this.customLinks = customLinks;
          this.eventInfo = eventInfo;
          this.contextInfo = contextInfo;
          this.canManageSession = canManageSession || false;
          this.canManageBlocks = canManageBlocks || false;
          this.canManageContribs = canManageContribs || false;
+         this.canManageEvent = canManageEvent || false;
          this.warnings = new WatchList();
          this.TimeTable(data, width, wrappingElement, detailLevel, true);
      }
@@ -1400,11 +1401,11 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     },
 
     getTTMenu: function() {
-        if (this.isSessionTimetable) {
+        if (this.isSessionTimetable && this.canManageEvent) {
             var goBackLink = $('<a>', {
                 'class': 'icon-arrow-up i-button',
                 'href': build_url(Indico.Urls.Timetable.management, {'confId': this.eventInfo.id})
-            }).text($T('Go to event timetable'));
+            }).text($T.gettext('Go to event timetable'));
             return $('<div>', {'class': 'group right'}).append(goBackLink);
         } else {
             return null;
@@ -1425,12 +1426,12 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     }
 },
      function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks,
-              canManageSession, canManageBlocks, canManageContribs) {
+              canManageSession, canManageBlocks, canManageContribs, canManageEvent) {
 
          this.isSessionTimetable = isSessionTimetable;
          this.isTopLevel = true;
 
-         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks, canManageContribs);
+         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks, canManageSession, canManageBlocks, canManageContribs, canManageEvent);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker, 'proportional');
 
