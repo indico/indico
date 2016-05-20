@@ -63,7 +63,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
                 raise ValueError(_("Person with email '{}' is duplicated").format(person_link.person.email))
             if not self.allow_authors and person_link.author_type != AuthorType.none:
                 if not self.object_data or person_link not in self.object_data:
-                    raise ValueError(_("Author data received"))
+                    person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
                 raise ValueError(_("{} has no role").format(person_link.full_name))
             persons.add(person_link.person)
