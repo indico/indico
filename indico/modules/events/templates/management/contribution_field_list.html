@@ -4,6 +4,7 @@
 (<a href="#" class="js-dialog-action"
     data-title="{% trans %}Manage fields{% endtrans %}"
     data-href="{{ url_for('contributions.manage_fields', event) }}"
-    data-ajax-dialog>
+    data-ajax-dialog
+    data-reload-after="customData">
     {%- trans %}edit{% endtrans -%}
 </a>)

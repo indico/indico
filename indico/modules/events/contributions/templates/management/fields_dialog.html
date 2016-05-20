@@ -9,7 +9,7 @@
         <ul class="dropdown">
             {% for form_type in custom_field_types %}
                 <li>
-                    <a data-ajax-dialog class="js-action-button"
+                    <a data-ajax-dialog class="js-action-button js-new-contribution-field"
                        data-href="{{ url_for('.create_field', event, field_type=form_type.name) }}"
                        data-title="{% trans %}Add custom field{% endtrans %}">
                         {{ form_type.friendly_name }}
@@ -32,7 +32,7 @@
 
     {% if custom_fields %}
         {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields") %}
-            <a class="icon-edit js-action-button" data-ajax-dialog
+            <a class="icon-edit js-action-button js-edit-contribution-field" data-ajax-dialog
                data-href="{{ url_for('.manage_field', event, custom_field) }}"
                data-title="{% trans %}Edit custom field{% endtrans %}"></a>
             <a class="js-delete-contribution-field icon-remove"
@@ -58,9 +58,18 @@
     (function() {
         'use strict';
 
+        /* Set the customData to true indicating that whatever is using this dialog may need to be refreshed */
+        function dialogModified() {
+            $dialog.trigger('ajaxDialog:setData', [true]);
+        }
+
         var $dialog = $('.manage-contribution-fields');
 
         $dialog.find('.toolbar').dropdown();
+
+        $dialog.on('ajaxDialog:closed', '.js-new-contribution-field, .js-edit-contribution-field', function(evt, data) {
+            dialogModified();
+        });
 
         $dialog.on('indico:confirmed', '.js-delete-contribution-field', function(evt) {
             evt.preventDefault();
@@ -72,6 +81,7 @@
                 error: handleAjaxError,
                 success: function() {
                     $dialog.trigger('ajaxDialog:reload');
+                    dialogModified();
                 }
             });
         });
@@ -97,6 +107,7 @@
                 },
                 error: handleAjaxError
             });
+            dialogModified();
         });
     })()
 </script>
