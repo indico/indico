@@ -253,7 +253,7 @@ def make_contribution_form(event):
 
     form_class = type(b'_ContributionForm', (ContributionForm,), {})
     for custom_field in event.contribution_fields:
-        field_impl = custom_field.get_field(management=True)
+        field_impl = custom_field.mgmt_field
         if field_impl is None:
             # field definition is not available anymore
             continue
