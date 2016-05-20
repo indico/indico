@@ -306,7 +306,10 @@ type("DraggableBlockMixin", [],
                  containment: $('#timetable'),
                  revert: 'invalid',
                  refreshPositions: true,
-                 start: function(event, ui) {/*
+                 start: function(event, ui) {
+                     /* Close and destroy balloon so it will be updated */
+                     self.element.find('[data-hasqtip]').qbubble('destroy');
+
                      /* Resize timeblock if nedeed */
                      maxCol = self.timetable.getTimetableDrawer().maxCol;
                      newWidth = (maxCol > 1) ? Math.round($('#timetable').width()/(maxCol)) : originalWidth;
