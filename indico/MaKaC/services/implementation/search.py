@@ -59,7 +59,8 @@ class SearchUsers(SearchBase):
             event_persons = self._event.persons.filter(*criteria).all()
         fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
         fossilized_event_persons = map(serialize_event_person, event_persons)
-        return fossilized_users + fossilized_event_persons
+        unique_users = {user['email']: user for user in fossilized_users + fossilized_event_persons}
+        return sorted(unique_users.values(), key=lambda x: (x['name'].lower(), x['email']))
 
 
 class SearchGroups(SearchBase):
