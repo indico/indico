@@ -434,12 +434,16 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                  if (e.keyCode == '16') {
                      $(window).data('shiftIsPressed', true);
                      indicatorDiv.fadeIn("fast");
-                 }}).keyup(function(e){
-                     if(e.keyCode == '16') {
-                         $(window).data('shiftIsPressed', false);
-                         indicatorDiv.fadeOut("fast");
-                     }
-                 });
+                 }
+             }).keyup(function(e){
+                 if(e.keyCode == '16') {
+                     $(window).data('shiftIsPressed', false);
+                     indicatorDiv.fadeOut("fast");
+                 }
+             }).blur(function() {
+                 $(window).data('shiftIsPressed', false);
+                 indicatorDiv.fadeOut("fast");
+             });
 
              $(window).data('shiftIsPressed', false); //default value is false
          },
