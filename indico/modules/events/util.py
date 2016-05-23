@@ -194,7 +194,8 @@ def serialize_event_person(person):
             'title': person.title,
             'affiliation': person.affiliation,
             'phone': person.phone,
-            'address': person.address}
+            'address': person.address,
+            'user_id': person.user_id}
 
 
 def serialize_person_link(person_link):
