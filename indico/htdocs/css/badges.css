@@ -88,7 +88,8 @@ h4 {
 
 .template_list ul li {
     display: block;
-    line-height: 2.7em;
+    overflow: hidden;
+    padding: 0.5em;
 }
 
 .template_list ul li .name {
