@@ -20,11 +20,10 @@ from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import render_acl
+from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -234,9 +233,9 @@ class RHContributionACLMessage(RHManageContributionBase):
     """Render the inheriting ACL message"""
 
     def _process(self):
-        if request.args.get('inheriting') == '1':
-            return jsonify_template('events/contributions/forms/_inherited_acl_message.html', contrib=self.contrib)
-        return jsonify_data(html='')
+        mode = ProtectionMode[request.args['mode']]
+        return jsonify_template('forms/protection_field_acl_message.html', object=self.contrib, mode=mode,
+                                endpoint='contributions.acl')
 
 
 class RHContributionREST(RHManageContributionBase):

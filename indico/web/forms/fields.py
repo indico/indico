@@ -843,8 +843,8 @@ class IndicoProtectionField(IndicoEnumRadioField):
 
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
-        if 'acl_message_url' in kwargs:
-            self.acl_message_url = kwargs.pop('acl_message_url')(kwargs['_form'])
+        get_acl_message_url = kwargs.pop('acl_message_url', None)
+        self.acl_message_url = get_acl_message_url(kwargs['_form']) if get_acl_message_url else None
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):

@@ -22,7 +22,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.core.db.sqlalchemy.protection import render_acl
+from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
@@ -197,9 +197,9 @@ class RHSessionACLMessage(RHManageSessionBase):
     """Render the inheriting ACL message"""
 
     def _process(self):
-        if request.args.get('inheriting') == '1':
-            return jsonify_template('events/sessions/forms/_inherited_acl_message.html', session_=self.session)
-        return jsonify_data(html='')
+        mode = ProtectionMode[request.args['mode']]
+        return jsonify_template('forms/protection_field_acl_message.html', object=self.session, mode=mode,
+                                endpoint='sessions.acl')
 
 
 class RHManageSessionBlock(RHManageSessionBase):
