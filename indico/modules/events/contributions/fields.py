@@ -57,16 +57,12 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     def pre_validate(self, form):
         super(ContributionPersonLinkListField, self).pre_validate(form)
-        persons = set()
         for person_link in self.data:
-            if person_link.person in persons:
-                raise ValueError(_("Person with email '{}' is duplicated").format(person_link.person.email))
             if not self.allow_authors and person_link.author_type != AuthorType.none:
                 if not self.object_data or person_link not in self.object_data:
                     person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
                 raise ValueError(_("{} has no role").format(person_link.full_name))
-            persons.add(person_link.person)
 
 
 class SubContributionPersonLinkListField(ContributionPersonLinkListField):
