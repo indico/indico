@@ -365,7 +365,7 @@ class EventPersonListField(PrincipalListField):
         elif person_type == 'PersonLink':
             return self.event.persons.filter_by(id=data['personId']).one()
         else:
-            raise ValueError(_("Uknown person type '{}'").format(person_type))
+            raise ValueError(_("Unknown person type '{}'").format(person_type))
 
     def _serialize_principal(self, principal):
         from indico.modules.events.util import serialize_event_person
