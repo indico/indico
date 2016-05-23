@@ -307,8 +307,13 @@ type("DraggableBlockMixin", [],
                  revert: 'invalid',
                  refreshPositions: true,
                  start: function(event, ui) {
-                     /* Close and destroy balloon so it will be updated */
-                     self.element.find('[data-hasqtip]').qbubble('destroy');
+                     /* Close and destroy balloon so it will be updated. For an unknown reason, if the
+                      * qTip is not disabled first it is re-opened when the drag action ends. */
+                     var $qbubble = self.element.find('[data-hasqtip]');
+                     if ($qbubble.length) {
+                         $qbubble.qbubble('destroy');
+                         $qbubble.qbubble('api').disable();
+                     }
 
                      /* Resize timeblock if nedeed */
                      maxCol = self.timetable.getTimetableDrawer().maxCol;
