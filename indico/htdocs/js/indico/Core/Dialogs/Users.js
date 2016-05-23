@@ -117,16 +117,23 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
             var affiliation = Html.$($('<span class="affiliation">').text(peopleData.get('affiliation')));
             var html = Html.div("info", userName, userEmail, affiliation);
 
+            var $actionButtons = $('<div>', {'class': 'actions'});
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
-                var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
-                return [html, favouritizeButtonDiv];
-            } else if (peopleData.get('_type') == 'EventPerson') {
-                var eventPersonIcon = $('<span>', {'class': 'event-person', 'title': $T("This person exists in the event")});
-                var wrapper = $('<div>', {'class': 'actions', 'html': eventPersonIcon});
-                return [html, Html.$(wrapper)];
-            } else {
-                return html;
+                var favouritizeButtonDiv = create_favorite_button(peopleData.get('id')).get(0);
+                $actionButtons.append(favouritizeButtonDiv);
             }
+            if (peopleData.get('_type') == 'EventPerson') {
+                var userId = peopleData.get('user_id');
+                if (userId) {
+                    $actionButtons.append(create_favorite_button(userId));
+                }
+                $('<span>', {
+                    'class': 'event-person',
+                    'title': $T("This person exists in the event")
+                }).appendTo($actionButtons);
+            }
+
+            return [html, new Html.$($actionButtons)];
         }
     }
 },
