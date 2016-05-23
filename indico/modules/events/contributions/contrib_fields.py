@@ -55,7 +55,7 @@ class ContribField(BaseField):
 
     @property
     def required_validator(self):
-        return Optional() if self.management else DataRequired()
+        return Optional if self.management else DataRequired
 
 
 class ContribTextField(TextField, ContribField):
