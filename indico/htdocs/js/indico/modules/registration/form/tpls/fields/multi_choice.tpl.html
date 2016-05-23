@@ -34,22 +34,22 @@
                     </span>
                 </span>
                 <span ng-if="!regMetadata.manager && regMetadata.paid && changesPrice(item)"
-                      class="icon-warning billable-items-warning"
+                      class="icon-warning item-warning"
                       data-qtip-style="warning"
                       title="{{ 'This option would result in a price change and has been blocked.' | i18n }}">
                 </span>
                 <span ng-if="regMetadata.manager && regMetadata.paid && changesPrice(item)"
-                      class="icon-warning billable-items-warning"
+                      class="icon-warning item-warning"
                       data-qtip-style="warning"
                       title="{{ 'Changing this option will result in a price change.' | i18n }}">
                 </span>
                 <span ng-if="field.deletedChoice && field.deletedChoice.indexOf(item.id) != -1"
-                      class="icon-warning deleted-option-warning"
+                      class="icon-warning item-warning"
                       data-qtip-style="warning"
                       title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
                 </span>
                 <span ng-if="field.modifiedChoice && field.modifiedChoice.indexOf(item.id) != -1"
-                      class="icon-warning deleted-option-warning"
+                      class="icon-warning item-warning"
                       data-qtip-style="warning"
                       title="{{ 'The currently chosen option has been modified. If you unselect it you may not be able to select it again for the same price' | i18n }}">
                 </span>

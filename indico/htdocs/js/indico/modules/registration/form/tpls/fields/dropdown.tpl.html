@@ -27,12 +27,12 @@
         </option>
     </select>
     <span ng-if="!regMetadata.manager && regMetadata.paid && !field.billableDisabled && hasBillableOptions(field)"
-          class="icon-warning billable-items-warning"
+          class="icon-warning item-warning"
           data-qtip-style="warning"
           title="{{ 'Options that could trigger a price change have been blocked.' | i18n }}">
     </span>
     <span ng-if="regMetadata.manager && regMetadata.paid && !field.billableDisabled && hasBillableOptions(field)"
-          class="icon-warning billable-items-warning"
+          class="icon-warning item-warning"
           data-qtip-style="warning"
           title="{{ 'Changing this option might trigger a price change.' | i18n }}">
     </span>
