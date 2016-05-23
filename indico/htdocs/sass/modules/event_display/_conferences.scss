@@ -56,8 +56,14 @@
         &:first-child {
             margin-top: 0;
         }
+
         margin: 1em 0 0.5em 0;
         color: $orange;
+
+        &[class^="icon-"]:before,
+        &[class*=" icon-"]:before {
+            margin-right: 5px;
+        }
     }
 
     #other-fields {
