@@ -61,19 +61,19 @@
                 <td>
                     <span ng-if="!regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
                           class="icon-warning billable-items-warning"
-                          data-qtip-style="danger"
+                          data-qtip-style="warning"
                           title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">
                     </span>
                 </td>
                 <td>
                     <span ng-if="field.deletedChoice && field.deletedChoice.indexOf(item.id) != -1"
                           class="icon-warning deleted-option-warning right"
-                          data-qtip-style="danger"
+                          data-qtip-style="warning"
                           title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
                     </span>
                     <span ng-if="field.modifiedChoice && field.modifiedChoice.indexOf(item.id) != -1"
                           class="icon-warning deleted-option-warning right"
-                          data-qtip-style="danger"
+                          data-qtip-style="warning"
                           title="{{ 'The currently chosen option has been modified. If you unselect it you may not be able to select it again for the same price' | i18n }}">
                     </span>
                 </td>
