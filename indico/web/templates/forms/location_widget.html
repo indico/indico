@@ -543,8 +543,10 @@ parent object. The key features and expected behaviour is the following:
                     $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
-                field.closest('.ui-dialog-content').css('overflow', 'inherit');  // Make sure the results dropdown are
-                                                                                 // displayed above the dialog.
+                // Make sure the results dropdown are displayed above the dialog.
+                field.closest('.ui-dialog-content').css('overflow', 'inherit');
+                field.closest('.exclusivePopup').css('overflow', 'inherit');
+
                 latestUsedField = $(this);
             })
             .on('keydown', function(evt) {
