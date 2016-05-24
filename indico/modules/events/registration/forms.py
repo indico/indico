@@ -316,3 +316,12 @@ class CreateMultipleRegistrationsForm(IndicoForm):
                                 default=True,
                                 description=_("Notify the users about the registration."),
                                 widget=SwitchWidget())
+
+    def __init__(self, *args, **kwargs):
+        self._regform = kwargs.pop('regform')
+        super(CreateMultipleRegistrationsForm, self).__init__(*args, **kwargs)
+
+    def validate_user_principals(self, field):
+        for user in field.data:
+            if user.registrations.filter_by(registration_form=self._regform, is_deleted=False).one_or_none():
+                raise ValidationError(_("A registration for {} already exists.").format(user.full_name))
