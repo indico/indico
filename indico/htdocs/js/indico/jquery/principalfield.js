@@ -50,15 +50,19 @@
         _add: function _add(people) {
             var self = this;
 
+            function comparePersons(first, second) {
+                if (first.id !== undefined && second.id !== undefined) {
+                    return first.id == second.id;
+                } else {
+                    return first.email && second.email && first.email == second.email;
+                }
+            }
+
             function cleanDuplicates(people) {
                 _.each(self.people, function(person) {
-                    var criteria;
-                    if (person.id) {
-                        criteria = {id: person.id, _type: person._type};
-                    } else {
-                        criteria = {email: person.email};
-                    }
-                    people = _.without(people, _.findWhere(people, criteria));
+                    people = _.without(people, _.find(people, function(p) {
+                        return comparePersons(person, p);
+                    }));
                 });
                 return people;
             }
