@@ -289,11 +289,23 @@ class RHRegistrationCreate(RHManageRegFormBase):
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
     """Create multiple registrations for Indico users (management area)"""
 
+    def _register_user(self, user, notify):
+        # Fill only the personal data fields, custom fields are left empty.
+        data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType}
+        with db.session.no_autoflush:
+            create_registration(self.regform, data, management=True, notify_user=notify)
+
     def _process(self):
         form = CreateMultipleRegistrationsForm(regform=self.regform)
 
         if form.validate_on_submit():
-            pass
+            for user in form.user_principals.data:
+                self._register_user(user, form.notify_users.data)
+            reg_list_config = _get_reg_list_config(regform=self.regform)
+            registrations_query = _query_registrations(self.regform)
+            registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
+            return jsonify_data(registration_list=_render_registration_list(self.regform, registrations),
+                                flash=False)
 
         return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
 
