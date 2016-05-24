@@ -290,7 +290,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
     """Create multiple registrations for Indico users (management area)"""
 
     def _process(self):
-        form = CreateMultipleRegistrationsForm()
+        form = CreateMultipleRegistrationsForm(regform=self.regform)
 
         if form.validate_on_submit():
             pass
