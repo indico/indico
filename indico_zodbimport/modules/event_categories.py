@@ -19,6 +19,9 @@ from __future__ import unicode_literals, division
 
 from operator import attrgetter
 
+import transaction
+
+from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.util.console import verbose_iterator, cformat
 from indico.util.struct.iterables import committing_iterator
@@ -41,17 +44,26 @@ class EventCategoriesImporter(Importer):
 
     def migrate_event_categories(self):
         self.print_step("Migrating event categories")
+        delete_events = set()
         for conf in committing_iterator(self._iter_events()):
             try:
                 category_chain = self.category_mapping[int(conf._Conference__owners[0].id)]
-            except KeyError:
+            except (IndexError, KeyError):
                 self.print_error(cformat('%{red!}Event has no category!'), event_id=conf.id)
+                delete_events.add(int(conf.id))
                 continue
             Event.query.filter_by(id=int(conf.id)).update({Event.category_id: category_chain[0],
                                                            Event.category_chain: category_chain},
                                                           synchronize_session=False)
             if not self.quiet:
                 self.print_success(repr(category_chain), event_id=conf.id)
+        for event_id in delete_events:
+            self.print_warning(cformat('%{yellow!}Deleting broken event {}').format(event_id))
+            Event.query.filter_by(id=event_id).update({Event.is_deleted: True}, synchronize_session=False)
+            if self.zodb_root['conferences'].has_key(str(event_id)):
+                del self.zodb_root['conferences'][str(event_id)]
+        db.session.commit()
+        transaction.commit()
 
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()
