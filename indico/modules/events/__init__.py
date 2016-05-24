@@ -226,12 +226,9 @@ def _event_moved(conf, old_parent, new_parent, **kwargs):
 @signals.category.moved.connect
 def _category_moved(category, old_parent, new_parent, **kwargs):
     events = Event.find(Event.category_chain.contains([int(category.id)])).all()
-    category_id = int(category.id)
     # update the category chain of all events from the moved category
     for event in events:
-        # categories containing other categories may not contain events
-        assert event.category_id == category_id
-        event.category_chain = map(int, reversed(category.getCategoryPath()))
+        event.category_chain = map(int, reversed(event.category.getCategoryPath()))
     # update the category chain of all events from the target category
     for event in g.get('detached_events_moved', set()):
         # the event was in the target category of of the category move
