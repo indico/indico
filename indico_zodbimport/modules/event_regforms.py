@@ -151,8 +151,8 @@ class RegformMigration(object):
         self.regform.manager_notification_recipients = sorted(set(old_rf.notification._ccList) |
                                                               set(old_rf.notification._toList))
         self.regform.manager_notifications_enabled = bool(self.regform.manager_notification_recipients)
-        self.regform.publish_registrations_enabled = not self.importer.participant_list_disabled.get(int(self.event.id),
-                                                                                                     False)
+        self.regform.publish_registrations_enabled = int(self.event.id) not in self.importer.participant_list_disabled
+
         old_messages = self.importer.all_payment_settings.get(int(self.event.id))
         if old_messages:
             self.regform.message_unpaid = old_messages.get('register_email', '')
@@ -840,7 +840,7 @@ class RegformMigration(object):
                                              _sanitize(str(old_item._value)),
                                              '{:.02f}'.format(price) if billable and price else ''))
         attrs = {}
-        if field.input_type in {'text', 'textarea'}:
+        if field.input_type in {'text', 'textarea', 'email'}:
             if isinstance(old_item._value, basestring):
                 attrs['data'] = convert_to_unicode(old_item._value)
             else:
