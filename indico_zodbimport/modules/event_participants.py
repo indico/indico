@@ -223,6 +223,8 @@ class ParticipationMigration(object):
                 except KeyError:
                     value = None
                 friendly_value = convert_to_unicode(old_part._title)
+            elif pd_type == PersonalDataType.position:
+                continue
             else:
                 value = convert_to_unicode(getattr(old_part, PARTICIPANT_ATTR_MAP[pd_type]))
                 if pd_type == PersonalDataType.phone and value:
