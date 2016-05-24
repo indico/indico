@@ -44,7 +44,7 @@ class EventCategoriesImporter(Importer):
         for conf in committing_iterator(self._iter_events()):
             try:
                 category_chain = self.category_mapping[int(conf._Conference__owners[0].id)]
-            except KeyError:
+            except IndexError:
                 self.print_error(cformat('%{red!}Event has no category!'), event_id=conf.id)
                 continue
             Event.query.filter_by(id=int(conf.id)).update({Event.category_id: category_chain[0],
