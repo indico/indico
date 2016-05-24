@@ -59,6 +59,9 @@ class EventLogImporter(Importer):
         msg_action = cformat('%{white!}{:6d}%{reset} %{cyan!}{}')
 
         for event in committing_iterator(self._iter_events()):
+            if not hasattr(event, '_logHandler'):
+                self.print_error('Event has no log handler!', event_id=event.id)
+                continue
             for item in event._logHandler._logLists['emailLog']:
                 entry = self._migrate_email_log(event, item)
                 db.session.add(entry)
