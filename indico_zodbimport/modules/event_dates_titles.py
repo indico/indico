@@ -46,12 +46,13 @@ class EventDatesTitlesImporter(Importer):
             if 'title' not in old_event.__dict__:
                 self.print_error('Event has no title in ZODB', old_event.id)
                 continue
+            tz = old_event.__dict__.get('timezone', 'UTC')
             updates = {
                 Event.title: convert_to_unicode(old_event.__dict__['title']) or '(no title)',
                 Event.description: convert_to_unicode(old_event.__dict__['description']) or '',
-                Event.timezone: old_event.__dict__.get('timezone', 'UTC'),
-                Event.start_dt: old_event.__dict__['startDate'],
-                Event.end_dt: old_event.__dict__['endDate']
+                Event.timezone: tz,
+                Event.start_dt: self._fix_naive(old_event, old_event.__dict__['startDate'], tz),
+                Event.end_dt: self._fix_naive(old_event, old_event.__dict__['endDate'], tz)
             }
             Event.query.filter_by(id=int(old_event.id)).update(updates, synchronize_session=False)
             if not self.quiet:
@@ -77,3 +78,10 @@ class EventDatesTitlesImporter(Importer):
             it = verbose_iterator(it, total, attrgetter('id'), lambda x: x.__dict__.get('title', ''))
         for old_event in self.flushing_iterator(it):
             yield old_event
+
+    def _fix_naive(self, old_event, dt, tz):
+        if dt.tzinfo is None:
+            self.print_warning('Naive datetime converted ({})'.format(dt), old_event.id)
+            return pytz.timezone(tz).localize(dt)
+        else:
+            return dt
