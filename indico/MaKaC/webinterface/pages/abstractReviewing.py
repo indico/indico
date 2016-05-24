@@ -467,25 +467,32 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         return "".join(res)
 
     def _getConditionsHTML(self):
-        res=[]
+        res = []
         for cond in self._notifTpl.getConditionList():
-            caption=""
+            caption = ""
             if isinstance(cond, (review.NotifTplCondAccepted, review.NotifTplCondMerged)):
-                track=cond.getTrack()
-                if track is None or track=="":
-                    track="--none--"
-                elif track not in ["--none--","--any--"]:
-                    track=track.getTitle()
-                cType=cond.getContribType()
-                if cType is None or cType=="":
-                    cType="--none--"
-                elif cType not in ["--none--","--any--"]:
-                    cType=cType.name
-                cond_type = _('MERGED') if isinstance(cond, review.NotifTplCondMerged) else _('ACCEPTED')
-                caption= _("""%s - type: %s - track: %s""")%(cond_type, self.htmlText(cType),self.htmlText(track))
-            elif isinstance(cond,review.NotifTplCondRejected):
-                caption= _("""REJECTED""")
-            res.append(""" <input type="image" src="%s" onclick="javascript:this.form.selCond.value = '%s'; this.form.submit();return false;"> %s"""%(Config.getInstance().getSystemIconURL( "remove" ), cond.getId(), caption))
+                track = cond.getTrack()
+                if track is None or track == "":
+                    track = "--none--"
+                elif track not in ["--none--", "--any--"]:
+                    track = track.getTitle()
+                cType = cond.getContribType()
+                if cType is None or cType == "":
+                    cType = "--none--"
+                elif cType not in ["--none--", "--any--"]:
+                    cType = cType.name
+                if not isinstance(cond, review.NotifTplCondMerged):
+                    cond_type = _('ACCEPTED')
+                    caption = _("""%s - type: %s - track: %s""") % (cond_type, self.htmlText(cType), self.htmlText(track))
+                else:
+                    cond_type = _('MERGED')
+                    caption = (_("""%s - type of the merged abstract: %s - track of the merged abstract: %s""")
+                               % (cond_type, self.htmlText(cType), self.htmlText(track)))
+            elif isinstance(cond, review.NotifTplCondRejected):
+                caption = _("""REJECTED""")
+            res.append(
+                """ <input type="image" src="%s" onclick="javascript:this.form.selCond.value = '%s'; this.form.submit();return false;"> %s""" % (
+                Config.getInstance().getSystemIconURL("remove"), cond.getId(), caption))
         return "<br>".join(res)
 
     def _getToAddrsHTML(self):
