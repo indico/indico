@@ -1,7 +1,7 @@
 """Add participation regforms
 
 Revision ID: 38641fb3afac
-Revises: 2f4eefa1050c
+Revises: 1d741fc6586c
 Create Date: 2015-10-28 10:25:51.199436
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '38641fb3afac'
-down_revision = '2f4eefa1050c'
+down_revision = '1d741fc6586c'
 
 
 def upgrade():

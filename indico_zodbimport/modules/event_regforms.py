@@ -71,6 +71,22 @@ def _sanitize(string, html=False):
     return WHITESPACE_RE.sub(' ', string).strip()
 
 
+def get_input_type_id(input):
+    return {
+        'LabelInput': 'label',
+        'CheckboxInput': 'checkbox',
+        'YesNoInput': 'yes/no',
+        'FileInput': 'file',
+        'RadioGroupInput': 'radio',
+        'CountryInput': 'country',
+        'DateInput': 'date',
+        'TextInput': 'text',
+        'TelephoneInput': 'telephone',
+        'TextareaInput': 'textarea',
+        'NumberInput': 'number'
+    }[input.__class__.__name__]
+
+
 class OldPaymentTransaction(db.Model):
     __tablename__ = 'payment_transactions_old'
     __table_args__ = {'schema': 'events'}
@@ -152,8 +168,8 @@ class RegformMigration(object):
         self.regform.manager_notification_recipients = sorted(set(old_rf.notification._ccList) |
                                                               set(old_rf.notification._toList))
         self.regform.manager_notifications_enabled = bool(self.regform.manager_notification_recipients)
-        self.regform.publish_registrations_enabled = not self.importer.participant_list_disabled.get(int(self.event.id),
-                                                                                                     False)
+        self.regform.publish_registrations_enabled = int(self.event.id) not in self.importer.participant_list_disabled
+
         old_messages = self.importer.all_payment_settings.get(int(self.event.id))
         if old_messages:
             self.regform.message_unpaid = old_messages.get('register_email', '')
@@ -366,7 +382,7 @@ class RegformMigration(object):
         return field
 
     def _migrate_field(self, old_field, pd_type=None):
-        if old_field._input._id == 'label':
+        if get_input_type_id(old_field._input) == 'label':
             text = RegistrationFormText(registration_form=self.regform, title=_sanitize(old_field._caption),
                                         description=_sanitize(getattr(old_field, '_description', '')))
             billable, price = self._convert_billable(old_field)
@@ -391,7 +407,7 @@ class RegformMigration(object):
         field_billable = False
         field_places_limit = False
         inp = old_field._input
-        old_type = inp._id
+        old_type = get_input_type_id(inp)
         if pd_type == PersonalDataType.email:
             input_type = 'email'
         elif old_type in {'text', 'country', 'file'}:
@@ -811,7 +827,7 @@ class RegformMigration(object):
     def _migrate_registration_fields(self, old_reg, registration):
         for mig in old_reg._miscellaneous.itervalues():
             for item_id, item in mig._responseItems.iteritems():
-                if item._generalField._input._id == 'label':
+                if get_input_type_id(item._generalField._input) == 'label':
                     billable, price = self._convert_billable(item)
                     if billable and price:
                         registration.base_price += Decimal(price)
@@ -841,7 +857,7 @@ class RegformMigration(object):
                                              _sanitize(str(old_item._value)),
                                              '{:.02f}'.format(price) if billable and price else ''))
         attrs = {}
-        if field.input_type in {'text', 'textarea'}:
+        if field.input_type in {'text', 'textarea', 'email'}:
             if isinstance(old_item._value, basestring):
                 attrs['data'] = convert_to_unicode(old_item._value)
             else:

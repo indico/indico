@@ -1,7 +1,7 @@
 """Delete old transaction table
 
 Revision ID: 2f4eefa1050c
-Revises: 1d741fc6586c
+Revises: 38641fb3afac
 Create Date: 2015-10-22 13:23:42.602410
 """
 
@@ -16,7 +16,7 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 
 # revision identifiers, used by Alembic.
 revision = '2f4eefa1050c'
-down_revision = '1d741fc6586c'
+down_revision = '38641fb3afac'
 
 
 def upgrade():

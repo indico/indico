@@ -1,7 +1,7 @@
 """Add Registration.event_id FK
 
 Revision ID: 468343faea20
-Revises: 38641fb3afac
+Revises: 2f4eefa1050c
 Create Date: 2015-11-05 11:58:35.121858
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '468343faea20'
-down_revision = '38641fb3afac'
+down_revision = '2f4eefa1050c'
 
 
 def upgrade():
