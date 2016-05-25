@@ -44,7 +44,6 @@ from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
-from indico.util.string import safe_upper
 from MaKaC.common.fossilize import fossilize
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
@@ -58,7 +57,7 @@ from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.users.util import get_user_by_email
-from indico.util.string import to_unicode
+from indico.util.string import encode_if_unicode, safe_upper, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
 
@@ -185,7 +184,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                     </div>
                 </div>
             </div>
-        '''.format(body)
+        '''.format(encode_if_unicode(body))
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
