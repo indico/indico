@@ -81,7 +81,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .options(contributions_strategy, blocks_strategy)
                 .one())
         return self.view_class.render_template('display/session_display.html', self._conf, sess=sess,
-                                                event=self.event_new, timezone=tz, **ical_params)
+                                               event=self.event_new, timezone=tz, **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):
