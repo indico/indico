@@ -119,6 +119,8 @@ class AttachmentImporter(LocalFileImporterMixin, Importer):
         with patch_default_group_provider(self.default_group_provider):
             self.migrate_category_attachments()
             self.migrate_event_attachments()
+
+        self.fix_attachment_file_ids()
         self.print_step('fixing id sequences')
         self.fix_sequences('attachments')
         self.update_merged_ids()
@@ -142,6 +144,11 @@ class AttachmentImporter(LocalFileImporterMixin, Importer):
                 db.session.commit()
         self.process_todo()
         db.session.commit()
+
+    def fix_attachment_file_ids(self):
+        db.session.execute('UPDATE attachments.attachments a SET file_id = (SELECT id FROM attachments.files WHERE '
+                           'attachment_id = a.id) WHERE type = 1')
+
 
     def update_merged_ids(self):
         self.print_step('updating merged users in attachment acls')
@@ -247,7 +254,6 @@ class AttachmentImporter(LocalFileImporterMixin, Importer):
                          'size': size,
                          'storage_backend': storage_backend,
                          'storage_file_id': storage_path}
-            data['file_id'] = file_data['id']
             self.todo[AttachmentFile].append(file_data)
         tmp = ProtectionTarget()
         protection_from_ac(tmp, resource._Resource__ac)
