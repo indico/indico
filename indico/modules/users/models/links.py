@@ -142,10 +142,6 @@ class UserLink(db.Model):
                                      'reviewer'}},
             'track': {'cls': MaKaC.conference.Track,
                       'roles': {'coordinator'}},
-            # XXX: remove when removing the old material code. probably already unused now that papers
-            # are not using the old material code anymore
-            'resource': {'cls': MaKaC.conference.Resource,
-                         'roles': {'access'}},
             'abstract': {'cls': MaKaC.review.Abstract,
                          'roles': {'submitter'}},
         }
