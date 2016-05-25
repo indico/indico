@@ -21,7 +21,7 @@ def upgrade():
 
     op.create_table('abstracts',
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('legacy_id', sa.Integer(), nullable=False),
+                    sa.Column('friendly_id', sa.Integer(), nullable=False),
                     sa.Column('event_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('description', sa.Text(), nullable=False),
                     sa.Column('accepted_track_id', sa.Integer(), nullable=True, index=True),
@@ -30,7 +30,7 @@ def upgrade():
                     sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
                     sa.ForeignKeyConstraint(['accepted_type_id'], ['events.contribution_types.id']),
                     sa.ForeignKeyConstraint(['type_id'], ['events.contribution_types.id']),
-                    sa.UniqueConstraint('legacy_id', 'event_id'),
+                    sa.UniqueConstraint('friendly_id', 'event_id'),
                     sa.PrimaryKeyConstraint('id'),
                     schema='event_abstracts')
 

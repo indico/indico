@@ -1,7 +1,7 @@
 """Sync contribution/abstract friendly ids
 
 Revision ID: 258db7e5a3e5
-Revises: 52bf61749171
+Revises: 3ca8e62e6c36
 Create Date: 2016-04-21 16:56:20.113767
 """
 
@@ -11,7 +11,7 @@ from alembic import context, op
 
 # revision identifiers, used by Alembic.
 revision = '258db7e5a3e5'
-down_revision = '52bf61749171'
+down_revision = '3ca8e62e6c36'
 
 
 def _sync_last_contrib_id():
