@@ -98,7 +98,7 @@ class EventLayoutImporter(Importer):
             stylesheet_content = convert_to_unicode(f.read())
         event.stylesheet_metadata = {
             'size': len(stylesheet_content),
-            'hash': binascii.crc32(stylesheet_content) & 0xffffffff,
+            'hash': binascii.crc32(stylesheet_content.encode('utf-8')) & 0xffffffff,
             'filename': secure_filename(convert_to_unicode(stylesheet.fileName), 'stylesheet.css'),
             'content_type': 'text/css'
         }
