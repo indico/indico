@@ -319,7 +319,9 @@ class CreateMultipleRegistrationsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self._regform = kwargs.pop('regform')
+        open_add_user_dialog = kwargs.pop('open_add_user_dialog', False)
         super(CreateMultipleRegistrationsForm, self).__init__(*args, **kwargs)
+        self.user_principals.open_immediately = open_add_user_dialog
 
     def validate_user_principals(self, field):
         for user in field.data:
