@@ -255,6 +255,7 @@ $i-form-button-line-height: 1.8;
 .i-form .form-group-footer {
     .i-button {
         @extend %form-field-button;
+        line-height: 1 !important;
     }
 }
 
