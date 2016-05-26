@@ -1,7 +1,7 @@
 {% macro render_attachment_info(obj) -%}
     <td class="i-table material-column" data-text="{{ obj.attachment_count }}">
         <span class="vertical-aligner">
-            <a href="#" class="icon-attachment close-balloon js-manage-attachments"
+            <a href="#" class="icon-attachment js-manage-attachments js-hide-balloon"
                title="{% trans %}Manage materials{% endtrans %}"
                data-title="{% trans title=obj.title %}Manage materials for '{{ title }}'{% endtrans %}"
                data-locator="{{ obj.locator|tojson|forceescape }}"

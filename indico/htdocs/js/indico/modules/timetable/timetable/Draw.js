@@ -566,6 +566,16 @@ function loadBalloonContent(self, api, editable) {
         // Set the tooltip content upon successful retrieval
         api.set('content.text', content.html);
         var $content = api.elements.content;
+
+        function hideBalloon() {
+            /* Make sure the balloon's qTip is hidden. qTip2 will trigger the hide event callbacks with the cached
+             * event when hide() is called. Sometimes the cached event happens to be a mouseleave event which will
+             * prevent the qTip from closing. To ensure the qTip is always closed we are changing the type of that
+             * event to one that will not be prevented. */
+            api.cache.event.type = 'click';
+            api.hide();
+        }
+
         if (editable) {
             var qtipId = $content.closest('.qtip').data('qtip-id');
             var $balloonQtip = $('[data-hasqtip=' + qtipId + ']');
@@ -684,9 +694,7 @@ function loadBalloonContent(self, api, editable) {
             });
 
         }
-        $content.find('.close-balloon').on('click', function() {
-            timetableBlock.qtip('hide');
-        });
+        $content.find('.js-hide-balloon').on('click', hideBalloon);
         // Change the target of the qTip position in order to open it at the mouse position
         api.options.position.target = 'mouse';
     }, function(xhr, status, error) {

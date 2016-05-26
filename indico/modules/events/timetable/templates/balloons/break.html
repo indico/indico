@@ -6,15 +6,15 @@
         {% if editable %}
             <div class="group right entry-action-buttons">
                 {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list) }}
-                <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                <a class="icon-edit i-button-icon js-dialog-action js-edit js-hide-balloon"
                    title="{% trans %}Edit break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>
                 {% if can_manage_event %}
-                    <a class="icon-transmission i-button-icon close-balloon js-move"
+                    <a class="icon-transmission i-button-icon js-move js-hide-balloon"
                        title="{% trans %}Move break{% endtrans %}"
                        data-subtitle="{% trans %}Break{% endtrans %}: {{ break_.title }}"></a>
                 {% endif %}
-                <a class="icon-remove i-button-icon close-balloon js-delete"
+                <a class="icon-remove i-button-icon js-delete js-hide-balloon"
                    title="{% trans %}Delete break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Delete break '{{ title }}'?{% endtrans %}"
                    data-confirm="{% trans title=break_.title %}Are you sure you want to delete the break '{{ title }}'?{% endtrans %}"></a>

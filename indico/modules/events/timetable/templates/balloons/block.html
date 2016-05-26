@@ -18,10 +18,10 @@
             {% if editable and can_manage_blocks %}
                 {% set title=' \'{}\''.format(block.title) if block.title else '' %}
                 <div class="group right entry-action-buttons">
-                    <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                    <a class="icon-edit i-button-icon js-dialog-action js-edit js-hide-balloon"
                        title="{% trans %}Edit session block{% endtrans %}"
                        data-title="{% trans title=title %}Edit session block{{ title }}{% endtrans %}"></a>
-                    <a href="#" class="icon-remove i-button-icon close-balloon js-delete"
+                    <a href="#" class="icon-remove i-button-icon js-delete js-hide-balloon"
                        title="{% trans %}Delete session block{% endtrans %}"
                        data-title="{% trans title=title %}Delete session block{{ title }}?{% endtrans %}"
                        data-confirm="{% trans title=title %}Are you sure you want to delete the session block{{ title }}?{% endtrans %}"></a>
@@ -39,11 +39,11 @@
                 {% if editable %}
                     {% if can_manage_session %}
                         {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
-                        <a class="icon-edit i-button-icon js-dialog-action close-balloon js-edit"
+                        <a class="icon-edit i-button-icon js-dialog-action js-edit js-hide-balloon"
                            title="{% trans %}Edit session{% endtrans %}"
                            data-extra-params='{"edit_session": 1}'
                            data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
-                        <a class="icon-shield i-button-icon close-balloon"
+                        <a class="icon-shield i-button-icon js-hide-balloon"
                            title="{% trans %}Manage session protection{% endtrans %}"
                            data-href="{{ url_for('sessions.session_protection', block.session) }}"
                            data-title="{% trans %}Manage session protection{% endtrans %}"
@@ -72,7 +72,7 @@
     </div>
     {% if editable %}
         <div class="bottom-link">
-            <a class="right js-switch-to-interval">
+            <a class="right js-switch-to-interval js-hide-balloon">
                 {% trans %}Go to session block timetable{% endtrans %}
                 <i class="icon-arrow-right"></i>
             </a>
