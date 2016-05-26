@@ -49,6 +49,10 @@ $i-label-color: $light-black;
         );
     }
 
+    &.small {
+        padding: 3px 5px;
+    }
+
     // same as in _buttons.scss
     &.accept {
         @include border-all(darken($green, $light-color-variation));
