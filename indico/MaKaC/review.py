@@ -343,6 +343,15 @@ class Author(AbstractParticipation):
     def isSpeaker(self):
         return self._abstract.isSpeaker(self)
 
+    def __eq__(self, other):
+        return self.getData() == other.getData()
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __hash__(self):
+        return hash(frozenset(self.getData().values()))
+
 
 class Submitter(AbstractParticipation):
 
@@ -2094,10 +2103,16 @@ class Abstract(AbstractLegacyMixin, Persistent):
             #    newAuth.setFromAbstractParticipation(auth)
             #    if self.isPrimaryAuthor(auth):
             #        targetAbs.addPrimaryAuthor(newAuth)
+            primary_authors_set = set(targetAbs.getPrimaryAuthorList())
             for auth in self.getPrimaryAuthorList():
+                if auth in primary_authors_set:
+                    continue
                 newAuth=targetAbs.newPrimaryAuthor()
                 newAuth.setFromAbstractParticipation(auth)
+            coauthors_set = set(targetAbs.getCoAuthorList())
             for auth in self.getCoAuthorList():
+                if auth in coauthors_set:
+                    continue
                 newAuth=targetAbs.newCoAuthor()
                 newAuth.setFromAbstractParticipation(auth)
 
