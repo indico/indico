@@ -32,7 +32,6 @@
         @extend %i-box-cancel-horizontal-padding;
     }
 
-    .person-row,
     .nobody-placeholder {
         height: 2em;
         line-height: 2em;
@@ -47,6 +46,7 @@
         @extend %i-box-horizontal-padding;
         @include single-transition(background-color);
         display: flex;
+        align-items: center;
 
         .name {
             flex-grow: 1;
@@ -57,24 +57,33 @@
             text-overflow: ellipsis;
         }
 
-        .person-status {
-            flex-grow: 0;
-        }
-
-        .person-status {
-            height: 2em;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
         .person-roles {
-            @include single-transition(margin);
+            margin-right: 10px;
 
             .i-label {
                 margin-right: 0;
                 margin-top: 1px;
-                min-width: 6em;
+                min-width: 5.5em;
                 vertical-align: top;
+                cursor: default;
+
+                &:not(.selected) {
+                    color: $pastel-gray !important;
+                    border-color: $pastel-gray;
+
+                    &:hover {
+                        color: $dark-gray !important;
+                    }
+                }
+
+                &:not(.other) {
+                    cursor: pointer;
+
+                    &.selected:hover {
+                        color: $blue !important;
+                        border-color: $blue;
+                    }
+                }
             }
         }
 
@@ -94,26 +103,26 @@
         &.active {
             background: $light-gray;
 
-            .person-roles {
-                margin-right: 10px;
-            }
-
             .person-buttons {
-                width: 47px;
+                opacity: 1;
             }
         }
     }
 
     .person-buttons {
-        @include single-transition(width);
+        @include transition(opacity .5s);
         display: inline-block;
         height: 2em;
+        line-height: 2;
         text-align: right;
-        width: 0;
 
         .i-button-icon {
             font-size: 1.1em;
             vertical-align: sub;
+        }
+
+        &:not(.selected) {
+            opacity: 0.3;
         }
     }
 
