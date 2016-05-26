@@ -25,13 +25,19 @@ You will also need to ``easy_install python-ldap`` if you want LDAP to work.
 Installing it
 =============
 
-There are two options:
+First of all, make sure your ``setuptools`` is up-to-date. You may want to execute:
 
---------------------------------
-Fetching a release (recommended)
---------------------------------
+.. code-block:: console
 
-You can do it from command line (**recommended**) executing:
+    # pip install -U setuptools
+
+You can then either install Indico's latest release or retrieve it from Git.
+
+-----------------------------------------
+Fetching the latest release (recommended)
+-----------------------------------------
+
+You can do it from command line executing:
 
 .. code-block:: console
 
