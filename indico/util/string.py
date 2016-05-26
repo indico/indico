@@ -407,6 +407,7 @@ def format_repr(obj, *args, **kwargs):
                   for objects which have one longer title or text
                   that doesn't look well in the unquoted
                   comma-separated argument list.
+    :param _rawtext: Like `_text` but without surrounding quotes.
     :param _repr: Similar as `_text`, but uses the `repr()` of the
                   passed object instead of quoting it.  Cannot be
                   used together with `_text`.
@@ -418,6 +419,7 @@ def format_repr(obj, *args, **kwargs):
             return value
 
     text_arg = kwargs.pop('_text', None)
+    raw_text_arg = kwargs.pop('_rawtext', None)
     repr_arg = kwargs.pop('_repr', None)
     obj_name = type(obj).__name__
     formatted_args = [unicode(_format_value(getattr(obj, arg))) for arg in args]
@@ -427,6 +429,8 @@ def format_repr(obj, *args, **kwargs):
             formatted_args.append(u'{}={}'.format(name, _format_value(value)))
     if text_arg is not None:
         return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+    elif raw_text_arg is not None:
+        return u'<{}({}): {}>'.format(obj_name, u', '.join(formatted_args), raw_text_arg)
     elif repr_arg is not None:
         return u'<{}({}): {!r}>'.format(obj_name, u', '.join(formatted_args), repr_arg)
     else:
