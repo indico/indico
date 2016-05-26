@@ -61,6 +61,7 @@ zope.sqlalchemy==0.7.6
 redis==2.10.3
 hiredis==0.1.5
 enum34
+py2-ipaddress
 blinker==1.3
 alembic==0.6.7
 Flask-Migrate==1.2.0
