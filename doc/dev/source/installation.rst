@@ -135,7 +135,7 @@ Create a new file in Apache HTTPD's config folder. Depending on the OS, it can b
 
 .. code-block:: console
 
-    $ sudo vim /etc/httpd/conf.d/indico
+    $ sudo vim /etc/httpd/conf.d/indico.conf
 
 This is an example configuration that should be able to get you started:
 
