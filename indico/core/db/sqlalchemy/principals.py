@@ -43,8 +43,8 @@ def _make_check(type_, allow_emails, *cols):
         all_cols.add('email')
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
-    criteria = ['{} IS NULL'.format(col) for col in forbidden_cols]
-    criteria += ['{} IS NOT NULL'.format(col) for col in required_cols]
+    criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
+    criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
     condition = 'type != {} OR ({})'.format(type_, ' AND '.join(criteria))
     return db.CheckConstraint(condition, 'valid_{}'.format(type_.name))
 
