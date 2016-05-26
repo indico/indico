@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.orm import joinedload, defaultload
+from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db import db
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -53,28 +53,25 @@ def build_note_legacy_api_data(note):
 def get_scheduled_notes(event):
     """Gets all notes of scheduled items inside an event"""
     tt_entries = (event.timetable_entries
-                  .filter(TimetableEntry.parent_id.is_(None),
-                          TimetableEntry.type != TimetableEntryType.BREAK)
-                  .options(joinedload('children'))
+                  .filter(TimetableEntry.type != TimetableEntryType.BREAK)
                   .options(joinedload('session_block').joinedload('contributions').joinedload('subcontributions'))
                   .options(joinedload('contribution').joinedload('subcontributions'))
+                  .options(noload('break_'))
                   .all())
     # build a list of all the objects we need notes for. that way we can query
     # all notes in a single go afterwards instead of making the already-huge
     # timetable query even bigger.
-    objects = []
+    objects = set()
     for entry in tt_entries:
-        objects.append(entry.object)
+        objects.add(entry.object)
         if entry.type == TimetableEntryType.CONTRIBUTION:
-            objects.extend(sc for sc in entry.object.subcontributions if not sc.is_deleted)
+            objects.update(sc for sc in entry.object.subcontributions if not sc.is_deleted)
         elif entry.type == TimetableEntryType.SESSION_BLOCK:
             for contrib in entry.object.contributions:
-                objects.append(contrib)
-                objects.extend(sc for sc in contrib.subcontributions if not sc.is_deleted)
-    used = set(objects)
-    notes = [x for x in event.all_notes.filter_by(is_deleted=False) if x.object in used]
-    positions = {obj: i for i, obj in enumerate(objects)}
-    return sorted(notes, key=lambda x: positions[x.object])
+                objects.add(contrib)
+                objects.update(sc for sc in contrib.subcontributions if not sc.is_deleted)
+    notes = [x for x in event.all_notes.filter_by(is_deleted=False) if x.object in objects]
+    return sorted(notes, key=lambda x: x.object.start_dt)
 
 
 def can_edit_note(obj, user):
