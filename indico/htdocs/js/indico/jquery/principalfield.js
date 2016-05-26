@@ -54,7 +54,7 @@
                 if (first.id !== undefined && second.id !== undefined) {
                     return first.id == second.id;
                 } else {
-                    return first.email && second.email && first.email == second.email;
+                    return first.email && second.email && first.email.toLowerCase() == second.email.toLowerCase();
                 }
             }
 
