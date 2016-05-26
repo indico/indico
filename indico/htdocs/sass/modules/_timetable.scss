@@ -326,3 +326,20 @@
         height: 14px;
     }
 }
+
+.entry-arrows {
+    @include border-bottom-radius();
+    @include border-horz();
+    @include border-bottom();
+    background: white;
+    cursor: default;
+    height: 14px;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+    right: 18px;
+
+    a:first-child {
+        margin-right: 2px;
+    }
+}

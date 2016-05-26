@@ -342,21 +342,28 @@ a.i-button-icon {
     color: $dark-gray;
     cursor: pointer;
 
-    &:hover,
-    &:active,
-    &.active {
-        color: $dark-blue;
+    &.disabled {
+        color: $gray;
+        cursor: default;
+    }
 
-        &.accept {
-            color: $green;
-        }
+    &:not(.disabled) {
+        &:hover,
+        &:active,
+        &.active {
+            color: $dark-blue;
 
-        &.danger {
-            color: $red;
-        }
+            &.accept {
+                color: $green;
+            }
 
-        &.warning {
-            color: $yellow;
+            &.danger {
+                color: $red;
+            }
+
+            &.warning {
+                color: $yellow;
+            }
         }
     }
 }

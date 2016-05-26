@@ -188,23 +188,37 @@ def update_timetable_entry_object(entry, data):
 
 def swap_timetable_entry(entry, direction, session_=None):
     """Swap entry with closest gap or non-parallel sibling"""
-    sibling = None
-    query = entry.siblings if not session_ else entry.session_siblings
+    in_session = session_ is not None
+    sibling = get_sibling_entry(entry, direction=direction, in_session=in_session)
+    if not sibling:
+        return
     if direction == 'down':
-        sibling = (query.filter(TimetableEntry.start_dt >= entry.end_dt)
-                        .order_by(TimetableEntry.start_dt.asc()).first())
-        if sibling:
-            if entry.end_dt != sibling.start_dt:
-                entry.move_next_to(sibling, position='before')
-            elif not sibling.is_parallel(in_session=session is not None):
-                sibling.move(entry.start_dt)
-                entry.move(sibling.end_dt)
+        if entry.end_dt != sibling.start_dt:
+            entry.move_next_to(sibling, position='before')
+        elif not sibling.is_parallel(in_session=in_session):
+            sibling.move(entry.start_dt)
+            entry.move(sibling.end_dt)
     elif direction == 'up':
-        sibling = (query.filter(TimetableEntry.end_dt <= entry.start_dt)
-                        .order_by(TimetableEntry.end_dt.desc()).first())
-        if sibling:
-            if entry.start_dt != sibling.end_dt:
-                entry.move_next_to(sibling, position='after')
-            elif not sibling.is_parallel(in_session=session is not None):
-                entry.move(sibling.start_dt)
-                sibling.move(entry.end_dt)
+        if entry.start_dt != sibling.end_dt:
+            entry.move_next_to(sibling, position='after')
+        elif not sibling.is_parallel(in_session=in_session):
+            entry.move(sibling.start_dt)
+            sibling.move(entry.end_dt)
+
+
+def can_swap_entry(entry, direction, in_session=False):
+    sibling = get_sibling_entry(entry, direction=direction, in_session=in_session)
+    if not sibling:
+        return False
+    if direction == 'down':
+        return entry.end_dt != sibling.start_dt or not sibling.is_parallel(in_session=in_session)
+    elif direction == 'up':
+        return entry.start_dt != sibling.end_dt or not sibling.is_parallel(in_session=in_session)
+
+
+def get_sibling_entry(entry, direction, in_session=False):
+    query = entry.siblings if not in_session else entry.session_siblings
+    if direction == 'down':
+        return query.filter(TimetableEntry.start_dt >= entry.end_dt).order_by(TimetableEntry.start_dt.asc()).first()
+    elif direction == 'up':
+        return query.filter(TimetableEntry.end_dt <= entry.start_dt).order_by(TimetableEntry.end_dt.desc()).first()

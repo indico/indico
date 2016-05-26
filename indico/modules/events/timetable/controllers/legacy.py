@@ -25,7 +25,6 @@ from flask import flash, request, jsonify, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
-from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.controllers.management import _get_field_values
@@ -42,7 +41,7 @@ from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionE
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
                                                     TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         schedule_contribution, fit_session_block_entry,
                                                         update_break_entry, update_timetable_entry,

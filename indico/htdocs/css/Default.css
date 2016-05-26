@@ -4750,31 +4750,6 @@ div.cloneElements {
     width: 450px;
 }
 
-.ttentryArrowsBackground.ttentryArrowsShifted, .ttentryArrows.ttentryArrowsShifted {
-    margin: 2px 25px 0 0;
-    border: none;
-}
-
-.ttentryArrowsBackground {
-    padding: 3px;
-    position: absolute;
-    top: -1px;
-    right: -1px;
-    -moz-border-radius-bottomleft:3px;
-    border-bottom:1px solid #AAAAAA;
-    border-left:1px solid #AAAAAA;
-    background-color: white;
-    width: 33px;
-    height: 14px;
-}
-
-.ttentryArrows {
-    padding: 2px;
-    position: absolute;
-    right:0px;
-    cursor: pointer;
-}
-
 .filterTable {
     border-collapse: collapse;
 }

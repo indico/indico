@@ -219,6 +219,7 @@ class TimetableSerializer(object):
                 'endDate': self._get_entry_date_dt(entry.end_dt, tzinfo)}
 
     def _get_entry_data(self, entry):
+        from indico.modules.events.timetable.operations import can_swap_entry
         data = {}
         data.update(self._get_date_data(entry))
         data['id'] = self._get_entry_key(entry)
@@ -228,6 +229,8 @@ class TimetableSerializer(object):
             data['isParallel'] = entry.is_parallel()
             data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
+            data['canSwapUp'] = can_swap_entry(entry, direction='up')
+            data['canSwapDown'] = can_swap_entry(entry, direction='down')
         return data
 
     def _get_entry_key(self, entry):

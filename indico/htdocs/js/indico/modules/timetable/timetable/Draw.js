@@ -803,34 +803,40 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
 
         _drawArrows: function() {
             var self = this;
-            var arrowUp = Html.img({src: imageSrc('upArrow'), title: $T('Move up')});
-            var arrowDown = Html.img({src: imageSrc('downArrow'), style:{paddingLeft: '5px'}, title: $T('Move down')});
+            var arrowUp = $('<a>', {class: 'i-button-icon icon-collapse'});
+            var arrowDown = $('<a>', {class: 'i-button-icon icon-expand'});
 
-            arrowUp.observeClick(function(event) {
-                self.managementActions.swapEntry(self.eventData, 'up');
-                if (event.stopPropagation) {
-                    event.stopPropagation();
-                } else {
-                    event.cancelBubble = true;
-                }
-            });
+            if (self.eventData.canSwapUp) {
+                arrowUp.attr('title', $T.gettext('Move up'));
+                arrowUp.on('click', function() {
+                    self.managementActions.swapEntry(self.eventData, 'up');
+                    if (event.stopPropagation) {
+                        event.stopPropagation();
+                    } else {
+                        event.cancelBubble = true;
+                    }
+                });
+            } else {
+                arrowUp.addClass('disabled');
+            }
 
-            arrowDown.observeClick(function(event) {
-                self.managementActions.swapEntry(self.eventData, 'down');
-                if (event.stopPropagation) {
-                    event.stopPropagation();
-                } else {
-                    event.cancelBubble = true;
-                }
-            });
+            if (self.eventData.canSwapDown) {
+                arrowDown.attr('title', $T.gettext('Move down'));
+                arrowDown.on('click', function() {
+                    self.managementActions.swapEntry(self.eventData, 'down');
+                    if (event.stopPropagation) {
+                        event.stopPropagation();
+                    } else {
+                        event.cancelBubble = true;
+                    }
+                });
+            } else {
+                arrowDown.addClass('disabled');
+            }
 
-            var startDate = parseInt(this.eventData.startDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.startDate.time.substring(3, 5));
-            var endDate = parseInt(this.eventData.endDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.endDate.time.substring(3, 5));
-            var shifted = (endDate - startDate < 20) ? " ttentryArrowsShifted" : "";
-
-            this.arrows = Html.div({},
-                                Html.div({className: "ttentryArrowsBackground" + shifted}),
-                                Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
+            if (self.eventData.canSwapDown || self.eventData.canSwapUp) {
+                this.arrows = Html.div({className: 'entry-arrows'}, arrowUp.get(0), arrowDown.get(0));
+            }
         }
     },
     function() {
