@@ -96,11 +96,11 @@ class ContributionProtectionForm(IndicoForm):
                                                                                  form.protected_object))
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 serializable=False, groups=True,
+                                 serializable=False, groups=True, allow_emails=True,
                                  description=_('List of users allowed to access the contribution'))
-    managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
+    managers = PrincipalListField(_('Managers'), serializable=False, groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the contribution'))
-    submitters = PrincipalListField(_('Submitters'), serializable=False, groups=True,
+    submitters = PrincipalListField(_('Submitters'), serializable=False, groups=True, allow_emails=True,
                                     description=_('List of users allowed to submit materials for this contribution'))
 
     def __init__(self, *args, **kwargs):

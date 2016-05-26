@@ -262,6 +262,7 @@ class PrincipalListField(HiddenField):
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
+        self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
@@ -270,7 +271,8 @@ class PrincipalListField(HiddenField):
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        principal = principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False)
+        principal = principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
+                                          allow_emails=self.allow_emails)
         return principal.as_principal if self.serializable else principal
 
     def process_formdata(self, valuelist):
