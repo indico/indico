@@ -14,18 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import ServiceBase
-
-from MaKaC.common import search
-
-from MaKaC.fossils.user import IGroupFossil
-from MaKaC.common.fossilize import fossilize
+from itertools import chain
 
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.modules.groups import GroupProxy
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
+from MaKaC.common.fossilize import fossilize
+from MaKaC.common.search import searchUsers
+from MaKaC.fossils.user import IGroupFossil
+from MaKaC.services.implementation.base import ServiceBase
 
 
 class SearchBase(ServiceBase):
@@ -48,8 +47,8 @@ class SearchUsers(SearchBase):
 
     def _getAnswer(self):
         event_persons = []
-        users = search.searchUsers(self._surName, self._name, self._organisation, self._email,
-                                   self._exactMatch, self._searchExt)
+        users = searchUsers(self._surName, self._name, self._organisation, self._email,
+                            self._exactMatch, self._searchExt)
         if self._event:
             fields = {EventPerson.first_name: self._name,
                       EventPerson.last_name: self._surName,
@@ -59,7 +58,7 @@ class SearchUsers(SearchBase):
             event_persons = self._event.persons.filter(*criteria).all()
         fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
         fossilized_event_persons = map(serialize_event_person, event_persons)
-        unique_users = {user['email']: user for user in fossilized_users + fossilized_event_persons}
+        unique_users = {user['email']: user for user in chain(fossilized_users, fossilized_event_persons)}
         return sorted(unique_users.values(), key=lambda x: (x['name'].lower(), x['email']))
 
 
