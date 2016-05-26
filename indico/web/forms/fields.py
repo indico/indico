@@ -333,6 +333,8 @@ class PrincipalListField(HiddenField):
             self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
+        # Whether the add user dialog is opened immediately when the field is displayed
+        self.open_immediately = kwargs.pop('open_immediately', False)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):

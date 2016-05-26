@@ -58,6 +58,10 @@
             );
 
             $E('userGroupList-{{ field.id }}').set(widget.draw());
+
+            {% if field.open_immediately %}
+                $('#userGroupList-{{ field.id }} input[type=button]').trigger('click');
+            {% endif %}
         })();
     </script>
 {% endblock %}
