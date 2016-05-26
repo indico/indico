@@ -27,11 +27,6 @@
 <div class="action-box">
     <div class="section">
         <div class="icon icon-wrench"></div>
-        <div class="toolbar right">
-            <a class="i-button js-reset-btn icon-close warning" type="button">
-                {%- trans %}Clear filters{% endtrans -%}
-            </a>
-        </div>
         <div class="text">
             <div class="label">Customize contribution list</div>
             <div>
@@ -40,6 +35,11 @@
                     Change the configuration of the contribution list by applying filtering ({{ filter_icon }}) options.
                 {%- endtrans -%}
             </div>
+        </div>
+        <div class="toolbar">
+            <a class="i-button js-reset-btn icon-close warning" type="button">
+                {%- trans %}Clear filters{% endtrans -%}
+            </a>
         </div>
     </div>
 </div>

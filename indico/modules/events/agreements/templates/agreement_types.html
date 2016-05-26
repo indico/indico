@@ -19,7 +19,7 @@
                             {{ definition.description }}
                         </div>
                     </div>
-                    <div class="toolbar right">
+                    <div class="toolbar">
                         <a class="i-button highlight {%- if not active %} disabled{% endif %} icon-settings"
                         {%- if active %}
                             href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}"

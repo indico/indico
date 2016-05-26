@@ -15,12 +15,6 @@
                 <div class="action-box">
                     <div class="section">
                         <div class="icon icon-wrench"></div>
-                        <div class="toolbar right">
-                            {{ switch(id='toggle-menu-customization',
-                                      checked=custom_menu_enabled,
-                                      data_href=url_for('.menu_toggle_custom', event),
-                                      data_confirm_disable=_('Disabling menu customizations will revert to the default menu and PERMANENTLY DELETE all menu customizations including custom pages.')) }}
-                        </div>
                         <div class="text">
                             <div class="label">
                                 {%- trans %}Customize menu{% endtrans -%}
@@ -32,6 +26,12 @@
                                     {%- trans %}When enabling menu customization, you can re-arrange menu entries and add custom links/pages to your event.{% endtrans -%}
                                 {% endif %}
                             </div>
+                        </div>
+                        <div class="toolbar">
+                            {{ switch(id='toggle-menu-customization',
+                                      checked=custom_menu_enabled,
+                                      data_href=url_for('.menu_toggle_custom', event),
+                                      data_confirm_disable=_('Disabling menu customizations will revert to the default menu and PERMANENTLY DELETE all menu customizations including custom pages.')) }}
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,15 @@
                     <div class="action-box">
                         <div class="section">
                             <div class="icon icon-plus"></div>
-                            <div class="toolbar right">
+                            <div class="text">
+                                <div class="label">
+                                    {%- trans %}Add entries{% endtrans -%}
+                                </div>
+                                <div>
+                                    {%- trans %}Add new entries to the event menu.{% endtrans -%}
+                                </div>
+                            </div>
+                            <div class="toolbar">
                                 <div class="group js-add-entry-dropdown">
                                     <a class="i-button arrow icon-plus" data-toggle="dropdown">
                                         {%- trans %}Add an entry{% endtrans -%}
@@ -82,14 +90,6 @@
                                             </a>
                                         </li>
                                     </ul>
-                                </div>
-                            </div>
-                            <div class="text">
-                                <div class="label">
-                                    {%- trans %}Add entries{% endtrans -%}
-                                </div>
-                                <div>
-                                    {%- trans %}Add new entries to the event menu.{% endtrans -%}
                                 </div>
                             </div>
                         </div>

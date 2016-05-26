@@ -22,7 +22,7 @@
                     </div>
                     {% trans %}Payments are disabled for this event{% endtrans %}
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <a href="#" class="js-enable-payments"
                        data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
                        data-method="PUT"
@@ -44,7 +44,7 @@
                     </div>
                     {% trans %}Define how the participant list will be shown on the event page.{% endtrans %}
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <div class="group">
                         <a href="{{ url_for('.manage_regforms_display', event) }}" class="i-button icon-settings">
                             {% trans %}Customize display{% endtrans %}
@@ -62,7 +62,7 @@
                 <div class="text">
                     <div class="label">{{ regform.title }}</div>
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <div class="group">
                         <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
                             {% trans %}Registrations{% endtrans %}

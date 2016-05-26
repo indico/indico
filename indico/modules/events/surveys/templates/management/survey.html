@@ -20,7 +20,7 @@
                 </div>
                 {% trans %}Edit settings for this survey.{% endtrans %}
             </div>
-            <div class="toolbar right">
+            <div class="toolbar">
                 <a href="{{ url_for('.edit_survey', survey) }}" class="i-button icon-edit">
                     {% trans %}Edit{% endtrans %}
                 </a>
@@ -36,7 +36,7 @@
                     </div>
                     {% trans %}Add, remove or modify questions.{% endtrans %}
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <a href="{{ url_for('.manage_questionnaire', survey) }}" class="i-button icon-settings">
                         {% trans %}Manage{% endtrans %}
                     </a>

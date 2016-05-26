@@ -41,7 +41,16 @@
 <div class="action-box">
     <div class="section">
         <div class="icon icon-wrench"></div>
-        <div class="toolbar right">
+        <div class="text">
+            <div class="label">Customize registration list</div>
+            <div>
+                {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
+                {%- trans -%}
+                    Change the configuration of the registration list by enabling/disabling the columns listed below, or by applying filtering ({{ filter_icon }}) options.
+                {%- endtrans -%}
+            </div>
+        </div>
+        <div class="toolbar">
             <div class="group left">
                 <a class="i-button icon-checkbox-checked arrow left icon-only" aria-hidden="true" href="#"
                    data-toggle="dropdown"></a>
@@ -54,15 +63,6 @@
                 <a class="i-button js-reset-btn icon-close warning" type="button">
                     {%- trans %}Clear filters{% endtrans -%}
                 </a>
-            </div>
-        </div>
-        <div class="text">
-            <div class="label">Customize registration list</div>
-            <div>
-                {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
-                {%- trans -%}
-                    Change the configuration of the registration list by enabling/disabling the columns listed below, or by applying filtering ({{ filter_icon }}) options.
-                {%- endtrans -%}
             </div>
         </div>
     </div>

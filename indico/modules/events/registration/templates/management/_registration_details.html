@@ -85,7 +85,7 @@
            You can validate or reject this registration and the user will receive a notification.
        {%- endtrans %}
     </div>
-    <div class="toolbar right">
+    <div class="toolbar">
         <div class="group">
             <a class="i-button accept"
                data-update="#registration-details"
@@ -117,7 +117,7 @@
             You can mark the registration as paid manually.
         {%- endtrans %}
     </div>
-    <div class="toolbar right">
+    <div class="toolbar">
         <div class="group">
             <span class="i-button label icon-coins">
                 {{ registration.render_price() }}
@@ -146,7 +146,7 @@
         {% endtrans %}
     </div>
     {% if registration.registration_form.tickets_enabled %}
-        <div class="toolbar right">
+        <div class="toolbar">
             <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                 {% trans %}Get ticket{% endtrans %}
             </a>
@@ -203,7 +203,7 @@
                     {%- endtrans %}
                 {% endif %}
             </div>
-            <div class="toolbar right">
+            <div class="toolbar">
                 <a class="i-button"
                    data-update="#registration-details"
                    data-method="PUT"

@@ -39,7 +39,7 @@
                         {% trans %}Event managers will receive emails every time an agreement is signed{% endtrans %}
                     </div>
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     {{ switch(id='toggle-manager-notifications',
                               checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
                               data_href=url_for_plugin('.toggle_notifications', event, definition)) }}
@@ -56,7 +56,7 @@
                             {% trans %}Print this version for people to sign it physically{% endtrans %}
                         </div>
                     </div>
-                    <div class="toolbar right">
+                    <div class="toolbar">
                         <a class="i-button icon-file-download" href="{{ definition.paper_form_url }}">
                             {% trans %}Download{% endtrans %}
                         </a>
@@ -82,7 +82,7 @@
                                 {% trans %}You can send all agreement requests{% endtrans %}
                             </div>
                         </div>
-                        <div class="toolbar right">
+                        <div class="toolbar">
                             <a class="i-button highlight icon-mail js-ajax-dialog" href="#"
                                data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
                                 {% trans %}Send all{% endtrans %}
@@ -105,7 +105,7 @@
                                 {% trans %}You can send reminders for all pending agreements{% endtrans %}
                             </div>
                         </div>
-                        <div class="toolbar right">
+                        <div class="toolbar">
                             <a class="i-button icon-alarm js-ajax-dialog"
                                href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
                                 {% trans %}Remind all{% endtrans %}

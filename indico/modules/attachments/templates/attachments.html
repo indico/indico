@@ -26,7 +26,7 @@
                     </div>
                     <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
                 </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <div class="group">
                         <a href="#" class="i-button icon-file js-dialog-action"
                            data-href="{{ url_for('.upload', linked_object) }}"
@@ -53,7 +53,7 @@
                         </div>
                         <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
                     </div>
-                    <div class="toolbar right">
+                    <div class="toolbar">
                         <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
                             {%- trans %}Material Package{% endtrans -%}
                         </a>
