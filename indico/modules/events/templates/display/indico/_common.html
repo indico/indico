@@ -49,7 +49,7 @@
 {%- endmacro %}
 
 {% macro _render_user_data(user_data, show_title=true, italic_affiliation=false) %}
-    {% if user_data.title and title -%}
+    {% if user_data.title and show_title -%}
         <span class="speaker-title">
             {{ user_data.title }}
         </span>
