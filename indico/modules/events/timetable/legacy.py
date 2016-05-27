@@ -35,7 +35,7 @@ class TimetableSerializer(object):
     def __init__(self, management=False):
         self.management = management
 
-    def serialize_timetable(self, event, days=None, hide_weekends=False, hide_empty_days=False):
+    def serialize_timetable(self, event, days=None, hide_weekends=False, strip_empty_days=False):
         timetable = {}
         for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
             date_str = day.strftime('%Y%m%d')
@@ -62,11 +62,11 @@ class TimetableSerializer(object):
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
                 timetable[date_str][key] = data
-        if hide_empty_days:
-            timetable = self._filter_empty_days(timetable)
+        if strip_empty_days:
+            timetable = self._strip_empty_days(timetable)
         return timetable
 
-    def serialize_session_timetable(self, session_, without_blocks=False, hide_empty_days=False):
+    def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
         timetable = {}
         for day in iterdays(session_.event_new.start_dt_local, session_.event_new.end_dt_local):
             timetable[day.strftime('%Y%m%d')] = {}
@@ -81,13 +81,19 @@ class TimetableSerializer(object):
                     continue
                 entry_key = self._get_entry_key(entry)
                 timetable[date_key][entry_key] = self.serialize_timetable_entry(entry, load_children=True)
-        if hide_empty_days:
-            timetable = self._filter_empty_days(timetable)
+        if strip_empty_days:
+            timetable = self._strip_empty_days(timetable)
         return timetable
 
     @staticmethod
-    def _filter_empty_days(timetable):
-        return {date_str: value for date_str, value in timetable.iteritems() if value}
+    def _strip_empty_days(timetable):
+        """Return the timetable without the leading and trailing empty days."""
+        days = sorted(timetable)
+        first_non_empty = next((day for day in days if timetable[day]), None)
+        if first_non_empty is None:
+            return {}
+        last_non_empty = next((day for day in reversed(days) if timetable[day]), first_non_empty)
+        return {day: timetable[day] for day in days if first_non_empty <= day <= last_non_empty}
 
     def serialize_timetable_entry(self, entry, **kwargs):
         if entry.type == TimetableEntryType.SESSION_BLOCK:

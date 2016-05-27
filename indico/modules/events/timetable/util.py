@@ -267,7 +267,7 @@ def render_session_timetable(session, timetable_layout=None, management=False):
         # no scheduled sessions present
         return ''
     timetable_data = TimetableSerializer().serialize_session_timetable(session, without_blocks=True,
-                                                                       hide_empty_days=True)
+                                                                       strip_empty_days=True)
     event_info = serialize_event_info(session.event_new)
     tpl = get_template_module('events/timetable/_timetable.html')
     return tpl.render_timetable(timetable_data, event_info, timetable_layout=timetable_layout, management=management)
