@@ -2,7 +2,7 @@
     {% for fav in user.favorite_users|sort(attribute='full_name') %}
         <li data-user-id="{{ fav.id }}" class="js-user-row">
             <span>{{ fav.full_name }}</span>
-            <a class="toggle icon-close right js-delete-user" title="{% trans %}Remove from favorites{% endtrans %}" href="#"
+            <a class="toggle icon-close right js-delete-user" title="{% trans %}Remove from favourites{% endtrans %}" href="#"
                data-href="{{ url_for('.user_favorites_user_remove', fav_user_id=fav.id) }}"></a>
         </li>
     {% endfor %}
