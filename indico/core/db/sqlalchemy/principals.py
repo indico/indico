@@ -35,12 +35,15 @@ class PrincipalType(int, IndicoEnum):
     local_group = 2
     multipass_group = 3
     email = 4
+    network = 5
 
 
-def _make_check(type_, allow_emails, *cols):
+def _make_check(type_, allow_emails, allow_networks, *cols):
     all_cols = {'user_id', 'local_group_id', 'mp_group_provider', 'mp_group_name'}
     if allow_emails:
         all_cols.add('email')
+    if allow_networks:
+        all_cols.add('ip_network_group_id')
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
     criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
@@ -125,6 +128,8 @@ class PrincipalMixin(object):
     #: an email being sent to the user, inviting him to create an
     #: account with that email address.
     allow_emails = False
+    #: Whether it should be allowed to add an IP network.
+    allow_networks = False
 
     @strict_classproperty
     @classmethod
@@ -142,12 +147,16 @@ class PrincipalMixin(object):
                 uniques.append(db.Index('ix_uq_{}_email'.format(cls.__tablename__), 'email', *cls.unique_columns,
                                         unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.email))))
         indexes = [db.Index(None, 'mp_group_provider', 'mp_group_name')]
-        checks = [_make_check(PrincipalType.user, cls.allow_emails, 'user_id'),
-                  _make_check(PrincipalType.local_group, cls.allow_emails, 'local_group_id'),
-                  _make_check(PrincipalType.multipass_group, cls.allow_emails, 'mp_group_provider', 'mp_group_name')]
+        checks = [_make_check(PrincipalType.user, cls.allow_emails, cls.allow_networks, 'user_id'),
+                  _make_check(PrincipalType.local_group, cls.allow_emails, cls.allow_networks, 'local_group_id'),
+                  _make_check(PrincipalType.multipass_group, cls.allow_emails, cls.allow_networks,
+                              'mp_group_provider', 'mp_group_name')]
         if cls.allow_emails:
-            checks.append(_make_check(PrincipalType.email, cls.allow_emails, 'email'))
+            checks.append(_make_check(PrincipalType.email, cls.allow_emails, cls.allow_networks, 'email'))
             checks.append(db.CheckConstraint('email IS NULL OR email = lower(email)', 'lowercase_email'))
+        if cls.allow_networks:
+            checks.append(_make_check(PrincipalType.network, cls.allow_emails, cls.allow_networks,
+                                      'ip_network_group_id'))
         return tuple(uniques + indexes + checks)
 
     multipass_group_provider = db.Column(
@@ -163,9 +172,13 @@ class PrincipalMixin(object):
 
     @declared_attr
     def type(cls):
-        exclude_values = None if cls.allow_emails else {PrincipalType.email}
+        exclude_values = set()
+        if not cls.allow_emails:
+            exclude_values.add(PrincipalType.email)
+        if not cls.allow_networks:
+            exclude_values.add(PrincipalType.network)
         return db.Column(
-            PyIntEnum(PrincipalType, exclude_values=exclude_values),
+            PyIntEnum(PrincipalType, exclude_values=(exclude_values or None)),
             nullable=False
         )
 
@@ -198,6 +211,17 @@ class PrincipalMixin(object):
         )
 
     @declared_attr
+    def ip_network_group_id(cls):
+        if not cls.allow_networks:
+            return
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('indico.ip_network_groups.id'),
+            nullable=True,
+            index=True
+        )
+
+    @declared_attr
     def user(cls):
         assert cls.principal_backref_name
         return db.relationship(
@@ -223,6 +247,21 @@ class PrincipalMixin(object):
             )
         )
 
+    @declared_attr
+    def ip_network_group(cls):
+        if not cls.allow_networks:
+            return
+        assert cls.principal_backref_name
+        return db.relationship(
+            'IPNetworkGroup',
+            lazy=False,
+            backref=db.backref(
+                cls.principal_backref_name,
+                cascade='all, delete-orphan',
+                lazy='dynamic'
+            )
+        )
+
     @hybrid_property
     def principal(self):
         from indico.modules.groups import GroupProxy
@@ -234,6 +273,8 @@ class PrincipalMixin(object):
             return GroupProxy(self.multipass_group_name, self.multipass_group_provider)
         elif self.type == PrincipalType.email:
             return EmailPrincipal(self.email)
+        elif self.type == PrincipalType.network:
+            return self.ip_network_group
 
     @principal.setter
     def principal(self, value):
@@ -242,9 +283,13 @@ class PrincipalMixin(object):
         self.user = None
         self.local_group = None
         self.multipass_group_provider = self.multipass_group_name = None
+        self.ip_network_group = None
         if self.type == PrincipalType.email:
             assert self.allow_emails
             self.email = value.email
+        elif self.type == PrincipalType.network:
+            assert self.allow_networks
+            self.ip_network_group = value
         elif self.type == PrincipalType.local_group:
             self.local_group = value.group
         elif self.type == PrincipalType.multipass_group:
@@ -336,7 +381,14 @@ class PrincipalRolesMixin(PrincipalMixin):
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        return db.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', 'has_privs'),
+        checks = [db.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', 'has_privs')]
+        if cls.allow_networks:
+            # you can match a network acl entry without being logged in.
+            # we never want that for anything but simple read access
+            checks.append(db.CheckConstraint('type != {} OR (NOT full_access AND array_length(roles, 1) IS NULL)'
+                                             .format(PrincipalType.network),
+                                             'networks_read_only'))
+        return tuple(checks)
 
     read_access = db.Column(
         db.Boolean,
@@ -427,6 +479,8 @@ class PrincipalComparator(Comparator):
     def __eq__(self, other):
         if other.principal_type == PrincipalType.email:
             criteria = [self.cls.email == other.email]
+        elif other.principal_type == PrincipalType.network:
+            criteria = [self.cls.ip_network_group_id == other.id]
         elif other.principal_type == PrincipalType.local_group:
             criteria = [self.cls.local_group_id == other.id]
         elif other.principal_type == PrincipalType.multipass_group:
@@ -448,7 +502,7 @@ def clone_principals(cls, principals):
     """
     rv = set()
     assert all(isinstance(x, cls) for x in principals)
-    attrs = get_simple_column_attrs(cls) | {'user', 'local_group'}
+    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group'}
     for old_principal in principals:
         principal = cls()
         principal.populate_from_dict({attr: getattr(old_principal, attr) for attr in attrs})
