@@ -30,7 +30,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField, IndicoRadioField
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoRadioField, AccessControlListField
 from indico.web.forms.validators import UsedIf, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget, DropzoneWidget
 
@@ -40,9 +40,9 @@ class AttachmentFormBase(IndicoForm):
     folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
                               description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
-    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
-                             groups=True, serializable=False, allow_external=True,
-                             description=_("The list of users and groups with access to the material"))
+    acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
+                                 groups=True, serializable=False, allow_external=True,
+                                 description=_("The list of users and groups allowed to access the material"))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
@@ -88,9 +88,9 @@ class AttachmentFolderForm(IndicoForm):
                         description=_("The name of the folder."))
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget())
-    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
-                             groups=True, serializable=False, allow_external=True,
-                             description=_("The list of users and groups with access to the folder"))
+    acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
+                                 groups=True, serializable=False, allow_external=True,
+                                 description=_("The list of users and groups allowed to access the folder"))
     is_always_visible = BooleanField(_("Always Visible"), widget=SwitchWidget(),
                                      description=_("By default, folders are always visible, even if a user cannot "
                                                    "access them. You can disable this behavior here, hiding the folder "
