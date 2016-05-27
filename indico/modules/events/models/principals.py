@@ -30,6 +30,7 @@ class EventPrincipal(PrincipalRolesMixin, db.Model):
     principal_for = 'Event'
     unique_columns = ('event_id',)
     allow_emails = True
+    allow_networks = True
 
     @declared_attr
     def __table_args__(cls):

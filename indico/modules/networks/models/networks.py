@@ -23,11 +23,13 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIPNetwork
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.string import return_ascii, format_repr
 
 
 class IPNetworkGroup(db.Model):
     __tablename__ = 'ip_network_groups'
+    principal_type = PrincipalType.network
 
     @declared_attr
     def __table_args__(cls):
@@ -60,6 +62,7 @@ class IPNetworkGroup(db.Model):
     networks = association_proxy('_networks', 'network', creator=lambda v: IPNetwork(network=v))
 
     # relationship backrefs:
+    # - in_event_acls (EventPrincipal.ip_network_group)
 
     @return_ascii
     def __repr__(self):
