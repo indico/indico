@@ -6,7 +6,7 @@
             ng-required="field.isRequired || paymentBlocked(field, userdata, regMetadata) == false"
             ng-disabled="!regMetadata.manager && paymentBlocked(field, userdata, regMetadata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
-            <option ng-if="!field.isRequired" value="">-- {{ 'Choose a value' | i18n }} --</option>
+            <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"
                 ng-disabled="!hasPlacesLeft(field, userdata[fieldName])"
                 ng-selected="userdata[fieldName] === true">
@@ -27,6 +27,5 @@
         <span class="error-message-tag" ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired">
             {{ "You must chose an option" | i18n }}
         </span>
-
     </ng-form>
 </div>
