@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
+import json
 from datetime import time
 
-from flask import session
 import jsonschema
+from flask import session
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
 from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
@@ -125,10 +126,11 @@ class RegistrationFormScheduleForm(IndicoForm):
 
 class _UsersField(PrincipalListField):
     def __init__(self, *args, **kwargs):
-        super(_UsersField, self).__init__(*args, allow_external=True, serializable=True, **kwargs)
+        super(_UsersField, self).__init__(*args, allow_external=True, **kwargs)
 
-    def _convert_principal(self, principal):
-        return principal
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
 
     def _value(self):
         return self._get_data()
