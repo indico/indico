@@ -34,7 +34,7 @@ class SearchForm(IndicoForm):
 
 class EditGroupForm(IndicoForm):
     name = StringField(_('Group name'), [DataRequired()])
-    members = PrincipalListField(_('Group members'), serializable=False)
+    members = PrincipalListField(_('Group members'))
 
     def __init__(self, *args, **kwargs):
         self.group = kwargs.pop('group', None)

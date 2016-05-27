@@ -23,8 +23,8 @@ from indico.util.i18n import _
 
 
 class SettingsForm(IndicoForm):
-    admin_principals = PrincipalListField(_(u'Administrators'), groups=True, serializable=False)
-    authorized_principals = PrincipalListField(_(u'Authorized users/groups'), groups=True, serializable=False)
+    admin_principals = PrincipalListField(_(u'Administrators'), groups=True)
+    authorized_principals = PrincipalListField(_(u'Authorized users/groups'), groups=True)
     assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
     notification_hour = IntegerField(_(u'Hour at which booking reminders should be sent'),
                                      [InputRequired(), NumberRange(0, 23)])

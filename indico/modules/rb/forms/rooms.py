@@ -115,7 +115,7 @@ class RoomForm(IndicoForm):
                                             [Optional(), NumberRange(min=1, max=9)], default=1)
     notification_for_responsible = BooleanField(_(u'Remind room manager too'))
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
-    owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True, serializable=False)
+    owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True)
     key_location = StringField(_(u'Where is key?'))
     telephone = StringField(_(u'Telephone'))
     capacity = IntegerField(_(u'Capacity'), [DataRequired(), NumberRange(min=1)], default=20)

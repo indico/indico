@@ -110,7 +110,7 @@ class NewBookingPeriodForm(NewBookingFormBase):
 
 
 class NewBookingConfirmForm(NewBookingPeriodForm):
-    booked_for_user = PrincipalField(_(u'User'), [DataRequired()], allow_external=True, serializable=False)
+    booked_for_user = PrincipalField(_(u'User'), [DataRequired()], allow_external=True)
     contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])

@@ -253,10 +253,6 @@ class PrincipalListField(HiddenField):
                            will automatically create a pending user once
                            the form is submitted, even if other fields
                            in the form fail to validate!
-    :param serializable: If True, the field will use a principal tuple
-                         such as ``('User', user_id)`` instead of the
-                         actual :class:`.User` or :class:`.GroupProxy`
-                         object.
     """
 
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
@@ -266,26 +262,18 @@ class PrincipalListField(HiddenField):
         self.groups = kwargs.pop('groups', False)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
-        # Whether we want serializable objects (usually for json) or the real thing (User/GroupProxy)
-        self.serializable = kwargs.pop('serializable', True)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        principal = principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
-                                          allow_emails=self.allow_emails)
-        return principal.as_principal if self.serializable else principal
+        return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
+                                     allow_emails=self.allow_emails)
 
     def process_formdata(self, valuelist):
         if valuelist:
-            data = map(self._convert_principal, json.loads(valuelist[0]))
-            self.data = data if self.serializable else set(data)
+            self.data = {self._convert_principal(x) for x in json.loads(valuelist[0])}
 
     def pre_validate(self, form):
-        if self.groups:
-            return
-        if not self.serializable and any(isinstance(p, GroupProxy) for p in self._get_data()):
-            raise ValueError(u'You cannot select groups')
-        elif self.serializable and any(p[0] == 'Group' for p in self._get_data()):
+        if not self.groups and any(isinstance(p, GroupProxy) for p in self._get_data()):
             raise ValueError(u'You cannot select groups')
 
     def _serialize_principal(self, principal):
@@ -297,11 +285,7 @@ class PrincipalListField(HiddenField):
             return serialize_group(principal)
 
     def _value(self):
-        if self.serializable:
-            principals = retrieve_principals(self._get_data(), legacy=False)
-        else:
-            principals = self._get_data()
-        principals.sort(key=lambda x: x.name.lower())
+        principals = sorted(self._get_data(), key=lambda x: x.name.lower())
         return map(self._serialize_principal, principals)
 
     def _get_data(self):
@@ -320,8 +304,7 @@ class EventPersonListField(PrincipalListField):
 
     def __init__(self, *args, **kwargs):
         self.event_person_conversions = {}
-        super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, serializable=False,
-                                                   **kwargs)
+        super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, **kwargs)
 
     @property
     def event(self):

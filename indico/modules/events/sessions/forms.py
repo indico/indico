@@ -61,11 +61,11 @@ class SessionProtectionForm(IndicoForm):
                                                                                  form.protected_object))
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 serializable=False, groups=True, allow_emails=True,
+                                 groups=True, allow_emails=True,
                                  description=_('List of users allowed to access the session.'))
-    managers = PrincipalListField(_('Managers'), serializable=False, groups=True, allow_emails=True,
+    managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the session'))
-    coordinators = PrincipalListField(_('Coordinators'), serializable=False, groups=True, allow_emails=True)
+    coordinators = PrincipalListField(_('Coordinators'), groups=True, allow_emails=True)
 
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('session')

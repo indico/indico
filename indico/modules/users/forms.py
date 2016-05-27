@@ -88,7 +88,7 @@ class SearchForm(IndicoForm):
 
 
 class MergeForm(IndicoForm):
-    source_user = PrincipalField(_('Source user'), [DataRequired()], serializable=False,
+    source_user = PrincipalField(_('Source user'), [DataRequired()],
                                  description=_('The user that will be merged into the target one'))
-    target_user = PrincipalField(_('Target user'), [DataRequired()], serializable=False,
+    target_user = PrincipalField(_('Target user'), [DataRequired()],
                                  description=_('The user that will remain active in the end'))
