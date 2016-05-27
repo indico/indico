@@ -40,7 +40,7 @@
 {% macro render_speakers(speakers) -%}
     <div class="speaker-list">
         <span class="label">{{ ngettext("Speaker", "Speakers", speakers | length) }}</span>:
-        {{ render_users(speakers) }}
+        {{ render_users(speakers | sort(attribute="full_name")) }}
     </div>
 {%- endmacro %}
 
