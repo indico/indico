@@ -82,8 +82,9 @@ def _get_category_score(user, categ, attended_events, debug=False):
     # Attendance percentage goes to the score directly. If the attendance is high chances are good that the user
     # is either very interested in whatever goes on in the category or it's something he has to attend regularily.
     total = sum(1 for _ in _unique_events(idx.iterateObjectsIn(categ.getId(), first_event_date, last_event_date)))
-    attended_block_event_count = sum(1 for e in attended_events_set if e.getStartDate() >= first_event_date)
-    score += attended_block_event_count / total
+    if total:
+        attended_block_event_count = sum(1 for e in attended_events_set if e.getStartDate() >= first_event_date)
+        score += attended_block_event_count / total
     if debug:
         print '{0:+.3f} - attendance'.format(score)
     # If there are lots/few unattended events after the last attended one we also update the score with that
