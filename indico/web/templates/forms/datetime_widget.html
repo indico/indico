@@ -102,8 +102,12 @@
                     var selectedTime = timeField.val();
                     if (selectedDate !== limitDate || (selectedDate === initialDate && selectedTime === initialTime)) {
                         timeField.removeAttr(attr);
-                    } else {
-                        timeField.attr(attr, limitTime);
+                    } else if (timeField.attr(attr) != limitTime) {
+                        // Fix for Chrome ignoring next number keydown after min/max attr change.
+                        // Delay gives some margin to type double digits.
+                        setTimeout(function() {
+                            timeField.attr(attr, limitTime);
+                        }, 1000);
                     }
                 }
 
