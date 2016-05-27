@@ -767,7 +767,8 @@ function drawBalloon(self, evt, editable) {
                 target: [ evt.pageX, evt.pageY ],
                 adjust: {
                     mouse: false
-                }
+                },
+                effect: false
             },
             style: {
                 classes: 'balloon-qtip'
