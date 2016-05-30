@@ -87,6 +87,7 @@
             var qtipOptions = {
                 prerender: false,
                 overwrite: false,
+                suppress: false,
                 style: {
                     classes: 'palette-picker-qtip'
                 },
