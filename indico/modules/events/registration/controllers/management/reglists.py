@@ -296,9 +296,11 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
             create_registration(self.regform, data, management=True, notify_user=notify)
 
     def _process(self):
-        form = CreateMultipleRegistrationsForm(regform=self.regform, open_add_user_dialog=(request.method == 'GET'))
+        form = CreateMultipleRegistrationsForm(regform=self.regform, open_add_user_dialog=(request.method == 'GET'),
+                                               notify_users=session.get('registration_notify_user_default', True))
 
         if form.validate_on_submit():
+            session['registration_notify_user_default'] = form.notify_users.data
             for user in form.user_principals.data:
                 self._register_user(user, form.notify_users.data)
             reg_list_config = _get_reg_list_config(regform=self.regform)
