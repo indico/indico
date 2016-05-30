@@ -84,15 +84,15 @@
             $('#fields li').each(function() {
                 var key = $(this).find('.key').val(),
                     value = $(this).find('.value').val();
-                if (key) { 
+                if (key) {
                     params[key] = value.trim();
                 }
             });
-            
+
             if (!persistent) {
                 params['timestamp'] = Math.round(Date.now() / 1000);
             }
-            
+
             params['ak'] = $('#api-key').val();
             var to_sign = path + '?' + params_sorted(params);
 
@@ -101,5 +101,5 @@
 
             $('#result').val($('#server-url').val() + path + '?' + $.param(params));
         })
-    })  
+    })
 </script>
