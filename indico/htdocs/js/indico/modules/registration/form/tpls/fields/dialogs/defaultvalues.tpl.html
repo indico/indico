@@ -1,0 +1,11 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Default value' | i18n }}
+    </label>
+    <select name="defaultValue" ng-model="formData.defaultValue"
+            ng-init="formData.defaultValue=field.defaultValue">
+        <option value="" ng-if="!formData.isRequired">-- {{ 'Choose a value' | i18n }} --</option>
+        <option ng-repeat="opt in settings.defaultValues" value="{{ opt }}"
+                ng-selected="{{ formData.defaultValue === opt }}">{{ opt | i18n }}</option>
+    </select>
+</div>
