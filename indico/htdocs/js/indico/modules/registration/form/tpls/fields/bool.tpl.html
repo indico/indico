@@ -6,15 +6,15 @@
             ng-required="field.isRequired || paymentBlocked(field, userdata, regMetadata) == false"
             ng-disabled="!regMetadata.manager && paymentBlocked(field, userdata, regMetadata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
-            <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+            <option value="" ng-if="!field.isRequired">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"
                 ng-disabled="!hasPlacesLeft(field, userdata[fieldName])"
-                ng-selected="userdata[fieldName] === true">
+                ng-selected="userdata[fieldName] === true || (userdata[fieldName] !== null && field.defaultValue === 'yes')">
                 {{ 'yes' | i18n }}
                 {{ getBillableStr(field, userdata[fieldName]) }}
             </option>
             <option value="no"
-                ng-selected="userdata[fieldName] === false">
+                ng-selected="userdata[fieldName] === false || (userdata[fieldName] !== null && userdata[fieldName] !== true && field.defaultValue === 'no')">
                 {{ 'no' | i18n }}
             </option>
         </select>
