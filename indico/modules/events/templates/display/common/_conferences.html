@@ -5,7 +5,8 @@
         {% if item.can_manage_attachments(session.user) -%}
             <a href="#" class="icon-edit i-button right"
                data-locator="{{ item.locator|tojson|forceescape }}"
-               data-attachment-editor></a>
+               data-attachment-editor
+               data-reload-on-change></a>
         {%- endif %}
 
         <h3 class="icon-attachment">
