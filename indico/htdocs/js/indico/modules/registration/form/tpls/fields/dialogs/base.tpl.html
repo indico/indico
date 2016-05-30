@@ -72,9 +72,11 @@
                 <div ng-if="settings.isBillable"
                     ng-include="getTpl('fields/dialogs/billable.tpl.html')"></div>
                 <div ng-if="settings.defaultValue"
-                    ng-include="getTpl('fields/dialogs/defaultvalue.tpl.html')"></div>
+                    ng-include="getTpl('fields/dialogs/inputtype.tpl.html')"></div>
                 <div ng-if="settings.date"
                     ng-include="getTpl('fields/dialogs/date.tpl.html')"></div>
+                <div ng-if="settings.defaultValues"
+                     ng-include="getTpl('fields/dialogs/defaultvalues.tpl.html')"></div>
             </form>
         </div>
 

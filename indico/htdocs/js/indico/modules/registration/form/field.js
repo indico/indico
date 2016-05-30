@@ -781,9 +781,11 @@ ndRegForm.directive('ndBoolField', function(url) {
             scope.settings.fieldName = $T("Yes/No");
             scope.settings.isBillable = true;
             scope.settings.placesLimit = true;
+            scope.settings.defaultValues = [$T("yes"), $T("no")];
             scope.settings.formData.push('isBillable');
             scope.settings.formData.push('price');
             scope.settings.formData.push('placesLimit');
+            scope.settings.formData.push('defaultValue');
         }
     };
 });
