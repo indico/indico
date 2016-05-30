@@ -158,6 +158,14 @@ def _filter_registration(regform, query, filters):
     return query.filter(db.or_(*items_criteria))
 
 
+def _jsonify_registration_list(regform):
+    reg_list_config = _get_reg_list_config(regform=regform)
+    registrations_query = _query_registrations(regform)
+    registrations = _filter_registration(regform, registrations_query, reg_list_config['filters']).all()
+    return jsonify_data(registration_list=_render_registration_list(regform, registrations),
+                        flash=False)
+
+
 def _query_registrations(regform):
     return (Registration.query
             .with_parent(regform)
@@ -540,11 +548,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
             session['registration_notify_user_default'] = form.notify_users.data
             for user in form.user_principals.data:
                 self._register_user(user, form.notify_users.data)
-            reg_list_config = _get_reg_list_config(regform=self.regform)
-            registrations_query = _query_registrations(self.regform)
-            registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-            return jsonify_data(registration_list=_render_registration_list(self.regform, registrations),
-                                flash=False)
+            return _jsonify_registration_list(self.regform)
 
         return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
 
@@ -687,10 +691,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return _jsonify_registration_list(self.regform)
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
@@ -701,10 +702,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return _jsonify_registration_list(self.regform)
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):
