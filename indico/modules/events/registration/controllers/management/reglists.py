@@ -31,7 +31,7 @@ from indico.core.config import Config
 from indico.core.db import db
 
 from indico.core import signals
-from indico.core.errors import FormValuesError
+from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.attachments.controllers.event_package import adjust_path_length
 from indico.modules.events.models.report_links import ReportLink
@@ -431,6 +431,8 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
     """Previews the email that will be sent to registrants"""
 
     def _process(self):
+        if not self.registrations:
+            raise UserValueError(_("The selected registrants have been removed."))
         registration = self.registrations[0]
         email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
                                           registration=registration)
