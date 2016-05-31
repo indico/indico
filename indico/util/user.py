@@ -18,6 +18,7 @@ from functools import wraps
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.util.decorators import smart_decorator
 
 from MaKaC.common.cache import GenericCache
@@ -93,8 +94,7 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
 
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False,
-                          allow_emails=False):
-    """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
+                          allow_emails=False, allow_networks=False):
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -132,6 +132,11 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         return user.as_avatar if legacy else user
     elif allow_emails and type_ == 'Email':
         return EmailPrincipal(id_)
+    elif allow_networks and type_ == 'IPNetworkGroup':
+        group = IPNetworkGroup.get(int(id_))
+        if group is None:
+            raise ValueError('IP network group does not exist: {}'.format(id_))
+        return group
     elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
         group = GroupProxy(int(id_))
         if group.group is None:
