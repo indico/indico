@@ -400,11 +400,7 @@ class AbstractLegacyMixin(object):
                 field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
             except NoResultFound:
                 field = self.event.contribution_fields.filter_by(id=field_id).one()
-            fval = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
-            if fval:
-                return fval
-            else:
-                return AbstractFieldValue(contribution_field=field, abstract=self.as_new, data={})
+            return AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
 
     @property
     @memoize_request
@@ -467,11 +463,13 @@ class AbstractFieldContentWrapper(object):
 
     @property
     def field(self):
-        return self.field_val.contribution_field
+        if self.field_val is not None:
+            return self.field_val.contribution_field
 
     @property
     def value(self):
-        return self.field_val.data
+        if self.field_val is not None:
+            return self.field_val.data
 
     def __eq__(self, other):
         if isinstance(other, AbstractFieldContentWrapper) and self.field.id == other.field.id:
@@ -481,14 +479,14 @@ class AbstractFieldContentWrapper(object):
         return False
 
     def __len__(self):
-        return len(self.field_val.data)
+        return 0 if self.field_val is None else len(self.field_val.data)
 
     def __ne__(self, other):
         return not (self == other)
 
     @encode_utf8
     def __str__(self):
-        if self.field.field_type == 'single_choice':
+        if self.field is not None and self.field.field_type == 'single_choice':
             return unicode(AbstractSelectionFieldWrapper(self.field).getOption(self.value))
         return unicode(self.value or '')
 
