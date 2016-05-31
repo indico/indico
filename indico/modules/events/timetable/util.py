@@ -112,7 +112,7 @@ def find_latest_entry_end_dt(obj, day=None):
     return max(entries, key=attrgetter('end_dt')).end_dt if entries else None
 
 
-def find_next_start_dt(duration, obj, day=None):
+def find_next_start_dt(duration, obj, day=None, force=False):
     """Find the next most convenient start date fitting a duration within an object.
 
     :param duration: Duration to fit into the event/session-block.
@@ -120,9 +120,11 @@ def find_next_start_dt(duration, obj, day=None):
                 fit into.
     :param day: The local event date where to fit the duration in case the object is
                 an event.
+    :param force: Gives earliest datetime if the duration doesn't fit.
     :return: The end datetime of the latest scheduled entry in the object if the
               duration fits then. It it doesn't, the latest datetime that fits it.
-              ``None`` if the duration cannot fit in the object.
+              ``None`` if the duration cannot fit in the object, earliest datetime
+              if ``force`` is ``True``.
     """
     if isinstance(obj, Event):
         if day is None:
@@ -140,7 +142,7 @@ def find_next_start_dt(duration, obj, day=None):
         raise ValueError("Invalid object type {}".format(type(obj)))
     max_duration = latest_dt - earliest_dt
     if duration > max_duration:
-        return None
+        return earliest_dt if force else None
     start_dt = find_latest_entry_end_dt(obj, day=day) or earliest_dt
     end_dt = start_dt + duration
     if end_dt > latest_dt:

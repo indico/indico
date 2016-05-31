@@ -315,18 +315,22 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         entries = []
         day = dateutil.parser.parse(data['day']).date()
         query = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(data['contribution_ids']))
-        for contribution in query:
-            start_dt = find_next_start_dt(contribution.duration,
-                                          obj=self.session_block or self.event_new,
-                                          day=None if self.session_block else day)
-            # TODO: handle scheduling not-fitting contributions
-            #       can only happen within session blocks that are shorter than contribution's duration
-            if start_dt:
-                entries.append(self._schedule(contribution, start_dt))
-        return jsonify(entries=[serialize_entry_update(x) for x in entries])
+        with track_time_changes(auto_extend='end', user=session.user) as changes:
+            for contribution in query:
+                start_dt = find_next_start_dt(contribution.duration,
+                                              obj=self.session_block or self.event_new,
+                                              day=None if self.session_block else day,
+                                              force=True)
+                entry = self._schedule(contribution, start_dt)
+                if entry.end_dt.astimezone(entry.event_new.tzinfo).date() > day:
+                    raise UserValueError(_("Contribution '{}' could not be scheduled since it doesn't fit on this day.")
+                                         .format(contribution.title))
+                entries.append(entry)
+        notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo)
+        return jsonify(entries=[serialize_entry_update(x) for x in entries], notifications=notifications)
 
     def _schedule(self, contrib, start_dt):
-        return schedule_contribution(contrib, start_dt, session_block=self.session_block)
+        return schedule_contribution(contrib, start_dt, session_block=self.session_block, extend_parent=True)
 
 
 class RHLegacyTimetableReschedule(RHManageTimetableBase):
