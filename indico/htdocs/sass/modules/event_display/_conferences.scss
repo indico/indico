@@ -67,23 +67,17 @@
     }
 
     #other-fields {
-        overflow: auto;
+        margin-left: 2em;
 
-        dd, dt {
-            float: left;
-            vertical-align: top;
-        }
-        dt {
-            margin-bottom: 1em;
-            text-align: right;
-            width: 25%;
+        th {
             color: $orange;
+            text-align: right;
+            vertical-align: top;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        dd {
-            margin: 0 0 1em 1em;
-            width: 70%;
-        }
-        clear: both;
     }
 
     .description, .infogrid {

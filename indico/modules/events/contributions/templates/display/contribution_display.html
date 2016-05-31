@@ -8,14 +8,16 @@
 
 {% macro _render_field_value(field_value) -%}
     {% set field = field_value.contribution_field %}
-    <dt>{{ field.title }}</dt>
-    <dd>
-        {% if field.field_type == 'text' %}
-            {{ field_value.data }}
-        {% elif field.field_type == 'single_choice' %}
-            {{ field_value.friendly_data }}
-        {% endif %}
-    </dd>
+    <tr>
+        <th>{{ field.title }}</th>
+        <td>
+            {% if field.field_type == 'text' %}
+                {{ field_value.data }}
+            {% elif field.field_type == 'single_choice' %}
+                {{ field_value.friendly_data }}
+            {% endif %}
+        </td>
+    </tr>
 {%- endmacro %}
 
 {% macro render_author_list(authors) %}
@@ -146,14 +148,14 @@
             {% endif %}
         {% endfor %}
 
-        <dl id="other-fields">
+        <table id="other-fields">
             {% for field_value in contribution.field_values %}
                 {% set field = field_value.contribution_field %}
                 {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
                     {{ _render_field_value(field_value) }}
                 {% endif %}
             {% endfor %}
-        </dl>
+        </table>
 
         <div class="infogrid condensed">
             {% if contribution.primary_authors %}
