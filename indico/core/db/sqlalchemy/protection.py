@@ -145,9 +145,7 @@ class ProtectionMixin(object):
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
-            if user is None:
-                return False
-            elif any(user in entry.principal for entry in iter_acl(self.acl_entries)):
+            if any(user in entry.principal for entry in iter_acl(self.acl_entries)):
                 return True
             elif isinstance(self, ProtectionManagersMixin):
                 return self.can_manage(user, allow_admin=allow_admin)
@@ -157,8 +155,7 @@ class ProtectionMixin(object):
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
             # might not need to check the parents at all
-            if (self.inheriting_have_acl and user is not None and
-                    any(user in entry.principal for entry in iter_acl(self.acl_entries))):
+            if self.inheriting_have_acl and any(user in entry.principal for entry in iter_acl(self.acl_entries)):
                 return True
             # the parent can be either an object inheriting from this
             # mixin or a legacy object with an AccessController

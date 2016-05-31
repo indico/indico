@@ -73,7 +73,10 @@ class EmailPrincipal(Fossilizable):
     """
 
     principal_type = PrincipalType.email
+    is_network = False
     is_group = False
+    is_single_person = True
+    principal_order = 0
     fossilizes(IEmailPrincipalFossil)
 
     def __init__(self, email):

@@ -26,15 +26,16 @@ from MaKaC.common.cache import GenericCache
 def iter_acl(acl):
     """Iterates over an ACL in the most efficient order.
 
-    This first yields users, then local groups, and eventually
-    multipass groups as a remote group check is much more expensive
-    than checking if two users are the same (``==``) or if a user is
-    in a local group (SQL query).
+    This first yields users/emails, then ip networks, then local
+    groups, and eventually multipass groups as a remote group check
+    is much more expensive than checking if two users are the same
+    (``==``), if an ip is in a network (just some math) or if a user
+    is in a local group (SQL query).
 
     :param acl: any iterable containing users/groups or objects which
                 contain users/groups in a `principal` attribute
     """
-    return sorted(acl, key=lambda x: (getattr(x, 'principal', x).is_group,
+    return sorted(acl, key=lambda x: (getattr(x, 'principal', x).principal_order,
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 

@@ -126,6 +126,9 @@ class User(PersonMixin, db.Model):
 
     # Useful when dealing with both users and groups in the same code
     is_group = False
+    is_single_person = True
+    is_network = False
+    principal_order = 0
     principal_type = PrincipalType.user
 
     __tablename__ = 'users'
