@@ -1501,7 +1501,7 @@ type("UserListField", ["IWidget"], {
                     if (value) {
                         each(results, function(person){
                             var key;
-                            if (person.isGroup || person._fossil === 'group') {
+                            if (person.isGroup || person._fossil === 'group' || person._type == 'IPNetworkGroup') {
                                 key = person.identifier;
                             } else if (person._type === "Avatar") {
                                 key = "existingAv" + person.id;

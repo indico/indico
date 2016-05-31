@@ -41,6 +41,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.models.users import User, UserTitle
@@ -248,6 +249,8 @@ class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 
     :param groups: If groups should be selectable.
+    :param allow_networks: If ip networks should be selectable.
+    :param allow_emails: If emails should be allowed.
     :param allow_external: If "search users with no indico account"
                            should be available.  Selecting such a user
                            will automatically create a pending user once
@@ -260,13 +263,14 @@ class PrincipalListField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
+        self.allow_networks = kwargs.pop('allow_networks', False)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
-                                     allow_emails=self.allow_emails)
+                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -279,10 +283,14 @@ class PrincipalListField(HiddenField):
     def _serialize_principal(self, principal):
         if principal.principal_type == PrincipalType.email:
             return principal.fossilize()
+        elif principal.principal_type == PrincipalType.network:
+            return serialize_ip_network_group(principal)
         elif principal.principal_type == PrincipalType.user:
             return serialize_user(principal)
-        else:
+        elif principal.is_group:
             return serialize_group(principal)
+        else:
+            raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
     def _value(self):
         principals = sorted(self._get_data(), key=lambda x: x.name.lower())
