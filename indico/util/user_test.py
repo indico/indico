@@ -16,18 +16,26 @@
 
 from mock import MagicMock
 
+from indico.modules.groups import GroupProxy
+from indico.modules.networks.models.networks import IPNetworkGroup
+from indico.modules.users import User
 from indico.util.user import iter_acl, unify_user_args
 
 
 def test_iter_acl():
-    user = MagicMock(is_group=False, spec=['is_group'])
+    user = User()
     user_p = MagicMock(principal=user, spec=['principal'])
-    local_group = MagicMock(is_group=True, is_local=True, spec=['is_local'])
+    ipn = IPNetworkGroup()
+    ipn_p = MagicMock(principal=ipn, spec=['principal'])
+    local_group = GroupProxy(123, _group=MagicMock())
     local_group_p = MagicMock(principal=local_group, spec=['principal'])
-    remote_group = MagicMock(is_group=True, is_local=False, spec=['is_local'])
+    remote_group = GroupProxy('foo', 'bar')
     remote_group_p = MagicMock(principal=remote_group, spec=['principal'])
-    acl = [user_p, remote_group, local_group_p, user, local_group, remote_group_p]
-    assert list(iter_acl(iter(acl))) == [user_p, user, local_group_p, local_group, remote_group, remote_group_p]
+    acl = [ipn, user_p, remote_group, local_group_p, user, local_group, remote_group_p, ipn_p]
+    assert list(iter_acl(iter(acl))) == [user_p, user,
+                                         ipn, ipn_p,
+                                         local_group_p, local_group,
+                                         remote_group, remote_group_p]
 
 
 def test_unify_user_args_new(dummy_avatar):
