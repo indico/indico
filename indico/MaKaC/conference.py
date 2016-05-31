@@ -2064,13 +2064,13 @@ class Conference(CommonObjectBase):
 
     def getManagerList(self):
         managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
-                          key=lambda x: (not x.is_group, x.name.lower()))
+                          key=lambda x: (x.is_single_person, x.name.lower()))
         return [x.as_legacy for x in managers]
 
     def getRegistrarList(self):
         registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
                                                                                                      explicit=True)],
-                            key=lambda x: (not x.is_group, x.name.lower()))
+                            key=lambda x: (x.is_single_person, x.name.lower()))
         return [x.as_legacy for x in registrars]
 
     def getAllowedToAccessList( self ):
