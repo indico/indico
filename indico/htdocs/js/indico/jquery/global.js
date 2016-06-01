@@ -126,6 +126,12 @@ $(document).ready(function() {
 
                 hide: function(event) {
                     $(this).qtip('destroy');
+                },
+
+                render: function(event, api) {
+                    $target.on('DOMNodeRemovedFromDocument remove', function(evt) {
+                        api.destroy();
+                    });
                 }
             },
 
@@ -138,10 +144,6 @@ $(document).ready(function() {
                 classes: qtipClass ? 'qtip-' + qtipClass : null
             }
         }, extraOpts), event);
-
-        $target.one('remove', function(evt) {
-            container.qtip('hide');
-        });
     });
 
     // Enable colorbox for links with .js-lightbox
