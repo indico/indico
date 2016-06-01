@@ -44,19 +44,7 @@ type("TimetableBlockBase", [],
          openPopup: function(event) {
              var self = this;
              self.popupActive = true;
-             var cursor = getMousePointerCoordinates(event);
              self._drawPopup(event);
-         },
-
-         closePopup: function() {
-             var self = this;
-
-              // If popup not open shown do nothing
-             if (!self.popupActive) {
-                 return;
-             }
-
-             this.popup.close();
          },
 
          createMaterialMenu: function(attachments, triggerElement, closeHandler) {
@@ -115,7 +103,6 @@ type("TimetableBlockBase", [],
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
                  stopPropagation(e);
-                 self.closePopup();
                  // use this style as long as the menu is open
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
                  $(".timetableBlockMaterialActive").qtip({
@@ -189,9 +176,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                 this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this._getTitle());
 
-                this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
+                this.titleWrapper = Html.div({}, this.titleDiv);
 
-                this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
+                this.div = Html.div({className: 'entry-content', style: { width: '100%', height: '100%'}}, this.titleWrapper);
 
                 if (this.compactMode) {
                     this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
@@ -285,7 +272,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 $(this.block.dom).addClass('timetableBlock ' +
                                            classTable[this.eventData.entryType]);
 
-                this.block.set(this._blockDescription());
+                this.block.set(this._getRightSideDecorators(), this._blockDescription());
 
                // This is a special case, when users shows contribution details it doesn't
                // apply to poster sessions. Instead add some grpahical elements to indicate
@@ -311,13 +298,12 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                }
 
                if (!self.printableVersion) {
-                   $(this.block.dom).click(function(e) {
+                   $(this.block.dom).on('click', '.entry-content', function(e) {
                        if (!self.timetable.getTimetableDrawer().eventsDisabled) {
                            $(this).trigger('tt_block.balloon', e);
                        }
                    });
                    highlightWithMouse(this.div, this.block);
-                   showWithMouse(this.div, this.arrows);
                }
                return this.block;
             },
@@ -526,9 +512,8 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
 
                 if (!self.printableVersion) {
                     block.dom.style.cursor = 'pointer';
-                  block.observeClick(function(e) { self.openPopup(e); });
+                    block.observeClick(function(e) { self.openPopup(e); });
                     highlightWithMouse(this.div, block);
-                    showWithMouse(this.div, this.arrows);
                 }
 
                 return block;
@@ -764,7 +749,7 @@ function drawBalloon(self, evt, editable) {
                     api.elements.target.on('click', function() {
                         api.hide();
                     });
-                }
+                },
             },
             position: {
                 at: 'top center',
@@ -810,11 +795,6 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                 arrowUp.attr('title', $T.gettext('Move up'));
                 arrowUp.on('click', function() {
                     self.managementActions.swapEntry(self.eventData, 'up');
-                    if (event.stopPropagation) {
-                        event.stopPropagation();
-                    } else {
-                        event.cancelBubble = true;
-                    }
                 });
             } else {
                 arrowUp.addClass('disabled');
@@ -824,11 +804,6 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                 arrowDown.attr('title', $T.gettext('Move down'));
                 arrowDown.on('click', function() {
                     self.managementActions.swapEntry(self.eventData, 'down');
-                    if (event.stopPropagation) {
-                        event.stopPropagation();
-                    } else {
-                        event.cancelBubble = true;
-                    }
                 });
             } else {
                 arrowDown.addClass('disabled');

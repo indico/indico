@@ -338,8 +338,15 @@
     position: absolute;
     right: 0;
     right: 18px;
+    visibility: hidden;
 
     a:first-child {
         margin-right: 2px;
+    }
+}
+
+.timetableBlock {
+    &:hover .entry-arrows {
+        visibility: visible;
     }
 }

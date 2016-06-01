@@ -28,21 +28,6 @@ function mouseOverSwitch(observable, overAction, outAction) {
 
 }
 
-function showWithMouse(observable, target) {
-
-    var stored = target.dom.style.display;
-    target.dom.style.display = 'none';
-
-    mouseOverSwitch(observable,
-                    function() {
-                        target.dom.style.display = stored;
-                    },
-                    function() {
-                        target.dom.style.display = 'none';
-                    });
-
-}
-
 function highlightWithMouse(observable, target) {
 
     /*
