@@ -759,12 +759,17 @@ function drawBalloon(self, evt, editable) {
                     if (evt.originalEvent.type == 'mouseleave') {
                         evt.preventDefault();
                     }
+                },
+                render: function(e, api) {
+                    api.elements.target.on('click', function() {
+                        api.hide();
+                    });
                 }
             },
             position: {
                 at: 'top center',
                 my: 'bottom center',
-                target: [ evt.pageX, evt.pageY ],
+                target: [evt.pageX, evt.pageY],
                 adjust: {
                     mouse: false
                 },
