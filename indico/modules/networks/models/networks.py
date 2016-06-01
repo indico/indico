@@ -66,6 +66,7 @@ class IPNetworkGroup(db.Model):
     networks = association_proxy('_networks', 'network', creator=lambda v: IPNetwork(network=v))
 
     # relationship backrefs:
+    # - in_category_acls (CategoryPrincipal.ip_network_group)
     # - in_event_acls (EventPrincipal.ip_network_group)
 
     @return_ascii

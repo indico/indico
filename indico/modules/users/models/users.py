@@ -322,6 +322,7 @@ class User(PersonMixin, db.Model):
     # - in_attachment_acls (AttachmentPrincipal.user)
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.user)
     # - in_blocking_acls (BlockingPrincipal.user)
+    # - in_category_acls (CategoryPrincipal.user)
     # - in_contribution_acls (ContributionPrincipal.user)
     # - in_event_acls (EventPrincipal.user)
     # - in_event_settings_acls (EventSettingPrincipal.user)
