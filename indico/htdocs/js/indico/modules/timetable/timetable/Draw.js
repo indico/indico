@@ -100,7 +100,7 @@ type("TimetableBlockBase", [],
          createMaterialButton: function(attachments) {
              var self = this;
 
-             var button = Html.div('timetableBlockMaterial');
+             var button = Html.a('entry-attachments i-button-icon');
              $(button.dom).qtip({
                  content: {
                      text: self.getMaterialMenu(attachments)
@@ -115,20 +115,14 @@ type("TimetableBlockBase", [],
                      my: 'top right',
                      at: 'bottom left'
                  },
-                 events: {
-                     hide: function(event, api) {
-                         // Restores the button style when menu is closed
-                         button.dom.className = "timetableBlockMaterial";
-                     }
-                 },
                  style: {
                      classes: 'material_tip'
-                 }
+                 },
+                 suppress: false
              }).on('click', function(evt) {
                  evt.stopPropagation();
-                 button.dom.className = 'timetableBlockMaterial timetableBlockMaterialActive';
                  $(this).qtip('show');
-             });
+             }).attr('title', $T.gettext("Show materials")).data('qtip-position', 'left');
 
              return button;
          },
