@@ -101,35 +101,33 @@ type("TimetableBlockBase", [],
              var self = this;
 
              var button = Html.div('timetableBlockMaterial');
-             button.observeClick(function(e) {
-                 stopPropagation(e);
-                 // use this style as long as the menu is open
-                 button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
-                 $(".timetableBlockMaterialActive").qtip({
-                         content: {
-                             text: self.getMaterialMenu(attachments)
-                         },
-                         show: {
-                             event: 'click'
-                         },
-                         hide: {
-                             event: 'unfocus'
-                         },
-                         position: {
-                             my: 'top right',
-                             at: 'bottom left'
-                         },
-                         events: {
-                             hide: function(event, api) {
-                                 // Restores the button style when menu is closed
-                                 button.dom.className = "timetableBlockMaterial";
-                             }
-                         },
-                         style: {
-                             classes: 'material_tip'
-                         }
-                 });
-                 $(".timetableBlockMaterialActive").qtip().show();
+             $(button.dom).qtip({
+                 content: {
+                     text: self.getMaterialMenu(attachments)
+                 },
+                 show: {
+                     event: false
+                 },
+                 hide: {
+                     event: 'unfocus'
+                 },
+                 position: {
+                     my: 'top right',
+                     at: 'bottom left'
+                 },
+                 events: {
+                     hide: function(event, api) {
+                         // Restores the button style when menu is closed
+                         button.dom.className = "timetableBlockMaterial";
+                     }
+                 },
+                 style: {
+                     classes: 'material_tip'
+                 }
+             }).on('click', function(evt) {
+                 evt.stopPropagation();
+                 button.dom.className = 'timetableBlockMaterial timetableBlockMaterialActive';
+                 $(this).qtip('show');
              });
 
              return button;
