@@ -23,7 +23,6 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalType
-from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
 
 
