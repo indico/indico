@@ -613,7 +613,7 @@ class TimeTablePlain(PDFWithTOC):
             if self._ttPDFFormat.showLogo():
                 self._drawLogo(c, False)
 
-            height = self._drawWrappedString(c, self._event.title)
+            height = self._drawWrappedString(c, self._event.title.encode('utf-8'))
             c.setFont('Times-Bold', modifiedFontSize(15, self._fontsize))
             height -= 2 * cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height,
@@ -624,8 +624,9 @@ class TimeTablePlain(PDFWithTOC):
                 c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name))
             c.setFont('Times-Bold', modifiedFontSize(30, self._fontsize))
             height -= 1 * cm
-            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title)
-            self._drawWrappedString(c, "{} / {}".format(self._event.title, self._title), width=inch,
+            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title.encode('utf-8'))
+            self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title.encode('utf-8')),
+                                    width=inch,
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
                                     measurement=inch, lineSpacing=0.15)
@@ -637,7 +638,8 @@ class TimeTablePlain(PDFWithTOC):
         maxi = self._PAGE_WIDTH - 2 * cm
         if doc.getCurrentPart().strip():
             maxi = self._PAGE_WIDTH - 6 * cm
-        self._drawWrappedString(c, "{} / {}".format(self._event.title, self._title), width=1 * cm,
+        self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title.encode('utf-8')),
+                                width=1 * cm,
                                 height=self._PAGE_HEIGHT - 1 * cm, font='Times-Roman',
                                 size=modifiedFontSize(9, self._fontsize), color=(0.5, 0.5, 0.5), align="left",
                                 lineSpacing=0.3, maximumWidth=maxi)
@@ -691,10 +693,10 @@ class TimeTablePlain(PDFWithTOC):
 
         lt = []
         date = format_time(contrib.start_dt, timezone=self._tz)
-        caption = u'[{}] {}'.format(contrib.friendly_id, escape(contrib.title))
+        caption = u'[{}] {}'.format(contrib.friendly_id, escape(contrib.title.encode('utf-8')))
 
         if not self._ttPDFFormat.showContribId():
-            caption = escape(contrib.title)
+            caption = escape(contrib.title.encode('utf-8'))
         elif self._ttPDFFormat.showLengthContribs():
             caption = u"{} ({})".format(caption, format_human_timedelta(contrib.timetable_entry.duration))
         elif self._ttPDFFormat.showContribAbstract():
@@ -740,9 +742,9 @@ class TimeTablePlain(PDFWithTOC):
                 return
 
             lt = []
-            caption = '- [{}] {}'.format(subc.friendly_id, escape(subc.title))
+            caption = '- [{}] {}'.format(subc.friendly_id, escape(subc.title.encode('utf-8')))
             if not self._ttPDFFormat.showContribId():
-                caption = '- {}' .format(escape(subc.title))
+                caption = '- {}' .format(escape(subc.title.encode('utf-8')))
             elif self._ttPDFFormat.showLengthContribs():
                 caption = '{} ({})'.format(caption, format_human_timedelta(subc.timetable_entry.duration))
 
@@ -777,9 +779,9 @@ class TimeTablePlain(PDFWithTOC):
             return
 
         lt = []
-        caption_text = "[{}] {}".format(contrib.friendly_id, escape(contrib.title))
+        caption_text = "[{}] {}".format(contrib.friendly_id, escape(contrib.title.encode('utf-8')))
         if not self._ttPDFFormat.showContribId():
-            caption_text = escape(contrib.title)
+            caption_text = escape(contrib.title.encode('utf-8'))
         if self._ttPDFFormat.showLengthContribs():
             caption_text = u"{} ({})".format(caption_text, format_human_timedelta(contrib.duration))
         caption_text = u'<font name="Times-Bold">{}</font>'.format(caption_text)
@@ -818,7 +820,7 @@ class TimeTablePlain(PDFWithTOC):
                 return
 
             lt = []
-            caption_text = "- [{}] {}".format(subc.friendly_id, escape(subc.title))
+            caption_text = "- [{}] {}".format(subc.friendly_id, escape(subc.title.encode('utf-8')))
             if not self._ttPDFFormat.showContribId():
                 caption_text = "- {}".format(subc.friendly_id)
             if self._ttPDFFormat.showLengthContribs():
@@ -881,7 +883,7 @@ class TimeTablePlain(PDFWithTOC):
 
                 room = ''
                 if sess_block.room_name:
-                    room = ' - {}'.format(escape(sess_block.room_name))
+                    room = ' - {}'.format(escape(sess_block.room_name.encode('utf-8')))
 
                 session_caption = sess_block.full_title
                 conv = []
@@ -916,7 +918,7 @@ class TimeTablePlain(PDFWithTOC):
 
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(sess_block.session.title), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(sess_block.session.title.encode('utf-8')), 'level': 2}
 
                 # add session description
                 if sess_block.session.description:
@@ -959,7 +961,7 @@ class TimeTablePlain(PDFWithTOC):
                         elif s_entry.type == TimetableEntryType.BREAK:
                             lt = []
                             date = self._fontify('{}'.format(format_time(s_entry.start_dt, timezone=self._tz)))
-                            caption = obj.title
+                            caption = obj.title.encode('utf-8')
 
                             if self._ttPDFFormat.showLengthContribs():
                                 caption = '{} ({})'.format(caption, format_human_timedelta(s_entry.duration))
@@ -1010,19 +1012,19 @@ class TimeTablePlain(PDFWithTOC):
 
                 room = ''
                 if contrib.room_name:
-                    room = ' - {}'.format(escape(contrib.room_name))
+                    room = ' - {}'.format(escape(contrib.room_name.encode('utf-8')))
 
                 speakers = ';'.join([self._get_speaker_name(spk) for spk in contrib.speakers])
                 if speakers.strip():
                     speakers = i18nformat('<font face="Times-Bold"><b>-_("Presenters"): {}</b></font>').format(speakers)
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
+                text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title.encode('utf-8')), room,
                                                     format_time(entry.start_dt, timezone=self._tz),
                                                     format_time(entry.end_dt, timezone=self._tz))
                 p1 = Paragraph(text, self._styles["session_title"])
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(contrib.title), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(contrib.title.encode('utf-8')), 'level': 2}
 
                 p2 = Paragraph(speakers, self._styles["conveners"])
                 res.append(p2)
@@ -1036,9 +1038,9 @@ class TimeTablePlain(PDFWithTOC):
                 break_ = break_entry.object
                 room = ''
                 if break_.room_name:
-                    room = ' - {}'.format(escape(break_.room_name))
+                    room = ' - {}'.format(escape(break_.room_name.encode('utf-8')))
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
+                text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title.encode('utf-8')), room,
                                                     format_time(break_entry.start_dt, timezone=self._tz),
                                                     format_time(break_entry.end_dt, timezone=self._tz))
 
@@ -1046,7 +1048,7 @@ class TimeTablePlain(PDFWithTOC):
                 res.append(p1)
 
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(break_.title), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(break_.title.encode('utf-8')), 'level': 2}
 
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
@@ -1167,10 +1169,10 @@ class SimplifiedTimeTablePlain(PDFBase):
                     e = sess
                 title = e.title
                 res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Session"):</b></font> {}')
-                                     .format(escape(title)), self._styles["normal"]))
+                                     .format(escape(title.encode('utf-8'))), self._styles["normal"]))
                 room_time = ""
                 if session_slot.room_name:
-                    room_time = escape(session_slot.room_name)
+                    room_time = escape(session_slot.room_name.encode('utf-8'))
                 room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
                              .format(room_time, format_time(entry.start_dt, timezone=self._tz),
                                      format_time(entry.end_dt, timezone=self._tz)))
@@ -1190,10 +1192,10 @@ class SimplifiedTimeTablePlain(PDFBase):
 
                 title = contrib.title
                 res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Contribution"):</b></font> {}')
-                                     .format(escape(title)), self._styles["normal"]))
+                                     .format(escape(title.encode('utf-8'))), self._styles["normal"]))
                 room_time = ""
                 if contrib.room_name:
-                    room_time = escape(contrib.room_name)
+                    room_time = escape(contrib.room_name.encode('utf-8'))
 
                 room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
                              .format(room_time, format_date(entry.start_dt, timezone=self._tz),
@@ -1210,10 +1212,10 @@ class SimplifiedTimeTablePlain(PDFBase):
                 break_ = entry.object
                 title = break_.title
                 res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Break"):</b></font> {}')
-                                     .format(escape(title)), self._styles["normal"]))
+                                     .format(escape(title.encode('utf-8'))), self._styles["normal"]))
                 room_time = ""
                 if break_.room_name:
-                    room_time = escape(break_.room_name)
+                    room_time = escape(break_.room_name.encode('utf-8'))
                 room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
                              .format(room_time, format_date(entry.start_dt, timezone=self._tz),
                                      format_date(entry.end_dt, timezone=self._tz)))
@@ -1239,11 +1241,11 @@ class SimplifiedTimeTablePlain(PDFBase):
                 current_day += timedelta(days=1)
                 continue
             if self._event.end_dt.astimezone(timezone(self._tz)).month != self._conf.getAdjustedEndDate(self._tz).month:
-                text = "%s - %s-%s" % (escape(self._event.title), escape(format_date(self._event.start_dt,
-                                                                                     timezone=self._tz)),
+                text = "%s - %s-%s" % (escape(self._event.title.encode('utf-8')),
+                                       escape(format_date(self._event.start_dt, timezone=self._tz)),
                                        escape(format_date(self._event.end_dt, timezone=self._tz)))
             else:
-                text = "%s - %s-%s" % (escape(self._event.title),
+                text = "%s - %s-%s" % (escape(self._event.title.encode('utf-8')),
                                        escape(format_date(self._event.start_dt, format='dd', timezone=self._tz)),
                                        escape(format_date(self._event.end_dt, format='dd MM YY', timezone=self._tz)))
             if self._event.venue_name:
