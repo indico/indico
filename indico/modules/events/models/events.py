@@ -32,9 +32,9 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.core.db.sqlalchemy.util.queries import (preprocess_ts_string, escape_like, db_dates_overlap,
-                                                    get_related_object)
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
@@ -46,8 +46,8 @@ from indico.util.string import return_ascii, format_repr, text_to_repr, RichMark
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin,
-            PersonLinkDataMixin, db.Model):
+class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
+            AttachedNotesMixin, PersonLinkDataMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -69,7 +69,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     @classmethod
     def __auto_table_args(cls):
         return (db.Index(None, 'category_chain', postgresql_using='gin'),
-                db.Index('ix_events_title_fts', db.func.to_tsvector('simple', cls.title), postgresql_using='gin'),
                 db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
                 db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
                 db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
@@ -81,7 +80,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
                 db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
-                db.CheckConstraint("title != ''", 'valid_title'),
                 db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
                 {'schema': 'events'})
 
@@ -139,11 +137,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     )
     #: The timezone of the event
     timezone = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The title of the event
-    title = db.Column(
         db.String,
         nullable=False
     )
@@ -390,21 +383,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             yield
         finally:
             self.__logging_disabled = False
-
-    @classmethod
-    def title_matches(cls, search_string, exact=False):
-        """Check whether the title matches a search string.
-
-        To be used in a SQLAlchemy `filter` call.
-
-        :param search_string: A string to search for
-        :param exact: Whether to search for the exact string
-        """
-        crit = db.func.to_tsvector('simple', cls.title).match(preprocess_ts_string(search_string),
-                                                              postgresql_regconfig='simple')
-        if exact:
-            crit = crit & cls.title.ilike('%{}%'.format(escape_like(search_string)))
-        return crit
 
     @hybrid_method
     def happens_between(self, from_dt=None, to_dt=None):
