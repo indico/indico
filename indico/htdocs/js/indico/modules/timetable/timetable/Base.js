@@ -1316,13 +1316,6 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         }
 
-        // Check if the result overflows the conference ending time
-        if ((result.day == this.eventInfo.endDate.date.replace(/-/g, '')) &&
-            (result.entry.endDate.time.replace(/:/g, '') >
-             this.eventInfo.endDate.time.replace(/:/g,''))) {
-            this.eventInfo.endDate.time = result.entry.endDate.time;
-        }
-
         var dfr = $.Deferred();
         $('body').one('timetable_redraw', function() {
             $('body').trigger('timetable_update', self);
@@ -1352,20 +1345,6 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         if (exists(result.session)) {
             this.eventInfo.sessions[result.session.id] = result.session;
-        }
-
-        // Check if the result overflows the conference ending time
-        var latestTime = null;
-
-        for (var key in result.entry) {
-            if(!latestTime || result.entry[key].endDate.time.replace(/:/g, '') > latestTime.replace(/:/g, '')) {
-                latestTime = result.entry[key].endDate.time;
-            }
-        }
-        if ((result.day == this.eventInfo.endDate.date.replace(/-/g, '')) &&
-            (latestTime.replace(/:/g, '') >
-             this.eventInfo.endDate.time.replace(/:/g, ''))) {
-            this.eventInfo.endDate.time = latestTime;
         }
 
         var self = this;
