@@ -162,16 +162,6 @@ class PrincipalMixin(object):
                                       'ip_network_group_id'))
         return tuple(uniques + indexes + checks)
 
-    multipass_group_provider = db.Column(
-        'mp_group_provider',  # otherwise the index name doesn't fit in 60 chars
-        db.String,
-        nullable=True
-    )
-    multipass_group_name = db.Column(
-        'mp_group_name',  # otherwise the index name doesn't fit in 60 chars
-        db.String,
-        nullable=True
-    )
 
     @declared_attr
     def type(cls):
@@ -201,6 +191,22 @@ class PrincipalMixin(object):
             db.ForeignKey('users.groups.id'),
             nullable=True,
             index=True
+        )
+
+    @declared_attr
+    def multipass_group_provider(cls):
+        return db.Column(
+            'mp_group_provider',  # otherwise the index name doesn't fit in 60 chars
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def multipass_group_name(cls):
+        return db.Column(
+            'mp_group_name',  # otherwise the index name doesn't fit in 60 chars
+            db.String,
+            nullable=True
         )
 
     @declared_attr
