@@ -33,7 +33,7 @@ def _sidemenu_sections(sender, **kwargs):
 def _sidemenu_items(sender, **kwargs):
     yield SideMenuItem('general', _('General Settings'), url_for('admin.adminList'), 100, icon='settings')
     yield SideMenuItem('storage', _('Disk Storage'), url_for('admin.adminSystem'), 70, icon='stack')
-    yield SideMenuItem('ip_domains', _('IP Domains'), url_for('admin.domainList'), section='security')
+    yield SideMenuItem('ip_domains_old', _('IP Domains (old)'), url_for('admin.domainList'), section='security')
     yield SideMenuItem('ip_acl', _('IP-based ACL'), url_for('admin.adminServices-ipbasedacl'), section='security')
     yield SideMenuItem('layout', _('Layout'), url_for('admin.adminLayout'), section='customization')
     yield SideMenuItem('homepage', _('Homepage'), url_for('admin.updateNews'), section='customization')
