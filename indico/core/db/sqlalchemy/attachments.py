@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.modules.attachments.util import get_attached_items, can_manage_attachments
 from indico.util.caching import memoize_request
 
 
@@ -36,6 +35,7 @@ class AttachedItemsMixin(object):
     @property
     @memoize_request
     def attached_items(self):
+        from indico.modules.attachments.util import get_attached_items
         return get_attached_items(self, include_empty=False, include_hidden=False,
                                   preload_event=self.PRELOAD_EVENT_ATTACHED_ITEMS)
 
@@ -54,4 +54,5 @@ class AttachedItemsMixin(object):
         return db.column_property(query, deferred=True)
 
     def can_manage_attachments(self, user):
+        from indico.modules.attachments.util import can_manage_attachments
         return can_manage_attachments(self, user)
