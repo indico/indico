@@ -275,18 +275,18 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         room = conf.as_event.room_name
         text = """
 _Category_
-%s
+{}
 _Title_
-%s
+{}
 _Speaker/Chair_
-%s
+{}
 _Room_
-%s
+{}
 _Description_
-%s
+{}
 _Creator_
-%s (%s)""" % (conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
-              conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
+{} ({})""".format(conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
+                  conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
         if len(confs) == 1:
             text += """
 _Date_
