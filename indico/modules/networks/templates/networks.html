@@ -1,6 +1,74 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}{% trans %}IP Domains{% endtrans %}{% endblock %}
+{% from 'message_box.html' import message_box %}
+
+{% macro render_network_group_row(network_group) %}
+    <tr>
+        <td>{{ network_group.name }}</td>
+        <td>{{ network_group.description }}</td>
+        <td>
+            {% if network_group.networks|length < 3 %}
+                {{ network_group.networks|join(', ') }}
+            {% else %}
+                <span data-qtip-html=".qtip-hidden-content">
+                    <em>{% trans number=network_group.networks|length %}{{ number }} subnets{% endtrans %}</em>
+                </span>
+                <div class="qtip-hidden-content">
+                    <ul>
+                        {% for network in network_group.networks | sort %}
+                            <li>{{ network }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </td>
+        <td class="actions">
+            <a class="icon-edit"></a>
+            <a class="icon-remove"></a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% block title %}{% trans %}IP Networks{% endtrans %}{% endblock %}
 
 {%- block content %}
+    {% call message_box('highlight', fixed_width=true) %}
+        {% trans -%}
+            IP networks can be used inside the ACLs of categories and events to
+            limit their access to certain ranges of IP addresses.
+        {%- endtrans %}
+    {% endcall %}
+    </p>
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}IP Networks{% endtrans %}
+            </div>
+            <div class="i-box-buttons toolbar right">
+                <a class="i-button icon-plus"
+                   data-ajax-dialog
+                   data-title="{% trans %}Create an IP network{% endtrans %}"
+                   data-href="{{ url_for('.create_group') }}">
+                    {% trans %}New IP network{% endtrans %}
+                </a>
+            </div>
+        </div>
+        <div class="i-box-table-widget">
+            <table class="i-table-widget ip-network-group">
+                <thead>
+                    <tr>
+                        <th>{% trans %}Name{% endtrans %}</th>
+                        <th>{% trans %}Description{% endtrans %}</th>
+                        <th>{% trans %}IP subnets{% endtrans %}</th>
+                        <th class="actions"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for network_group in network_groups %}
+                        {{ render_network_group_row(network_group) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {%- endblock %}

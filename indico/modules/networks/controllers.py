@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
+from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.views import WPNetworksAdmin
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
@@ -23,4 +24,5 @@ class RHManageNetworks(RHAdminBase):
     """Management list for IPNetworks"""
 
     def _process(self):
-        return WPNetworksAdmin.render_template('networks.html')
+        network_groups = IPNetworkGroup.find().order_by(IPNetworkGroup.name).all()
+        return WPNetworksAdmin.render_template('networks.html', network_groups=network_groups)
