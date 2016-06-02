@@ -58,6 +58,7 @@ class IPNetworkGroup(db.Model):
         'IPNetwork',
         lazy=False,
         cascade='all, delete-orphan',
+        collection_class=set,
         backref=db.backref(
             'group',
             lazy=True
