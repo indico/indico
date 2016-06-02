@@ -36,6 +36,8 @@ def upgrade():
         sa.Column('event_creation_notification_emails', pg.ARRAY(sa.String()), nullable=False),
         sa.Column('event_message_mode', PyIntEnum(EventMessageMode), nullable=False),
         sa.Column('event_message', sa.Text(), nullable=False),
+        sa.Column('no_access_contact', sa.String(), nullable=False),
+        sa.Column('suggestions_disabled', sa.Boolean(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
         sa.Column('protection_mode', PyIntEnum(ProtectionMode), nullable=False),
