@@ -21,6 +21,8 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.roles import check_roles, ManagementRole
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
@@ -78,3 +80,19 @@ def _sidemenu_items(sender, category, **kwargs):
                        70, icon='shield')
     yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
                        60, icon='wrench')
+
+
+@signals.app_created.connect
+def _check_roles(app, **kwargs):
+    check_roles(Category)
+
+
+@signals.acl.get_management_roles.connect_via(Category)
+def _get_management_roles(sender, **kwargs):
+    return CreatorRole
+
+
+class CreatorRole(ManagementRole):
+    name = 'create'
+    friendly_name = _('Event creation')
+    description = _('Allows creating events in the category')
