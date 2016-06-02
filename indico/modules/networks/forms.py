@@ -14,11 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.networks.controllers import RHCreateIPNetworkGroup, RHManageNetworks
-from indico.web.flask.wrappers import IndicoBlueprint
+from wtforms.fields import StringField, TextAreaField
+from wtforms.validators import DataRequired
+
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import MultiStringField
 
 
-_bp = IndicoBlueprint('networks', __name__, template_folder='templates', virtual_template_folder='networks')
+class IPNetworkGroupForm(IndicoForm):
+    """Form to create or edit an IPNetworkGroup"""
 
-_bp.add_url_rule('/admin/networks/', 'manage', RHManageNetworks)
-_bp.add_url_rule('/admin/networks/groups/create', 'create_group', RHCreateIPNetworkGroup)
+    name = StringField(_("Name"), [DataRequired()])
+    description = TextAreaField(_("Description"))
+    ip_networks = MultiStringField(_('IP subnets'), [DataRequired()], field=('', ''), unique=True,
+                                   description=_('The IPv4 or IPv6 subnets in CIDR notation part of the network.'))
