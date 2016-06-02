@@ -135,6 +135,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=''
     )
+    no_access_contact = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    suggestions_disabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     children = db.relationship(
         'Category',
