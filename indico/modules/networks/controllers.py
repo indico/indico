@@ -15,8 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
+from indico.modules.networks.forms import IPNetworkGroupForm
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.views import WPNetworksAdmin
+from indico.web.util import jsonify_form
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -26,3 +28,11 @@ class RHManageNetworks(RHAdminBase):
     def _process(self):
         network_groups = IPNetworkGroup.find().order_by(IPNetworkGroup.name).all()
         return WPNetworksAdmin.render_template('networks.html', network_groups=network_groups)
+
+
+class RHCreateIPNetworkGroup(RHAdminBase):
+    """Dialog to create an IPNetworkGroup"""
+
+    def _process(self):
+        form = IPNetworkGroupForm()
+        return jsonify_form(form)
