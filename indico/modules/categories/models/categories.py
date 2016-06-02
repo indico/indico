@@ -148,6 +148,13 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         )
     )
 
+    acl_entries = db.relationship(
+        'CategoryPrincipal',
+        backref='category',
+        cascade='all, delete-orphan',
+        collection_class=set
+    )
+
     # relationship backrefs:
     # - parent (Category.children)
 
