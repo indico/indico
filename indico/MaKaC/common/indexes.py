@@ -26,14 +26,9 @@ from pytz import timezone
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
 from zope.index.text import textindex
-from sqlalchemy import func
 
-from indico.core.db.util import retry_request_on_conflict
 from indico.core.logger import Logger
-from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
-from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
@@ -1118,48 +1113,11 @@ class TextIndex(IntStringMappedIndex):
         return [(self.getString(record[0]), record[1]) for record in records]
 
 
-class CategoryTitleIndex(object):
-
-    def index(self, obj):
-        if not obj.getId():  # newly created root category has id=''
-            return
-        self.unindex(obj)
-        category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
-        db.session.add(category)
-        with retry_request_on_conflict():
-            db.session.flush()
-
-    def unindex(self, obj):
-        if not obj.getId():  # newly created root category has id=''
-            return
-        IndexedCategory.find(id=obj.getId()).delete()
-        db.session.flush()
-
-    def search(self, search_string, limit=None, offset=None):
-        query = (db.session.query(IndexedCategory.id)
-                 .filter(IndexedCategory.title_vector.op('@@')(
-                     func.to_tsquery('simple', preprocess_ts_string(search_string))))
-                 .limit(limit)
-                 .offset(offset))
-        return [x[0] for x in query]
-
-    def initialize(self, items):
-        for i, categ in enumerate(items, 1):
-            cat = IndexedCategory(id=categ.getId(), title=categ.getTitle())
-            db.session.add(cat)
-            if i % 1000 == 0:
-                db.session.commit()
-        db.session.commit()
-
-    def clear(self):
-        IndexedCategory.query.delete()
-
-
 class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName',
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll',
                      'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
 
     def getIndex( self, name ):
@@ -1190,6 +1148,4 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingCoordinators":
                 Idx[str(id)] = PendingManagersIndex()
-            elif id=="categoryName":
-                return CategoryTitleIndex()
             return Idx[str(id)]

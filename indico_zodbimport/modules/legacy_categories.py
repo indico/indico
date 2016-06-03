@@ -22,7 +22,6 @@ import transaction
 
 from indico.core.db import db
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
-from indico.modules.fulltextindexes.models.categories import IndexedCategory
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import is_legacy_id
 from indico_zodbimport import Importer
@@ -53,7 +52,6 @@ class LegacyCategoryImporter(Importer):
                     if data is not None:
                         idx[categ.id] = data
                 self.zodb_root['categories'][categ.id] = categ
-                IndexedCategory.find(id=categ._old_id).update({IndexedCategory.id: categ.id})
                 FavoriteCategory.find(target_id=categ._old_id).update({FavoriteCategory.target_id: categ.id})
                 db.session.add(LegacyCategoryMapping(legacy_category_id=categ._old_id, category_id=int(categ.id)))
                 print cformat('%{green}+++%{reset} '
