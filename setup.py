@@ -364,6 +364,7 @@ if __name__ == '__main__':
             event_paper_reviewing = indico_zodbimport.modules.event_paper_reviewing:EventPaperReviewingImporter
             legal = indico_zodbimport.modules.legal:LegalImporter
             networks = indico_zodbimport.modules.networks:NetworkImporter
+            categories = indico_zodbimport.modules.categories:CategoryImporter
             """,
           zip_safe=False,
           packages=foundPackages,
