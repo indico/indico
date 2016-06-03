@@ -89,6 +89,10 @@ class IPNetworkGroup(db.Model):
         ip = ip_address(ip)
         return any(ip in network for network in self.networks)
 
+    @property
+    def locator(self):
+        return {'network_group_id': self.id}
+
 
 class IPNetwork(db.Model):
     __tablename__ = 'ip_networks'
