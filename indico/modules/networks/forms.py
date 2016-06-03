@@ -17,9 +17,9 @@
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.modules.networks.fields import MultiIPNetworkField
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import MultiStringField
 
 
 class IPNetworkGroupForm(IndicoForm):
@@ -27,5 +27,5 @@ class IPNetworkGroupForm(IndicoForm):
 
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    ip_networks = MultiStringField(_('IP subnets'), [DataRequired()], field=('', ''), unique=True,
-                                   description=_('The IPv4 or IPv6 subnets in CIDR notation part of the network.'))
+    networks = MultiIPNetworkField(_('Subnets'), [DataRequired()], field=('subnet', _("subnet")),
+                                      description=_("IPv4 or IPv6 subnets in CIDR notation"))
