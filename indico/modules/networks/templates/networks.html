@@ -23,7 +23,12 @@
             {% endif %}
         </td>
         <td class="actions">
-            <a class="icon-edit"></a>
+            <a class="icon-edit"
+               data-ajax-dialog
+               data-title="{% trans %}Edit network{% endtrans %}"
+               data-href="{{ url_for('.edit_group', network_group) }}"
+               data-reload-after>
+            </a>
             <a class="icon-remove"></a>
         </td>
     </tr>

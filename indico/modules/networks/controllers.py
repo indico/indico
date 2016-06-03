@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
 
 from indico.core.db import db
 from indico.modules.networks.forms import IPNetworkGroupForm
@@ -42,5 +43,23 @@ class RHCreateIPNetworkGroup(RHAdminBase):
             network_group = IPNetworkGroup()
             form.populate_obj(network_group)
             db.session.add(network_group)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHAdminIPNetworkGroupBase(RHAdminBase):
+    """Base class for managing in IPNetworkGroup"""
+
+    def _checkParams(self):
+        self.network_group = IPNetworkGroup.get_one(request.view_args['network_group_id'])
+
+
+class RHEditIPNetworkGroup(RHAdminIPNetworkGroupBase):
+    """Dialog to edit an IPNetworkGroup"""
+
+    def _process(self):
+        form = IPNetworkGroupForm(obj=self.network_group)
+        if form.validate_on_submit():
+            form.populate_obj(self.network_group)
             return jsonify_data(flash=False)
         return jsonify_form(form)
