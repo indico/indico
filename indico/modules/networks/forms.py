@@ -18,6 +18,7 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.networks.fields import MultiIPNetworkField
+from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 
@@ -29,3 +30,7 @@ class IPNetworkGroupForm(IndicoForm):
     description = TextAreaField(_("Description"))
     networks = MultiIPNetworkField(_('Subnets'), [DataRequired()], field=('subnet', _("subnet")),
                                       description=_("IPv4 or IPv6 subnets in CIDR notation"))
+
+    def validate_name(self, field):
+        if IPNetworkGroup.find(name=field.data).first():
+            raise ValueError(_("An IP network with this name already exists."))
