@@ -202,6 +202,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def tzinfo(self):
         return pytz.timezone(self.timezone)
 
+    def can_create_events(self, user):
+        """Check whether the user can create events in the category."""
+        return user and (not self.event_creation_restricted or self.can_manage(user, role='create'))
+
     def _get_chain_query(self, start_criterion):
         cte_query = (select([Category.id, Category.parent_id, literal(0).label('level')])
                      .where(start_criterion)
