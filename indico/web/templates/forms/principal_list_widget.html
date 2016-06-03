@@ -54,10 +54,6 @@
                 addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }}
             );
 
-            $('#{{ field.id }}').parent().find('.inheriting-acl-message').on('protection:inheriting', function(evt, isInheriting) {
-                $(this).toggle(isInheriting);
-            });
-
             $E('userGroupList-{{ field.id }}').set(widget.draw());
         })();
     </script>
