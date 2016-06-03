@@ -1,8 +1,13 @@
-{% macro message_box(type, message=none, fixed_width=false, large_icon=false) %}
+{% macro message_box(type, message=none, fixed_width=false, large_icon=false, footer=none) %}
     <div class="{{ type }}-message-box {%- if fixed_width %} fixed-width{% endif %}{%- if large_icon %} large-icon{% endif %}"
          {{ kwargs | html_params }}>
         <div class="message-text">
             {{ message or caller() }}
         </div>
+        {% if footer %}
+            <div class="message-box-footer">
+                {{ footer }}
+            </div>
+        {% endif %}
     </div>
 {% endmacro %}
