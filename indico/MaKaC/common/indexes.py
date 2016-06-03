@@ -966,62 +966,6 @@ class CategoryDayIndex(CategoryDateIndex):
                 yield problem
 
 
-class PendingQueuesUsersIndex( Index ):
-    _name = ""
-
-    def indexPendingUser( self, user ):
-        email = user.getEmail().lower()
-        self._addItem( email, user )
-        self.notifyModification()
-
-    def unindexPendingUser( self, user ):
-        email = user.getEmail().lower()
-        self._withdrawItem( email, user )
-        self.notifyModification()
-
-    def _withdrawItem( self, value, item ):
-        Index._withdrawItem( self, value, item )
-        if self._words.has_key(value):
-            if self._words[value]==[]:
-                del self._words[value]
-
-    def matchPendingUser( self, email, cs=0, exact=1 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
-
-class PendinQueuesTasksIndex( Index ):
-    _name = ""
-
-    def indexTask( self, email, task ):
-        email = email.lower().strip()
-        self._addItem( email, task )
-        self.notifyModification()
-
-    def unindexTask( self, email, task ):
-        email = email.lower().strip()
-        self._withdrawItem( email, task )
-        self.notifyModification()
-
-    def _withdrawItem( self, value, item ):
-        Index._withdrawItem( self, value, item )
-        if self._words.has_key(value):
-            if self._words[value]==[]:
-                del self._words[value]
-
-    def matchTask( self, email, cs=0, exact=1 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
-
-class PendingSubmittersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingSubmitters"
-    pass
-
-
-class PendingManagersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingManagers"
-    pass
-
-
 class IntStringMappedIndex(Persistent):
     def __init__(self):
         self._intToStrMap = {}
@@ -1117,8 +1061,7 @@ class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll',
-                     'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll']
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1142,10 +1085,4 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryDateAll":
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
-            elif id=="pendingSubmitters":
-                Idx[str(id)] = PendingSubmittersIndex()
-            elif id=="pendingManagers":
-                Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingCoordinators":
-                Idx[str(id)] = PendingManagersIndex()
             return Idx[str(id)]
