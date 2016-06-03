@@ -20,6 +20,7 @@ import pytz
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import select, literal
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -28,6 +29,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.util.caching import memoize_request
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -200,19 +202,37 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def tzinfo(self):
         return pytz.timezone(self.timezone)
 
-    def get_chain(self):
-        """Retrieve the category chain from the root to the category"""
-        chain = []
-        cat = self
-        while cat:
-            chain.append(cat)
-            cat = cat.parent
-        chain.reverse()
-        return chain
+    def _get_chain_query(self, start_criterion):
+        cte_query = (select([Category.id, Category.parent_id, literal(0).label('level')])
+                     .where(start_criterion)
+                     .cte('category_chain', recursive=True))
+        parent_query = (select([Category.id, Category.parent_id, cte_query.c.level + 1])
+                        .where(Category.id == cte_query.c.parent_id))
+        cte_query = cte_query.union_all(parent_query)
+        return Category.query.join(cte_query, Category.id == cte_query.c.id).order_by(cte_query.c.level.desc())
 
+    @property
+    def chain_query(self):
+        """Get a query object for the category chain.
+
+        The query retrieves the root category first and then all the
+        intermediate categories up to (and including) this category.
+        """
+        return self._get_chain_query(Category.id == self.id)
+
+    @property
+    def parent_chain_query(self):
+        """Get a query object for the category's parent chain.
+
+        The query retrieves the root category first and then all the
+        intermediate categories up to (excluding) this category.
+        """
+        return self._get_chain_query(Category.id == self.parent_id)
+
+    @memoize_request
     def get_chain_titles(self):
         """Retrieve the category titles from the root to the category"""
-        return [c.title for c in self.get_chain()]
+        return [c.title for c in self.chain_query]
 
 
 Category.register_protection_events()
