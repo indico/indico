@@ -21,4 +21,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('networks', __name__, template_folder='templates', virtual_template_folder='networks')
 
 _bp.add_url_rule('/admin/networks/', 'manage', RHManageNetworks)
-_bp.add_url_rule('/admin/networks/groups/create', 'create_group', RHCreateIPNetworkGroup)
+_bp.add_url_rule('/admin/networks/create', 'create_group', RHCreateIPNetworkGroup, methods=('GET', 'POST'))
