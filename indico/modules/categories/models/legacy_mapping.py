@@ -38,8 +38,20 @@ class LegacyCategoryMapping(db.Model):
     )
     category_id = db.Column(
         db.Integer,
+        db.ForeignKey('categories.categories.id'),
+        index=True,
         primary_key=True,
         autoincrement=False
+    )
+
+    category = db.relationship(
+        'Category',
+        lazy=True,
+        backref=db.backref(
+            'legacy_mapping',
+            uselist=False,
+            lazy=True
+        )
     )
 
     @return_ascii
