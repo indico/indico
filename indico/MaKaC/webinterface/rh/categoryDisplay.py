@@ -62,6 +62,9 @@ class RHCategDisplayBase(base.RHDisplayBaseProtected):
     def _checkParams(self, params, mustExist=True):
         if "categId" in params:
             params["categId"] = escape_html(str(params["categId"]))
+        # TODO: Workaround to avoid breaking the category navigation (display)
+        if 'category' in params:
+            params['categId'] = params['category']
         l = locators.CategoryWebLocator(params, mustExist)
         self._target = l.getObject()
 
