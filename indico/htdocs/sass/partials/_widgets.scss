@@ -106,3 +106,14 @@ i.info-helper {
         }
     }
 }
+
+.text-holder-box {
+    @include border-all($style: dashed);
+    align-items: center;
+    color: $light-black;
+    display: flex;
+    min-height: 25px;
+    min-width: 320px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}

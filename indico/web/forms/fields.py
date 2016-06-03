@@ -249,6 +249,21 @@ class IndicoPasswordField(PasswordField):
         super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 
+class CategoryField(HiddenField):
+    """Field that lets you select a category"""
+
+    widget = JinjaWidget('forms/category_picker_widget.html')
+
+    def process_formdata(self, valuelist):
+        from indico.modules.categories import Category
+        if valuelist:
+            category_id = int(valuelist[0])
+            self.data = Category.get(category_id, is_deleted=False)
+
+    def _get_data(self):
+        return self.data
+
+
 class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 

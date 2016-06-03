@@ -1,0 +1,31 @@
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    <div class="i-form-field-fixed-width" data-tooltip-anchor>
+        <div id="category-title-{{ field.id }}" class="text-holder-box"></div>
+        <a class="i-button" id="category-picker-button-{{ field.id }}"
+           href="#">
+            {%- trans %}Choose category{% endtrans -%}
+        </a>
+        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}">
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var field = $('#{{ field.id }}');
+            var categoryTitle = $('#category-title-{{ field.id }}');
+
+            // TODO: Open the category picker on click on $('#category-picker-button-{{ field.id }}')
+            // For now let's assume the category picker returns the "TEST Category"
+            var result = {id: 2, title: 'TEST Category'};
+            field.val(result.id);
+            categoryTitle.text(result.title);
+        })();
+    </script>
+{% endblock %}
