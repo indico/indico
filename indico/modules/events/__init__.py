@@ -292,6 +292,5 @@ def _render_event_ical_export(event, **kwargs):
 
 @template_hook('contribution-fields')
 def _render_contribution_fields(event, **kwargs):
-    from indico.modules.events.contributions.models.fields import ContributionField
     return render_template('events/management/contribution_field_list.html', event=event,
                            fields=event.contribution_fields)
