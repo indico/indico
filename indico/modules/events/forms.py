@@ -25,7 +25,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
 from indico.modules.events.models.references import ReferenceType, EventReference
-from indico.web.forms.fields import IndicoLocationField
+from indico.web.forms.fields import IndicoLocationField, CategoryField
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -69,3 +69,7 @@ class EventPersonLinkForm(IndicoForm):
         super(EventPersonLinkForm, self).__init__(*args, **kwargs)
         if self.event_type == 'lecture':
             self.person_link_data.label.text = _('Speakers')
+
+
+class EventCategoryForm(IndicoForm):
+    category = CategoryField(_('Category'), [DataRequired()])
