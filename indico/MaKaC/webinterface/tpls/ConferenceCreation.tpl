@@ -7,10 +7,20 @@
 
     <div class="groupTitle">${ _("Step 1: Choose a category")}</div>
 
-    <div style="padding: 10px">
-        <input type="hidden" value="${ categ['id'] }" name="categId" id="createCategId"/>
-        <span class="selectedCategoryName">${ _("The event will be created in:")} <span id="categTitle" class="categTitleChosen">${ categ['title'] }</span></span><input ${'style="display: none;"' if nocategs else ""} id="buttonCategChooser" type="button" value="${ _("Browse...")}" onclick="openCategoryChooser()"/>
-    </div>
+    <table class="groupTable" id="event-creation-category-field">
+        <tr>
+            <td nowrap class="titleCellTD">
+                <span class="titleCellFormat">${ _("Category")}</span>
+            </td>
+            <td>
+                <div class="form-group">
+                    <div class="form-field">
+                        ${ template_hook('event-category-field') }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <div class="groupTitle">${ _("Step 2: Enter basic information about the conference") }</div>
 
@@ -139,32 +149,16 @@
 
     }
 
-    // ----- Categ Chooser
-    var categoryChooserHandler = function(categ, protection){
-        $E("createCategId").set(categ.id);
-        $E("categTitle").set(categ.title);
-        $E("buttonCategChooser").set("Change...")
-        IndicoUI.Effect.highLightBackground($E("categTitle"));
-
-        updateProtectionChooser(categ.title, protection);
-    };
-
-    var openCategoryChooser = function() {
-        var categoryChooserPopup = new CategoryChooser(${ categ | n,j}, categoryChooserHandler, true);
-        categoryChooserPopup.open();
-    }
-
-
     // ---- On Load
     IndicoUI.executeOnLoad(function()
     {
         showAdvancedOptions();
 
-        if ("${categ["id"]}" != ""){
-            $E("buttonCategChooser").set("${ _("Change...")}");
-        }
-
-        protectionChooserExecOnLoad("${categ["id"]}", "${protection}");
+        var $category = $('#event-creation-category-field #category');
+        $category.on('indico:categorySelected', function(evt, category) {
+            updateProtectionChooser(category.title, category.is_protected ? 'private' : 'public');
+        });
+        protectionChooserExecOnLoad('', '');
 
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute'])
         $E('sDatePlace').set(startDate);
@@ -195,7 +189,7 @@
                     popup.open();
                     return false
                 }
-                if ($E("createCategId").get() == "") {
+                if (!$category.val()) {
                     var popup = new ErrorPopup($T('Missing mandatory data'), [$T('Please, choose a category (step 1)')], "");
                     popup.open();
                     return false;
