@@ -75,6 +75,7 @@
             var params = $this.data('params') || {};
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
+            var ajaxRequest = $this.data('ajax-request') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
             if (!$.isPlainObject(params)) {
@@ -151,7 +152,7 @@
                 }
 
                 // Handle html update
-                if (update) {
+                if (update || ajaxRequest) {
                     $.ajax({
                         method: method,
                         url: url,
