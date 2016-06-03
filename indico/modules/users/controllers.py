@@ -26,8 +26,8 @@ from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.notifications import make_email
+from indico.modules.categories import Category
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
@@ -47,11 +47,9 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -140,8 +138,8 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        categories = sorted([(cat, truncate_path(cat.getCategoryPathTitles()[:-1], chars=50))
-                             for cat in self.user.favorite_categories], key=lambda c: (c[0].name, c[1]))
+        categories = sorted([(cat, truncate_path(cat.get_chain_titles()[:-1], chars=50))
+                             for cat in self.user.favorite_categories], key=lambda c: (c[0].title, c[1]))
         return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
 
 
@@ -169,23 +167,25 @@ class RHUserFavoritesUserRemove(RHUserBase):
 class RHUserFavoritesCategoryAPI(RHUserBase):
     CSRF_ENABLED = True
 
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.category = Category.get_one(request.view_args['category_id'])
+
     def _process_PUT(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category not in self.user.favorite_categories:
-            if not category.canAccess(AccessWrapper(self.user.as_avatar)):
+        if self.category not in self.user.favorite_categories:
+            if not self.category.can_access(self.user):
                 raise Forbidden()
-            self.user.favorite_categories.add(category)
+            self.user.favorite_categories.add(self.category)
             if redis_write_client:
-                suggestions.unignore(self.user, 'category', category.getId())
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unignore(self.user, 'category', str(self.category.id))
+                suggestions.unsuggest(self.user, 'category', str(self.category.id))
         return jsonify(success=True)
 
     def _process_DELETE(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category in self.user.favorite_categories:
-            self.user.favorite_categories.remove(category)
+        if self.category in self.user.favorite_categories:
+            self.user.favorite_categories.remove(self.category)
             if redis_write_client:
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unsuggest(self.user, 'category', self.category.id)
         return jsonify(success=True)
 
 

@@ -23,6 +23,9 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
+from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.modules.categories import Category
+from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
@@ -32,17 +35,21 @@ from indico.util.redis import suggestions, avatar_links
 from MaKaC.accessControl import AccessWrapper
 
 
-def get_related_categories(user):
+def get_related_categories(user, detailed=True):
     """Gets the related categories of a user for the dashboard"""
     favorites = user.favorite_categories
-    managed = user.get_linked_objects('category', 'manager')
+    managed = set(Category.query
+                  .filter(Category.acl_entries.any(db.and_(CategoryPrincipal.type == PrincipalType.user,
+                                                           CategoryPrincipal.user == user))))
+    if not detailed:
+        return favorites | managed
     res = {}
     for categ in favorites | managed:
-        res[(categ.getTitle(), categ.getId())] = {
+        res[(categ.title, categ.id)] = {
             'categ': categ,
             'favorite': categ in favorites,
             'managed': categ in managed,
-            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
+            'path': truncate_path(categ.get_chain_titles()[:-1], chars=50)
         }
     return OrderedDict(sorted(res.items(), key=itemgetter(0)))
 
@@ -53,7 +60,7 @@ def get_suggested_categories(user):
 
     if not redis_write_client:
         return []
-    related = user.favorite_categories | user.get_linked_objects('category', 'manager')
+    related = {cat.id for cat in get_related_categories(user, detailed=False)}
     res = []
     for id_, score in suggestions.get_suggestions(user, 'category').iteritems():
         try:
@@ -61,7 +68,7 @@ def get_suggested_categories(user):
         except KeyError:
             suggestions.unsuggest(user, 'category', id_)
             continue
-        if not categ or categ.isSuggestionsDisabled() or categ in related:
+        if not categ or categ.isSuggestionsDisabled() or int(categ.id) in related:
             continue
         if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
             continue

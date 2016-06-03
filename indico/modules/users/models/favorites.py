@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 favorite_user_table = db.Table(
     'favorite_users',
@@ -40,35 +39,23 @@ favorite_user_table = db.Table(
     schema='users'
 )
 
-
-# TODO: change this to a proper many-to-many association once categories are in SQL
-class FavoriteCategory(db.Model):
-    __tablename__ = 'favorite_categories'
-    __table_args__ = {'schema': 'users'}
-
-    user_id = db.Column(
+favorite_category_table = db.Table(
+    'favorite_categories',
+    db.metadata,
+    db.Column(
+        'user_id',
         db.Integer,
         db.ForeignKey('users.users.id'),
         primary_key=True,
         nullable=False,
         index=True
-    )
-    target_id = db.Column(
+    ),
+    db.Column(
+        'target_id',
         db.Integer,
+        db.ForeignKey('categories.categories.id'),
         primary_key=True,
-        nullable=False,
-        autoincrement=False
-    )
-
-    @property
-    def target(self):
-        from MaKaC.conference import CategoryManager
-        return CategoryManager().getById(self.target_id, True)
-
-    @target.setter
-    def target(self, value):
-        self.target_id = value.id
-
-    @return_ascii
-    def __repr__(self):
-        return '<FavoriteCategory({}, {})>'.format(self.user_id, self.target_id)
+        nullable=False
+    ),
+    schema='users'
+)

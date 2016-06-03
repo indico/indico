@@ -34,7 +34,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
+from indico.modules.users.models.favorites import favorite_user_table, favorite_category_table
 from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.string import return_ascii, format_full_name
@@ -263,15 +263,14 @@ class User(PersonMixin, db.Model):
         collection_class=set,
         backref=db.backref('favorite_of', lazy=True, collection_class=set),
     )
-    _favorite_categories = db.relationship(
-        'FavoriteCategory',
-        lazy=True,
-        cascade='all, delete-orphan',
-        collection_class=set
-    )
     #: the users's favorite categories
-    favorite_categories = association_proxy('_favorite_categories', 'target',
-                                            creator=lambda x: FavoriteCategory(target=x))
+    favorite_categories = db.relationship(
+        'Category',
+        secondary=favorite_category_table,
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('favorite_of', lazy=True, collection_class=set),
+    )
     #: the legacy objects the user is connected to
     linked_objects = db.relationship(
         'UserLink',

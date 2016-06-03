@@ -1,7 +1,7 @@
 {% macro _category_path(category, truncated_path) %}
     {% set first_node, inner_nodes, last_node, truncated = truncated_path %}
     <span class="category-path">
-        <ul {% if truncated %} title="{{ ' » '.join(category.getCategoryPathTitles()[:-1]) }}"{% endif %}>
+        <ul {% if truncated %} title="{{ ' » '.join(category.get_chain_titles()[:-1]) }}"{% endif %}>
             {% if first_node is not none %}<li>{{ first_node }}</li>{% endif %}
             {% if truncated %}
                 <li data-tooltip-anchor>&hellip;</li>
@@ -20,7 +20,7 @@
     <li class="category-box">
         <div>
             <span class="category-info">
-                <a href="{{ category.url }}" class="category-title">{{ category.getTitle() }}</a>
+                <a href="{{ category.url }}" class="category-title">{{ category.title }}</a>
                 {{ _category_path(category, truncated_path) }}
                 {{ caller() }}
             {# The caller must provide the closing span tag (</span>). #}
@@ -51,7 +51,7 @@
             </a>
         </div></span>
         <a href="#"
-           data-href="{{ url_for('.user_suggestions_remove', category_id=category.getId()) }}"
+           data-href="{{ url_for('.user_suggestions_remove', category_id=category.id) }}"
            title="{% trans %}Click here to remove this suggestion. It will not be suggested again.{% endtrans %}"
            class="category-action icon-close active suggestion-remove">
         </a>
