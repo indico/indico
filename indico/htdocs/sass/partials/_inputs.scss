@@ -453,3 +453,14 @@ dd > .i-has-action {
         padding: 0.25em 0;
     }
 }
+
+.text-holder {
+    border: 1px dashed #bbb;
+    min-height: 25px;
+    min-width: 320px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    color: $light-black;
+}
