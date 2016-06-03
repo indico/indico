@@ -138,9 +138,11 @@
                                 if (update) {
                                     handleHtmlUpdate(data, update, $this);
                                 } else if (reload !== undefined && reload !== 'customData') {
+                                    IndicoUI.Dialogs.Util.progress();
                                     location.reload();
                                 }
                             } else if (reload === 'customData' && customData) {
+                                IndicoUI.Dialogs.Util.progress();
                                 location.reload();
                             }
                         }
