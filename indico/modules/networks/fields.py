@@ -31,6 +31,7 @@ class MultiIPNetworkField(MultiStringField):
     def __init__(self, *args, **kwargs):
         super(MultiIPNetworkField, self).__init__(*args, **kwargs)
         self._data_converted = False
+        self.data = None
 
     def _value(self):
         if self.data is None:
@@ -41,9 +42,16 @@ class MultiIPNetworkField(MultiStringField):
         else:
             return self.data
 
+    def process_data(self, value):
+        if value is not None:
+            self._data_converted = True
+            self.data = value
+
+
     def process_formdata(self, valuelist):
+        self._data_converted = False
         super(MultiIPNetworkField, self).process_formdata(valuelist)
-        self.data = {ip_network(entry[self.field_name]) for entry in self.data}
+        self.data = {ip_network(entry[self.field_name].encode('ascii', 'ignore')) for entry in self.data}
         self._data_converted = True
 
     def pre_validate(self, form):
