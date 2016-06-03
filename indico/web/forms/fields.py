@@ -47,7 +47,7 @@ from indico.modules.users.models.users import User, UserTitle
 from indico.modules.users.util import serialize_user
 from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
-from indico.util.user import retrieve_principals, principal_from_fossil
+from indico.util.user import principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, LocationWidget
