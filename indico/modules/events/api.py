@@ -131,7 +131,7 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         id_list = set(self._idList)
         if self._wantFavorites and aw.getUser():
-            id_list.update(c.getId() for c in aw.getUser().user.favorite_categories)
+            id_list.update(str(c.id) for c in aw.getUser().user.favorite_categories)
         legacy_id_map = {m.legacy_category_id: m.category_id
                          for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}

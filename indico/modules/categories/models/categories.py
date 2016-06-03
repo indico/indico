@@ -33,6 +33,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import RichMarkup, text_to_repr, format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
+from indico.web.flask.util import url_for
 
 
 def _get_next_position(context):
@@ -180,6 +181,13 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def locator(self):
         return {'categId': self.id}
 
+    @property
+    def url(self):
+        if self.is_root:
+            return url_for('misc.index')
+        else:
+            return url_for('category.categoryDisplay', self)
+
     @hybrid_property
     def is_root(self):
         return self.parent_id is None
@@ -191,6 +199,20 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def tzinfo(self):
         return pytz.timezone(self.timezone)
+
+    def get_chain(self):
+        """Retrieve the category chain from the root to the category"""
+        chain = []
+        cat = self
+        while cat:
+            chain.append(cat)
+            cat = cat.parent
+        chain.reverse()
+        return chain
+
+    def get_chain_titles(self):
+        """Retrieve the category titles from the root to the category"""
+        return [c.title for c in self.get_chain()]
 
 
 Category.register_protection_events()

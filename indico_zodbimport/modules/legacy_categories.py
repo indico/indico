@@ -23,7 +23,6 @@ import transaction
 from indico.core.db import db
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.fulltextindexes.models.categories import IndexedCategory
-from indico.modules.users import FavoriteCategory
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import is_legacy_id
 from indico_zodbimport import Importer
