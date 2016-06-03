@@ -53,7 +53,8 @@ class CategoryImporter(Importer):
                                help="The base path where resources are stored (ArchiveDir in indico.conf). "
                                     "When used multiple times, the dirs are checked in order until a file is "
                                     "found.")(command)
-        command = click.option('--default-group-provider', help="Name of the default group provider")(command)
+        command = click.option('--default-group-provider', required=True,
+                               help="Name of the default group provider")(command)
         return command
 
     def has_data(self):
