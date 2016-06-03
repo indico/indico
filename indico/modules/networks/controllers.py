@@ -35,4 +35,6 @@ class RHCreateIPNetworkGroup(RHAdminBase):
 
     def _process(self):
         form = IPNetworkGroupForm()
+        if form.validate_on_submit():
+            pass
         return jsonify_form(form)
