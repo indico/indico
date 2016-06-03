@@ -72,7 +72,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group">
                 <button type="button"
-                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in _session.user.favorite_categories else ''}"
+                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ.as_new in _session.user.favorite_categories else ''}"
                         data-href="${ url_for('users.user_favorites_category_api', category_id=categ.id) }"></button>
             </div>
             % endif

@@ -123,7 +123,7 @@ class UserEventHook(HTTPAPIHook):
 
     def export_categ_events(self, aw):
         self._checkProtection(aw)
-        catIds = [item['categ'].getId() for item in get_related_categories(self._avatar.user).itervalues()]
+        catIds = [str(cat.id) for cat in get_related_categories(self._avatar.user, detailed=False)]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 

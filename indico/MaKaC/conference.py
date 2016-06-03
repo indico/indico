@@ -294,6 +294,11 @@ class Category(CommonObjectBase):
         self._timezone = ""
         self._notifyCreationList = ""
 
+    @property
+    @memoize_request
+    def as_new(self):
+        return db.m.Category.get(int(self.id))
+
     def __cmp__(self, other):
         if type(self) is not type(other):
             # This is actually dangerous and the ZODB manual says not to do this
