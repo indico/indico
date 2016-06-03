@@ -294,7 +294,6 @@ def shift_following_entries(entry, shift, session_=None):
         return []
     for sibling in entries:
         sibling.move(sibling.start_dt + shift)
-    return entries
 
 
 def get_timetable_offline_pdf_generator(event):

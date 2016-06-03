@@ -1327,24 +1327,25 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
     /**
      * updateDay should be used when all the entries for a given day will be changed by the
-     * info received in 'result'.
+     * info received in 'update'.
      *
-     * result must contain:
-     *
-     *     result.id: string with a given day, e.g. "20100828"
-     *     result.entry: all entries for a given day
-     *
+     * update must contain:
+     *     update.day: string with a given day, e.g. "20100828"
+     *     update.entries: all entries for a given day
+     *     update.session: info about the session
      */
-    _updateDay: function(result) {
-        this._processAutoOps(result);
+    _updateDay: function(update) {
+        this._processAutoOps(update);
 
         var data = this.getData();
-        var entry = {};
-        entry[result.day] = result.entry; // entry contains a whole day
-        extend(data, entry);
+        var entries = {};
 
-        if (exists(result.session)) {
-            this.eventInfo.sessions[result.session.id] = result.session;
+        entries[update.day] = update.entries;
+        extend(data, entries);
+        this._removeMissingEntries(update.entries, update.day);
+
+        if (exists(update.session)) {
+            this.eventInfo.sessions[update.session.id] = update.session;
         }
 
         var self = this;
@@ -1355,7 +1356,15 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         });
         this.timetableDrawer.redraw();
         return dfr.promise();
+    },
 
+    _removeMissingEntries: function(entries, day) {
+        var self = this;
+        _.each(self.data[day], function(value, key) {
+            if (!entries[key]) {
+                delete self.data[key];
+            }
+        });
     },
 
     _updateSessionData: function(sessionId, fields, newValues) {
@@ -1470,37 +1479,33 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     /**
      * updateDay should be used when all the entries for a given slot will be changed by the
-     * info received in 'result'.
+     * info received in 'update'.
      *
-     * result must contain:
-     *
-     *     result.id: string with a given day, e.g. "20100828"
-     *     result.entry: all entries for a given slot
-     *     result.slotEntry: info about the slot
-     *     result.session: info about the session
-     *
+     * update must contain:
+     *     update.day: string with a given day, e.g. "20100828"
+     *     update.entries: all entries for a given slot
+     *     update.slotEntry: info about the slot
+     *     update.session: info about the session
      */
-    _updateDay: function(result) {
-
-        this._processAutoOps(result);
+    _updateDay: function(update) {
+        this._processAutoOps(update);
 
         var slot = this.contextInfo;
-        var data = this.getData();
+        extend(this.data, update.entries);
+        this._removeMissingEntries(update.entries);
 
-        extend(data, result.entry);
-
-        if (exists(result.session)) {
-            this.parentTimetable.eventInfo.sessions[result.session.sessionId] = result.session;
+        if (exists(update.session)) {
+            this.parentTimetable.eventInfo.sessions[update.session.sessionId] = update.session;
         }
 
-        if (exists(result.slotEntry)) {
+        if (exists(update.slotEntry)) {
             // Save the entries, otherwise they are lost
-            result.slotEntry.entries = slot.entries;
-            this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
-            this.contextInfo = result.slotEntry;
+            update.slotEntry.entries = slot.entries;
+            this.parentTimetable.data[update.day][update.slotEntry.id] = update.slotEntry;
+            this.contextInfo = update.slotEntry;
 
             // Update the times for the slot
-            this._updateTimes(result.slotEntry.startDate.time, result.slotEntry.endDate.time);
+            this._updateTimes(update.slotEntry.startDate.time, update.slotEntry.endDate.time);
         }
 
         var dfr = $.Deferred();
@@ -1510,6 +1515,15 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
         this.timetableDrawer.redraw();
         return dfr.promise();
+    },
+
+    _removeMissingEntries: function(entries) {
+        var self = this;
+        _.each(self.data, function(value, key) {
+            if (!entries[key]) {
+                delete self.data[key];
+            }
+        });
     },
 
     getTTMenu: function() {

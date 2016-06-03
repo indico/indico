@@ -194,7 +194,10 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             error: handleAjaxError,
             success: function(data) {
                 self.close();
-                self.callback(data);
+                if (data) {
+                    handleNotifications(data);
+                    self.timetable._updateDay(data.update);
+                }
             }
         });
     },

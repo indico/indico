@@ -39,7 +39,7 @@ from indico.modules.events.timetable.controllers.manage import RHBreakREST
 from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
                                                    BaseEntryForm)
 from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
-                                                    TimetableSerializer)
+                                                    serialize_day_update, TimetableSerializer)
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
@@ -100,7 +100,8 @@ class RHLegacyTimetableAddBreak(RHLegacyTimetableAddEntryBase):
             with track_time_changes(auto_extend=True, user=session.user) as changes:
                 entry = create_break_entry(self.event_new, form.data, session_block=self.session_block)
             notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=entry)
-            return jsonify_data(entry=serialize_entry_update(entry), notifications=notifications, flash=False)
+            return jsonify_data(update=serialize_entry_update(entry, session_=self.session),
+                                notifications=notifications, flash=False)
         return jsonify_form(form, fields=form._display_fields)
 
 
@@ -116,7 +117,8 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
                                               extend_parent=True)
             entry = contrib.timetable_entry
             notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=entry)
-            return jsonify_data(entries=[serialize_entry_update(entry)], notifications=notifications, flash=False)
+            return jsonify_data(entries=[serialize_entry_update(entry, session_=self.session)],
+                                notifications=notifications, flash=False)
         self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form, fields=form._display_fields)
 
@@ -126,19 +128,19 @@ class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
 
     def _checkParams(self, params):
         RHLegacyTimetableAddEntryBase._checkParams(self, params)
-        if not self.session:
-            self.session = self.event_new.get_session(request.args['session_id'])
-            if not self.session:
-                raise NotFound
+        self.parent_session = self.session or self.event_new.get_session(request.args['parent_session_id'])
+        if not self.parent_session:
+            raise NotFound
 
     def _process(self):
-        defaults = self._get_form_defaults(location_parent=self.session)
+        defaults = self._get_form_defaults(location_parent=self.parent_session)
         form = SessionBlockEntryForm(obj=defaults, **self._get_form_params())
         if form.validate_on_submit():
             with track_time_changes(auto_extend=True, user=session.user) as changes:
-                entry = create_session_block_entry(self.session, form.data)
+                entry = create_session_block_entry(self.parent_session, form.data)
             notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=entry)
-            return jsonify_data(entry=serialize_entry_update(entry), notifications=notifications, flash=False)
+            return jsonify_data(update=serialize_entry_update(entry, session_=self.session),
+                                notifications=notifications, flash=False)
         self.commit = False
         return jsonify_form(form, fields=form._display_fields, disabled_until_change=False)
 
@@ -154,13 +156,16 @@ class RHLegacyTimetableDeleteEntry(RHManageTimetableEntryBase):
             return SessionManagementLevel.coordinate
 
     def _process(self):
+        day = self.entry.start_dt.astimezone(self.entry.event_new.tzinfo).date()
+        block = self.entry.parent
         if self.entry.type == TimetableEntryType.SESSION_BLOCK:
             delete_session_block(self.entry.session_block)
         elif self.entry.type == TimetableEntryType.CONTRIBUTION and self.event_new.type != 'conference':
             delete_contribution(self.entry.contribution)
         else:
             delete_timetable_entry(self.entry)
-        return jsonify_data(flash=False)
+        return jsonify_data(update=serialize_day_update(self.event_new, day, block=block, session_=self.session),
+                            flash=False)
 
 
 class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
@@ -192,7 +197,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                 with track_time_changes(auto_extend=True, user=session.user) as changes:
                     update_contribution(contrib, *_get_field_values(form.data))
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
-                return jsonify_data(entries=[serialize_entry_update(contrib.timetable_entry)],
+                return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                     notifications=notifications, flash=False)
             return jsonify_template('events/contributions/forms/contribution.html', form=form,
                                     fields=form._display_fields)
@@ -205,7 +210,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                 with track_time_changes(auto_extend=True, user=session.user) as changes:
                     update_break_entry(break_, form.data)
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
-                return jsonify_data(entries=[serialize_entry_update(break_.timetable_entry)],
+                return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                     notifications=notifications, flash=False)
         elif self.entry.session_block:
             if self.edit_session:
@@ -213,8 +218,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                 form = SessionForm(obj=FormDefaults(session_), event=self.event_new)
                 if form.validate_on_submit():
                     update_session(session_, form.data)
-                    return jsonify_data(entries=[serialize_entry_update(x.timetable_entry) for x in session_.blocks],
-                                        flash=False)
+                    return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session), flash=False)
             else:
                 block = self.entry.session_block
                 tt_entry_dt = self.entry.start_dt.astimezone(self.event_new.tzinfo)
@@ -226,7 +230,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                         update_session_block(block, form.data)
                     notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo,
                                                                    entry=self.entry)
-                    return jsonify_data(entries=[serialize_entry_update(block.timetable_entry)],
+                    return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                         notifications=notifications, flash=False)
         self.commit = False
         return jsonify_form(form, fields=getattr(form, '_display_fields', None))
@@ -248,14 +252,13 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
                              session_block=self.entry.parent.object if self.entry.parent else None)
         data = form.data
         shift_later = data.pop('shift_later')
-        updated_entries = []
 
         if form.validate_on_submit():
             with track_time_changes(auto_extend=True, user=session.user) as changes:
                 if shift_later:
                     new_end_dt = form.start_dt.data + form.duration.data
                     shift = new_end_dt - self.entry.end_dt
-                    updated_entries += shift_following_entries(self.entry, shift, session_=self.session)
+                    shift_following_entries(self.entry, shift, session_=self.session)
                 if self.entry.contribution:
                     update_timetable_entry(self.entry, {'start_dt': form.start_dt.data})
                     update_contribution(item, {'duration': form.duration.data})
@@ -264,9 +267,8 @@ class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
                 elif self.entry.session_block:
                     update_session_block(item, data)
             notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
-            updated_entries.append(item.timetable_entry)
-            return jsonify_data(entries=[serialize_entry_update(entry) for entry in updated_entries], flash=False,
-                                shift_later=shift_later, notifications=notifications)
+            return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
+                                notifications=notifications, flash=False)
         self.commit = False
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
@@ -327,7 +329,8 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
                                          .format(contribution.title))
                 entries.append(entry)
         notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo)
-        return jsonify(entries=[serialize_entry_update(x) for x in entries], notifications=notifications)
+        return jsonify_data(update=serialize_entry_update(entries[0], session_=self.session) if entries else None,
+                            notifications=notifications, flash=False)
 
     def _schedule(self, contrib, start_dt):
         return schedule_contribution(contrib, start_dt, session_block=self.session_block, extend_parent=True)
@@ -454,13 +457,8 @@ class RHLegacyTimetableShiftEntries(RHManageTimetableEntryBase):
         with track_time_changes(auto_extend=True, user=session.user) as changes:
             shift_following_entries(self.entry, shift, session_=self.session)
             self.entry.move(new_start_dt)
-        serializer = TimetableSerializer(management=True)
-        if self.session:
-            timetable = serializer.serialize_session_timetable(self.session)
-        else:
-            timetable = serializer.serialize_timetable(self.event_new)
         notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable,
+        return jsonify_data(flash=False, update=serialize_entry_update(self.entry, session_=self.session),
                             notifications=notifications)
 
 
@@ -481,12 +479,7 @@ class RHLegacyTimetableSwapEntries(RHManageTimetableEntryBase):
         direction = request.form['direction']
         with track_time_changes():
             swap_timetable_entry(self.entry, direction, session_=self.session)
-        serializer = TimetableSerializer(management=True)
-        if self.session:
-            timetable_data = serializer.serialize_session_timetable(self.session)
-        else:
-            timetable_data = serializer.serialize_timetable(self.event_new)
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), timetable=timetable_data)
+        return jsonify_data(flash=False, update=serialize_entry_update(self.entry, session_=self.session))
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
@@ -519,7 +512,8 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
                 raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
                                        "wouldn't fit."))
         notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
-        return jsonify_data(flash=False, entry=serialize_entry_update(self.entry), notifications=notifications)
+        return jsonify_data(flash=False, update=serialize_entry_update(self.entry, session_=self.session),
+                            notifications=notifications)
 
 
 class RHLegacyTimetableEditSession(RHSessionREST):

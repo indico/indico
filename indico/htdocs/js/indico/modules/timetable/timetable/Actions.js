@@ -44,20 +44,7 @@ type("TimetableManagementActions", [], {
             },
             success: function(data) {
                 if (data) {
-                    var timetableData = self.timetable.getData();
-                    var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-
-                    if (self.session) {
-                        delete timetableData[eventData.id];
-                    } else {
-                        delete timetableData[day][eventData.id];
-                    }
-
-                    if (self.session) {
-                        self.timetable.setData(self.session);
-                    } else {
-                        self.timetable.setData(timetableData);
-                    }
+                    self.timetable._updateDay(data.update);
                 }
             }
         });
@@ -66,32 +53,21 @@ type("TimetableManagementActions", [], {
     /*
      * Edit start and end date. date format has to be dd/mm/yy mm:hh
      */
-    editEntryStartEndDate: function(startDate, endDate, eventData, reschedule, undo) {
+    editEntryStartEndDate: function(startDate, endDate, eventData, shift, undo) {
         var self = this;
-        var info = new WatchObject();
-
-        info.set('startDate', startDate);
-        info.set('endDate', endDate);
-        info.set('reschedule', reschedule);
-        info.set('sessionTimetable', this.isSessionTimetable);
-
         var urlArgs = {
             confId: eventData.conferenceId,
             entry_id: eventData.scheduleEntryId
         };
+
         if (self.isSessionTimetable) {
             urlArgs.session_id = self.timetable.contextInfo.sessionId || self.timetable.contextInfo.timetableSession.id;
         }
 
-        if (exists(eventData.sessionId)) {
-            info.set('session', eventData.sessionId);
-            info.set('slot', eventData.sessionSlotId);
-        }
-
         return $.ajax({
-            url: build_url(Indico.Urls.Timetable.entries[reschedule ? 'shift' : 'editDatetime'], urlArgs),
+            url: build_url(Indico.Urls.Timetable.entries[shift ? 'shift' : 'editDatetime'], urlArgs),
             method: 'POST',
-            data: info.getAll(),
+            data: {startDate: startDate, endDate: endDate},
             error: function(xhr) {
                 handleAjaxError(xhr);
                 self.timetable.timetableDrawer.redraw();
@@ -99,27 +75,12 @@ type("TimetableManagementActions", [], {
             complete: IndicoUI.Dialogs.Util.progress(),
             success: function(data) {
                 if (undo) {
-                    self.timetable.enableUndo(undo, {eventData: eventData, shifted: reschedule});
+                    self.timetable.enableUndo(undo, {eventData: eventData, shifted: shift});
                 }
-
-                if (reschedule) {
-                    var entries;
-                    if (data.entry.slotEntry) {
-                        entries = data.timetable[self.timetable.currentDay][data.entry.slotEntry.id].entries;
-                    } else {
-                        entries = data.timetable[self.timetable.currentDay];
-                    }
-
-                    self.timetable._updateDay({
-                        day: self.timetable.currentDay,
-                        entry: entries,
-                        slotEntry: data.entry.slotEntry,
-                        session: data.entry.slotEntry
-                    });
-                } else {
-                    self.timetable._updateEntry(data.entry, data.entry.id);
+                if (data) {
+                    handleNotifications(data);
+                    self.timetable._updateDay(data.update);
                 }
-                handleNotifications(data);
             }
         });
     },
@@ -268,7 +229,7 @@ type("TimetableManagementActions", [], {
             onClose: function(data) {
                 if (data) {
                     handleNotifications(data);
-                    self.timetable._updateEntry(data.entry);
+                    self.timetable._updateDay(data.update);
                 }
             }
         });
@@ -299,8 +260,8 @@ type("TimetableManagementActions", [], {
         var params = this._addToSessionParams(session, 'SessionSlot');
         var urlArgs = {
             'confId': params.conference,
-            'session_id': params.session,
-            'day': params.selectedDay
+            'day': params.selectedDay,
+            'parent_session_id': params.session,
         };
         if (self.isSessionTimetable) {
             urlArgs.session_id = self.timetable.contextInfo.timetableSession.id;
@@ -329,7 +290,7 @@ type("TimetableManagementActions", [], {
             onClose: function(data) {
                 if (data) {
                     handleNotifications(data);
-                    self.timetable._updateEntry(data.entry);
+                    self.timetable._updateDay(data.update);
                 }
             }
         });
@@ -363,16 +324,7 @@ type("TimetableManagementActions", [], {
             complete: IndicoUI.Dialogs.Util.progress(),
             success: function(data) {
                 if (data) {
-                    var entries;
-                    if (data.entry.slotEntry) {
-                        entries = data.timetable[self.timetable.currentDay][data.entry.slotEntry.id].entries;
-                    } else {
-                        entries = data.timetable[self.timetable.currentDay];
-                    }
-                    self.timetable._updateDay({day: self.timetable.currentDay,
-                                               entry: entries,
-                                               slotEntry: data.entry.slotEntry,
-                                               session: data.entry.slotEntry});
+                    self.timetable._updateDay(data.update);
                 }
             }
         });
@@ -384,17 +336,10 @@ type("TimetableManagementActions", [], {
     */
     _addEntries: function(entries) {
         var self = this;
-
-        each(entries, function(entry) {
-            //check if we created the contribution from inside a session timetable in the top level timetable
-            //if so, that entry needs to be updated in the top level timetable
-            if(self.timetable.currentDay != entry.day && exists(self.timetable.parentTimetable)) {
-                self.timetable.parentTimetable._updateEntry(entry, entry.id);
-            } else {
-                self.timetable._updateEntry(entry, entry.id);
-            }
+        each(entries, function(update) {
+            self.timetable._updateDay(update);
         });
-    },
+    }
 },
      function(timetable, eventInfo, isSessionTimetable) {
          this.timetable = timetable;

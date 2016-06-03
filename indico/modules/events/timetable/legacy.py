@@ -273,17 +273,24 @@ def serialize_contribution(contribution):
             'title': contribution.title}
 
 
-def serialize_entry_update(entry):
+def serialize_day_update(event, day, block=None, session_=None):
     serializer = TimetableSerializer(management=True)
-    serialization = {TimetableEntryType.BREAK: serializer.serialize_break_entry,
-                     TimetableEntryType.CONTRIBUTION: serializer.serialize_contribution_entry,
-                     TimetableEntryType.SESSION_BLOCK: serializer.serialize_session_block_entry}
-    tzinfo = entry.event_new.tzinfo
-    return {'id': serializer._get_entry_key(entry),
-            'day': entry.start_dt.astimezone(tzinfo).strftime('%Y%m%d'),
-            'entry': serialization[entry.type](entry),
-            'slotEntry': serializer.serialize_session_block_entry(entry.parent) if entry.parent else None,
-            'autoOps': None}
+    timetable = serializer.serialize_session_timetable(session_) if session_ else serializer.serialize_timetable(event)
+    block_id = serializer._get_entry_key(block) if block else None
+    day = day.strftime('%Y%m%d')
+    return {'day': day,
+            'entries': timetable[day] if not block else timetable[day][block_id]['entries'],
+            'slotEntry': serializer.serialize_session_block_entry(block) if block else None}
+
+
+def serialize_entry_update(entry, with_timetable=False, session_=None):
+    serializer = TimetableSerializer(management=True)
+    day = entry.start_dt.astimezone(entry.event_new.tzinfo)
+    day_update = serialize_day_update(entry.event_new, day, block=entry.parent, session_=session_)
+    return dict({'id': serializer._get_entry_key(entry),
+                 'entry': serializer.serialize_timetable_entry(entry),
+                 'autoOps': None},
+                **day_update)
 
 
 def serialize_event_info(event):

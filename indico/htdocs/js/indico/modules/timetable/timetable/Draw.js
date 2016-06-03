@@ -588,8 +588,8 @@ function loadBalloonContent(self, api, editable) {
                 },
                 onClose: function(data) {
                     handleNotifications(data);
-                    if (data && data.entries) {
-                        self.managementActions._addEntries(data.entries);
+                    if (data) {
+                        self.timetable._updateDay(data.update);
                         /* Since the entry update creates a new div we can't
                          * easily reposition the balloon on the timetable entry. */
                         closeBalloon = true;
@@ -624,9 +624,9 @@ function loadBalloonContent(self, api, editable) {
                     url: build_url(Indico.Urls.Timetable.entries.edit, $.extend({}, urlParams, extraParams)),
                     title: $(this).data('title'),
                     onClose: function(data) {
-                        handleNotifications(data);
-                        if (data && data.entries) {
-                            self.managementActions._addEntries(data.entries);
+                        if (data) {
+                            handleNotifications(data);
+                            self.timetable._updateDay(data.update);
                         }
                     }
                 });
@@ -1725,9 +1725,9 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                             url: build_url(Indico.Urls.Timetable.entries.edit, urlArgs),
                             title: $this.data('title'),
                             onClose: function(data) {
-                                handleNotifications(data);
-                                if (data && data.entries) {
-                                    self.managementActions._addEntries(data.entries);
+                                if (data) {
+                                    handleNotifications(data);
+                                    self.timetable._updateDay(data.update);
                                 }
                             }
                         });
