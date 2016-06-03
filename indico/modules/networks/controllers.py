@@ -15,10 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
+from indico.core.db import db
 from indico.modules.networks.forms import IPNetworkGroupForm
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.views import WPNetworksAdmin
-from indico.web.util import jsonify_form
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -33,8 +34,13 @@ class RHManageNetworks(RHAdminBase):
 class RHCreateIPNetworkGroup(RHAdminBase):
     """Dialog to create an IPNetworkGroup"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         form = IPNetworkGroupForm()
         if form.validate_on_submit():
-            pass
+            network_group = IPNetworkGroup()
+            form.populate_obj(network_group)
+            db.session.add(network_group)
+            return jsonify_data(flash=False)
         return jsonify_form(form)
