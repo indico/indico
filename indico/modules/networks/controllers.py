@@ -14,13 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, session
+from sqlalchemy.orm import contains_eager
 
 from indico.core.db import db
+from indico.modules.categories.models.categories import Category
+from indico.modules.events.models.events import Event
+from indico.modules.networks import logger
 from indico.modules.networks.forms import IPNetworkGroupForm
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.views import WPNetworksAdmin
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -63,3 +67,25 @@ class RHEditIPNetworkGroup(RHAdminIPNetworkGroupBase):
             form.populate_obj(self.network_group)
             return jsonify_data(flash=False)
         return jsonify_form(form)
+
+
+class RHDeleteIPNetworkGroup(RHAdminIPNetworkGroupBase):
+    """Dialog to delete an IPNetworkGroup"""
+
+    def _process_GET(self):
+        query = (self.network_group.in_event_acls
+                 .join(Event)
+                 .options(contains_eager('event_new'))
+                 .order_by(Event.title))
+        events = [principal.event_new for principal in query]
+        query = (self.network_group.in_category_acls
+                 .join(Category)
+                 .order_by(Category.title)
+                 .options(contains_eager('category')))
+        categories = [principal.category for principal in query]
+        return jsonify_template('networks/delete_network.html', network_group=self.network_group, categories=categories,
+                                events=events)
+
+    def _process_POST(self):
+        db.session.delete(self.network_group)
+        return jsonify_data(flash=False)
