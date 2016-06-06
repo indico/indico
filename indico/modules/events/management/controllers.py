@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import flash, redirect, session
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -27,6 +29,7 @@ from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.operations import update_event
+from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, jsonify_data
@@ -151,6 +154,7 @@ class RHEventProtection(RHConferenceModifBase):
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
             update_object_principals(self.event_new, form.registration_managers.data, role='registration')
+            self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
         return WPEventManagement.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
@@ -160,10 +164,23 @@ class RHEventProtection(RHConferenceModifBase):
         managers = {p.principal for p in self.event_new.acl_entries if p.full_access}
         registration_managers = {p.principal for p in self.event_new.acl_entries
                                  if p.has_management_role('registration', explicit=True)}
+        event_session_settings = session_settings.get_all(self.event_new)
+        coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
+                             if event_session_settings.get(val)}
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers,
-                     'access_key': self.event_new.as_legacy.getAccessKey()})
+                     'access_key': self.event_new.as_legacy.getAccessKey()}, **coordinator_privs)
 
+    def _update_session_coordinator_privs(self, form):
+        for priv_field in form.priv_fields:
+            try:
+                setting = COORDINATOR_PRIV_SETTINGS[priv_field]
+            except KeyError:
+                raise BadRequest('No such privilege')
+            session_settings.set(self.event_new, setting, form.data[priv_field])
+            log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
+                                                                               COORDINATOR_PRIV_TITLES[priv_field])
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
 
 
 class RHGrantSubmissionRights(RHConferenceModifBase):

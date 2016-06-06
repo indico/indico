@@ -21,7 +21,6 @@ from functools import partial
 from indico.modules.events.sessions.controllers.compat import compat_session
 from indico.modules.events.sessions.controllers.display import (RHDisplaySessionList, RHDisplaySession,
                                                                 RHExportSessionToICAL, RHExportSessionTimetableToPDF)
-from indico.modules.events.sessions.controllers.management.protection import RHSessionCoordinatorPrivs
 from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
                                                                             RHModifySession, RHDeleteSessions,
                                                                             RHExportSessionsCSV, RHExportSessionsExcel,
@@ -53,10 +52,6 @@ _bp.add_url_rule('/manage/sessions/<int:session_id>/blocks/<int:block_id>', 'man
 _bp.add_url_rule('/manage/sessions/<int:session_id>/acl', 'acl', RHSessionACL)
 _bp.add_url_rule('/manage/sessions/<int:session_id>/acl-message', 'acl_message', RHSessionACLMessage)
 
-
-_bp.add_url_rule('/manage/sessions/coordinator-privs/', 'coordinator_privs_rest', RHSessionCoordinatorPrivs)
-_bp.add_url_rule('/manage/sessions/coordinator-privs/<priv>', 'coordinator_privs_rest', RHSessionCoordinatorPrivs,
-                 methods=('PUT', 'DELETE'))
 
 # Display
 _bp.add_url_rule('/sessions/mine', 'my_sessions', RHDisplaySessionList)

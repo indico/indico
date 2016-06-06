@@ -16,10 +16,16 @@
 
 from __future__ import unicode_literals
 
+from operator import itemgetter
+
+from wtforms import BooleanField
+
+from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
                                      IndicoPasswordField)
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import UsedIf
 
 
@@ -36,7 +42,17 @@ class EventProtectionForm(IndicoForm):
                                   description=_('List of users allowed to modify the event'))
     registration_managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
                                                description=_('List of users allowed to modify registrations'))
+    priv_fields = set()
 
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('event')
         super(EventProtectionForm, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def _create_coordinator_priv_fields(cls):
+        for name, title in sorted(COORDINATOR_PRIV_TITLES.iteritems(), key=itemgetter(1)):
+            setattr(cls, name, BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name]))
+            cls.priv_fields.add(name)
+
+
+EventProtectionForm._create_coordinator_priv_fields()
