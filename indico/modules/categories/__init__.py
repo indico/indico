@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect
+from flask import redirect, render_template, request
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -26,6 +26,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -92,6 +93,11 @@ def _check_roles(app, **kwargs):
 @signals.acl.get_management_roles.connect_via(Category)
 def _get_management_roles(sender, **kwargs):
     return CreatorRole
+
+
+@template_hook('category-management-header')
+def _add_action_menu(category, **kwargs):
+    return render_template('management/action_menu.html', category=category)
 
 
 class CreatorRole(ManagementRole):
