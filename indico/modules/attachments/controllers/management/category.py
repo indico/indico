@@ -34,7 +34,7 @@ class RHCategoryAttachmentManagementBase(RHCategModifBase):
     def _checkParams(self, params):
         RHCategModifBase._checkParams(self, params)
         self.object_type = 'category'
-        self.object = self.base_object = self._target
+        self.object = self.base_object = self._target.as_new
 
     def _checkProtection(self):
         RHCategModifBase._checkProtection(self)

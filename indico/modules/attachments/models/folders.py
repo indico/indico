@@ -25,7 +25,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
+from indico.core.db.sqlalchemy.links import LinkMixin
 from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.attachments.models.attachments import Attachment
@@ -142,8 +142,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     @locator_property
     def locator(self):
-        locator = self.object.locator if self.link_type != LinkType.category else self.object.getLocator()
-        return dict(locator, folder_id=self.id)
+        return dict(self.object.locator, folder_id=self.id)
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the folder.

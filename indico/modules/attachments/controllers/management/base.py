@@ -48,8 +48,8 @@ def _render_protection_message(linked_object):
 
 
 def _get_parent_info(parent):
-    from MaKaC.conference import Category
-    parent_data = {'is_protected': parent.is_protected}
+    parent_data = {'is_protected': parent.is_protected,
+                   'title': parent.title}
     if isinstance(parent, db.m.Event):
         parent_data['type'] = _('Event')
     elif isinstance(parent, db.m.Session):
@@ -58,9 +58,8 @@ def _get_parent_info(parent):
         parent_data['type'] = _('Contribution')
     elif isinstance(parent, db.m.SubContribution):
         parent_data['type'] = _('Sub contribution')
-    elif isinstance(parent, Category):
+    elif isinstance(parent, db.m.Category):
         parent_data['type'] = _('Category')
-    parent_data['title'] = parent.name if isinstance(parent, Category) else parent.title
     return parent_data
 
 
