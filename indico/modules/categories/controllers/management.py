@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.views import WPCategoryManagement
 
 
 class RHCategorySettings(RHManageCategoryBase):
     def _process(self):
-        return u'TODO: Actual management page. \U0001f4aa'
+        return WPCategoryManagement.render_template('management/general_settings.html', category=self.category)

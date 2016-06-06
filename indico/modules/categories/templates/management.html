@@ -1,0 +1,13 @@
+{% extends 'layout/management_page.html' %}
+
+{% block banner_title %}
+    {{ category.title }}
+{% endblock %}
+
+{% block banner_actions %}
+    {{ template_hook('category-management-header', category=category) }}
+{% endblock %}
+
+{% block side_menu %}
+    {{ side_menu|safe }}
+{% endblock %}
