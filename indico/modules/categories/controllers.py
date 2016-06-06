@@ -20,6 +20,7 @@ from math import ceil
 
 from flask import jsonify, request
 
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics, WPCategoryMove
 from indico.modules.users import User
@@ -27,6 +28,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
 from MaKaC.webinterface.rh.categoryMod import RHCategModifBase
+from indico.web.util import jsonify_data
 
 
 def _plot_data(stats, tooltip=''):
@@ -66,6 +68,13 @@ def _count_users():
     return User.find(is_deleted=False, is_pending=False).count()
 
 
+def _serialize_category(category):
+    return {
+        'id': category.id,
+        'title': category.title
+    }
+
+
 class RHCategoryStatistics(RHCategDisplayBase):
     def _process(self):
         stats = get_category_stats(int(self._target.getId()))
@@ -89,3 +98,14 @@ class RHCategoryMoveContents(RHCategModifBase):
     def _process(self):
         return WPCategoryMove.render_template('move_category_contents.html', self._target,
                                               category=self._target)
+
+
+class RHCategoryLoadSubcategories(RHCategModifBase):
+    def _process(self):
+        category_id = request.values.get('categoryId', None)
+        if not category_id:
+            return
+        category = Category.get(category_id)
+        category_contents = category.children
+        return jsonify_data(category=_serialize_category(category),
+                            subcategories=[_serialize_category(c) for c in category_contents])

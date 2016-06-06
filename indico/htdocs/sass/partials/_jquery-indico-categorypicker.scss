@@ -17,4 +17,16 @@
 
 .category-picker {
     width: 800px;
+
+    input[type='text'] {
+        @extend %form-field-input;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .category-navigator {
+        .subcategory {
+            padding-left: 2em;
+        }
+    }
 }
