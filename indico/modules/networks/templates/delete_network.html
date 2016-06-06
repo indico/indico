@@ -1,0 +1,42 @@
+{% from 'confirmation_dialog.html' import confirmation_dialog %}
+
+{% set ok_text=_("Delete network group") %}
+
+{% set confirmation_message %}
+    {% trans -%}
+        Deleting the network will remove the ACL entries referencing it. This may lead
+        to people not being able to access the categories and events mentioned above.
+    {%- endtrans %}
+{% endset %}
+
+{% if categories or events %}
+    {% call confirmation_dialog('danger', message=confirmation_message, ok_text=ok_text) %}
+        {% trans name=network_group.name, count=(categories|length + events|length)%}
+            You are about to <strong>delete</strong> the network group <strong>{{ name }}</strong> which is currently
+            in use by {{ count }} object:
+        {% pluralize count %}
+            You are about to <strong>delete</strong> the network group <strong>{{ name }}</strong> which is currently
+            in use by {{ count }} objects:
+        {% endtrans %}
+        <ul>
+            {% for category in categories %}
+                <li>
+                    {{ category.title }}
+                </li>
+            {% endfor %}
+            {% for event in events %}
+                <li>{{ event.title }}
+                    <a href="{{ url_for('event_mgmt.confModifAC', event) }}" target="_blank">
+                        {{ event.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endcall %}
+{% else %}
+    {% call confirmation_dialog('warning', ok_text=ok_text, extra_confirmation=false) %}
+        {% trans name=network_group.name -%}
+            You are about to <strong>delete</strong> the network group <strong>{{ name }}</strong>.
+        {%- endtrans %}
+    {% endcall %}
+{% endif %}
