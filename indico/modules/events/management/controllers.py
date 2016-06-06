@@ -148,11 +148,17 @@ class RHEventProtection(RHConferenceModifBase):
             update_event(self.event_new, {'protection_mode': form.protection_mode.data})
             if self.event_new.is_self_protected:
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
+            update_object_principals(self.event_new, form.managers.data, full_access=True)
+            update_object_principals(self.event_new, form.registration_managers.data, role='registration')
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
         return WPEventManagement.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
 
     def _get_defaults(self):
         acl = {p.principal for p in self.event_new.acl_entries if p.read_access}
-        return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl})
+        managers = {p.principal for p in self.event_new.acl_entries if p.full_access}
+        registration_managers = {p.principal for p in self.event_new.acl_entries
+                                 if p.has_management_role('registration', explicit=True)}
+        return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
+                     'registration_managers': registration_managers})
 
