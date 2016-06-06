@@ -841,9 +841,15 @@ class IndicoProtectionField(IndicoEnumRadioField):
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):
+        from indico.modules.categories.models.categories import Category
         protected_object = self.get_form().protected_object
         non_inheriting_objects = protected_object.get_non_inheriting_objects()
-        parent_type = _('Event') if isinstance(protected_object.protection_parent, Event) else _('Session')
+        if isinstance(protected_object.protection_parent, Event):
+            parent_type = _('Event')
+        elif isinstance(protected_object.protection_parent, Category):
+            parent_type = _('Category')
+        else:
+            parent_type = _('Session')
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
                              parent_type=parent_type, non_inheriting_objects=non_inheriting_objects)
         return Markup(rv)
