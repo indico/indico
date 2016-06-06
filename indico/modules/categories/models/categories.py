@@ -184,7 +184,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @locator_property
     def locator(self):
-        return {'categId': self.id}
+        return {'category_id': self.id}
 
     @classmethod
     def get_root(cls):
