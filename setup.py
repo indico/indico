@@ -365,6 +365,7 @@ if __name__ == '__main__':
             legal = indico_zodbimport.modules.legal:LegalImporter
             networks = indico_zodbimport.modules.networks:NetworkImporter
             categories = indico_zodbimport.modules.categories:CategoryImporter
+            event_acls = indico_zodbimport.modules.event_acls:EventACLImporter
             """,
           zip_safe=False,
           packages=foundPackages,
