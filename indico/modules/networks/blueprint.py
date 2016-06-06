@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.networks.controllers import RHCreateIPNetworkGroup, RHEditIPNetworkGroup, RHManageNetworks
+from indico.modules.networks.controllers import (RHCreateIPNetworkGroup, RHDeleteIPNetworkGroup, RHEditIPNetworkGroup,
+                                                 RHManageNetworks)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -23,3 +24,5 @@ _bp = IndicoBlueprint('networks', __name__, template_folder='templates', virtual
 _bp.add_url_rule('/admin/networks/', 'manage', RHManageNetworks)
 _bp.add_url_rule('/admin/networks/create', 'create_group', RHCreateIPNetworkGroup, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/networks/<int:network_group_id>/', 'edit_group', RHEditIPNetworkGroup, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/networks/<int:network_group_id>/delete', 'delete_group', RHDeleteIPNetworkGroup,
+                 methods=('GET', 'POST'))
