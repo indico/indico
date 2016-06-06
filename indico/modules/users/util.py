@@ -56,28 +56,31 @@ def get_related_categories(user, detailed=True):
 
 def get_suggested_categories(user):
     """Gets the suggested categories of a user for the dashboard"""
-    from MaKaC.conference import CategoryManager
-
     if not redis_write_client:
         return []
     related = {cat.id for cat in get_related_categories(user, detailed=False)}
     res = []
-    for id_, score in suggestions.get_suggestions(user, 'category').iteritems():
+    categ_suggestions = suggestions.get_suggestions(user, 'category')
+    query = Category.find_all(Category.id.in_(categ_suggestions),
+                              ~Category.id.in_(related),
+                              ~Category.is_deleted,
+                              ~Category.suggestions_disabled)
+    categories = {c.id: c for c in query}
+    for id_, score in categ_suggestions.iteritems():
         try:
-            categ = CategoryManager().getById(id_)
+            categ = categories[int(id_)]
         except KeyError:
             suggestions.unsuggest(user, 'category', id_)
             continue
-        if not categ or categ.isSuggestionsDisabled() or int(categ.id) in related:
+        if any(p.suggestions_disabled for p in categ.parent_chain_query):
+            suggestions.unsuggest(user, 'category', id_)
             continue
-        if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
-            continue
-        if not categ.canAccess(AccessWrapper(user.as_avatar)):
+        if not categ.can_access(user):
             continue
         res.append({
             'score': score,
             'categ': categ,
-            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
+            'path': truncate_path(categ.get_chain_titles()[:-1], chars=50)
         })
     return res
 
