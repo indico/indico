@@ -164,3 +164,58 @@ class RHEventProtection(RHConferenceModifBase):
                      'registration_managers': registration_managers,
                      'access_key': self.event_new.as_legacy.getAccessKey()})
 
+
+
+class RHGrantSubmissionRights(RHConferenceModifBase):
+    """Grants submission rights to all contribution speakers"""
+
+    def _process(self):
+        for cont in self._target.as_event.contributions:
+            speakers = cont.speakers[:]
+            for subcontrib in cont.subcontributions:
+                speakers += subcontrib.speakers
+            for speaker in speakers:
+                principal = speaker.person.principal
+                if principal:
+                    cont.update_principal(principal, add_roles={'submit'})
+                    self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+                                       'Speaker {} has been granted with submission privileges'.format(principal),
+                                       session.user)
+        flash(_('Submission rights have been granted to contribution speakers'))
+        return jsonify_data()
+
+
+class RHGrantModificationRights(RHConferenceModifBase):
+    """Grants session modification rights to all session conveners"""
+
+    def _process(self):
+        for sess in self.event_new.sessions:
+            for convener in sess.conveners:
+                principal = convener.person.principal
+                if principal:
+                    sess.update_principal(principal, full_access=True)
+                    log_msg = ('Session convener {} has been granted with modification privileges to session {}'
+                               .format(principal, sess))
+                    self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg,
+                                       session.user)
+        flash(_('Session modification rights have been granted to session conveners'))
+        return jsonify_data()
+
+
+class RHRevokeSubmissionRights(RHConferenceModifBase):
+    """Revokes submission rights"""
+
+    def _process(self):
+        for cont in self.event_new.contributions:
+            for entry in set(cont.acl_entries):
+                cont.update_principal(entry.principal, del_roles={'submit'})
+                self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
+                                   'Submission privileges has been revoked from {} in {}'.format(entry.principal, cont),
+                                   session.user)
+        for entry in set(self.event_new.acl_entries):
+            self.event_new.update_principal(entry.principal, del_roles={'submit'})
+            self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
+                               'Submission privileges has been revoked from event submitter {}'.format(entry.principal),
+                               session.user)
+        flash(_('Submission rights have been revoked'))
+        return jsonify_data()
