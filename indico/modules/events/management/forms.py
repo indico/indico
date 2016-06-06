@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import AccessControlListField, IndicoProtectionField, PrincipalListField
+from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
+                                     IndicoPasswordField)
 from indico.web.forms.validators import UsedIf
 
 
@@ -28,6 +29,9 @@ class EventProtectionForm(IndicoForm):
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                  groups=True, allow_emails=True, allow_networks=True,
                                  description=_('List of users allowed to access the event.'))
+    access_key = IndicoPasswordField(_('Access key'), toggle=True,
+                                     description=_('It is more secure to make the event restricted instead of using '
+                                                   'an access key'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the event'))
     registration_managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,

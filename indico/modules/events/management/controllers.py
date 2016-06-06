@@ -146,6 +146,7 @@ class RHEventProtection(RHConferenceModifBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
         if form.validate_on_submit():
             update_event(self.event_new, {'protection_mode': form.protection_mode.data})
+            self.event_new.as_legacy.setAccessKey(form.access_key.data)
             if self.event_new.is_self_protected:
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
@@ -160,5 +161,6 @@ class RHEventProtection(RHConferenceModifBase):
         registration_managers = {p.principal for p in self.event_new.acl_entries
                                  if p.has_management_role('registration', explicit=True)}
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
-                     'registration_managers': registration_managers})
+                     'registration_managers': registration_managers,
+                     'access_key': self.event_new.as_legacy.getAccessKey()})
 
