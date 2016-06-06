@@ -41,6 +41,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
@@ -264,6 +265,9 @@ class PrincipalListField(HiddenField):
         self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
         self.allow_networks = kwargs.pop('allow_networks', False)
+        self.ip_networks = []
+        if self.allow_networks:
+            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         super(PrincipalListField, self).__init__(*args, **kwargs)

@@ -101,6 +101,7 @@
     global.toggleAclField = function toogleAclField(aclField, state) {
         aclField.closest('.form-group')
                 .find('input.i-button').prop('disabled', state).end()
+                .find('a.i-button').toggleClass('disabled', state).end()
                 .find('.PluginOptionPeopleListDiv').toggleClass('disabled', state);
     };
 

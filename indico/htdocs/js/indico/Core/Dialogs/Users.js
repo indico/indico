@@ -1481,14 +1481,34 @@ type("UserListField", ["IWidget"], {
 
     draw: function() {
         var self = this;
-        var select;
-        var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
+        var buttonDiv = Html.div({style: {marginTop: pixels(10)}});
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
+            var chooseUserButton = Html.input("button", {style: {marginRight: pixels(5)},
+                                                         className: 'i-button', type: 'button'},
+                                              this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
+            var chooseIpNetwork = Html.a({href: '#', style: {marginRight: pixels(5)},
+                                          className: 'i-button arrow js-dropdown',
+                                          'data-toggle': 'dropdown'}, $T('Add IP Network'));
+            var ipNetworksContainer = Html.span({className: 'group'});
+            var ipNetworksList = Html.ul({className: 'dropdown'});
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
+            _.each(this.ipNetworks, function(network) {
+                var li = Html.li();
+                li.append(Html.a({href: '#'}, network.name));
+                li.observeClick(function() {
+                    self.newProcess([network], function(result) {
+                        if (result && !self.userList.get(network.identifier)) {
+                            self.userList.set(network.identifier, $O(network))
+                        }
+                    });
+                });
+                ipNetworksList.append(li);
+            });
 
-            var title = "";
+            ipNetworksContainer.append(chooseIpNetwork);
+            ipNetworksContainer.append(ipNetworksList);
+            var title;
             if (this.includeFavourites || exists(this.suggestedUsers)) {
                 title = this.enableGroups ? $T("Add Users and Groups") : $T("Add Users");
             } else {
@@ -1532,6 +1552,9 @@ type("UserListField", ["IWidget"], {
             });
 
             buttonDiv.append(chooseUserButton);
+            if (this.enableIpNetworks) {
+                buttonDiv.append(ipNetworksContainer);
+            }
         }
 
 
@@ -1617,10 +1640,11 @@ type("UserListField", ["IWidget"], {
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
              allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
-             newProcess, editProcess, removeProcess, allowExternal) {
+             newProcess, editProcess, removeProcess, allowExternal, enableIpNetworks, ipNetworks) {
 
         var self = this;
-        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess,
+                                           showToggleFavouriteButtons, this);
         self.newUserCounter = 0;
         this.userDivStyle = any(userDivStyle, "user-list");
         this.setUpParameters();
@@ -1631,7 +1655,7 @@ type("UserListField", ["IWidget"], {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else if (user._type === 'EventPerson') {
                     self.userList.set('existingEventPerson' + user.id, $O(user));
-                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup'].indexOf(user._type)) {
+                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup', 'IPNetworkGroup'].indexOf(user._type)) {
                     self.userList.set(user.identifier, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
@@ -1655,6 +1679,8 @@ type("UserListField", ["IWidget"], {
 
         this.allowSearch = any(allowSearch, true);
         this.enableGroups = any(enableGroups, false);
+        this.enableIpNetworks = any(enableIpNetworks, false);
+        this.ipNetworks = any(ipNetworks, []);
         this.conferenceId = any(conferenceId, null);
         this.privileges = any(privileges, {});
         this.selectedPrivileges = new WatchObject();
