@@ -1,0 +1,10 @@
+{% extends 'layout/base.html' %}
+
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}{% trans %}Event protection{% endtrans %}{% endblock %}
+
+{% block content %}
+    {{ simple_form(form) }}
+{% endblock %}
+

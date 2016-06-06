@@ -19,15 +19,18 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import flash, redirect, session
-from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
-from indico.modules.events.util import get_object_from_args
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.operations import update_event
+from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, jsonify_data
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
 
 from MaKaC.webinterface.rh.base import RH
@@ -134,3 +137,22 @@ class RHShowNonInheriting(RHConferenceModifBase):
     def _process(self):
         objects = self.obj.get_non_inheriting_objects()
         return jsonify_template('events/management/non_inheriting_objects.html', objects=objects)
+
+
+class RHEventProtection(RHConferenceModifBase):
+    """Show event protection"""
+
+    def _process(self):
+        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, {'protection_mode': form.protection_mode.data})
+            if self.event_new.is_self_protected:
+                update_object_principals(self.event_new, form.acl.data, read_access=True)
+            flash(_('Protection settings have been updated'), 'success')
+            return redirect(url_for('.protection', self.event_new))
+        return WPEventManagement.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
+
+    def _get_defaults(self):
+        acl = {p.principal for p in self.event_new.acl_entries if p.read_access}
+        return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl})
+
