@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.categories.controllers.display import RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo
+from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
+                                                           RHCategoryLoadSubcategories)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryProtection,
@@ -43,3 +44,4 @@ _bp.add_url_rule('/manage/create-subcategory', 'create_subcategory', RHCreateCat
 _bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHCategoryIcon)
 _bp.add_url_rule('/logo-<slug>.png', 'display_logo', RHCategoryLogo)
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
+_bp.add_url_rule('/load-subcategories', 'load-subcategories', RHCategoryLoadSubcategories, methods=('POST',))

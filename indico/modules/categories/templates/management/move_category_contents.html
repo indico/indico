@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class="category-picker"></div>
+    <div class="category-picker"
+         data-href="{{ url_for('categories.load-subcategories', category) }}"></div>
     <script>
         $('.category-picker').categorypicker();
     </script>
