@@ -26,6 +26,8 @@ from MaKaC.webinterface.rh import calendar, categoryDisplay
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', url_prefix='/category/<int:category_id>')
 
 _bp.add_url_rule('/manage/settings', 'manage', RHCategorySettings)
+#_bp.add_url_rule('/', 'display', RHDisplayCategory)
+_bp.add_url_rule('/', 'display', categoryDisplay.RHCategoryDisplay)
 
 _legacy_bp = IndicoBlueprint('category', __name__, template_folder='templates',
                              url_prefix='/category/<int:categId>')
