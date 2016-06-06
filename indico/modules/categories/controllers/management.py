@@ -13,3 +13,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+from indico.modules.categories.controllers.base import RHManageCategoryBase
+
+
+class RHCategorySettings(RHManageCategoryBase):
+    def _process(self):
+        return u'TODO: Actual management page. \U0001f4aa'
