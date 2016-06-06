@@ -122,7 +122,8 @@ def _build_folder_api_data(folder):
         'attachments': [_build_attachment_api_data(attachment)
                         for attachment in folder.attachments
                         if attachment.can_access(user)],
-        'default_folder': folder.is_default
+        'default_folder': folder.is_default,
+        'is_protected': folder.is_protected
     }
 
 
@@ -135,6 +136,7 @@ def _build_attachment_api_data(attachment):
         'description': attachment.description,
         'modified_dt': attachment.modified_dt.isoformat(),
         'type': attachment.type.name,
+        'is_protected': attachment.is_protected
     }
 
     if attachment.type == AttachmentType.file:
