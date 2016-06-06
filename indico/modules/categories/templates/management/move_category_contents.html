@@ -1,0 +1,12 @@
+{% extends 'categories/management/base.html' %}
+
+{% block title %}
+    {% trans %}Move categories{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="category-picker"></div>
+    <script>
+        $('.category-picker').categorypicker();
+    </script>
+{% endblock %}
