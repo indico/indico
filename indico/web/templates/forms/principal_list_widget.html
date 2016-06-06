@@ -25,10 +25,8 @@
 
             function addPrincipal(newPrincipals, setResult) {
                 // remove existing ones first to avoid duplicates
-                _.each(newPrincipals, function(principal) {
-                    principals = _.without(principals, _.findWhere(principals, {
-                        identifier: principal.identifier
-                    }));
+                newPrincipals = _.filter(newPrincipals, function(principal) {
+                    return !_.findWhere(principals, {identifier: principal.identifier});
                 });
                 principals = principals.concat(newPrincipals);
                 field.val(JSON.stringify(principals));
@@ -51,7 +49,8 @@
                 null, false, false, false,
                 // Disable favorite button for EventPerson mode
                 {{ (field.event is none)|tojson }},
-                addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }}
+                addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }},
+                {{ field.allow_networks | tojson }}, {{ field.ip_networks | tojson }}
             );
 
             $E('userGroupList-{{ field.id }}').set(widget.draw());
