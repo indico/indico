@@ -16,9 +16,27 @@
 
 from __future__ import unicode_literals
 
+from flask import render_template
+
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
+from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.menu import MenuItem, render_sidemenu
+
+
+class WPCategoryManagement(WPJinjaMixin, WPMainBase):
+    """WP for catagory management pages
+
+    The category must be passed as 'category' parameter when rendering.
+    """
+
+    def _getBody(self, params):
+        category = params['category']
+        params['side_menu'] = render_sidemenu('category-management-sidemenu', old_style=True, category=category)
+        return self._getPageContent(params)
 
 
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
