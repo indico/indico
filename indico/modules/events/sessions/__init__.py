@@ -16,10 +16,7 @@
 
 from __future__ import unicode_literals
 
-from operator import itemgetter
-
-from flask import flash, session, render_template
-from wtforms import BooleanField
+from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -28,10 +25,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_sessions_for_user
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
-from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm, FormDefaults
-from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import SideMenuItem
 
 
@@ -77,19 +71,6 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if event.type == 'conference':
         return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
-
-
-@template_hook('conference-protection')
-def _inject_conference_protection_coordinator_privs(event, **kwargs):
-    settings = session_settings.get_all(event)
-    form_class = type(b'PrivsForm', (IndicoForm,), {})
-    defaults = {}
-    for name, title in sorted(COORDINATOR_PRIV_TITLES.iteritems(), key=itemgetter(1)):
-        field = BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name])
-        setattr(form_class, name, field)
-        defaults[name] = settings[COORDINATOR_PRIV_SETTINGS[name]]
-    form = form_class(csrf_enabled=False, obj=FormDefaults(defaults))
-    return render_template('events/sessions/management/coordinator_privs.html', event=event, form=form)
 
 
 @signals.event_management.get_cloners.connect
