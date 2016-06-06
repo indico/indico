@@ -108,6 +108,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     #: The ID of immediate parent category of the event
     category_id = db.Column(
         db.Integer,
+        db.ForeignKey('categories.categories.id'),
         nullable=True,
         index=True
     )
@@ -191,6 +192,17 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         default=0
     ))
 
+    #: The category containing the event
+    category = db.relationship(
+        'Category',
+        lazy=True,
+        backref=db.backref(
+            'events',
+            primaryjoin='(Category.id == Event.category_id) & ~Event.is_deleted',
+            order_by=start_dt,
+            lazy=True
+        )
+    )
     #: The user who created the event
     creator = db.relationship(
         'User',
@@ -298,11 +310,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def event_new(self):
         """Convenience property so all event entities have it"""
         return self
-
-    @property
-    def category(self):
-        from MaKaC.conference import CategoryManager
-        return CategoryManager().getById(str(self.category_id), True) if self.category_id else None
 
     @property
     def has_logo(self):
@@ -556,11 +563,9 @@ Event.register_location_events()
 Event.register_protection_events()
 
 
-@listens_for(Event.category_id, 'set')
+@listens_for(Event.category, 'set')
 def _category_id_set(target, value, *unused):
-    from MaKaC.conference import CategoryManager
-    cat = CategoryManager().getById(str(value))
-    target.category_chain = map(int, reversed(cat.getCategoryPath()))
+    target.category_chain = [x.id for x in value.chain_query[::-1]]
 
 
 @listens_for(Event.start_dt, 'set')
