@@ -136,7 +136,7 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
 
     def validate_duration(self, field):
         super(BaseEntryForm, self).validate_duration(field)
-        if self.entry.type == TimetableEntryType.SESSION_BLOCK:
+        if self.entry.type == TimetableEntryType.SESSION_BLOCK and self.entry.children:
             needed_duration = max(x.end_dt for x in self.entry.children) - min(x.start_dt for x in self.entry.children)
             if field.data < needed_duration:
                 raise ValidationError(_("The duration must be at least {duration} to fit the entries within.")
