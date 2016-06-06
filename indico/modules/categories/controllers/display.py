@@ -24,13 +24,14 @@ from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
 
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
-
+from indico.web.util import jsonify_data
 from MaKaC.conference import CategoryManager
 
 
@@ -111,3 +112,21 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
 
     def _count_users(self):
         return User.find(is_deleted=False, is_pending=False).count()
+
+
+def _serialize_category(category):
+    return {
+        'id': category.id,
+        'title': category.title
+    }
+
+
+class RHCategoryLoadSubcategories(RHDisplayCategoryBase):
+    def _process(self):
+        category_id = request.values.get('categoryId', None)
+        if not category_id:
+            return
+        category = Category.get(category_id)
+        category_contents = category.children
+        return jsonify_data(category=_serialize_category(category),
+                            subcategories=[_serialize_category(c) for c in category_contents])
