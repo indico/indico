@@ -21,21 +21,10 @@ from collections import defaultdict
 from flask import g
 from sqlalchemy.orm import joinedload
 
-from indico.modules.attachments.util import get_attached_folders
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-
+from indico.modules.attachments.util import get_attached_folders, get_event
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.conference import Conference
-
-
-def get_event(linked_object):
-    from MaKaC.conference import Category
-
-    if isinstance(linked_object, Conference):
-        return linked_object.as_event
-    else:
-        return linked_object.event_new if not isinstance(linked_object, Category) else None
 
 
 def build_material_legacy_api_data(linked_object):

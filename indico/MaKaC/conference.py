@@ -74,8 +74,6 @@ from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import utc_timestamp, format_datetime
 from indico.util.redis import write_client as redis_write_client
 from indico.util.user import unify_user_args
@@ -210,8 +208,9 @@ class CommonObjectBase(CoreObject, Fossilizable):
         CAUTION: this won't return empty directories (used by interface), nor things the
         current user can't see
         """
+        from indico.modules.attachments.util import get_attached_items
         if isinstance(self, Category):
-            return get_attached_items(self, include_empty=False, include_hidden=False)
+            return self.as_new.attached_items
         elif isinstance(self, Conference):
             return get_attached_items(self.as_event, include_empty=False, include_hidden=False, preload_event=True)
         else:
@@ -316,7 +315,7 @@ class Category(CommonObjectBase):
 
     @property
     def attachment_folders(self):
-        return AttachmentFolder.find(object=self)
+        return db.m.AttachmentFolder.find(object=self)
 
     @property
     def is_protected(self):
