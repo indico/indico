@@ -143,6 +143,7 @@ class LinkMixin(object):
         if LinkType.category in cls.allowed_link_types:
             return db.Column(
                 db.Integer,
+                db.ForeignKey('categories.categories.id'),
                 nullable=True,
                 index=True
             )
@@ -194,6 +195,20 @@ class LinkMixin(object):
                 db.ForeignKey('events.subcontributions.id'),
                 nullable=True,
                 index=True
+            )
+
+    @declared_attr
+    def category(cls):
+        if LinkType.category in cls.allowed_link_types:
+            return db.relationship(
+                'Category',
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
+                )
             )
 
     @declared_attr
@@ -267,9 +282,8 @@ class LinkMixin(object):
 
     @hybrid_property
     def object(self):
-        from MaKaC.conference import CategoryManager
         if self.link_type == LinkType.category:
-            return CategoryManager().getById(self.category_id, True)
+            return self.category
         elif self.link_type == LinkType.event:
             return self.event_new
         elif self.link_type == LinkType.session:
@@ -281,10 +295,10 @@ class LinkMixin(object):
 
     @object.setter
     def object(self, obj):
-        from MaKaC.conference import Category
-        self.category = self.event_new = self.session = self.contribution = self.subcontribution = None
-        if isinstance(obj, Category):
-            self.category_id = int(obj.id)
+        self.category = None
+        self.linked_event = self.event_new = self.session = self.contribution = self.subcontribution = None
+        if isinstance(obj, db.m.Category):
+            self.category = obj
         elif isinstance(obj, db.m.Event):
             self.linked_event = obj
         elif isinstance(obj, db.m.Session):
@@ -336,10 +350,9 @@ class LinkedObjectComparator(Comparator):
         raise NotImplementedError
 
     def __eq__(self, other):
-        from MaKaC.conference import Category
-        if isinstance(other, Category):
+        if isinstance(other, db.m.Category):
             return db.and_(self.cls.link_type == LinkType.category,
-                           self.cls.category_id == int(other.id))
+                           self.cls.category_id == other.id)
         elif isinstance(other, db.m.Event):
             return db.and_(self.cls.link_type == LinkType.event,
                            self.cls.linked_event_id == other.id)

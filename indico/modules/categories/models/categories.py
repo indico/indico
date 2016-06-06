@@ -169,6 +169,9 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     )
 
     # relationship backrefs:
+    # - attachment_folders (AttachmentFolder.category)
+    # - favorite_of (User.favorite_categories)
+    # - legacy_mapping (LegacyCategoryMapping.category)
     # - parent (Category.children)
 
     @return_ascii
