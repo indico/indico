@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
+from MaKaC.webinterface.pages.category import WPCategoryDisplayBase, WPCategoryModifBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
@@ -36,3 +36,7 @@ class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
 
     def getCSSFiles(self):
         return WPCategoryDisplayBase.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
+
+
+class WPCategoryMove(WPJinjaMixin, WPCategoryModifBase):
+    template_prefix = 'categories/'
