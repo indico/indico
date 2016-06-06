@@ -1,0 +1,42 @@
+{% from 'message_box.html' import message_box %}
+
+
+{% macro confirmation_checkbox() %}
+    <input id="js-confirm-action" type="checkbox">
+    <label for="js-confirm-action">
+        {% trans %}I understand what this means. Please go ahead.{% endtrans %}
+    </label>
+{% endmacro %}
+
+{% macro confirmation_dialog(type, content, message, extra_confirmation=true, ok_text=none, cancel_text=none) %}
+    {# type can be any of the usual message_box types like 'warning', 'danger', 'info', 'highlight',... #}
+    <form method="POST" class="confirmation-dialog">
+        <div class="confirmation-dialog-content">
+            {{ content or caller() }}
+        </div>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        {% if message %}
+            {% call message_box(type=type, large_icon=true, footer=confirmation_checkbox() if extra_confirmation else none) %}
+                {{ message }}
+            {% endcall %}
+        {% elif extra_confirmation %}
+            {{ confirmation_checkbox() }}
+        {% endif %}
+        <div class="form-group form-group-footer">
+            <div class="form-field">
+                <button id="js-button-action" class="i-button big {{ type }} right" {% if extra_confirmation %}disabled{% endif %}>
+                    {{ ok_text|default(_("Perform action"), true) }}
+                </button>
+                <button id="js-button-close" class="i-button big right" data-button-back>
+                    {{ cancel_text|default(_("I've changed my mind!"), true) }}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        $('#js-confirm-action').on('change', function() {
+            $('#js-button-action').prop('disabled', !this.checked);
+        });
+    </script>
+{% endmacro %}
