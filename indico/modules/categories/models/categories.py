@@ -160,7 +160,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
             lazy=True
         )
     )
-
     acl_entries = db.relationship(
         'CategoryPrincipal',
         backref='category',
@@ -170,6 +169,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.category)
+    # - events (Event.category)
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
     # - parent (Category.children)
@@ -185,6 +185,15 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @locator_property
     def locator(self):
         return {'categId': self.id}
+
+    @classmethod
+    def get_root(cls):
+        """Get the root category or create if if needed"""
+        root = cls.query.filter(cls.is_root).one_or_none()
+        if not root:
+            root = cls(id=0, title='Home', protection_mode=ProtectionMode.public)
+            db.session.add(root)
+        return root
 
     @property
     def url(self):

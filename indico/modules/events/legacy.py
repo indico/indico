@@ -136,7 +136,7 @@ class XMLEventSerializer(object):
         xml = Element(self._event_tag_name)
         SubElement(xml, '_deprecated').text = 'True'
         SubElement(xml, 'ID').text = str(event.id)
-        SubElement(xml, 'category').text = event.category.name
+        SubElement(xml, 'category').text = event.category.title
         SubElement(xml, 'parentProtection').text = self._format_bool(event.is_protected)
         if event.can_manage(self._user):
             SubElement(xml, 'modifyLink').text = self._url_for('event_mgmt.conferenceModification', event)

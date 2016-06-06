@@ -220,11 +220,12 @@ def _event_moved(conf, old_parent, new_parent, **kwargs):
         g.setdefault('detached_events_moved', set()).add(conf.as_event)
         return
     event = conf.as_event
-    event.category_id = int(new_parent.id)
+    event.category = new_parent.as_new
 
 
 @signals.category.moved.connect
 def _category_moved(category, old_parent, new_parent, **kwargs):
+    raise Exception("Adapt to new code. Can probably go away.")
     events = Event.find(Event.category_chain.contains([int(category.id)])).all()
     # update the category chain of all events from the moved category
     for event in events:

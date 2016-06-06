@@ -544,7 +544,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': unicode(event.category_id),
-            'category': event.category.getTitle(),
+            'category': event.category.title,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
             'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
