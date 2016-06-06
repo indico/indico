@@ -47,6 +47,8 @@ class RHCreateIPNetworkGroup(RHAdminBase):
             network_group = IPNetworkGroup()
             form.populate_obj(network_group)
             db.session.add(network_group)
+            db.session.flush()
+            logger.info('Network group %s created by %s', network_group, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
@@ -65,6 +67,7 @@ class RHEditIPNetworkGroup(RHAdminIPNetworkGroupBase):
         form = IPNetworkGroupForm(obj=self.network_group)
         if form.validate_on_submit():
             form.populate_obj(self.network_group)
+            logger.info('Network group %s edited by %s', self.network_group, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
@@ -88,4 +91,5 @@ class RHDeleteIPNetworkGroup(RHAdminIPNetworkGroupBase):
 
     def _process_POST(self):
         db.session.delete(self.network_group)
+        logger.info('Network group %s deleted by %s', self.network_group, session.user)
         return jsonify_data(flash=False)

@@ -15,9 +15,13 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
+
+
+logger = Logger.get('networks')
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
