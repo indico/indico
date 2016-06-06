@@ -1,6 +1,6 @@
 {% extends 'layout/base.html' %}
 
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
 
 {% block title %}{% trans %}Event protection{% endtrans %}{% endblock %}
 
@@ -45,6 +45,27 @@
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form) }}
+    {{ form_header(form) }}
+    {{ form_rows(form, skip=form.priv_fields) }}
+    {% call form_fieldset(_("Session coordinator rights")) %}
+        <div class="action-box highlight">
+            <div class="section">
+                <div class="icon icon-info"></div>
+                <div class="text">
+                    <div class="label">{% trans %}Basic rights{% endtrans %}</div>
+                    <div>
+                        <div>{% trans %}Restricted session timetable management (add contributions, create breaks){% endtrans %}</div>
+                        <div>{% trans %}View comments from the conference manager (no modifications){% endtrans %}</div>
+                        <div>{% trans %}View contribution list (no modifications){% endtrans %}</div>
+                        <div>{% trans %}View session main data (no modifications){% endtrans %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ form_rows(form, fields=form.priv_fields) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change>
+    {% endcall %}
 {% endblock %}
-
