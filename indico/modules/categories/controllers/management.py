@@ -214,6 +214,12 @@ class RHDeleteCategory(RHManageCategoryBase):
             return redirect(url)
 
 
+class RHCategoryMoveContents(RHManageCategoryBase):
+    def _process(self):
+        return WPCategoryManagement.render_template('management/move_category_contents.html', self.category,
+                                                    active_menu_item='')
+
+
 class RHSortSubcategories(RHManageCategoryBase):
     def _process(self):
         subcategories = {category.id: category for category in self.category.children}

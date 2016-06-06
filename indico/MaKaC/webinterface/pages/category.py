@@ -1021,8 +1021,13 @@ class WPCategoryModifBase( WPCategoryBase ):
     _userData = ['favorite-user-ids']
 
     def getJSFiles(self):
-        return WPCategoryBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+        return (WPCategoryBase.getJSFiles(self) +
+                main.WPMainBase.getJSFiles(self) +
+                self._includeJSPackage('Management') +
+                self._asset_env['modules_event_management_js'].urls())
+
+    def getCSSFiles(self):
+        return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW(), currentCategory=self._currentCategory())
