@@ -51,7 +51,7 @@ class RHDeleteEvent(RHConferenceModifBase):
         flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
 
         if category:
-            redirect_url = url_for('category_mgmt.categoryModification', category)
+            redirect_url = url_for('categories.manage', category)
         else:
             redirect_url = url_for('misc.index')
 
