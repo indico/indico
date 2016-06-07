@@ -1,15 +1,21 @@
 <%
 from MaKaC.webinterface.urlHandlers import UHHelper
-from MaKaC.conference import Category
-from MaKaC.conference import Track
+from MaKaC.conference import Conference, Track
 from MaKaC.review import Abstract
+from indico.modules.categories.models.categories import Category
 
 l = []
 
 target_ = target
 while target_ != None:
-    if type(target_) == Category:
-        name = target_.getName()
+    if isinstance(target_, Category):
+        for category in target_.parent_chain_query[::-1]:
+            if isModif:
+                url = url_for('categories.manage', category)
+            else:
+                url = category.url
+            l.append((category.title, url))
+        break
     else:
         name = target_.getTitle()
 
@@ -24,7 +30,9 @@ while target_ != None:
 
     l.append( (name, url) )
 
-    if type(target_) != Abstract:
+    if isinstance(target_, Conference):
+        target_ = target_.as_event.category
+    elif not isinstance(target_, Abstract):
         target_ = target_.getOwner()
     else:
         if track:
