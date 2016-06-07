@@ -355,7 +355,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def protection_parent(self):
-        return self.as_legacy.getOwner()
+        return self.category
 
     @property
     def start_dt_local(self):
