@@ -91,11 +91,8 @@ else:
 
         <div class="separator"></div>
 
-        <a id="manageEventButton" href="${ urlHandlers.UHConferenceModification.getURL(conf)  if usingModifKey else  urlHandlers.UHConfManagementAccess.getURL(conf) }"
+        <a id="manageEventButton" href="${ urlHandlers.UHConfManagementAccess.getURL(conf) }"
            style="background-image: url(${ systemIcon('manage') })"></a>
-        % if usingModifKey:
-            <a href="${urlHandlers.UHConfCloseModifKey.getURL(self_._conf)}" style=class="eventHeaderButtonBar"> ${_('exit manage')} <div class="leftCorner"></div></a>
-        % endif
     </div>
 
 

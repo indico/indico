@@ -453,11 +453,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from MaKaC.accessControl import AccessWrapper
         return self.as_legacy.canAccess(AccessWrapper(user.as_avatar if user else None))
 
-    def can_manage(self, user, role=None, allow_key=False, *args, **kwargs):
-        # XXX: Remove this method once modification keys are gone!
-        return (super(Event, self).can_manage(user, role, *args, **kwargs) or
-                bool(allow_key and user and self.as_legacy.canKeyModify()))
-
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
