@@ -17,12 +17,12 @@
 from __future__ import unicode_literals
 
 from indico.modules.categories.controllers import (RHCategoryStatistics, RHCategoryMoveContents,
-                                                   RHCategoryLoadSubcategories)
+                                                   RHCategoryInfo)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', url_prefix='/category')
 
 _bp.add_url_rule('/<categId>/statistics', 'category-statistics', RHCategoryStatistics)
 _bp.add_url_rule('/<categId>/manage/move/', 'move-contents', RHCategoryMoveContents)
-_bp.add_url_rule('/<categId>/manage/load-subcategories', 'load-subcategories', RHCategoryLoadSubcategories,
-                 methods=('POST',))
+# TODO: Change to <int:category_id>
+_bp.add_url_rule('/<categId>/info', 'info', RHCategoryInfo)

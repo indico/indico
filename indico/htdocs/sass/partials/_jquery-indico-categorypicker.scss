@@ -25,8 +25,41 @@
     }
 
     .category-navigator {
+        &.fixed-height {
+            max-height: 500px;
+            overflow: auto;
+            overflow-y: auto;
+        }
+
+        .item {
+            cursor: pointer;
+        }
+
         .subcategory {
             padding-left: 2em;
+        }
+
+        .title {
+            display: block;
+        }
+
+        .parent-category .title {
+            font-weight: bold;
+        }
+
+        ul.breadcrumb {
+            font-size: 0.9em;
+            list-style: none;
+            padding: 0;
+
+            li{
+                display: inline;
+
+                &:not(:last-child):after {
+                    content: '»';
+                    padding: 0 0.5em;
+                }
+            }
         }
     }
 }

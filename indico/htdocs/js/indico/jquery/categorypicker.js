@@ -33,51 +33,85 @@
                 placeholder: $T.gettext("Search")
             });
             self.categoryList = $('<ul>').addClass('group-list');
-            self.categoryNavigator = $('<div>', {
-                class: 'category-navigator i-box just-group-list with-hover-effect'
-            })
+            self.categoryNavigator = $('<div>')
+            .addClass('category-navigator i-box just-group-list with-hover-effect fixed-height')
             .append($('<div>').addClass('i-box-content'))
             .append(self.categoryList);
 
-            this.buildCategoryList(self.element, opt.initialCateg, self.categoryList);
+            buildCategoryList(opt.initialCateg, self.categoryList);
 
             self.element.append(self.searchInput).append(self.categoryNavigator);
-        },
 
-        buildCategoryList: function($element, categoryId, $categoryList) {
-            $.ajax({
-                url: $element.data('href'),
-                method: 'POST',
-                dataType: 'json',
-                data: {categoryId: categoryId},
-                error: function(data) {
-                    handleAjaxError(data);
-                },
-                success: function(data) {
-                    if (data.category) {
-                        var category = $('<li>', {
-                            text: data.category.title,
-                            class: 'item parent-category',
-                            data: {
-                                id: data.category.id
-                            }
-                        });
-                        $categoryList.append(category);
+            function goToCategory(categoryId, $categoryList) {
+                $('.category-navigator .item').animate({
+                    height: 0,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    border: 0
+                }, {
+                    complete: function() {
+                        $(this).remove();
                     }
-                    if (data.subcategories) {
-                        for (var i = 0; i < data.subcategories.length; i++) {
-                            var subcategory = $('<li>', {
-                                text: data.subcategories[i].title,
-                                class: 'item subcategory',
+                });
+                buildCategoryList(categoryId, $categoryList);
+            }
+
+            function buildCategoryList(categoryId, $categoryList) {
+                $.ajax({
+                    url: build_url(Indico.Urls.Categories.info, {categId: categoryId}),
+                    dataType: 'json',
+                    error: function(data) {
+                        handleAjaxError(data);
+                    },
+                    success: function(data) {
+                        if (data.category) {
+                            var category = $('<li>', {
+                                class: 'item parent-category',
                                 data: {
-                                    id: data.subcategories[i].id
+                                    id: data.category.id
                                 }
+                            }).append($('<span>', {
+                                class: 'title',
+                                text: data.category.title,
+                            }));
+                            var breadcrumb = $('<ul>').addClass('breadcrumb');
+                            _.each(data.category.breadcrumb, function(category) {
+                                breadcrumb.append($('<li>')
+                                    .append($('<a>', {
+                                        text: category.title,
+                                        data: {
+                                            id: category.id
+                                        },
+                                        href: '#'
+                                    }).on('click', function(evt) {
+                                        evt.preventDefault()
+                                        goToCategory($(this).data('id'), $categoryList);
+                                    }))
+                                );
                             });
-                            $categoryList.append(subcategory);
-                        };
+                            category.append(breadcrumb);
+                            $categoryList.append(category);
+                        }
+                        if (data.subcategories) {
+                            _.each(data.subcategories, function(subcat) {
+                                var subcategory = $('<li>', {
+                                    class: 'item subcategory',
+                                    data: {
+                                        id: subcat.id
+                                    }
+                                }).append($('<span>', {
+                                    class: 'title',
+                                    text: subcat.title,
+                                }));
+                                subcategory.on('click', function() {
+                                    goToCategory($(this).data('id'), $categoryList);
+                                });
+                                $categoryList.append(subcategory);
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     });
 })(jQuery);
