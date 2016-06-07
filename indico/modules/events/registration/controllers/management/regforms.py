@@ -24,11 +24,13 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.payment import settings as payment_global_settings
 from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import (RegistrationFormForm, RegistrationFormScheduleForm,
-                                                      ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm)
+                                                      ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
+                                                      RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
@@ -36,7 +38,7 @@ from indico.modules.events.registration.stats import OverviewStats, Accommodatio
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
-from indico.modules.events.payment import settings as payment_global_settings
+from indico.modules.events.util import update_object_principals
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -57,7 +59,7 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                                    .filter(Registration.is_active)
                                    .group_by(Registration.registration_form_id))
         return WPManageRegistration.render_template('management/regform_list.html', self.event,
-                                                    event=self.event, regforms=regforms,
+                                                    event=self.event_new, regforms=regforms,
                                                     registration_counts=registration_counts)
 
 
@@ -283,3 +285,16 @@ class RHRegistrationFormStats(RHManageRegFormBase):
         regform_stats += [AccommodationStats(x) for x in self.regform.active_fields if x.input_type == 'accommodation']
         return WPManageRegistrationStats.render_template('management/regform_stats.html', self.event,
                                                          regform=self.regform, regform_stats=regform_stats)
+
+
+class RHManageRegistrationManagers(RHManageRegFormsBase):
+    """Modify event managers with registration role"""
+
+    def _process(self):
+        reg_managers = {p.principal for p in self.event_new.acl_entries
+                        if p.has_management_role('registration', explicit=True)}
+        form = RegistrationManagersForm(obj=FormDefaults(managers=reg_managers))
+        if form.validate_on_submit():
+            update_object_principals(self.event_new, form.managers.data, role='registration')
+            return jsonify_data(flash=False)
+        return jsonify_form(form)

@@ -9,7 +9,16 @@
     <a class="i-button inconspicuous icon-settings arrow js-dropdown"
        data-toggle="dropdown"></a>
     <ul class="dropdown">
-        {% if event.getType() == 'conference' %}
+        <li>
+            <a href="#"
+               title="{% trans %}Add/Remove users allowed to modify registration{% endtrans %}"
+               data-title="{% trans %}Manage registration managers{% endtrans %}"
+               data-href="{{ url_for('.manage_registration_managers', event) }}"
+               data-qtip-position="right"
+               data-ajax-dialog>
+                {% trans %}Manage registration managers{% endtrans %}</a>
+        </li>
+        {% if event.type == 'conference' %}
             <li>
                 <a href="{{ url_for('.manage_regforms_display', event) }}"
                    title="{% trans %}Define how the participant list will be shown on the event page{% endtrans %}"
