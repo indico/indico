@@ -22,7 +22,7 @@
                     $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
 
                     toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
-                    {% if field.acl_message_url and field.protected_object.get_inherited_acl(count_only=true) %}
+                    {% if field.acl_message_url and (field.protected_object.get_inherited_acl() | length) %}
                         $.ajax({
                             url: {{ field.acl_message_url | tojson }},
                             data: {mode: $this.val()},
