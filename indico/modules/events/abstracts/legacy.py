@@ -392,7 +392,7 @@ class AbstractDescriptionValue(object):
 class AbstractLegacyMixin(object):
     """Implements legacy interface of ZODB ``Abstract`` object."""
 
-    def _get_field_value(self, field_id):
+    def _get_field_value(self, field_id, create=False):
         if field_id == 'content':
             return AbstractDescriptionValue(self.as_new)
         else:
@@ -400,7 +400,10 @@ class AbstractLegacyMixin(object):
                 field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
             except NoResultFound:
                 field = self.event.contribution_fields.filter_by(id=field_id).one()
-            return AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
+            afv = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
+            if afv is None and create:
+                afv = AbstractFieldValue(contribution_field=field, abstract=self.as_new)
+            return afv
 
     @property
     @memoize_request
@@ -448,7 +451,7 @@ class AbstractLegacyMixin(object):
             self.as_new.field_values.remove(field_val)
 
     def setField(self, field_id, val):
-        field_val = self._get_field_value(field_id)
+        field_val = self._get_field_value(field_id, create=True)
         field_val.data = val
 
     def getContribType(self):
@@ -472,10 +475,11 @@ class AbstractFieldContentWrapper(object):
             return self.field_val.data
 
     def __eq__(self, other):
+        val = self.field_val.data if self.field_val else ''
         if isinstance(other, AbstractFieldContentWrapper) and self.field.id == other.field.id:
-            return self.field_val.data == other.data
+            return val == other.data
         elif not isinstance(other, AbstractFieldContentWrapper):
-            return self.field_val.data == other
+            return val == other
         return False
 
     def __len__(self):
