@@ -4,46 +4,6 @@
 
 {% block title %}{% trans %}Event protection{% endtrans %}{% endblock %}
 
-{% block title_actions %}
-    <a class="i-button inconspicuous icon-settings arrow js-dropdown"
-       data-toggle="dropdown"></a>
-    <ul class="dropdown">
-        <li>
-            <a href="#"
-               title="{% trans %}Grant submission rights to all speakers{% endtrans %}"
-               data-title="{% trans %}Manage contribution types{% endtrans %}"
-               data-confirm="{% trans %}Are you sure you want to perform this operation? This operation is irreversible{% endtrans %}"
-               data-href="{{ url_for('.grant_submission_rights', event) }}"
-               data-method="POST"
-               data-qtip-position="right"
-               data-ajax-request>
-                {% trans %}Grant submission rights{% endtrans %}</a>
-        </li>
-        <li>
-            <a href="#"
-               title="{% trans %}Grant modification rights to all session conveners{% endtrans %}"
-               data-title="{% trans %}Manage custom fields{% endtrans %}"
-               data-confirm="{% trans %}Are you sure you want to perform this operation? This operation is irreversible{% endtrans %}"
-               data-href="{{ url_for('.grant_modification_rights', event) }}"
-               data-method="POST"
-               data-qtip-position="right"
-               data-ajax-request>
-                {% trans %}Grant modification rights{% endtrans %}</a>
-        </li>
-        <li>
-            <a href="#"
-               title="{% trans %}Revoke submission rights{% endtrans %}"
-               data-title="{% trans %}Manage custom fields{% endtrans %}"
-               data-confirm="{% trans %}Are you sure you want to perform this operation? This operation is irreversible{% endtrans %}"
-               data-href="{{ url_for('.revoke_submission_rights', event) }}"
-               data-method="POST"
-               data-qtip-position="right"
-               data-ajax-request>
-                {% trans %}Revoke submission rights{% endtrans %}</a>
-        </li>
-    </ul>
-{% endblock %}
-
 {% block content %}
     {{ form_header(form, id='event-protection-form') }}
     {{ form_rows(form, skip=form.priv_fields) }}
