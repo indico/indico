@@ -19,9 +19,12 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from pytz import timezone
 
-from flask import session
-from sqlalchemy.orm import defaultload
+from flask import g, session
+from sqlalchemy.orm import defaultload, joinedload
 
+from indico.core.db import db
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
@@ -36,6 +39,10 @@ class TimetableSerializer(object):
         self.management = management
 
     def serialize_timetable(self, event, days=None, hide_weekends=False, strip_empty_days=False):
+        # pre-fetch ContributionPrincipals (to save time)
+        query = Contribution.find(Contribution.event_new == event).options(joinedload('acl_entries'))
+        g.contribution_acl_cache = {contrib.id: contrib.acl_entries for contrib in query}
+
         timetable = {}
         for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
             date_str = day.strftime('%Y%m%d')
