@@ -114,19 +114,19 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category):
-    return {
+def _serialize_category(category, include_breadcrumb=False):
+    data = {
         'id': category.id,
         'title': category.title
     }
+    if include_breadcrumb:
+        data['breadcrumb'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
+    return data
 
 
-class RHCategoryLoadSubcategories(RHDisplayCategoryBase):
+class RHCategoryInfo(RHDisplayCategoryBase):
     def _process(self):
-        category_id = request.values.get('categoryId', None)
-        if not category_id:
-            return
-        category = Category.get(category_id)
+        category = self._target.as_new
         category_contents = category.children
-        return jsonify_data(category=_serialize_category(category),
+        return jsonify_data(category=_serialize_category(category, include_breadcrumb=True),
                             subcategories=[_serialize_category(c) for c in category_contents])
