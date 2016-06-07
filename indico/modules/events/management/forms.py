@@ -20,13 +20,14 @@ from operator import itemgetter
 
 from wtforms import BooleanField
 
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
                                      IndicoPasswordField)
 from indico.web.forms.widgets import SwitchWidget
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import UsedIf, HiddenUnless
 
 
 class EventProtectionForm(IndicoForm):
@@ -35,9 +36,9 @@ class EventProtectionForm(IndicoForm):
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                  groups=True, allow_emails=True, allow_networks=True,
                                  description=_('List of users allowed to access the event.'))
-    access_key = IndicoPasswordField(_('Access key'), toggle=True,
-                                     description=_('It is more secure to make the event restricted instead of using '
-                                                   'an access key'))
+    access_key = IndicoPasswordField(_('Access key'), [HiddenUnless('protection_mode', ProtectionMode.protected)],
+                                     toggle=True, description=_('It is more secure to make the event restricted '
+                                                                'instead of using an access key'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the event'))
     registration_managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
