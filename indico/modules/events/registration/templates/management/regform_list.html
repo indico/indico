@@ -5,6 +5,21 @@
     {%- trans %}Registration{% endtrans -%}
 {% endblock %}
 
+{% block title_actions %}
+    <a class="i-button inconspicuous icon-settings arrow js-dropdown"
+       data-toggle="dropdown"></a>
+    <ul class="dropdown">
+        {% if event.getType() == 'conference' %}
+            <li>
+                <a href="{{ url_for('.manage_regforms_display', event) }}"
+                   title="{% trans %}Define how the participant list will be shown on the event page{% endtrans %}"
+                   data-qtip-position="right">
+                    {% trans %}Participant list customization{% endtrans %}</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
 {% block description %}
     {% trans -%}
         Registration forms allow people to register for the event.
@@ -30,26 +45,6 @@
                        data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
                         {% trans %}Enable payments{% endtrans %}
                     </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-
-    {% if event.getType() == 'conference' %}
-        <div class="action-box plain">
-            <div class="section">
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Participant list customization{% endtrans %}
-                    </div>
-                    {% trans %}Define how the participant list will be shown on the event page.{% endtrans %}
-                </div>
-                <div class="toolbar">
-                    <div class="group">
-                        <a href="{{ url_for('.manage_regforms_display', event) }}" class="i-button icon-settings">
-                            {% trans %}Customize display{% endtrans %}
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
