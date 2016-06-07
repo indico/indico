@@ -37,8 +37,8 @@ class EventProtectionForm(IndicoForm):
                                  groups=True, allow_emails=True, allow_networks=True,
                                  description=_('List of users allowed to access the event.'))
     access_key = IndicoPasswordField(_('Access key'), [HiddenUnless('protection_mode', ProtectionMode.protected)],
-                                     toggle=True, description=_('It is more secure to make the event restricted '
-                                                                'instead of using an access key'))
+                                     toggle=True, classes=['event-protection-access-key'],
+                                     description=_('It is more secure to use only the ACL and not set an access key'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the event'))
     registration_managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
