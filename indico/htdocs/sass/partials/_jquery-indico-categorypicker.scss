@@ -33,6 +33,8 @@
 
         .item {
             cursor: pointer;
+            display: flex;
+            align-items: center;
         }
 
         .subcategory {
@@ -58,6 +60,19 @@
                 &:not(:last-child):after {
                     content: '»';
                     padding: 0 0.5em;
+                }
+            }
+        }
+
+        .button-wrapper {
+            flex-shrink: 0;
+            margin-left: auto;
+
+            .navigate-up {
+                padding: 10px;
+
+                &:hover {
+                    background-color: $pastel-gray;
                 }
             }
         }

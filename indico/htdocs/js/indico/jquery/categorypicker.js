@@ -52,7 +52,7 @@
                     complete: function() {
                         $(this).remove();
                     }
-                });
+                }).find('.title').fadeOut();
                 buildCategoryList(categoryId, $categoryList);
             }
 
@@ -70,7 +70,9 @@
                                 data: {
                                     id: data.category.id
                                 }
-                            }).append($('<span>', {
+                            });
+                            var titleWrapper = $('<div>').addClass('title-wrapper');
+                            titleWrapper.append($('<span>', {
                                 class: 'title',
                                 text: data.category.title,
                             }));
@@ -82,6 +84,7 @@
                                         data: {
                                             id: category.id
                                         },
+                                        title:  $T.gettext("Go to: {0}".format(category.title)),
                                         href: '#'
                                     }).on('click', function(evt) {
                                         evt.preventDefault()
@@ -89,7 +92,20 @@
                                     }))
                                 );
                             });
-                            category.append(breadcrumb);
+                            titleWrapper.append(breadcrumb);
+                            category.append(titleWrapper);
+                            if (data.category.breadcrumb.length) {
+                                var parent = _.last(data.category.breadcrumb);
+
+                                var buttonWrapper = $('<div>').addClass('button-wrapper');
+                                buttonWrapper.append($('<a>', {
+                                    class: 'icon-arrow-up navigate-up',
+                                    title: $T.gettext("Go to parent: {0}".format(parent.title))
+                                }).on('click', function() {
+                                    goToCategory(parent.id, $categoryList);
+                                }));
+                                category.append(buttonWrapper);
+                            }
                             $categoryList.append(category);
                         }
                         if (data.subcategories) {
