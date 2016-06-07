@@ -155,6 +155,7 @@ class RHEventProtection(RHConferenceModifBase):
                 self.event_new.as_legacy.setAccessKey(form.access_key.data)
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
+            update_object_principals(self.event_new, form.submitters.data, role='submit')
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
@@ -162,6 +163,7 @@ class RHEventProtection(RHConferenceModifBase):
 
     def _get_defaults(self):
         acl = {p.principal for p in self.event_new.acl_entries if p.read_access}
+        submitters = {p.principal for p in self.event_new.acl_entries if p.has_management_role('submit', explicit=True)}
         managers = {p.principal for p in self.event_new.acl_entries if p.full_access}
         registration_managers = {p.principal for p in self.event_new.acl_entries
                                  if p.has_management_role('registration', explicit=True)}
@@ -169,7 +171,7 @@ class RHEventProtection(RHConferenceModifBase):
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
-                     'registration_managers': registration_managers,
+                     'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event_new.as_legacy.getAccessKey()}, **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):

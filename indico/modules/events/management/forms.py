@@ -41,6 +41,8 @@ class EventProtectionForm(IndicoForm):
                                      description=_('It is more secure to use only the ACL and not set an access key'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the event'))
+    submitters = PrincipalListField(_('Submitters', allow_emails=True),
+                                    description=_('List of users with submission rights'))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):
