@@ -595,14 +595,6 @@ class UHConfManagementAccess(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-managementAccess'
 
 
-class UHConfEnterModifKey(UHConfUser):
-    _endpoint = 'event_mgmt.conferenceModification-modifKey'
-
-
-class UHConfCloseModifKey(UHConfUser):
-    _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
-
-
 class UHDomains(URLHandler):
     _endpoint = 'admin.domainList'
 

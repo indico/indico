@@ -224,13 +224,6 @@ def test_update_principal_errors(create_event, dummy_user):
         event.update_principal(dummy_user, roles={'invalid'})
 
 
-@pytest.mark.parametrize(('allow_key', 'has_key', 'authenticated', 'expected'), bool_matrix('...', expect=all))
-def test_can_manage_key(create_event, dummy_user, allow_key, has_key, authenticated, expected):
-    event = create_event()
-    event.as_legacy.canKeyModify = lambda: has_key
-    assert event.can_manage(dummy_user if authenticated else None, allow_key=allow_key) == expected
-
-
 @pytest.mark.usefixtures('request_context')
 def test_can_manage_roles(create_event, dummy_user):
     event = create_event()

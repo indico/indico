@@ -321,9 +321,7 @@ class ProtectedModificationService(ProtectedService):
 
         target = self._target
         if not target.canModify( self.getAW() ):
-            if target.getModifKey() != "":
-                raise ServiceAccessError("You don't have the rights to modify this object")
-            if self._getUser() == None:
+            if self._getUser() is None:
                 self._checkSessionUser()
             else:
                 raise ServiceAccessError("You don't have the rights to modify this object")

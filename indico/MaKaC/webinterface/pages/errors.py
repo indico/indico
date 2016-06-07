@@ -273,40 +273,13 @@ class WModificationError( WTemplated ):
         return vars
 
 
-class WModificationKeyError( WTemplated ):
-
-    def __init__( self, rh, msg="" ):
-        self._rh = rh
-        self._msg = msg
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["msg"] = self._msg
-        redirectURL = ""
-        if hasattr(self._rh, "_redirectURL"):
-            redirectURL = self._rh._redirectURL
-        vars["redirectURL"] = quoteattr(redirectURL)
-        vars["url"] = quoteattr( str( urlHandlers.UHConfEnterModifKey.getURL(self._rh._target) ) )
-        return vars
-
-
 class WPModificationError( WPDecorated ):
 
     def __init__( self, rh ):
         WPDecorated.__init__( self, rh )
 
     def _getBody( self, params ):
-        if hasattr(self._rh._target, "getModifKey") and \
-            self._rh._target.getModifKey() != "":
-            keys = session.get("modifKeys", {})
-            if keys.get(self._rh._target.getId()):
-                msg = i18nformat("""<font color=red> _("Wrong modification key!")</font>""")
-            else:
-                msg = ""
-            wc = WModificationKeyError( self._rh, msg )
-        else:
-            wc = WModificationError( self._rh )
-        return wc.getHTML()
+        return WModificationError(self._rh).getHTML()
 
 
 class WReportError( WTemplated ):

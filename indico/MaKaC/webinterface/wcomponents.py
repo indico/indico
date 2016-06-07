@@ -356,9 +356,6 @@ class WConferenceHeader(WHeader):
         vars["showDLMaterial"] = True
         vars["showLayout"] = True
 
-        vars["usingModifKey"]=False
-        if self._conf.canKeyModify():
-            vars["usingModifKey"]=True
         vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
 
         # This is basically the same WICalExportBase, but we need some extra
@@ -397,22 +394,14 @@ class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
         WConferenceHeader.__init__(self, self._aw, conf)
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
         vars["categurl"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
-        url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-        vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
-        if self._conf.canKeyModify():
-            url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
-            url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-            vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -487,9 +476,8 @@ class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
         WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
@@ -578,10 +566,6 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
 
     def getVars( self ):
         vars = WMenuMeetingHeader.getVars( self )
-        vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
-        if self._conf.canKeyModify():
-            vars["confModif"] = """<a href=%s>exit manage</a>"""%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
-
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
         vars["showExportToPDF"] = False
@@ -915,7 +899,6 @@ class WConfModificationControlFrame(WTemplated):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
         vars["confId"] = self.__target.getId()
-        vars["modifKey"] = self.__target.getModifKey()
         vars["managers"] = self._getManagersList()
         return vars
 
