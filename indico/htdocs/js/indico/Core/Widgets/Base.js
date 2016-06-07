@@ -111,8 +111,7 @@ type("EnumWidget", ["WatchObject", "IWidget"],
 
             var returnedDom = $B(self.domList, self,
                 function(pair) {
-                    var listItem =  self._iteratingElement(
-                        {id: self.id + '_' + pair.key}, self._drawItem(pair));
+                    var listItem =  self._iteratingElement({id: self.id + '_' + pair.key, pair: pair}, self._drawItem(pair));
                     if (exists(self.mouseoverObserver)) {
                         listItem.observeEvent('mouseover', function(event){
                             self.mouseoverObserver(true, pair, listItem, event);
