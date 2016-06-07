@@ -21,9 +21,3 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 # Management entrance (redirects to most appropriate page)
 event_mgmt.add_url_rule('/', 'conferenceModification-managementAccess',
                         conferenceModif.RHConferenceModifManagementAccess)
-
-# Modification key
-event_mgmt.add_url_rule('/modificationkey/logout', 'conferenceModification-closeModifKey',
-                        conferenceModif.RHConferenceCloseModifKey)
-event_mgmt.add_url_rule('/modificationkey', 'conferenceModification-modifKey', conferenceModif.RHConferenceModifKey,
-                        methods=('GET', 'POST'))

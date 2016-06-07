@@ -635,9 +635,6 @@ class Category(CommonObjectBase):
     def getAccessKey(self):
         return ""
 
-    def getModifKey(self):
-        return ""
-
     def indexConf(self, conf):
         # Specific for category changes, calls Conference.indexConf()
         # (date-related indexes)
@@ -1029,7 +1026,6 @@ class Conference(CommonObjectBase):
         self.___contribTypeGenerator = Counter()
         self._boa = BOAConfig(self)
         self._accessKey = ""
-        self._modifKey = ""
         self._closed = False
         self._visibility = 999
         self.__badgeTemplateManager = BadgeTemplateManager(self)
@@ -1749,18 +1745,6 @@ class Conference(CommonObjectBase):
             self._accessKey = ""
             return self._accessKey
 
-    def setModifKey(self, modifKey=""):
-        """sets the modification key of the conference"""
-        self._modifKey = modifKey
-        self.notifyModification()
-
-    def getModifKey(self):
-        try:
-            return self._modifKey
-        except AttributeError:
-            self._modifKey = ""
-            return self._modifKey
-
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
@@ -2033,12 +2017,6 @@ class Conference(CommonObjectBase):
             return False
         return key == accessKey or session.get('accessKeys', {}).get(self.getUniqueId()) == accessKey
 
-    def canKeyModify(self):
-        modifKey = self.getModifKey()
-        if not modifKey or not session.user:
-            return False
-        return session.get('modifKeys', {}).get(self.id) == modifKey
-
     @unify_user_args
     def canUserModify(self, user):
         return self.as_event.can_manage(user)
@@ -2052,7 +2030,7 @@ class Conference(CommonObjectBase):
             aw_or_user = aw_or_user.getUser()
         if isinstance(aw_or_user, AvatarUserWrapper):
             aw_or_user = aw_or_user.user
-        return self.as_event.can_manage(aw_or_user, allow_key=True)
+        return self.as_event.can_manage(aw_or_user)
 
     def getManagerList(self):
         managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
@@ -2114,7 +2092,6 @@ class Conference(CommonObjectBase):
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
-            conf.setModifKey(self.getModifKey())
         # Access Control cloning
         if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
@@ -2840,9 +2817,6 @@ class Track(CoreObject):
             return
         self._contributions[ newContrib.getId() ] = newContrib
         newContrib.setTrack( self )
-
-    def getModifKey( self ):
-        return self.getConference().getModifKey()
 
     def removeContribution( self, contrib ):
         """

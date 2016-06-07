@@ -91,12 +91,6 @@ class RequestHandlerBase():
         """
         pass
 
-    def _getAuth(self):
-        """
-        Returns True if current user is a user or has either a modification key in their session.
-        """
-        return session.get('modifKeys') or self._getUser()
-
     def getAW(self):
         """
         Returns the access wrapper related to this session/user
@@ -586,10 +580,9 @@ class RH(RequestHandlerBase):
         # this is used for checking access/modification key existence
         # in the user session
         self._setSessionUser()
-        if self._getAuth():
-            if self._getUser():
-                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
-                    request, self._getUser().getFullName(), self._getUser().getId()))
+        if self._getUser():
+            Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
+                request, self._getUser().getFullName(), self._getUser().getId()))
             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                 self._tohttps = True
                 if self._checkHttpsRedirect():
@@ -860,9 +853,6 @@ class RHDisplayBaseProtected(RHProtected):
                 if target.getAccessKey() != "" or target.getConference() and \
                         target.getConference().getAccessKey() != "":
                     raise KeyAccessError()
-                elif target.getModifKey() != "" or target.getConference() and \
-                        target.getConference().getModifKey() != "":
-                    raise ModificationError()
             if self._getUser() is None:
                 self._checkSessionUser()
             else:
@@ -876,12 +866,10 @@ class RHModificationBaseProtected(RHProtected):
 
     def _checkProtection(self):
         if isinstance(self._target, Conference):
-            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE, allow_key=True)
+            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE)
         else:
             can_manage = self._target.canModify(session.avatar)
         if not can_manage:
-            if self._target.getModifKey() != "":
-                raise ModificationError()
             if self._getUser() is None:
                 self._checkSessionUser()
             else:

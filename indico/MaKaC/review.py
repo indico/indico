@@ -1664,9 +1664,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         conf = self.getConference()
         return conf.canUserModify(av)
 
-    def getModifKey(self):
-        return ""
-
     def getAccessKey(self):
         return ""
 
@@ -3235,10 +3232,6 @@ class NotificationTemplate(Persistent):
         # replace the %% by %
         result = result.replace("%%", "%")
         return result
-
-    def getModifKey( self ):
-        return self.getConference().getModifKey()
-
 
 
 class NotifTplToAddr(Persistent):
