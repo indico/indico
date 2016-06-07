@@ -5,9 +5,10 @@
 {% endblock %}
 
 {% block content %}
-    <div class="category-picker"
-         data-href="{{ url_for('categories.load-subcategories', category) }}"></div>
+    <div class="category-picker"></div>
     <script>
-        $('.category-picker').categorypicker();
+        $('.category-picker').categorypicker({
+            initialCateg: {{ category.id }}
+        });
     </script>
 {% endblock %}
