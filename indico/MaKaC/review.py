@@ -2781,8 +2781,8 @@ class AbstractStatusWithdrawn(AbstractStatus):
             else:
                 s = self.getPrevStatus()
         abstract.setCurrentStatus(s)
-        abstract.as_new.accepted_track_id = int(contrib.track.id) if contrib.track else None
-        abstract.as_new.accepted_type = contrib.type
+        abstract.as_new.accepted_track_id = int(contrib.track.id) if contrib and contrib.track else None
+        abstract.as_new.accepted_type = contrib.type if contrib else None
 
 
     def markAsDuplicated(self,responsible,originalAbs,comments=""):
