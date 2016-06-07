@@ -184,6 +184,8 @@ def _transaction_ended(session, transaction):
             del g.event_notes
         if 'event_attachments' in g:
             del g.event_attachments
+        if 'contribution_acl_cache' in g:
+            del g.contribution_acl_cache
     if has_request_context() and hasattr(flask_session, '_user'):
         delattr(flask_session, '_user')
 
