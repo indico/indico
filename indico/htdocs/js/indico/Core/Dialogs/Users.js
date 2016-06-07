@@ -1297,6 +1297,20 @@ $(function() {
  */
 type("UserListWidget", ["ListWidget"],
      {
+        _iteratingElement: function(attrs, item) {
+            var className;
+            var pairProperties = attrs.pair.get();
+            if (pairProperties.get('isGroup')) {
+                className = 'item-group';
+            } else if (pairProperties.get('_type') === 'IPNetworkGroup') {
+                className = 'icon-lan2';
+            } else {
+                className = 'icon-user';
+            }
+            attrs['className'] = className;
+            delete attrs['pair'];
+            return this.ListWidget.prototype._iteratingElement.call(this, attrs, item);
+        },
         _drawItem: function(user) {
             var self = this;
             var userData = user.get();
