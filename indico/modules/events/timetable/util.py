@@ -34,6 +34,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.legacy import serialize_event_info
+from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -285,7 +286,7 @@ def get_session_block_entries(event, day):
 
 def shift_following_entries(entry, shift, session_=None):
     """Reschedules entries starting after the given entry by the given shift."""
-    query = entry.siblings.filter(TimetableEntry.start_dt >= entry.end_dt)
+    query = entry.siblings_query.filter(TimetableEntry.start_dt >= entry.end_dt)
     if session_ and not entry.parent:
         query.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
                      TimetableEntry.session_block.has(session_id=session_.id))
@@ -333,3 +334,17 @@ def get_time_changes_notifications(changes, tzinfo, entry=None):
         if msg:
             notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
     return notifications
+
+
+@memoize_request
+def get_top_level_entries(event):
+    return event.timetable_entries.filter_by(parent_id=None).all()
+
+
+@memoize_request
+def get_nested_entries(event):
+    entries = event.timetable_entries.filter(TimetableEntry.parent_id.isnot(None)).all()
+    result = defaultdict(list)
+    for entry in entries:
+        result[entry.parent_id].append(entry)
+    return result

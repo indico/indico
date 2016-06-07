@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session
 
 from indico.core import signals
@@ -217,8 +219,10 @@ def can_swap_entry(entry, direction, in_session=False):
 
 
 def get_sibling_entry(entry, direction, in_session=False):
-    query = entry.siblings if not in_session else entry.session_siblings
+    siblings = entry.siblings if not in_session else entry.session_siblings
     if direction == 'down':
-        return query.filter(TimetableEntry.start_dt >= entry.end_dt).order_by(TimetableEntry.start_dt.asc()).first()
+        siblings = [x for x in siblings if x.start_dt >= entry.end_dt]
+        return min(siblings, key=attrgetter('start_dt')) if siblings else None
     elif direction == 'up':
-        return query.filter(TimetableEntry.end_dt <= entry.start_dt).order_by(TimetableEntry.end_dt.desc()).first()
+        siblings = [x for x in siblings if x.end_dt <= entry.start_dt]
+        return max(siblings, key=attrgetter('end_dt')) if siblings else None
