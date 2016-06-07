@@ -155,7 +155,6 @@ class RHEventProtection(RHConferenceModifBase):
                 self.event_new.as_legacy.setAccessKey(form.access_key.data)
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
-            update_object_principals(self.event_new, form.registration_managers.data, role='registration')
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
