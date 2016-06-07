@@ -299,3 +299,10 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
             raise ValidationError(exc.message)
+
+
+class RegistrationManagersForm(IndicoForm):
+    """Form to manage users with privileges to modify registration-related items"""
+
+    managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
+                                  description=_('List of users allowed to modify registrations'))
