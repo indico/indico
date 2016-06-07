@@ -1353,6 +1353,9 @@ type("UserListWidget", ["ListWidget"],
                 } else {
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
                 }
+
+                userName.append(Html.span('email', userData.get('email')));
+                userName.append(Html.span('affiliation', userData.get('affiliation')));
                 return [userName, buttonDiv];
             }
          }
@@ -1486,7 +1489,7 @@ type("UserListField", ["IWidget"], {
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
             var chooseUserButton = Html.input("button", {style: {marginRight: pixels(5)},
                                                          className: 'i-button', type: 'button'},
-                                              this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
+                                              this.enableGroups ? $T('Add User / Group'): $T('Add user'));
             var chooseIpNetwork = Html.a({href: '#', style: {marginRight: pixels(5)},
                                           className: 'i-button arrow js-dropdown',
                                           'data-toggle': 'dropdown'}, $T('Add IP Network'));
