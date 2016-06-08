@@ -298,7 +298,11 @@ class PrincipalListField(HiddenField):
             raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
     def _value(self):
-        principals = sorted(self._get_data(), key=lambda x: x.name.lower())
+        def key(obj):
+            if isinstance(obj, PersonLinkBase):
+                return obj.name.lower()
+            return obj.principal_type, obj.name.lower()
+        principals = sorted(self._get_data(), key=key)
         return map(self._serialize_principal, principals)
 
     def _get_data(self):

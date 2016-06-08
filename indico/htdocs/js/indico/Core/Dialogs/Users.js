@@ -1403,7 +1403,6 @@ type("UserListWidget", ["ListWidget"],
  *
  */
 type("UserListField", ["IWidget"], {
-
     getUsers: function() {
         return $L(this.userList);
     },
@@ -1516,7 +1515,9 @@ type("UserListField", ["IWidget"], {
                 li.observeClick(function() {
                     self.newProcess([network], function(result) {
                         if (result && !self.userList.get(network.identifier)) {
-                            self.userList.set(network.identifier, $O(network))
+                            var entries = self.userList.getAll();
+                            entries[network.identifier] = $O(network);
+                            updatePrincipalsList(entries);
                         }
                     });
                 });
@@ -1530,6 +1531,19 @@ type("UserListField", ["IWidget"], {
                 title = this.enableGroups ? $T("Add Users and Groups") : $T("Add Users");
             } else {
                 title = this.enableGroups ? $T("Search Users and Groups") : $T("Search Users");
+            }
+
+            function updatePrincipalsList(entries) {
+                var sortedKeys = _.sortBy(_.keys(entries), function(key) {
+                    var principal = entries[key].getAll();
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal.isGroup ? 1 : 2);
+                    return [weight, principal.name.toLowerCase()];
+                });
+
+                self.userList.clearList();
+                _.each(sortedKeys, function(key) {
+                    self.userList.set(key, $O(entries[key].getAll()));
+                });
             }
 
             var peopleAddedHandler = function(peopleList){
@@ -1547,14 +1561,12 @@ type("UserListField", ["IWidget"], {
                             } else {
                                 key = person.id;
                             }
-                            if (person._type === "Avatar" && self.userList.get(key)) {
-                                // it is an existing avatar, unchanged, and already exists: we do nothing
-                            } else {
-                                if (self.userList.get(key)) {
-                                    self.userList.set(key, null);
-                                }
-                                self.userList.set(key, $O(person));
-                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
+                            if (!self.userList.get(key)) {
+                                var entries = self.userList.getAll();
+                                entries[key] = $O(person);
+                                updatePrincipalsList(entries);
+                                $('.icon-shield[data-id="author_' + person.email + '"]')
+                                    .trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
                             }
                         });
                     }

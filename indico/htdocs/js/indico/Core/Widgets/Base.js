@@ -108,22 +108,20 @@ type("EnumWidget", ["WatchObject", "IWidget"],
 
         draw: function() {
             var self = this;
+            var returnedDom = $B(self.domList, self, function(pair) {
+                var listItem =  self._iteratingElement({id: self.id + '_' + pair.key, pair: pair}, self._drawItem(pair));
+                if (exists(self.mouseoverObserver)) {
+                    listItem.observeEvent('mouseover', function(event){
+                        self.mouseoverObserver(true, pair, listItem, event);
+                    });
+                    listItem.observeEvent('mouseout', function(event){
+                        self.mouseoverObserver(false, pair, listItem, event);
+                    });
+                }
 
-            var returnedDom = $B(self.domList, self,
-                function(pair) {
-                    var listItem =  self._iteratingElement({id: self.id + '_' + pair.key, pair: pair}, self._drawItem(pair));
-                    if (exists(self.mouseoverObserver)) {
-                        listItem.observeEvent('mouseover', function(event){
-                            self.mouseoverObserver(true, pair, listItem, event);
-                        });
-                        listItem.observeEvent('mouseout', function(event){
-                            self.mouseoverObserver(false, pair, listItem, event);
-                        });
-                    }
-                    self._postDraw(pair);
-
-                    return listItem;
-                });
+                self._postDraw(pair);
+                return listItem;
+            });
 
             // Optional header
             var header = self._getHeader();
@@ -271,9 +269,7 @@ type("SelectableListWidget", ["ListWidget"],
             var dom = $B(self.domList, self,
 
                 function(pair) {
-
                     var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
-
                     if (pair.get().get("unselectable") === true) {
                         listItem.dom.className += ' unselectable';
 
