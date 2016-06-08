@@ -91,8 +91,22 @@
         }
 
         .button-wrapper {
+            align-items: center;
+            display: flex;
             flex-shrink: 0;
             margin-left: auto;
+
+            > * {
+                margin: 0 0.5rem;
+            }
+
+            > *:first-child {
+                margin-left: 0;
+            }
+
+            > *:last-child {
+                margin-right: 0;
+            }
 
             .navigate-up {
                 padding: 10px;
