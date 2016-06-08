@@ -29,8 +29,8 @@ class IPNetworkGroupForm(IndicoForm):
 
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    networks = MultiIPNetworkField(_('Subnets'), [DataRequired()], field=('subnet', _("subnet")),
-                                      description=_("IPv4 or IPv6 subnets in CIDR notation"))
+    networks = MultiIPNetworkField(_('Subnets'), [DataRequired()],
+                                   description=_("IPv4 or IPv6 subnets in CIDR notation"))
 
     def __init__(self, *args, **kwargs):
         self._network_group_id = kwargs['obj'].id if 'obj' in kwargs else None
