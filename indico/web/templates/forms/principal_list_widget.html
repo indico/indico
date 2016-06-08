@@ -28,7 +28,10 @@
                 newPrincipals = _.filter(newPrincipals, function(principal) {
                     return !_.findWhere(principals, {identifier: principal.identifier});
                 });
-                principals = principals.concat(newPrincipals);
+                principals = _.sortBy(principals.concat(newPrincipals), function(principal) {
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal.isGroup ? 1 : 2);
+                    return [weight, principal.name.toLowerCase()];
+                });
                 field.val(JSON.stringify(principals));
                 field.trigger('change');
                 setResult(true, principals);
