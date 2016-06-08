@@ -56,13 +56,13 @@ admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTm
 admin.add_url_rule('/protection/messages', 'adminProtection', admins.RHAdminProtection)
 
 # IP domains (let's call them "networks" in the URL - that's more fitting)
-admin.add_url_rule('/networks/create', 'domainCreation', domains.RHDomainCreation)
-admin.add_url_rule('/networks/create', 'domainCreation-create', domains.RHDomainPerformCreation, methods=('POST',))
-admin.add_url_rule('/networks/<domainId>/modify', 'domainDataModification', domains.RHDomainModification)
-admin.add_url_rule('/networks/<domainId>/modify', 'domainDataModification-modify', domains.RHDomainPerformModification,
-                   methods=('POST',))
-admin.add_url_rule('/networks/<domainId>/details', 'domainDetails', domains.RHDomainDetails)
-admin.add_url_rule('/networks/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
+admin.add_url_rule('/networks-old/create', 'domainCreation', domains.RHDomainCreation)
+admin.add_url_rule('/networks-old/create', 'domainCreation-create', domains.RHDomainPerformCreation, methods=('POST',))
+admin.add_url_rule('/networks-old/<domainId>/modify', 'domainDataModification', domains.RHDomainModification)
+admin.add_url_rule('/networks-old/<domainId>/modify', 'domainDataModification-modify',
+                   domains.RHDomainPerformModification, methods=('POST',))
+admin.add_url_rule('/networks-old/<domainId>/details', 'domainDetails', domains.RHDomainDetails)
+admin.add_url_rule('/networks-old/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))
