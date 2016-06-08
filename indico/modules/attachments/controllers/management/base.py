@@ -75,8 +75,10 @@ class ManageAttachmentsMixin:
     def _process(self):
         tpl_args = {'linked_object': self.object, 'linked_object_type': self.object_type,
                     'attachments': get_attached_items(self.object)}
-        if self.object_type in ('event', 'category'):
+        if self.object_type == 'event':
             return self.wp.render_template('attachments.html', self._target, **tpl_args)
+        elif self.object_type == 'category' and not request.is_xhr:
+            return self.wp.render_template('management/attachments.html', category=self.category, **tpl_args)
         else:
             return jsonify_template('attachments/attachments.html', **tpl_args)
 
