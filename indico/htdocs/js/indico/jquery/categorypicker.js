@@ -32,8 +32,8 @@
                 type: 'text',
                 placeholder: $T.gettext("Search")
             });
-            self.$categoryList = $('<ul>', {class: 'group-list'});
-            self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect fixed-height'})
+            self.$categoryList = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
                 .append($('<div>', {class: 'i-box-content'})
                     .append(self.$categoryList));
             self.goToCategory(opt.categoryId);
