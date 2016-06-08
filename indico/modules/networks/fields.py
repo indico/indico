@@ -18,6 +18,7 @@ from operator import itemgetter
 
 from ipaddress import ip_network
 
+from indico.util.i18n import _
 from indico.web.forms.fields import MultiStringField
 
 
@@ -29,7 +30,7 @@ class MultiIPNetworkField(MultiStringField):
     """
 
     def __init__(self, *args, **kwargs):
-        super(MultiIPNetworkField, self).__init__(*args, **kwargs)
+        super(MultiIPNetworkField, self).__init__(*args, field=('subnet', _("subnet")), **kwargs)
         self._data_converted = False
         self.data = None
 
