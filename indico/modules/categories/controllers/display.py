@@ -120,7 +120,7 @@ def _serialize_category(category, include_breadcrumb=False):
         'title': category.title
     }
     if include_breadcrumb:
-        data['breadcrumb'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
+        data['path'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
     return data
 
 
