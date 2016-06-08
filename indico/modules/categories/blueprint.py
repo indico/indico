@@ -23,13 +23,14 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 from MaKaC.webinterface.rh import calendar, categoryDisplay
 
-_bp = IndicoBlueprint('categories', __name__, template_folder='templates', url_prefix='/category/<int:category_id>')
+_bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtual_template_folder='categories',
+                      url_prefix='/category/<int:category_id>')
 
 _bp.add_url_rule('/manage/settings', 'manage', RHCategorySettings)
 #_bp.add_url_rule('/', 'display', RHDisplayCategory)
 _bp.add_url_rule('/', 'display', categoryDisplay.RHCategoryDisplay)
 
-_legacy_bp = IndicoBlueprint('category', __name__, template_folder='templates',
+_legacy_bp = IndicoBlueprint('category', __name__, template_folder='templates', virtual_template_folder='categories',
                              url_prefix='/category/<int:categId>')
 
 # Short URLs

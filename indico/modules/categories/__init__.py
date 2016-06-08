@@ -97,7 +97,7 @@ def _get_management_roles(sender, **kwargs):
 
 @template_hook('category-management-header')
 def _add_action_menu(category, **kwargs):
-    return render_template('management/action_menu.html', category=category)
+    return render_template('categories/management/action_menu.html', category=category)
 
 
 class CreatorRole(ManagementRole):
