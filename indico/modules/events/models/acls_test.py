@@ -286,36 +286,27 @@ def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_
     assert event.can_manage(user, allow_admin=allow_admin, explicit_role=not not_explicit) == expected
 
 
-def test_can_manage_guest(create_event):
+def test_can_manage_guest(create_event, dummy_category):
     event = create_event()
     # we grant explicit management access on the parent to ensure that
     # we don't even check there but bail out early
-    event.as_legacy.category = MagicMock(spec=['can_manage'])
-    event.as_legacy.category.can_manage.return_value = True
+    event.category = dummy_category
+    event.category.can_manage = MagicMock(return_value=True)
     assert not event.can_manage(None)
 
 
 @pytest.mark.parametrize('can_manage_parent', (True, False))
-def test_can_manage_parent(create_event, dummy_user, can_manage_parent):
+def test_can_manage_parent(create_event, dummy_category, dummy_user, can_manage_parent):
     event = create_event()
-    event.as_legacy.category = MagicMock(spec=['can_manage'])
-    event.as_legacy.category.can_manage.return_value = can_manage_parent
+    event.category = dummy_category
+    event.category.can_manage = MagicMock(return_value=can_manage_parent)
     assert event.can_manage(dummy_user) == can_manage_parent
-    event.as_legacy.category.can_manage.assert_called_once_with(dummy_user, allow_admin=True)
-
-
-@pytest.mark.parametrize('can_manage_parent', (True, False))
-def test_can_manage_parent_legacy(create_event, dummy_user, can_manage_parent):
-    event = create_event()
-    event.as_legacy.category = MagicMock(spec=['canUserModify'])
-    event.as_legacy.category.canUserModify.return_value = can_manage_parent
-    assert event.can_manage(dummy_user) == can_manage_parent
-    event.as_legacy.category.canUserModify.assert_called_once_with(dummy_user.as_avatar)
+    event.category.can_manage.assert_called_once_with(dummy_user, allow_admin=True)
 
 
 def test_can_manage_parent_invalid(create_event, dummy_user):
     event = create_event()
-    event.as_legacy.category = MagicMock(spec=[])
+    event.__dict__['category'] = MagicMock(spec=[])
     with pytest.raises(TypeError):
         event.can_manage(dummy_user)
 
