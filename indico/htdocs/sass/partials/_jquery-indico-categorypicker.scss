@@ -25,7 +25,7 @@
     }
 
     .category-navigator {
-        &.fixed-height {
+        .group-list.fixed-height {
             max-height: 500px;
             overflow: auto;
             overflow-y: auto;
@@ -45,7 +45,8 @@
             display: block;
         }
 
-        .current-category{
+        .current-category {
+            cursor: initial;
             margin-left: -10px;
             margin-right: -10px;
             padding: 10px 10px;
