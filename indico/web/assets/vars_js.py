@@ -133,6 +133,10 @@ def generate_global_file(config):
 
             'Sessions': {
                 'display_session': url_rule_to_js('sessions.display_session')
+            },
+
+            'Categories': {
+                'info': url_rule_to_js('categories.info')
             }
         },
 

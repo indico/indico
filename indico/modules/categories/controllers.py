@@ -20,12 +20,15 @@ from math import ceil
 
 from flask import jsonify, request
 
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
-from indico.modules.categories.views import WPCategoryStatistics
+from indico.modules.categories.views import WPCategoryStatistics, WPCategoryMove
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
+from MaKaC.webinterface.rh.categoryMod import RHCategModifBase
+from indico.web.util import jsonify_data
 
 
 def _plot_data(stats, tooltip=''):
@@ -65,6 +68,16 @@ def _count_users():
     return User.find(is_deleted=False, is_pending=False).count()
 
 
+def _serialize_category(category, include_breadcrumb=False):
+    data = {
+        'id': category.id,
+        'title': category.title
+    }
+    if include_breadcrumb:
+        data['breadcrumb'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
+    return data
+
+
 class RHCategoryStatistics(RHCategDisplayBase):
     def _process(self):
         stats = get_category_stats(int(self._target.getId()))
@@ -82,3 +95,17 @@ class RHCategoryStatistics(RHCategDisplayBase):
                                                         values=values,
                                                         updated=updated,
                                                         has_stats=True)
+
+
+class RHCategoryMoveContents(RHCategModifBase):
+    def _process(self):
+        return WPCategoryMove.render_template('move_category_contents.html', self._target,
+                                              category=self._target)
+
+
+class RHCategoryInfo(RHCategModifBase):
+    def _process(self):
+        category = self._target.as_new
+        category_contents = category.children
+        return jsonify_data(category=_serialize_category(category, include_breadcrumb=True),
+                            subcategories=[_serialize_category(c) for c in category_contents])
