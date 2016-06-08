@@ -28,7 +28,11 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
-class RHManageNetworks(RHAdminBase):
+class RHNetworkBase(RHAdminBase):
+    CSRF_ENABLED = True
+
+
+class RHManageNetworks(RHNetworkBase):
     """Management list for IPNetworks"""
 
     def _process(self):
@@ -36,10 +40,8 @@ class RHManageNetworks(RHAdminBase):
         return WPNetworksAdmin.render_template('networks.html', network_groups=network_groups)
 
 
-class RHCreateIPNetworkGroup(RHAdminBase):
+class RHCreateIPNetworkGroup(RHNetworkBase):
     """Dialog to create an IPNetworkGroup"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         form = IPNetworkGroupForm()
@@ -53,7 +55,7 @@ class RHCreateIPNetworkGroup(RHAdminBase):
         return jsonify_form(form)
 
 
-class RHAdminIPNetworkGroupBase(RHAdminBase):
+class RHAdminIPNetworkGroupBase(RHNetworkBase):
     """Base class for managing in IPNetworkGroup"""
 
     def _checkParams(self):
