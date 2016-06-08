@@ -37,7 +37,7 @@ from speaklater import _LazyString
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr',
-                                             'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+                                             'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre']
 BLEACH_ALLOWED_ATTRIBUTES = dict(bleach.ALLOWED_ATTRIBUTES, img=['src', 'alt'])
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
