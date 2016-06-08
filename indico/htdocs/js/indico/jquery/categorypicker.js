@@ -103,6 +103,15 @@
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
 
+
+            $buttonWrapper.append($('<div>').append($('<span>', {
+                class: 'action-button',
+                text: self.options.actionButtonText
+            }).on('click', function(evt) {
+                evt.stopPropagation();
+                self.options.onAction(category.id);
+            })));
+
             if (category.path && category.path.length) {
                 var parent = _.last(category.path);
                 var $arrowUp = $('<a>', {
@@ -114,13 +123,17 @@
                 $buttonWrapper.append($arrowUp);
             }
 
-            $buttonWrapper.append($('<div>', {
-                class: 'action-button',
-                text: self.options.actionButtonText
-            }).on('click', function(evt) {
-                evt.stopPropagation();
-                self.options.onAction(category.id);
-            }));
+            if (category.is_protected) {
+                var $protection = $('<div>').append($('<span>', {class: 'icon-shield'}));
+                $buttonWrapper.append($protection);
+            }
+
+            var $info = $('<div>')
+                .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.category_count)
+                                            .format(category.category_count)}))
+                .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.event_count)
+                                            .format(category.event_count)}));
+            $buttonWrapper.append($info);
 
             return $buttonWrapper;
         },
