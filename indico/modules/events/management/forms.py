@@ -34,8 +34,7 @@ class EventProtectionForm(IndicoForm):
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 groups=True, allow_emails=True, allow_networks=True,
-                                 description=_('List of users allowed to access the event.'))
+                                 groups=True, allow_emails=True, allow_networks=True)
     access_key = IndicoPasswordField(_('Access key'), [HiddenUnless('protection_mode', ProtectionMode.protected)],
                                      toggle=True, classes=['event-protection-access-key'],
                                      description=_('It is more secure to use only the ACL and not set an access key'))
