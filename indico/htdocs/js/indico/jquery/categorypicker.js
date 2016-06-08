@@ -27,6 +27,7 @@
             var element = self.element;
             var opt = self.options;
 
+            self.cache = {};
             self.$searchInput = $('<input>', {
                 class: 'js-search-category',
                 type: 'text',
@@ -52,7 +53,7 @@
                         title:  $T.gettext("Go to: {0}".format(category.title)),
                         href: '#'
                     }).on('click', function(evt) {
-                        evt.preventDefault()
+                        evt.preventDefault();
                         self.goToCategory($(this).data('id'));
                     }))
                 );
@@ -68,7 +69,7 @@
                 class: 'item current-category',
                 data: {id: category.id}
             });
-            var $titleWrapper = $('<div>', {class: 'title-wrapper'})
+            var $titleWrapper = $('<div>', {class: 'title-wrapper'});
             $titleWrapper.append($('<span>', {
                 class: 'title',
                 text: category.title,
@@ -133,18 +134,23 @@
                 }
             }).find('.title').fadeOut();
 
-            $.ajax({
-                url: build_url(Indico.Urls.Categories.info, {categId: id}),
-                dataType: 'json',
-                error: function(data) {
-                    handleAjaxError(data);
-                },
-                success: function(data) {
-                    if (data) {
-                        self._renderNavigator(data);
+            if (self.cache[id]) {
+                self._renderNavigator(self.cache[id]);
+            } else {
+                $.ajax({
+                    url: build_url(Indico.Urls.Categories.info, {categId: id}),
+                    dataType: 'json',
+                    error: function(data) {
+                        handleAjaxError(data);
+                    },
+                    success: function(data) {
+                        if (data) {
+                            self.cache[id] = data;
+                            self._renderNavigator(data);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     });
 })(jQuery);
