@@ -117,7 +117,10 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
 def _serialize_category(category, include_breadcrumb=False):
     data = {
         'id': category.id,
-        'title': category.title
+        'title': category.title,
+        'is_protected': category.is_protected,
+        'category_count': category.deep_children_count,
+        'event_count': category.deep_events_count
     }
     if include_breadcrumb:
         data['path'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
