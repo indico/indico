@@ -45,14 +45,29 @@
             display: block;
         }
 
-        .parent-category .title {
-            font-weight: bold;
+        .current-category{
+            margin-left: -10px;
+            margin-right: -10px;
+            padding: 10px 10px;
+            position: relative;
+            overflow: hidden;
+            color: $light-black;
+            border-bottom: 1px solid #e1e1e1;
+
+            &:hover {
+                background-color: $light-gray;
+            }
+
+            .title {
+                font-weight: bold;
+            }
         }
 
-        ul.breadcrumb {
+        ul.breadcrumbs {
             font-size: 0.9em;
             list-style: none;
             padding: 0;
+            margin: 0;
 
             li{
                 display: inline;
