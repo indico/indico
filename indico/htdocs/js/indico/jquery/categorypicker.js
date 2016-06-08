@@ -19,7 +19,9 @@
     $.widget("indico.categorypicker", {
 
         options: {
-            categoryId: 0
+            categoryId: 0,
+            actionButtonText: $T.gettext("Select"),
+            onAction: function() {}
         },
 
         _create: function() {
@@ -76,35 +78,51 @@
             }));
             $titleWrapper.append(self._buildBreadcrumbs(category.path));
             $category.append($titleWrapper);
-            if (category.path.length) {
-                var parent = _.last(category.path);
-                var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
-                $buttonWrapper.append($('<a>', {
-                    class: 'icon-arrow-up navigate-up',
-                    title: $T.gettext("Go to parent: {0}".format(parent.title))
-                }).on('click', function() {
-                    self.goToCategory(parent.id);
-                }));
-                $category.append($buttonWrapper);
-            }
+            $category.append(self._buildSidePanel(category));
 
             return $category;
         },
 
-        _buildSubcategory: function(subcategory) {
+        _buildSubcategory: function(category) {
             var self = this;
 
             var $subcategory = $('<li>', {
                 class: 'item subcategory',
-                data: {id: subcategory.id}
+                data: {id: category.id}
+            }).on('click', function() {
+                self.goToCategory($(this).data('id'));
             }).append($('<span>', {
                 class: 'title',
-                text: subcategory.title,
-            })).on('click', function() {
-                self.goToCategory($(this).data('id'));
-            });
+                text: category.title,
+            })).append(self._buildSidePanel(category));
 
             return $subcategory;
+        },
+
+        _buildSidePanel: function(category) {
+            var self = this;
+            var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
+
+            if (category.path && category.path.length) {
+                var parent = _.last(category.path);
+                var $arrowUp = $('<a>', {
+                    class: 'icon-arrow-up navigate-up',
+                    title: $T.gettext("Go to parent: {0}".format(parent.title))
+                }).on('click', function() {
+                    self.goToCategory(parent.id);
+                });
+                $buttonWrapper.append($arrowUp);
+            }
+
+            $buttonWrapper.append($('<div>', {
+                class: 'action-button',
+                text: self.options.actionButtonText
+            }).on('click', function(evt) {
+                evt.stopPropagation();
+                self.options.onAction(category.id);
+            }));
+
+            return $buttonWrapper;
         },
 
         _renderNavigator: function(data) {

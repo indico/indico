@@ -35,6 +35,16 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+
+            .action-button {
+                @extend .i-button;
+                @extend .i-button.highlight;
+                visibility: hidden;
+            }
+
+            &:hover .action-button {
+                visibility: visible;
+            }
         }
 
         .subcategory {
@@ -70,7 +80,7 @@
             padding: 0;
             margin: 0;
 
-            li{
+            li {
                 display: inline;
 
                 &:not(:last-child):after {
