@@ -40,7 +40,7 @@ class RHManageNetworks(RHNetworkBase):
         return WPNetworksAdmin.render_template('networks.html', network_groups=network_groups)
 
 
-class RHCreateIPNetworkGroup(RHNetworkBase):
+class RHCreateNetworkGroup(RHNetworkBase):
     """Dialog to create an IPNetworkGroup"""
 
     def _process(self):
@@ -55,14 +55,14 @@ class RHCreateIPNetworkGroup(RHNetworkBase):
         return jsonify_form(form)
 
 
-class RHAdminIPNetworkGroupBase(RHNetworkBase):
+class RHAdminNetworkGroupBase(RHNetworkBase):
     """Base class for managing in IPNetworkGroup"""
 
     def _checkParams(self):
         self.network_group = IPNetworkGroup.get_one(request.view_args['network_group_id'])
 
 
-class RHEditIPNetworkGroup(RHAdminIPNetworkGroupBase):
+class RHEditNetworkGroup(RHAdminNetworkGroupBase):
     """Dialog to edit an IPNetworkGroup"""
 
     def _process(self):
@@ -74,7 +74,7 @@ class RHEditIPNetworkGroup(RHAdminIPNetworkGroupBase):
         return jsonify_form(form)
 
 
-class RHDeleteIPNetworkGroup(RHAdminIPNetworkGroupBase):
+class RHDeleteNetworkGroup(RHAdminNetworkGroupBase):
     """Dialog to delete an IPNetworkGroup"""
 
     def _process_GET(self):
