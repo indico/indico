@@ -34,7 +34,7 @@ HTML_TPL = b"""
 
 ROW_TPL = b"""<tr style="background-color: #ddd;">
     <td style="max-width: 10%;">{}</td>
-    <td style="max-width: 45%;">{}</td>
+    <td style="max-width: 45%; white-space: pre-wrap; word-wrap: break-word;">{}</td>
     <td style="max-width: 45%;">{}</td>
 </tr>
 """
@@ -52,13 +52,14 @@ def _added(text):
 def _new_row(html_log, obj, result):
     if html_log:
         html_log.write((ROW_TPL.format("{} ({})".format(obj.title.encode('utf-8'), obj.event_id),
-                        obj.description.encode('utf-8'), render_markdown(result))))
+                        obj.description.encode('utf-8'), render_markdown(result).encode('utf-8'))))
 
 
 def migrate_description(obj, verbose, html_log):
     h = HTML2Text()
     h.unicode_snob = True
-    result = h.handle(unicode(obj.description))
+    input_html = re.sub(r'^\r?\n$', '<br>', unicode(obj.description))
+    result = h.handle(input_html)
 
     if verbose:
         click.echo(click.style('\n' + ' ' * 80, bg='cyan', fg='black'))
