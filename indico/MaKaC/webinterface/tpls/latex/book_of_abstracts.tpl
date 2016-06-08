@@ -25,7 +25,7 @@
             \fancyhead[R]{}
 
             \phantomsection
-            \addcontentsline{toc}{chapter}{${contrib.title | latex_escape} ${('{0}').format(contrib.id) if conf.getBOAConfig().getShowIds() else ''}
+            \addcontentsline{toc}{chapter}{${contrib.title | latex_escape} ${('{0}').format(contrib.friendly_id) if conf.getBOAConfig().getShowIds() else ''}
             }
 
             <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>
