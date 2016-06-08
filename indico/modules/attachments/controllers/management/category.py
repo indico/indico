@@ -24,20 +24,20 @@ from indico.modules.attachments.controllers.management.base import (ManageAttach
                                                                     CreateFolderMixin, EditFolderMixin,
                                                                     DeleteFolderMixin, DeleteAttachmentMixin)
 from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.attachments.views import WPCategoryAttachments
-from MaKaC.webinterface.rh.categoryMod import RHCategModifBase
+from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.views import WPCategoryManagement
 
 
-class RHCategoryAttachmentManagementBase(RHCategModifBase):
+class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
-        RHCategModifBase._checkParams(self, params)
+        RHManageCategoryBase._checkParams(self, params)
         self.object_type = 'category'
-        self.object = self.base_object = self._target.as_new
+        self.object = self.base_object = self.category
 
     def _checkProtection(self):
-        RHCategModifBase._checkProtection(self)
+        RHManageCategoryBase._checkProtection(self)
         # This is already covered by CategModifBase, but if we ever add more
         # checks to can_manage_attachments we are on the safe side...
         if not can_manage_attachments(self.object, session.user):
@@ -45,7 +45,7 @@ class RHCategoryAttachmentManagementBase(RHCategModifBase):
 
 
 class RHManageCategoryAttachments(ManageAttachmentsMixin, RHCategoryAttachmentManagementBase):
-    wp = WPCategoryAttachments
+    wp = WPCategoryManagement
 
 
 class RHAddCategoryAttachmentFiles(AddAttachmentFilesMixin, RHCategoryAttachmentManagementBase):
