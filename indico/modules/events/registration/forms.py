@@ -304,5 +304,5 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
 class RegistrationManagersForm(IndicoForm):
     """Form to manage users with privileges to modify registration-related items"""
 
-    managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
+    managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify registrations'))
