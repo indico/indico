@@ -60,7 +60,8 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              }).join(", ");
              var selected = false;
 
-             var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+             var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}},
+                              elem.get('friendly_id'));
              return Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
          },
 
