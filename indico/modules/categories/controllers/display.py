@@ -29,11 +29,6 @@ from indico.util.i18n import _
 from MaKaC.conference import CategoryManager
 
 
-class RHDisplayCategory(RHDisplayCategoryBase):
-    def _process(self):
-        return 'DISPLAY ALL THE EVENTS! ({})'.format(self.category.title)
-
-
 class RHCategoryStatistics(RHDisplayCategoryBase):
     def _get_stats_json(self, stats):
         data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
