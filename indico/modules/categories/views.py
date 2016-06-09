@@ -27,8 +27,9 @@ class WPCategory(WPJinjaMixin, WPMainBase):
 
     template_prefix = 'categories/'
 
-    def __init__(self, rh, category, **kwargs):
+    def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['category'] = category
+        kwargs['active_menu_item'] = active_menu_item
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
 

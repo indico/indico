@@ -22,5 +22,4 @@ from indico.modules.categories.views import WPCategoryManagement
 
 class RHManageCategoryContent(RHManageCategoryBase):
     def _process(self):
-        return WPCategoryManagement.render_template('management/content.html', self.category,
-                                                    active_menu_item='content')
+        return WPCategoryManagement.render_template('management/content.html', self.category, 'content')

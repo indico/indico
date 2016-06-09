@@ -78,8 +78,7 @@ class ManageAttachmentsMixin:
         if self.object_type == 'event':
             return self.wp.render_template('attachments.html', self._target, **tpl_args)
         elif self.object_type == 'category' and not request.is_xhr:
-            return self.wp.render_template('management/attachments.html', category=self.category,
-                                           active_menu_item='attachments', **tpl_args)
+            return self.wp.render_template('management/attachments.html', self.category, 'attachments', **tpl_args)
         else:
             return jsonify_template('attachments/attachments.html', **tpl_args)
 
