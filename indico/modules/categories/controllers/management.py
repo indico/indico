@@ -20,7 +20,7 @@ from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.views import WPCategoryManagement
 
 
-class RHCategorySettings(RHManageCategoryBase):
+class RHManageCategoryContent(RHManageCategoryBase):
     def _process(self):
-        return WPCategoryManagement.render_template('management/general_settings.html', category=self.category,
-                                                    active_menu_item='general')
+        return WPCategoryManagement.render_template('management/content.html', category=self.category,
+                                                    active_menu_item='content')
