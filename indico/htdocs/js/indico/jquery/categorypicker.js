@@ -69,7 +69,12 @@
             $element.typeahead({
                 source: data,
                 cancelButton: false,
-                display: 'title'
+                display: 'title',
+                callback: {
+                    onClickAfter: function(node, a, item) {
+                        self.goToCategory(item.id);
+                    }
+                }
             });
         },
 
