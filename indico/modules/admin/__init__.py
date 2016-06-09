@@ -21,7 +21,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuSection, SideMenuItem
 
-
 @signals.menu.sections.connect_via('admin-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
     yield SideMenuSection('security', _("Security"), 90, icon='shield')
