@@ -16,15 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template
-
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem, render_sidemenu
 
 
 class WPCategoryManagement(WPJinjaMixin, WPMainBase):
@@ -36,9 +31,6 @@ class WPCategoryManagement(WPJinjaMixin, WPMainBase):
     template_prefix = 'categories/'
 
     def _getBody(self, params):
-        category = params['category']
-        params['side_menu'] = render_sidemenu('category-management-sidemenu', old_style=True, category=category,
-                                              active_item=params.get('active_menu_item'))
         return self._getPageContent(params)
 
 

@@ -9,5 +9,5 @@
 {% endblock %}
 
 {% block side_menu %}
-    {{ side_menu|safe }}
+    {{ render_sidemenu('category-management-sidemenu', old_style=true, category=category, active_item=active_menu_item) }}
 {% endblock %}
