@@ -17,9 +17,12 @@
 from __future__ import unicode_literals
 
 import pytz
+from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 from sqlalchemy.sql import select, literal
 
 from indico.core.db import db
@@ -167,6 +170,9 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         collection_class=set
     )
 
+    # column properties:
+    # - deep_events_count
+
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.category)
     # - events (Event.category)
@@ -283,3 +289,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
 
 Category.register_protection_events()
+
+
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    from indico.modules.events import Event
+    query = (select([db.func.count()])
+             .where(Event.category_chain.contains(array([Category.id])) & ~Event.is_deleted)
+             .correlate_except(Event))
+    Category.deep_events_count = column_property(query, deferred=True)
