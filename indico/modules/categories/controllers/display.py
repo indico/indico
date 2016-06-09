@@ -19,12 +19,11 @@ from __future__ import unicode_literals
 from io import BytesIO
 from math import ceil
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
 
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
-from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
@@ -120,7 +119,8 @@ def _serialize_category(category, include_breadcrumb=False):
         'title': category.title,
         'is_protected': category.is_protected,
         'category_count': category.deep_children_count,
-        'event_count': category.deep_events_count
+        'event_count': category.deep_events_count,
+        'can_access': category.can_access(session.user)
     }
     if include_breadcrumb:
         data['path'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]

@@ -118,12 +118,16 @@
                 class: 'item subcategory',
                 'data-id': category.id,
                 id: 'category-' + category.id
-            }).on('click', function() {
-                self.goToCategory($(this).data('id'));
             }).append($('<span>', {
                 class: 'title',
                 text: category.title,
             })).append(self._buildSidePanel(category));
+
+            if (category.can_access) {
+                $subcategory.on('click', function() {
+                    self.goToCategory($(this).data('id'));
+                }).addClass('can-access');
+            }
 
             return $subcategory;
         },
