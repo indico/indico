@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals, absolute_import
 
-from flask import render_template, request
 from operator import attrgetter
+
+from flask import render_template, request
+from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
@@ -200,4 +202,4 @@ def render_sidemenu(menu_id, active_item=None, old_style=False, **kwargs):
     :param kwargs: Additional arguments passed to the menu signals.
     """
     items = build_menu_structure(menu_id, active_item=active_item, **kwargs)
-    return render_template('side_menu.html', items=items, old_style=old_style, menu_id=menu_id)
+    return Markup(render_template('side_menu.html', items=items, old_style=old_style, menu_id=menu_id))
