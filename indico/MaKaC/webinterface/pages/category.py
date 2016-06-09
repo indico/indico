@@ -1051,7 +1051,7 @@ class WPCategoryModifBase( WPCategoryBase ):
         return frame.getHTML({
             "category": self._target,
             "body": self._getPageContent(params),
-            "sideMenu": render_sidemenu('category-management-sidemenu', active_item=self.sidemenu_option,
+            "sideMenu": render_sidemenu('category-management-sidemenu-old', active_item=self.sidemenu_option,
                                         category=self._target, old_style=True)
         })
 

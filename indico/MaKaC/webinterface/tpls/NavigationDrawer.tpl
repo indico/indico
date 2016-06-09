@@ -9,9 +9,9 @@ l = []
 target_ = target
 while target_ != None:
     if isinstance(target_, Category):
-        for category in target_.parent_chain_query[::-1]:
+        for category in target_.chain_query[::-1]:
             if isModif:
-                url = url_for('categories.manage', category)
+                url = url_for('categories.manage_content', category)
             else:
                 url = category.url
             l.append((category.title, url))

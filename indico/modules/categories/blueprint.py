@@ -16,47 +16,16 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.categories.controllers.display import RHDisplayCategory, RHCategoryStatistics
-from indico.modules.categories.controllers.management import RHCategorySettings
-from indico.web.flask.util import redirect_view, make_compat_redirect_func
+from indico.modules.categories.controllers.display import RHCategoryStatistics
+from indico.modules.categories.controllers.management import RHManageCategoryContent
 from indico.web.flask.wrappers import IndicoBlueprint
 
-from MaKaC.webinterface.rh import calendar, categoryDisplay
 
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtual_template_folder='categories',
                       url_prefix='/category/<int:category_id>')
 
-_bp.add_url_rule('/manage/settings', 'manage', RHCategorySettings)
-#_bp.add_url_rule('/', 'display', RHDisplayCategory)
-_bp.add_url_rule('/', 'display', categoryDisplay.RHCategoryDisplay)
-
-_legacy_bp = IndicoBlueprint('category', __name__, template_folder='templates', virtual_template_folder='categories',
-                             url_prefix='/category/<int:categId>')
-
-# Short URLs
-_legacy_bp.add_url_rule('!/categ/<categId>', view_func=redirect_view('.display'), strict_slashes=False)
-_legacy_bp.add_url_rule('!/c/<categId>', view_func=redirect_view('.display'), strict_slashes=False)
+# Management
+_bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)
 
 # Display
-_legacy_bp.add_url_rule('/', 'categoryDisplay', categoryDisplay.RHCategoryDisplay)
-_legacy_bp.add_url_rule('/statistics/', 'statistics', RHCategoryStatistics)
-_legacy_bp.add_url_rule('/events.atom', 'categoryDisplay-atom', categoryDisplay.RHCategoryToAtom)
-_legacy_bp.add_url_rule('/events.rss', 'categoryDisplay-rss',
-                 make_compat_redirect_func(_legacy_bp, 'categoryDisplay-atom'))
-_legacy_bp.add_url_rule('/events.ics', 'categoryDisplay-ical', categoryDisplay.RHCategoryToiCal)
-_legacy_bp.add_url_rule('/icon', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
-
-# Overview
-_legacy_bp.add_url_rule('/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
-_legacy_bp.add_url_rule('!/category/<selCateg>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
-_legacy_bp.add_url_rule('/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
-_legacy_bp.add_url_rule('/overview.rss', 'categOverview-rss',
-                 make_compat_redirect_func(_legacy_bp, 'categoryDisplay-atom'))
-
-# Event map
-_legacy_bp.add_url_rule('/map', 'categoryMap', categoryDisplay.RHCategoryMap)
-
-# Event calendar
-_legacy_bp.add_url_rule('!/category/calendar/', 'wcalendar', calendar.RHCalendar)
-_legacy_bp.add_url_rule('!/category/calendar/select', 'wcalendar-select', calendar.RHCalendarSelectCategories,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)

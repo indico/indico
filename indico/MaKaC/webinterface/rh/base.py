@@ -843,12 +843,7 @@ class RHProtected(RH):
 class RHDisplayBaseProtected(RHProtected):
 
     def _checkProtection(self):
-        try:
-            can_access = self._target.can_access(session.user)
-        except AttributeError:
-            can_access = self._target.canAccess(self.getAW())
-
-        if not can_access:
+        if not self._target.canAccess(self.getAW()):
             from MaKaC.conference import Resource, Category
             if isinstance(self._target, Resource):
                 target = self._target.getOwner()
@@ -870,9 +865,9 @@ class RHModificationBaseProtected(RHProtected):
     ROLE = None
 
     def _checkProtection(self):
-        try:
-            can_manage = self._target.can_manage(session.user, role=self.ROLE)
-        except AttributeError:
+        if isinstance(self._target, Conference):
+            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE)
+        else:
             can_manage = self._target.canModify(session.avatar)
         if not can_manage:
             if self._getUser() is None:

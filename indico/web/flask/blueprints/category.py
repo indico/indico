@@ -13,3 +13,38 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from MaKaC.webinterface.rh import calendar, categoryDisplay
+from indico.web.flask.util import redirect_view, make_compat_redirect_func
+from indico.web.flask.wrappers import IndicoBlueprint
+
+
+category = IndicoBlueprint('category', __name__, url_prefix='/category')
+
+
+# Short URLs
+category.add_url_rule('!/categ/<categId>', view_func=redirect_view('.categoryDisplay'), strict_slashes=False)
+category.add_url_rule('!/c/<categId>', view_func=redirect_view('.categoryDisplay'), strict_slashes=False)
+
+# Display
+category.add_url_rule('/<categId>/', 'categoryDisplay', categoryDisplay.RHCategoryDisplay)
+category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', categoryDisplay.RHCategoryToAtom)
+category.add_url_rule('/<categId>/events.rss', 'categoryDisplay-rss',
+                      make_compat_redirect_func(category, 'categoryDisplay-atom'))
+category.add_url_rule('/<categId>/events.ics', 'categoryDisplay-ical', categoryDisplay.RHCategoryToiCal)
+category.add_url_rule('/<categId>/icon', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
+
+# Overview
+category.add_url_rule('/<categId>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/<selCateg>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/<categId>/overview.rss', 'categOverview-rss',
+                      make_compat_redirect_func(category, 'categoryDisplay-atom'))
+
+# Event map
+category.add_url_rule('/<categId>/map', 'categoryMap', categoryDisplay.RHCategoryMap)
+
+# Event calendar
+category.add_url_rule('/calendar/', 'wcalendar', calendar.RHCalendar)
+category.add_url_rule('/calendar/select', 'wcalendar-select', calendar.RHCalendarSelectCategories,
+                      methods=('GET', 'POST'))

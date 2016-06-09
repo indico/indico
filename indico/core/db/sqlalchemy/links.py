@@ -107,7 +107,7 @@ class LinkMixin(object):
                          cls.subcontribution: lambda x: x.contribution.event_new,
                          cls.linked_event: lambda x: x}
 
-        type_mapping = {cls.category_id: LinkType.category,
+        type_mapping = {cls.category: LinkType.category,
                         cls.linked_event: LinkType.event,
                         cls.session: LinkType.session,
                         cls.contribution: LinkType.contribution,

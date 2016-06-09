@@ -16,12 +16,11 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
-
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
+from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 
 
-class RHDownloadCategoryAttachment(DownloadAttachmentMixin, RHCategDisplayBase):
-    def _checkParams(self, params):
-        RHCategDisplayBase._checkParams(self, params)
+class RHDownloadCategoryAttachment(DownloadAttachmentMixin, RHDisplayCategoryBase):
+    def _checkParams(self):
+        RHDisplayCategoryBase._checkParams(self)
         DownloadAttachmentMixin._checkParams(self)

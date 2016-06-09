@@ -26,6 +26,7 @@ from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from MaKaC.conference import CategoryManager
 
 
 def _plot_data(stats, tooltip=''):
@@ -72,17 +73,18 @@ class RHDisplayCategory(RHDisplayCategoryBase):
 
 class RHCategoryStatistics(RHDisplayCategoryBase):
     def _process(self):
-        stats = get_category_stats(int(self._target.getId()))
+        stats = get_category_stats(self.category.id)
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
                     'files': stats['attachments'], 'updated': stats['updated'].isoformat()}
-            if self._target.isRoot():
+            if self.category.is_root:
                 data['users'] = _count_users()
             return jsonify(data)
         else:
-            plots, values, updated = _process_stats(stats, root=self._target.isRoot())
-            return WPCategoryStatistics.render_template('category_statistics.html', self._target,
-                                                        cat=self._target,
+            plots, values, updated = _process_stats(stats, root=self.category.is_root)
+            return WPCategoryStatistics.render_template('category_statistics.html',
+                                                        CategoryManager().getById(self.category.id, True),
+                                                        cat=self.category,
                                                         plots=plots,
                                                         values=values,
                                                         updated=updated,
