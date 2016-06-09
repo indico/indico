@@ -32,6 +32,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
 from MaKaC.conference import CategoryManager
+from MaKaC.webinterface.rh.base import RH
 
 
 class RHCategoryIcon(RHDisplayCategoryBase):
@@ -133,3 +134,8 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         category_contents = category.children
         return jsonify_data(category=_serialize_category(category, include_breadcrumb=True),
                             subcategories=[_serialize_category(c) for c in category_contents])
+
+
+class RHCategoryTitles(RH):
+    def _process(self):
+        return jsonify_data(categories=[{'title': c.title} for c in Category.find(is_deleted=False)])

@@ -136,7 +136,8 @@ def generate_global_file(config):
             },
 
             'Categories': {
-                'info': url_rule_to_js('categories.info')
+                'info': url_rule_to_js('categories.info'),
+                'titles': url_rule_to_js('categories.titles')
             }
         },
 

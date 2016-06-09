@@ -28,19 +28,49 @@
             var self = this;
             var element = self.element;
             var opt = self.options;
+            var typeaheadTemplate = `<form>
+                <div class="typeahead__container">
+                    <div class="typeahead__field">
+                        <span class="typeahead__query"></span>
+                    </div>
+                </div>
+            </form>`
 
             self.cache = {};
             self.$searchInput = $('<input>', {
-                class: 'js-search-category',
-                type: 'text',
+                class: 'js-search-category js-typeahead',
+                type: 'search',
+                name: 'q',
                 placeholder: $T.gettext("Search")
+            }).attr('autocomplete', 'off');
+
+            var $typeaheadForm = $($.parseHTML(typeaheadTemplate)[0]);
+            $typeaheadForm.find('.typeahead__query').append(self.$searchInput);
+            $.ajax({
+                url: build_url(Indico.Urls.Categories.titles),
+                success: function(data) {
+                    if (data && data.categories) {
+                        self._initializeTypeahead(self.$searchInput, data.categories);
+                    }
+                }
             });
+
             self.$categoryList = $('<ul>', {class: 'group-list fixed-height'});
             self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
                 .append($('<div>', {class: 'i-box-content'})
                     .append(self.$categoryList));
             self.goToCategory(opt.categoryId);
-            self.element.append(self.$searchInput).append(self.$categoryNavigator);
+            self.element.append($typeaheadForm).append(self.$categoryNavigator);
+        },
+
+        _initializeTypeahead: function($element, data) {
+            var self = this;
+
+            $element.typeahead({
+                source: data,
+                cancelButton: false,
+                display: 'title'
+            });
         },
 
         _buildBreadcrumbs: function(path) {
