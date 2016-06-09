@@ -22,20 +22,28 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
-class WPCategoryManagement(WPJinjaMixin, WPMainBase):
-    """WP for category management pages
-
-    The category must be passed in the 'category' kwarg when
-    rendering a template.
-    """
+class WPCategory(WPJinjaMixin, WPMainBase):
+    """WP for category display pages"""
 
     template_prefix = 'categories/'
+
+    def __init__(self, rh, category, **kwargs):
+        kwargs['category'] = category
+        self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
+        WPMainBase.__init__(self, rh, **kwargs)
 
     def _getBody(self, params):
         return self._getPageContent(params)
 
 
+class WPCategoryManagement(WPCategory):
+    """WP for category management pages"""
+
+    MANAGEMENT = True
+
+
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
+    # TODO: when moving category display to Jinja, inherit from WPCategory instead
     template_prefix = 'categories/'
 
     def _getBody(self, params):
