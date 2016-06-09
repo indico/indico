@@ -17,9 +17,17 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
-class WPManageLegalMessages(WPJinjaMixin, WPAdminsBase):
+class WPLegalMixin:
     template_prefix = 'legal/'
+
+
+class WPManageLegalMessages(WPLegalMixin, WPJinjaMixin, WPAdminsBase):
     sidemenu_option = 'legal_messages'
+
+
+class WPDisplayLegalMessages(WPLegalMixin, WPJinjaMixin, WPDecorated):
+    def _getBody(self, params):
+        return self._getPageContent(params)

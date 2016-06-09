@@ -13,5 +13,9 @@
     <a id="cern_link" href="http://cern.ch">
         <img src="${ systemIcon("cern_small_light" if is_meeting else "cern_small") }" alt="${ _("Indico")}" class="cern_logo" style="vertical-align: middle; margin: 15px;">
     </a>
-    <div class="text" style="width: 200px">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></div>
+    <div class="text" style="width: 200px">
+        ${ _("Powered by ")} <a href="http://indico-software.org">Indico</a>
+        <br/>
+        <a href="${ url_for('legal.display') }">${ _("Terms and conditions") }</a>
+    </div>
 </%block>
