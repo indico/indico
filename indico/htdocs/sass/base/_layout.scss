@@ -24,6 +24,10 @@ body {
 
 body > .main {
     flex-grow: 1;
+
+    .terms-and-conditions {
+        margin: 2em auto;
+    }
 }
 
 /* Work around issues in WebKit (used by Safari) which shrinks the contained
