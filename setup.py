@@ -362,6 +362,7 @@ if __name__ == '__main__':
             event_dates_titles = indico_zodbimport.modules.event_dates_titles:EventDatesTitlesImporter
             event_abstracts_zodb = indico_zodbimport.modules.event_abstracts_zodb:EventAbstractZODBPatcher
             event_paper_reviewing = indico_zodbimport.modules.event_paper_reviewing:EventPaperReviewingImporter
+            legal = indico_zodbimport.modules.legal:LegalImporter
             """,
           zip_safe=False,
           packages=foundPackages,
