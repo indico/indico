@@ -32,7 +32,7 @@ class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
-        RHManageCategoryBase._checkParams(self, params)
+        RHManageCategoryBase._checkParams(self)
         self.object_type = 'category'
         self.object = self.base_object = self.category
 

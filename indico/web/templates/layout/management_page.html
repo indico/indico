@@ -16,12 +16,6 @@
         </div>
         <div class="body">
             {% include 'flashed_messages.html' %}
-            {# FIXME: render super() inside the body block so that we can redefine the body block when extending to have a page without title #}
-            {#
-            {% block body %}
-                {{ super() }}
-            {% endblock %}
-            #}
             {{ super() }}
         </div>
     </div>

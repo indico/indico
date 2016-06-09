@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, render_template, request
+from flask import redirect, request
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -26,7 +26,6 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
-from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -71,18 +70,22 @@ def _app_created(app, **kwargs):
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
 
 
+@signals.menu.items.connect_via('category-management-sidemenu-old')
+def _sidemenu_items_old(sender, category, **kwargs):
+    yield SideMenuItem('view', _('View category'), url_for('category.categoryDisplay', category),
+                       100, icon='eye')
+    yield SideMenuItem('general', _('General Settings'), url_for('category_mgmt.categoryModification', category),
+                       90, icon='settings')
+    yield SideMenuItem('protection', _('Protection'), url_for('category_mgmt.categoryAC', category),
+                       70, icon='shield')
+    yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
+                       60, icon='wrench')
+
+
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _sidemenu_items(sender, category, **kwargs):
-    yield SideMenuItem('general', _('General Settings'), url_for('categories.manage', category),
-                       100, icon='settings')
-    #yield SideMenuItem('view', _('View category'), url_for('category.categoryDisplay', category),
-    #                   100, icon='eye')
-    #yield SideMenuItem('general', _('General Settings'), url_for('category_mgmt.categoryModification', category),
-    #                   90, icon='settings')
-    #yield SideMenuItem('protection', _('Protection'), url_for('category_mgmt.categoryAC', category),
-    #                   70, icon='shield')
-    #yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
-    #                   60, icon='wrench')
+    yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
+                       100, icon='eye')
 
 
 @signals.app_created.connect
@@ -93,11 +96,6 @@ def _check_roles(app, **kwargs):
 @signals.acl.get_management_roles.connect_via(Category)
 def _get_management_roles(sender, **kwargs):
     return CreatorRole
-
-
-@template_hook('category-management-header')
-def _add_action_menu(category, **kwargs):
-    return render_template('categories/management/action_menu.html', category=category)
 
 
 class CreatorRole(ManagementRole):

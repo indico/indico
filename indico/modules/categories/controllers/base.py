@@ -14,24 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import request, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
-
-from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected, RHModificationBaseProtected
+from MaKaC.webinterface.rh.base import RH
 
 
 class RHCategoryBase(RH):
-    def _checkParams(self, params):
+    CSRF_ENABLED = True
+
+    def _checkParams(self):
         category_id = request.view_args['category_id']
-        self.category = Category.get(category_id)
+        self.category = Category.get(category_id, is_deleted=False)
         if self.category is None:
-            raise NotFound(_("The category with id '{}' does not exist or has been deleted").format(
-                           category_id),
-                           title=_("Category not found"))
+            raise NotFound(_("This category does not exist or has been deleted."))
 
 
 class RHDisplayCategoryBase(RHCategoryBase):

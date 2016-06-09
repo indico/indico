@@ -23,9 +23,10 @@ from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
 class WPCategoryManagement(WPJinjaMixin, WPMainBase):
-    """WP for catagory management pages
+    """WP for category management pages
 
-    The category must be passed as 'category' parameter when rendering.
+    The category must be passed in the 'category' kwarg when
+    rendering a template.
     """
 
     template_prefix = 'categories/'
@@ -44,8 +45,10 @@ class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
         return WSimpleNavigationDrawer(self._target.getName(), type='Statistics')
 
     def getJSFiles(self):
-        return (WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('jqplot_js', prefix='')
-                + self._asset_env['statistics_js'].urls() + self._asset_env['modules_category_statistics_js'].urls())
+        return (WPCategoryDisplayBase.getJSFiles(self) +
+                self._includeJSPackage('jqplot_js', prefix='') +
+                self._asset_env['statistics_js'].urls() +
+                self._asset_env['modules_category_statistics_js'].urls())
 
     def getCSSFiles(self):
         return WPCategoryDisplayBase.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
