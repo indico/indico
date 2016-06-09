@@ -48,20 +48,47 @@
             var $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
 
             _.each(path, function(category) {
-                $breadcrumbs.append($('<li>')
-                    .append($('<a>', {
-                        text: category.title,
-                        data: {id: category.id},
-                        title:  $T.gettext("Go to: {0}".format(category.title)),
-                        href: '#'
-                    }).on('click', function(evt) {
-                        evt.preventDefault();
-                        self.goToCategory($(this).data('id'));
-                    }))
-                );
+                var $item = $('<a>', {
+                    text: category.title,
+                    'data-id': category.id,
+                    title:  $T.gettext("Go to: {0}".format(category.title)),
+                    href: '#'
+                });
+                self._bindClickEvent($item);
+                $breadcrumbs.append($('<li>').append($item));
             });
 
             return $breadcrumbs;
+        },
+
+        _ellipsizeBreadcrumbs: function($breadcrumbs, availableSpace) {
+            var self = this;
+            var cutFromLeft = true;
+            var items = $breadcrumbs.children();
+            var middleIndex = Math.floor(items.length / 2);
+            var leftList = items.slice(0, middleIndex);
+            var rightList = items.slice(middleIndex, items.length);
+
+            shortenBreadcrumbs(leftList, rightList);
+
+            function shortenBreadcrumbs (leftList, rightList) {
+                if ($breadcrumbs.width() >= availableSpace) {
+                    if (cutFromLeft) {
+                        leftList.splice(-1, 1);
+                        cutFromLeft = false;
+                    } else {
+                        rightList.splice(0, 1);
+                        cutFromLeft = true;
+                    }
+                    var newItemList = $.merge($.merge($.merge([], leftList), [$('<li>', {text: '...'}).get(0)]), rightList);
+                    $breadcrumbs.empty();
+                    _.each(newItemList, function(item) {
+                        self._bindClickEvent($(item).find('a'));
+                        $breadcrumbs.append(item);
+                    });
+                    shortenBreadcrumbs(leftList, rightList);
+                }
+            }
         },
 
         _buildCurrentCategory: function(category) {
@@ -69,7 +96,8 @@
 
             var $category = $('<div>', {
                 class: 'item current-category',
-                data: {id: category.id}
+                'data-id': category.id,
+                id: 'category-' + category.id
             });
             var $titleWrapper = $('<div>', {class: 'title-wrapper'});
             $titleWrapper.append($('<span>', {
@@ -88,7 +116,8 @@
 
             var $subcategory = $('<li>', {
                 class: 'item subcategory',
-                data: {id: category.id}
+                'data-id': category.id,
+                id: 'category-' + category.id
             }).on('click', function() {
                 self.goToCategory($(this).data('id'));
             }).append($('<span>', {
@@ -142,13 +171,28 @@
             var self = this;
 
             if (data.category) {
-                self.$categoryList.before(self._buildCurrentCategory(data.category));
+                var $currentCategory = self._buildCurrentCategory(data.category);
+                self.$categoryList.before($currentCategory);
+                var $breadcrumbs = $currentCategory.find('.breadcrumbs');
+                var availableSpace = $currentCategory.width() - $currentCategory.find('.button-wrapper').width();
+                if ($breadcrumbs.width() >= availableSpace) {
+                    self._ellipsizeBreadcrumbs($breadcrumbs, availableSpace);
+                }
             }
             if (data.subcategories) {
                 _.each(data.subcategories, function(subcategory) {
                     self.$categoryList.append(self._buildSubcategory(subcategory));
                 });
             }
+        },
+
+        _bindClickEvent: function($element) {
+            var self = this;
+
+            $element.on('click', function(evt) {
+                evt.preventDefault();
+                self.goToCategory($(this).data('id'));
+            })
         },
 
         goToCategory: function(id) {
