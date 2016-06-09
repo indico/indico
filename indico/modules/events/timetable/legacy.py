@@ -272,6 +272,7 @@ class TimetableSerializer(object):
 
 def serialize_contribution(contribution):
     return {'id': contribution.id,
+            'friendly_id': contribution.friendly_id,
             'title': contribution.title}
 
 
