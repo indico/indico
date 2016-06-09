@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import pytz
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import select, literal
@@ -245,6 +245,36 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         intermediate categories up to (excluding) this category.
         """
         return self._get_chain_query(Category.id == self.parent_id)
+
+    @staticmethod
+    def _get_ancestry_query():
+        cte_query = (select([Category.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
+                     .where(Category.parent_id.is_(None) & ~Category.is_deleted)
+                     .cte('chains', recursive=True))
+        parent_query = (select([Category.id, cte_query.c.parents.op('||')(Category.parent_id)])
+                        .where((Category.parent_id == cte_query.c.id) & ~Category.is_deleted))
+        return cte_query.union_all(parent_query)
+
+    @property
+    def deep_children_count(self):
+        """Get the total number of subcategories.
+
+        This includes subcategories at any level of nesting.
+        """
+        cte_query = self._get_ancestry_query()
+        query = select([db.func.count()]).where(cte_query.c.parents.contains([self.id]))
+        return db.session.execute(query).fetchone()[0]
+
+    @property
+    def deep_children_query(self):
+        """Get a query object for all subcategories.
+
+        This includes subcategories at any level of nesting.
+        """
+        cte_query = self._get_ancestry_query()
+        return (Category.query
+                .join(cte_query, Category.id == cte_query.c.id)
+                .filter(cte_query.c.parents.contains([self.id])))
 
     @memoize_request
     def get_chain_titles(self):
