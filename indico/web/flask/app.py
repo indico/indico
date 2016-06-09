@@ -62,6 +62,7 @@ from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, List
                                    IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
+from indico.web.menu import render_sidemenu
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
@@ -180,6 +181,7 @@ def setup_jinja(app):
     app.add_template_global(url_for_logout)
     app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
+    app.add_template_global(render_sidemenu)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))

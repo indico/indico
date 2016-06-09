@@ -130,3 +130,71 @@
         </div>
     {% endif %}
 {%- endmacro %}
+
+{% macro attachments_page(linked_object, linked_object_type, attachments) %}
+    <div class="flashed-messages"></div>
+
+    <div class="attachment-editor">
+        <div class="action-box fixed-width">
+            <div class="section">
+                <span class="icon icon-upload"></span>
+                <div class="text">
+                    <div class="label">
+                        {% if linked_object_type == 'category' %}
+                            {% trans %}Add materials to the category.{% endtrans %}
+                        {% elif linked_object_type == 'event' %}
+                            {% trans %}Add materials to the event.{% endtrans %}
+                        {% elif linked_object_type == 'session' %}
+                            {% trans %}Add materials to the session.{% endtrans %}
+                        {% elif linked_object_type == 'contribution' %}
+                            {% trans %}Add materials to the contribution.{% endtrans %}
+                        {% elif linked_object_type == 'subcontribution' %}
+                            {% trans %}Add materials to the subcontribution.{% endtrans %}
+                        {% endif %}
+                    </div>
+                    <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
+                </div>
+                <div class="toolbar">
+                    <div class="group">
+                        <a href="#" class="i-button icon-file js-dialog-action"
+                           data-href="{{ url_for('.upload', linked_object) }}"
+                           data-title="{%- trans %}Upload files{% endtrans -%}">
+                            {%- trans %}Upload files{% endtrans -%}
+                        </a>
+                        <a href="#" class="i-button icon-link js-dialog-action"
+                           data-href="{{ url_for('.add_link', linked_object) }}"
+                           data-title="{%- trans %}Add link{% endtrans -%}">
+                            {%- trans %}Add link{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if linked_object_type == 'event' and not request.is_xhr and linked_object.can_manage(session.user) %}
+            <div class="action-box fixed-width">
+                <div class="section">
+                    <span class="icon icon-package-download"></span>
+                    <div class="text">
+                        <div class="label">
+                            {% trans %}Generate a material package.{% endtrans %}
+                        </div>
+                        <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
+                    </div>
+                    <div class="toolbar">
+                        <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
+                            {%- trans %}Material Package{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="i-box fixed-width attachments-container" id="attachments-container">
+            {{ render_attachments(attachments, linked_object) }}
+        </div>
+    </div>
+    <script>
+        setupAttachmentEditor();
+    </script>
+{% endmacro  %}

@@ -184,7 +184,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @locator_property
     def locator(self):
-        return {'categId': self.id}
+        return {'category_id': self.id}
 
     @classmethod
     def get_root(cls):
@@ -200,7 +200,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         if self.is_root:
             return url_for('misc.index')
         else:
-            return url_for('category.categoryDisplay', self)
+            return url_for('categories.display', self)
 
     @hybrid_property
     def is_root(self):

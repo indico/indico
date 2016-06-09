@@ -18,7 +18,20 @@ from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
+from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+
+
+class WPCategoryManagement(WPJinjaMixin, WPMainBase):
+    """WP for catagory management pages
+
+    The category must be passed as 'category' parameter when rendering.
+    """
+
+    template_prefix = 'categories/'
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
 
 
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):

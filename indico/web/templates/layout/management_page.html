@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+
+{% block page %}
+    <div class="banner">
+        <div class="title">
+            {% block banner_title %}{% endblock %}
+        </div>
+        <div class="action-menu">
+            {% block banner_actions %}{% endblock %}
+        </div>
+    </div>
+
+    <div class="layout-sidemenu">
+        <div id="event-sidemenu" class="sidemenu">
+            {% block side_menu %}{% endblock %}
+        </div>
+        <div class="body">
+            {% include 'flashed_messages.html' %}
+            {# FIXME: render super() inside the body block so that we can redefine the body block when extending to have a page without title #}
+            {#
+            {% block body %}
+                {{ super() }}
+            {% endblock %}
+            #}
+            {{ super() }}
+        </div>
+    </div>
+{% endblock page %}

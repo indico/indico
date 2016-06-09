@@ -20,12 +20,12 @@ from math import ceil
 
 from flask import jsonify, request
 
+from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
 
 
 def _plot_data(stats, tooltip=''):
@@ -65,7 +65,12 @@ def _count_users():
     return User.find(is_deleted=False, is_pending=False).count()
 
 
-class RHCategoryStatistics(RHCategDisplayBase):
+class RHDisplayCategory(RHDisplayCategoryBase):
+    def _process(self):
+        return 'DISPLAY ALL THE EVENTS! ({})'.format(self.category.title)
+
+
+class RHCategoryStatistics(RHDisplayCategoryBase):
     def _process(self):
         stats = get_category_stats(int(self._target.getId()))
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
