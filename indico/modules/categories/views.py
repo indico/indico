@@ -37,7 +37,8 @@ class WPCategoryManagement(WPJinjaMixin, WPMainBase):
 
     def _getBody(self, params):
         category = params['category']
-        params['side_menu'] = render_sidemenu('category-management-sidemenu', old_style=True, category=category)
+        params['side_menu'] = render_sidemenu('category-management-sidemenu', old_style=True, category=category,
+                                              active_item=params.get('active_menu_item'))
         return self._getPageContent(params)
 
 

@@ -22,4 +22,5 @@ from indico.modules.categories.views import WPCategoryManagement
 
 class RHCategorySettings(RHManageCategoryBase):
     def _process(self):
-        return WPCategoryManagement.render_template('management/general_settings.html', category=self.category)
+        return WPCategoryManagement.render_template('management/general_settings.html', category=self.category,
+                                                    active_menu_item='general')
