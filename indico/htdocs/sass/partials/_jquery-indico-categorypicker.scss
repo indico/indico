@@ -18,13 +18,14 @@
 .category-picker {
     width: 800px;
 
-    input[type='text'] {
+    input[type='search'] {
         @extend %form-field-input;
         width: 100%;
-        margin: 10px 0;
     }
 
     .category-navigator {
+        margin-top: 10px;
+
         .group-list.fixed-height {
             max-height: 500px;
             overflow: auto;
