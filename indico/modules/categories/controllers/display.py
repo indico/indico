@@ -29,63 +29,63 @@ from indico.util.i18n import _
 from MaKaC.conference import CategoryManager
 
 
-def _plot_data(stats, tooltip=''):
-    years = sorted(stats.iterkeys())
-    min_year = now_utc().year
-    max_year = min_year
-    if years:
-        min_year = min(min_year, years[0]) - 1
-        max_year = max(max_year, years[-1])
-        data = {year: stats.get(year, 0) for year in xrange(min_year, max_year + 1)}
-        max_y = ceil(max(data.itervalues()) * 1.1)  # 1.1 for padding in the graph
-    else:
-        data = {}
-        max_y = 0
-    return {'min_x': min_year, 'max_x': max_year, 'min_y': 0, 'max_y': max_y, 'values': data,
-            'total': sum(data.itervalues()), 'label_x': _("Years"), 'label_y': '', 'tooltip': tooltip}
-
-
-def _process_stats(stats, root=False):
-    # tooltip formatting is for ease of translation
-    plots = [
-        (_('Number of events'), _('The year is the one of the start date of the event.'),
-         _plot_data(stats.get('events_by_year', {}),
-                    tooltip=_('{value} events in {year}').format(value='', year=''))),
-        (_('Number of contributions'), _('The year is the one of the start date of the contribution.'),
-         _plot_data(stats.get('contribs_by_year', {}),
-                    tooltip=_('{value} contributions in {year}').format(value='', year='')))
-    ]
-    values = [(_('Number of attachments'), stats['attachments'])]
-    if root:
-        values.append((_('Number of users'), _count_users()))
-
-    return plots, values, stats['updated']
-
-
-def _count_users():
-    return User.find(is_deleted=False, is_pending=False).count()
-
-
 class RHDisplayCategory(RHDisplayCategoryBase):
     def _process(self):
         return 'DISPLAY ALL THE EVENTS! ({})'.format(self.category.title)
 
 
 class RHCategoryStatistics(RHDisplayCategoryBase):
+    def _get_stats_json(self, stats):
+        data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
+                'files': stats['attachments'], 'updated': stats['updated'].isoformat()}
+        if self.category.is_root:
+            data['users'] = self._count_users()
+        return jsonify(data)
+
+    def _get_stats_html(self, stats):
+        plots, values, updated = self._process_stats(stats, root=self.category.is_root)
+        return WPCategoryStatistics.render_template('category_statistics.html',
+                                                    # TODO: use self.category once we don't use the legacy WP anymore
+                                                    CategoryManager().getById(self.category.id, True),
+                                                    cat=self.category, plots=plots, values=values, updated=updated,
+                                                    has_stats=True)
+
     def _process(self):
         stats = get_category_stats(self.category.id)
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
-            data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
-                    'files': stats['attachments'], 'updated': stats['updated'].isoformat()}
-            if self.category.is_root:
-                data['users'] = _count_users()
-            return jsonify(data)
+            return self._get_stats_json(stats)
         else:
-            plots, values, updated = _process_stats(stats, root=self.category.is_root)
-            return WPCategoryStatistics.render_template('category_statistics.html',
-                                                        CategoryManager().getById(self.category.id, True),
-                                                        cat=self.category,
-                                                        plots=plots,
-                                                        values=values,
-                                                        updated=updated,
-                                                        has_stats=True)
+            return self._get_stats_html(stats)
+
+    def _plot_data(self, stats, tooltip=''):
+        years = sorted(stats.iterkeys())
+        min_year = now_utc().year
+        max_year = min_year
+        if years:
+            min_year = min(min_year, years[0]) - 1
+            max_year = max(max_year, years[-1])
+            data = {year: stats.get(year, 0) for year in xrange(min_year, max_year + 1)}
+            max_y = ceil(max(data.itervalues()) * 1.1)  # 1.1 for padding in the graph
+        else:
+            data = {}
+            max_y = 0
+        return {'min_x': min_year, 'max_x': max_year, 'min_y': 0, 'max_y': max_y, 'values': data,
+                'total': sum(data.itervalues()), 'label_x': _("Years"), 'label_y': '', 'tooltip': tooltip}
+
+    def _process_stats(self, stats, root=False):
+        # tooltip formatting is for ease of translation
+        plots = [(_('Number of events'),
+                  _('The year is the one of the start date of the event.'),
+                  self._plot_data(stats.get('events_by_year', {}),
+                                  tooltip=_('{value} events in {year}').format(value='', year=''))),
+                 (_('Number of contributions'),
+                  _('The year is the one of the start date of the contribution.'),
+                  self._plot_data(stats.get('contribs_by_year', {}),
+                                  tooltip=_('{value} contributions in {year}').format(value='', year='')))]
+        values = [(_('Number of attachments'), stats['attachments'])]
+        if root:
+            values.append((_('Number of users'), self._count_users()))
+        return plots, values, stats['updated']
+
+    def _count_users(self):
+        return User.find(is_deleted=False, is_pending=False).count()
