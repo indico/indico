@@ -149,9 +149,7 @@ class RHEventProtection(RHConferenceModifBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
         if form.validate_on_submit():
             update_event(self.event_new, {'protection_mode': form.protection_mode.data})
-            # TODO replace with self.event_new.is_self_protected when ACLs are in new DB
-            from indico.core.db.sqlalchemy.protection import ProtectionMode
-            if self.event_new.protection_mode == ProtectionMode.protected:
+            if self.event_new.is_protected:
                 self.event_new.as_legacy.setAccessKey(form.access_key.data)
                 update_event(self.event_new, {'no_access_contact': form.no_access_contact.data})
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
