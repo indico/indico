@@ -18,16 +18,15 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
-from wtforms import BooleanField
+from wtforms import BooleanField, StringField
 
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
                                      IndicoPasswordField)
 from indico.web.forms.widgets import SwitchWidget
-from indico.web.forms.validators import UsedIf, HiddenUnless
+from indico.web.forms.validators import UsedIf
 
 
 class EventProtectionForm(IndicoForm):
@@ -35,9 +34,14 @@ class EventProtectionForm(IndicoForm):
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                  groups=True, allow_emails=True, allow_networks=True, allow_external=True)
-    access_key = IndicoPasswordField(_('Access key'), [HiddenUnless('protection_mode', ProtectionMode.protected)],
+    access_key = IndicoPasswordField(_('Access key'), [UsedIf(lambda form, field: form.protected_object.is_protected)],
                                      toggle=True, classes=['event-protection-access-key'],
-                                     description=_('It is more secure to use only the ACL and not set an access key'))
+                                     description=_('It is more secure to use only the ACL and not set an access key. '
+                                                   '<b>It will have no effect if the event is not protected</b>'))
+    no_access_contact = StringField(_('No access contact'),
+                                    [UsedIf(lambda form, field: form.protected_object.is_protected)],
+                                    description=_('Contact in case of no access. <b>Used only if the '
+                                                  'event is protected</b>'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify the event'))
     submitters = PrincipalListField(_('Submitters', allow_emails=True), allow_external=True,
