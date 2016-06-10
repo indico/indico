@@ -131,6 +131,7 @@
                         subtitle: $this.data('subtitle'),
                         closeButton: $this.data('close-button'),
                         dialogClasses: $this.data('dialog-classes'),
+                        hidePageHeader: $this.data('hide-page-header') !== undefined,
                         onClose: function(data, customData) {
                             if (data) {
                                 handleFlashes(data, true, $this);
