@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer, WNavigationDrawer
 
 
 class WPCategory(WPJinjaMixin, WPMainBase):
@@ -30,6 +30,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
     def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['category'] = category
         kwargs['active_menu_item'] = active_menu_item
+        self.category = category
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
 
@@ -41,6 +42,9 @@ class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
 
     MANAGEMENT = True
+
+    def _getNavigationDrawer(self):
+        return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 
 
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
