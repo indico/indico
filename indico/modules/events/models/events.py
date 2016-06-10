@@ -170,6 +170,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         index=True,
         nullable=True
     )
+    #: Information who to contact if one cannot access the event
+    no_access_contact = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
         'last_friendly_registration_id',
@@ -223,7 +229,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             order_by=start_dt
         )
     )
-
     #: The event's default page (conferences only)
     default_page = db.relationship(
         'EventPage',
