@@ -15,7 +15,6 @@
     </a>
     <div class="text" style="width: 200px">
         ${ _("Powered by ")} <a href="http://indico-software.org">Indico</a>
-        <br/>
-        <a href="${ url_for('legal.display') }">${ _("Terms and conditions") }</a>
+        ${ template_hook('page-footer') }
     </div>
 </%block>

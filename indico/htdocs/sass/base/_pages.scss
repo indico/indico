@@ -163,6 +163,27 @@
     }
 }
 
+.fixed-width-standalone-text-page {
+    // standalone page that looks good if there's just a big bunch of text
+    // which would look ugly with 1000px width and the default font size
+    // which is rather small
+    @extend .fixed-width-standalone-page;
+
+    width: 800px;
+
+    .page-content {
+        max-width: 800px;
+        font-size: 1.2em;
+
+        p:first-child {
+            margin-top: 0;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
 .conference-page {
     @extend %indico-page;
 

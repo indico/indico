@@ -17,10 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.modules.legal import settings
-from indico.util.console import cformat
+from indico.modules.legal import legal_settings
 
-from indico_zodbimport import Importer
+from indico_zodbimport import Importer, convert_to_unicode
 
 
 class LegalImporter(Importer):
@@ -28,11 +27,11 @@ class LegalImporter(Importer):
         self.migrate_settings()
 
     def migrate_settings(self):
-        print cformat('%{white!}migrating settings')
+        self.print_step('migrating settings')
         settings_map = {
             '_protectionDisclaimerProtected': 'protected_disclaimer',
             '_protectionDisclaimerRestricted': 'restricted_disclaimer'
         }
         for old, new in settings_map.iteritems():
-            settings.set(new, getattr(self.zodb_root['MaKaCInfo']['main'], old))
+            legal_settings.set(new, convert_to_unicode(getattr(self.zodb_root['MaKaCInfo']['main'], old)))
         db.session.commit()

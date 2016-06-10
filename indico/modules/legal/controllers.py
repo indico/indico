@@ -16,29 +16,29 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import redirect
 
-from indico.modules.legal import settings
+from indico.modules.legal import legal_settings
 from indico.modules.legal.forms import LegalMessagesForm
 from indico.modules.legal.views import WPDisplayLegalMessages, WPManageLegalMessages
-from indico.web.util import jsonify_template
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
 class RHManageLegalMessages(RHAdminBase):
+    CSRF_ENABLED = True
+
     def _process(self):
-        form = LegalMessagesForm(**settings.get_all())
+        form = LegalMessagesForm(**legal_settings.get_all())
         if form.validate_on_submit():
-            for field in form.visible_fields:
-                settings.set(field.name, getattr(form, field.name).data)
+            legal_settings.set_multi(form.data)
+            return redirect(url_for('legal.manage'))
         return WPManageLegalMessages.render_template('manage_messages.html', form=form)
 
 
 class RHDisplayLegalMessages(RH):
+    CSRF_ENABLED = True
+
     def _process(self):
-        tos = settings.get('terms_and_conditions')
-        if request.is_xhr:
-            return jsonify_template('legal/tos.html', tos=tos)
-        else:
-            return WPDisplayLegalMessages.render_template('tos.html', tos=tos)
+        return WPDisplayLegalMessages.render_template('tos.html', tos=legal_settings.get('tos'))
