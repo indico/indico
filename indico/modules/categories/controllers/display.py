@@ -138,4 +138,4 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 class RHCategoryTitles(RH):
     def _process(self):
-        return jsonify_data(categories=[{'title': c.title} for c in Category.find(is_deleted=False)])
+        return jsonify_data(categories=[{'id': c.id, 'title': c.title} for c in Category.find(is_deleted=False)])
