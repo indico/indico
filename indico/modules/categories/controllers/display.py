@@ -23,6 +23,7 @@ from flask import jsonify, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
 
+from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
@@ -136,6 +137,8 @@ class RHCategoryInfo(RHDisplayCategoryBase):
                             subcategories=[_serialize_category(c) for c in category_contents])
 
 
-class RHCategoryTitles(RH):
+class RHCategorySearch(RH):
     def _process(self):
-        return jsonify_data(categories=[{'id': c.id, 'title': c.title} for c in Category.find(is_deleted=False)])
+        starts_with = '{}%'.format(escape_like(request.args['q']))
+        categories = Category.query.filter(Category.title.ilike(starts_with)).order_by(Category.title).limit(10).all()
+        return jsonify_data(categories=[_serialize_category(c) for c in categories], flash=False)
