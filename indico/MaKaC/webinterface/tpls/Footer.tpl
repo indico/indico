@@ -22,10 +22,12 @@ else:
          }
      </script>
 % endif
-  <%block name="footer">
-          <img src="${ systemIcon("indico_small") }" alt="${ _("Indico")}" style="vertical-align: middle; margin-right: 2px;"/>
-            <span style="vertical-align: middle;">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
-  </%block>
+    <%block name="footer">
+        <img src="${ systemIcon("indico_small") }" alt="${ _("Indico")}" style="vertical-align: middle; margin-right: 2px;"/>
+        <span>${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
+        <br/>
+        <a href="${ url_for('legal.display') }">${ _("Terms and conditions") }</a>
+    </%block>
 
     ${ template_hook('page-footer') }
 </div>

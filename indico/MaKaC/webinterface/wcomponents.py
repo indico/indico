@@ -51,6 +51,7 @@ from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.util import preload_events
+from indico.modules.legal import settings as legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month, format_date
 from indico.util.signals import values_from_signal
@@ -296,8 +297,8 @@ class WHeader(WTemplated):
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
-        vars['protectionDisclaimerProtected'] = minfo.getProtectionDisclaimerProtected()
-        vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
+        vars['protectionDisclaimerProtected'] = legal_settings.get('protected_disclaimer')
+        vars['protectionDisclaimerRestricted'] = legal_settings.get('restricted_disclaimer')
         #Build a list of items for the administration menu
         adminItemList = []
         if session.user and session.user.is_admin:
