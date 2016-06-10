@@ -25,9 +25,17 @@ from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
+_DEFAULT_RESTRICTED_DISCLAIMER = ("Circulation to people other than the intended audience is not authorized. "
+                                  "You are obliged to treat the information with the appropriate level of "
+                                  "confidentiality.")
+_DEFAULT_PROTECTED_DISCLAINER = ("As such, this information is intended for an internal audience only. "
+                                 "You are obliged to treat the information with the appropriate level of "
+                                 "confidentiality.")
+
+
 legal_settings = SettingsProxy('legal', {
-    'protected_disclaimer': '',
-    'restricted_disclaimer': '',
+    'network_protected_disclaimer': _DEFAULT_PROTECTED_DISCLAINER,
+    'restricted_disclaimer': _DEFAULT_RESTRICTED_DISCLAIMER,
     'tos': ''
 }, preload=True)
 
