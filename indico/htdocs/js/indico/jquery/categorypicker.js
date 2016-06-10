@@ -16,27 +16,48 @@
  */
 
 (function($) {
-    $.widget("indico.categorypicker", {
+    'use strict';
 
+    $.widget("indico.categorypicker", {
         options: {
             categoryId: 0,
             actionButtonText: $T.gettext("Select"),
             onAction: function() {}
         },
 
+        // Cache for data of already visited categories
+        // Shared between instances
+        _cache: {},
+
+        _typeaheadTemplate:
+        '<form>\
+            <div class="typeahead__container">\
+                <div class="typeahead__field">\
+                    <span class="typeahead__query"></span>\
+                </div>\
+            </div>\
+        </form>',
+
         _create: function() {
             var self = this;
-            var element = self.element;
-            var opt = self.options;
-            var typeaheadTemplate = `<form>
-                <div class="typeahead__container">
-                    <div class="typeahead__field">
-                        <span class="typeahead__query"></span>
-                    </div>
-                </div>
-            </form>`
+            self._createSearchField();
+            self._createNavigator();
+            self.goToCategory(self.options.categoryId);
+        },
 
-            self.cache = {};
+        _createNavigator: function() {
+            var self = this;
+            self.$categoryList = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
+                .append($('<div>', {class: 'i-box-content'})
+                    .append(self.$categoryList));
+            self.element.append(self.$categoryNavigator);
+        },
+
+        _createSearchField: function() {
+            var self = this;
+
+            // Visible search field
             self.$searchInput = $('<input>', {
                 class: 'js-search-category js-typeahead',
                 type: 'search',
@@ -44,30 +65,23 @@
                 placeholder: $T.gettext("Search")
             }).attr('autocomplete', 'off');
 
-            var $typeaheadForm = $($.parseHTML(typeaheadTemplate)[0]);
+            // Insert elements in DOM
+            var $typeaheadForm = $($.parseHTML(self._typeaheadTemplate)[0]);
             $typeaheadForm.find('.typeahead__query').append(self.$searchInput);
-            $.ajax({
-                url: build_url(Indico.Urls.Categories.titles),
-                success: function(data) {
-                    if (data && data.categories) {
-                        self._initializeTypeahead(self.$searchInput, data.categories);
+            self.element.prepend($typeaheadForm);
+
+            // Typeahead init
+            self.$searchInput.typeahead({
+                dynamic: true,
+                source: {
+                    ajax: {
+                        url: build_url(Indico.Urls.Categories.search),
+                        path: 'categories',
+                        data: {
+                            q: "{{query}}"
+                        }
                     }
-                }
-            });
-
-            self.$categoryList = $('<ul>', {class: 'group-list fixed-height'});
-            self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
-                .append($('<div>', {class: 'i-box-content'})
-                    .append(self.$categoryList));
-            self.goToCategory(opt.categoryId);
-            self.element.append($typeaheadForm).append(self.$categoryNavigator);
-        },
-
-        _initializeTypeahead: function($element, data) {
-            var self = this;
-
-            $element.typeahead({
-                source: data,
+                },
                 cancelButton: false,
                 display: 'title',
                 callback: {
@@ -248,8 +262,8 @@
                 }
             }).find('.title').fadeOut();
 
-            if (self.cache[id]) {
-                self._renderNavigator(self.cache[id]);
+            if (self._cache[id]) {
+                self._renderNavigator(self._cache[id]);
             } else {
                 $.ajax({
                     url: build_url(Indico.Urls.Categories.info, {categId: id}),
@@ -259,7 +273,7 @@
                     },
                     success: function(data) {
                         if (data) {
-                            self.cache[id] = data;
+                            self._cache[id] = data;
                             self._renderNavigator(data);
                         }
                     }
