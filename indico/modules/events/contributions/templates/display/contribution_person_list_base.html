@@ -12,7 +12,7 @@
         {% set contribution_links = contribution_links|selectattr('author_type') %}
     {% endif %}
     <ul class="author-links">
-        {% for link in contribution_links|sort(attribute='author_type.value') %}
+        {% for link in contribution_links|sort(attribute='author_type.value') if not link.contribution.is_deleted %}
             {% set contribution = link.contribution %}
             <li>
                 <span class="contrib-role">
