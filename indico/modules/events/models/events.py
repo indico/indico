@@ -549,15 +549,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
                            _text=text_to_repr(self.title, max_length=75))
 
-    # TODO: Remove the next block of code once event acls (read access) are migrated
-    def _fail(self, *args, **kwargs):
-        raise NotImplementedError('These properties are not usable until event ACLs are in the new DB')
-    is_public = classproperty(classmethod(_fail))
-    is_inheriting = classproperty(classmethod(_fail))
-    is_self_protected = classproperty(classmethod(_fail))
-    protection_repr = property(_fail)
-    del _fail
-
 
 Event.register_location_events()
 Event.register_protection_events()
