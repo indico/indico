@@ -41,7 +41,7 @@ from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps
-from indico.util.decorators import classproperty, strict_classproperty
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
 from indico.web.flask.util import url_for
 
