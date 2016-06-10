@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
 import warnings
 
 from flask import current_app as app
@@ -24,13 +23,6 @@ from BTrees import OOBTree
 
 from indico.core.config import Config
 from indico.core import db
-
-DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = ("Circulation to people other than the intended audience is not authorized. "
-                                            "You are obliged to treat the information with the appropriate level of "
-                                            "confidentiality.")
-DEFAULT_PROTECTION_DISCLAINER_PROTECTED = ("As such, this information is intended for an internal audience only. "
-                                           "You are obliged to treat the information with the appropriate level of "
-                                           "confidentiality.")
 
 
 class MaKaCInfo(Persistent):
@@ -84,9 +76,6 @@ class MaKaCInfo(Persistent):
         self._apiMode = 0
         self._apiCacheTTL = 600
         self._apiSignatureTTL = 600
-
-        self._protectionDisclaimerRestricted = DEFAULT_PROTECTION_DISCLAINER_RESTRICTED
-        self._protectionDisclaimerProtected = DEFAULT_PROTECTION_DISCLAINER_PROTECTED
 
     def getSocialAppConfig( self ):
         if not hasattr(self, '_socialAppConfig'):
@@ -248,22 +237,6 @@ class MaKaCInfo(Persistent):
 
     def getIPBasedACLMgr(self):
         return self._ip_based_acl_mgr
-
-    def getProtectionDisclaimerProtected(self):
-        if not hasattr(self, '_protectionDisclaimerProtected'):
-            self._protectionDisclaimerProtected = DEFAULT_PROTECTION_DISCLAINER_PROTECTED
-        return self._protectionDisclaimerProtected
-
-    def setProtectionDisclaimerProtected(self, v):
-        self._protectionDisclaimerProtected = v
-
-    def getProtectionDisclaimerRestricted(self):
-        if not hasattr(self, '_protectionDisclaimerRestricted'):
-            self._protectionDisclaimerRestricted = DEFAULT_PROTECTION_DISCLAINER_RESTRICTED
-        return self._protectionDisclaimerRestricted
-
-    def setProtectionDisclaimerRestricted(self, v):
-        self._protectionDisclaimerRestricted = v
 
 
 class HelperMaKaCInfo:
