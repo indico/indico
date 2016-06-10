@@ -19,12 +19,12 @@ from __future__ import unicode_literals, division
 
 import re
 import os
+from HTMLParser import HTMLParser
 from io import BytesIO
 from operator import attrgetter
 
 import click
 from PIL import Image
-
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -36,6 +36,7 @@ from indico.modules.users import User
 from indico.util.console import cformat
 from indico.util.fs import secure_filename
 from indico.util.string import crc32, sanitize_email, is_valid_mail
+from indico.web.flask.templating import strip_tags
 
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import patch_default_group_provider, get_archived_file, convert_principal
@@ -172,15 +173,27 @@ class CategoryImporter(Importer):
                 default_themes['lecture'] = old_default_styles['simple_event']
             else:
                 self.print_warning('Invalid lecture theme: {}'.format(old_default_styles['simple_event']),
-                                   event_id=old_cat.id)
+                                   always=False, event_id=old_cat.id)
             if not old_default_styles['meeting']:
                 pass
             elif old_default_styles['meeting'] in theme_settings.get_themes_for('meeting'):
                 default_themes['meeting'] = old_default_styles['meeting']
             else:
                 self.print_warning('Invalid meeting theme: {}'.format(old_default_styles['meeting']),
-                                   event_id=old_cat.id)
+                                   always=False, event_id=old_cat.id)
         return default_themes
+
+    def _fix_title(self, title, categ_id, _ws_re=re.compile(r'\s+'),
+                   _status_re=re.compile(r'<font[^>]+>\s*(open|closed)\s*$')):
+        orig = title
+        title = _status_re.sub(r'(\1)', title)  # XXX: remove for 2.0; only needed for a CERN indico catgory
+        title = HTMLParser().unescape(strip_tags(title))
+        title = _ws_re.sub(' ', title).strip()
+        if title != orig:
+            self.print_warning('Sanitized category title', event_id=categ_id)
+            self.print_warning(cformat('%{red!}OLD: {}').format(orig))
+            self.print_warning(cformat('%{green!}NEW: {}').format(title))
+        return title
 
     def _migrate_category(self, old_cat, position):
         # unlimited visibility is 999 but we have a 994 for some reason.. since nobody
@@ -190,7 +203,8 @@ class CategoryImporter(Importer):
         emails = {sanitize_email(email).lower() for email in emails}
         emails = sorted(email for email in emails if is_valid_mail(email, False))
         default_themes = self._process_default_themes(old_cat)
-        cat = Category(id=int(old_cat.id), position=position, title=convert_to_unicode(old_cat.name),
+        title = self._fix_title(convert_to_unicode(old_cat.name), old_cat.id)
+        cat = Category(id=int(old_cat.id), position=position, title=title,
                        description=convert_to_unicode(old_cat.description), visibility=visibility,
                        timezone=convert_to_unicode(old_cat._timezone), event_creation_notification_emails=emails,
                        default_event_themes=default_themes,
