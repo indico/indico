@@ -295,9 +295,8 @@ class WHeader(WTemplated):
 
         vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
-        vars['protectionDisclaimerProtected'] = legal_settings.get('protected_disclaimer')
+        vars['protectionDisclaimerProtected'] = legal_settings.get('network_protected_disclaimer')
         vars['protectionDisclaimerRestricted'] = legal_settings.get('restricted_disclaimer')
         #Build a list of items for the administration menu
         adminItemList = []

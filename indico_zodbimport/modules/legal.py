@@ -29,7 +29,7 @@ class LegalImporter(Importer):
     def migrate_settings(self):
         self.print_step('migrating settings')
         settings_map = {
-            '_protectionDisclaimerProtected': 'protected_disclaimer',
+            '_protectionDisclaimerProtected': 'network_protected_disclaimer',
             '_protectionDisclaimerRestricted': 'restricted_disclaimer'
         }
         for old, new in settings_map.iteritems():
