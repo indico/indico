@@ -26,4 +26,4 @@ from indico.web.forms.widgets import CKEditorWidget
 class LegalMessagesForm(IndicoForm):
     protected_disclaimer = TextAreaField(_("Protected information disclaimer"), widget=CKEditorWidget())
     restricted_disclaimer = TextAreaField(_("Restricted information disclaimer"), widget=CKEditorWidget())
-    terms_and_conditions = TextAreaField(_("Terms and conditions"), widget=CKEditorWidget())
+    tos = TextAreaField(_("Terms and conditions"), widget=CKEditorWidget())

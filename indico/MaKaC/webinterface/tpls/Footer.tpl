@@ -25,11 +25,8 @@ else:
     <%block name="footer">
         <img src="${ systemIcon("indico_small") }" alt="${ _("Indico")}" style="vertical-align: middle; margin-right: 2px;"/>
         <span>${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
-        <br/>
-        <a href="${ url_for('legal.display') }">${ _("Terms and conditions") }</a>
+        ${ template_hook('page-footer') }
     </%block>
-
-    ${ template_hook('page-footer') }
 </div>
 
 % if 'injected_js' in _g:

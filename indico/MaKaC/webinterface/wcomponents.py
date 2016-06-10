@@ -51,7 +51,7 @@ from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.util import preload_events
-from indico.modules.legal import settings as legal_settings
+from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month, format_date
 from indico.util.signals import values_from_signal

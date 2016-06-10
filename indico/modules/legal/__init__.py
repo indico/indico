@@ -16,19 +16,28 @@
 
 from __future__ import unicode_literals
 
+from flask import render_template
+
 from indico.core import signals
 from indico.util.i18n import _
 from indico.core.settings.core import SettingsProxy
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
-settings = SettingsProxy('legal', {
-    'protected_disclaimer': "",
-    'restricted_disclaimer': "",
-    'terms_and_conditions': ""
+legal_settings = SettingsProxy('legal', {
+    'protected_disclaimer': '',
+    'restricted_disclaimer': '',
+    'tos': ''
 }, preload=True)
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
     yield SideMenuItem('legal_messages', _('Legal/Disclaimers'), url_for('legal.manage'), section='security')
+
+
+@template_hook('page-footer')
+def _inject_footer(**kwargs):
+    if legal_settings.get('tos'):
+        return render_template('legal/tos_footer.html')
