@@ -37,7 +37,11 @@ class RHCategoryBase(RH):
 class RHDisplayCategoryBase(RHCategoryBase):
     def _checkProtection(self):
         if not self.category.can_access(session.user):
-            raise Forbidden
+            msg = [_("You are not authorized to access this category.")]
+            if self.category.no_access_contact:
+                msg.append(_("If you believe you should have access, please contact {}")
+                           .format(self.category.no_access_contact))
+            raise Forbidden(' '.join(msg))
 
 
 class RHManageCategoryBase(RHCategoryBase):
