@@ -24,7 +24,7 @@ pytest-cov==2.2.1
 pytest-localserver==0.3.5
 pytest-mock==0.11.0
 python-dateutil==1.5
-pytz==2015.7
+pytz
 reportlab==3.2
 simplejson==2.6.2
 termcolor==1.1.0
