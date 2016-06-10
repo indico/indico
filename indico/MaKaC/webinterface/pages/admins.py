@@ -887,21 +887,3 @@ class WIPBasedACL(wcomponents.WTemplated):
         vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
         vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
         return vars
-
-
-class WPAdminProtection(WPAdminsBase):
-    sidemenu_option = 'protection'
-
-    def _getPageContent(self, params):
-        wc = WAdminProtection()
-        return wc.getHTML()
-
-
-class WAdminProtection(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["protectionDisclaimerProtected"] = minfo.getProtectionDisclaimerProtected()
-        vars["protectionDisclaimerRestricted"] = minfo.getProtectionDisclaimerRestricted()
-        return vars

@@ -647,10 +647,6 @@ class UHAdminsSystemModif(URLHandler):
     _endpoint = 'admin.adminSystem-modify'
 
 
-class UHAdminsProtection(URLHandler):
-    _endpoint = 'admin.adminProtection'
-
-
 class UHCategoryModification(URLHandler):
     _endpoint = 'category_mgmt.categoryModification'
 

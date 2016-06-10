@@ -19,15 +19,11 @@ from flask import session
 from indico.modules.users import User
 from indico.util.i18n import _
 
-from MaKaC.services.implementation.base import AdminService, TextModificationBase, LoggedOnlyService
-
-from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.user import AvatarHolder
-import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
-import MaKaC.common.info as info
+from MaKaC.common import timezoneUtils
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.user import IAvatarAllDetailsFossil
+from MaKaC.services.implementation.base import AdminService, LoggedOnlyService
+from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.services.interface.rpc.common import NoReportError
 
 
 class AdminLoginAs(AdminService):
@@ -95,66 +91,10 @@ class RemoveAdministrator(AdminService):
         return fossilize([u.as_avatar for u in User.find(is_admin=True)])
 
 
-class MergeGetCompleteUserInfo(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        pm = ParameterManager(self._params)
-        av = AvatarHolder()
-        userId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._user = av.getById(userId)
-        if self._user == None:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % userId)
-
-    def _getAnswer(self):
-        userFossil = fossilize(self._user, IAvatarAllDetailsFossil)
-        identityList = []
-        for identity in self._user.getIdentityList():
-            identityDict = {}
-            identityDict["login"] = identity.getLogin()
-            identityDict["authTag"] = identity.getAuthenticatorTag()
-            identityList.append(identityDict)
-        userFossil["identityList"] = identityList
-        return userFossil
-
-
-class EditProtectionDisclaimerProtected (TextModificationBase, AdminService):
-
-    def _handleSet(self):
-        if (self._value ==""):
-            raise ServiceError("ERR-E1",
-                               "The protected disclaimer cannot be empty")
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setProtectionDisclaimerProtected(self._value)
-
-    def _handleGet(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        return minfo.getProtectionDisclaimerProtected()
-
-
-class EditProtectionDisclaimerRestricted (TextModificationBase, AdminService):
-
-    def _handleSet(self):
-        if (self._value ==""):
-            raise ServiceError("ERR-E1",
-                               "The restricted disclaimer cannot be empty")
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setProtectionDisclaimerRestricted(self._value)
-
-    def _handleGet(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        return minfo.getProtectionDisclaimerRestricted()
-
-
 methodMap = {
     "general.addExistingAdmin": AddAdministrator,
     "general.removeAdmin": RemoveAdministrator,
 
     "header.loginAs": AdminLoginAs,
-    "header.undoLoginAs": AdminUndoLoginAs,
-
-    "merge.getCompleteUserInfo": MergeGetCompleteUserInfo,
-
-    "protection.editProtectionDisclaimerProtected": EditProtectionDisclaimerProtected,
-    "protection.editProtectionDisclaimerRestricted": EditProtectionDisclaimerRestricted
+    "header.undoLoginAs": AdminUndoLoginAs
 }

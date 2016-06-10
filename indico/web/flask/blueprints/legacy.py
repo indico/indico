@@ -54,7 +54,7 @@ legacy_endpoints = {
     'adminLayout-addStyle', 'adminLayout-deleteStyle', 'adminLayout-saveSocial', 'adminLayout-saveTemplateSet',
     'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList',
     'adminList-switchNewsActive', 'adminMaintenance', 'adminMaintenance-pack', 'adminMaintenance-performPack',
-    'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminProtection', 'adminServices-ipbasedacl',
+    'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminServices-ipbasedacl',
     'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke',
     'adminSystem', 'adminSystem-modify',
     'adminUpcomingEvents', 'assignContributions', 'assignContributions-downloadAcceptedPapers', 'badgeTemplates',

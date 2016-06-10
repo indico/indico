@@ -52,9 +52,6 @@ admin.add_url_rule('/maintenance/clean-tmp', 'adminMaintenance-tmpCleanup', main
 admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTmpCleanup',
                    maintenance.RHMaintenancePerformTmpCleanup, methods=('POST',))
 
-# Protection
-admin.add_url_rule('/protection/messages', 'adminProtection', admins.RHAdminProtection)
-
 # IP domains (let's call them "networks" in the URL - that's more fitting)
 admin.add_url_rule('/networks/create', 'domainCreation', domains.RHDomainCreation)
 admin.add_url_rule('/networks/create', 'domainCreation-create', domains.RHDomainPerformCreation, methods=('POST',))

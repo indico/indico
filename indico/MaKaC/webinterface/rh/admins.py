@@ -179,13 +179,3 @@ class RHConferenceStyles(RHAdminBase):
     def _process( self ):
         p = admins.WPAdminsConferenceStyles( self )
         return p.display()
-
-class RHAdminProtection( RHAdminBase ):
-    _uh = urlHandlers.UHDomains
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-
-    def _process( self ):
-        p = admins.WPAdminProtection( self )
-        return p.display()
