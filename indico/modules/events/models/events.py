@@ -332,10 +332,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 theme_settings.defaults[self.type])
 
     @property
-    def is_protected(self):
-        return self.as_legacy.isProtected()
-
-    @property
     def locator(self):
         return {'confId': self.id}
 
