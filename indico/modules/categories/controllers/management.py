@@ -59,7 +59,7 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
     def _process(self):
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content',
-                                                    categories=self.category.children)
+                                                    subcategories=self.category.children)
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
@@ -147,3 +147,10 @@ class RHManageCategoryProtection(RHManageCategoryBase):
         event_creators = {x.principal for x in self.category.acl_entries
                           if x.has_management_role('create', explicit=True)}
         return FormDefaults(self.category, acl=acl, managers=managers, event_creators=event_creators)
+
+
+class RHSortSubcategories(RHManageCategoryBase):
+    def _process(self):
+        subcategories = {category.id: category for category in self.category.children}
+        for position, id_ in enumerate(request.json['categories'], 1):
+            subcategories[id_].position = position

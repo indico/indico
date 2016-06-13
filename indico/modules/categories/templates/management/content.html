@@ -1,29 +1,31 @@
 {% extends 'categories/management/base.html' %}
 
-{% macro category_row(category) %}
-    <tr class="i-table">
-        <td class="i-table column-icon">
+{% macro subcategory_row(subcategory) %}
+    <tr class="i-table"
+        data-category-id="{{ subcategory.id }}"
+        data-category-title="{{ subcategory.title }}">
+        <td class="i-table column-icon js-handle handle">
             <a class="i-button-icon icon-handle"></a>
         </td>
         <td class="i-table column-icon">
-            <input type="checkbox" name="category_id" value="{{ category.id }}">
+            <input type="checkbox" name="category_id" value="{{ subcategory.id }}">
         </td>
         <td class="i-table column-icon">
-            {% if category.is_self_protected %}
+            {% if subcategory.is_self_protected %}
                 <span class="icon-protection-self"></span>
-            {% elif category.is_public %}
+            {% elif subcategory.is_public %}
                 <span class="icon-protection-public"></span>
             {% endif %}
         </td>
         <td class="i-table">
-            <a href="{{ url_for('.manage_content', category) }}">
-                {{ category.title }}
+            <a href="{{ url_for('.manage_content', subcategory) }}">
+                {{ subcategory.title }}
             </a>
         </td>
         <td class="i-table actions">
             <a class="i-button-icon icon-transmission"
                title="{% trans %}Move to another category{% endtrans %}"></a>
-            {% if category.deep_children_count or category.deep_events_count %}
+            {% if subcategory.deep_children_count or subcategory.deep_events_count %}
                 <a class="i-button-icon icon-remove disabled"
                    title="{% trans %}This category cannot be deleted because it is not empty.{% endtrans %}"></a>
             {% else %}
@@ -34,7 +36,7 @@
     </tr>
 {% endmacro %}
 
-{% macro categories_table(categories) %}
+{% macro subcategories_table(subcategories) %}
     <div class="toolbar">
         <div class="group">
             <button class="i-button highlight icon-plus">{% trans %}New category{% endtrans %}</button>
@@ -48,7 +50,8 @@
             <button class="i-button icon-remove"></button>
         </div>
     </div>
-    <table class="i-table categories-management">
+    <table class="i-table categories-management"
+           data-sort-url="{{ url_for('.sort_subcategories', category) }}">
         <thead>
             <tr class="i-table">
                 <th class="i-table column-icon"></th>
@@ -58,9 +61,11 @@
                 <th class="i-table actions"></th>
             </tr>
         </thead>
-        {% for category in categories %}
-            {{ category_row(category) }}
-        {% endfor %}
+        <tbody>
+            {% for subcategory in subcategories %}
+                {{ subcategory_row(subcategory) }}
+            {% endfor %}
+        </tbody>
     </table>
 {% endmacro %}
 
@@ -69,5 +74,8 @@
 {% endblock %}
 
 {% block content %}
-    {{ categories_table(categories) }}
+    {{ subcategories_table(subcategories) }}
+    <script>
+        setupCategoryTable();
+    </script>
 {% endblock content %}
