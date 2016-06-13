@@ -854,7 +854,10 @@ class IndicoProtectionField(IndicoEnumRadioField):
     def render_protection_message(self):
         from indico.modules.categories.models.categories import Category
         protected_object = self.get_form().protected_object
-        non_inheriting_objects = protected_object.get_non_inheriting_objects()
+        if hasattr(protected_object, 'get_non_inheriting_objects'):
+            non_inheriting_objects = protected_object.get_non_inheriting_objects()
+        else:
+            non_inheriting_objects = []
         if isinstance(protected_object.protection_parent, Event):
             parent_type = _('Event')
         elif isinstance(protected_object.protection_parent, Category):
