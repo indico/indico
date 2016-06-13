@@ -16,3 +16,25 @@
 
 from .core import db
 from .custom import *
+
+
+def _patch_sa_cte_fix():
+    import pkg_resources
+    sa_dist = pkg_resources.get_distribution('sqlalchemy')
+    if sa_dist.parsed_version > pkg_resources.parse_version('1.0.12'):
+        raise Exception('Remove this monkeypatch; SQLAlchemy contains the CTE fix')
+    from sqlalchemy.sql.selectable import CTE
+    from sqlalchemy.sql.elements import _clone
+
+    def _copy_internals(self, clone=_clone, **kw):
+        super(CTE, self)._copy_internals(clone, **kw)
+        if self._cte_alias is not None:
+            self._cte_alias = self
+        self._restates = frozenset([
+            clone(elem, **kw) for elem in self._restates
+        ])
+
+    CTE._copy_internals = _copy_internals
+
+
+_patch_sa_cte_fix()
