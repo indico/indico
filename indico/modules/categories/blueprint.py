@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.categories.controllers.display import RHCategoryStatistics
-from indico.modules.categories.controllers.management import RHManageCategoryContent
+from indico.modules.categories.controllers.management import RHManageCategoryContent, RHManageCategoryProtection
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -26,6 +26,7 @@ _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtu
 
 # Management
 _bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)
+_bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 
 # Display
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
