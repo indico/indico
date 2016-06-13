@@ -202,9 +202,9 @@ class ProtectionMixin(object):
         assert self.allow_access_key
         if not self.access_key:
             return False
-        if not has_request_context():
-            return False
         if access_key is None:
+            if not has_request_context():
+                return False
             access_key = session.get('access_keys', {}).get(self._access_key_session_key)
         if not access_key:
             return False
