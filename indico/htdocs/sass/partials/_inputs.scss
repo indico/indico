@@ -437,7 +437,9 @@ dd > .i-has-action {
         lighten($pastel-gray, 0.7*$color-variation) 10px,
         lighten($pastel-gray, 0.7*$color-variation) 20px
     );
-    font-style: italic;
+    span.info {
+        font-style: italic;
+    }
     color: $dark-gray !important;
     pointer-events: none;
 
