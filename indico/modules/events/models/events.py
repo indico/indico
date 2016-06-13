@@ -58,6 +58,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     __tablename__ = 'events'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    allow_access_key = True
     location_backref_name = 'events'
     allow_location_inheritance = False
     description_wrapper = RichMarkup

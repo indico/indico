@@ -54,6 +54,8 @@ class ProtectionMixin(object):
     #: ACL entries (which will grant access even if the user cannot
     #: access the parent object).
     inheriting_have_acl = False
+    #: Whether the object can have an access key that grants read access
+    allow_access_key = False
 
     @classmethod
     def register_protection_events(cls):
@@ -76,6 +78,15 @@ class ProtectionMixin(object):
             nullable=False,
             default=ProtectionMode.inheriting
         )
+
+    @declared_attr
+    def access_key(cls):
+        if cls.allow_access_key:
+            return db.Column(
+                db.String,
+                nullable=False,
+                default=''
+            )
 
     @hybrid_property
     def is_public(self):
