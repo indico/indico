@@ -243,7 +243,6 @@ class IndicoPasswordField(PasswordField):
 
     def __init__(self, *args, **kwargs):
         self.toggle = kwargs.pop('toggle', False)
-        self.classes = kwargs.pop('classes', [])
         super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 

@@ -424,6 +424,9 @@ dd > .i-has-action {
     }
 }
 
+.PluginOptionPeopleListDiv {
+    min-width: 400px !important;
+}
 
 .PluginOptionPeopleListDiv.disabled {
     background-color: lighten($pastel-gray, $light-color-variation);
