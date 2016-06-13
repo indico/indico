@@ -7,7 +7,7 @@
 {% block content %}
     {{ form_header(form, id='event-protection-form') }}
     {{ form_rows(form, skip=form.priv_fields) }}
-    {% call form_fieldset(_("Session coordinator rights")) %}
+    {% call form_fieldset(_("Session coordinator rights"), collapsible=true, initially_collapsed=true) %}
         <div class="action-box highlight">
             <div class="section">
                 <div class="icon icon-info"></div>
