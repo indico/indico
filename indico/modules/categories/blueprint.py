@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.modules.categories.controllers.display import RHCategoryStatistics, RHSettingsIconDisplay
-from indico.modules.categories.controllers.management import (RHManageCategoryContent, RHManageCategorySettings,
-                                                              RHManageCategoryProtection, RHSettingsIconUpload)
+from indico.modules.categories.controllers.management import (RHManageCategoryContent, RHManageCategoryProtection,
+                                                              RHManageCategorySettings, RHSettingsIconUpload,
+                                                              RHSortSubcategories)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -27,9 +28,10 @@ _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtu
 
 # Management
 _bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)
-_bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
-_bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/icon', 'upload_icon', RHSettingsIconUpload, methods=('POST', 'DELETE'))
+_bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/sort-subcategories', 'sort_subcategories', RHSortSubcategories, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHSettingsIconDisplay)

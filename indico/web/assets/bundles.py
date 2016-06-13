@@ -373,6 +373,7 @@ base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jqu
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
+    'category_management': rjs_bundle('modules_category_management', 'js/indico/modules/category_management.js'),
     'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/category_statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
     'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'eventdisplay.js',
