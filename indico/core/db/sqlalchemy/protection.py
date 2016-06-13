@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import has_request_context, session
+from sqlalchemy import inspect
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -147,6 +149,10 @@ class ProtectionMixin(object):
         if allow_admin and user and user.is_admin:
             return True
 
+        # If there's a valid access key we can skip all other ACL checks
+        if self.allow_access_key and self.check_access_key():
+            return True
+
         if self.protection_mode == ProtectionMode.public:
             # if it's public we completely ignore the parent protection
             # this is quite ugly which is why it should only be allowed
@@ -186,6 +192,38 @@ class ProtectionMixin(object):
             # should never happen, but since this is a sensitive area
             # we better fail loudly if we have garbage
             raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
+
+    def check_access_key(self, access_key=None):
+        """Check whether an access key is valid for the object.
+
+        :param access_key: Use the given access key instead of taking
+                           it from the session.
+        """
+        assert self.allow_access_key
+        if not self.access_key:
+            return False
+        if not has_request_context():
+            return False
+        if access_key is None:
+            access_key = session.get('access_keys', {}).get(self._access_key_session_key)
+        if not access_key:
+            return False
+        return self.access_key == access_key
+
+    def set_session_access_key(self, access_key):
+        """Store an access key for the object in the session.
+
+        :param access_key: The access key to store. It is not checked
+                           for validity.
+        """
+        assert self.allow_access_key
+        session.setdefault('access_keys', {})[self._access_key_session_key] = access_key
+        session.modified = True
+
+    @property
+    def _access_key_session_key(self):
+        cls, pks = inspect(self).identity_key
+        return '{}-{}'.format(cls.__name__, '-'.join(map(unicode, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
         """Updates access privileges for the given principal.
