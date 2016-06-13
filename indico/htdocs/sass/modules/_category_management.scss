@@ -29,4 +29,12 @@ table.categories-management {
         width: 1.6em;
         text-align: center;
     }
+
+    .handle .icon-handle {
+        cursor: move;
+
+        &:hover, &:active {
+            color: $dark-gray;
+        }
+    }
 }
