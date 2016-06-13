@@ -21,6 +21,7 @@ from mock import MagicMock
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.roles import get_available_roles
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
@@ -222,6 +223,31 @@ def test_update_principal_errors(create_event, dummy_user):
         event.update_principal(dummy_user, roles={'foo'}, del_roles={'bar'})
     with pytest.raises(ValueError):
         event.update_principal(dummy_user, roles={'invalid'})
+
+
+def test_can_access_key_outside_context(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.can_access(None)
+
+
+def test_check_access_key(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.check_access_key('foobar')
+    assert event.check_access_key('12345')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_can_access_key(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.can_access(None)
+    event.set_session_access_key('12345')
+    assert event.can_access(None)
+    event.set_session_access_key('foobar')
+    assert not event.can_access(None)
+    # make sure we never accept empty access keys
+    event.access_key = ''
+    event.set_session_access_key('')
+    assert not event.can_access(None)
 
 
 @pytest.mark.usefixtures('request_context')
