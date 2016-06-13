@@ -172,20 +172,17 @@
                 id: 'category-' + category.id
             });
 
-            var $title = $('<span>', {
+            var $categoryTitle = $('<div>', {class: 'title-wrapper'});
+            $categoryTitle.append($('<span>', {
                 class: 'title',
                 text: category.title
-            });
-
+            }));
             if (withBreadcrumbs) {
-                var $titleWrapper = $('<div>', {class: 'title-wrapper'});
-                $titleWrapper.append($title);
-                $titleWrapper.append(self._buildBreadcrumbs(category.path, clickableBreadcrumbs));
-                $category.append($titleWrapper);
-            } else {
-                $category.append($title);
+                $categoryTitle.append(self._buildBreadcrumbs(category.path, clickableBreadcrumbs));
             }
 
+            $category.append($('<div>', {class: 'icon-wrapper'}));
+            $category.append($categoryTitle);
             $category.append(self._buildSidePanel(category, !isSubcategory));
             return $category;
         },
@@ -268,7 +265,12 @@
 
             self.$categoryResults.html('');
             _.each(categories, function(category) {
-                self.$categoryResults.append(self._buildSubcategory(category, true));
+                var $result = self._buildSubcategory(category, true);
+                $result.find('.icon-wrapper').append($('<i>', {
+                    class: 'icon-search',
+                    title: $T.gettext("Search result")
+                }));
+                self.$categoryResults.append($result);
             });
         },
 
