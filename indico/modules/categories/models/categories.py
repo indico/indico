@@ -262,16 +262,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return cte_query.union_all(parent_query)
 
     @property
-    def deep_children_count(self):
-        """Get the total number of subcategories.
-
-        This includes subcategories at any level of nesting.
-        """
-        cte_query = self._get_ancestry_query()
-        query = select([db.func.count()]).where(cte_query.c.parents.contains([self.id]))
-        return db.session.execute(query).fetchone()[0]
-
-    @property
     def deep_children_query(self):
         """Get a query object for all subcategories.
 
@@ -294,7 +284,20 @@ Category.register_protection_events()
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
     from indico.modules.events import Event
+
+    # deep_events_count
     query = (select([db.func.count()])
              .where(Event.category_chain.contains(array([Category.id])) & ~Event.is_deleted)
              .correlate_except(Event))
     Category.deep_events_count = column_property(query, deferred=True)
+
+    # deep_children_count
+    cat_alias = db.aliased(Category)
+    cte_query = (select([cat_alias.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
+                 .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
+                 .cte('chains', recursive=True))
+    parent_query = (select([cat_alias.id, cte_query.c.parents.op('||')(cat_alias.parent_id)])
+                    .where((cat_alias.parent_id == cte_query.c.id) & ~cat_alias.is_deleted))
+    cte_query = cte_query.union_all(parent_query)
+    query = select([db.func.count()]).where(cte_query.c.parents.contains(array([Category.id])))
+    Category.deep_children_count = column_property(query, deferred=True)
