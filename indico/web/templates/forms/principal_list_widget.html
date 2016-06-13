@@ -29,8 +29,9 @@
                     return !_.findWhere(principals, {identifier: principal.identifier});
                 });
                 principals = _.sortBy(principals.concat(newPrincipals), function(principal) {
-                    var weight = (principal._type == 'Avatar') ? 0 : (principal.isGroup ? 1 : 2);
-                    return [weight, principal.name.toLowerCase()];
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal._type == 'Email' ? 1 : (principal.isGroup ? 2 : 3));
+                    var name = principal._type !== 'Email' ? principal.name : principal.email;
+                    return [weight, name.toLowerCase()];
                 });
                 field.val(JSON.stringify(principals));
                 field.trigger('change');
