@@ -1304,6 +1304,8 @@ type("UserListWidget", ["ListWidget"],
                 className = 'item-group';
             } else if (pairProperties.get('_type') === 'IPNetworkGroup') {
                 className = 'icon-lan2';
+            } else if (pairProperties.get('_type') === 'Email') {
+                className = 'icon-mail';
             } else {
                 className = 'icon-user';
             }
@@ -1368,8 +1370,10 @@ type("UserListWidget", ["ListWidget"],
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
                 }
 
-                userName.append(Html.span('email', userData.get('email')));
-                userName.append(Html.span('affiliation', userData.get('affiliation')));
+                if (userData.get('_type') !== 'Email') {
+                    userName.append(Html.span('email', userData.get('email')));
+                    userName.append(Html.span('affiliation', userData.get('affiliation')));
+                }
                 return [userName, buttonDiv];
             }
          }
@@ -1536,8 +1540,9 @@ type("UserListField", ["IWidget"], {
             function updatePrincipalsList(entries) {
                 var sortedKeys = _.sortBy(_.keys(entries), function(key) {
                     var principal = entries[key].getAll();
-                    var weight = (principal._type == 'Avatar') ? 0 : (principal.isGroup ? 1 : 2);
-                    return [weight, principal.name.toLowerCase()];
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal._type == 'Email' ? 1 : (principal.isGroup ? 2 : 3));
+                    var name = principal._type !== 'Email' ? principal.name : principal.email;
+                    return [weight, name.toLowerCase()];
                 });
 
                 self.userList.clearList();
