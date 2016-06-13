@@ -23,6 +23,7 @@ from operator import attrgetter
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup
 from pytz import timezone
+from sqlalchemy.orm import undefer
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
@@ -138,8 +139,11 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        categories = sorted([(cat, truncate_path(cat.get_chain_titles()[:-1], chars=50))
-                             for cat in self.user.favorite_categories], key=lambda c: (c[0].title, c[1]))
+        query = (Category.query
+                 .filter(Category.id.in_(c.id for c in self.user.favorite_categories))
+                 .options(undefer('chain_titles')))
+        categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
+                            key=lambda c: (c[0].title, c[1]))
         return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
 
 

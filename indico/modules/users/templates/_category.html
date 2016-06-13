@@ -1,7 +1,7 @@
 {% macro _category_path(category, truncated_path) %}
     {% set first_node, inner_nodes, last_node, truncated = truncated_path %}
     <span class="category-path">
-        <ul {% if truncated %} title="{{ ' » '.join(category.get_chain_titles()[:-1]) }}"{% endif %}>
+        <ul {% if truncated %} title="{{ ' » '.join(category.chain_titles[:-1]) }}"{% endif %}>
             {% if first_node is not none %}<li>{{ first_node }}</li>{% endif %}
             {% if truncated %}
                 <li data-tooltip-anchor>&hellip;</li>

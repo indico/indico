@@ -32,7 +32,6 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.caching import memoize_request
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -225,7 +224,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """Check whether the user can create events in the category."""
         return user and (not self.event_creation_restricted or self.can_manage(user, role='create'))
 
-    def _get_chain_query(self, start_criterion):
+    @staticmethod
+    def _get_chain_query(start_criterion):
         cte_query = (select([Category.id, Category.parent_id, literal(0).label('level')])
                      .where(start_criterion)
                      .cte('category_chain', recursive=True))
@@ -272,11 +272,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 .join(cte_query, Category.id == cte_query.c.id)
                 .filter(cte_query.c.parents.contains([self.id])))
 
-    @memoize_request
-    def get_chain_titles(self):
-        """Retrieve the category titles from the root to the category"""
-        return [c.title for c in self.chain_query]
-
 
 Category.register_protection_events()
 
@@ -285,6 +280,18 @@ Category.register_protection_events()
 def _mappers_configured():
     from indico.modules.events import Event
 
+    cat_alias = db.aliased(Category)
+
+    # chain_titles
+    cte_query = (select([cat_alias.id, array([cat_alias.title]).label('path')])
+                 .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
+                 .cte(recursive=True))
+    parent_query = (select([cat_alias.id, cte_query.c.path.op('||')(cat_alias.title)])
+                    .where((cat_alias.parent_id == cte_query.c.id) & ~cat_alias.is_deleted))
+    cte_query = cte_query.union_all(parent_query)
+    query = select([cte_query.c.path]).where(cte_query.c.id == Category.id).correlate_except(cte_query)
+    Category.chain_titles = column_property(query, deferred=True)
+
     # deep_events_count
     query = (select([db.func.count()])
              .where(Event.category_chain.contains(array([Category.id])) & ~Event.is_deleted)
@@ -292,12 +299,13 @@ def _mappers_configured():
     Category.deep_events_count = column_property(query, deferred=True)
 
     # deep_children_count
-    cat_alias = db.aliased(Category)
     cte_query = (select([cat_alias.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
                  .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
-                 .cte('chains', recursive=True))
+                 .cte(recursive=True))
     parent_query = (select([cat_alias.id, cte_query.c.parents.op('||')(cat_alias.parent_id)])
                     .where((cat_alias.parent_id == cte_query.c.id) & ~cat_alias.is_deleted))
     cte_query = cte_query.union_all(parent_query)
-    query = select([db.func.count()]).where(cte_query.c.parents.contains(array([Category.id])))
+    query = (select([db.func.count()])
+             .where(cte_query.c.parents.contains(array([Category.id])))
+             .correlate_except(cte_query))
     Category.deep_children_count = column_property(query, deferred=True)

@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
+from sqlalchemy.orm import undefer
+
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
@@ -32,15 +34,19 @@ from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
-from MaKaC.accessControl import AccessWrapper
 
 
 def get_related_categories(user, detailed=True):
     """Gets the related categories of a user for the dashboard"""
-    favorites = user.favorite_categories
+    favorites = set(Category.query
+                    .filter(Category.id.in_(c.id for c in user.favorite_categories))
+                    .options(undefer('chain_titles'))
+                    .all())
     managed = set(Category.query
                   .filter(Category.acl_entries.any(db.and_(CategoryPrincipal.type == PrincipalType.user,
-                                                           CategoryPrincipal.user == user))))
+                                                           CategoryPrincipal.user == user)),
+                          ~Category.is_deleted)
+                  .options(undefer('chain_titles')))
     if not detailed:
         return favorites | managed
     res = {}
@@ -49,7 +55,7 @@ def get_related_categories(user, detailed=True):
             'categ': categ,
             'favorite': categ in favorites,
             'managed': categ in managed,
-            'path': truncate_path(categ.get_chain_titles()[:-1], chars=50)
+            'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
     return OrderedDict(sorted(res.items(), key=itemgetter(0)))
 
@@ -61,10 +67,12 @@ def get_suggested_categories(user):
     related = {cat.id for cat in get_related_categories(user, detailed=False)}
     res = []
     categ_suggestions = suggestions.get_suggestions(user, 'category')
-    query = Category.find_all(Category.id.in_(categ_suggestions),
-                              ~Category.id.in_(related),
-                              ~Category.is_deleted,
-                              ~Category.suggestions_disabled)
+    query = (Category.query
+             .filter(Category.id.in_(categ_suggestions),
+                     ~Category.id.in_(related),
+                     ~Category.is_deleted,
+                     ~Category.suggestions_disabled)
+             .options(undefer('chain_titles')))
     categories = {c.id: c for c in query}
     for id_, score in categ_suggestions.iteritems():
         try:
@@ -80,7 +88,7 @@ def get_suggested_categories(user):
         res.append({
             'score': score,
             'categ': categ,
-            'path': truncate_path(categ.get_chain_titles()[:-1], chars=50)
+            'path': truncate_path(categ.chain_titles[:-1], chars=50)
         })
     return res
 
