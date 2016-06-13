@@ -43,6 +43,9 @@ class WPCategoryManagement(WPCategory):
 
     MANAGEMENT = True
 
+    def getCSSFiles(self):
+        return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()
+
     def _getNavigationDrawer(self):
         return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 

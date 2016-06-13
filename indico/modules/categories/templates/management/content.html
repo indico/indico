@@ -1,9 +1,68 @@
 {% extends 'categories/management/base.html' %}
 
+{% macro category_row(category) %}
+    <tr class="i-table">
+        <td class="i-table column-icon">
+            <a class="i-button-icon icon-handle"></a>
+        </td>
+        <td class="i-table column-icon">
+            <input type="checkbox" name="category_id" value="{{ category.id }}">
+        </td>
+        <td class="i-table column-icon">
+            {% if category.is_self_protected %}
+                <span class="icon-lock"></span>
+            {% elif category.is_public %}
+                <span class="icon-unlocked"></span>
+            {% endif %}
+        </td>
+        <td class="i-table">
+            <a href="{{ url_for('.manage_content', category) }}">
+                {{ category.title }}
+            </a>
+        </td>
+        <td class="i-table actions">
+            <a class="i-button-icon icon-transmission"
+               title="{% trans %}Move to another category{% endtrans %}"></a>
+            <a class="i-button-icon icon-remove"
+               title="{% trans %}Delete category{% endtrans %}"></a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro categories_table(categories) %}
+    <div class="toolbar">
+        <div class="group">
+            <button class="i-button highlight icon-plus">{% trans %}New category{% endtrans %}</button>
+        </div>
+        <div class="group">
+            <button class="i-button icon-sort-alpha-asc js-sort-categories"
+                    title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
+        </div>
+        <div class="group right">
+            <button class="i-button icon-transmission"></button>
+            <button class="i-button icon-remove"></button>
+        </div>
+    </div>
+    <table class="i-table categories-management">
+        <thead>
+            <tr class="i-table">
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                <th class="i-table actions"></th>
+            </tr>
+        </thead>
+        {% for category in categories %}
+            {{ category_row(category) }}
+        {% endfor %}
+    </table>
+{% endmacro %}
+
 {% block title %}
     {% trans %}Content{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    page content
+    {{ categories_table(categories) }}
 {% endblock content %}
