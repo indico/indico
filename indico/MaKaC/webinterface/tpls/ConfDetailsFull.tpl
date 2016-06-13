@@ -42,14 +42,14 @@
       <ul class="chair_list text">
         % for link in event.person_links:
         <li>
-          % if link.person.email:
+          % if link.email:
             % if _session.user:
-              <a href="mailto:${link.person.email}">${link.person.full_name}</a>
+              <a href="mailto:${link.email}">${link.full_name}</a>
             % else:
-              <a href="#" class="nomail">${link.person.full_name}</a>
+              <a href="#" class="nomail">${link.full_name}</a>
             % endif
           % else:
-            ${link.person.full_name}
+            ${link.full_name}
           % endif
         </li>
         % endfor
