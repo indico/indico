@@ -150,8 +150,8 @@ class RHEventProtection(RHConferenceModifBase):
         if form.validate_on_submit():
             update_event(self.event_new, {'protection_mode': form.protection_mode.data})
             if self.event_new.is_protected:
-                self.event_new.as_legacy.setAccessKey(form.access_key.data)
-                update_event(self.event_new, {'no_access_contact': form.no_access_contact.data})
+                update_event(self.event_new, {'no_access_contact': form.no_access_contact.data,
+                                              'access_key': form.access_key.data})
                 update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
             update_object_principals(self.event_new, form.submitters.data, role='submit')
@@ -171,7 +171,7 @@ class RHEventProtection(RHConferenceModifBase):
                              if event_session_settings.get(val)}
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
-                     'access_key': self.event_new.as_legacy.getAccessKey(),
+                     'access_key': self.event_new.access_key,
                      'no_access_contact': self.event_new.no_access_contact}, **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):
