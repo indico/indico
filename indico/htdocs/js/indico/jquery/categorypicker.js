@@ -18,7 +18,7 @@
 (function($) {
     'use strict';
 
-    $.widget("indico.categorypicker", {
+    $.widget('indico.categorypicker', {
         options: {
             categoryId: 0,
             actionButtonText: $T.gettext("Select"),
@@ -40,17 +40,21 @@
 
         _create: function() {
             var self = this;
-            self._createSearchField();
             self._createNavigator();
+            self._createSearchField();
             self.goToCategory(self.options.categoryId);
         },
 
         _createNavigator: function() {
             var self = this;
-            self.$categoryList = $('<ul>', {class: 'group-list fixed-height'});
+            self.$category = $('<div>');
+            self.$categoryTree = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryResults = $('<ul>', {class: 'group-list fixed-height'});
             self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
                 .append($('<div>', {class: 'i-box-content'})
-                    .append(self.$categoryList));
+                    .append(self.$category)
+                    .append(self.$categoryTree)
+                    .append(self.$categoryResults));
             self.element.append(self.$categoryNavigator);
         },
 
@@ -73,6 +77,7 @@
             // Typeahead init
             self.$searchInput.typeahead({
                 dynamic: true,
+                filter: false,
                 source: {
                     ajax: {
                         url: build_url(Indico.Urls.Categories.search),
@@ -82,28 +87,44 @@
                         }
                     }
                 },
+                resultContainer: false,
                 cancelButton: false,
                 display: 'title',
                 callback: {
                     onClickAfter: function(node, a, item) {
                         self.goToCategory(item.id);
+                    },
+                    onResult: function(node, query, result) {
+                        self._renderResults(result);
+                    },
+                    onHideLayout: function() {
+                        self.$categoryResults.html('');
+                        self.$category.show();
+                        self.$categoryTree.show();
+                    },
+                    onShowLayout: function(node, query) {
+                        self.$category.hide();
+                        self.$categoryTree.hide();
                     }
                 }
             });
         },
 
-        _buildBreadcrumbs: function(path) {
+        _buildBreadcrumbs: function(path, clickable) {
             var self = this;
             var $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
+            var tag = clickable ? '<a>' : '<span>';
 
             _.each(path, function(category) {
-                var $item = $('<a>', {
+                var $item = $(tag, {
                     text: category.title,
-                    'data-id': category.id,
-                    title:  $T.gettext("Go to: {0}".format(category.title)),
-                    href: '#'
+                    'data-id': category.id
                 });
-                self._bindClickEvent($item);
+                if (clickable) {
+                    $item.attr('href', '');
+                    $item.attr('title', $T.gettext("Go to: {0}".format(category.title)));
+                }
+                self._bindGoToCategoryOnClick($item, category.id);
                 $breadcrumbs.append($('<li>').append($item));
             });
 
@@ -132,7 +153,8 @@
                     var newItemList = $.merge($.merge($.merge([], leftList), [$('<li>', {text: '...'}).get(0)]), rightList);
                     $breadcrumbs.empty();
                     _.each(newItemList, function(item) {
-                        self._bindClickEvent($(item).find('a'));
+                        var $element = $(item).find('a');
+                        self._bindGoToCategoryOnClick($element, $element.data('id'));
                         $breadcrumbs.append(item);
                     });
                     shortenBreadcrumbs(leftList, rightList);
@@ -140,51 +162,54 @@
             }
         },
 
-        _buildCurrentCategory: function(category) {
+        _buildCategory: function(category, isSubcategory, withBreadcrumbs, clickableBreadcrumbs) {
             var self = this;
+            var tag = isSubcategory ? '<li>' : '<div>';
+            var itemClass = isSubcategory ? 'subcategory' : 'current-category';
 
-            var $category = $('<div>', {
-                class: 'item current-category',
-                'data-id': category.id,
+            var $category = $(tag, {
+                class: 'item ' + itemClass,
                 id: 'category-' + category.id
             });
-            var $titleWrapper = $('<div>', {class: 'title-wrapper'});
-            $titleWrapper.append($('<span>', {
-                class: 'title',
-                text: category.title,
-            }));
-            $titleWrapper.append(self._buildBreadcrumbs(category.path));
-            $category.append($titleWrapper);
-            $category.append(self._buildSidePanel(category));
 
+            var $title = $('<span>', {
+                class: 'title',
+                text: category.title
+            });
+
+            if (withBreadcrumbs) {
+                var $titleWrapper = $('<div>', {class: 'title-wrapper'});
+                $titleWrapper.append($title);
+                $titleWrapper.append(self._buildBreadcrumbs(category.path, clickableBreadcrumbs));
+                $category.append($titleWrapper);
+            } else {
+                $category.append($title);
+            }
+
+            $category.append(self._buildSidePanel(category, !isSubcategory));
             return $category;
         },
 
-        _buildSubcategory: function(category) {
+        _buildCurrentCategory: function(category) {
             var self = this;
+            return self._buildCategory(category, false, true, true);
+        },
 
-            var $subcategory = $('<li>', {
-                class: 'item subcategory',
-                'data-id': category.id,
-                id: 'category-' + category.id
-            }).append($('<span>', {
-                class: 'title',
-                text: category.title,
-            })).append(self._buildSidePanel(category));
+        _buildSubcategory: function(category, withBreadcrumbs) {
+            var self = this;
+            var $subcategory = self._buildCategory(category, true, withBreadcrumbs);
 
             if (category.can_access) {
-                $subcategory.on('click', function() {
-                    self.goToCategory($(this).data('id'));
-                }).addClass('can-access');
+                self._bindGoToCategoryOnClick($subcategory, category.id);
+                $subcategory.addClass('can-access');
             }
 
             return $subcategory;
         },
 
-        _buildSidePanel: function(category) {
+        _buildSidePanel: function(category, withGoToParent) {
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
-
 
             $buttonWrapper.append($('<div>').append($('<span>', {
                 class: 'action-button',
@@ -194,7 +219,7 @@
                 self.options.onAction(category.id);
             })));
 
-            if (category.path && category.path.length) {
+            if (withGoToParent && category.path && category.path.length) {
                 var parent = _.last(category.path);
                 var $arrowUp = $('<a>', {
                     class: 'icon-arrow-up navigate-up',
@@ -224,28 +249,36 @@
             var self = this;
 
             if (data.category) {
-                var $currentCategory = self._buildCurrentCategory(data.category);
-                self.$categoryList.before($currentCategory);
-                var $breadcrumbs = $currentCategory.find('.breadcrumbs');
-                var availableSpace = $currentCategory.width() - $currentCategory.find('.button-wrapper').width();
+                self.$category.html(self._buildCurrentCategory(data.category));
+                var $breadcrumbs = self.$category.find('.breadcrumbs');
+                var availableSpace = self.$category.width() - self.$category.find('.button-wrapper').width();
                 if ($breadcrumbs.width() >= availableSpace) {
                     self._ellipsizeBreadcrumbs($breadcrumbs, availableSpace);
                 }
             }
             if (data.subcategories) {
                 _.each(data.subcategories, function(subcategory) {
-                    self.$categoryList.append(self._buildSubcategory(subcategory));
+                    self.$categoryTree.append(self._buildSubcategory(subcategory));
                 });
             }
         },
 
-        _bindClickEvent: function($element) {
+        _renderResults: function(categories) {
+            var self = this;
+
+            self.$categoryResults.html('');
+            _.each(categories, function(category) {
+                self.$categoryResults.append(self._buildSubcategory(category, true));
+            });
+        },
+
+        _bindGoToCategoryOnClick: function($element, id) {
             var self = this;
 
             $element.on('click', function(evt) {
                 evt.preventDefault();
-                self.goToCategory($(this).data('id'));
-            })
+                self.goToCategory(id);
+            });
         },
 
         goToCategory: function(id) {
