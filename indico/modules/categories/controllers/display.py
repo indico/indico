@@ -115,7 +115,7 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category, include_breadcrumb=False):
+def _serialize_category(category, with_path=False):
     data = {
         'id': category.id,
         'title': category.title,
@@ -124,7 +124,7 @@ def _serialize_category(category, include_breadcrumb=False):
         'event_count': category.deep_events_count,
         'can_access': category.can_access(session.user)
     }
-    if include_breadcrumb:
+    if with_path:
         data['path'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
     return data
 
@@ -133,7 +133,7 @@ class RHCategoryInfo(RHDisplayCategoryBase):
     def _process(self):
         category = self._target.as_new
         category_contents = category.children
-        return jsonify_data(category=_serialize_category(category, include_breadcrumb=True),
+        return jsonify_data(category=_serialize_category(category, with_path=True),
                             subcategories=[_serialize_category(c) for c in category_contents])
 
 
@@ -141,4 +141,4 @@ class RHCategorySearch(RH):
     def _process(self):
         starts_with = '{}%'.format(escape_like(request.args['q']))
         categories = Category.query.filter(Category.title.ilike(starts_with)).order_by(Category.title).limit(10).all()
-        return jsonify_data(categories=[_serialize_category(c) for c in categories], flash=False)
+        return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in categories], flash=False)
