@@ -53,7 +53,7 @@
                 // Disable favorite button for EventPerson mode
                 {{ (field.event is none)|tojson }},
                 addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }},
-                {{ field.allow_networks | tojson }}, {{ field.ip_networks | tojson }}
+                {{ field.allow_networks | tojson }}, {{ field.ip_networks | sort(attribute='name') | tojson }}
             );
 
             $E('userGroupList-{{ field.id }}').set(widget.draw());
