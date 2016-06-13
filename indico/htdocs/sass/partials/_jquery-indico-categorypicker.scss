@@ -93,6 +93,25 @@
             }
         }
 
+        .icon-wrapper {
+            display: flex;
+
+            i {
+                @include border-radius(50%);
+                background: $blue;
+                color: white;
+                font-size: 1.5em;
+                margin-right: 1rem;
+                text-align: center;
+                height: 1.5em;
+                width: 1.5em;
+
+                &:before {
+                    vertical-align: middle;
+                }
+            }
+        }
+
         .button-wrapper {
             align-items: center;
             display: flex;
