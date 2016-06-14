@@ -1,0 +1,70 @@
+{% extends 'categories/management/base.html' %}
+
+{% from 'forms/_form.html' import form_header, form_rows, form_fieldset, form_footer %}
+
+{% block title %}
+    {% trans %}Settings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form) }}
+        {{ form_rows(form, fields=form.BASIC_FIELDS) }}
+        {% call form_fieldset(_('Event Header')) %}
+            {{ form_rows(form, fields=form.EVENT_HEADER_FIELDS) }}
+        {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change>
+    {% endcall %}
+
+    {{ form_header(icon_form, id='icon-form', action=url_for('.upload_icon', category)) }}
+        {% call form_fieldset(_('Icon')) %}
+            {{ form_rows(icon_form, skip_labels=true) }}
+        {% endcall %}
+    {% call form_footer(icon_form) %}
+        <input class="i-button big highlight icon-upload" type="submit"
+               value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
+        <button class="i-button js-remove-button danger icon-remove{% if not icon_form.icon.data %} weak-hidden{% endif %}"
+                data-method="DELETE"
+                data-href="{{ url_for('.upload_icon', category) }}">
+            {% trans %}Delete{% endtrans %}
+        </button>
+    {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            $('#icon-form').on('indico:fieldsSaved', function(evt, response) {
+                var hidden = !response.content;
+                var $this = $(this);
+                $this.find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+
+            }).on('click', '.js-remove-button', function(evt) {
+                var $this = $(this);
+                var $form = $this.closest('form');
+                var dropzone = $form.get(0).dropzone;
+
+                evt.preventDefault();
+
+                confirmPrompt($T.gettext("Are you sure you want to remove the icon of this category?"),
+                              $T.gettext("Delete icon?")
+                ).done(function() {
+                    $this.prop('disabled', true);
+
+                    $.ajax({
+                        url: $this.data('href'),
+                        method: $this.data('method'),
+                        complete: IndicoUI.Dialogs.Util.progress(),
+                        error: handleAjaxError,
+                        success: function(data) {
+                            handleFlashes(data, true, $form.find('.flashed-messages'));
+                            dropzone.removeAllFiles();
+                            $form.trigger('indico:fieldsSaved', data);
+                        }
+                    });
+                });
+            });
+        })();
+    </script>
+{% endblock content %}

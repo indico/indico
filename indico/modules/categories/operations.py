@@ -22,7 +22,7 @@ from indico.core.db import db
 from indico.modules.categories import logger
 
 
-def update_category(category, data):
-    category.populate_from_dict(data)
+def update_category(category, data, skip=()):
+    category.populate_from_dict(data, skip=skip)
     db.session.flush()
     logger.info('Category %s updated by %s', category, session.user)
