@@ -22,9 +22,11 @@ from math import ceil
 from flask import jsonify, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
+from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
@@ -130,6 +132,13 @@ def _serialize_category(category, with_path=False):
 
 
 class RHCategoryInfo(RHDisplayCategoryBase):
+    @property
+    def _category_query_options(self):
+        children_strategy = joinedload('children')
+        children_strategy.undefer('deep_children_count')
+        children_strategy.undefer('deep_events_count')
+        return children_strategy, joinedload('acl_entries')
+
     def _process(self):
         return jsonify_data(category=_serialize_category(self.category, with_path=True),
                             subcategories=[_serialize_category(c) for c in self.category.children])
@@ -138,5 +147,9 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 class RHCategorySearch(RH):
     def _process(self):
         starts_with = '{}%'.format(escape_like(request.args['q']))
-        categories = Category.query.filter(Category.title.ilike(starts_with)).order_by(Category.title).limit(10).all()
-        return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in categories], flash=False)
+        query = (Category.query
+                 .filter(Category.title.ilike(starts_with))
+                 .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries'))
+                 .order_by(Category.title)
+                 .limit(10))
+        return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in query], flash=False)
