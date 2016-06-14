@@ -17,9 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.modules.categories.controllers.display import RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo
-from indico.modules.categories.controllers.management import (RHManageCategoryContent, RHManageCategoryProtection,
-                                                              RHManageCategorySettings, RHManageCategoryIcon,
-                                                              RHManageCategoryLogo, RHSortSubcategories)
+from indico.modules.categories.controllers.management import (RHCreateCategory, RHManageCategoryContent,
+                                                              RHManageCategoryIcon, RHManageCategoryLogo,
+                                                              RHManageCategoryProtection, RHManageCategorySettings,
+                                                              RHSortSubcategories)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -33,6 +34,7 @@ _bp.add_url_rule('/manage/logo', 'manage_logo', RHManageCategoryLogo, methods=('
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
 _bp.add_url_rule('/manage/sort-subcategories', 'sort_subcategories', RHSortSubcategories, methods=('POST',))
+_bp.add_url_rule('/manage/create-subcategory', 'create_subcategory', RHCreateCategory, methods=('GET', 'POST'))
 
 # Display
 _bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHCategoryIcon)
