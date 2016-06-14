@@ -71,13 +71,66 @@
     </table>
 {% endmacro %}
 
+{% macro event_row(event) %}
+    <tr class="i-table">
+        <td class="i-table column-icon">
+            <a href="" class="i-button-icon icon-handle"></a>
+        </td>
+        <td class="i-table column-icon">
+            {% if event.is_self_protected %}
+                <span class="icon-lock"></span>
+            {% elif event.is_public %}
+                <span class="icon-unlocked"></span>
+            {% endif %}
+        </td>
+        <td class="i-table">
+            <a href="{{ url_for('event_mgmt.conferenceModification-managementAccess', event) }}">
+                {{ event.title }}
+            </a>
+        </td>
+        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
+        <td class="i-table actions">
+            <a class="i-button-icon icon-remove"
+               title="{% trans %}Delete event{% endtrans %}"></a>
+            <a class="i-button-icon icon-transmission"
+               title="{% trans %}Move to different category{% endtrans %}"></a>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}"
+               class="i-button-icon icon-arrow-right"
+               title="{% trans %}Go to the event display page{% endtrans %}"></a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro events_table(events) %}
+    <div class="toolbar">
+    </div>
+    <table class="i-table events-management">
+        <thead>
+            <tr class="i-table">
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                <th class="i-table">{% trans %}Start date{% endtrans %}</th>
+                <th class="i-table actions"></th>
+            </tr>
+        </thead>
+        {% for event in events %}
+            {{ event_row(event) }}
+        {% endfor %}
+    </table>
+{% endmacro %}
+
 {% block title %}
     {% trans %}Content{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    {{ subcategories_table(subcategories) }}
-    <script>
-        setupCategoryTable();
-    </script>
+    {% if subcategories %}
+        {{ subcategories_table(subcategories) }}
+        <script>
+            setupCategoryTable();
+        </script>
+    {% elif events %}
+        {{ events_table(events) }}
+    {% endif %}
 {% endblock content %}

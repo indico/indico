@@ -65,7 +65,8 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
     def _process(self):
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content',
-                                                    subcategories=self.category.children)
+                                                    subcategories=self.category.children,
+                                                    events=self.category.events)
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
