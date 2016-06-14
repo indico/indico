@@ -217,6 +217,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return cls.parent_id.is_(None)
 
     @property
+    def has_icon(self):
+        return self.icon_metadata is not None
+
+    @property
     def tzinfo(self):
         return pytz.timezone(self.timezone)
 
@@ -272,6 +276,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 .join(cte_query, Category.id == cte_query.c.id)
                 .filter(cte_query.c.parents.contains([self.id])))
 
+    @property
+    def icon_url(self):
+        """Get the HTTP URL of the icon."""
+        return url_for('categories.display_icon', self, slug=self.icon_metadata['hash'])
 
 Category.register_protection_events()
 
