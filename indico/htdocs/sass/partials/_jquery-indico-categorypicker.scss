@@ -78,6 +78,7 @@
         }
 
         ul.breadcrumbs {
+            display:inline-block;
             font-size: 0.9em;
             list-style: none;
             padding: 0;
@@ -90,6 +91,10 @@
                     content: '»';
                     padding: 0 0.5em;
                 }
+            }
+
+            li.ellipsis:before {
+                content: '...';
             }
         }
 
@@ -110,6 +115,10 @@
                     vertical-align: middle;
                 }
             }
+        }
+
+        .title-wrapper {
+            flex-grow: 1;
         }
 
         .button-wrapper {

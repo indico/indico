@@ -116,10 +116,7 @@
             var tag = clickable ? '<a>' : '<span>';
 
             _.each(path, function(category) {
-                var $item = $(tag, {
-                    text: category.title,
-                    'data-id': category.id
-                });
+                var $item = $(tag, {text: category.title});
                 if (clickable) {
                     $item.attr('href', '');
                     $item.attr('title', $T.gettext("Go to: {0}".format(category.title)));
@@ -129,37 +126,6 @@
             });
 
             return $breadcrumbs;
-        },
-
-        _ellipsizeBreadcrumbs: function($breadcrumbs, availableSpace) {
-            var self = this;
-            var cutFromLeft = true;
-            var items = $breadcrumbs.children();
-            var middleIndex = Math.floor(items.length / 2);
-            var leftList = items.slice(0, middleIndex);
-            var rightList = items.slice(middleIndex, items.length);
-
-            shortenBreadcrumbs(leftList, rightList);
-
-            function shortenBreadcrumbs (leftList, rightList) {
-                if ($breadcrumbs.width() >= availableSpace) {
-                    if (cutFromLeft) {
-                        leftList.splice(-1, 1);
-                        cutFromLeft = false;
-                    } else {
-                        rightList.splice(0, 1);
-                        cutFromLeft = true;
-                    }
-                    var newItemList = $.merge($.merge($.merge([], leftList), [$('<li>', {text: '...'}).get(0)]), rightList);
-                    $breadcrumbs.empty();
-                    _.each(newItemList, function(item) {
-                        var $element = $(item).find('a');
-                        self._bindGoToCategoryOnClick($element, $element.data('id'));
-                        $breadcrumbs.append(item);
-                    });
-                    shortenBreadcrumbs(leftList, rightList);
-                }
-            }
         },
 
         _buildCategory: function(category, isSubcategory, withBreadcrumbs, clickableBreadcrumbs) {
@@ -242,16 +208,30 @@
             return $buttonWrapper;
         },
 
+        _ellipsizeBreadcrumbs: function($category) {
+            var self = this;
+            var $breadcrumbs = $category.find('.breadcrumbs');
+            var availableSpace = $category.find('.title-wrapper').width();
+            var $ellipsis = $('<li>', {class: 'ellipsis'});
+            var shortened = false;
+
+            while ($breadcrumbs.outerWidth() >= availableSpace) {
+                var $segments = $breadcrumbs.children(':not(.ellipsis)');
+                var middleIndex = Math.floor($segments.length / 2);
+                if (!shortened) {
+                    $segments.eq(middleIndex).replaceWith($ellipsis);
+                } else {
+                    $segments.eq(middleIndex).remove();
+                }
+            }
+        },
+
         _renderNavigator: function(data) {
             var self = this;
 
             if (data.category) {
                 self.$category.html(self._buildCurrentCategory(data.category));
-                var $breadcrumbs = self.$category.find('.breadcrumbs');
-                var availableSpace = self.$category.width() - self.$category.find('.button-wrapper').width();
-                if ($breadcrumbs.width() >= availableSpace) {
-                    self._ellipsizeBreadcrumbs($breadcrumbs, availableSpace);
-                }
+                self._ellipsizeBreadcrumbs(self.$category);
             }
             if (data.subcategories) {
                 _.each(data.subcategories, function(subcategory) {
@@ -271,6 +251,7 @@
                     title: $T.gettext("Search result")
                 }));
                 self.$categoryResults.append($result);
+                self._ellipsizeBreadcrumbs($result);
             });
         },
 
