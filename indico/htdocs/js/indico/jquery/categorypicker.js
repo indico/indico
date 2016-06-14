@@ -301,7 +301,7 @@
                 self._renderNavigator(self._cache[id]);
             } else {
                 $.ajax({
-                    url: build_url(Indico.Urls.Categories.info, {categId: id}),
+                    url: build_url(Indico.Urls.Categories.info, {category_id: id}),
                     dataType: 'json',
                     error: function(data) {
                         handleAjaxError(data);
