@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from io import BytesIO
 from math import ceil
 
 from flask import jsonify, request
+from werkzeug.exceptions import NotFound
 
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.util import get_category_stats
@@ -26,7 +28,18 @@ from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.web.flask.util import send_file
+
 from MaKaC.conference import CategoryManager
+
+
+class RHSettingsIconDisplay(RHDisplayCategoryBase):
+    def _process(self):
+        if not self.category.has_icon:
+            raise NotFound
+        metadata = self.category.icon_metadata
+        return send_file(metadata['filename'], BytesIO(self.category.icon), mimetype=metadata['content_type'],
+                         conditional=True)
 
 
 class RHCategoryStatistics(RHDisplayCategoryBase):

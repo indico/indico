@@ -18,8 +18,9 @@ import json
 import uuid
 from collections import OrderedDict
 from datetime import time, timedelta
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
+import pytz
 from flask import render_template
 from markupsafe import escape, Markup
 from sqlalchemy import inspect
@@ -28,15 +29,17 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select, RadioInput
-from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
+from wtforms.fields.core import RadioField, SelectMultipleField, SelectField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
@@ -871,3 +874,29 @@ class IndicoProtectionField(IndicoEnumRadioField):
 
 class IndicoTagListField(HiddenFieldList):
     widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
+
+
+class IndicoMarkdownField(TextAreaField):
+    widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
+
+
+class IndicoTimezoneSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
+        config = Config.getInstance()
+        self.choices = [(v, v) for v in pytz.common_timezones]
+        self.default = config.getDefaultTimezone()
+
+    def process_data(self, value):
+        super(IndicoTimezoneSelectField, self).process_data(value)
+        if self.data is not None and self.data not in pytz.common_timezones_set:
+            self.choices.append((self.data, self.data))
+
+
+class IndicoThemeSelectField(SelectField):
+    def __init__(self, event_type, *args, **kwargs):
+        super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
+        self.choices = sorted([(tid, theme['title'])
+                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
+                              key=itemgetter(1))
+        self.default = theme_settings.defaults[event_type]

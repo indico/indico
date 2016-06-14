@@ -86,6 +86,8 @@ def _sidemenu_items_old(sender, category, **kwargs):
 def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
                        100, icon='eye')
+    yield SideMenuItem('settings', _('Settings'), url_for('categories.manage_settings', category),
+                       90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
 

@@ -16,12 +16,75 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, StringField
+from wtforms.fields import BooleanField, SelectField, StringField
+from wtforms.validators import DataRequired, Optional
 
-from indico.util.i18n import _
+from indico.modules.categories.models.categories import EventMessageMode
+from indico.util.i18n import _, ngettext
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import AccessControlListField, PrincipalListField, IndicoProtectionField, EmailListField
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
+                                     IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
+                                     IndicoTimezoneSelectField, EmailListField, JSONField)
+from indico.web.forms.widgets import DropzoneWidget, SwitchWidget
+
+
+def calculate_visibility_options(category):
+    options = [(n + 1, (ngettext('From category above',
+                                 'From {} categories above', n).format(n) + ' ' +
+                        '\N{RIGHTWARDS ARROW} "{}"'.format(title)))
+               for n, title in enumerate(category.chain_titles[::-1])]
+    options.insert(0, (0, _("Invisible")))
+    options[1] = (1, _("From this category only"))
+    options[-1] = ('', _("From everywhere"))
+    return options
+
+
+class CategorySettingsForm(IndicoForm):
+    BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
+                    'suggestions_disabled', 'event_creation_notification_emails')
+    EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
+
+    title = StringField(_("Title"), [DataRequired()])
+    description = IndicoMarkdownField(_("Description"),
+                                      description=_("You can use Markdown or basic HTML formatting tags."))
+    timezone = IndicoTimezoneSelectField(_("Timezone"), [DataRequired()],
+                                         description=_("Default timezone event lists will show up in. It will also be "
+                                                       "used as a default for new events."))
+    lecture_theme = IndicoThemeSelectField('simple_event', _("Theme for Lectures"), [DataRequired()],
+                                           description=_("Default timetable theme used for lecture events"))
+    meeting_theme = IndicoThemeSelectField('meeting', _("Theme for Meetings"), [DataRequired()],
+                                           description=_("Default timetable theme used for meeting events"))
+    visibility = SelectField(_("Event visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
+                             description=_("""From which point in the category tree contents will be visible from """
+                                           """(number of categories upwards). Applies to "Today's events" and """
+                                           """Calendar. If the category is moved, this number will be preserved."""))
+    suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
+                                        description=_("Enable this if you don't want Indico to suggest this category as"
+                                                      " a possible addition to a user's favourites."))
+    event_message_mode = IndicoEnumSelectField(_("Message Type"), enum=EventMessageMode,
+                                               default=EventMessageMode.disabled,
+                                               description=_("This message will show up at the top of every event page "
+                                                             "in this category"))
+    event_message = IndicoMarkdownField(_("Content"),
+                                        description=_("You can use Markdown or basic HTML formatting tags."))
+    event_creation_notification_emails = EmailListField(_("Notification E-mails"),
+                                                        description=_("List of e-mails that will receive a notification"
+                                                                      " every time a new event is created. One e-mail "
+                                                                      "per line."))
+
+    def __init__(self, *args, **kwargs):
+        super(CategorySettingsForm, self).__init__(*args, **kwargs)
+        category = kwargs.pop('category')
+        self.visibility.choices = calculate_visibility_options(category)
+
+
+class CategoryIconForm(IndicoForm):
+    icon = JSONField("Icon", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                                                   max_files=1, submit_form=False, submit_if_empty=False,
+                                                   add_remove_links=False, handle_flashes=True),
+                     description=_("Small icon that will show up next to category names in overview pages. Will be "
+                                   "automatically resized to 16x16 pixels. This may involve loss of image quality, "
+                                   "so try to upload images as close as those dimensions."))
 
 
 class CategoryProtectionForm(IndicoForm):
@@ -38,10 +101,6 @@ class CategoryProtectionForm(IndicoForm):
                                                            'to a list of specific persons'))
     event_creators = PrincipalListField(_('Event creators'), groups=True, allow_external=True,
                                         description=_('Users allowed to create events in this category'))
-    event_creation_notification_emails = EmailListField(_('Event creation notification recipients'),
-                                                        description=_('List of email addresses that will be '
-                                                                      'notified whenever an event is created '
-                                                                      'in the category'))
 
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('category')

@@ -32,7 +32,7 @@ category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', category
 category.add_url_rule('/<categId>/events.rss', 'categoryDisplay-rss',
                       make_compat_redirect_func(category, 'categoryDisplay-atom'))
 category.add_url_rule('/<categId>/events.ics', 'categoryDisplay-ical', categoryDisplay.RHCategoryToiCal)
-category.add_url_rule('/<categId>/icon', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
+category.add_url_rule('/<categId>/icon-old', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
 
 # Overview
 category.add_url_rule('/<categId>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
