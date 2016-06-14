@@ -27,9 +27,18 @@ from MaKaC.webinterface.rh.base import RH
 class RHCategoryBase(RH):
     CSRF_ENABLED = True
 
+    _category_query_options = ()
+
+    @property
+    def _category_query(self):
+        query = Category.query
+        if self._category_query_options:
+            query = query.options(*self._category_query_options)
+        return query
+
     def _checkParams(self):
         category_id = request.view_args['category_id']
-        self.category = Category.get(category_id, is_deleted=False)
+        self.category = self._category_query.filter_by(id=category_id, is_deleted=False).one_or_none()
         if self.category is None:
             raise NotFound(_("This category does not exist or has been deleted."))
 
