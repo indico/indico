@@ -112,3 +112,11 @@ class CategoryProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('category')
         super(CategoryProtectionForm, self).__init__(*args, **kwargs)
+
+
+class CreateCategoryForm(IndicoForm):
+    """Form to create a new Category"""
+
+    title = StringField(_("Title"), [DataRequired()])
+    description = IndicoMarkdownField(_("Description"),
+                                      description=_("You can use Markdown or basic HTML formatting tags."))
