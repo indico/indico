@@ -82,9 +82,16 @@ class EntryFormMixin(object):
                                   .format(self._entry_type.title.capitalize()))
 
     def _get_default_time(self):
-        start_dt = find_next_start_dt(self._default_duration,
-                                      obj=self.session_block or self.event,
-                                      day=None if self.session_block else self.day)
+        if self.session_block:
+            # inside a block we suggest right after the latest contribution
+            # or fall back to the block start time if it's empty
+            entry = self.session_block.timetable_entry
+            start_dt = max(x.end_dt for x in entry.children) if entry.children else entry.start_dt
+        else:
+            # outside a block we find the first slot where a contribution would fit
+            start_dt = find_next_start_dt(self._default_duration,
+                                          obj=self.session_block or self.event,
+                                          day=None if self.session_block else self.day)
         return start_dt.astimezone(self.event.tzinfo).time() if start_dt else None
 
 
