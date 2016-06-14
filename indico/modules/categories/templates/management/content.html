@@ -103,6 +103,28 @@
 
 {% macro events_table(events) %}
     <div class="toolbar">
+        <div class="group">
+            <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
+                {% trans %}Create event{% endtrans %}
+            </a>
+            <ul class="dropdown">
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='lecture') }}">
+                        {% trans %}Create lecture{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='meeting') }}">
+                        {% trans %}Create meeting{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='conference') }}">
+                        {% trans %}Create conference{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
     <table class="i-table events-management">
         <thead>
