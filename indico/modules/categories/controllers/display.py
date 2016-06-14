@@ -131,10 +131,8 @@ def _serialize_category(category, with_path=False):
 
 class RHCategoryInfo(RHDisplayCategoryBase):
     def _process(self):
-        category = self._target.as_new
-        category_contents = category.children
-        return jsonify_data(category=_serialize_category(category, with_path=True),
-                            subcategories=[_serialize_category(c) for c in category_contents])
+        return jsonify_data(category=_serialize_category(self.category, with_path=True),
+                            subcategories=[_serialize_category(c) for c in self.category.children])
 
 
 class RHCategorySearch(RH):
