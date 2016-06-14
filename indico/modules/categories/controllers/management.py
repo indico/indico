@@ -16,11 +16,21 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.orm import joinedload, undefer
+
 from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.views import WPCategoryManagement
 
 
 class RHManageCategoryContent(RHManageCategoryBase):
+    @property
+    def _category_query_options(self):
+        children_strategy = joinedload('children')
+        children_strategy.undefer('deep_children_count')
+        children_strategy.undefer('deep_events_count')
+        return children_strategy,
+
     def _process(self):
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content',
                                                     categories=self.category.children)
