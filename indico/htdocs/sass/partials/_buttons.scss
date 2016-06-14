@@ -342,8 +342,8 @@ a.i-button-icon {
     color: $dark-gray;
     cursor: pointer;
 
-    &:hover,
-    &:active,
+    &:hover:not(.disabled):not(:disabled),
+    &:active:not(.disabled):not(:disabled),
     &.active {
         color: $dark-blue;
 
@@ -358,6 +358,12 @@ a.i-button-icon {
         &.warning {
             color: $yellow;
         }
+    }
+
+    &:disabled,
+    &.disabled {
+        @extend %button-disabled;
+        background: inherit;
     }
 }
 
