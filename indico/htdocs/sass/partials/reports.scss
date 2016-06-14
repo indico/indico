@@ -23,7 +23,7 @@
         }
 
         th {
-            &:not(.sorter-false){
+            &.tablesorter-header:not(.sorter-false){
                 cursor: pointer;
             }
 

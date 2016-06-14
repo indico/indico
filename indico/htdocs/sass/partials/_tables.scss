@@ -21,7 +21,7 @@
 @import 'partials/icons';
 
 @mixin sortable-table-header() {
-    &:not(.sorter-false) {
+    &.tablesorter-header:not(.sorter-false) {
         cursor: pointer;
     }
 
