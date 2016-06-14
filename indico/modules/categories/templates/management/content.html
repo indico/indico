@@ -39,7 +39,12 @@
 {% macro subcategories_table(subcategories) %}
     <div class="toolbar">
         <div class="group">
-            <button class="i-button highlight icon-plus">{% trans %}New category{% endtrans %}</button>
+            <button class="i-button highlight icon-plus js-new-category"
+                    data-ajax-dialog
+                    data-href="{{ url_for('.create_subcategory', category) }}"
+                    data-title="{% trans %}New category{% endtrans %}">
+                {% trans %}New category{% endtrans %}
+            </button>
         </div>
         <div class="group">
             <button class="i-button icon-sort-alpha-asc js-sort-categories"

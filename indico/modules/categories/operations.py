@@ -20,6 +20,18 @@ from flask import session
 
 from indico.core.db import db
 from indico.modules.categories import logger
+from indico.modules.categories.models.categories import Category
+
+
+def create_category(parent, data):
+    category = Category(parent=parent)
+    data.setdefault('default_event_themes', parent.default_event_themes)
+    data.setdefault('timezone', parent.timezone)
+    category.populate_from_dict(data)
+    db.session.add(category)
+    db.session.flush()
+    logger.info('Category %s created by %s', category, session.user)
+    return category
 
 
 def update_category(category, data, skip=()):

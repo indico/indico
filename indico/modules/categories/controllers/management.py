@@ -23,19 +23,19 @@ from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
 
-from indico.modules.events.util import update_object_principals
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
-                                             CategorySettingsForm)
-from indico.modules.categories.operations import update_category
+                                             CategorySettingsForm, CreateCategoryForm)
+from indico.modules.categories.operations import create_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
+from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_form
 
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
@@ -186,6 +186,15 @@ class RHManageCategoryProtection(RHManageCategoryBase):
         event_creators = {x.principal for x in self.category.acl_entries
                           if x.has_management_role('create', explicit=True)}
         return FormDefaults(self.category, acl=acl, managers=managers, event_creators=event_creators)
+
+
+class RHCreateCategory(RHManageCategoryBase):
+    def _process(self):
+        form = CreateCategoryForm()
+        if form.validate_on_submit():
+            new_category = create_category(self.category, form.data)
+            return jsonify_data(flash=False, redirect=url_for('.manage_settings', new_category))
+        return jsonify_form(form)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
