@@ -451,25 +451,6 @@ th.i-table {
     }
 }
 
-td.i-table,
-td.i-table i {
-    &.self-protection-icon {
-        @include icon-before('icon-lock');
-
-        &:before {
-            color: $red;
-        }
-    }
-
-    &.public-protection-icon {
-        @include icon-before('icon-unlocked');
-
-        &:before {
-            color: $green;
-        }
-    }
-}
-
 // Filters/lists
 
 #eventModificationForm {
