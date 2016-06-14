@@ -28,7 +28,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
 from indico.modules.events.management.views import WPEventManagement
-from indico.modules.events.operations import update_event
+from indico.modules.events.operations import update_event, delete_event
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
@@ -52,7 +52,7 @@ class RHDeleteEvent(RHConferenceModifBase):
         return jsonify_template('events/management/delete_event.html', event=self._conf)
 
     def _process_POST(self):
-        self._conf.delete(session.user)
+        delete_event(self.event_new)
         flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
 
         redirect_url = url_for('categories.manage_content', self.event_new.category)
