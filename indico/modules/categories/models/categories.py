@@ -282,7 +282,8 @@ def _mappers_configured():
 
     cat_alias = db.aliased(Category)
 
-    # chain_titles
+    # Category.chain_titles -- a list of the titles in the parent chain,
+    # starting with the root category down to the current category.
     cte_query = (select([cat_alias.id, array([cat_alias.title]).label('path')])
                  .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
                  .cte(recursive=True))
@@ -292,13 +293,15 @@ def _mappers_configured():
     query = select([cte_query.c.path]).where(cte_query.c.id == Category.id).correlate_except(cte_query)
     Category.chain_titles = column_property(query, deferred=True)
 
-    # deep_events_count
+    # Category.deep_events_count -- the number of events in the category
+    # or any child category (excluding deleted events)
     query = (select([db.func.count()])
              .where(Event.category_chain.contains(array([Category.id])) & ~Event.is_deleted)
              .correlate_except(Event))
     Category.deep_events_count = column_property(query, deferred=True)
 
-    # deep_children_count
+    # Category.deep_children_count -- the number of subcategories in the
+    # category or any child category (excluding deleted ones)
     cte_query = (select([cat_alias.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
                  .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
                  .cte(recursive=True))
