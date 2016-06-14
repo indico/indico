@@ -90,8 +90,12 @@
         </td>
         <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
         <td class="i-table actions">
-            <a class="i-button-icon icon-remove"
-               title="{% trans %}Delete event{% endtrans %}"></a>
+            <a href="#"
+               class="i-button-icon icon-remove js-ajax-dialog-delete"
+               title="{% trans %}Delete event{% endtrans %}"
+               data-href="{{ url_for('event_management.delete', event) }}"
+               data-ajax-dialog
+               data-reload-after></a>
             <a class="i-button-icon icon-transmission"
                title="{% trans %}Move to different category{% endtrans %}"></a>
             <a href="{{ url_for('event.conferenceDisplay', event) }}"
@@ -124,6 +128,10 @@
                     </a>
                 </li>
             </ul>
+        </div>
+        <div class="group right">
+            <a href="" class="i-button icon-transmission"></a>
+            <a href="" class="i-button icon-remove"></a>
         </div>
     </div>
     <table class="i-table events-management">
