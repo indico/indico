@@ -7,7 +7,7 @@
 </p>
 <ul id="{{ id }}">
     {% for object in objects|sort(attribute='title') %}
-        <li class="{{ 'public-protection-icon' if object.is_public else 'self-protection-icon' }}">
+        <li class="{{ 'icon-protection-public' if object.is_public else 'icon-protection-self' }}">
             <a href="#" {{ object.edit_link_attrs|html_params }}>
                 <strong>{{ object.title }}</strong>
             </a>
