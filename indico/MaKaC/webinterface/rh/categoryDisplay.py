@@ -303,15 +303,20 @@ _Access%s_
 %s """ % (i,c.getAdjustedStartDate(), c.getAdjustedEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
                 i+=1
 
-        msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\nFrom: %s\r\nReturn-Path: %s\r\nTo: %s\r\nCc: \r\nSubject: %s\r\n\r\n"%(fromAddr, fromAddr, addrs, subject))
+        msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\n"
+               "From: %s\r\n"
+               "Return-Path: %s\r\n"
+               "To: %s\r\nCc: \r\n"
+               "Subject: %s\r\n\r\n" % (fromAddr, fromAddr, addrs, subject))
         msg = msg + text
-        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+        maildata = {"fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text}
         GenericMailer.send(maildata)
         # Category notification
-        if conf.getOwner().getNotifyCreationList() != "":
-            addrs2 = [ conf.getOwner().getNotifyCreationList() ]
-            maildata2 = { "fromAddr": fromAddr, "toList": addrs2, "subject": subject, "body": text }
-            GenericMailer.send(maildata2)
+        event_creation_notification_emails = conf.as_event.category.event_creation_notification_emails
+        if event_creation_notification_emails:
+            mail_data = {"fromAddr": fromAddr, "toList": event_creation_notification_emails,
+                         "subject": subject, "body": text}
+            GenericMailer.send(mail_data)
 
 
 class UtilPersons:
