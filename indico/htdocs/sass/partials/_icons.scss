@@ -409,6 +409,12 @@ i[class^="icon-"]:before {
 .icon-sort:before {
     content: "\e00e";
 }
+.icon-sort-alpha-asc:before {
+    content: "\ee4c";
+}
+.icon-sort-alpha-desc:before {
+    content: "\ee4d";
+}
 .icon-stack:before {
     content: "\e097";
 }
