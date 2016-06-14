@@ -61,8 +61,8 @@
                             </td>
                             <td class="i-table">
                                 <span class="vertical-aligner">
-                                    <i class="{% if contrib.is_self_protected %}self-protection-icon
-                                              {% elif contrib.is_public %}public-protection-icon{% endif %}"></i>
+                                    <i class="{% if contrib.is_self_protected %}icon-protection-self
+                                              {% elif contrib.is_public %}icon-protection-public{% endif %}"></i>
                                 </span>
                             </td>
                             <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
