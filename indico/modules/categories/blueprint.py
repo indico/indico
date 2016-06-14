@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.categories.controllers.display import RHCategoryStatistics
-from indico.modules.categories.controllers.management import RHManageCategoryContent
+from indico.modules.categories.controllers.display import RHCategoryStatistics, RHSettingsIconDisplay
+from indico.modules.categories.controllers.management import (RHManageCategoryContent, RHManageCategorySettings,
+                                                              RHSettingsIconUpload, RHSettingsIconDelete)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -26,6 +27,10 @@ _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtu
 
 # Management
 _bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)
+_bp.add_url_rule('/manage/settings/', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/settings/upload_icon', 'upload_icon', RHSettingsIconUpload, methods=('POST',))
+_bp.add_url_rule('/manage/settings/delete_icon', 'delete_icon', RHSettingsIconDelete, methods=('DELETE',))
 
 # Display
+_bp.add_url_rule('/icon', 'display_icon', RHSettingsIconDisplay)
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)

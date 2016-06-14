@@ -1,0 +1,10 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <textarea {{ input_args|html_params }} name="{{ field.name }}" rows={{ rows }}>
+        {{- field._value() -}}
+    </textarea>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

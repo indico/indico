@@ -16,10 +16,101 @@
 
 from __future__ import unicode_literals
 
+import os
+from io import BytesIO
+
+from flask import flash, redirect, request, session
+from PIL import Image
+
+from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.forms import CategoryIconForm, CategorySettingsForm
 from indico.modules.categories.views import WPCategoryManagement
+from indico.util.fs import secure_filename
+from indico.util.i18n import _
+from indico.util.string import crc32
+from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data
+
+
+CATEGORY_ICON_DIMENSIONS = (16, 16)
+
+
+def _icon_data(category):
+    return {
+        'url': category.icon_url,
+        'filename': category.icon_metadata['filename'],
+        'size': category.icon_metadata['size'],
+        'content_type': category.icon_metadata['content_type']
+    }
 
 
 class RHManageCategoryContent(RHManageCategoryBase):
     def _process(self):
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content')
+
+
+class RHManageCategorySettings(RHManageCategoryBase):
+    def _process(self):
+        defaults = FormDefaults(self.category,
+                                meeting_theme=self.category.default_event_themes['meeting'],
+                                lecture_theme=self.category.default_event_themes['lecture'])
+        form = CategorySettingsForm(obj=defaults, category=self.category)
+        icon_form = CategoryIconForm(obj=FormDefaults(self.category))
+
+        if form.validate_on_submit():
+            self.category.populate_from_dict(form.data, skip={'meeting_theme', 'lecture_theme'})
+            self.category.default_event_themes = {
+                'meeting': form.data['meeting_theme'],
+                'lecture': form.data['lecture_theme']
+            }
+            flash(_("Category settings saved!"), 'success')
+            return redirect(url_for('categories.manage_settings', self.category))
+        else:
+            if self.category.icon_metadata:
+                icon_form.icon.data = _icon_data(self.category)
+        return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
+                                                    icon_form=icon_form)
+
+
+class RHSettingsIconUpload(RHManageCategoryBase):
+    def _process(self):
+        f = request.files['file']
+        try:
+            img = Image.open(f)
+        except IOError:
+            flash(_('You cannot upload this file as a icon.'), 'error')
+            return jsonify_data(content=None)
+        if img.format.lower() not in {'jpeg', 'png', 'gif'}:
+            flash(_('The file has an invalid format ({format})').format(format=img.format), 'error')
+            return jsonify_data(content=None)
+        if img.mode == 'CMYK':
+            flash(_('The icon you uploaded is using the CMYK colorspace and has been converted to RGB. Please check if '
+                    'the colors are correct and convert it manually if necessary.'), 'warning')
+            img = img.convert('RGB')
+        if img.size != CATEGORY_ICON_DIMENSIONS:
+            img = img.resize(CATEGORY_ICON_DIMENSIONS, Image.ANTIALIAS)
+        image_bytes = BytesIO()
+        img.save(image_bytes, 'PNG')
+        image_bytes.seek(0)
+        content = image_bytes.read()
+        self.category.icon = content
+        self.category.icon_metadata = {
+            'hash': crc32(content),
+            'size': len(content),
+            'filename': os.path.splitext(secure_filename(f.filename, 'icon'))[0] + '.png',
+            'content_type': 'image/png'
+        }
+        flash(_('New icon saved'), 'success')
+        logger.info("New icon '%s' uploaded by %s (%s)", f.filename, session.user, self.category)
+        return jsonify_data(content=_icon_data(self.category))
+
+
+class RHSettingsIconDelete(RHManageCategoryBase):
+    def _process(self):
+        self.category.icon = None
+        self.category.icon_metadata = None
+        flash(_('Icon deleted'), 'success')
+        logger.info("Icon of %s deleted by %s", self.category, session.user)
+        return jsonify_data(content=None)

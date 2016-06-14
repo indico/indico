@@ -74,8 +74,6 @@ def _app_created(app, **kwargs):
 def _sidemenu_items_old(sender, category, **kwargs):
     yield SideMenuItem('view', _('View category'), url_for('category.categoryDisplay', category),
                        100, icon='eye')
-    yield SideMenuItem('general', _('General Settings'), url_for('category_mgmt.categoryModification', category),
-                       90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('category_mgmt.categoryAC', category),
                        70, icon='shield')
     yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
@@ -86,6 +84,8 @@ def _sidemenu_items_old(sender, category, **kwargs):
 def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
                        100, icon='eye')
+    yield SideMenuItem('settings', _('Settings'), url_for('categories.manage_settings', category),
+                       90, icon='settings')
 
 
 @signals.app_created.connect
