@@ -265,6 +265,10 @@
 
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);
+                        if (data.redirect) {
+                            IndicoUI.Dialogs.Util.progress();
+                            location.href = data.redirect;
+                        }
                     } else if (data.html) {
                         popup.contentContainer.html(data.html);
                         ajaxifyForms();
