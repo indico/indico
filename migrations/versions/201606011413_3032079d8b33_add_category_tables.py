@@ -43,6 +43,7 @@ def upgrade():
         sa.Column('protection_mode', PyIntEnum(ProtectionMode), nullable=False),
         sa.CheckConstraint("(icon IS NULL) = (icon_metadata::text = 'null')", name='valid_icon'),
         sa.CheckConstraint("title != ''", name='valid_title'),
+        sa.CheckConstraint('(id != 0) OR NOT is_deleted', name='root_not_deleted'),
         sa.CheckConstraint('(id != 0) OR (protection_mode != 1)', name='root_not_inheriting'),
         sa.CheckConstraint('(parent_id IS NULL) = (id = 0)', name='valid_parent'),
         sa.ForeignKeyConstraint(['parent_id'], ['categories.categories.id']),
