@@ -34,7 +34,6 @@ from indico.util.signals import values_from_signal
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
-from MaKaC.accessControl import AccessWrapper
 
 
 class ProtectionMode(TitledIntEnum):
@@ -184,8 +183,6 @@ class ProtectionMixin(object):
                 raise TypeError('protection_parent of {} is None'.format(self))
             elif hasattr(parent, 'can_access'):
                 return parent.can_access(user, allow_admin=allow_admin)
-            elif hasattr(parent, 'canAccess'):
-                return parent.canAccess(AccessWrapper(user.as_avatar if user else None))
             else:
                 raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
         else:
@@ -326,7 +323,6 @@ class ProtectionManagersMixin(ProtectionMixin):
             # An unauthorized user is never allowed to perform management operations.
             # Not even signals may override this since management code generally
             # expects session.user to be not None.
-            # XXX: Legacy modification keys are checked outside
             return False
 
         # Trigger signals for protection overrides
@@ -360,8 +356,6 @@ class ProtectionManagersMixin(ProtectionMixin):
             return False
         elif hasattr(parent, 'can_manage'):
             return parent.can_manage(user, allow_admin=allow_admin)
-        elif hasattr(parent, 'canUserModify'):
-            return parent.canUserModify(user.as_avatar)
         else:
             raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
 
