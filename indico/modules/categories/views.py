@@ -52,9 +52,6 @@ class WPCategoryManagement(WPCategory):
     def getCSSFiles(self):
         return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()
 
-    def getJSFiles(self):
-        return WPCategory.getJSFiles(self) + self._asset_env['modules_category_management_js'].urls()
-
     def _getNavigationDrawer(self):
         return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 
