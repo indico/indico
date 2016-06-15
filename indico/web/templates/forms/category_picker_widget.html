@@ -5,7 +5,7 @@
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <div id="category-title-{{ field.id }}" class="text-holder-box"></div>
         <a class="i-button" id="category-picker-button-{{ field.id }}"
-           href="#">
+           data-title='{% trans %}Choose category{% endtrans %}'>
             {%- trans %}Choose category{% endtrans -%}
         </a>
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}">
@@ -18,14 +18,20 @@
         (function() {
             'use strict';
 
-            var field = $('#{{ field.id }}');
-            var categoryTitle = $('#category-title-{{ field.id }}');
+            var $field = $('#{{ field.id }}');
+            var $categoryTitle = $('#category-title-{{ field.id }}');
+            var $dialogTrigger = $('#category-picker-button-{{ field.id }}');
 
-            // TODO: Open the category picker on click on $('#category-picker-button-{{ field.id }}')
-            // For now let's assume the category picker returns the "TEST Category"
-            var result = {id: 2, title: 'TEST Category'};
-            field.val(result.id);
-            categoryTitle.text(result.title);
+            $dialogTrigger.on('click', function(evt) {
+                evt.preventDefault();
+                $('<div>').categorypicker({
+                    openInDialog: true,
+                    onAction: function(category) {
+                        $categoryTitle.text(category.title);
+                        $field.val(category.id).trigger('indico:categorySelected', category);
+                    }
+                });
+            });
         })();
     </script>
 {% endblock %}
