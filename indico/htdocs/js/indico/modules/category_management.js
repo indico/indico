@@ -47,10 +47,15 @@
                 url: $this.data('href'),
                 method: 'POST',
                 error: handleAjaxError,
-                success: function() {
-                    $target.closest(categoryRowSelector).remove();
+                success: function(data) {
+                    if (!$target.closest(categoryRowSelector).remove().length) {
+                        IndicoUI.Dialogs.Util.progress();
+                        location.href = data.redirect;
+                    } else {
+                        updateCategoryDeleteButton();
+                    }
                 }
-            })
+            });
         });
 
         $tbody.sortable({
@@ -94,6 +99,15 @@
                 contentType: 'application/json',
                 error: handleAjaxError
             });
+        }
+
+        function updateCategoryDeleteButton() {
+            if ($table.find(categoryRowSelector).length) {
+                $('.banner .js-delete-category').addClass('disabled');
+            } else {
+                $('.banner .js-delete-category').removeClass('disabled')
+                    .attr('title', $T.gettext("Delete category"));
+            }
         }
     };
 })(window);
