@@ -650,7 +650,7 @@ class Category(CommonObjectBase):
     @unify_user_args
     def newConference(self, creator, title, start_dt, end_dt, timezone):
         conf = Conference()
-        event = Event(creator=creator, category_id=int(self.id), title=to_unicode(title).strip(),
+        event = Event(creator=creator, category=self.as_new, title=to_unicode(title).strip(),
                       start_dt=start_dt, end_dt=end_dt, timezone=timezone)
         ConferenceHolder().add(conf, event)
         self._addConference(conf)
