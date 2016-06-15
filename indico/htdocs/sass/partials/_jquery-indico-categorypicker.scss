@@ -15,9 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.category-picker {
+%category-picker-sizing {
     width: 800px;
     height: 600px;
+}
+
+.category-picker-wrapper {
+    @extend %category-picker-sizing;
+}
+
+.category-picker {
+    @extend %category-picker-sizing;
 
     input[type='search'] {
         @extend %form-field-input;
