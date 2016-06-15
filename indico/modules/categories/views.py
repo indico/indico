@@ -33,6 +33,9 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
 
+    def getJSFiles(self):
+        return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
+
     def _getBody(self, params):
         return self._getPageContent(params)
 
