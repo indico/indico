@@ -17,6 +17,7 @@
 
 .category-picker {
     width: 800px;
+    height: 600px;
 
     input[type='search'] {
         @extend %form-field-input;
