@@ -210,14 +210,12 @@ class WPKeyAccessError( WPDecorated ):
     def __init__( self, rh ):
         WPDecorated.__init__( self, rh )
 
-    def _getBody( self, params ):
-        tgt = self._rh._target
+    def _getBody(self, params):
+        event = self._rh.event_new
         msg = ""
-        keys = session.get("accessKeys", {})
-        if tgt.getUniqueId() in keys:
+        has_key = session.get("access_keys", {}).get(event._access_key_session_key) is not None
+        if has_key:
             msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
-        else:
-            msg = ""
         wc = WAccessKeyError( self._rh, msg )
         return wc.getHTML()
 

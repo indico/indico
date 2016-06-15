@@ -844,15 +844,8 @@ class RHDisplayBaseProtected(RHProtected):
 
     def _checkProtection(self):
         if not self._target.canAccess(self.getAW()):
-            from MaKaC.conference import Resource, Category
-            if isinstance(self._target, Resource):
-                target = self._target.getOwner()
-            else:
-                target = self._target
-            if not isinstance(self._target, Category) and target.isProtected():
-                if target.getAccessKey() != "" or target.getConference() and \
-                        target.getConference().getAccessKey() != "":
-                    raise KeyAccessError()
+            if isinstance(self._target, Conference) and self._target.as_event.access_key:
+                raise KeyAccessError()
             if self._getUser() is None:
                 self._checkSessionUser()
             else:
