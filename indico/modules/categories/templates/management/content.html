@@ -29,8 +29,13 @@
                 <a class="i-button-icon icon-remove disabled"
                    title="{% trans %}This category cannot be deleted because it is not empty.{% endtrans %}"></a>
             {% else %}
-                <a class="i-button-icon icon-remove"
-                   title="{% trans %}Delete category{% endtrans %}"></a>
+                {% set confirmation_message = _('Do you really want to delete the category "{}"?').format(category.title) %}
+                <a class="i-button-icon icon-remove js-delete-category"
+                   title="{% trans %}Delete category{% endtrans %}"
+                   data-confirm="{{ confirmation_message|forceescape }}"
+                   data-title="{% trans %}Delete category{% endtrans %}"
+                   data-href="{{ url_for('.delete', category) }}"
+                   data-method="POST"></a>
             {% endif %}
         </td>
     </tr>

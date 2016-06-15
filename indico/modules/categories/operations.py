@@ -34,6 +34,12 @@ def create_category(parent, data):
     return category
 
 
+def delete_category(category):
+    category.is_deleted = True
+    db.session.flush()
+    logger.info('Category %s deleted by %s', category, session.user)
+
+
 def update_category(category, data, skip=()):
     category.populate_from_dict(data, skip=skip)
     db.session.flush()

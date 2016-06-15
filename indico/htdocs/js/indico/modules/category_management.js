@@ -40,6 +40,19 @@
             });
         });
 
+        $('.js-delete-category').on('indico:confirmed', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: 'POST',
+                error: handleAjaxError,
+                success: function() {
+                    $target.closest(categoryRowSelector).remove();
+                }
+            })
+        });
+
         $tbody.sortable({
             axis: 'y',
             containment: 'parent',
