@@ -22,12 +22,13 @@ from io import BytesIO
 from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import BadRequest
 
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm)
-from indico.modules.categories.operations import create_category, update_category
+from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
@@ -195,6 +196,15 @@ class RHCreateCategory(RHManageCategoryBase):
             new_category = create_category(self.category, form.data)
             return jsonify_data(flash=False, redirect=url_for('.manage_settings', new_category))
         return jsonify_form(form)
+
+
+class RHDeleteCategory(RHManageCategoryBase):
+    def _process(self):
+        if self.category.is_root:
+            raise BadRequest('The root category cannot be deleted')
+        delete_category(self.category)
+        url = url_for('.manage_content', self.category.parent)
+        return jsonify_data(flash=False, redirect=url) if request.is_xhr else redirect(url)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
