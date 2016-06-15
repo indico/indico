@@ -24,6 +24,7 @@ from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
 from sqlalchemy.orm import joinedload, undefer
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
@@ -150,6 +151,6 @@ class RHCategorySearch(RH):
         query = (Category.query
                  .filter(Category.title.ilike(starts_with))
                  .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries'))
-                 .order_by(Category.title)
+                 .order_by(db.func.lower(Category.title))
                  .limit(10))
         return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in query], flash=False)
