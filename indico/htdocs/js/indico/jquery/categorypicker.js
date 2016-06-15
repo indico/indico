@@ -179,7 +179,7 @@
                 text: self.options.actionButtonText
             }).on('click', function(evt) {
                 evt.stopPropagation();
-                self.options.onAction(category.id);
+                self.options.onAction(category);
             })));
 
             if (withGoToParent && category.path && category.path.length) {
