@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.categories.controllers.display import RHCategoryStatistics, RHSettingsIconDisplay
+from indico.modules.categories.controllers.display import RHCategoryStatistics, RHCategoryIcon
 from indico.modules.categories.controllers.management import (RHManageCategoryContent, RHManageCategoryProtection,
                                                               RHManageCategorySettings, RHSettingsIconUpload,
                                                               RHSortSubcategories)
@@ -34,5 +34,5 @@ _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings
 _bp.add_url_rule('/manage/sort-subcategories', 'sort_subcategories', RHSortSubcategories, methods=('POST',))
 
 # Display
-_bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHSettingsIconDisplay)
+_bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHCategoryIcon)
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
