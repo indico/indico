@@ -369,3 +369,7 @@ class AccessWrapper:
 
     def getUser( self ):
         return self._currentUser
+
+    @property
+    def user(self):
+        return self._currentUser.as_new if self._currentUser else None
