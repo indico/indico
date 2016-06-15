@@ -68,6 +68,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def __auto_table_args(cls):
         return (db.CheckConstraint("(icon IS NULL) = (icon_metadata::text = 'null')", 'valid_icon'),
                 db.CheckConstraint("(parent_id IS NULL) = (id = 0)", 'valid_parent'),
+                db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
                 db.CheckConstraint("(id != 0) OR (protection_mode != {})".format(ProtectionMode.inheriting),
                                    'root_not_inheriting'),
                 {'schema': 'categories'})
