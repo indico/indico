@@ -54,7 +54,8 @@
             subtitle: null, // subtitle of the dialog
             closeButton: undefined, // include a close button at the bottom of the dialog. the inner text of the button
                                     // is configurable
-            url: null, // url to get the form/dialog from
+            url: null, // url to get the content from
+            content: null, // content of the dialog (used instead of the url option)
             method: 'GET', // http method to get the form/dialog
             data: null, // object or callable to add data when loading the form/dialog
             backSelector: '[data-button-back]', // elements in the form which will close the form
@@ -81,6 +82,10 @@
         loadDialog();
 
         function loadDialog() {
+            if (options.content) {
+                showDialog({js: '', html: options.content});
+                return;
+            }
             $.ajax({
                 type: options.method,
                 url: options.url,
@@ -214,7 +219,7 @@
                 onCloseResult.then(function() {
                     _doCloseDialog();
                     if (options.trigger) {
-                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData])
+                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData]);
                     }
                 }, function() {
                     ignoreOnBeforeUnload = false;
@@ -297,7 +302,7 @@
 
         function injectJS(js) {
             if (js) {
-                $('body').append(js)
+                $('body').append(js);
             }
         }
     };
