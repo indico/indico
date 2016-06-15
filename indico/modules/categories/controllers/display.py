@@ -33,7 +33,7 @@ from indico.web.flask.util import send_file
 from MaKaC.conference import CategoryManager
 
 
-class RHSettingsIconDisplay(RHDisplayCategoryBase):
+class RHCategoryIcon(RHDisplayCategoryBase):
     def _process(self):
         if not self.category.has_icon:
             raise NotFound
