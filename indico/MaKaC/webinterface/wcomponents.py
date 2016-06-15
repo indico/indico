@@ -252,12 +252,23 @@ class WHeader(WTemplated):
         Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
     """
     def _getProtection(self, target):
-        if target.isProtected():
-            return ["Restricted", _("Restricted")]
-        domain_list = target.getAccessController().getAnyDomainProtection()
-        if domain_list:
-            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
-        return ["Public", _("Public")]
+        if isinstance(target, Conference):
+            event = target.as_event
+            if not event.is_protected:
+                return ['Public', _('Public')]
+            else:
+                networks = [x.name for x in event.get_access_list() if x.is_network]
+                if networks:
+                    return ['DomainProtected', _('{} network only').format('/'.join(networks))]
+                else:
+                    return ["Restricted", _("Restricted")]
+        else:
+            if target.isProtected():
+                return ["Restricted", _("Restricted")]
+            domain_list = target.getAccessController().getAnyDomainProtection()
+            if domain_list:
+                return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
+            return ["Public", _("Public")]
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
