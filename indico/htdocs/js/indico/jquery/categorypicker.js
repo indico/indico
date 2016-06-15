@@ -22,6 +22,8 @@
         options: {
             categoryId: 0,
             actionButtonText: $T.gettext("Select"),
+            openInDialog: false,
+            dialogTitle: $T.gettext("Select a category"),
             onAction: function() {}
         },
 
@@ -40,9 +42,32 @@
 
         _create: function() {
             var self = this;
+            if (self.options.openInDialog) {
+                self._createInDialog();
+            } else {
+                self._createInline();
+            }
+        },
+
+        _createInline: function() {
+            var self = this;
+            self.element.addClass('category-picker');
             self._createNavigator();
             self._createSearchField();
             self.goToCategory(self.options.categoryId);
+        },
+
+        _createInDialog: function() {
+            var self = this;
+            ajaxDialog({
+                title: self.options.dialogTitle,
+                content: $('<div>', {class: 'category-picker-wrapper'}).append($('<div>'))[0].outerHTML,
+                onOpen: function(dialog) {
+                    self.element = dialog.contentContainer.children().first();
+                    self.dialog = dialog;
+                    self._createInline();
+                }
+            });
         },
 
         _createNavigator: function() {
@@ -174,13 +199,14 @@
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
 
-            $buttonWrapper.append($('<div>').append($('<span>', {
+            var $button = $('<div>').append($('<span>', {
                 class: 'action-button',
                 text: self.options.actionButtonText
             }).on('click', function(evt) {
                 evt.stopPropagation();
-                self.options.onAction(category);
-            })));
+                self._onAction(category);
+            }));
+            $buttonWrapper.append($button);
 
             if (withGoToParent && category.path && category.path.length) {
                 var parent = _.last(category.path);
@@ -262,6 +288,14 @@
                 evt.preventDefault();
                 self.goToCategory(id);
             });
+        },
+
+        _onAction: function(category) {
+            var self = this;
+            self.options.onAction(category);
+            if (self.dialog) {
+                self.dialog.close();
+            }
         },
 
         goToCategory: function(id) {
