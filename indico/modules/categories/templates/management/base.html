@@ -1,5 +1,27 @@
 {% extends 'layout/management_page.html' %}
 
+{% macro delete_category_button(category, classes="i-button") %}
+    {% set confirmation_message -%}
+        {% trans category=category.title %}Do you really want to delete the category "{{ category }}"?{% endtrans %}
+    {%- endset %}
+    {% if category.deep_children_count or category.deep_events_count %}
+        {% set classes = classes + " disabled" %}
+        {% set tooltip -%}
+            {% trans %}This category cannot be deleted because it is not empty.{% endtrans %}
+        {%- endset %}
+    {% else %}
+        {% set tooltip -%}
+            {% trans %}Delete category{% endtrans %}
+        {%- endset %}
+    {% endif %}
+    <a class="{{ classes }} icon-remove js-delete-category"
+       title="{{ tooltip|forceescape }}"
+       data-confirm="{{ confirmation_message|forceescape }}"
+       data-title="{% trans %}Delete category{% endtrans %}"
+       data-href="{{ url_for('.delete', category) }}"
+       data-method="POST"></a>
+{% endmacro %}
+
 {% block banner_title %}
     {{ category.title }}
 {% endblock %}
@@ -11,9 +33,7 @@
                 <a class="i-button icon-transmission"
                    title="{% trans %}Move category{% endtrans %}"
                    href="#"></a>
-                <a class="i-button icon-remove"
-                   title="{% trans %}Delete category{% endtrans %}"
-                   href="#"></a>
+                {{ delete_category_button(category) }}
             </div>
             <div class="group">
                 <a class="icon-switchon highlight i-button"
