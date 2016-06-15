@@ -1963,59 +1963,8 @@ class Conference(CommonObjectBase):
                 return True
         return False
 
-    def isAllowedToAccess( self, av):
-        """tells if a user has privileges to access the current conference
-            (independently that it is protected or not)
-        """
-        if not av:
-            return False
-        if self.__ac.canUserAccess(av) or self.canUserModify(av):
-            return True
-
-        # if the conference is not protected by itself
-        if not self.isItselfProtected():
-            # then inherit behavior from parent category
-            for owner in self.getOwnerList():
-                if owner.isAllowedToAccess( av ):
-                    return True
-
-        # track coordinators are also allowed to access the conference
-        for track in self.getTrackList():
-            if track.isCoordinator( av ):
-                return True
-
-        # paper reviewing team should be also allowed to access
-        if self.getConfPaperReview().isInReviewingTeam(av):
-            return True
-
-        return False
-
-    def canAccess( self, aw ):
-        """Tells whether an access wrapper is allowed to access the current
-            conference: when the conference is protected, only if the user is a
-            chair or is granted to access the conference, when the client ip is
-            not restricted.
-        """
-
-        # Allow harvesters (Invenio, offline cache) to access
-        # protected pages
-        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
-            return True
-
-        if self.isProtected():
-            if self.isAllowedToAccess(aw.getUser()):
-                return True
-            else:
-                return self.canKeyAccess(aw) or self.canModify(aw)
-        else:
-            # Domain control is triggered just for PUBLIC events
-            return self.canIPAccess(request.remote_addr) or self.canModify(aw)
-
-    def canKeyAccess(self, aw, key=None):
-        accessKey = self.getAccessKey()
-        if not accessKey:
-            return False
-        return key == accessKey or session.get('accessKeys', {}).get(self.getUniqueId()) == accessKey
+    def canAccess(self, aw):
+        return self.as_event.can_access(aw.user)
 
     @unify_user_args
     def canUserModify(self, user):

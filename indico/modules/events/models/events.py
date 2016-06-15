@@ -449,12 +449,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def duration(self):
         return self.end_dt - self.start_dt
 
-    def can_access(self, user, allow_admin=True):
-        if not allow_admin:
-            raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
-        from MaKaC.accessControl import AccessWrapper
-        return self.as_legacy.canAccess(AccessWrapper(user.as_avatar if user else None))
-
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
@@ -520,10 +514,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
                               data=data or {})
         self.log_entries.append(entry)
-
-    # XXX: Delete once event ACLs are in the new DB
-    def get_access_list(self, skip_managers=False, skip_self_acl=False):
-        return {x.as_new for x in self.as_legacy.getRecursiveAllowedToAccessList(skip_managers, skip_self_acl)}
 
     def get_contribution_field(self, field_id):
         return next((v for v in self.contribution_fields if v.id == field_id), '')
