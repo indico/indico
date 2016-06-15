@@ -40,6 +40,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -232,12 +233,12 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
 
         eventAccessProtection = params.get("eventProtection", "inherit")
         if eventAccessProtection == "private" :
-            c.getAccessController().setProtection(1)
+            c.as_event.protection_mode = ProtectionMode.protected
         elif eventAccessProtection == "public" :
-            c.getAccessController().setProtection(-1)
+            c.as_event.protection_mode = ProtectionMode.public
 
-        allowedAvatars = self._getPersons()
-        UtilPersons.addToConf(allowedAvatars, c)
+        for legacy_principal in self._getPersons():
+            c.as_event.update_principal(legacy_principal.as_new, read_access=True)
 
         # Add EventPersonLinks to the Event
         person_links = self.get_event_person_links_data(c.as_event)
@@ -317,16 +318,6 @@ _Access%s_
             mail_data = {"fromAddr": fromAddr, "toList": event_creation_notification_emails,
                          "subject": subject, "body": text}
             GenericMailer.send(mail_data)
-
-
-class UtilPersons:
-
-    @staticmethod
-    def addToConf(accessingAvatars, conf):
-        if accessingAvatars:
-            for person in accessingAvatars:
-                if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
-                    conf.grantAccess(person)
 
 
 class UtilsConference:
