@@ -849,7 +849,7 @@ class IndicoProtectionField(IndicoEnumRadioField):
         self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
         get_acl_message_url = kwargs.pop('acl_message_url', None)
         self.acl_message_url = get_acl_message_url(kwargs['_form']) if get_acl_message_url else None
-        self.can_inherit_protection = self.protected_object.parent is not None
+        self.can_inherit_protection = self.protected_object.protection_parent is not None
         if not self.can_inherit_protection:
             kwargs['skip'] = {ProtectionMode.inheriting}
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
