@@ -1,0 +1,28 @@
+{% from 'confirmation_dialog.html' import confirmation_dialog %}
+
+{% set ok_text=_("Delete events") %}
+
+{% set confirmation_message %}
+    {% trans -%}
+        Please note that if you delete the events you will lose all the information contained in them.
+        This operation is irreversible!
+    {%- endtrans %}
+{% endset %}
+
+{% if events %}
+    {% call confirmation_dialog('danger', message=confirmation_message, ok_text=ok_text) %}
+        {% trans %}
+            You are about to <strong>delete</strong> the following events:
+        {% endtrans %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <a href="{{ url_for('event_mgmt.confModifAC', event) }}" target="_blank">
+                        {{ event.title }}
+                    </a>
+                    ({{ event.start_dt|format_date(timezone=event.timezone) }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% endcall %}
+{% endif %}

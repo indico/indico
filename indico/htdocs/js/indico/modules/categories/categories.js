@@ -111,4 +111,8 @@
             });
         }
     };
+
+    global.setupCategoryEventList = function setupCategoryEventsList() {
+        enableIfChecked('.event-management', 'input[name=event_id]', '.js-enable-if-checked');
+    };
 })(window);
