@@ -117,3 +117,18 @@ class CreateCategoryForm(IndicoForm):
 
     title = StringField(_("Title"), [DataRequired()])
     description = IndicoMarkdownField(_("Description"))
+
+
+class SplitCategoryForm(IndicoForm):
+    first_category = StringField(_('Category name #1'), [DataRequired()],
+                                 description=_('Selected events will be moved into a new sub-category with this '
+                                               'title.'))
+    second_category = StringField(_('Category name #2'), [DataRequired()],
+                                  description=_('Events that were not selected will be moved into a new sub-category '
+                                                'with this title.'))
+
+    def __init__(self, *args, **kwargs):
+        super(SplitCategoryForm, self).__init__(*args, **kwargs)
+        if kwargs.get('move_all', False):
+            self.first_category.label.text = _('Category name')
+            del self.second_category
