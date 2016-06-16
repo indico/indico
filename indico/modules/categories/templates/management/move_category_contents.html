@@ -1,14 +1,16 @@
-{% extends 'categories/management/base.html' %}
-
-{% block title %}
-    {% trans %}Move categories{% endtrans %}
-{% endblock %}
-
-{% block content %}
-    <div class="category-picker"></div>
-    <script>
-        $('.category-picker').categorypicker({
-            categoryId: {{ category.id }}
-        });
-    </script>
-{% endblock %}
+<div class="action-box">
+    <div class="section">
+        <span class="icon icon-transmission"></span>
+        <div class="text">
+            <div class="label">{% trans %}Selected categories to be moved{% endtrans %}:</div>
+            <div>{{ category.title }}</div>
+        </div>
+    </div>
+</div>
+<div id="category-picker-holder"></div>
+<script>
+    $('#category-picker-holder').categorypicker({
+        categoryId: {{ category.parent.id if not category.is_root else category.id }},
+        selectLeafOnly: true
+    });
+</script>
