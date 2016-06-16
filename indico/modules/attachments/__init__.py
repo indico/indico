@@ -69,10 +69,10 @@ def _get_attachment_cloner(sender, **kwargs):
 
 @signals.acl.can_access.connect_via(Attachment)
 @signals.acl.can_access.connect_via(AttachmentFolder)
-def _can_access(cls, obj, user, **kwargs):
+def _can_access(cls, obj, user, authorized, **kwargs):
     """Grant full access to attachments/folders to certain IPs"""
     from MaKaC.common import HelperMaKaCInfo
-    if not has_request_context():
+    if not has_request_context() or authorized is not None:
         return
     full_access_ips = HelperMaKaCInfo.getMaKaCInfoInstance().getIPBasedACLMgr().get_full_access_acl()
     if request.remote_addr in full_access_ips:
