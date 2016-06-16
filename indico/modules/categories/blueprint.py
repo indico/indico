@@ -23,7 +23,7 @@ from indico.modules.categories.controllers.management import (RHCategoryMoveCont
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryProtection,
                                                               RHManageCategorySettings, RHSortSubcategories,
-                                                              RHDeleteEvents)
+                                                              RHDeleteEvents, RHSplitCategory)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -39,6 +39,7 @@ _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProt
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
 _bp.add_url_rule('/manage/move', 'move-contents', RHCategoryMoveContents)
 _bp.add_url_rule('/manage/delete-events', 'delete_events', RHDeleteEvents, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/split', 'split_category', RHSplitCategory, methods=('GET', 'POST'))
 
 # Subcategory management
 _bp.add_url_rule('/manage/subcategories/create', 'create_subcategory', RHCreateCategory, methods=('GET', 'POST'))

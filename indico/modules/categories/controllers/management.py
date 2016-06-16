@@ -29,7 +29,7 @@ from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
-                                             CategorySettingsForm, CreateCategoryForm)
+                                             CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
@@ -283,3 +283,30 @@ class RHDeleteEvents(RHManageCategoryBase):
         flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))
              .format(len(self.events)), 'success')
         return jsonify_data(flash=False)
+
+
+class RHSplitCategory(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.event_ids = set(map(int, request.args.getlist('event_id')))
+        self.category_events = {x.id: x for x in self.category.events}
+
+    def _process(self):
+        all_selected = not bool(self.category_events.viewkeys() - self.event_ids)
+        form = SplitCategoryForm(move_all=all_selected)
+        if form.validate_on_submit():
+            selected_events = self.category_events.viewkeys() & self.event_ids
+            not_selected_events = self.category_events.viewkeys() - self.event_ids
+            if selected_events:
+                self._move_events(selected_events, form.first_category.data)
+            if not_selected_events:
+                self._move_events(not_selected_events, form.second_category.data)
+            return jsonify_data()
+        return jsonify_form(form)
+
+    def _move_events(self, event_ids, category_title):
+        category = Category(title=category_title, parent_id=self.category.id)
+        for event_id in event_ids:
+            event = self.category_events.get(event_id)
+            category.events.append(event)
+        db.session.flush()
