@@ -50,10 +50,16 @@ The `sender` is the type of the object that's using the mixin.  The
 actual instance is passed as `obj`.  The `user` and `allow_admin`
 arguments of `can_access` are passed as kwargs with the same name.
 
+The `authorized` argument is ``None`` when this signal is called at
+the beginning of the access check and ``True`` or ``False`` at the end
+when regular access rights have already been checked.  For expensive
+checks (such as anything involving database queries) it is recommended
+to skip the check while `authorized` is ``None`` since the regular
+access check is likely to be cheaper (due to ACLs being preloaded etc).
+
 If the signal returns ``True`` or ``False``, the access check succeeds
-or fails without any further checks.  If multiple subscribers to the
-signal return contradictory results, ``False`` wins and access is
-denied.
+or fails immediately.  If multiple subscribers to the signal return
+contradictory results, ``False`` wins and access is denied.
 """)
 
 

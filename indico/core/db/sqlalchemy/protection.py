@@ -127,6 +127,15 @@ class ProtectionMixin(object):
         """The parent object to consult for ProtectionMode.inheriting"""
         raise NotImplementedError
 
+    def _check_can_access_override(self, user, allow_admin, authorized=None):
+        # Trigger signals for protection overrides
+        rv = values_from_signal(signals.acl.can_access.send(type(self), obj=self, user=user, allow_admin=allow_admin,
+                                                            authorized=authorized),
+                                single_value=True)
+        # in case of contradictory results (shouldn't happen at all)
+        # we stay on the safe side and deny access
+        return all(rv) if rv else None
+
     @memoize_request
     def can_access(self, user, allow_admin=True):
         """Checks if the user can access the object.
@@ -136,59 +145,58 @@ class ProtectionMixin(object):
         :param allow_admin: If admin users should always have access
         """
 
-        # Trigger signals for protection overrides
-        rv = values_from_signal(signals.acl.can_access.send(type(self), obj=self, user=user, allow_admin=allow_admin),
-                                single_value=True)
-        if rv:
-            # in case of contradictory results (shouldn't happen at all)
-            # we stay on the safe side and deny access
-            return all(rv)
+        override = self._check_can_access_override(user, allow_admin=allow_admin)
+        if override is not None:
+            return override
 
         # Usually admins can access everything, so no need for checks
         if allow_admin and user and user.is_admin:
-            return True
-
+            rv = True
         # If there's a valid access key we can skip all other ACL checks
-        if self.allow_access_key and self.check_access_key():
-            return True
-
-        if self.protection_mode == ProtectionMode.public:
+        elif self.allow_access_key and self.check_access_key():
+            rv = True
+        elif self.protection_mode == ProtectionMode.public:
             # if it's public we completely ignore the parent protection
             # this is quite ugly which is why it should only be allowed
             # in rare cases (e.g. events which might be in a protected
             # category but should be public nonetheless)
-            return True
+            rv = True
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
             if any(user in entry.principal for entry in iter_acl(self.acl_entries)):
-                return True
+                rv = True
             elif isinstance(self, ProtectionManagersMixin):
-                return self.can_manage(user, allow_admin=allow_admin)
+                rv = self.can_manage(user, allow_admin=allow_admin)
             else:
-                return False
+                rv = False
         elif self.protection_mode == ProtectionMode.inheriting:
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
             # might not need to check the parents at all
             if self.inheriting_have_acl and any(user in entry.principal for entry in iter_acl(self.acl_entries)):
-                return True
-            # the parent can be either an object inheriting from this
-            # mixin or a legacy object with an AccessController
-            parent = self.protection_parent
-            if parent is None:
-                # This should be the case for the top-level object,
-                # i.e. the root category, which shouldn't allow
-                # ProtectionMode.inheriting as it makes no sense.
-                raise TypeError('protection_parent of {} is None'.format(self))
-            elif hasattr(parent, 'can_access'):
-                return parent.can_access(user, allow_admin=allow_admin)
+                rv = True
             else:
-                raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
+                # the parent can be either an object inheriting from this
+                # mixin or a legacy object with an AccessController
+                parent = self.protection_parent
+                if parent is None:
+                    # This should be the case for the top-level object,
+                    # i.e. the root category, which shouldn't allow
+                    # ProtectionMode.inheriting as it makes no sense.
+                    raise TypeError('protection_parent of {} is None'.format(self))
+                elif hasattr(parent, 'can_access'):
+                    rv = parent.can_access(user, allow_admin=allow_admin)
+                else:
+                    raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent),
+                                                                                                parent))
         else:
             # should never happen, but since this is a sensitive area
             # we better fail loudly if we have garbage
             raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
+
+        override = self._check_can_access_override(user, allow_admin=allow_admin, authorized=rv)
+        return override if override is not None else rv
 
     def check_access_key(self, access_key=None):
         """Check whether an access key is valid for the object.
