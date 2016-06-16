@@ -4,14 +4,14 @@
     {% set confirmation_message -%}
         {% trans category=category.title %}Do you really want to delete the category "{{ category }}"?{% endtrans %}
     {%- endset %}
-    {% if category.deep_children_count or category.deep_events_count %}
+    {% if category.is_empty %}
+        {% set tooltip -%}
+            {% trans %}Delete category{% endtrans %}
+        {%- endset %}
+    {% else %}
         {% set classes = classes + " disabled" %}
         {% set tooltip -%}
             {% trans %}This category cannot be deleted because it is not empty.{% endtrans %}
-        {%- endset %}
-    {% else %}
-        {% set tooltip -%}
-            {% trans %}Delete category{% endtrans %}
         {%- endset %}
     {% endif %}
     <a class="{{ classes }} icon-remove js-delete-category"

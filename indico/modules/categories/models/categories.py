@@ -224,6 +224,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return cls.parent_id.is_(None)
 
     @property
+    def is_empty(self):
+        return not self.deep_children_count and not self.deep_events_count
+
+    @property
     def has_icon(self):
         return self.icon_metadata is not None
 
