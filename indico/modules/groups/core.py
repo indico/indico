@@ -73,6 +73,8 @@ class GroupProxy(object):
         raise NotImplementedError
 
     def __contains__(self, user):
+        if not user:
+            return False
         return self.has_member(user)
 
     @cached_property
