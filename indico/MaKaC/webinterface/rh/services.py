@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from ipaddress import ip_address
+
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import utils
@@ -49,8 +51,10 @@ class RHIPBasedACLFullAccessGrant( RHServicesBase ):
         ipAddress = self._params.get('ipAddress', None)
 
         if ipAddress:
-            if not utils.validIP(ipAddress):
-                raise MaKaCError("IP Address %s is  not valid!" % ipAddress)
+            try:
+                ipAddress = unicode(ip_address(ipAddress))
+            except ValueError as exc:
+                raise MaKaCError("IP Address {} is not valid: {}".format(ipAddress, exc))
             else:
                 minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
                 ip_acl_mgr = minfo.getIPBasedACLMgr()
