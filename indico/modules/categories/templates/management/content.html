@@ -1,5 +1,7 @@
 {% extends 'categories/management/base.html' %}
 
+{% from 'categories/management/_events_list.html' import render_events_list %}
+
 {% macro subcategory_row(subcategory) %}
     <tr class="i-table"
         data-category-id="{{ subcategory.id }}"
@@ -51,7 +53,7 @@
             <button class="i-button icon-remove js-bulk-delete-category"></button>
         </div>
     </div>
-    <table class="i-table categories-management"
+    <table class="i-table category-management"
            data-sort-url="{{ url_for('.sort_subcategories', category) }}"
            data-bulk-delete-url="{{ url_for('.delete_subcategories', category) }}">
         <thead>
@@ -71,96 +73,18 @@
     </table>
 {% endmacro %}
 
-{% macro event_row(event) %}
-    <tr class="i-table">
-        <td class="i-table column-icon">
-            <a href="" class="i-button-icon icon-handle"></a>
-        </td>
-        <td class="i-table column-icon">
-            {% if event.is_self_protected %}
-                <span class="icon-lock"></span>
-            {% elif event.is_public %}
-                <span class="icon-unlocked"></span>
-            {% endif %}
-        </td>
-        <td class="i-table">
-            <a href="{{ url_for('event_mgmt.conferenceModification-managementAccess', event) }}">
-                {{ event.title }}
-            </a>
-        </td>
-        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
-        <td class="i-table actions">
-            <a href="#"
-               class="i-button-icon icon-remove js-ajax-dialog-delete"
-               title="{% trans %}Delete event{% endtrans %}"
-               data-href="{{ url_for('event_management.delete', event) }}"
-               data-ajax-dialog
-               data-reload-after></a>
-            <a class="i-button-icon icon-transmission"
-               title="{% trans %}Move to different category{% endtrans %}"></a>
-            <a href="{{ url_for('event.conferenceDisplay', event) }}"
-               class="i-button-icon icon-arrow-right"
-               title="{% trans %}Go to the event display page{% endtrans %}"></a>
-        </td>
-    </tr>
-{% endmacro %}
-
-{% macro events_table(events) %}
-    <div class="toolbar">
-        <div class="group">
-            <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
-                {% trans %}Create event{% endtrans %}
-            </a>
-            <ul class="dropdown">
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='lecture') }}">
-                        {% trans %}Create lecture{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='meeting') }}">
-                        {% trans %}Create meeting{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=current_category.id, event_type='conference') }}">
-                        {% trans %}Create conference{% endtrans %}
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="group right">
-            <a href="" class="i-button icon-transmission"></a>
-            <a href="" class="i-button icon-remove"></a>
-        </div>
-    </div>
-    <table class="i-table events-management">
-        <thead>
-            <tr class="i-table">
-                <th class="i-table column-icon"></th>
-                <th class="i-table column-icon"></th>
-                <th class="i-table">{% trans %}Title{% endtrans %}</th>
-                <th class="i-table">{% trans %}Start date{% endtrans %}</th>
-                <th class="i-table actions"></th>
-            </tr>
-        </thead>
-        {% for event in events %}
-            {{ event_row(event) }}
-        {% endfor %}
-    </table>
-{% endmacro %}
-
 {% block title %}
     {% trans %}Content{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    {% if subcategories %}
+    {% if subcategories or not event_count %}
         {{ subcategories_table(subcategories) }}
         <script>
             setupCategoryTable();
         </script>
-    {% elif events %}
-        {{ events_table(events) }}
+    {% endif %}
+    {% if event_count or not subcategories %}
+        {{ render_events_list(current_category, page, is_paginated, order_column, direction, events, event_count) }}
     {% endif %}
 {% endblock content %}

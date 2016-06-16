@@ -15,10 +15,37 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base";
 @import "base/palette";
 
-table.categories-management, table.events-management {
+table.category-management, table.event-management {
     margin-top: 0;
+    margin-bottom: 25px;
+
+    th {
+        &.sortable-column {
+            a {
+                display: inline-block;
+                width: 100%;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &.desc {
+                @include icon-before('icon-arrow-down');
+            }
+
+            &.asc {
+                @include icon-before('icon-arrow-down');
+
+                &:before {
+                    @include rotate(-180deg);
+                }
+            }
+        }
+    }
 
     .actions {
         width: 6em;
@@ -36,5 +63,10 @@ table.categories-management, table.events-management {
         &:hover, &:active {
             color: $dark-gray;
         }
+    }
+
+    & + .pagination {
+        margin-top: 8px;
+        float: right;
     }
 }
