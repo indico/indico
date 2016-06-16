@@ -68,6 +68,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @classmethod
     def __auto_table_args(cls):
         return (db.CheckConstraint("(icon IS NULL) = (icon_metadata::text = 'null')", 'valid_icon'),
+                db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(parent_id IS NULL) = (id = 0)", 'valid_parent'),
                 db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
                 db.CheckConstraint("(id != 0) OR (protection_mode != {})".format(ProtectionMode.inheriting),
@@ -109,6 +110,15 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         default=None
     )
     icon = db.deferred(db.Column(
+        db.LargeBinary,
+        nullable=True
+    ))
+    logo_metadata = db.Column(
+        JSON,
+        nullable=False,
+        default=None
+    )
+    logo = db.deferred(db.Column(
         db.LargeBinary,
         nullable=True
     ))
@@ -218,6 +228,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return self.icon_metadata is not None
 
     @property
+    def has_logo(self):
+        return self.logo_metadata is not None
+
+    @property
     def tzinfo(self):
         return pytz.timezone(self.timezone)
 
@@ -277,6 +291,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def icon_url(self):
         """Get the HTTP URL of the icon."""
         return url_for('categories.display_icon', self, slug=self.icon_metadata['hash'])
+
+    @property
+    def logo_url(self):
+        """Get the HTTP URL of the logo."""
+        return url_for('categories.display_logo', self, slug=self.logo_metadata['hash'])
+
 
 Category.register_protection_events()
 

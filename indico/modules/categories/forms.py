@@ -84,7 +84,14 @@ class CategoryIconForm(IndicoForm):
                                                    add_remove_links=False, handle_flashes=True),
                      description=_("Small icon that will show up next to category names in overview pages. Will be "
                                    "automatically resized to 16x16 pixels. This may involve loss of image quality, "
-                                   "so try to upload images as close as those dimensions."))
+                                   "so try to upload images as close as possible to those dimensions."))
+
+
+class CategoryLogoForm(IndicoForm):
+    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                                                   max_files=1, submit_form=False, submit_if_empty=False,
+                                                   add_remove_links=False, handle_flashes=True),
+                     description=_("Logo that will show up next to the category description."))
 
 
 class CategoryProtectionForm(IndicoForm):

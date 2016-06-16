@@ -2,6 +2,24 @@
 
 {% from 'forms/_form.html' import form_header, form_rows, form_fieldset, form_footer %}
 
+{% macro render_image_form(image_form, type, endpoint, title, deletion_prompt_title, deletion_prompt) %}
+    {{ form_header(image_form, classes='image-form', action=url_for(endpoint, category)) }}
+        {% call form_fieldset(title) %}
+            {{ form_rows(image_form, skip_labels=true) }}
+        {% endcall %}
+    {% call form_footer(image_form) %}
+        <input class="i-button big highlight icon-upload" type="submit"
+               value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
+        <button class="i-button js-remove-button danger icon-remove{% if not image_form|attr(type)|attr('data') %} weak-hidden{% endif %}"
+                data-method="DELETE"
+                data-href="{{ url_for(endpoint, category) }}"
+                data-title="{{ deletion_prompt_title }}"
+                data-confirm="{{ deletion_prompt }}">
+            {% trans %}Delete{% endtrans %}
+        </button>
+    {% endcall %}
+{% endmacro %}
+
 {% block title %}
     {% trans %}Settings{% endtrans %}
 {% endblock %}
@@ -17,52 +35,37 @@
                data-disabled-until-change>
     {% endcall %}
 
-    {{ form_header(icon_form, id='icon-form', action=url_for('.upload_icon', category)) }}
-        {% call form_fieldset(_('Icon')) %}
-            {{ form_rows(icon_form, skip_labels=true) }}
-        {% endcall %}
-    {% call form_footer(icon_form) %}
-        <input class="i-button big highlight icon-upload" type="submit"
-               value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
-        <button class="i-button js-remove-button danger icon-remove{% if not icon_form.icon.data %} weak-hidden{% endif %}"
-                data-method="DELETE"
-                data-href="{{ url_for('.upload_icon', category) }}">
-            {% trans %}Delete{% endtrans %}
-        </button>
-    {% endcall %}
+    {% set delete_icon_prompt = _("Are you sure you want to remove the icon of this category?") %}
+    {% set delete_logo_prompt = _("Are you sure you want to remove the logo of this category?") %}
+    {{ render_image_form(icon_form, 'icon', '.manage_icon', _('Icon'), _('Delete Icon?'), delete_icon_prompt) }}
+    {{ render_image_form(logo_form, 'logo', '.manage_logo', _('Logo'), _('Delete Logo?'), delete_logo_prompt) }}
 
     <script>
         (function() {
             'use strict';
 
-            $('#icon-form').on('indico:fieldsSaved', function(evt, response) {
+            $('.image-form').on('indico:fieldsSaved', function(evt, response) {
                 var hidden = !response.content;
                 var $this = $(this);
                 $this.find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+            }).on('indico:confirmed', '.js-remove-button', function(evt) {
+                evt.preventDefault();
 
-            }).on('click', '.js-remove-button', function(evt) {
                 var $this = $(this);
                 var $form = $this.closest('form');
                 var dropzone = $form.get(0).dropzone;
 
-                evt.preventDefault();
-
-                confirmPrompt($T.gettext("Are you sure you want to remove the icon of this category?"),
-                              $T.gettext("Delete icon?")
-                ).done(function() {
-                    $this.prop('disabled', true);
-
-                    $.ajax({
-                        url: $this.data('href'),
-                        method: $this.data('method'),
-                        complete: IndicoUI.Dialogs.Util.progress(),
-                        error: handleAjaxError,
-                        success: function(data) {
-                            handleFlashes(data, true, $form.find('.flashed-messages'));
-                            dropzone.removeAllFiles();
-                            $form.trigger('indico:fieldsSaved', data);
-                        }
-                    });
+                $this.prop('disabled', true);
+                $.ajax({
+                    url: $this.data('href'),
+                    method: $this.data('method'),
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        handleFlashes(data, true, $form.find('.flashed-messages'));
+                        dropzone.removeAllFiles();
+                        $form.trigger('indico:fieldsSaved', data);
+                    }
                 });
             });
         })();
