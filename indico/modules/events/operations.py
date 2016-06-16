@@ -55,3 +55,9 @@ def update_event(event, data):
     event.populate_from_dict(data)
     db.session.flush()
     logger.info('Event %r updated with %r', event, data)
+
+
+def delete_event(event):
+    event.as_legacy.delete(session.user)
+    db.session.flush()
+    logger.info('Event %r deleted by %r', event, session.user)
