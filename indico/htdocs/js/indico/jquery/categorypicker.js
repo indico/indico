@@ -24,6 +24,7 @@
             actionButtonText: $T.gettext("Select"),
             openInDialog: false,
             dialogTitle: $T.gettext("Select a category"),
+            selectLeafOnly: false, // Allow only the leaf categories to be selected
             onAction: function() {}
         },
 
@@ -200,14 +201,19 @@
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
 
-            var $button = $('<div>').append($('<span>', {
+            var $button = $('<span>', {
                 class: 'action-button',
                 text: self.options.actionButtonText
             }).on('click', function(evt) {
                 evt.stopPropagation();
-                self._onAction(category);
-            }));
-            $buttonWrapper.append($button);
+                if (!self.options.selectLeafOnly || category.category_count === 0) {
+                    self._onAction(category);
+                }
+            });
+            if (self.options.selectLeafOnly && category.category_count) {
+                $button.addClass('disabled').attr('title', $T.gettext("You cannot select this category"));
+            }
+            $buttonWrapper.append($('<div>').append($button));
 
             if (withGoToParent && category.path && category.path.length) {
                 var parent = _.last(category.path);
