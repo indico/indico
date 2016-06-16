@@ -56,5 +56,8 @@ class MockConference(object):
         except AttributeError:
             return None
 
+    def getTrackList(self):
+        return []
+
     def log(self, *args, **kwargs):
         pass
