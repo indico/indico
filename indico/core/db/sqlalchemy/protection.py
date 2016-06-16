@@ -57,6 +57,9 @@ class ProtectionMixin(object):
     inheriting_have_acl = False
     #: Whether the object can have an access key that grants read access
     allow_access_key = False
+    #: Whether the object can have contact information shown in case of
+    #: no access
+    allow_no_access_contact = False
 
     @classmethod
     def register_protection_events(cls):
@@ -83,6 +86,15 @@ class ProtectionMixin(object):
     @declared_attr
     def access_key(cls):
         if cls.allow_access_key:
+            return db.Column(
+                db.String,
+                nullable=False,
+                default=''
+            )
+
+    @declared_attr
+    def no_access_contact(cls):
+        if cls.allow_no_access_contact:
             return db.Column(
                 db.String,
                 nullable=False,
