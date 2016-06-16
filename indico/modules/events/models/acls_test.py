@@ -279,6 +279,24 @@ def test_can_manage_signal_override(create_event, dummy_user, signal_rv_1, signa
             assert event.can_manage(dummy_user) == allowed
 
 
+@pytest.mark.parametrize(('signal_rv_1', 'signal_rv_2', 'allowed'), (
+        (False, False, False),
+        (False, True,  False),
+        (True,  True,  True)
+))
+def test_can_access_signal_override(create_event, dummy_user, signal_rv_1, signal_rv_2, allowed):
+    event = create_event()
+
+    def _signal_fn(sender, obj, user, rv, **kwargs):
+        assert obj is event
+        assert user is dummy_user
+        return rv
+
+    with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_1), sender=Event):
+        with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_2), sender=Event):
+            assert event.can_access(dummy_user) == allowed
+
+
 @pytest.mark.parametrize(('is_admin', 'allow_admin', 'not_explicit', 'expected'), bool_matrix('...', expect=all))
 def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_explicit, expected):
     event = create_event()
