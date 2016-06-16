@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
+from inspect import getcallargs
 
 from flask import has_request_context, g, current_app
 
@@ -28,7 +29,9 @@ def make_hashable(obj):
     elif isinstance(obj, dict):
         return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
     elif hasattr(obj, 'getId'):
-        return obj.__class__.__name__, obj.getId()
+        # getId of AvatarUserWrapper would access a cached property, we can't have that here
+        id_ = obj.getId() if obj.__class__.__name__ != 'AvatarUserWrapper' else obj.id
+        return obj.__class__.__name__, id_
     return obj
 
 
@@ -59,7 +62,7 @@ def memoize_request(f):
         except AttributeError:
             g.memoize_cache = cache = {}
 
-        key = (f.__name__, make_hashable(args), make_hashable(kwargs))
+        key = (f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs)))
         if key not in cache:
             cache[key] = f(*args, **kwargs)
         return cache[key]
@@ -84,7 +87,7 @@ def memoize_redis(ttl):
 
     def decorator(f):
         def _get_key(args, kwargs):
-            return f.__name__, make_hashable(args), make_hashable(kwargs)
+            return f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
 
         def _clear_cached(*args, **kwargs):
             cache.delete(_get_key(args, kwargs))
