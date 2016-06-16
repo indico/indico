@@ -134,7 +134,7 @@ class CategoryImporter(Importer):
     def _process_protection(self, cat, old_cat):
         ac = old_cat._Category__ac
         cat.event_creation_restricted = bool(old_cat._Category__confCreationRestricted)
-        cat.no_access_contact = convert_to_unicode(getattr(ac, 'contactInfo', ''))
+        cat.own_no_access_contact = convert_to_unicode(getattr(ac, 'contactInfo', ''))
         if ac._accessProtection == -1 or (old_cat.id == '0' and ac._accessProtection == 0):
             cat.protection_mode = ProtectionMode.public
         elif ac._accessProtection == 0:

@@ -113,7 +113,7 @@ class EventACLImporter(Importer):
 
             no_access_contact = convert_to_unicode(getattr(ac, 'contactInfo', ''))
             if no_access_contact != 'no contact info defined':
-                event.no_access_contact = no_access_contact
+                event.own_no_access_contact = no_access_contact
             event.access_key = convert_to_unicode(getattr(legacy_event, '_accessKey', ''))
             if not self.quiet:
                 self.print_success('Protection mode set to {}'.format(event.protection_mode.name, event_id=event.id))
