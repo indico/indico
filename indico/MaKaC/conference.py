@@ -1110,6 +1110,8 @@ class Conference(CommonObjectBase):
             # use get() so sqlalchemy can make use of the identity cache
             return Event.get_one(event_id)
 
+    as_new = as_event
+
     @property
     @memoize_request
     def note(self):
