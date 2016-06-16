@@ -290,6 +290,31 @@
             });
         },
 
+        _getCategoryInfo: function(id) {
+            var self = this;
+            var dfd = $.Deferred();
+
+            if (self._cache[id]) {
+                _.defer(function() {
+                    dfd.resolve(self._cache[id]);
+                });
+            } else {
+                $.ajax({
+                    url: build_url(Indico.Urls.Categories.info, {category_id: id}),
+                    dataType: 'json',
+                    error: handleAjaxError,
+                    success: function(data) {
+                        if (data) {
+                            self._cache[id] = data;
+                            dfd.resolve(data);
+                        }
+                    }
+                });
+            }
+
+            return dfd.promise();
+        },
+
         _onAction: function(category) {
             var self = this;
             self.options.onAction(category);
@@ -312,23 +337,7 @@
                 }
             }).find('.title').fadeOut();
 
-            if (self._cache[id]) {
-                self._renderNavigator(self._cache[id]);
-            } else {
-                $.ajax({
-                    url: build_url(Indico.Urls.Categories.info, {category_id: id}),
-                    dataType: 'json',
-                    error: function(data) {
-                        handleAjaxError(data);
-                    },
-                    success: function(data) {
-                        if (data) {
-                            self._cache[id] = data;
-                            self._renderNavigator(data);
-                        }
-                    }
-                });
-            }
+            self._getCategoryInfo(id).then(self._renderNavigator.bind(self));
         }
     });
 })(jQuery);
