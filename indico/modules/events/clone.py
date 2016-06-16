@@ -17,9 +17,12 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
+from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.sessions import session_settings
 from indico.util.i18n import _
 
 
@@ -92,3 +95,30 @@ class EventPersonLinkCloner(EventCloner):
             link.populate_from_attrs(old_link, attrs)
             link.person = self._person_map[old_link.person]
             new_event.person_links.append(link)
+
+
+class EventProtectionCloner(EventCloner):
+    name = 'event_protection'
+    friendly_name = _('ACLs and protection settings')
+    is_default = True
+
+    def run(self, new_event, cloners, shared_data):
+        with db.session.no_autoflush:
+            self._clone_protection(new_event)
+            self._clone_session_coordinator_privs(new_event)
+            self._clone_acl(new_event)
+        db.session.flush()
+
+    def _clone_protection(self, new_event):
+        new_event.protection_mode = self.old_event.protection_mode
+        new_event.access_key = self.old_event.access_key
+
+    def _clone_session_coordinator_privs(self, new_event):
+        session_settings_data = session_settings.get_all(self.old_event)
+        session_settings.set_multi(new_event, {
+            'coordinators_manage_contributions': session_settings_data['coordinators_manage_contributions'],
+            'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
+        })
+
+    def _clone_acl(self, new_event):
+        new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries)
