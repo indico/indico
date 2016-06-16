@@ -34,9 +34,10 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
+from indico.modules.events.operations import delete_event
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -266,3 +267,22 @@ class RHSortSubcategories(RHManageCategoryBase):
         subcategories = {category.id: category for category in self.category.children}
         for position, id_ in enumerate(request.json['categories'], 1):
             subcategories[id_].position = position
+
+
+class RHDeleteEvents(RHManageCategoryBase):
+    """Delete multiple events"""
+
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        event_ids = map(int, request.args.getlist('event_id'))
+        self.events = Event.query.with_parent(self.category).filter(Event.id.in_(event_ids)).all()
+
+    def _process_GET(self):
+        return jsonify_template('events/management/delete_events.html', events=self.events)
+
+    def _process_POST(self):
+        for ev in self.events[:]:
+            delete_event(ev)
+        flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))
+             .format(len(self.events)), 'success')
+        return jsonify_data(flash=False)

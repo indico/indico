@@ -86,5 +86,8 @@
     {% endif %}
     {% if event_count or not subcategories %}
         {{ render_events_list(current_category, page, is_paginated, order_column, direction, events, event_count) }}
+        <script>
+            setupCategoryEventList();
+        </script>
     {% endif %}
 {% endblock content %}

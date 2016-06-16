@@ -3,7 +3,7 @@
 {% macro event_row(event) %}
     <tr class="i-table">
         <td class="i-table column-icon">
-            <a href="" class="i-button-icon icon-handle"></a>
+            <input type="checkbox" name="event_id" value="{{ event.id }}">
         </td>
         <td class="i-table column-icon">
             {% if event.is_self_protected %}
@@ -105,8 +105,13 @@
                 {% endif %}
             </div>
             <div class="group right">
-                <a href="" class="i-button icon-transmission"></a>
-                <a href="" class="i-button icon-remove"></a>
+                <a href="#" class="i-button icon-transmission js-enable-if-checked"></a>
+                <a href="#" class="i-button icon-remove js-enable-if-checked"
+                   data-method="GET"
+                   data-href="{{ url_for('.delete_events', category) }}"
+                   data-params-selector="#event-management input[name=event_id]:checkbox:checked"
+                   data-ajax-dialog
+                   data-reload-after></a>
             </div>
         {% endif %}
     </div>
