@@ -27,7 +27,6 @@ from MaKaC.common.PickleJar import Updates
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.sessions import session_settings
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.events.util import track_time_changes
 from indico.modules.users.legacy import AvatarUserWrapper
@@ -45,7 +44,7 @@ from operator import methodcaller
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
-from flask import session, request, has_request_context
+from flask import request, has_request_context
 from pytz import timezone
 from pytz import all_timezones
 
@@ -648,11 +647,11 @@ class Category(CommonObjectBase):
         conf.unindexConf()
 
     @unify_user_args
-    def newConference(self, creator, title, start_dt, end_dt, timezone):
+    def newConference(self, creator, title, start_dt, end_dt, timezone, add_creator_as_manager=True):
         conf = Conference()
         event = Event(creator=creator, category=self.as_new, title=to_unicode(title).strip(),
                       start_dt=start_dt, end_dt=end_dt, timezone=timezone)
-        ConferenceHolder().add(conf, event)
+        ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
         self._addConference(conf)
 
         signals.event.created.send(event)
@@ -2007,10 +2006,7 @@ class Conference(CommonObjectBase):
         else:
             creator = self.as_event.creator
         conf = cat.newConference(creator, title=self.getTitle(), start_dt=self.getStartDate(), end_dt=self.getEndDate(),
-                                 timezone=self.getTimezone())
-        if managing is not None:
-            with conf.as_event.logging_disabled:
-                conf.as_event.update_principal(managing.user, full_access=True)
+                                 timezone=self.getTimezone(), add_creator_as_manager=False)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -2041,21 +2037,6 @@ class Conference(CommonObjectBase):
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
-        # Access Control cloning
-        if options.get("access", False):
-            conf.setProtection(self.getAccessController()._getAccessProtection())
-            for entry in self.as_event.acl_entries:
-                conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
-                                               full_access=entry.full_access, roles=entry.roles, quiet=True)
-            for user in self.getAllowedToAccessList():
-                conf.grantAccess(user)
-            session_settings_data = session_settings.get_all(self)
-            session_settings.set_multi(conf, {
-                'coordinators_manage_contributions': session_settings_data['coordinators_manage_contributions'],
-                'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
-            })
-            for domain in self.getDomainList():
-                conf.requireDomain(domain)
         conf.notifyModification()
 
         # Copy the list of enabled features
@@ -2067,6 +2048,13 @@ class Conference(CommonObjectBase):
         # Run the new modular cloning system
         EventCloner.run_cloners(self.as_event, conf.as_event)
         signals.event.cloned.send(self.as_event, new_event=conf.as_event)
+
+        # Grant access to the event creator -- must be done after modular cloners
+        # since cloning the event ACL would result in a duplicate entry
+        if managing is not None:
+            with conf.as_event.logging_disabled:
+                conf.as_event.update_principal(managing.user, full_access=True)
+
         return conf
 
     def getCoordinatedTracks( self, av ):
@@ -2178,15 +2166,16 @@ class ConferenceHolder( ObjectHolder ):
     def _newId(self):
         raise RuntimeError('Tried to get new event id from zodb')
 
-    def add(self, conf, event):
+    def add(self, conf, event, add_creator_as_manager=True):
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)
         if conf.id in self._getIdx():
             raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
         ObjectHolder.add(self, conf)
-        with event.logging_disabled:
-            event.update_principal(event.creator, full_access=True)
+        if add_creator_as_manager:
+            with event.logging_disabled:
+                event.update_principal(event.creator, full_access=True)
         db.session.flush()
 
     def getById(self, id, quiet=False):
