@@ -30,7 +30,7 @@
     }
 
     global.setupCategoryTable = function setupCategoryTable() {
-        var $table = $('table.categories-management');
+        var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var $bulkDeleteButton = $('.js-bulk-delete-category');
         var categoryRowSelector = 'tr[data-category-id]';

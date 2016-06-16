@@ -23,8 +23,9 @@ from operator import attrgetter
 from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
@@ -32,6 +33,7 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
+from indico.modules.events import Event
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -64,9 +66,25 @@ class RHManageCategoryContent(RHManageCategoryBase):
         return children_strategy,
 
     def _process(self):
+        page = request.args.get('page', '1')
+        is_paginated = page != 'all'
+        order_columns = {'start_dt': Event.start_dt, 'title': db.func.lower(Event.title)}
+        direction = 'desc' if request.args.get('desc', '1') == '1' else 'asc'
+        order_column = order_columns[request.args.get('order', 'start_dt')]
+        events = (Event.query.with_parent(self.category)
+                  .order_by(getattr(order_column, direction)())
+                  .order_by(Event.id))
+        count = events.count()
+        if is_paginated:
+            try:
+                events = events.paginate(page=int(page))
+            except NotFound:
+                events = events.paginate(page=1)
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content',
                                                     subcategories=self.category.children,
-                                                    current_category=self.category, events=self.category.events)
+                                                    current_category=self.category, events=events,
+                                                    event_count=count, page=page, order_column=order_column.key,
+                                                    direction=direction, is_paginated=is_paginated)
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
