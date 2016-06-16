@@ -93,9 +93,9 @@ class CategoryProtectionForm(IndicoForm):
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     acl = AccessControlListField(_('Access control list'), groups=True, allow_external=True, allow_networks=True)
     managers = PrincipalListField(_('Managers'), groups=True)
-    no_access_contact = StringField(_('No access contact'),
-                                    description=_('Contact information shown when someone lacks access to the '
-                                                  'category'))
+    own_no_access_contact = StringField(_('No access contact'),
+                                        description=_('Contact information shown when someone lacks access to the '
+                                                      'category'))
     event_creation_restricted = BooleanField(_('Restricted event creation'), widget=SwitchWidget(),
                                              description=_('Whether the event creation should be restricted '
                                                            'to a list of specific persons'))

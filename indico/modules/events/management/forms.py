@@ -36,8 +36,9 @@ class EventProtectionForm(IndicoForm):
                                      description=_('It is more secure to use only the ACL and not set an access key. '
                                                    '<strong>It will have no effect if the event is not '
                                                    'protected</strong>'))
-    no_access_contact = StringField(_('No access contact'),
-                                    description=_('Contact information shown when someone lacks access to the event'))
+    own_no_access_contact = StringField(_('No access contact'),
+                                        description=_('Contact information shown when someone lacks access to the '
+                                                      'event'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify the event'))
     submitters = PrincipalListField(_('Submitters'), allow_emails=True, allow_external=True,

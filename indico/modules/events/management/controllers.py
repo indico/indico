@@ -144,7 +144,7 @@ class RHEventProtection(RHConferenceModifBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
         if form.validate_on_submit():
             update_event(self.event_new, {'protection_mode': form.protection_mode.data,
-                                          'no_access_contact': form.no_access_contact.data,
+                                          'own_no_access_contact': form.own_no_access_contact.data,
                                           'access_key': form.access_key.data})
             update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
@@ -166,7 +166,7 @@ class RHEventProtection(RHConferenceModifBase):
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event_new.access_key,
-                     'no_access_contact': self.event_new.no_access_contact}, **coordinator_privs)
+                     'own_no_access_contact': self.event_new.own_no_access_contact}, **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):
         for priv_field in form.priv_fields:
