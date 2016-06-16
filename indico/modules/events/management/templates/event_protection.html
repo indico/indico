@@ -6,7 +6,8 @@
 
 {% block content %}
     {{ form_header(form, id='event-protection-form') }}
-    {{ form_rows(form, skip=form.priv_fields) }}
+    {{ form_rows(form, skip=form.priv_fields,
+                 widget_attrs={'own_no_access_contact': {'placeholder': event.no_access_contact}}) }}
     {% call form_fieldset(_("Session coordinator rights"), collapsible=true, initially_collapsed=true) %}
         <div class="action-box highlight">
             <div class="section">

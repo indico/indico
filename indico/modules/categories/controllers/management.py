@@ -131,7 +131,7 @@ class RHManageCategoryProtection(RHManageCategoryBase):
         if form.validate_on_submit():
             update_category(self.category,
                             {'protection_mode': form.protection_mode.data,
-                             'no_access_contact': form.no_access_contact.data,
+                             'own_no_access_contact': form.own_no_access_contact.data,
                              'event_creation_restricted': form.event_creation_restricted.data})
             update_object_principals(self.category, form.acl.data, read_access=True)
             update_object_principals(self.category, form.managers.data, full_access=True)

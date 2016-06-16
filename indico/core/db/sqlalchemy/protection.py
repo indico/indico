@@ -93,13 +93,20 @@ class ProtectionMixin(object):
             )
 
     @declared_attr
-    def no_access_contact(cls):
+    def own_no_access_contact(cls):
         if cls.allow_no_access_contact:
             return db.Column(
+                'no_access_contact',
                 db.String,
                 nullable=False,
                 default=''
             )
+
+    @property
+    def no_access_contact(self):
+        return (self.own_no_access_contact
+                if self.own_no_access_contact or not self.protection_parent
+                else self.protection_parent.no_access_contact)
 
     @hybrid_property
     def is_public(self):

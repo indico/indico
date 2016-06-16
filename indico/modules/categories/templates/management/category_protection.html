@@ -8,7 +8,8 @@
 
 {% block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, skip=form._event_creation_fields) }}
+    {{ form_rows(form, skip=form._event_creation_fields,
+                 widget_attrs={'own_no_access_contact': {'placeholder': category.no_access_contact}}) }}
     {% call form_fieldset(_('Event creation settings')) %}
         {{ form_rows(form, fields=form._event_creation_fields) }}
     {% endcall %}
