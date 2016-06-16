@@ -32,6 +32,7 @@
     global.setupCategoryTable = function setupCategoryTable() {
         var $table = $('table.categories-management');
         var $tbody = $table.find('tbody');
+        var $bulkDeleteButton = $('.js-bulk-delete-category');
         var categoryRowSelector = 'tr[data-category-id]';
 
         $('.js-sort-categories').on('click', function() {
@@ -66,6 +67,16 @@
                     }
                 }
             });
+        });
+
+        enableIfChecked($tbody, 'input[type=checkbox]', $bulkDeleteButton, function($checkboxes) {
+            return $checkboxes.filter(':not([data-is-empty=true])').length == 0;
+        });
+        $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
+            suppress: false,
+            content: {
+                text: bulkDeleteButtonTooltipContent
+            }
         });
 
         $tbody.sortable({
@@ -109,6 +120,56 @@
                 contentType: 'application/json',
                 error: handleAjaxError
             });
+        }
+
+        function updateCategoryDeleteButton() {
+            if ($table.find(categoryRowSelector).length) {
+                $('.banner .js-delete-category').addClass('disabled');
+            } else {
+                $('.banner .js-delete-category').removeClass('disabled')
+                    .attr('title', $T.gettext("Delete category"));
+            }
+        }
+
+        function bulkDeleteButtonTooltipContent() {
+            var $checked = getSelectedRows();
+            if ($checked.length) {
+                if ($bulkDeleteButton.hasClass('disabled')) {
+                    return $T.gettext("At least one selected category cannot be deleted because it is not empty.");
+                } else {
+                    return $T.ngettext("Delete the selected category", "Delete {0} selected categories",
+                                       $checked.length).format($checked.length);
+                }
+            } else {
+                return $T.gettext("Select the categories to delete first.");
+            }
+        }
+
+        function bulkDeleteCategories() {
+            var $selectedRows = getSelectedRows();
+            ajaxDialog({
+                url: $table.data('bulk-delete-url'),
+                title: $T.gettext("Delete categories"),
+                data: {
+                    category_id: getSelectedCategories()
+                },
+                onClose: function(data) {
+                    if (data && data.success) {
+                        $selectedRows.remove();
+                        updateCategoryDeleteButton();
+                    }
+                }
+            });
+        }
+
+        function getSelectedCategories() {
+            return $table.find(categoryRowSelector).find('input[type=checkbox]:checked').map(function() {
+                return this.value;
+            }).toArray();
+        }
+
+        function getSelectedRows() {
+            return $table.find(categoryRowSelector).has('input[type=checkbox]:checked');
         }
     };
 })(window);

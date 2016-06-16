@@ -28,6 +28,7 @@ from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm)
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events.util import update_object_principals
@@ -217,6 +218,28 @@ class RHDeleteCategory(RHManageCategoryBase):
 class RHCategoryMoveContents(RHManageCategoryBase):
     def _process(self):
         return jsonify_template('categories/management/move_category_contents.html', category=self.category)
+
+
+class RHDeleteSubcategories(RHManageCategoryBase):
+    """Bulk-delete subcategories"""
+
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.subcategories = (Category.query
+                              .with_parent(self.category)
+                              .filter(Category.id.in_(map(int, request.args.getlist('category_id'))))
+                              .all())
+
+    def _process_GET(self):
+        return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories)
+
+    def _process_POST(self):
+        subcategories = self.subcategories
+        for subcategory in subcategories:
+            if not subcategory.is_empty:
+                raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
+            delete_category(subcategory)
+        return jsonify_data(flash=False)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
