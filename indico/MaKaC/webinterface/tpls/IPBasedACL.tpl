@@ -1,4 +1,4 @@
-<span>${_("IPs with full access to any private and public event, session, contribution, material or file")}:</span>
+<span>${_("IPs with full access to all materials uploaded to indico")}:</span>
 % if len(ipList) == 0:
   <em>None - you can add one using the form below</em>
 % else:
