@@ -50,11 +50,18 @@ class MultiIPNetworkField(MultiStringField):
             self._data_converted = True
             self.data = value
 
+    def _fix_network(self, network):
+        network = network.encode('ascii', 'ignore')
+        if network.startswith('::ffff:'):
+            # convert ipv6-style ipv4 to regular ipv4
+            # the ipaddress library doesn't deal with such IPs properly!
+            network = network[7:]
+        return network
 
     def process_formdata(self, valuelist):
         self._data_converted = False
         super(MultiIPNetworkField, self).process_formdata(valuelist)
-        self.data = {ip_network(entry[self.field_name].encode('ascii', 'ignore')) for entry in self.data}
+        self.data = {ip_network(self._fix_network(entry[self.field_name])) for entry in self.data}
         self._data_converted = True
 
     def pre_validate(self, form):

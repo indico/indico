@@ -53,6 +53,14 @@ class IndicoRequest(Request):
         """
         return self.full_path.rstrip(u'?')
 
+    @cached_property
+    def remote_addr(self):
+        ip = super(IndicoRequest, self).remote_addr
+        if ip.startswith('::ffff:'):
+            # convert ipv6-style ipv4 to the regular ipv4 notation
+            ip = ip[7:]
+        return ip
+
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
         if isinstance(rv, unicode):
