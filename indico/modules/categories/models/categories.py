@@ -61,6 +61,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
     description_wrapper = RichMarkup
+    allow_no_access_contact = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'category_id'
 
     @strict_classproperty
@@ -138,11 +139,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     )
     event_message = db.Column(
         db.Text,
-        nullable=False,
-        default=''
-    )
-    no_access_contact = db.Column(
-        db.String,
         nullable=False,
         default=''
     )

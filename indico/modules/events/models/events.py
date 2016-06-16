@@ -59,6 +59,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
     allow_access_key = True
+    allow_no_access_contact = True
     location_backref_name = 'events'
     allow_location_inheritance = False
     description_wrapper = RichMarkup
@@ -170,12 +171,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('events.pages.id'),
         index=True,
         nullable=True
-    )
-    #: Information who to contact if one cannot access the event
-    no_access_contact = db.Column(
-        db.String,
-        nullable=False,
-        default=''
     )
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
