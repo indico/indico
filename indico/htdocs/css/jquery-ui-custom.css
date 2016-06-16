@@ -46,6 +46,10 @@
 
 }
 
+.ui-dialog .ui-dialog-title {
+    max-width: 800px;
+}
+
 .ui-dialog-content {
     padding: 0px !important;
 }
