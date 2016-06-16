@@ -8,7 +8,8 @@
             <a class="i-button-icon icon-handle"></a>
         </td>
         <td class="i-table column-icon">
-            <input type="checkbox" name="category_id" value="{{ subcategory.id }}">
+            <input type="checkbox" name="category_id" value="{{ subcategory.id }}"
+                   data-is-empty="{{ subcategory.is_empty|tojson|forceescape }}">
         </td>
         <td class="i-table column-icon">
             {% if subcategory.is_self_protected %}
@@ -47,11 +48,12 @@
         </div>
         <div class="group right">
             <button class="i-button icon-transmission"></button>
-            <button class="i-button icon-remove"></button>
+            <button class="i-button icon-remove js-bulk-delete-category"></button>
         </div>
     </div>
     <table class="i-table categories-management"
-           data-sort-url="{{ url_for('.sort_subcategories', category) }}">
+           data-sort-url="{{ url_for('.sort_subcategories', category) }}"
+           data-bulk-delete-url="{{ url_for('.delete_subcategories', category) }}">
         <thead>
             <tr class="i-table">
                 <th class="i-table column-icon"></th>
