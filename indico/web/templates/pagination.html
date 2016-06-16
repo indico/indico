@@ -1,0 +1,19 @@
+{% macro render_pagination(pagination) %}
+    {% if pagination.pages > 1 %}
+        <div class="pagination">
+            {%- for page in pagination.iter_pages() %}
+                {% if page %}
+                    <span class="page-number">
+                        {% if page != pagination.page %}
+                            <a href="{{ caller(page)|trim }}" class="i-button js-pagination-element">{{ page }}</a>
+                        {% else %}
+                            <a href="#" class="i-button highlight">{{ page }}</a>
+                        {% endif %}
+                    </span>
+                {% else %}
+                    <span>…</span>
+                {% endif %}
+            {%- endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
