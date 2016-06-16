@@ -109,6 +109,8 @@ class EmailPrincipal(Fossilizable):
         return hash(self.email)
 
     def __contains__(self, user):
+        if not user:
+            return False
         return self.email in user.all_emails
 
     @return_ascii
