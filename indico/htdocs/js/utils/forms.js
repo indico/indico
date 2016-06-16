@@ -148,9 +148,20 @@
         });
     };
 
-    global.enableIfChecked = function enableIfChecked(checkboxContainer, checkboxSelector, buttonSelector) {
+    /* Enable or disable elements (typically buttons) based on the state of checkboxes.
+     *
+     * - checkboxContainer: Element or jQuery object containing the checkboxes to consider
+     * - checkboxSelector: Selector to find the checkboxes inside the containers
+     * - buttonSelector: Selector, jQuery object or element corresponding to the button(s) to be enabled/disabled
+     * - extraCheckCallback: Function called with the checkboxes as argument. If it returns false the buttons will be disabled.
+     */
+    global.enableIfChecked = function enableIfChecked(checkboxContainer, checkboxSelector, buttonSelector, extraCheckCallback) {
         function _update(force) {
-            var checked = force || !!$(checkboxContainer).find(checkboxSelector).filter(':checked').length;
+            var $checkboxes = $(checkboxContainer).find(checkboxSelector).filter(':checked');
+            var checked = force || !!$checkboxes.length;
+            if (extraCheckCallback && extraCheckCallback($checkboxes) === false) {
+                checked = false;
+            }
             $(buttonSelector).prop('disabled', !checked).toggleClass('disabled', !checked);
         }
 
