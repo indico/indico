@@ -42,6 +42,15 @@ class RHCategoryIcon(RHDisplayCategoryBase):
                          conditional=True)
 
 
+class RHCategoryLogo(RHDisplayCategoryBase):
+    def _process(self):
+        if not self.category.has_logo:
+            raise NotFound
+        metadata = self.category.logo_metadata
+        return send_file(metadata['filename'], BytesIO(self.category.logo), mimetype=metadata['content_type'],
+                         conditional=True)
+
+
 class RHCategoryStatistics(RHDisplayCategoryBase):
     def _get_stats_json(self, stats):
         data = {'events': stats['events_by_year'], 'contributions': stats['contribs_by_year'],
