@@ -26,7 +26,8 @@ from sqlalchemy.orm import joinedload
 from indico.modules.events.util import update_object_principals
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
-from indico.modules.categories.forms import CategoryIconForm, CategoryProtectionForm, CategorySettingsForm
+from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
+                                             CategorySettingsForm)
 from indico.modules.categories.operations import update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.util.fs import secure_filename
@@ -40,12 +41,14 @@ from indico.web.util import jsonify_data
 CATEGORY_ICON_DIMENSIONS = (16, 16)
 
 
-def _icon_data(category):
+def _get_image_data(category, image_type):
+    url = getattr(category, image_type + '_url')
+    metadata = getattr(category, image_type + '_metadata')
     return {
-        'url': category.icon_url,
-        'filename': category.icon_metadata['filename'],
-        'size': category.icon_metadata['size'],
-        'content_type': category.icon_metadata['content_type']
+        'url': url,
+        'filename': metadata['filename'],
+        'size': metadata['size'],
+        'content_type': metadata['content_type']
     }
 
 
@@ -69,6 +72,7 @@ class RHManageCategorySettings(RHManageCategoryBase):
                                 lecture_theme=self.category.default_event_themes['lecture'])
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
+        logo_form = CategoryLogoForm(obj=self.category)
 
         if form.validate_on_submit():
             update_category(self.category, form.data, skip={'meeting_theme', 'lecture_theme'})
@@ -80,49 +84,84 @@ class RHManageCategorySettings(RHManageCategoryBase):
             return redirect(url_for('.manage_settings', self.category))
         else:
             if self.category.icon_metadata:
-                icon_form.icon.data = _icon_data(self.category)
+                icon_form.icon.data = _get_image_data(self.category, 'icon')
+            if self.category.logo_metadata:
+                logo_form.logo.data = _get_image_data(self.category, 'logo')
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
-                                                    icon_form=icon_form)
+                                                    icon_form=icon_form, logo_form=logo_form)
 
 
-class RHSettingsIconUpload(RHManageCategoryBase):
+class RHCategoryImageUploadBase(RHManageCategoryBase):
+    IMAGE_TYPE = None
+    SAVED_FLASH_MSG = None
+    DELETED_FLASH_MSG = None
+
+    def _resize(self, img):
+        return img
+
+    def _set_image(self, data, metadata):
+        raise NotImplementedError
+
     def _process_POST(self):
         f = request.files['file']
         try:
             img = Image.open(f)
         except IOError:
-            flash(_('You cannot upload this file as an icon.'), 'error')
+            flash(_('You cannot upload this file as an icon/logo.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
             flash(_('The file has an invalid format ({format})').format(format=img.format), 'error')
             return jsonify_data(content=None)
         if img.mode == 'CMYK':
-            flash(_('The icon you uploaded is using the CMYK colorspace and has been converted to RGB. Please check if '
-                    'the colors are correct and convert it manually if necessary.'), 'warning')
+            flash(_('The image you uploaded is using the CMYK colorspace and has been converted to RGB.  '
+                    'Please check if the colors are correct and convert it manually if necessary.'), 'warning')
             img = img.convert('RGB')
-        if img.size != CATEGORY_ICON_DIMENSIONS:
-            img = img.resize(CATEGORY_ICON_DIMENSIONS, Image.ANTIALIAS)
+        img = self._resize(img)
         image_bytes = BytesIO()
         img.save(image_bytes, 'PNG')
         image_bytes.seek(0)
         content = image_bytes.read()
-        self.category.icon = content
-        self.category.icon_metadata = {
+        metadata = {
             'hash': crc32(content),
             'size': len(content),
-            'filename': os.path.splitext(secure_filename(f.filename, 'icon'))[0] + '.png',
+            'filename': os.path.splitext(secure_filename(f.filename, self.IMAGE_TYPE))[0] + '.png',
             'content_type': 'image/png'
         }
-        flash(_('New icon saved'), 'success')
-        logger.info("New icon '%s' uploaded by %s (%s)", f.filename, session.user, self.category)
-        return jsonify_data(content=_icon_data(self.category))
+        self._set_image(content, metadata)
+        flash(self.SAVED_FLASH_MSG, 'success')
+        logger.info("New {} '%s' uploaded by %s (%s)".format(self.IMAGE_TYPE), f.filename, session.user, self.category)
+        return jsonify_data(content=_get_image_data(self.category, self.IMAGE_TYPE))
 
     def _process_DELETE(self):
-        self.category.icon = None
-        self.category.icon_metadata = None
-        flash(_('Icon deleted'), 'success')
-        logger.info("Icon of %s deleted by %s", self.category, session.user)
+        self._set_image(None, None)
+        flash(self.DELETED_FLASH_MSG, 'success')
+        logger.info("{} of %s deleted by %s".format(self.IMAGE_TYPE.title()), self.category, session.user)
         return jsonify_data(content=None)
+
+
+class RHManageCategoryIcon(RHCategoryImageUploadBase):
+    IMAGE_TYPE = 'icon'
+    SAVED_FLASH_MSG = _('New icon saved')
+    DELETED_FLASH_MSG = _('Icon deleted')
+
+    def _resize(self, img):
+        if img.size != CATEGORY_ICON_DIMENSIONS:
+            img = img.resize(CATEGORY_ICON_DIMENSIONS, Image.ANTIALIAS)
+        return img
+
+    def _set_image(self, data, metadata):
+        self.category.icon = data
+        self.category.icon_metadata = metadata
+
+
+class RHManageCategoryLogo(RHCategoryImageUploadBase):
+    IMAGE_TYPE = 'logo'
+    SAVED_FLASH_MSG = _('New logo saved')
+    DELETED_FLASH_MSG = _('Logo deleted')
+
+    def _set_image(self, data, metadata):
+        self.category.logo = data
+        self.category.logo_metadata = metadata
 
 
 class RHManageCategoryProtection(RHManageCategoryBase):
