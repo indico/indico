@@ -20,6 +20,7 @@ from io import BytesIO
 from math import ceil
 
 from flask import jsonify, request
+from sqlalchemy.orm import undefer
 from werkzeug.exceptions import NotFound
 
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
@@ -34,6 +35,8 @@ from MaKaC.conference import CategoryManager
 
 
 class RHCategoryIcon(RHDisplayCategoryBase):
+    _category_query_options = undefer('icon'),
+
     def _process(self):
         if not self.category.has_icon:
             raise NotFound
@@ -43,6 +46,8 @@ class RHCategoryIcon(RHDisplayCategoryBase):
 
 
 class RHCategoryLogo(RHDisplayCategoryBase):
+    _category_query_options = undefer('logo'),
+
     def _process(self):
         if not self.category.has_logo:
             raise NotFound
