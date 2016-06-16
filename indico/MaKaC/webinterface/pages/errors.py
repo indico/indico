@@ -163,17 +163,13 @@ class WAccessError( WTemplated ):
         self._rh = rh
 
     def getVars( self ):
+        from MaKaC.conference import Category, Conference
         vars = WTemplated.getVars( self )
         vars["area"]= i18nformat(""" _("Authorisation") - """)
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
-        if isinstance(self._rh._target, list):
-            #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
-            contactInfo = [item.getAccessController().getAnyContactInfo() for item in self._rh._target if hasattr(item, 'getAccessController') ]
-            vars["contactInfo"] = ";".join(contactInfo)
-        elif self._rh._target is not None and hasattr(self._rh._target, 'getAccessController'): #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
-            vars["contactInfo"] = self._rh._target.getAccessController().getAnyContactInfo()
-        else:
-            vars["contactInfo"] = ""
+        vars["contactInfo"] = ""
+        if isinstance(self._rh._target, (Category, Conference)):
+            vars["contactInfo"] = self._rh._target.as_new.no_access_contact
         return vars
 
 class WAccessKeyError( WTemplated ):
