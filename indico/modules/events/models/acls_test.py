@@ -280,9 +280,9 @@ def test_can_manage_signal_override(create_event, dummy_user, signal_rv_1, signa
 
 
 @pytest.mark.parametrize(('signal_rv_1', 'signal_rv_2', 'allowed'), (
-        (False, False, False),
-        (False, True,  False),
-        (True,  True,  True)
+    (False, False, False),
+    (False, True,  False),
+    (True,  True,  True)
 ))
 def test_can_access_signal_override(create_event, dummy_user, signal_rv_1, signal_rv_2, allowed):
     event = create_event()
@@ -295,6 +295,46 @@ def test_can_access_signal_override(create_event, dummy_user, signal_rv_1, signa
     with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_1), sender=Event):
         with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_2), sender=Event):
             assert event.can_access(dummy_user) == allowed
+
+
+def test_can_access_signal_override_calls(create_event, dummy_user):
+    event = create_event()
+
+    def _signal_fn_noreturn(sender, authorized,  **kwargs):
+        calls.append(authorized)
+
+    def _signal_fn_early(sender, authorized,  **kwargs):
+        calls.append(authorized)
+        return True if authorized is None else None
+
+    def _signal_fn_late(sender, authorized,  **kwargs):
+        calls.append(authorized)
+        return True if authorized is not None else None
+
+    # early check - signal only invoked once since we return something
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_early, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None]
+
+    # signal invoked twice (nothing returned)
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_noreturn, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, True]
+
+    # late check - signal invoked twice, once with the regular access state
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_late, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, True]
+
+    # late check - signal invoked twice, once with the regular access state
+    calls = []
+    event.protection_mode = ProtectionMode.protected
+    with signals.acl.can_access.connected_to(_signal_fn_late, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, False]
 
 
 @pytest.mark.parametrize(('is_admin', 'allow_admin', 'not_explicit', 'expected'), bool_matrix('...', expect=all))
