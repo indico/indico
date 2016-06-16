@@ -113,14 +113,6 @@ def setValidEmailSeparators(emailstr):
     # return the string obtained after replacing the separators
     return re.subn(r"[ ;,]+", ",", emails)[0]
 
-def validIP(ip):
-    """
-    Quick and dirty IP address validation
-    (not exact, but enough)
-    """
-    expr = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
-    return re.match(expr, ip) != None
-
 
 def isStringHTML(s):
     if not isinstance(s, basestring):
