@@ -202,6 +202,8 @@ class RHDeleteCategory(RHManageCategoryBase):
     def _process(self):
         if self.category.is_root:
             raise BadRequest('The root category cannot be deleted')
+        if not self.category.is_empty:
+            raise BadRequest('Cannot delete a non-empty category')
         delete_category(self.category)
         url = url_for('.manage_content', self.category.parent)
         return jsonify_data(flash=False, redirect=url) if request.is_xhr else redirect(url)
