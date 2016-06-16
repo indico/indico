@@ -36,7 +36,7 @@ from indico.util.i18n import _
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
@@ -216,8 +216,7 @@ class RHDeleteCategory(RHManageCategoryBase):
 
 class RHCategoryMoveContents(RHManageCategoryBase):
     def _process(self):
-        return WPCategoryManagement.render_template('management/move_category_contents.html', self.category,
-                                                    active_menu_item='')
+        return jsonify_template('categories/management/move_category_contents.html', category=self.category)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
