@@ -78,7 +78,7 @@ class RHManageCategorySettings(RHManageCategoryBase):
             update_category(self.category, form.data, skip={'meeting_theme', 'lecture_theme'})
             self.category.default_event_themes = {
                 'meeting': form.meeting_theme.data,
-                'lecture': form.meeting_theme.data
+                'lecture': form.lecture_theme.data
             }
             flash(_("Category settings saved!"), 'success')
             return redirect(url_for('.manage_settings', self.category))
