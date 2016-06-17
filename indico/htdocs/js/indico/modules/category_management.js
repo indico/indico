@@ -48,12 +48,8 @@
                 method: 'POST',
                 error: handleAjaxError,
                 success: function(data) {
-                    if (!$target.closest(categoryRowSelector).remove().length) {
-                        IndicoUI.Dialogs.Util.progress();
-                        location.href = data.redirect;
-                    } else {
-                        updateCategoryDeleteButton();
-                    }
+                    $this.closest(categoryRowSelector).remove();
+                    updateCategoryDeleteButton();
                 }
             });
         });
