@@ -19,7 +19,7 @@ import pkg_resources
 from importlib import import_module
 
 from flask import g
-from flask_sqlalchemy import Model
+from flask_sqlalchemy import Model, BaseQuery, Pagination
 from sqlalchemy import inspect, orm
 from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -30,6 +30,34 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.core import signals
 
 
+class IndicoBaseQuery(BaseQuery):
+    def paginate(self, page=1, per_page=25, show_all=False):
+        """Paginate a query object.
+
+        This behaves almost like the default `paginate` method from
+        Flask-SQLAlchemy but allows showing all results on a single page.
+
+        :param page: Number of the page to return.
+        :param per_page: Number of items per page.
+        :param show_all: Whether to show all the elements on one page.
+        :return: a :class:`Pagination` object
+        """
+        if page < 1 or show_all:
+            page = 1
+
+        if show_all:
+            items = self.all()
+            per_page = total = len(items)
+        else:
+            items = self.limit(per_page).offset((page - 1) * per_page).all()
+            if page == 1 and len(items) < per_page:
+                total = len(items)
+            else:
+                total = self.order_by(None).count()
+
+        return Pagination(self, page, per_page, total, items)
+
+
 class IndicoModel(Model):
     """Indico DB model"""
 
@@ -37,6 +65,7 @@ class IndicoModel(Model):
     #: the on-load event that populates relationship from the preload
     #: cache is not registered.
     allow_relationship_preloading = False
+    query_class = IndicoBaseQuery
 
     @classmethod
     def find(cls, *args, **kwargs):
