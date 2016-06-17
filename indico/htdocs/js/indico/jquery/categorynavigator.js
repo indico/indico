@@ -177,7 +177,7 @@
                 class: 'title',
                 text: category.title
             }));
-            if (withBreadcrumbs) {
+            if (withBreadcrumbs && category.path.length > 0) {
                 $categoryTitle.append(self._buildBreadcrumbs(category.path, clickableBreadcrumbs));
             }
 
