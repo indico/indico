@@ -20,11 +20,18 @@
 
     $.widget('indico.categorypicker', {
         options: {
+            // ID of the current category
             categoryId: 0,
+            // The text contained in action buttons
             actionButtonText: $T.gettext("Select"),
+            // A dialog opens with the picker rendered on it
             openInDialog: false,
+            // The title for the category picker dialog
             dialogTitle: $T.gettext("Select a category"),
-            selectLeafOnly: false, // Allow only the leaf categories to be selected
+            // Restrict action to categories with no subcategories
+            selectLeafOnly: false,
+            // Callback for action button
+            // If it returns a deferred object the dialog will close only when it gets resolved
             onAction: function() {}
         },
 
@@ -324,10 +331,17 @@
 
         _onAction: function(category) {
             var self = this;
-            self.options.onAction(category);
-            if (self.dialog) {
-                self.dialog.close();
+            var res = self.options.onAction(category);
+
+            if (res === undefined) {
+                res = $.Deferred().resolve();
             }
+
+            res.then(function() {
+                if (self.dialog) {
+                    self.dialog.close();
+                }
+            });
         },
 
         goToCategory: function(id) {
