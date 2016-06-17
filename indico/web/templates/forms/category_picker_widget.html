@@ -27,8 +27,13 @@
                 $('<div>').categorypicker({
                     openInDialog: true,
                     onAction: function(category) {
+                        var evt = $.Event('indico:categorySelected');
+                        var dfd = $.Deferred();
                         $categoryTitle.text(category.title);
-                        $field.val(category.id).trigger('indico:categorySelected', category);
+                        $field.val(category.id).trigger(evt, [category, dfd]);
+                        if (evt.isDefaultPrevented()) {
+                            return dfd;
+                        }
                     }
                 });
             });
