@@ -70,7 +70,7 @@
             ajaxDialog({
                 title: self.options.dialogTitle,
                 content: $('<div>', {class: 'category-picker-wrapper'}).append($('<div>'))[0].outerHTML,
-                closeButton: '',
+                closeButton: true,
                 onOpen: function(dialog) {
                     self.element = dialog.contentContainer.children().first();
                     self.dialog = dialog;
