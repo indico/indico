@@ -207,7 +207,10 @@ class RHDeleteCategory(RHManageCategoryBase):
             raise BadRequest('Cannot delete a non-empty category')
         delete_category(self.category)
         url = url_for('.manage_content', self.category.parent)
-        return jsonify_data(flash=False, redirect=url) if request.is_xhr else redirect(url)
+        if request.is_xhr:
+            return jsonify_data(flash=False, redirect=url, is_empty=self.category.is_empty)
+        else:
+            return redirect(url)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
