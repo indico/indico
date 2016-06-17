@@ -210,6 +210,7 @@ class RHDeleteCategory(RHManageCategoryBase):
         if request.is_xhr:
             return jsonify_data(flash=False, redirect=url, is_empty=self.category.is_empty)
         else:
+            flash(_('Category "{}" has been deleted.').format(self.category.title), 'success')
             return redirect(url)
 
 
