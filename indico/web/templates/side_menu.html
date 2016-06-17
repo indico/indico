@@ -8,9 +8,13 @@
     {% endif %}
     <li class="item {{ classes }}">
         {%- if item.disabled %}
-            <span class="title">{{ item.title }}</span>
+            <span class="title">
+                <span>{{ item.title }}</span>
+            </span>
         {%- else -%}
-            <a class="title {{ icon }}" href="{{ item.url }}">{{ item.title }}</a>
+            <a class="title {{ icon }}" href="{{ item.url }}">
+                <span>{{ item.title }}</span>
+            </a>
         {%- endif -%}
     </li>
 {% endmacro %}

@@ -11,7 +11,6 @@
                 {% endif %}
             </div>
 
-
             <a id="action-menu-actions-target" class="i-button icon-settings i-button arrow"
                title="{% trans %}Event actions{% endtrans %}"></a>
 
@@ -30,7 +29,7 @@
                         {% trans %}Lock{% endtrans %}</button>
                 {% endif %}
 
-                <button class="i-button icon-remove js-ajax-dialog-delete danger light"
+                <button class="i-button icon-remove js-ajax-dialog-delete danger"
                         data-href="{{ url_for('event_management.delete', event) }}"
                         title="{% trans %}Delete event{% endtrans %}"
                         data-qtip-style="danger">
@@ -51,12 +50,6 @@
                 </ul>
             </div>
         {% endif %}
-
-        <div class="group">
-            <a class="icon-switchon highlight i-button"
-               title="{% trans %}See the display page of the event{% endtrans %}"
-               href="{{ url_for('event.conferenceDisplay', event) }}">{% trans %}Switch to display view{% endtrans %}</a>
-        </div>
     </div>
 </div>
 

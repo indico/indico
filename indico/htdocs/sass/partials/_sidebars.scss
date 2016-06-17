@@ -57,20 +57,16 @@
 
 .side-menu {
     @extend %font-family-title;
-    float: left;
-    width: 200px;
-    margin-right: 30px;
-    margin-left: 30px;
     font-size: 1.1em;
     @include user-select(none);
-    background: #ECECEC;
+    border-radius: 2px;
+    border: 1px solid lightgray;
 
     ul.menu-items > li.section {
         padding: 0;
 
         .title-wrapper {
             @include icon-before('icon-arrow-down');
-            padding: 10px;
             cursor: pointer;
 
             &:before {
@@ -88,55 +84,81 @@
     }
 
     ul.menu-items {
-        min-height: 200px;
+        display: flex;
+        flex-direction: column;
         list-style-type: none;
         padding: 0;
         margin: 0;
 
         > li {
+            display: block;
             border-bottom: 1px solid darken($pastel-gray, 2%);
             margin: 0;
-
-            padding: 10px 10px 10px 27px;
-            display: block;
 
             &.disabled {
                 color: $dark-gray;
             }
 
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .title-wrapper {
+                display: block;
+                min-height: 2.3rem;
+                line-height: 2.3rem;
+                padding-left: 9px;
+
+                .title {
+                    display: inline;
+                    padding-left: 3px;
+                }
+            }
+
             .title {
+                display: block;
+                min-height: 2.3rem;
+                line-height: 2.3rem;
                 color: $black;
-                cursor: pointer;
+                padding-left: 26px;
 
                 &:before {
                     margin-right: 0.5rem;
+                }
+
+                span {
+                    display: inline-block;
+                    vertical-align: middle;
                 }
             }
 
             a.title {
                 color: $dark-blue;
-
-                &:hover {
-                    color: $darker-blue;
-                }
             }
 
             > ul {
+                list-style-type: none;
                 font-size: 0.95em;
                 padding: 0;
-            }
 
-            > ul > li {
-                padding: 5px 5px 5px 27px;
-                display: block;
-
-                &:last-child {
-                    margin-bottom: 5px;
+                > li .title {
+                    min-height: 1.7rem;
+                    line-height: 1.7rem;
+                    padding-left: 51px;
                 }
             }
 
             &:last-child > ul > li:last-child {
                 margin-bottom: 0;
+            }
+
+            &:not(.active) a.title:hover {
+                color: $darker-blue;
+                background-color: $light-gray;
+            }
+
+            &.active a.title {
+                color: $darker-blue;
             }
         }
     }

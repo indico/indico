@@ -15,14 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-%title-border {
-    border-bottom: 1px solid $separator-color;
-}
-
 %indico-page {
     header {
         $separator-margin: 0.42rem;
-        margin-bottom: 2em;
+        margin-bottom: 1.8em;
 
         h2, h3 {
             display: inline-block;
@@ -40,10 +36,13 @@
         }
 
         div.title {
-            @extend %title-border;
-            align-items: baseline;
             display: flex;
-            padding-bottom: $separator-margin;
+            align-items: baseline;
+
+            padding-top: 0.4rem;
+            min-height: 2.00rem;
+            border-bottom: 1px solid $separator-color;
+            margin-bottom: 1rem;
 
             > .text {
                 flex-grow: 1;
@@ -101,18 +100,22 @@
 }
 
 .banner {
-    $banner-color: #888;
-    $banner-title-color: #777777;
+    $banner-color: #000;
+    $banner-title-color: $orange;
+    $banner-subtitle-color: $dark-gray;
 
     display: flex;
-    background-color: #ECECEC;
     color: $banner-color;
-    padding: 20px 30px 0px 20px;
+
+    .toolbar {
+        padding: 0;
+    }
 
     .title {
         flex-grow: 1;
-        margin-bottom: 20px;
-        font-size: 1.6em;
+        margin-bottom: 15px;
+        font-family: "Roboto Light", sans-serif;
+        font-size: 2em;
         color: $banner-title-color;
 
         a:not(:hover) {
@@ -120,8 +123,8 @@
         }
 
         .subtitle {
-            color: $banner-color;
-            font-size: 0.6em;
+            color: $banner-subtitle-color;
+            font-size: 0.5em;
 
             a {
                 border-bottom: 1px dashed;

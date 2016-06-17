@@ -33,23 +33,26 @@
 {% endblock %}
 
 {% block banner_actions %}
-    <div class="action-menu">
-        <div class="toolbar">
-            <div class="group">
-                {% if not category.is_root %}
-                    {{ move_category_button(category) }}
-                    {{ delete_category_button(category) }}
-                {% endif %}
-            </div>
-            <div class="group">
-                <a class="icon-switchon highlight i-button"
-                   title="{% trans %}See the display page of the category{% endtrans %}"
-                   href="{{ category.url }}">{% trans %}Switch to display view{% endtrans %}</a>
-            </div>
+    <div class="toolbar">
+        <div class="group">
+            {% if not category.is_root %}
+                {{ move_category_button(category, classes="i-button inconspicuous") }}
+                {{ delete_category_button(category, classes="i-button inconspicuous") }}
+            {% endif %}
         </div>
     </div>
 {% endblock %}
 
 {% block side_menu %}
-    {{ render_sidemenu('category-management-sidemenu', old_style=true, category=category, active_item=active_menu_item) }}
+    {{ render_sidemenu('category-management-sidemenu', old_style=false, category=category, active_item=active_menu_item) }}
+{% endblock %}
+
+{% block display_view_button %}
+    <div class="group">
+        <a href="{{ category.url }}"
+           class="icon-switchon highlight i-button"
+           title="{% trans %}See the display page of the category{% endtrans %}">
+            {% trans %}Switch to display view{% endtrans %}
+        </a>
+    </div>
 {% endblock %}
