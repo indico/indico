@@ -682,7 +682,7 @@ class WPConferenceModifBase(main.WPMainBase):
             "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL,
             "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL,
             "event": "Conference",
-            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option, old_style=True,
+            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option, old_style=False,
                                         event=self._conf.as_event)
         }
 
