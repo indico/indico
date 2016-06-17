@@ -153,11 +153,12 @@
                         text: options.subtitle
                     }));
                 }
-                if (options.closeButton !== undefined) {
+                if (options.closeButton !== undefined && options.closeButton !== false) {
+                    var text = options.closeButton === true ? $T.gettext("Close") : options.closeButton;
                     this.contentContainer.append($('<button>', {
                         'class': 'i-button big right',
                         'type': 'button',
-                        'text': options.closeButton || $T("Close"),
+                        'text': text,
                         'data-button-back': ''
                     }));
                 }

@@ -122,6 +122,7 @@
 
                 // Handle AJAX dialog
                 if (dialog) {
+                    var closeButton = $this.data('close-button');
                     ajaxDialog({
                         trigger: $this,
                         url: url,
@@ -129,7 +130,7 @@
                         data: params,
                         title: $this.data('title'),
                         subtitle: $this.data('subtitle'),
-                        closeButton: $this.data('close-button'),
+                        closeButton: closeButton === undefined ? false : (closeButton || true),
                         dialogClasses: $this.data('dialog-classes'),
                         onClose: function(data, customData) {
                             if (data) {
