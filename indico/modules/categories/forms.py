@@ -45,8 +45,7 @@ class CategorySettingsForm(IndicoForm):
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_("Title"), [DataRequired()])
-    description = IndicoMarkdownField(_("Description"),
-                                      description=_("You can use Markdown or basic HTML formatting tags."))
+    description = IndicoMarkdownField(_("Description"))
     timezone = IndicoTimezoneSelectField(_("Timezone"), [DataRequired()],
                                          description=_("Default timezone event lists will show up in. It will also be "
                                                        "used as a default for new events."))
@@ -65,8 +64,7 @@ class CategorySettingsForm(IndicoForm):
                                                default=EventMessageMode.disabled,
                                                description=_("This message will show up at the top of every event page "
                                                              "in this category"))
-    event_message = IndicoMarkdownField(_("Content"),
-                                        description=_("You can use Markdown or basic HTML formatting tags."))
+    event_message = IndicoMarkdownField(_("Content"))
     event_creation_notification_emails = EmailListField(_("Notification E-mails"),
                                                         description=_("List of e-mails that will receive a notification"
                                                                       " every time a new event is created. One e-mail "
@@ -118,5 +116,4 @@ class CreateCategoryForm(IndicoForm):
     """Form to create a new Category"""
 
     title = StringField(_("Title"), [DataRequired()])
-    description = IndicoMarkdownField(_("Description"),
-                                      description=_("You can use Markdown or basic HTML formatting tags."))
+    description = IndicoMarkdownField(_("Description"))
