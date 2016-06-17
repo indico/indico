@@ -34,7 +34,7 @@
     </tr>
 {% endmacro %}
 
-{% macro events_table(category, page, is_paginated, order_column, direction, events) %}
+{% macro events_table(category, page, order_column, direction, events) %}
     <table class="i-table event-management">
         <thead>
             <tr class="i-table">
@@ -53,12 +53,11 @@
                 <th class="i-table actions"></th>
             </tr>
         </thead>
-        {% set events_list = events.items if is_paginated else events %}
-        {% for event in events_list %}
+        {% for event in events.items %}
             {{ event_row(event) }}
         {% endfor %}
     </table>
-    {% if is_paginated %}
+    {% if events.pages > 1 %}
         {% call(page) render_pagination(events) %}
             {{ url_for('.manage_content', category, page=page,
                        desc=(1 if direction == 'desc' else 0), order=order_column) }}
@@ -66,7 +65,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_events_list(category, page, is_paginated, order_column, direction, events, event_count) %}
+{% macro render_events_list(category, page, order_column, direction, events) %}
     <div class="toolbar">
         <div class="group">
             <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
@@ -90,9 +89,9 @@
                 </li>
             </ul>
         </div>
-        {% if event_count %}
+        {% if events.total %}
             <div class="group">
-                {% if is_paginated %}
+                {% if page != 'all' %}
                     {% if events.pages > 1 %}
                         <a href="{{ url_for('.manage_content', category, page='all', order=order_column,
                                             desc=(1 if direction == 'desc' else 0)) }}"
@@ -115,9 +114,9 @@
             </div>
         {% endif %}
     </div>
-    <div id="event-management">
-        {% if event_count %}
-            {{ events_table(category, page, is_paginated, order_column, direction, events) }}
+    <div id="event-management" data-total="{{ events.total }}">
+        {% if events.total %}
+            {{ events_table(category, page, order_column, direction, events) }}
         {% else %}
             <div class="info-message-box">
                 <div class="message-text">

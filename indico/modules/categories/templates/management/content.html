@@ -78,14 +78,14 @@
 {% endblock %}
 
 {% block content %}
-    {% if subcategories or not event_count %}
+    {% if subcategories or not events.total %}
         {{ subcategories_table(subcategories) }}
         <script>
             setupCategoryTable();
         </script>
     {% endif %}
-    {% if event_count or not subcategories %}
-        {{ render_events_list(current_category, page, is_paginated, order_column, direction, events, event_count) }}
+    {% if events.total or not subcategories %}
+        {{ render_events_list(category, page, order_column, direction, events) }}
         <script>
             setupCategoryEventList();
         </script>
