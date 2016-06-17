@@ -82,7 +82,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     description_wrapper = MarkdownText
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
-    PRELOAD_EVENT_ATTACHED_NOTES = True
+    PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'contribution_id'
 
     @declared_attr

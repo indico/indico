@@ -46,7 +46,7 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
                       {'schema': 'events'})
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
-    PRELOAD_EVENT_ATTACHED_NOTES = True
+    PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'subcontribution_id'
     description_wrapper = MarkdownText
 

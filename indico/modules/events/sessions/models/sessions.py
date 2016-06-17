@@ -55,7 +55,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     default_colors = ColorTuple('#202020', '#e3f2d3')
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
-    PRELOAD_EVENT_ATTACHED_NOTES = True
+    PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'session_id'
     description_wrapper = MarkdownText
 
