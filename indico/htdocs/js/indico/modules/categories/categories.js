@@ -25,7 +25,7 @@
     function setupCategoryMoveButton() {
         $('.js-move-category').on('click', function(evt) {
             evt.preventDefault();
-            $('<div>').categorypicker({openInDialog: true});
+            $('<div>').categorynavigator({openInDialog: true});
         });
     }
 

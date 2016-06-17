@@ -4,7 +4,7 @@
 {% block html %}
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <div id="category-title-{{ field.id }}" class="text-holder-box"></div>
-        <a class="i-button" id="category-picker-button-{{ field.id }}"
+        <a class="i-button" id="categorynav-button-{{ field.id }}"
            data-title='{% trans %}Choose category{% endtrans %}'>
             {%- trans %}Choose category{% endtrans -%}
         </a>
@@ -20,11 +20,11 @@
 
             var $field = $('#{{ field.id }}');
             var $categoryTitle = $('#category-title-{{ field.id }}');
-            var $dialogTrigger = $('#category-picker-button-{{ field.id }}');
+            var $dialogTrigger = $('#categorynav-button-{{ field.id }}');
 
             $dialogTrigger.on('click', function(evt) {
                 evt.preventDefault();
-                $('<div>').categorypicker({
+                $('<div>').categorynavigator({
                     openInDialog: true,
                     onAction: function(category) {
                         var evt = $.Event('indico:categorySelected');

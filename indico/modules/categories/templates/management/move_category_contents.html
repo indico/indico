@@ -7,9 +7,9 @@
         </div>
     </div>
 </div>
-<div id="category-picker-holder"></div>
+<div id="categorynav-holder"></div>
 <script>
-    $('#category-picker-holder').categorypicker({
+    $('#categorynav-holder').categorynavigator({
         categoryId: {{ category.parent.id if not category.is_root else category.id }},
         selectLeafOnly: true
     });
