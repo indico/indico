@@ -38,8 +38,9 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
-from indico.core.db.sqlalchemy.util.models import IndicoModel
+from indico.core.db.sqlalchemy.util.models import IndicoModel, IndicoBaseQuery
 flask_sqlalchemy.Model = IndicoModel
+flask_sqlalchemy.BaseQuery = IndicoBaseQuery
 
 
 class ConstraintViolated(Exception):
