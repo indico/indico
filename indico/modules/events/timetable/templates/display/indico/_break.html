@@ -14,7 +14,7 @@
                     {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
                     {{- item.title | safe -}}
                 </span>
-                {% if hide_end_time and item.duration -%}
+                {% if item.duration -%}
                     <span class="icon-time timetable-duration">
                         {{ item.duration | format_human_timedelta(narrow=true) }}
                     </span>
