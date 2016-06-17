@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-%category-picker-sizing {
+%categorynav-sizing {
     width: 800px;
     min-height: 600px;
 }
@@ -35,19 +35,19 @@
     z-index: 2;
 }
 
-.category-picker-wrapper {
-    @extend %category-picker-sizing;
+.categorynav-wrapper {
+    @extend %categorynav-sizing;
 }
 
-.category-picker {
-    @extend %category-picker-sizing;
+.categorynav {
+    @extend %categorynav-sizing;
 
     input[type='search'] {
         @extend %form-field-input;
         width: 100%;
     }
 
-    .category-navigator {
+    .category-list {
         position: relative;
         margin-top: 10px;
         min-height: 55px;
@@ -176,7 +176,7 @@
     }
 }
 
-.category-navigator.loading {
+.category-list.loading {
     .i-box-content:before {
         @extend %spinner;
         border-color: rgba(0, 0, 0, 0.35);

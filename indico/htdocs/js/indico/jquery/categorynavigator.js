@@ -18,15 +18,15 @@
 (function($) {
     'use strict';
 
-    $.widget('indico.categorypicker', {
+    $.widget('indico.categorynavigator', {
         options: {
             // ID of the current category
             categoryId: 0,
             // The text contained in action buttons
             actionButtonText: $T.gettext("Select"),
-            // A dialog opens with the picker rendered on it
+            // A dialog opens with the navigator rendered on it
             openInDialog: false,
-            // The title for the category picker dialog
+            // The title for the category navigator dialog
             dialogTitle: $T.gettext("Select a category"),
             // Restrict action to categories with no subcategories
             selectLeafOnly: false,
@@ -59,8 +59,8 @@
 
         _createInline: function() {
             var self = this;
-            self.element.addClass('category-picker');
-            self._createNavigator();
+            self.element.addClass('categorynav');
+            self._createList();
             self._createSearchField();
             self.goToCategory(self.options.categoryId);
         },
@@ -69,7 +69,7 @@
             var self = this;
             ajaxDialog({
                 title: self.options.dialogTitle,
-                content: $('<div>', {class: 'category-picker-wrapper'}).append($('<div>'))[0].outerHTML,
+                content: $('<div>', {class: 'categorynav-wrapper'}).append($('<div>'))[0].outerHTML,
                 closeButton: true,
                 onOpen: function(dialog) {
                     self.element = dialog.contentContainer.children().first();
@@ -79,17 +79,17 @@
             });
         },
 
-        _createNavigator: function() {
+        _createList: function() {
             var self = this;
             self.$category = $('<div>');
             self.$categoryTree = $('<ul>', {class: 'group-list fixed-height'});
             self.$categoryResults = $('<ul>', {class: 'group-list fixed-height'});
-            self.$categoryNavigator = $('<div>', {class: 'category-navigator i-box just-group-list with-hover-effect'})
+            self.$categoryList = $('<div>', {class: 'category-list i-box just-group-list with-hover-effect'})
                 .append($('<div>', {class: 'i-box-content'})
                     .append(self.$category)
                     .append(self.$categoryTree)
                     .append(self.$categoryResults));
-            self.element.append(self.$categoryNavigator);
+            self.element.append(self.$categoryList);
         },
 
         _createSearchField: function() {
@@ -266,7 +266,7 @@
             }
         },
 
-        _renderNavigator: function(data) {
+        _renderList: function(data) {
             var self = this;
 
             if (data.category) {
@@ -352,14 +352,14 @@
 
         _toggleLoading: function() {
             var self = this;
-            self.$categoryNavigator.toggleClass('loading');
-            self.element.find('input').prop('disabled', self.$categoryNavigator.hasClass('loading'));
+            self.$categoryList.toggleClass('loading');
+            self.element.find('input').prop('disabled', self.$categoryList.hasClass('loading'));
         },
 
         goToCategory: function(id) {
             var self = this;
 
-            $('.category-navigator .item').animate({
+            $('.category-list .item').animate({
                 height: 0,
                 paddingTop: 0,
                 paddingBottom: 0,
@@ -370,7 +370,7 @@
                 }
             }).find('.title').fadeOut();
 
-            self._getCategoryInfo(id).then(self._renderNavigator.bind(self));
+            self._getCategoryInfo(id).then(self._renderList.bind(self));
         }
     });
 })(jQuery);
