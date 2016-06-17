@@ -194,6 +194,7 @@ class RHCreateCategory(RHManageCategoryBase):
         form = CreateCategoryForm()
         if form.validate_on_submit():
             new_category = create_category(self.category, form.data)
+            flash(_('Category "{}" has been created.').format(new_category.title), 'success')
             return jsonify_data(flash=False, redirect=url_for('.manage_settings', new_category))
         return jsonify_form(form)
 
