@@ -49,7 +49,10 @@
                 error: handleAjaxError,
                 success: function(data) {
                     $this.closest(categoryRowSelector).remove();
-                    updateCategoryDeleteButton();
+                    if (data.is_empty) {
+                        $('.banner .js-delete-category').removeClass('disabled')
+                            .attr('title', $T.gettext("Delete category"));
+                    }
                 }
             });
         });
@@ -95,15 +98,6 @@
                 contentType: 'application/json',
                 error: handleAjaxError
             });
-        }
-
-        function updateCategoryDeleteButton() {
-            if ($table.find(categoryRowSelector).length) {
-                $('.banner .js-delete-category').addClass('disabled');
-            } else {
-                $('.banner .js-delete-category').removeClass('disabled')
-                    .attr('title', $T.gettext("Delete category"));
-            }
         }
     };
 })(window);
