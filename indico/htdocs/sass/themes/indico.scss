@@ -366,6 +366,10 @@ div.event-header {
             color: darken($tt-secondary-color, 10%) !important;
         }
 
+        .timetable-duration, .timetable-duration:before {
+            color: $tt-secondary-color !important;
+        }
+
         .timetable-item-header {
             background: repeating-linear-gradient(
                 -40deg,
