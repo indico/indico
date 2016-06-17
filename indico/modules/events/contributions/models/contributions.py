@@ -16,14 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import g
-
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper
-from sqlalchemy.orm.attributes import set_committed_value
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
@@ -80,6 +77,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
     description_wrapper = MarkdownText
+    allow_relationship_preloading = True
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
@@ -294,6 +292,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         kwargs.setdefault('timetable_entry', None)
         super(Contribution, self).__init__(**kwargs)
 
+    @classmethod
+    def preload_acl_entries(cls, event):
+        cls.preload_relationships(cls.query.with_parent(event), 'acl_entries')
+
     @property
     def location_parent(self):
         if self.session_block_id is not None:
@@ -410,19 +412,3 @@ def _add_timetable_consistency_trigger(target, conn, **kw):
         EXECUTE PROCEDURE events.check_timetable_consistency('contribution');
     """.format(target.fullname)
     DDL(sql).execute(conn)
-
-
-@listens_for(Contribution, 'load')
-def _preload_principals(target, context):
-    """
-    Pre-fill contribution with information about ``ContributionPrincipal``s, if available in cache.
-
-    This is set using ``g.contribution_acl_cache`` and is quite useful for queries that involve
-    generating large timetables needing access control information.
-    """
-    if 'contribution_acl_cache' not in g:
-        return
-
-    principals = g.contribution_acl_cache.get(target.id)
-    if principals is not None:
-        set_committed_value(target, 'acl_entries', principals)

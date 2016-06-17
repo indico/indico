@@ -554,6 +554,10 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             entry.move(new_dt)
         self.start_dt = start_dt
 
+    def preload_all_acl_entries(self):
+        db.m.Contribution.preload_acl_entries(self)
+        db.m.Session.preload_acl_entries(self)
+
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it

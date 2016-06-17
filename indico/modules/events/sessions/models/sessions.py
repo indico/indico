@@ -53,6 +53,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
     default_colors = ColorTuple('#202020', '#e3f2d3')
+    allow_relationship_preloading = True
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
@@ -143,6 +144,10 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
         super(Session, self).__init__(**kwargs)
+
+    @classmethod
+    def preload_acl_entries(cls, event):
+        cls.preload_relationships(cls.query.with_parent(event), 'acl_entries')
 
     @property
     def location_parent(self):

@@ -41,6 +41,7 @@ class RHTimetable(RHConferenceBaseDisplay):
             self.layout = request.args.get('ttLyt')
 
     def _process(self):
+        self.event_new.preload_all_acl_entries()
         if self.event_new.theme == 'static':
             event_info = serialize_event_info(self.event_new)
             timetable_data = TimetableSerializer().serialize_timetable(self.event_new, strip_empty_days=True)

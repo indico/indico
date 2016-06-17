@@ -25,6 +25,7 @@ from pytz import timezone
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
@@ -72,6 +73,7 @@ class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
 @template_hook('meeting-body')
 def inject_meeting_body(event, **kwargs):
+    event.preload_all_acl_entries()
     event_tz_name = DisplayTZ(session.user, event.as_legacy).getDisplayTZ()
     event_tz = timezone(event_tz_name)
     show_date = request.args.get('showDate') or 'all'

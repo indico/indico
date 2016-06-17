@@ -21,7 +21,7 @@ from importlib import import_module
 from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy import inspect, orm
-from sqlalchemy.event import listens_for
+from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload, contains_eager
 from sqlalchemy.orm.attributes import get_history, set_committed_value
@@ -32,6 +32,11 @@ from indico.core import signals
 
 class IndicoModel(Model):
     """Indico DB model"""
+
+    #: Whether relationship preloading is allowed.  If disabled,
+    #: the on-load event that populates relationship from the preload
+    #: cache is not registered.
+    allow_relationship_preloading = False
 
     @classmethod
     def find(cls, *args, **kwargs):
@@ -105,6 +110,41 @@ class IndicoModel(Model):
         pk_col = getattr(cls, inspect(cls).primary_key[0].name)
         return db.session.query(db.session.query(pk_col).exists()).one()[0]
 
+    @classmethod
+    def preload_relationships(cls, query, *relationships, **kwargs):
+        """Preload relationships for all objects from a query.
+
+        :param query: A SQLAlchemy query object.
+        :param relationships: The names of relationships to preload.
+        :param strategy: The loading strategy to use for the
+                         relationships.  Defaults to `joinedload` and
+                         can be any callable that takes a relationship
+                         name and returns a query option.
+        """
+        assert cls.allow_relationship_preloading
+        strategy = kwargs.pop('strategy', joinedload)
+        assert not kwargs  # no other kwargs allowed
+        cache = g.setdefault('relationship_cache', {}).setdefault(cls, {'data': {}, 'relationships': set()})
+        missing_relationships = set(relationships) - cache['relationships']
+        if not missing_relationships:
+            return
+        query = query.options(*map(strategy, missing_relationships))
+        data_cache = cache['data']
+        for obj in query:
+            obj_cache = data_cache.setdefault(obj, {})
+            for rel in missing_relationships:
+                obj_cache[rel] = getattr(obj, rel)
+        cache['relationships'] |= missing_relationships
+
+    @classmethod
+    def _populate_preloaded_relationships(cls, target, *unused):
+        cache = g.get('relationship_cache', {}).get(type(target))
+        if not cache:
+            return
+        for rel, value in cache['data'].get(target, {}).iteritems():
+            if rel not in target.__dict__:
+                set_committed_value(target, rel, value)
+
     def assign_id(self):
         """Immediately assigns an ID to the object.
 
@@ -168,6 +208,14 @@ class IndicoModel(Model):
         if hasattr(g, 'memoize_cache'):
             del g.memoize_cache
         signals.model_committed.send(type(self), obj=self, change=change)
+
+
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    from indico.core.db import db
+    for model in db.Model._decl_class_registry.itervalues():
+        if hasattr(model, '__table__') and model.allow_relationship_preloading:
+            listen(model, 'load', model._populate_preloaded_relationships)
 
 
 def import_all_models(package_name=None):
