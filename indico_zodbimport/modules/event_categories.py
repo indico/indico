@@ -40,7 +40,7 @@ class EventCategoriesImporter(Importer):
     def _load_data(self):
         self.category_mapping = {}
         for category in self.zodb_root['categories'].itervalues():
-            self.category_mapping[int(category.id)] = map(int, reversed(category.getCategoryPath()))
+            self.category_mapping[int(category.id)] = map(int, category.getCategoryPath())
 
     def migrate_event_categories(self):
         self.print_step("Migrating event categories")
@@ -52,7 +52,7 @@ class EventCategoriesImporter(Importer):
                 self.print_error(cformat('%{red!}Event has no category!'), event_id=conf.id)
                 delete_events.add(int(conf.id))
                 continue
-            Event.query.filter_by(id=int(conf.id)).update({Event.category_id: category_chain[0],
+            Event.query.filter_by(id=int(conf.id)).update({Event.category_id: category_chain[-1],
                                                            Event.category_chain: category_chain},
                                                           synchronize_session=False)
             if not self.quiet:

@@ -45,7 +45,7 @@ def is_visible_from(event, categ):
     """Check whether ``event`` is visible from ``categ``
     """
     visibility = event.as_legacy.getFullVisibility()
-    for cat_id in event.category_chain:
+    for cat_id in event.category_chain[::-1]:
         if visibility <= 0:
             return False
         if str(cat_id) == categ.id:
