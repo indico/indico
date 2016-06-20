@@ -555,7 +555,7 @@ def _set_start_end_dt(target, value, oldvalue, *unused):
 def _add_timetable_consistency_trigger(target, conn, **kw):
     sql = """
         CREATE CONSTRAINT TRIGGER consistent_timetable
-        AFTER UPDATE
+        AFTER UPDATE OF start_dt, end_dt
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
