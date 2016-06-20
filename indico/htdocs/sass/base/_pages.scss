@@ -106,13 +106,21 @@
 
     display: flex;
     color: $banner-color;
+    max-width: 800px;
+
+    &.full-width {
+        max-width: none;
+
+        .title {
+            flex-grow: 1;
+        }
+    }
 
     .toolbar {
         padding: 0;
     }
 
     .title {
-        flex-grow: 1;
         margin-bottom: 15px;
         font-family: "Roboto Light", sans-serif;
         font-size: 2em;
