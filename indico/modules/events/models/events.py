@@ -542,6 +542,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Contribution.preload_acl_entries(self)
         db.m.Session.preload_acl_entries(self)
 
+    def move(self, category):
+        if self.category != category and not category.children:
+            self.category = category
+
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it
