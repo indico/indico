@@ -268,15 +268,17 @@
 
         _renderList: function(data) {
             var self = this;
-
-            if (data.category) {
-                self.$category.html(self._buildCurrentCategory(data.category));
-                self._ellipsizeBreadcrumbs(self.$category);
-            }
-            if (data.subcategories) {
-                _.each(data.subcategories, function(subcategory) {
-                    self.$categoryTree.append(self._buildSubcategory(subcategory));
-                });
+            // Avoid infinite loops if dialog closed before rendering the results
+            if ($.contains(document, self.$category[0])) {
+                if (data.category) {
+                    self.$category.html(self._buildCurrentCategory(data.category));
+                    self._ellipsizeBreadcrumbs(self.$category);
+                }
+                if (data.subcategories) {
+                    _.each(data.subcategories, function(subcategory) {
+                        self.$categoryTree.append(self._buildSubcategory(subcategory));
+                    });
+                }
             }
         },
 
