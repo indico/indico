@@ -78,7 +78,7 @@ class WPAdminsBase(WPMainBase):
 
         return frame.getHTML({
             "body": self._getPageContent(params),
-            "sideMenu": render_sidemenu('admin-sidemenu', active_item=self.sidemenu_option, old_style=True)
+            "sideMenu": render_sidemenu('admin-sidemenu', active_item=self.sidemenu_option, old_style=False)
         })
 
     def _getNavigationDrawer(self):
