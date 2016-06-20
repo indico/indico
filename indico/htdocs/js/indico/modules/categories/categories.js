@@ -113,6 +113,49 @@
     };
 
     global.setupCategoryEventList = function setupCategoryEventsList() {
-        enableIfChecked('.event-management', 'input[name=event_id]', '.js-enable-if-checked');
+        enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
+
+        function deselectRows() {
+            $('#selection-message').hide();
+            $('.js-enabled-if-checked').data('params', {all_selected: false});
+        }
+
+        $('#event-management input[name=event_id]').on('change', function() {
+            if (!this.checked) {
+                deselectRows();
+            }
+        });
+
+        $('[data-select-all]').on('click', function() {
+            var $this = $(this);
+            var total = $this.data('total');
+            var isPaginated = $this.data('is-paginated');
+            var selectionMessage = $('#selection-message');
+            var selected = $($this.data('select-all'));
+
+            if (isPaginated && selected.length < total) {
+                var html = $('<span>', {
+                    text: $T.gettext('You have selected {0} out of {1} events. ').format(selected.length, total)
+                });
+                var selectAll = $('<a>', {
+                    'href': '#',
+                    'text': $T.gettext('Click here to select them all.'),
+                    'on': {
+                        click: function(evt) {
+                            evt.preventDefault();
+                            $('.js-enabled-if-checked').data('params', {all_selected: true});
+                            selectionMessage.text($T.gettext('You have selected all {0} events').format(total));
+                        }
+                    }
+                });
+
+                html.append(selectAll);
+                selectionMessage.html(html).show();
+            }
+        });
+
+        $('[data-select-none]').on('click', function() {
+            deselectRows();
+        });
     };
 })(window);
