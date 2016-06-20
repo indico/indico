@@ -40,15 +40,17 @@
             <tr class="i-table">
                 <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
-                <th class="i-table sortable-column {{ direction if order_column == 'title' else ''}}">
+                <th class="i-table sortable-column">
                     <a href="{{ url_for('.manage_content', category, page=page,
                                         desc=(0 if direction == 'desc' and order_column == 'title' else 1),
-                                        order='title') }}">{% trans %}Title{% endtrans %}</a>
+                                        order='title') }}"
+                       class="{{ direction if order_column == 'title' else ''}}">{% trans %}Title{% endtrans %}</a>
                 </th>
-                <th class="i-table sortable-column {{ direction if order_column == 'start_dt' else ''}}">
+                <th class="i-table sortable-column">
                     <a href="{{ url_for('.manage_content', category, page=page,
                                         desc=(0 if direction == 'desc' and order_column == 'start_dt' else 1),
-                                        order='start_dt') }}">{% trans %}Start date{% endtrans %}</a>
+                                        order='start_dt') }}"
+                       class="{{ direction if order_column == 'start_dt' else ''}}">{% trans %}Start date{% endtrans %}</a>
                 </th>
                 <th class="i-table actions"></th>
             </tr>
