@@ -147,14 +147,18 @@
             var $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
             var tag = clickable ? '<a>' : '<span>';
 
-            _.each(path, function(category) {
-                var $item = $(tag, {text: category.title});
-                if (clickable) {
-                    $item.attr('href', '');
-                    $item.attr('title', $T.gettext("Go to: {0}".format(category.title)));
+            _.each(path, function(category, idx) {
+                var $item = $('<li>');
+                var $segment = $(tag, {text: category.title});
+                if (idx == 0) {
+                    $item.text($T.gettext("in "));
                 }
-                self._bindGoToCategoryOnClick($item, category.id);
-                $breadcrumbs.append($('<li>').append($item));
+                if (clickable) {
+                    $segment.attr('href', '');
+                    $segment.attr('title', $T.gettext("Go to: {0}".format(category.title)));
+                }
+                self._bindGoToCategoryOnClick($segment, category.id);
+                $breadcrumbs.append($item.append($segment));
             });
 
             return $breadcrumbs;
