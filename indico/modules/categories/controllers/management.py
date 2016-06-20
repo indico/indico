@@ -24,15 +24,18 @@ from PIL import Image
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest
 
+from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm)
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
+from indico.modules.events import Event
+from indico.modules.events.operations import delete_event
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -62,8 +65,22 @@ class RHManageCategoryContent(RHManageCategoryBase):
         return children_strategy,
 
     def _process(self):
+        page = request.args.get('page', '1')
+        order_columns = {'start_dt': Event.start_dt, 'title': db.func.lower(Event.title)}
+        direction = 'desc' if request.args.get('desc', '1') == '1' else 'asc'
+        order_column = order_columns[request.args.get('order', 'start_dt')]
+        events = (Event.query.with_parent(self.category)
+                  .order_by(getattr(order_column, direction)())
+                  .order_by(Event.id))
+        if page == 'all':
+            events = events.paginate(show_all=True)
+        else:
+            events = events.paginate(page=int(page))
         return WPCategoryManagement.render_template('management/content.html', self.category, 'content',
-                                                    subcategories=self.category.children)
+                                                    subcategories=self.category.children,
+                                                    current_category=self.category, events=events,
+                                                    page=page, order_column=request.args.get('order', 'start_dt'),
+                                                    direction=direction)
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
@@ -224,3 +241,22 @@ class RHSortSubcategories(RHManageCategoryBase):
         subcategories = {category.id: category for category in self.category.children}
         for position, id_ in enumerate(request.json['categories'], 1):
             subcategories[id_].position = position
+
+
+class RHDeleteEvents(RHManageCategoryBase):
+    """Delete multiple events"""
+
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        event_ids = map(int, request.args.getlist('event_id'))
+        self.events = Event.query.with_parent(self.category).filter(Event.id.in_(event_ids)).all()
+
+    def _process_GET(self):
+        return jsonify_template('events/management/delete_events.html', events=self.events)
+
+    def _process_POST(self):
+        for ev in self.events[:]:
+            delete_event(ev)
+        flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))
+             .format(len(self.events)), 'success')
+        return jsonify_data(flash=False)

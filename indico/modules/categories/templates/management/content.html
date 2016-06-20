@@ -1,5 +1,7 @@
 {% extends 'categories/management/base.html' %}
 
+{% from 'categories/management/_events_list.html' import render_events_list %}
+
 {% macro subcategory_row(subcategory) %}
     <tr class="i-table"
         data-category-id="{{ subcategory.id }}"
@@ -50,7 +52,7 @@
             <button class="i-button icon-remove"></button>
         </div>
     </div>
-    <table class="i-table categories-management"
+    <table class="i-table category-management"
            data-sort-url="{{ url_for('.sort_subcategories', category) }}">
         <thead>
             <tr class="i-table">
@@ -74,8 +76,16 @@
 {% endblock %}
 
 {% block content %}
-    {{ subcategories_table(subcategories) }}
-    <script>
-        setupCategoryTable();
-    </script>
+    {% if subcategories or not events.total %}
+        {{ subcategories_table(subcategories) }}
+        <script>
+            setupCategoryTable();
+        </script>
+    {% endif %}
+    {% if events.total or not subcategories %}
+        {{ render_events_list(current_category, page, order_column, direction, events) }}
+        <script>
+            setupCategoryEventList();
+        </script>
+    {% endif %}
 {% endblock content %}

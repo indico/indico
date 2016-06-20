@@ -30,7 +30,7 @@
     }
 
     global.setupCategoryTable = function setupCategoryTable() {
-        var $table = $('table.categories-management');
+        var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var categoryRowSelector = 'tr[data-category-id]';
 
@@ -110,5 +110,9 @@
                 error: handleAjaxError
             });
         }
+    };
+
+    global.setupCategoryEventList = function setupCategoryEventsList() {
+        enableIfChecked('.event-management', 'input[name=event_id]', '.js-enable-if-checked');
     };
 })(window);
