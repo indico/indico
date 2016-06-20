@@ -27,9 +27,8 @@ class WPCategory(WPJinjaMixin, WPMainBase):
 
     template_prefix = 'categories/'
 
-    def __init__(self, rh, category, active_menu_item, **kwargs):
+    def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category
-        kwargs['active_menu_item'] = active_menu_item
         self.category = category
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
@@ -42,6 +41,10 @@ class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
 
     MANAGEMENT = True
+
+    def __init__(self, rh, category, active_menu_item, **kwargs):
+        kwargs['active_menu_item'] = active_menu_item
+        WPCategory.__init__(self, rh, category, **kwargs)
 
     def getCSSFiles(self):
         return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()
