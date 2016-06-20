@@ -1934,20 +1934,6 @@ div.filterDiv strong {
 {
 }
 
-.frontPageSideBarContainer {
-    margin: 30px 80px 30px 60px;
-}
-
-.smallSideBox {
-    font-family: Georgia, Times, Times New Roman;
-    padding: 15px 15px 10px 15px;
-    background: #f8f8f8;
-}
-
-.smallSideBox h1 {
-    font-family: 'Special Elite', arial, serif;
-}
-
 .topBar {
     margin-bottom: 0px;
 }
@@ -1970,32 +1956,6 @@ div.filterDiv strong {
 .topBar .smaller {
     padding: 10px;
     margin-top: 10px;
-}
-
-.leftMenu
-{
-    float: left;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    width: 150px;
-    background: #f6f6f6;
-
-}
-
-h1.menuHeader
-{
-    height: 20px;
-    font-size: 13px;
-    text-align: center;
-    margin-top: 0px;
-    margin-bottom: 4px;
-    padding-top: 2px;
-    display: block;
-    width: 100%;
-    background: #5fa5d4;
-    color: white;
 }
 
 h1.active
@@ -2370,24 +2330,6 @@ div.ACModifButtonEntry {
 
 div.ACUserListDiv {
     margin-bottom: 20px;
-}
-
-.areaTitle_orange {
-   font-size: 14px;
-   color: #E25300;
-   padding: 0px;
-   margin-top: 0px;
-}
-
-.titleMiddleImg
-{
-    vertical-align: middle;
-}
-
-/* Context Help */
-
-.ctxtInfo {
-
 }
 
 /* Forms */
