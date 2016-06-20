@@ -45,7 +45,7 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
 </div>
 
 <div class="layout-side-menu">
-    <div id="event-sidemenu" class="menu-column">
+    <div id="js-event-side-menu" class="menu-column">
         ${ sideMenu }
     </div>
     <div class="content-column">
