@@ -179,6 +179,29 @@
     global.setupCategoryEventList = function setupCategoryEventsList() {
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
+        $('.js-move-event-to-subcategory').on('click', function(evt) {
+            var $this = $(this);
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                selectLeafOnly: true,
+                onAction: function(category) {
+                    $.ajax({
+                        url: $this.data('href'),
+                        type: 'POST',
+                        data: JSON.stringify(category),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        success: function(data) {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
         function deselectRows() {
             $('#selection-message').hide();
             $('.js-enabled-if-checked').data('params', {all_selected: false});

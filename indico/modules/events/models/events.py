@@ -22,7 +22,7 @@ import pytz
 from sqlalchemy import orm, DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.dialects.postgresql import JSON, ARRAY
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
@@ -543,8 +543,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
-        if self.category != category and not category.children:
-            self.category = category
+        self.category = category
+        db.session.flush()
+        # TODO: trigger moved signal
 
     @return_ascii
     def __repr__(self):
