@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import flash, redirect, session
+from flask import flash, redirect, session, request
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.modules.categories.models.categories import Category
 from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
@@ -28,7 +29,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
 from indico.modules.events.management.views import WPEventManagement
-from indico.modules.events.operations import update_event
+from indico.modules.events.operations import update_event, delete_event
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
@@ -52,9 +53,8 @@ class RHDeleteEvent(RHConferenceModifBase):
         return jsonify_template('events/management/delete_event.html', event=self._conf)
 
     def _process_POST(self):
-        self._conf.delete(session.user)
+        delete_event(self.event_new)
         flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
-
         redirect_url = url_for('categories.manage_content', self.event_new.category)
         return jsonify_data(url=redirect_url, flash=False)
 
@@ -178,3 +178,13 @@ class RHEventProtection(RHConferenceModifBase):
             log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
                                                                                COORDINATOR_PRIV_TITLES[priv_field])
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
+
+
+class RHMoveEvent(RHConferenceModifBase):
+    """Move event to a different category"""
+
+    def _process(self):
+        category = Category.find(id=request.json.get('id')).first_or_404()
+        update_event(self.event_new, {'category': category})
+        flash(_('You have moved event "{}" to "{}"').format(self.event_new.title, category.title), 'success')
+        return jsonify_data(flash=False)

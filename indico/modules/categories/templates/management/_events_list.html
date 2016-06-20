@@ -1,0 +1,159 @@
+{% from 'pagination.html' import render_pagination %}
+
+{% macro event_row(event) %}
+    <tr class="i-table">
+        <td class="i-table column-icon">
+            <input type="checkbox" name="event_id" value="{{ event.id }}">
+        </td>
+        <td class="i-table column-icon">
+            {% if event.is_self_protected %}
+                <span class="icon-lock"></span>
+            {% elif event.is_public %}
+                <span class="icon-unlocked"></span>
+            {% endif %}
+        </td>
+        <td class="i-table">
+            <a href="{{ url_for('event_mgmt.conferenceModification-managementAccess', event) }}">
+                {{ event.title }}
+            </a>
+        </td>
+        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
+        <td class="i-table actions">
+            <a href="#"
+               class="i-button-icon icon-remove"
+               title="{% trans %}Delete event{% endtrans %}"
+               data-href="{{ url_for('event_management.delete', event) }}"
+               data-ajax-dialog
+               data-reload-after></a>
+            <a class="i-button-icon icon-transmission js-move-event-to-subcategory"
+               title="{% trans %}Move to different category{% endtrans %}"
+               data-href="{{ url_for('event_management.move', event) }}"></a>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}"
+               class="i-button-icon icon-arrow-right"
+               title="{% trans %}Go to the event display page{% endtrans %}"></a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro events_table(category, page, order_column, direction, events) %}
+    <table class="i-table event-management">
+        <thead>
+            <tr class="i-table">
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table sortable-column">
+                    <a href="{{ url_for('.manage_content', category, page=page,
+                                        desc=(0 if direction == 'desc' and order_column == 'title' else 1),
+                                        order='title') }}"
+                       class="{{ direction if order_column == 'title' else ''}}">{% trans %}Title{% endtrans %}</a>
+                </th>
+                <th class="i-table sortable-column">
+                    <a href="{{ url_for('.manage_content', category, page=page,
+                                        desc=(0 if direction == 'desc' and order_column == 'start_dt' else 1),
+                                        order='start_dt') }}"
+                       class="{{ direction if order_column == 'start_dt' else ''}}">{% trans %}Start date{% endtrans %}</a>
+                </th>
+                <th class="i-table actions"></th>
+            </tr>
+        </thead>
+        {% for event in events.items %}
+            {{ event_row(event) }}
+        {% endfor %}
+    </table>
+    {% if events.pages > 1 %}
+        {% call(page) render_pagination(events) %}
+            {{ url_for('.manage_content', category, page=page,
+                       desc=(1 if direction == 'desc' else 0), order=order_column) }}
+        {% endcall %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_events_list(category, page, order_column, direction, events) %}
+    <div class="toolbar">
+        <div class="group">
+            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#"
+                       data-total="{{ events.total }}"
+                       data-is-paginated="{{ (events.pages > 1) | tojson }}"
+                       data-select-all="#event-management input:checkbox">
+                        {% trans %}All{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-select-none="#event-management input:checkbox">
+                        {% trans %}None{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="group">
+            <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
+                {% trans %}Create event{% endtrans %}
+            </a>
+            <ul class="dropdown">
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='lecture') }}">
+                        {% trans %}Create lecture{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='meeting') }}">
+                        {% trans %}Create meeting{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='conference') }}">
+                        {% trans %}Create conference{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% if events.total %}
+            <div class="group">
+                {% if page != 'all' %}
+                    {% if events.pages > 1 %}
+                        <a href="{{ url_for('.manage_content', category, page='all', order=order_column,
+                                            desc=(1 if direction == 'desc' else 0)) }}"
+                           class="i-button">{% trans %}Show all events{% endtrans %}</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('.manage_content', category, page=1, order=order_column,
+                                        desc=(1 if direction == 'desc' else 0)) }}"
+                       class="i-button">{% trans %}Paginate the results{% endtrans %}</a>
+                {% endif %}
+            </div>
+            <div class="group right">
+                <a href="#" class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
+                   data-href="{{ url_for('.move_events', category) }}"></a>
+                <a href="#" class="i-button icon-remove js-enabled-if-checked"
+                   data-href="{{ url_for('.delete_events', category) }}"
+                   data-method="POST"
+                   data-params-selector="#event-management input[name=event_id]:checkbox:checked"
+                   data-ajax-dialog></a>
+            </div>
+            <div class="group right">
+                <a href="#" class="i-button icon-split js-enabled-if-checked"
+                   title="{% trans %}Split selected events into new categories{% endtrans %}"
+                   data-method="POST"
+                   data-href="{{ url_for('.split_category', category) }}"
+                   data-title="{% trans %}Move selected events to a new category{% endtrans %}"
+                   data-params-selector="#event-management input[name=event_id]:checkbox:checked"
+                   data-ajax-dialog></a>
+            </div>
+        {% endif %}
+        <div id="selection-message" class="action-box accept"></div>
+    </div>
+    <div id="event-management">
+        {% if events.total %}
+            {{ events_table(category, page, order_column, direction, events) }}
+        {% else %}
+            <div class="info-message-box">
+                <div class="message-text">
+                    {% trans %}There are no events in this category{% endtrans %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}

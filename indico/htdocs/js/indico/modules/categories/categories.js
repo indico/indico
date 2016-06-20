@@ -30,7 +30,7 @@
     }
 
     global.setupCategoryTable = function setupCategoryTable() {
-        var $table = $('table.categories-management');
+        var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var categoryRowSelector = 'tr[data-category-id]';
 
@@ -110,5 +110,105 @@
                 error: handleAjaxError
             });
         }
+    };
+
+    global.setupCategoryEventList = function setupCategoryEventsList() {
+        enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
+
+        $('.js-move-event-to-subcategory').on('click', function(evt) {
+            var $this = $(this);
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                onAction: function(category) {
+                    $.ajax({
+                        url: $this.data('href'),
+                        type: 'POST',
+                        data: JSON.stringify(category),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        success: function(data) {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $('.js-move-events-to-subcategory').on('click', function(evt) {
+            var $this = $(this);
+            var data = {};
+            if ($this.data('params') && $this.data('params').all_selected) {
+                data['all_selected'] = true;
+            } else {
+                data['event_id'] = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
+                    return obj.value;
+                });
+            }
+
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                onAction: function(category) {
+                    $.ajax({
+                        url: $this.data('href'),
+                        type: 'POST',
+                        data: JSON.stringify($.extend(data, {'category_id': category.id})),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        success: function(data) {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        function deselectRows() {
+            $('#selection-message').hide();
+            $('.js-enabled-if-checked').data('params', {all_selected: false});
+        }
+
+        $('#event-management input[name=event_id]').on('change', function() {
+            if (!this.checked) {
+                deselectRows();
+            }
+        });
+
+        $('[data-select-all]').on('click', function() {
+            var $this = $(this);
+            var total = $this.data('total');
+            var isPaginated = $this.data('is-paginated');
+            var selectionMessage = $('#selection-message');
+            var selected = $($this.data('select-all'));
+
+            if (isPaginated && selected.length < total) {
+                var html = $('<span>', {
+                    text: $T.gettext('You have selected {0} out of {1} events. ').format(selected.length, total)
+                });
+                var selectAll = $('<a>', {
+                    'href': '#',
+                    'text': $T.gettext('Click here to select them all.'),
+                    'on': {
+                        click: function(evt) {
+                            evt.preventDefault();
+                            $('.js-enabled-if-checked').data('params', {all_selected: true});
+                            selectionMessage.text($T.gettext('You have selected all {0} events').format(total));
+                        }
+                    }
+                });
+
+                html.append(selectAll);
+                selectionMessage.html(html).show();
+            }
+        });
+
+        $('[data-select-none]').on('click', function() {
+            deselectRows();
+        });
     };
 })(window);
