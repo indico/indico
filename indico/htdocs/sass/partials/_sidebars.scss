@@ -61,6 +61,7 @@
     @include user-select(none);
     border-radius: 2px;
     border: 1px solid lightgray;
+    @include single-box-shadow();
 
     ul.menu-items > li.section {
         padding: 0;
@@ -177,10 +178,10 @@ ul.menu-items li.active {
         content: ".";
         color: transparent;
         font-size: 0;
-        border-right: 2px solid $link;
+        border-left: 2px solid $link;
         height: 100%;
         position: absolute;
-        right: 0;
+        left: 0;
         top: 0;
     }
 }
