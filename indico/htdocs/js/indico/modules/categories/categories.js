@@ -179,16 +179,15 @@
     global.setupCategoryEventList = function setupCategoryEventsList() {
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
-        $('.js-move-event-to-subcategory').on('click', function(evt) {
-            var $this = $(this);
+        function createCategoryNavigator(element, data) {
             $('<div>').categorynavigator({
                 openInDialog: true,
                 selectLeafOnly: true,
                 onAction: function(category) {
                     $.ajax({
-                        url: $this.data('href'),
+                        url: element.data('href'),
                         type: 'POST',
-                        data: JSON.stringify(category),
+                        data: JSON.stringify($.extend({'category_id': category.id}, data || {})),
                         dataType: 'json',
                         contentType: 'application/json',
                         error: handleAjaxError,
@@ -200,10 +199,20 @@
                     });
                 }
             });
+        }
+
+        $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
+            evt.preventDefault();
+            createCategoryNavigator($(this));
         });
 
-        $('.js-move-events-to-subcategory').on('click', function(evt) {
+        $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
             var $this = $(this);
+
+            if ($this.hasClass('disabled')) {
+                return;
+            }
+
             var data = {};
             if ($this.data('params') && $this.data('params').all_selected) {
                 data['all_selected'] = true;
@@ -213,28 +222,11 @@
                 });
             }
 
-            $('<div>').categorynavigator({
-                openInDialog: true,
-                onAction: function(category) {
-                    $.ajax({
-                        url: $this.data('href'),
-                        type: 'POST',
-                        data: JSON.stringify($.extend(data, {'category_id': category.id})),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        error: handleAjaxError,
-                        success: function(data) {
-                            if (data.success) {
-                                location.reload();
-                            }
-                        }
-                    });
-                }
-            });
+            createCategoryNavigator($this, data);
         });
 
         function deselectRows() {
-            $('#selection-message').hide();
+            $('.event-management-toolbar #selection-message').hide();
             $('.js-enabled-if-checked').data('params', {all_selected: false});
         }
 
@@ -244,7 +236,7 @@
             }
         });
 
-        $('[data-select-all]').on('click', function() {
+        $('.event-management-toolbar [data-select-all]').on('click', function() {
             var $this = $(this);
             var total = $this.data('total');
             var isPaginated = $this.data('is-paginated');
@@ -272,7 +264,7 @@
             }
         });
 
-        $('[data-select-none]').on('click', function() {
+        $('.event-management-toolbar [data-select-none]').on('click', function() {
             deselectRows();
         });
     };
