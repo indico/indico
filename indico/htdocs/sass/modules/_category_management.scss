@@ -25,23 +25,24 @@ table.category-management, table.event-management {
     th {
         &.sortable-column {
             a {
-                display: inline-block;
+                display: block;
                 width: 100%;
-            }
 
-            &:hover {
-                cursor: pointer;
-            }
+                &:hover {
+                    cursor: pointer;
+                }
 
-            &.desc {
-                @include icon-before('icon-arrow-down');
-            }
+                &.desc {
+                    @include icon-before('icon-arrow-down');
+                }
 
-            &.asc {
-                @include icon-before('icon-arrow-down');
+                &.asc {
+                    @include icon-before('icon-arrow-down');
 
-                &:before {
-                    @include rotate(-180deg);
+                    &:before {
+                        display: inline-block;
+                        @include rotate(-180deg);
+                    }
                 }
             }
         }
