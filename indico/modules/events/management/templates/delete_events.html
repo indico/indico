@@ -17,6 +17,7 @@
         <ul>
             {% for event in events %}
                 <li>
+                    <input type="hidden" name="event_id" value="{{ event.id }}">
                     <a href="{{ url_for('event_mgmt.confModifAC', event) }}" target="_blank">
                         {{ event.title }}
                     </a>
