@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 import os
 from io import BytesIO
-from operator import attrgetter
 
 from flask import flash, redirect, request, session
 from PIL import Image
@@ -322,3 +321,25 @@ class RHSplitCategory(RHManageCategoryBase):
             event = self.category_events[event_id]
             event.move(category)
         db.session.flush()
+
+
+class RHMoveEvents(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.category_events = {x.id: x for x in self.category.events}
+        if request.json.get('all_selected') == 1:
+            self.event_ids = self.category_events.viewkeys()
+        else:
+            self.event_ids = set(map(int, request.json.get('event_id')))
+
+    def _process(self):
+        new_category = Category.find(id=request.json.get('category_id')).first_or_404()
+        count = 0
+        for event_id in self.event_ids:
+            if event_id in self.category_events:
+                self.category_events[event_id].move(new_category)
+                count += 1
+        flash(ngettext('You have moved one event to the category "{0}"',
+                       'You have moved {0} events to the category "{1}"', count).format(count,
+                                                                                        new_category.title), 'success')
+        return jsonify_data(flash=False)

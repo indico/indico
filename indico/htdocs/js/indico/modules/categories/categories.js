@@ -202,6 +202,37 @@
             });
         });
 
+        $('.js-move-events-to-subcategory').on('click', function(evt) {
+            var $this = $(this);
+            var data = {};
+            if ($this.data('params') && $this.data('params').all_selected) {
+                data['all_selected'] = true;
+            } else {
+                data['event_id'] = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
+                    return obj.value;
+                });
+            }
+
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                onAction: function(category) {
+                    $.ajax({
+                        url: $this.data('href'),
+                        type: 'POST',
+                        data: JSON.stringify($.extend(data, {'category_id': category.id})),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        success: function(data) {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
         function deselectRows() {
             $('#selection-message').hide();
             $('.js-enabled-if-checked').data('params', {all_selected: false});

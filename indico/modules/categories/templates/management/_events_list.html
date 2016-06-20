@@ -122,7 +122,8 @@
                 {% endif %}
             </div>
             <div class="group right">
-                <a href="#" class="i-button icon-transmission js-enabled-if-checked"></a>
+                <a href="#" class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
+                   data-href="{{ url_for('.move_events', category) }}"></a>
                 <a href="#" class="i-button icon-remove js-enabled-if-checked"
                    data-href="{{ url_for('.delete_events', category) }}"
                    data-method="POST"
