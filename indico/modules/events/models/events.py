@@ -75,9 +75,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
                 db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
                                    'category_data_set'),
-                db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),
-                db.CheckConstraint("category_chain[array_length(category_chain, 1)] = 0",
-                                   'category_chain_has_root'),
+                db.CheckConstraint("category_id = category_chain[array_length(category_chain, 1)]",
+                                   'category_id_matches_chain'),
+                db.CheckConstraint("category_chain[1] = 0", 'category_chain_has_root'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
@@ -538,7 +538,7 @@ Event.register_protection_events()
 
 @listens_for(Event.category, 'set')
 def _category_id_set(target, value, *unused):
-    target.category_chain = [x.id for x in value.chain_query[::-1]]
+    target.category_chain = [x.id for x in value.chain_query]
 
 
 @listens_for(Event.start_dt, 'set')

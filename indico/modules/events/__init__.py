@@ -229,7 +229,7 @@ def _category_moved(category, old_parent, new_parent, **kwargs):
     events = Event.find(Event.category_chain.contains([int(category.id)])).all()
     # update the category chain of all events from the moved category
     for event in events:
-        event.category_chain = map(int, reversed(event.category.getCategoryPath()))
+        event.category_chain = map(int, event.category.getCategoryPath())
     # update the category chain of all events from the target category
     for event in g.get('detached_events_moved', set()):
         # the event was in the target category of of the category move
