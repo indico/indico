@@ -33,7 +33,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
-from indico.modules.events.operations import delete_event
+from indico.modules.events.operations import delete_event, update_event
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -294,3 +294,20 @@ class RHSplitCategory(RHManageCategoryBase):
             event = self.category_events.get(event_id)
             category.events.append(event)
         db.session.flush()
+
+
+class RHMoveEvents(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.category_events = {x.id: x for x in self.category.events}
+        if request.json.get('all_selected'):
+            self.event_ids = self.category_events.viewkeys()
+        else:
+            self.event_ids = set(map(int, request.json.get('event_id')))
+
+    def _process(self):
+        new_category = Category.find(id=request.json.get('category_id')).first_or_404()
+        for event_id in self.event_ids:
+            if event_id in self.category_events:
+                update_event(self.category_events[event_id], {'category': new_category})
+        return jsonify_data()
