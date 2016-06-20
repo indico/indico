@@ -131,12 +131,11 @@
             <div class="group right">
                 <a href="#" class="i-button icon-split js-enabled-if-checked"
                    title="{% trans %}Split selected events into new categories{% endtrans %}"
-                   data-method="GET"
+                   data-method="POST"
                    data-href="{{ url_for('.split_category', category) }}"
                    data-title="{% trans %}Move selected events to a new category{% endtrans %}"
                    data-params-selector="#event-management input[name=event_id]:checkbox:checked"
-                   data-ajax-dialog
-                   data-reload-after></a>
+                   data-ajax-dialog></a>
             </div>
         {% endif %}
         <div id="selection-message" class="action-box accept"></div>
