@@ -35,7 +35,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import RichMarkup, text_to_repr, format_repr, return_ascii
+from indico.util.string import MarkdownText, RichMarkup, text_to_repr, format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
@@ -147,7 +147,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=EventMessageMode.disabled
     )
-    event_message = db.Column(
+    _event_message = db.Column(
+        'event_message',
         db.Text,
         nullable=False,
         default=''
@@ -185,6 +186,18 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
     # - parent (Category.children)
+
+    @hybrid_property
+    def event_message(self):
+        return MarkdownText(self._event_message)
+
+    @event_message.setter
+    def event_message(self, value):
+        self._event_message = value
+
+    @event_message.expression
+    def event_message(cls):
+        return cls._event_message
 
     @return_ascii
     def __repr__(self):
