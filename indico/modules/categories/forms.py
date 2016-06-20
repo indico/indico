@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, SelectField, StringField
+from flask import request
+from wtforms.fields import BooleanField, SelectField, StringField, HiddenField
 from wtforms.validators import DataRequired, Optional
 
 from indico.modules.categories.models.categories import EventMessageMode
@@ -24,7 +25,7 @@ from indico.util.i18n import _, ngettext
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
                                      IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
-                                     IndicoTimezoneSelectField, EmailListField, JSONField)
+                                     IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList)
 from indico.web.forms.widgets import DropzoneWidget, SwitchWidget
 
 
@@ -125,8 +126,13 @@ class SplitCategoryForm(IndicoForm):
     second_category = StringField(_('Category name #2'), [DataRequired()],
                                   description=_('Events that were not selected will be put into a new sub-category '
                                                 'with this title.'))
+    event_id = HiddenFieldList(validators=[DataRequired()])
+    submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         super(SplitCategoryForm, self).__init__(*args, **kwargs)
         if kwargs.pop('move_all'):
             del self.second_category
+
+    def is_submitted(self):
+        return super(SplitCategoryForm, self).is_submitted() and 'submitted' in request.form

@@ -270,14 +270,14 @@ class RHSplitCategory(RHManageCategoryBase):
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
         self.category_events = {x.id: x for x in self.category.events}
-        if request.args.get('all_selected') == 'true':
+        if request.form.get('all_selected') == 'true':
             self.event_ids = self.category_events.viewkeys()
         else:
-            self.event_ids = set(map(int, request.args.getlist('event_id')))
+            self.event_ids = set(map(int, request.form.getlist('event_id')))
 
     def _process(self):
         all_selected = not bool(self.category_events.viewkeys() - self.event_ids)
-        form = SplitCategoryForm(move_all=all_selected)
+        form = SplitCategoryForm(move_all=all_selected, event_id=self.event_ids)
         if form.validate_on_submit():
             selected_events = self.category_events.viewkeys() & self.event_ids
             not_selected_events = self.category_events.viewkeys() - self.event_ids
@@ -285,7 +285,7 @@ class RHSplitCategory(RHManageCategoryBase):
                 self._move_events(selected_events, form.first_category.data)
             if not_selected_events:
                 self._move_events(not_selected_events, form.second_category.data)
-            return jsonify_data()
+            return jsonify_data(flash=False, redirect=url_for('.manage_content', self.category))
         return jsonify_form(form)
 
     def _move_events(self, event_ids, category_title):
