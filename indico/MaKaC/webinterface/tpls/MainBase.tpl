@@ -8,28 +8,21 @@
 <div class="clearfix">
     % if isRoomBooking:
         % if sideMenu:
-            <div class="emptyVerticalGap"></div>
-        % endif
-        <table border="0" cellSpacing="0" cellPadding="0">
-            <tr>
-                % if sideMenu:
-                <td style="vertical-align: top;" class="rb-menu-column">
+            <div class="layout-side-menu">
+                <div class="menu-column">
                     ${ sideMenu }
-                </td>
-                % endif
-                <td style="vertical-align: top; width: 100%;">
-                    <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}${" bodyWithSideBar" if isFrontPage else ""}" style="margin-left:0px;">
-                        ${ render_template('flashed_messages.html') }
-                        ${ body }
-                    </div>
-                </td>
-            </tr>
-        </table>
-
+                </div>
+                <div class="content-column">
+                    ${ render_template('flashed_messages.html') }
+                    ${ body }
+                </div>
+            </div>
+        % else:
+            ${ render_template('flashed_messages.html') }
+            ${ body }
+        % endif
     % else:
-
        % if sideMenu:
-           <div class="emptyVerticalGap"></div>
            ${ sideMenu }
        % endif
 
