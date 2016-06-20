@@ -49,6 +49,7 @@ else:
     </div>
     <div id="confSectionsBox" class="clearfix">
     ${ render_template('flashed_messages.html') }
+    ${ render_template('events/display/mako_compat/_event_header_message.html', event=conf.as_event) }
     ${ render_template('events/layout/menu_display.html', event_title=confTitle, menu=menu, support_info=support_info, active_entry_id=active_menu_entry_id) }
     ${ body }
     </div>
