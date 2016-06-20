@@ -272,7 +272,10 @@ class RHDeleteEvents(RHManageCategoryBase):
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
         event_ids = map(int, request.args.getlist('event_id'))
-        self.events = Event.query.with_parent(self.category).filter(Event.id.in_(event_ids)).all()
+        if request.args.get('all_selected') == 'true':
+            self.events = self.category.events
+        else:
+            self.events = Event.query.with_parent(self.category).filter(Event.id.in_(event_ids)).all()
 
     def _process_GET(self):
         return jsonify_template('events/management/delete_events.html', events=self.events)
@@ -288,8 +291,11 @@ class RHDeleteEvents(RHManageCategoryBase):
 class RHSplitCategory(RHManageCategoryBase):
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
-        self.event_ids = set(map(int, request.args.getlist('event_id')))
         self.category_events = {x.id: x for x in self.category.events}
+        if request.args.get('all_selected') == 'true':
+            self.event_ids = self.category_events.viewkeys()
+        else:
+            self.event_ids = set(map(int, request.args.getlist('event_id')))
 
     def _process(self):
         all_selected = not bool(self.category_events.viewkeys() - self.event_ids)

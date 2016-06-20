@@ -70,6 +70,21 @@
 {% macro render_events_list(category, page, order_column, direction, events) %}
     <div class="toolbar">
         <div class="group">
+            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#" data-select-all="#event-management input:checkbox">
+                        {% trans %}All{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-select-none="#event-management input:checkbox">
+                        {% trans %}None{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="group">
             <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
                 {% trans %}Create event{% endtrans %}
             </a>
@@ -106,8 +121,8 @@
                 {% endif %}
             </div>
             <div class="group right">
-                <a href="#" class="i-button icon-transmission js-enable-if-checked"></a>
-                <a href="#" class="i-button icon-remove js-enable-if-checked"
+                <a href="#" class="i-button icon-transmission js-enabled-if-checked"></a>
+                <a href="#" class="i-button icon-remove js-enabled-if-checked"
                    data-method="GET"
                    data-href="{{ url_for('.delete_events', category) }}"
                    data-params-selector="#event-management input[name=event_id]:checkbox:checked"
@@ -115,7 +130,7 @@
                    data-reload-after></a>
             </div>
             <div class="group right">
-                <a href="#" class="i-button icon-pagebreak js-enable-if-checked"
+                <a href="#" class="i-button icon-split js-enabled-if-checked"
                    title="{% trans %}Split selected events into new categories{% endtrans %}"
                    data-method="GET"
                    data-href="{{ url_for('.split_category', category) }}"
@@ -125,6 +140,7 @@
                    data-reload-after></a>
             </div>
         {% endif %}
+        <div id="selection-message" class="action-box accept"></div>
     </div>
     <div id="event-management" data-total="{{ events.total }}">
         {% if events.total %}
