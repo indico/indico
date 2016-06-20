@@ -8,7 +8,7 @@
            data-title='{% trans %}Choose category{% endtrans %}'>
             {%- trans %}Choose category{% endtrans -%}
         </a>
-        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}">
+        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
     </div>
 {% endblock %}
 
@@ -21,6 +21,12 @@
             var $field = $('#{{ field.id }}');
             var $categoryTitle = $('#category-title-{{ field.id }}');
             var $dialogTrigger = $('#categorynav-button-{{ field.id }}');
+            var hiddenData = $field.val() ? JSON.parse($field.val()) : {};
+
+            if (hiddenData) {
+                $categoryTitle.text(hiddenData.title);
+                $field.val(JSON.stringify(hiddenData));
+            }
 
             $dialogTrigger.on('click', function(evt) {
                 evt.preventDefault();
@@ -30,7 +36,8 @@
                         var evt = $.Event('indico:categorySelected');
                         var dfd = $.Deferred();
                         $categoryTitle.text(category.title);
-                        $field.val(category.id).trigger(evt, [category, dfd]);
+                        hiddenData = {id: category.id, title: category.title};
+                        $field.val(JSON.stringify(hiddenData)).trigger(evt, [category, dfd]);
                         if (evt.isDefaultPrevented()) {
                             return dfd;
                         }
