@@ -335,10 +335,10 @@ def _mappers_configured():
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
     cte_query = (select([cat_alias.id, array([cat_alias.title]).label('path')])
-                 .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
+                 .where(cat_alias.parent_id.is_(None))
                  .cte(recursive=True))
     parent_query = (select([cat_alias.id, cte_query.c.path.op('||')(cat_alias.title)])
-                    .where((cat_alias.parent_id == cte_query.c.id) & ~cat_alias.is_deleted))
+                    .where((cat_alias.parent_id == cte_query.c.id)))
     cte_query = cte_query.union_all(parent_query)
     query = select([cte_query.c.path]).where(cte_query.c.id == Category.id).correlate_except(cte_query)
     Category.chain_titles = column_property(query, deferred=True)
