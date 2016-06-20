@@ -32,6 +32,7 @@
                 evt.preventDefault();
                 $('<div>').categorynavigator({
                     openInDialog: true,
+                    selectLeafOnly: {{ field.select_leaf_only | tojson }},
                     onAction: function(category) {
                         var evt = $.Event('indico:categorySelected');
                         var dfd = $.Deferred();

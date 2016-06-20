@@ -254,6 +254,10 @@ class CategoryField(HiddenField):
 
     widget = JinjaWidget('forms/category_picker_widget.html')
 
+    def __init__(self, *args, **kwargs):
+        self.select_leaf_only = kwargs.pop('select_leaf_only', False)
+        super(CategoryField, self).__init__(*args, **kwargs)
+
     def process_formdata(self, valuelist):
         from indico.modules.categories import Category
         if valuelist:
