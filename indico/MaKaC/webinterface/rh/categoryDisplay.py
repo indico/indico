@@ -64,7 +64,7 @@ class RHCategDisplayBase(base.RHDisplayBaseProtected):
             params["categId"] = escape_html(str(params["categId"]))
         # TODO: Workaround to avoid breaking the category navigation (display)
         if 'category' in params:
-            params['categId'] = params['category']
+            params['categId'] = str(json.loads(params['category'])['id'])
         l = locators.CategoryWebLocator(params, mustExist)
         self._target = l.getObject()
 
