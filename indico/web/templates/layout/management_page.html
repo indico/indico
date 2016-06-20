@@ -4,21 +4,17 @@
     <div class="layout-side-menu">
         <div class="menu-column">
             {% block display_view_button %}{% endblock %}
-        </div>
-        <div class="content-column banner">
-            <div class="title">
-                {% block banner_title %}{% endblock %}
-            </div>
-            <div class="action-menu">
-                {% block banner_actions %}{% endblock %}
-            </div>
-        </div>
-    </div>
-    <div class="layout-side-menu">
-        <div class="menu-column">
             {% block side_menu %}{% endblock %}
         </div>
         <div class="content-column">
+            <div class="banner">
+                <div class="title">
+                    {% block banner_title %}{% endblock %}
+                </div>
+                <div class="action-menu">
+                    {% block banner_actions %}{% endblock %}
+                </div>
+            </div>
             {% include 'flashed_messages.html' %}
             {{ super() }}
         </div>

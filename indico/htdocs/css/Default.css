@@ -1934,25 +1934,6 @@ div.filterDiv strong {
 {
 }
 
-.bodyWithSideBar {
-    margin-right: 420px;
-}
-
-.bodyWithSideMenu {
-    margin-left: 220px;
-    margin-top: 5px;
-    margin-right: 20px;
-}
-
-/*
-    Used to create empty space between the main
-    blue bar and the content, when there is
-    a basic side menu like in Room Booking.
-*/
-.emptyVerticalGap {
-    height: 20px;
-}
-
 .frontPageSideBarContainer {
     margin: 30px 80px 30px 60px;
 }
