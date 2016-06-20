@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import flash, redirect, session
+from flask import flash, redirect, session, request
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.modules.categories.models.categories import Category
 from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
@@ -177,3 +178,13 @@ class RHEventProtection(RHConferenceModifBase):
             log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
                                                                                COORDINATOR_PRIV_TITLES[priv_field])
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
+
+
+class RHMoveEvent(RHConferenceModifBase):
+    """Move event to a different category"""
+
+    def _process(self):
+        category = Category.get_one(request.json['category_id'], is_deleted=False)
+        self.event_new.move(category)
+        flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, category.title), 'success')
+        return jsonify_data(flash=False)

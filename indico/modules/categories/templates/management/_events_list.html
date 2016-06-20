@@ -25,8 +25,9 @@
                data-href="{{ url_for('event_management.delete', event) }}"
                data-ajax-dialog
                data-reload-after></a>
-            <a class="i-button-icon icon-transmission"
-               title="{% trans %}Move to different category{% endtrans %}"></a>
+            <a class="i-button-icon icon-transmission js-move-event-to-subcategory"
+               title="{% trans %}Move to different category{% endtrans %}"
+               data-href="{{ url_for('event_management.move', event) }}"></a>
             <a href="{{ url_for('event.conferenceDisplay', event) }}"
                class="i-button-icon icon-arrow-right"
                title="{% trans %}Go to the event display page{% endtrans %}"></a>

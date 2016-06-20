@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockEvent, RHUnlockEvent,
-                                                          RHShowNonInheriting, RHEventProtection)
+                                                          RHShowNonInheriting, RHEventProtection,
+                                                          RHMoveEvent)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -30,6 +31,7 @@ _bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/protection', 'protection', RHEventProtection, methods=('GET', 'POST'))
+_bp.add_url_rule('/move', 'move', RHMoveEvent, methods=('POST',))
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():
     if object_type == 'subcontribution':
