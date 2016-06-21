@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, simple_form %}
 
 {%- block content %}
     <div class="i-box-group vert">
@@ -10,9 +10,21 @@
                 </div>
                 <div class="i-box-buttons toolbar right">
                     <div class="group">
-                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">Merge users</a>
+                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">{% trans %}Merge users{% endtrans %}</a>
+                    </div>
+                    <div class="group">
+                        <a class="i-button icon-plus" href="{{ url_for('.users_create') }}">{% trans %}Create a new account{% endtrans %}</a>
+                    </div>
+                    <div class="group">
+                        <a class="i-button icon-info" href="{{ url_for('.registration_requests_list') }}">
+                            {% trans %}Registration requests{% endtrans %}
+                        </a>
                     </div>
                 </div>
+            </div>
+            <div class="i-box-content">
+                <h2>{% trans %} Account creation settings {% endtrans %} </h2>
+                {{ simple_form(user_management_form, back_button=false) }}
             </div>
             <div class="i-box-content">
                 <div class="info-message-box">
