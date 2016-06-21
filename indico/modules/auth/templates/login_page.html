@@ -54,7 +54,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {% if indico_config.LocalIdentities %}
+        {% if local_registration_enabled and indico_config.LocalIdentities %}
             <p class="register">
                 {% trans url=url_for('.register', next=request.args.get('next')) -%}
                     If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
