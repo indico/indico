@@ -23,6 +23,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole, get_available_roles
+from indico.modules.categories import Category
 from indico.modules.events.cloning import get_event_cloners
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
@@ -249,9 +250,10 @@ def _render_location_field(event, **kwargs):
 
 
 @template_hook('event-category-field')
-def _render_category_field(**kwargs):
+def _render_category_field(category_id, **kwargs):
     from indico.modules.events.forms import EventCategoryForm
-    form = EventCategoryForm()
+    category = Category.get_one(int(category_id), is_deleted=False) if category_id else None
+    form = EventCategoryForm(obj=FormDefaults(category=category))
     tpl = get_template_module('forms/_form.html')
     return tpl.form_row(form.category, skip_label=True)
 
