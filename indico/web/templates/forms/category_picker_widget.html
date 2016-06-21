@@ -22,6 +22,14 @@
             var $categoryTitle = $('#category-title-{{ field.id }}');
             var $dialogTrigger = $('#categorynav-button-{{ field.id }}');
             var hiddenData = $field.val() ? JSON.parse($field.val()) : {};
+            var actionOn = {};
+
+            {% if not field.allow_events -%}
+                actionOn.categoriesWithEvents = {disabled: true};
+            {%- endif %}
+            {% if not field.allow_subcats -%}
+                actionOn.categoriesWithSubcategories = {disabled: true};
+            {%- endif %}
 
             if (hiddenData) {
                 $categoryTitle.text(hiddenData.title);
@@ -32,7 +40,7 @@
                 evt.preventDefault();
                 $('<div>').categorynavigator({
                     openInDialog: true,
-                    selectLeafOnly: {{ field.select_leaf_only | tojson }},
+                    actionOn: actionOn,
                     onAction: function(category) {
                         var evt = $.Event('indico:categorySelected');
                         var dfd = $.Deferred();

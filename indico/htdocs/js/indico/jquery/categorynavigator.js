@@ -28,8 +28,22 @@
             openInDialog: false,
             // The title for the category navigator dialog
             dialogTitle: $T.gettext("Select a category"),
-            // Restrict action to categories with no subcategories
-            selectLeafOnly: false,
+            // Disallow action on specific categories
+            actionOn: {
+                categoriesWithSubcategories: {
+                    disabled: false,
+                    message: $T.gettext("Not possible for categories containing subcategories")
+                },
+                categoriesWithEvents: {
+                    disabled: false,
+                    message: $T.gettext("Not possible for categories containing events")
+                },
+                categories: {
+                    disabled: false,
+                    message: $T.gettext("Not possible for this category"),
+                    ids: []
+                }
+            },
             // Callback for action button
             // If it returns a deferred object the dialog will close only when it gets resolved
             onAction: function() {}
@@ -209,19 +223,35 @@
         _buildSidePanel: function(category, withGoToParent) {
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
+            var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
+            var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
 
             var $button = $('<span>', {
                 class: 'action-button',
                 text: self.options.actionButtonText
-            }).on('click', function(evt) {
-                evt.stopPropagation();
-                if (!self.options.selectLeafOnly || category.category_count === 0) {
-                    self._onAction(category);
-                }
             });
-            if (self.options.selectLeafOnly && category.category_count) {
-                $button.addClass('disabled').attr('title', $T.gettext("You cannot select this category"));
+
+            if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
+                $button.addClass('disabled').attr('title', categoriesWithSubcategories.message);
             }
+            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.event_count) {
+                $button.addClass('disabled').attr('title', categoriesWithEvents.message);
+            }
+            if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {
+                $button.addClass('disabled').attr('title', self.options.actionOn.categories.message);
+            }
+            if (!$button.hasClass('disabled')) {
+                $button.on('click', function(evt) {
+                    evt.stopPropagation();
+                    self._onAction(category);
+                });
+            } else {
+                $button.on('click', function(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                });
+            }
+
             $buttonWrapper.append($('<div>').append($button));
 
             if (withGoToParent && category.path && category.path.length) {

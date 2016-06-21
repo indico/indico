@@ -250,12 +250,19 @@ class IndicoPasswordField(PasswordField):
 
 
 class CategoryField(HiddenField):
-    """Field that lets you select a category"""
+    """WTForms field that lets you select a category.
+
+    :param allow_events: Whether to allow selecting a category that
+                         contains events.
+    :param allow_subcats: Whether to allow selecting a category that
+                          contains subcategories.
+    """
 
     widget = JinjaWidget('forms/category_picker_widget.html')
 
     def __init__(self, *args, **kwargs):
-        self.select_leaf_only = kwargs.pop('select_leaf_only', False)
+        self.allow_events = kwargs.pop('allow_events', True)
+        self.allow_subcats = kwargs.pop('allow_subcats', True)
         super(CategoryField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):

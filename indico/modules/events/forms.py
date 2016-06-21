@@ -72,4 +72,4 @@ class EventPersonLinkForm(IndicoForm):
 
 
 class EventCategoryForm(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], select_leaf_only=True)
+    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
