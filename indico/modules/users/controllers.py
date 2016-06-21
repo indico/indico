@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import transaction
+
 from collections import namedtuple
 from datetime import datetime
 from operator import attrgetter
@@ -28,15 +30,19 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 from indico.core import signals
 from indico.core.db import db
 from indico.core.notifications import make_email
-from indico.modules.users import User, logger
+from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.users import RegistrationRequest
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
-from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm
-from indico.modules.auth.forms import LocalRegistrationForm
+from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserManagementForm, UserEmailsForm,
+                                        SearchForm, MergeForm)
+from indico.modules.auth.forms import AdminAccountRegistrationForm
+from indico.util import user as user_utils
 from indico.util.date_time import timedelta_split
 from indico.util.event import truncate_path
+from indico.util.emails import notify_of_registration_request_approval
 from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -54,6 +60,7 @@ from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
+
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
@@ -287,21 +294,24 @@ class RHUsersAdminSettings(RHAdminBase):
     """Admin users overview"""
 
     def _process(self):
-        form = SearchForm(obj=FormDefaults(exact=True))
-        form_data = form.data
+        search_form = SearchForm(obj=FormDefaults(exact=True))
+        user_management_form = self._create_user_management_form()
+        search_form_data = search_form.data
+        user_mgt_form_data = user_management_form.data
         search_results = None
         num_of_users = User.query.count()
         num_deleted_users = User.find(is_deleted=True).count()
-        if form.validate_on_submit():
+
+        if not user_management_form.is_submitted() and search_form.validate_on_submit():
             search_results = []
-            exact = form_data.pop('exact')
-            include_deleted = form_data.pop('include_deleted')
-            include_pending = form_data.pop('include_pending')
-            external = form_data.pop('external')
-            form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
+            exact = search_form_data.pop('exact')
+            include_deleted = search_form_data.pop('include_deleted')
+            include_pending = search_form_data.pop('include_pending')
+            external = search_form_data.pop('external')
+            search_form_data = {k: v for (k, v) in search_form_data.iteritems() if v and v.strip()}
 
             for entry in search_users(exact=exact, include_deleted=include_deleted,
-                                      include_pending=include_pending, external=external, **form_data):
+                                      include_pending=include_pending, external=external, **search_form_data):
                 if isinstance(entry, User):
                     search_results.append(UserEntry(profile_url=url_for('.user_profile', entry),
                                                     **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}))
@@ -311,15 +321,45 @@ class RHUsersAdminSettings(RHAdminBase):
                         **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}))
 
             search_results.sort(key=attrgetter('first_name', 'last_name'))
-        return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
-                                            num_of_users=num_of_users, num_deleted_users=num_deleted_users)
+
+        if user_management_form.is_submitted() and user_management_form.validate_on_submit():
+            self._save_account_mgmt_settings(user_mgt_form_data)
+
+        return WPUsersAdmin.render_template('users_admin.html', form=search_form, search_results=search_results,
+                                            num_of_users=num_of_users, num_deleted_users=num_deleted_users,
+                                            user_management_form=user_management_form)
+
+    def _create_user_management_form(self):
+        return UserManagementForm(obj=FormDefaults(**self._load_management_settings()))
+
+    def _load_management_settings(self):
+        return {
+            'notify_on_new_account': user_management_settings.get('notify_account_creation'),
+            'local_account_creation': user_management_settings.get('authorised_account_creation'),
+            'account_moderation_workflow': user_management_settings.get('moderate_account_creation')
+        }
+
+    def _save_account_mgmt_settings(self, data):
+        settings = user_management_settings
+        settings.set('notify_account_creation', data.pop('notify_on_new_account'))
+        settings.set('authorised_account_creation', data.pop('local_account_creation'))
+        settings.set('moderate_account_creation', data.pop('account_moderation_workflow'))
 
 
 class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
 
     def _process(self):
-        form = LocalRegistrationForm()
+        from indico.modules.auth.controllers import LocalRegistrationHandler
+
+        form = AdminAccountRegistrationForm()
+        handler = LocalRegistrationHandler(self)
+
+        if form.validate_on_submit():
+            user_utils.create_user(form, handler)
+            flash(_('Account has been successfully created.'))
+            return redirect(url_for('.users_create'))
+
         return WPUsersAdmin.render_template('users_create.html', form=form)
 
 
@@ -377,3 +417,37 @@ class RHUsersAdminMergeCheck(RHAdminBase):
         target = User.get_one(request.args['target'])
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings)
+
+
+class RHUsersRegistrationRequests(RHAdminBase):
+
+    def _process(self):
+        request_id = request.view_args.get('request_id', False)
+
+        if request_id:
+            if request.method == 'DELETE':
+                return self._reject_request(request_id)
+            elif request.method == 'POST':
+                return self._approve_request(request_id)
+
+        pending_requests = RegistrationRequest.find_all(approved=False)
+        return WPUsersAdmin.render_template('users_registration_requests.html', pending_requests=pending_requests)
+
+    def _reject_request(self, request_id):
+        request = RegistrationRequest.find_first(id=request_id)
+        if request:
+            db.session.delete(request)
+            transaction.commit()
+
+        return jsonify(success=True)
+
+    def _approve_request(self, request_id):
+        request = RegistrationRequest.find_first(id=request_id)
+        request.approve()
+        self._send_confirmation(request.email)
+
+        return jsonify(success=True)
+
+    def _send_confirmation(self, email):
+        notify_of_registration_request_approval(email, 'auth.register')
+        return redirect(url_for('.registration_requests_list'))

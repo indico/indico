@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
 from indico.core.settings.models.settings import Setting, SettingPrincipal
-from indico.util.user import iter_acl
 
 
 class ACLProxy(ACLProxyBase):
@@ -52,6 +51,7 @@ class ACLProxy(ACLProxyBase):
         :param name: Setting name
         :param user: A :class:`.User`
         """
+        from indico.util.user import iter_acl
         return any(user in principal for principal in iter_acl(self.get(name)))
 
     def add_principal(self, name, principal):

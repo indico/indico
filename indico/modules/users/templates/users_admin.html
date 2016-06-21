@@ -12,9 +12,25 @@
                 </div>
                 <div class="i-box-buttons toolbar right">
                     <div class="group">
-                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">Merge users</a>
+                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">{% trans %}Merge users{% endtrans %}</a>
+                    </div>
+                    <div class="group">
+                        <a class="i-button icon-plus" href="{{ url_for('.users_create') }}">{% trans %}Create a new account{% endtrans %}</a>
+                    </div>
+                    <div class="group">
+                        <a class="i-button icon-info" href="{{ url_for('.registration_requests_list') }}">
+                            {% trans %}Registration requests{% endtrans %}
+                        </a>
                     </div>
                 </div>
+            </div>
+            <div class="i-box-content">
+                <h2>{% trans %} Account creation settings {% endtrans %} </h2>
+                {{ form_header(user_management_form) }}
+                {{ form_rows(user_management_form, skip=('submit_field',)) }}
+                {% call form_footer(user_management_form) %}
+                    {{ user_management_form.submit_field(class_='i-button big highlight') }}
+                {% endcall %}
             </div>
             <div class="i-box-content">
                 <div class="info-message-box">

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHRegister, RHLinkAccount,
-                                             RHResetPassword, RHAccounts, RHRemoveAccount)
+                                             RHResetPassword, RHAccounts, RHRemoveAccount, RHCreateRegistrationRequest)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -34,6 +34,8 @@ _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), defaults={'provider': None})
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))
+_bp.add_url_rule('/register/registration-requests', 'create_registration_request', RHCreateRegistrationRequest,
+                 methods=('GET', 'POST'))
 
 _bp.add_url_rule('/reset-password/', 'resetpass', RHResetPassword, methods=('GET', 'POST'))
 

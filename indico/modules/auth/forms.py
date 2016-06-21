@@ -84,6 +84,10 @@ class RegistrationEmailForm(IndicoForm):
     email = EmailField(_('Email address'), [DataRequired(), _check_existing_email], filters=[_tolower])
 
 
+class RegistrationRequestForm(IndicoForm):
+    comment = StringField(_('Comment for the admins'))
+
+
 class RegistrationForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
@@ -104,6 +108,10 @@ class LocalRegistrationForm(RegistrationForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+
+
+class AdminAccountRegistrationForm(LocalRegistrationForm):
+    email = EmailField(_('Email address'), [DataRequired(), _check_existing_email])
 
 
 class ResetPasswordEmailForm(IndicoForm):
