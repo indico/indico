@@ -20,7 +20,7 @@ from io import BytesIO
 from math import ceil
 
 from flask import jsonify, request, session
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import subqueryload, load_only
 from werkzeug.exceptions import NotFound
 from sqlalchemy.orm import joinedload, undefer
 
@@ -128,7 +128,8 @@ def _serialize_category(category, with_path=False):
         'can_access': category.can_access(session.user)
     }
     if with_path:
-        data['path'] = [{'id': c.id, 'title': c.title} for c in category.parent_chain_query]
+        data['path'] = [{'id': c.id, 'title': c.title}
+                        for c in category.parent_chain_query.options(load_only('id', 'title'))]
     return data
 
 
@@ -136,9 +137,11 @@ class RHCategoryInfo(RHDisplayCategoryBase):
     @property
     def _category_query_options(self):
         children_strategy = joinedload('children')
+        children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode')
+        children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
-        return children_strategy, joinedload('acl_entries')
+        return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode')
 
     def _process(self):
         return jsonify_data(category=_serialize_category(self.category, with_path=True),
