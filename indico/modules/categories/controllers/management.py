@@ -274,6 +274,25 @@ class RHDeleteSubcategories(RHManageCategoryBase):
                                 category_ids=[x.id for x in self.subcategories])
 
 
+class RHMoveSubcategories(RHMoveCategoryBase):
+    """Bulk-move subcategories"""
+
+    def _checkParams(self):
+        RHMoveCategoryBase._checkParams(self)
+        subcategory_ids = map(int, request.values.getlist('category_id'))
+        self.subcategories = Category.query.with_parent(self.category).filter(Category.id.in_(subcategory_ids)).all()
+        if self.destination.id in subcategory_ids:
+            raise BadRequest(_("Cannot move a category inside itself."))
+        if self.destination.parent_chain_query.filter(Category.id.in_(subcategory_ids)).count():
+            raise BadRequest(_("Cannot move a category in a descendant of itself."))
+
+    def _process(self):
+        map(lambda x: move_category(x, self.destination), self.subcategories)
+        flash(ngettext('{} category moved into "{}".', '{} categories moved in "{}".', len(self.subcategories))
+              .format(len(self.subcategories), self.destination.title), 'success')
+        return redirect(url_for('.manage_content', self.category))
+
+
 class RHSortSubcategories(RHManageCategoryBase):
     def _process(self):
         subcategories = {category.id: category for category in self.category.children}

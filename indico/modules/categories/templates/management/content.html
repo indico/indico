@@ -47,13 +47,14 @@
                     title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
         </div>
         <div class="group right">
-            <button class="i-button icon-transmission"></button>
+            <button class="i-button icon-transmission js-bulk-move-category"></button>
             <button class="i-button icon-remove js-bulk-delete-category"></button>
         </div>
     </div>
     <table class="i-table category-management"
            data-sort-url="{{ url_for('.sort_subcategories', category) }}"
-           data-bulk-delete-url="{{ url_for('.delete_subcategories', category) }}">
+           data-bulk-delete-url="{{ url_for('.delete_subcategories', category) }}"
+           data-bulk-move-url="{{ url_for('.move_subcategories', category) }}">
         <thead>
             <tr class="i-table">
                 <th class="i-table column-icon"></th>
