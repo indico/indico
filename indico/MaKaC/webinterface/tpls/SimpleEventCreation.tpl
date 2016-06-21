@@ -14,7 +14,7 @@
             <td>
                 <div class="form-group">
                     <div class="form-field">
-                        ${ template_hook('event-category-field') }
+                        ${ template_hook('event-category-field', category_id=categ["id"]) }
                     </div>
                 </div>
             </td>
