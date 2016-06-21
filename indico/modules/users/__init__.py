@@ -20,6 +20,7 @@ from flask import session, render_template
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.settings.core import SettingsProxy
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
@@ -40,6 +41,12 @@ user_settings = UserSettingsProxy('users', {
     'show_past_events': False,
     'use_previewer_pdf': True,
     'synced_fields': None  # None to synchronise all fields, empty set to not synchronize
+})
+
+user_management_settings = SettingsProxy('user_management', {
+    'notify_account_creation': False,
+    'moderate_account_creation': False,
+    'authorised_account_creation': False
 })
 
 
