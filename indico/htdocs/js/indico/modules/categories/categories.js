@@ -45,6 +45,7 @@
         var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var $bulkDeleteButton = $('.js-bulk-delete-category');
+        var $bulkMoveButton = $('.js-bulk-move-category');
         var categoryRowSelector = 'tr[data-category-id]';
         var checkboxSelector = 'input[name=category_id]';
 
@@ -114,6 +115,14 @@
             suppress: false,
             content: {
                 text: bulkDeleteButtonTooltipContent
+            }
+        });
+
+        enableIfChecked($tbody, checkboxSelector, $bulkMoveButton);
+        $bulkMoveButton.on('click', bulkMoveCategories).qtip({
+            suppress: false,
+            content: {
+                text: getBulkMoveButtonTooltipContent
             }
         });
 
@@ -201,6 +210,34 @@
                         $selectedRows.remove();
                         updateCategoryDeleteButton(data.is_empty);
                     }
+                }
+            });
+        }
+
+        function getBulkMoveButtonTooltipContent() {
+            var $checked = getSelectedRows();
+            if ($checked.length) {
+                return $T.ngettext("Move the selected category", "Move the {0} selected categories", $checked.length)
+                    .format($checked.length);
+            } else {
+                return $T.gettext("Select the categories to move first.");
+            }
+        }
+
+        function bulkMoveCategories() {
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                selectLeafOnly: false, // FIXME: Select category without events only
+                actionButtonText: $T.gettext('Move here'),
+                onAction: function(category) {
+                    var $form = $('<form>').attr('action', $table.data('bulk-move-url')).attr('method', 'POST')
+                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
+                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
+                        .appendTo('body');
+                    $.each(getSelectedCategories(), function(index, value) {
+                        $('<input>').attr('name', 'category_id').attr('value', value).appendTo($form);
+                    });
+                    $form.submit();
                 }
             });
         }
