@@ -25,7 +25,6 @@ from werkzeug.exceptions import NotFound
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
@@ -150,9 +149,8 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 class RHCategorySearch(RH):
     def _process(self):
-        starts_with = '{}%'.format(escape_like(request.args['q']))
         query = (Category.query
-                 .filter(Category.title.ilike(starts_with))
+                 .filter(Category.title_matches(request.args['q']))
                  .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries'))
                  .order_by(db.func.lower(Category.title))
                  .limit(10))
