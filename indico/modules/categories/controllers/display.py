@@ -123,9 +123,11 @@ def _serialize_category(category, with_path=False):
         'id': category.id,
         'title': category.title,
         'is_protected': category.is_protected,
-        'category_count': category.deep_children_count,
-        'event_count': category.deep_events_count,
-        'can_access': category.can_access(session.user)
+        'event_count': len(category.events),
+        'deep_category_count': category.deep_children_count,
+        'deep_event_count': category.deep_events_count,
+        'can_access': category.can_access(session.user),
+
     }
     if with_path:
         data['path'] = [{'id': c.id, 'title': c.title}
