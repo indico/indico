@@ -40,6 +40,11 @@ def delete_category(category):
     logger.info('Category %s deleted by %s', category, session.user)
 
 
+def move_category(category, destination):
+    category.parent = destination
+    db.session.flush()
+    logger.info('Category %s moved to %s by %s', category, destination, session.user)
+
 def update_category(category, data, skip=()):
     category.populate_from_dict(data, skip=skip)
     db.session.flush()

@@ -22,6 +22,12 @@
        data-method="POST"></a>
 {% endmacro %}
 
+{% macro move_category_button(category, classes="i-button") %}
+    <a class="{{ classes }} icon-transmission js-move-category"
+       title="{% trans %}Move to another category{% endtrans %}"
+       data-move-url="{{ url_for('.move', category) }}"></a>
+{% endmacro %}
+
 {% block banner_title %}
     {{ category.title }}
 {% endblock %}
@@ -30,9 +36,7 @@
     <div class="action-menu">
         <div class="toolbar">
             <div class="group">
-                <a class="i-button icon-transmission js-move-category"
-                   title="{% trans %}Move under another category{% endtrans %}"
-                   href="#"></a>
+                {{ move_category_button(category) }}
                 {{ delete_category_button(category) }}
             </div>
             <div class="group">
