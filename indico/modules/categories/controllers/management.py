@@ -22,11 +22,11 @@ from io import BytesIO
 from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.categories import logger
-from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.controllers.base import RHManageCategoryBase, RHMoveCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
@@ -232,20 +232,15 @@ class RHDeleteCategory(RHManageCategoryBase):
             return redirect(url)
 
 
-class RHMoveCategory(RHManageCategoryBase):
+class RHMoveCategory(RHMoveCategoryBase):
     """Move a category."""
 
     def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
-        self.destination = self._category_query.filter_by(id=request.values['destination_id'], is_deleted=False).one()
-        if not self.destination.can_manage(session.user):
-            raise Forbidden(_("You are not allowed to manage the selected destination."))
+        RHMoveCategoryBase._checkParams(self)
         if self.destination == self.category:
             raise BadRequest(_("Cannot move the category inside itself."))
         if self.destination.parent_chain_query.filter(Category.id == self.category.id).count():
             raise BadRequest(_("Cannot move the category in a descendant of itself."))
-        if self.destination.events:
-            raise BadRequest(_("The destination already contains an event."))
 
     def _process(self):
         move_category(self.category, self.destination)
