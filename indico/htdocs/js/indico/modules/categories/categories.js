@@ -24,8 +24,20 @@
 
     function setupCategoryMoveButton() {
         $('.js-move-category').on('click', function(evt) {
+            var $button = $(this);
             evt.preventDefault();
-            $('<div>').categorynavigator({openInDialog: true});
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                selectLeafOnly: false, // FIXME: Select category without events only
+                actionButtonText: $T.gettext('Move here'),
+                onAction: function(category) {
+                    $('<form>').attr('action', $button.data('move-url')).attr('method', 'POST')
+                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
+                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
+                        .appendTo('body')
+                        .submit();
+                }
+            });
         });
     }
 
@@ -65,6 +77,34 @@
                     updateCategoryDeleteButton(data.is_parent_empty);
                 }
             });
+        });
+
+        $('.js-move-category').on('click', function(evt) {
+            evt.preventDefault();
+            var $button = $(this);
+            evt.preventDefault();
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                selectLeafOnly: false, // FIXME: Select category without events only
+                actionButtonText: $T.gettext('Move here'),
+                onAction: function(category) {
+                    $('<form>').attr('action', $button.data('move-url')).attr('method', 'POST')
+                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
+                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
+                        .appendTo('body')
+                        .submit();
+                }
+            });
+        });
+
+        enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {
+            return $checkboxes.filter(':not([data-is-empty=true])').length == 0;
+        });
+        $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
+            suppress: false,
+            content: {
+                text: bulkDeleteButtonTooltipContent
+            }
         });
 
         enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {

@@ -30,7 +30,7 @@ from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.operations import create_category, delete_category, update_category
+from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
 from indico.modules.events.operations import delete_event
@@ -230,6 +230,27 @@ class RHDeleteCategory(RHManageCategoryBase):
         else:
             flash(_('Category "{}" has been deleted.').format(self.category.title), 'success')
             return redirect(url)
+
+
+class RHMoveCategory(RHManageCategoryBase):
+    """Move a category."""
+
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.destination = self._category_query.filter_by(id=request.values['destination_id'], is_deleted=False).one()
+        if not self.destination.can_manage(session.user):
+            raise Forbidden(_("You are not allowed to manage the selected destination."))
+        if self.destination == self.category:
+            raise BadRequest(_("Cannot move the category inside itself."))
+        if self.destination.parent_chain_query.filter(Category.id == self.category.id).count():
+            raise BadRequest(_("Cannot move the category in a descendant of itself."))
+        if self.destination.events:
+            raise BadRequest(_("The destination already contains an event."))
+
+    def _process(self):
+        move_category(self.category, self.destination)
+        flash(_('Category "{}" moved in "{}".').format(self.category.title, self.destination.title), 'success')
+        return redirect(request.referrer) or url_for('.manage_settings')
 
 
 class RHCategoryMoveContents(RHManageCategoryBase):

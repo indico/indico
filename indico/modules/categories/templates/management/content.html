@@ -26,9 +26,7 @@
             </a>
         </td>
         <td class="i-table actions">
-            <a class="i-button-icon icon-transmission js-move-category"
-               title="{% trans %}Move under another category{% endtrans %}"
-               href="#"></a>
+            {{ move_category_button(subcategory, 'i-button-icon') }}
             {{ delete_category_button(subcategory, 'i-button-icon') }}
         </td>
     </tr>

@@ -19,28 +19,34 @@ from __future__ import unicode_literals
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
                                                            RHCategoryInfo, RHCategorySearch)
 from indico.modules.categories.controllers.management import (RHCategoryMoveContents, RHCreateCategory,
-                                                              RHDeleteCategory, RHDeleteSubcategories,
+                                                              RHDeleteCategory, RHDeleteEvents, RHDeleteSubcategories,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryProtection,
                                                               RHManageCategorySettings, RHSortSubcategories,
-                                                              RHDeleteEvents, RHSplitCategory, RHMoveEvents)
+                                                              RHManageCategorySettings, RHMoveCategory, RHMoveEvents,
+                                                              RHSortSubcategories, RHSplitCategory)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtual_template_folder='categories',
                       url_prefix='/category/<int:category_id>')
 
+# TODO: Remove when not used anymore
+_bp.add_url_rule('/manage/move-example', 'move_example', RHCategoryMoveContents)
+
 # Category management
 _bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)
 _bp.add_url_rule('/manage/delete', 'delete', RHDeleteCategory, methods=('POST',))
 _bp.add_url_rule('/manage/icon', 'manage_icon', RHManageCategoryIcon, methods=('POST', 'DELETE'))
 _bp.add_url_rule('/manage/logo', 'manage_logo', RHManageCategoryLogo, methods=('POST', 'DELETE'))
+_bp.add_url_rule('/manage/move', 'move', RHMoveCategory, methods=('POST',))
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
-_bp.add_url_rule('/manage/move', 'move-contents', RHCategoryMoveContents)
+
+# Event management
 _bp.add_url_rule('/manage/events/delete', 'delete_events', RHDeleteEvents, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/events/split', 'split_category', RHSplitCategory, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/events/move', 'move_events', RHMoveEvents, methods=('POST',))
+_bp.add_url_rule('/manage/events/split', 'split_category', RHSplitCategory, methods=('GET', 'POST'))
 
 # Subcategory management
 _bp.add_url_rule('/manage/subcategories/create', 'create_subcategory', RHCreateCategory, methods=('GET', 'POST'))
