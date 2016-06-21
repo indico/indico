@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import BadRequest, NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
 from indico.util.i18n import _
@@ -57,3 +57,13 @@ class RHManageCategoryBase(RHCategoryBase):
     def _checkProtection(self):
         if not self.category.can_manage(session.user):
             raise Forbidden
+
+
+class RHMoveCategoryBase(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.destination = Category.get_one(int(request.form['destination_id']), is_deleted=False)
+        if not self.destination.can_manage(session.user):
+            raise Forbidden(_("You are not allowed to manage the selected destination."))
+        if self.destination.events:
+            raise BadRequest(_("The destination already contains an event."))
