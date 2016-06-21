@@ -241,10 +241,10 @@
             }
 
             var $info = $('<div>')
-                .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.category_count)
-                                            .format(category.category_count)}))
-                .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.event_count)
-                                            .format(category.event_count)}));
+                .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.deep_category_count)
+                                            .format(category.deep_category_count)}))
+                .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.deep_event_count)
+                                            .format(category.deep_event_count)}));
             $buttonWrapper.append($info);
 
             return $buttonWrapper;
