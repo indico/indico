@@ -366,6 +366,7 @@ if __name__ == '__main__':
             categories = indico_zodbimport.modules.categories:CategoryImporter
             event_acls = indico_zodbimport.modules.event_acls:EventACLImporter
             legal = indico_zodbimport.modules.legal:LegalImporter
+            user_management = indico_zodbimport.modules.user_management:UserManagementImporter
             """,
           zip_safe=False,
           packages=foundPackages,
