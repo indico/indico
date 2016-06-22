@@ -107,6 +107,10 @@ class LocalRegistrationForm(RegistrationForm):
     comment = StringField(_('Comment for the moderators'))
 
 
+class AdminAccountRegistrationForm(LocalRegistrationForm):
+    email = EmailField(_('Email address'), [DataRequired(), _check_existing_email])
+
+
 class ResetPasswordEmailForm(IndicoForm):
     email = EmailField(_('Email address'), [DataRequired()], filters=[_tolower])
 

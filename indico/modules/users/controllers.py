@@ -351,8 +351,14 @@ class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
 
     def _process(self):
-        form = LocalRegistrationForm()
-        return WPUsersAdmin.render_template('users_create.html', form=form)
+        from indico.modules.auth.controllers import LocalRegistrationHandler
+        form = AdminAccountRegistrationForm()
+        if form.validate_on_submit():
+            handler = LocalRegistrationHandler(self)
+            create_user(form, handler)
+            flash(_('Account has been successfully created.'), 'success')
+            return redirect(url_for('.users_create'))
+        return WPUsersAdmin.render_template('users_admin_create.html', form=form)
 
 
 def _get_merge_problems(source, target):
