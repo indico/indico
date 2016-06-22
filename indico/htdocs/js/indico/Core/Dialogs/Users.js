@@ -1338,11 +1338,26 @@ type("UserListWidget", ["ListWidget"],
             });
 
             var remove_button = $('<i class="remove-user icon-close">').click(function() {
-                self.removeProcess(userData, function(result) {
+                var currentUserId = $('body').data('user-id');
+                var userId = userData.get('id');
+                var confirmed;
+
+                function setResult(result) {
                     if (result) {
                         self.set(user.key, null);
                         self.userListField.inform();
                     }
+                }
+
+                if (currentUserId === userId) {
+                    confirmed = confirmPrompt($T.gettext('Are you sure you want to remove yourself from the list?'),
+                                              $T.gettext('Confirm action'));
+                } else {
+                    confirmed = $.Deferred().resolve();
+                }
+
+                confirmed.then(function() {
+                    self.removeProcess(userData, setResult);
                 });
             });
 
@@ -1726,4 +1741,3 @@ type("UserListField", ["IWidget"], {
         this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
      }
 );
-
