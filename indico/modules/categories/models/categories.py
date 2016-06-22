@@ -271,6 +271,43 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """
         db.session.execute(db.func.categories.sync_event_category_chains(self.id))
 
+    @classmethod
+    def get_tree_cte(cls, col='id'):
+        """Create a CTE for the category tree.
+
+        The CTE contains the followign columns:
+        - ``id`` -- the category id
+        - ``path`` -- an array containing the path from the root to
+                      the category itself
+        - ``is_deleted`` -- whether the category is deleted
+
+        :param col: The name of the column to use in the path
+        """
+        cat_alias = db.aliased(cls)
+        path_column = getattr(cat_alias, col)
+        cte_query = (select([cat_alias.id, array([path_column]).label('path'), cat_alias.is_deleted])
+                     .where(cat_alias.parent_id.is_(None))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id,
+                             cte_query.c.path.op('||')(path_column),
+                             cte_query.c.is_deleted | cat_alias.is_deleted])
+                     .where(cat_alias.parent_id == cte_query.c.id))
+        cte_query = cte_query.union_all(rec_query)
+        return cte_query
+
+    @property
+    def deep_children_query(self):
+        """Get a query object for all subcategories.
+
+        This includes subcategories at any level of nesting.
+        """
+        cte = Category.get_tree_cte()
+        return (Category.query
+                .join(cte, Category.id == cte.c.id)
+                .filter(cte.c.path.contains([self.id]),
+                        cte.c.id != self.id,
+                        ~cte.c.is_deleted))
+
     @staticmethod
     def _get_chain_query(start_criterion):
         cte_query = (select([Category.id, Category.parent_id, literal(0).label('level')])
@@ -299,26 +336,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """
         return self._get_chain_query(Category.id == self.parent_id)
 
-    @staticmethod
-    def _get_ancestry_query():
-        cte_query = (select([Category.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
-                     .where(Category.parent_id.is_(None) & ~Category.is_deleted)
-                     .cte('chains', recursive=True))
-        parent_query = (select([Category.id, cte_query.c.parents.op('||')(Category.parent_id)])
-                        .where((Category.parent_id == cte_query.c.id) & ~Category.is_deleted))
-        return cte_query.union_all(parent_query)
-
-    @property
-    def deep_children_query(self):
-        """Get a query object for all subcategories.
-
-        This includes subcategories at any level of nesting.
-        """
-        cte_query = self._get_ancestry_query()
-        return (Category.query
-                .join(cte_query, Category.id == cte_query.c.id)
-                .filter(cte_query.c.parents.contains([self.id])))
-
     @property
     def icon_url(self):
         """Get the HTTP URL of the icon."""
@@ -345,37 +362,29 @@ def _mappers_configured():
     # the `undefer` query option, e.g. `.options(undefer('chain_titles'))`.
 
     from indico.modules.events import Event
-    cat_alias = db.aliased(Category)
 
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
-    cte_query = (select([cat_alias.id, array([cat_alias.title]).label('path')])
-                 .where(cat_alias.parent_id.is_(None))
-                 .cte(recursive=True))
-    parent_query = (select([cat_alias.id, cte_query.c.path.op('||')(cat_alias.title)])
-                    .where((cat_alias.parent_id == cte_query.c.id)))
-    cte_query = cte_query.union_all(parent_query)
-    query = select([cte_query.c.path]).where(cte_query.c.id == Category.id).correlate_except(cte_query)
+    cte = Category.get_tree_cte('title')
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
     Category.chain_titles = column_property(query, deferred=True)
 
     # Category.deep_events_count -- the number of events in the category
     # or any child category (excluding deleted events)
-    query = (select([db.func.count()])
-             .where(Event.category_chain.contains(array([Category.id])) & ~Event.is_deleted)
-             .correlate_except(Event))
+    cte = Category.get_tree_cte()
+    crit = db.and_(cte.c.id == Event.category_id,
+                   cte.c.path.contains(array([Category.id])),
+                   ~cte.c.is_deleted,
+                   ~Event.is_deleted)
+    query = select([db.func.count()]).where(crit).correlate_except(Event)
     Category.deep_events_count = column_property(query, deferred=True)
 
     # Category.deep_children_count -- the number of subcategories in the
     # category or any child category (excluding deleted ones)
-    cte_query = (select([cat_alias.id, db.cast(array([]), ARRAY(db.Integer)).label('parents')])
-                 .where(cat_alias.parent_id.is_(None) & ~cat_alias.is_deleted)
-                 .cte(recursive=True))
-    parent_query = (select([cat_alias.id, cte_query.c.parents.op('||')(cat_alias.parent_id)])
-                    .where((cat_alias.parent_id == cte_query.c.id) & ~cat_alias.is_deleted))
-    cte_query = cte_query.union_all(parent_query)
-    query = (select([db.func.count()])
-             .where(cte_query.c.parents.contains(array([Category.id])))
-             .correlate_except(cte_query))
+    cte = Category.get_tree_cte()
+    crit = db.and_(cte.c.path.contains(array([Category.id])),
+                   cte.c.id != Category.id, ~cte.c.is_deleted)
+    query = select([db.func.count()]).where(crit).correlate_except(cte)
     Category.deep_children_count = column_property(query, deferred=True)
 
 
