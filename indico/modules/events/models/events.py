@@ -556,9 +556,49 @@ def _add_timetable_consistency_trigger(target, conn, **kw):
     sql = """
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER UPDATE OF start_dt, end_dt
-        ON {}
+        ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('event');
-    """.format(target.fullname)
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
+
+
+@listens_for(Event.__table__, 'after_create')
+def _add_deletion_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_deleted_insert
+        AFTER INSERT
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_consistency_deleted();
+
+        CREATE CONSTRAINT TRIGGER consistent_deleted_update
+        AFTER UPDATE OF category_id, category_chain, is_deleted
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_consistency_deleted();
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
+
+
+@listens_for(Event.__table__, 'after_create')
+def _add_category_chain_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_category_chain_insert
+        AFTER INSERT
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_category_chain_consistency();
+
+        CREATE CONSTRAINT TRIGGER consistent_category_chain_update
+        AFTER UPDATE OF category_id, category_chain
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_category_chain_consistency();
+    """.format(table=target.fullname)
     DDL(sql).execute(conn)
