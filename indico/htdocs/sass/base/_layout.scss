@@ -51,10 +51,6 @@ body > * {
             float: left;
             padding: 0 1em 0 1em;
 
-            &.col-20 {
-                width: 20%;
-            }
-
             &.col-40 {
                 width: 40%;
             }
@@ -65,10 +61,6 @@ body > * {
 
             &.col-60 {
                 width: 60%;
-            }
-
-            &.col-80 {
-                width: 80%;
             }
 
             &.col-full {
