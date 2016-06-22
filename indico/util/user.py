@@ -14,13 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from functools import wraps
 
+from flask import session
+
+from indico.core import signals
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.util.decorators import smart_decorator
+from indico.web.flask.templating import get_template_module
 
 from MaKaC.common.cache import GenericCache
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 def iter_acl(acl):
@@ -181,3 +189,43 @@ def unify_user_args(fn, legacy=False):
         return fn(*args, **kwargs)
 
     return wrapper
+
+
+def create_user(user_form, handler, pending_user=None):
+    """Creates a new user based on the data passed as argument"""
+    from indico.modules.users import user_management_settings
+    from indico.modules.users.models.users import User
+    from indico.util.emails import send_notification_to_admins
+
+    user_data = user_form.data
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+
+    if pending_user:
+        user = pending_user
+        user.is_pending = True
+    else:
+        user = User()
+
+    user_form.populate_obj(user, skip={'email'})
+    if user_form.email.data in user.secondary_emails:
+        user.make_email_primary(user_form.email.data)
+    else:
+        user.email = user_form.email.data
+
+    identity = handler.create_identity(user_data)
+    user.identities.add(identity)
+    user.secondary_emails |= handler.get_all_emails(user_form) - {user.email}
+    user.favorite_users.add(user)
+    timezone = session.timezone
+    if timezone == 'LOCAL':
+        timezone = Config.getInstance().getDefaultTimezone()
+
+    user.settings.set('timezone', timezone)
+    user.settings.set('lang', session.lang or minfo.getLang())
+    handler.update_user(user, user_data)
+    db.session.flush()
+    signals.users.registered.send(user)
+
+    if user_management_settings.get('notify_account_creation'):
+        send_notification_to_admins(get_template_module('auth/emails/account_creation_email.txt', user=user))
+    return user, identity
