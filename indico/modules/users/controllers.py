@@ -27,10 +27,14 @@ from sqlalchemy.orm import undefer
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.notifications import make_email
+from indico.modules.auth.forms import AdminAccountRegistrationForm, LocalRegistrationForm
+from indico.modules.auth.util import notify_of_registration_request_approval
 from indico.modules.categories import Category
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.users import RegistrationRequest
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
@@ -44,9 +48,11 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
+from indico.util.user import create_user
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
@@ -411,3 +417,27 @@ class RHRegistrationRequestList(RHAdminBase):
     def _process(self):
         return WPUsersAdmin.render_template('registration_requests.html',
                                             pending_requests=RegistrationRequest.find_all())
+
+
+class RHRegistrationRequestsREST(RHAdminBase):
+    """Approve/Reject registration request"""
+
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHAdminBase._checkParams(self, params)
+        self.request = RegistrationRequest.get_one(request.view_args['request_id'])
+
+    def _process_DELETE(self):
+        db.session.delete(self.request)
+        flash(_('The request has been rejected'), 'success')
+        return jsonify_data(flash=False, redirect=url_for('.registration_request_list'))
+
+    def _process_POST(self):
+        from indico.modules.auth.controllers import LocalRegistrationHandler
+        pending_user = User.find_first(email=self.request.email, is_pending=True)
+        user, identity = create_user(self.request.user_data, LocalRegistrationHandler(self), pending_user=pending_user)
+        notify_of_registration_request_approval(user, 'auth.register')
+        db.session.delete(self.request)
+        flash(_('The request has been successfully approved'), 'success')
+        return redirect(url_for('.registration_request_list'))
