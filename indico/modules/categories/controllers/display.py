@@ -28,13 +28,14 @@ from indico.core.db import db
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
-from indico.modules.categories.views import WPCategoryStatistics
+from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
+from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RH
 
@@ -174,3 +175,12 @@ class RHCategorySearch(RH):
         query = query.limit(10)
         return jsonify_data(categories=[_serialize_category(c, with_path=True, with_favorite=True) for c in query],
                             total_count=total_count, flash=False)
+
+
+class RHDisplayCategory(RHDisplayCategoryBase):
+    def _process(self):
+        future_events = []
+        past_events = []
+        events = self.category.events
+        show_news = HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive()
+        return WPCategory.render_template('display/category.html', self.category, events=events)
