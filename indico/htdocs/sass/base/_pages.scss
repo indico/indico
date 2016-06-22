@@ -39,8 +39,8 @@
             display: flex;
             align-items: baseline;
 
-            padding-top: 0.6rem;
-            min-height: 2.00rem;
+            padding-top: 0.4rem;
+            min-height: 2rem;
             border-bottom: 1px solid $separator-color;
             margin-bottom: 1rem;
 
@@ -121,7 +121,7 @@
     }
 
     .title {
-        margin-bottom: 15px;
+        margin-bottom: 19px;
         font-family: "Roboto Light", sans-serif;
         font-size: 2em;
         color: $banner-title-color;

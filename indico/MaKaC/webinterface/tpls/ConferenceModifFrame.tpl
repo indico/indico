@@ -12,9 +12,6 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
                title="${ _(u'See the display page of the event')}"
                href="${ url_for('event.conferenceDisplay', event) }">${ _(u'Switch to display view') }</a>
         </div>
-        <div id="js-event-side-menu" class="menu-column">
-            ${ sideMenu }
-        </div>
     </div>
     <div class="content-column">
         <div class="banner full-width">
@@ -46,6 +43,15 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
             </div>
             ${ template_hook('event-manage-header', event=conf) }
         </div>
+    </div>
+</div>
+<div class="layout-side-menu">
+    <div class="menu-column">
+        <div id="event-side-menu" class="menu-column">
+            ${ sideMenu }
+        </div>
+    </div>
+    <div class="content-column">
         ${ render_template('flashed_messages.html') }
         ${ body }
     </div>
