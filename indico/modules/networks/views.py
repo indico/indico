@@ -22,4 +22,4 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPNetworksAdmin(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'networks/'
-    sidemenu_option = 'networks'
+    sidemenu_option = 'ip_networks'
