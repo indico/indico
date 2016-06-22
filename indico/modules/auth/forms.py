@@ -106,10 +106,6 @@ class LocalRegistrationForm(RegistrationForm):
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
     comment = StringField(_('Comment for the moderators'))
 
-    @property
-    def user_data(self):
-        return {key: value for key, value in self.data.iteritems() if key not in {'comment', 'email', 'csrf_token'}}
-
 
 class ResetPasswordEmailForm(IndicoForm):
     email = EmailField(_('Email address'), [DataRequired()], filters=[_tolower])

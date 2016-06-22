@@ -28,10 +28,14 @@
                     <td>{{ pending_request.user_data.affiliation }}</td>
                     <td>{{ pending_request.comment }}</td>
                     <td>
-                        <a href="#" class="i-button highlight right js-registration-request">
+                        <a href="#" class="i-button highlight right"
+                           data-method="POST"
+                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
                             {% trans %}Accept{% endtrans %}
                         </a>
-                        <a href="#" class="i-button highlight right js-registration-request">
+                        <a href="#" class="i-button highlight right js-reject"
+                           data-method="DELETE"
+                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
                            {% trans %}Reject{% endtrans %}
                         </a>
                     </td>
@@ -44,4 +48,26 @@
             </tbody>
         </table>
     </div>
+    <script>
+        (function() {
+            'use strict';
+
+            $('.registration-requests .js-reject').on('click', function(evt) {
+                evt.preventDefault();
+
+                var $this = $(this);
+                $.ajax({
+                    url: $this.data('href'),
+                    type: $this.data('method'),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        if (data.success) {
+                            IndicoUI.Dialogs.Util.progress();
+                            location.href = data.redirect;
+                        }
+                    }
+                });
+            })
+        })();
+    </script>
 {%- endblock %}
