@@ -191,11 +191,11 @@ def unify_user_args(fn, legacy=False):
     return wrapper
 
 
-def create_user(user_form, handler, pending_user=None):
+def create_user(user_form, handler, pending_user=None, is_admin=False):
     """Creates a new user based on the data passed as argument"""
     from indico.modules.users import user_management_settings
     from indico.modules.users.models.users import User
-    from indico.util.emails import send_notification_to_admins
+    from indico.modules.auth.util import send_notification_to_admins
 
     user_data = user_form.data
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -207,6 +207,7 @@ def create_user(user_form, handler, pending_user=None):
         user = User()
 
     user_form.populate_obj(user, skip={'email'})
+    user.is_admin = is_admin
     if user_form.email.data in user.secondary_emails:
         user.make_email_primary(user_form.email.data)
     else:

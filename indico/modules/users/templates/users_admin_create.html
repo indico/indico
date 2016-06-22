@@ -1,0 +1,15 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, form_fieldset %}
+
+{% block title %}{% trans %}Create admin{% endtrans %}{% endblock %}
+
+{%- block content %}
+    {{ form_header(form) }}
+    {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone', 'email')) }}
+    {% call form_fieldset(_('Login details')) %}
+        {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+    {% endcall %}
+{%- endblock %}
