@@ -403,3 +403,11 @@ class RHUsersAdminMergeCheck(RHAdminBase):
         target = User.get_one(request.args['target'])
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings)
+
+
+class RHRegistrationRequestList(RHAdminBase):
+    """List all registration requests"""
+
+    def _process(self):
+        return WPUsersAdmin.render_template('registration_requests.html',
+                                            pending_requests=RegistrationRequest.find_all())
