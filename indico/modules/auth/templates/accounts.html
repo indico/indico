@@ -1,10 +1,6 @@
 {% extends 'users/base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
 
-{% block subtitle -%}
-    {% trans %}Accounts{% endtrans %}
-{%- endblock %}
-
 {% block user_content %}
     {% if indico_config.LocalIdentities %}
         <div class="i-box-group vert">
