@@ -517,8 +517,8 @@ class TimetablePDFFormat:
         self.contribsAtConfLevel = params.get('showContribsAtConfLevel', False)
         self.breaksAtConfLevel = params.get('showBreaksAtConfLevel', False)
         self.dateCloseToSessions = params.get('printDateCloseToSessions', False)
-        self.coverPage = params.get('showCoverPage', True)
-        self.tableContents = params.get('showTableContents', True)
+        self.coverPage = params.get('showCoverPage', False)
+        self.tableContents = params.get('showTableContents', False)
         self.logo = False
 
     def showContribId(self):
