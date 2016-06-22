@@ -1,39 +1,41 @@
 {% block page %}
     <div class="{% block page_class %}management-page{% endblock %}">
-        <header>
-            <div class="title">
-                <div class="text">
-                    <div class="title-with-actions">
-                        <h2>
-                            {%- block title %}{% endblock -%}
-                        </h2>
-                        {%- if self.title_actions -%}
-                            <div class="actions">
-                                {% block title_actions %}{% endblock %}
-                            </div>
-                        {%- endif -%}
+        {% if self.title() %}
+            <header>
+                <div class="title">
+                    <div class="text">
+                        <div class="title-with-actions">
+                            <h2>
+                                {%- block title %}{% endblock -%}
+                            </h2>
+                            {%- if self.title_actions -%}
+                                <div class="actions">
+                                    {% block title_actions %}{% endblock %}
+                                </div>
+                            {%- endif -%}
+                        </div>
+                        {% if self.subtitle() -%}
+                            <h3>{% block subtitle %}{% endblock %}</h3>
+                        {% endif %}
                     </div>
-                    {% if self.subtitle() -%}
-                        <h3>{% block subtitle %}{% endblock %}</h3>
+                    {% if self.page_actions() %}
+                        <div class="actions">
+                            {% block page_actions %}{% endblock %}
+                        </div>
                     {% endif %}
                 </div>
-                {% if self.page_actions() %}
-                    <div class="actions">
-                        {% block page_actions %}{% endblock %}
+                {% if self.description() -%}
+                    <div class="page-description">
+                        {% block description %}{% endblock %}
                     </div>
                 {% endif %}
-            </div>
-            {% if self.description() -%}
-                <div class="page-description">
-                    {% block description %}{% endblock %}
-                </div>
-            {% endif %}
-            {% if self.info() %}
-                <div class="page-info">
-                    {% block info %}{% endblock %}
-                </div>
-            {% endif %}
-        </header>
+                {% if self.info() %}
+                    <div class="page-info">
+                        {% block info %}{% endblock %}
+                    </div>
+                {% endif %}
+            </header>
+        {% endif %}
         <div class="page-content">
             {% block content %}{% endblock %}
         </div>
