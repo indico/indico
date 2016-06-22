@@ -1,0 +1,142 @@
+{% extends 'categories/display/base.html' %}
+{% from 'attachments/_attachments.html' import render_attachments %}
+
+{% macro subcategory_list(category) %}
+    <ul class="category-list">
+    {% for subcategory in category.children %}
+            <li>
+                <span class="protection {{ 'icon-shield' if subcategory.is_self_protected }}"></span>
+                <span class="number-events">
+                    {% set event_count=subcategory.deep_events_count %}
+                    {% if event_count %}
+                        {% trans count=event_count|format_number -%}
+                            {{ count }} event
+                        {%- pluralize -%}
+                            {{ count }} events
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans %}empty{% endtrans %}
+                    {% endif %}
+                </span>
+                <a href="{{ url_for('.display', subcategory) }}" class="name">{{ subcategory.title }}</a>
+            </li>
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro event_list() %}
+    <div class="eventList">
+        {% if category.material %}
+            <span>
+                {# TODO: understand what was shown here #}
+            </span>
+        {% endif %}
+
+        {% if future_events %}
+            <div class="topBar" style="margin-bottom: 10px">
+                <div class="content smaller">
+                    <span id="futureEventsShow">
+                        There are ${ numOfEventsInTheFuture } events in the <em>future</em>.
+                        <span class="fakeLink futureEventsLink">Show them.</span>
+                    </span>
+                    <span id="futureEventsHide" style="display: none;">
+                        <span class="fakeLink futureEventsLink">Hide</span> the events in the future (${ numOfEventsInTheFuture })
+                    </span>
+                </div>
+            </div>
+
+            <div id="futureEvents" style="display: none;">
+                {{ event_list_block(future_events) }}
+            </div>
+        {% endif %}
+        <div>
+            {{ event_list_block(events) }}
+        </div>
+        {% if past_events %}
+            <div id="pastEvents"></div>
+            <div class="topBar">
+                <div class="content smaller">
+                    <span id="pastEventsText">
+                        <span id="pastEventsShow" class="pastEventsControl">
+                            {% trans count=past_events|count %}
+                                There is {{ count }} event in the past.
+                            {% pluralize %}
+                                There are {{ count }} events in the past.
+                            {% endtrans %}
+                            <span class="fakeLink pastEventsLink">{% trans %}Show them.{% endtrans %}</span>
+                        </span>
+                        <span id="pastEventsHide" class="pastEventsControl" style="display: none;">
+                            {% trans count = past_events|count %}
+                                <span class="fakeLink pastEventsLink">Hide</span> past events ({{ count }}).
+                            {% endtrans %}
+                        </span>
+                        <span id="loadingPast" class="loadingPast"><em>{% trans %}fetching past events...{% endtrans %}</em></span>
+                    </span>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro event_list_block(events) %}
+    {# TODO: list events grouped by month #}
+    <ul>
+        {% for event in events %}
+            <li>{{ event.title }}</li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% block content %}
+    <div class="category-info">
+        {% if category.is_root %}
+            <p>
+                {% trans %}
+                    Welcome to Indico. Indico allows you to manage complex conferences, workshops and meetings.
+                {% endtrans %}
+            </p>
+            <p>
+                {% trans %}To start browsing, please select a category below.{% endtrans %}
+            </p>
+        {% else %}
+            {{ category.description }}
+        {% endif %}
+    </div>
+
+    <div>
+        {{ subcategory_list(category) }}
+        {{ event_list() }}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    {%- if category.is_root or category.attachment_count or managers %}
+        {% if category.is_root %}
+            {% if show_news %}
+                <h2 class="icon-bullhorn">
+                    {% trans %}News{% endtrans %}
+                    <a href="{{ url_for('misc.news') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
+                </h2>
+                {# TODO
+                <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
+                #}
+            {% endif %}
+            {% if upcoming_events %}
+                <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
+                {# TODO: render upcoming_events #}
+            {% endif %}
+        {% elif managers %}
+            <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
+            <ul id="manager-list">
+                {% for manager in managers %}
+                    {# TODO: sort and format managers #}
+                    <li>{{ manager }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if category.attachment_count %}
+            {{ render_attachments(category.attached_items, linked_object=category,
+                                  management=category.can_manage(session.user)) }}
+        {% endif %}
+    {% endif -%}
+{% endblock %}

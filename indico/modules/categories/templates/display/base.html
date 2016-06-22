@@ -1,0 +1,111 @@
+<div class="category-container">
+    <div class="category-header">
+        <div id="category-toolbar" class="toolbar right">
+            <div class="group">
+                {% if not category.is_root %}
+                    <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
+                        {% trans %}Parent category{% endtrans %}
+                    </a>
+                {% endif %}
+                {% if category.events %}
+                    <a id="exportIcal{{ category.id }}"
+                       class="i-button icon-calendar arrow exportIcal"
+                       title="{% trans %}Export to scheduling tool{% endtrans %}"
+                       data-id="{{ category.id }}"></a>
+                    {# TODO
+                    <span><%include file="CategoryICalExport.tpl" args="item=categ"/></span>
+                    #}
+                {% endif %}
+                <a class="i-button icon-eye arrow js-dropdown"
+                   title="{% trans %}View{% endtrans %}"
+                   data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="{# TODO url_for('.today', category) #}">{% trans %}Today's events{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{# TODO url_for('.week', category) #}">{% trans %}Week's events{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{# TODO url_for('.calendar', category) #}">{% trans %}Calendar{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{# TODO url_for('.map', category) #}">{% trans %}Category map{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
+                    </li>
+                </ul>
+                <a class="i-button icon-plus arrow js-dropdown"
+                   title="{% trans %}Create new event{% endtrans %}"
+                   data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="{# TODO url_for('event.create', event_type='lecture') #}">{% trans %}Lecture{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{# TODO url_for('event.create', event_type='meeting') #}">{% trans %}Meeting{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="{# TODO url_for('event.create', event_type='conference') #}">{% trans %}Conference{% endtrans %}</a>
+                    </li>
+                </ul>
+                {% if category.can_manage(session.user) %}
+                    <a class="i-button icon-edit arrow js-dropdown"
+                       title="{% trans %}Management options{% endtrans %}"
+                       data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="{{ url_for('categories.manage_content', category) }}">
+                                {% trans %}Edit category{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                               data-ajax-dialog
+                               data-href="{{ url_for('.create_subcategory', category) }}"
+                               data-title="{% trans %}New category{% endtrans %}">
+                                {% trans %}Add subcategory{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+            {% if session.user and not category.is_root %}
+                <div class="group">
+                    <button type="button"
+                            class="i-button fav-button icon-only icon-bookmark {{ 'enabled' if category in session.user.favorite_categories }}"
+                            data-href="{{ url_for('users.user_favorites_category_api', category) }}"></button>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if category.is_root or category.attachment_count or category.can_manage(session.user) %}
+            {% set category_title_classes = 'sidebar-padding' %}
+        {% endif %}
+        <h1 class="category-title {{ category_title_classes }}">
+            {% block title %}
+                {% if category.is_root and category.children %}
+                    {% trans %}Main categories{% endtrans %}
+                {% elif category.is_root %}
+                    {% trans %}All events{% endtrans %}
+                {% else %}
+                    {{ category.title }}
+                {% endif %}
+            {% endblock %}
+        </h1>
+    </div>
+
+    {% if self.sidebar() %}
+        <div class="category-sidebar">
+            {% block sidebar %}{% endblock %}
+        </div>
+    {% endif %}
+
+    <div class="category-content-wrapper">
+        <div class="category-content">
+            {% include 'flashed_messages.html' %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
