@@ -188,6 +188,11 @@
                 id: 'category-' + category.id
             });
 
+            var $protection = $('<div>', {class: 'protection-wrapper'});
+            if (isSubcategory || category.is_protected) {
+                $protection.append($('<span>', {class: 'protection'}).toggleClass('icon-shield', category.is_protected));
+            }
+
             var $categoryTitle = $('<div>', {class: 'title-wrapper'});
             $categoryTitle.append($('<span>', {
                 class: 'title',
@@ -198,8 +203,9 @@
             }
 
             $category.append($('<div>', {class: 'icon-wrapper'}));
+            $category.append($protection);
             $category.append($categoryTitle);
-            $category.append(self._buildSidePanel(category, !isSubcategory));
+            $category.append(self._buildSidePanel(category, isSubcategory));
             return $category;
         },
 
@@ -220,7 +226,7 @@
             return $subcategory;
         },
 
-        _buildSidePanel: function(category, withGoToParent) {
+        _buildSidePanel: function(category, forSubcategory) {
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
             var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
@@ -254,7 +260,7 @@
 
             $buttonWrapper.append($('<div>').append($button));
 
-            if (withGoToParent && category.path && category.path.length) {
+            if (!forSubcategory && category.path && category.path.length) {
                 var parent = _.last(category.path);
                 var $arrowUp = $('<a>', {
                     class: 'icon-arrow-up navigate-up',
@@ -265,17 +271,14 @@
                 $buttonWrapper.append($arrowUp);
             }
 
-            if (category.is_protected) {
-                var $protection = $('<div>').append($('<span>', {class: 'icon-shield'}));
-                $buttonWrapper.append($protection);
+            if (forSubcategory) {
+                var $info = $('<div>', {class: 'stats'})
+                    .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.deep_category_count)
+                                                .format(category.deep_category_count)}))
+                    .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.deep_event_count)
+                                                .format(category.deep_event_count)}));
+                $buttonWrapper.append($info);
             }
-
-            var $info = $('<div>')
-                .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.deep_category_count)
-                                            .format(category.deep_category_count)}))
-                .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.deep_event_count)
-                                            .format(category.deep_event_count)}));
-            $buttonWrapper.append($info);
 
             return $buttonWrapper;
         },
@@ -298,6 +301,20 @@
             }
         },
 
+        refurbishUI: function() {
+            var self = this;
+            var statsMaxWidth = 0;
+
+            // Calculate and set the width of the category statistics information for horizontal alignment
+            self.$categoryList.find('.stats').each(function() {
+                var width = this.getBoundingClientRect().width;
+                if (width > statsMaxWidth) {
+                    statsMaxWidth = width;
+                }
+            });
+            self.$categoryList.find('.item:not(.hiding) .stats').width(Math.ceil(statsMaxWidth));
+        },
+
         _renderList: function(data) {
             var self = this;
             // Avoid infinite loops if dialog closed before rendering the results
@@ -311,6 +328,7 @@
                         self.$categoryTree.append(self._buildSubcategory(subcategory));
                     });
                 }
+                self.refurbishUI();
             }
         },
 
@@ -402,7 +420,7 @@
                 complete: function() {
                     $(this).remove();
                 }
-            }).find('.title').fadeOut();
+            }).addClass('hiding').find('.title').fadeOut();
 
             self._getCategoryInfo(id).then(self._renderList.bind(self));
         }

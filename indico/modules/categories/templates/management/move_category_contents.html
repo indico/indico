@@ -33,7 +33,7 @@
                 categoriesWithEvents: {disabled: true},
                 categories: {
                     disabled: true,
-                    ids: {{ categories|map(attribute='id')|list|safe }}
+                    ids: {{ categories|map(attribute='id')|list|tojson }}
                 }
             },
             actionButtonText: $T.gettext('Move here'),

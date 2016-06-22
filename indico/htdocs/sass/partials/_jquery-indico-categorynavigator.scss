@@ -42,6 +42,10 @@
 .categorynav {
     @extend %categorynav-sizing;
 
+    a {
+        color: $link;
+    }
+
     input[type='search'] {
         @extend %form-field-input;
         width: 100%;
@@ -83,9 +87,12 @@
 
         .title {
             display: block;
+            @extend %font-family-title-light;
         }
 
         .current-category {
+            @include box-shadow(0 2px 2px 0 $light-gray);
+            min-height: 40px;
             margin-left: -10px;
             margin-right: -10px;
             padding: 10px 10px;
@@ -99,12 +106,14 @@
             }
 
             .title {
+                font-size: 1.2em;
                 font-weight: bold;
+                color: $dark-blue;
             }
         }
 
         ul.breadcrumbs {
-            display:inline-block;
+            display: inline-block;
             font-size: 0.9em;
             list-style: none;
             padding: 0;
@@ -112,6 +121,14 @@
 
             li {
                 display: inline;
+
+                a {
+                    color: inherit;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
 
                 &:not(:last-child):after {
                     content: '»';
@@ -129,9 +146,9 @@
 
             i {
                 @include border-radius(50%);
-                background: $blue;
-                color: white;
-                font-size: 1.5em;
+                border: 2px solid $blue;
+                color: $blue;
+                font-size: 16px;
                 margin-right: 1rem;
                 text-align: center;
                 height: 1.5em;
@@ -140,6 +157,16 @@
                 &:before {
                     vertical-align: middle;
                 }
+            }
+        }
+
+        .protection {
+            margin-right: 0.5rem;
+            min-width: 13px;
+            display: inline-block;
+
+            &:before {
+                color: $pastel-red;
             }
         }
 
@@ -173,10 +200,21 @@
                 }
             }
         }
+
+        .stats {
+            font-size: 0.85em;
+        }
     }
 }
 
 .category-list.loading {
+    min-height: 55px;
+    pointer-events: none;
+
+    .i-box-content * {
+        opacity: 0.7;
+    }
+
     .i-box-content:before {
         @extend %spinner;
         border-color: rgba(0, 0, 0, 0.35);
