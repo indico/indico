@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import pytz
-from sqlalchemy import orm
+from sqlalchemy import orm, DDL
 from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -256,6 +256,21 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """Check whether the user can create events in the category."""
         return user and (not self.event_creation_restricted or self.can_manage(user, role='create'))
 
+    def move(self, target):
+        """Move the category into another category."""
+        assert not self.is_root
+        self.parent = target
+        db.session.flush()
+        self.sync_event_category_chains()
+
+    def sync_event_category_chains(self):
+        """Synchronize the category chains of all events in the category.
+
+        This operation synchronizes events in the category itself and
+        also within subcategories.
+        """
+        db.session.execute(db.func.categories.sync_event_category_chains(self.id))
+
     @staticmethod
     def _get_chain_query(start_criterion):
         cte_query = (select([Category.id, Category.parent_id, literal(0).label('level')])
@@ -362,3 +377,36 @@ def _mappers_configured():
              .where(cte_query.c.parents.contains(array([Category.id])))
              .correlate_except(cte_query))
     Category.deep_children_count = column_property(query, deferred=True)
+
+
+@listens_for(Category.__table__, 'after_create')
+def _add_deletion_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_deleted_insert
+        AFTER INSERT
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_consistency_deleted();
+
+        CREATE CONSTRAINT TRIGGER consistent_deleted_update
+        AFTER UPDATE OF parent_id, is_deleted
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_consistency_deleted();
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
+
+
+@listens_for(Category.__table__, 'after_create')
+def _add_category_chain_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_category_chain_update
+        AFTER UPDATE OF parent_id
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_category_chain_consistency();
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
