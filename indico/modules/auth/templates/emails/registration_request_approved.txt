@@ -1,0 +1,19 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Your request has been approved{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {{ recipient.full_name }}
+{%- endblock %}
+
+{% block body -%}
+    {% filter dedent -%}
+        {% trans url=url_for('auth.login', _external=true)-%}
+            Your account has been approved. You can now login to your account using the following link:
+
+            {{ url }}
+        {%- endtrans %}
+    {%- endfilter %}
+{%- endblock %}

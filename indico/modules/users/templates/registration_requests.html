@@ -36,10 +36,16 @@
                     </td>
                     <td>{{ pending_request.comment }}</td>
                     <td>
-                        <a href="#" class="i-button highlight right js-registration-request">
+                        <a href="#" class="i-button highlight right js-registration-request"
+                           data-method="POST"
+                           data-params="{{ dict(email=pending_request.email, comment=pending_request.comment,
+                                                **pending_request.user_data) | tojson | forceescape }}"
+                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
                             {% trans %}Accept{% endtrans %}
                         </a>
-                        <a href="#" class="i-button highlight right js-registration-request">
+                        <a href="#" class="i-button highlight right js-registration-request"
+                           data-method="DELETE"
+                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
                            {% trans %}Reject{% endtrans %}
                         </a>
                     </td>
