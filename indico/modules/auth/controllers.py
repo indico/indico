@@ -30,10 +30,12 @@ from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationFor
                                        AddLocalIdentityForm, EditLocalIdentityForm)
 from indico.modules.auth.util import load_identity_info, send_confirmation
 from indico.modules.auth.views import WPAuth, WPAuthUser
-from indico.modules.users import User
+from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.models.users import RegistrationRequest
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
+from indico.util.user import create_user
 from indico.web.flask.util import url_for
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
@@ -220,6 +222,8 @@ class RHRegister(RH):
     def _process(self):
         if session.user:
             return redirect(url_for_index())
+
+        account_moderation_enabled = user_management_settings.get('moderate_account_creation')
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email, prevalidated = self._get_verified_email()
         if verified_email is not None:
@@ -241,6 +245,8 @@ class RHRegister(RH):
         if form.validate_on_submit():
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
+            elif account_moderation_enabled:
+                return self._create_registration_request(form)
             else:
                 return self._create_user(form, handler, pending)
         elif not form.is_submitted() and pending:
@@ -254,44 +260,25 @@ class RHRegister(RH):
                     "We are going to link it automatically."), 'info')
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
-                                      email_sent=session.pop('register_verification_email_sent', False))
+                                      email_sent=session.pop('register_verification_email_sent', False),
+                                      account_moderation_enabled=account_moderation_enabled)
 
     def _send_confirmation(self, email):
         session['register_verification_email_sent'] = True
         return send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
                                  url_args={'provider': self.provider_name})
 
+    def _create_registration_request(self, form):
+        request = RegistrationRequest(comment=form.data.get('comment'), email=form.data.get('email'),
+                                      user_data=form.user_data)
+        db.session.add(request)
+        if 'register_verified_email' in session:
+            del session['register_verified_email']
+        flash(_('Your request has been created. We will send you an email as soon as it gets approved.'))
+        return redirect(url_for('misc.index'))
+
     def _create_user(self, form, handler, pending_user):
-        data = form.data
-        if pending_user:
-            user = pending_user
-            user.is_pending = False
-        else:
-            user = User()
-        form.populate_obj(user, skip={'email'})
-        if form.email.data in user.secondary_emails:
-            # This can happen if there's a pending user who has a secondary email
-            # for some weird reason which should now become the primary email...
-            user.make_email_primary(form.email.data)
-        else:
-            user.email = form.email.data
-        identity = handler.create_identity(data)
-        user.identities.add(identity)
-        user.secondary_emails |= handler.get_all_emails(form) - {user.email}
-        user.favorite_users.add(user)
-        db.session.add(user)
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        timezone = session.timezone
-        if timezone == 'LOCAL':
-            timezone = Config.getInstance().getDefaultTimezone()
-        user.settings.set('timezone', timezone)
-        user.settings.set('lang', session.lang or minfo.getLang())
-        handler.update_user(user, form)
-        db.session.flush()
-
-        # notify everyone of user creation
-        signals.users.registered.send(user)
-
+        user, identity = create_user(form, handler, pending_user)
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')
@@ -506,7 +493,8 @@ class LocalRegistrationHandler(RegistrationHandler):
         return form
 
     def create_identity(self, data):
-        del session['register_verified_email']
+        if 'register_verified_email' in session:
+            del session['register_verified_email']
         return Identity(provider='indico', identifier=data['username'], password=data['password'])
 
     def redirect_success(self):
