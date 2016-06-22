@@ -23,6 +23,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 class WPReferenceTypes(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'events/'
+    sidemenu_option = 'reference_types'
 
 
 class WPEventDisplay(WPJinjaMixin, WPConferenceDefaultDisplayBase):
