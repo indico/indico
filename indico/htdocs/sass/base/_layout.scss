@@ -97,6 +97,8 @@ body > * {
 .layout-side-menu {
     display: flex;
     min-height: 100%;
+    margin-left: 30px;
+    margin-right: 30px;
 
     &:first-of-type {
         margin-top: 20px;
@@ -123,7 +125,6 @@ body > * {
 
     > .menu-column {
         width: 200px;
-        margin-left: 30px;
         margin-right: 30px;
 
         .group:first-child {
@@ -140,6 +141,5 @@ body > * {
     > .content-column {
         flex-grow: 1;
         width: 0;
-        margin-right: 30px;
     }
 }

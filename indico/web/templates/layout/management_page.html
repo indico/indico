@@ -2,10 +2,12 @@
 
 {% block page %}
     <div class="layout-side-menu">
-        <div class="menu-column">
-            {% block display_view_button %}{% endblock %}
-            {% block side_menu %}{% endblock %}
-        </div>
+        {% if self.display_view_button() or self.side_menu() %}
+            <div class="menu-column">
+                {% block display_view_button %}{% endblock %}
+                {% block side_menu %}{% endblock %}
+            </div>
+        {% endif %}
         <div class="content-column">
             <div class="banner">
                 <div class="title">
