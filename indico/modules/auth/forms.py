@@ -24,6 +24,7 @@ from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
+from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import ConfirmPassword, used_if_not_synced
 from indico.web.forms.widgets import SyncedInputWidget
 
@@ -104,6 +105,15 @@ class LocalRegistrationForm(RegistrationForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+    comment = StringField(_('Comment for the moderators'))
+
+    @property
+    def user_data(self):
+        data = {}
+        field_names = set(get_form_field_names(LocalRegistrationForm)) - {'comment', 'email', 'csrf_token'}
+        for field in field_names:
+            data[field] = getattr(self, field).data
+        return data
 
 
 class ResetPasswordEmailForm(IndicoForm):

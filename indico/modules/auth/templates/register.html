@@ -29,6 +29,24 @@
             {% call form_fieldset(_('Login details')) %}
                 {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
             {% endcall %}
+            {% if account_moderation_enabled %}
+                {% call form_fieldset(_('Account moderation')) %}
+                    <div class="action-box highlight">
+                        <div class="section">
+                            <div class="icon icon-info"></div>
+                            <div class="text">
+                                <div>
+                                    {% trans %}
+                                        Each account needs to be approved by one of the moderators.</br>
+                                        We will send you an email as soon as your request is approved.
+                                    {% endtrans %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_row(form.comment) }}
+                {% endcall %}
+            {% endif %}
         {% endif %}
         {% call form_footer(form) %}
             <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
