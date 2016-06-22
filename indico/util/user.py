@@ -197,24 +197,23 @@ def create_user(user_form, handler, pending_user=None):
     from indico.modules.users.models.users import User
     from indico.util.emails import send_notification_to_admins
 
-    user_data = user_form.data
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
     if pending_user:
         user = pending_user
-        user.is_pending = True
+        user.is_pending = False
     else:
         user = User()
 
-    user_form.populate_obj(user, skip={'email'})
-    if user_form.email.data in user.secondary_emails:
-        user.make_email_primary(user_form.email.data)
+    user.populate_from_dict(user_data, skip={'email', 'password', 'username', 'confirm_password', 'comment', 'emails'})
+    if user_data['email'] in user.secondary_emails:
+        user.make_email_primary(user_data['email'])
     else:
-        user.email = user_form.email.data
+        user.email = user_data['email']
 
     identity = handler.create_identity(user_data)
     user.identities.add(identity)
-    user.secondary_emails |= handler.get_all_emails(user_form) - {user.email}
+    user.secondary_emails |= set(user_data.get('emails', set())) - {user.email}
     user.favorite_users.add(user)
     timezone = session.timezone
     if timezone == 'LOCAL':

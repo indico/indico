@@ -246,7 +246,7 @@ class RHRegister(RH):
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
             elif account_moderation_enabled:
-                return self._create_registration_request(form)
+                return self._create_registration_request(form, handler)
             else:
                 return self._create_user(form, handler, pending)
         elif not form.is_submitted() and pending:
@@ -268,9 +268,10 @@ class RHRegister(RH):
         return send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
                                  url_args={'provider': self.provider_name})
 
-    def _create_registration_request(self, form):
+    def _create_registration_request(self, form, handler):
+        user_data = dict(form.data, emails=list(handler.get_all_emails(form)))
         request = RegistrationRequest(comment=form.data.get('comment'), email=form.data.get('email'),
-                                      user_data=form.user_data)
+                                      user_data=user_data)
         db.session.add(request)
         if 'register_verified_email' in session:
             del session['register_verified_email']
@@ -278,7 +279,8 @@ class RHRegister(RH):
         return redirect(url_for('misc.index'))
 
     def _create_user(self, form, handler, pending_user):
-        user, identity = create_user(form, handler, pending_user)
+        user_data = dict(form.data, emails=handler.get_all_emails(form))
+        user, identity = create_user(user_data, handler, pending_user)
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')

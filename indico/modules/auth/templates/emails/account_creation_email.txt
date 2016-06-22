@@ -1,0 +1,18 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Account has been created{% endtrans %}
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {% filter dedent %}
+        A new Indico profile has been created
+
+        Full name: {{ user.full_name }}
+        Email address: {{ user.email }}
+
+        {{ url_for('users.user_dashboard', user_id=user.id, _external=true) }}
+    {% endfilter %}
+{%- endblock %}
