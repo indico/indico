@@ -1,0 +1,47 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Registration requests{% endtrans %}
+{% endblock %}
+
+{%- block content %}
+    <div class="registration-requests">
+        <table class="i-table-widget fixed-width">
+            <thead>
+                <tr>
+                    <th>{% trans %}Email Address{% endtrans %}</th>
+                    <th>{% trans %}Username{% endtrans %}</th>
+                    <th>{% trans %}First name{% endtrans %}</th>
+                    <th>{% trans %}Last name{% endtrans %}</th>
+                    <th>{% trans %}Affiliation{% endtrans %}</th>
+                    <th>{% trans %}Comment{% endtrans %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {%- for pending_request in pending_requests %}
+                <tr>
+                    <td>{{ pending_request.email }}</td>
+                    <td>{{ pending_request.user_data.username }}</td>
+                    <td>{{ pending_request.user_data.first_name }}</td>
+                    <td>{{ pending_request.user_data.last_name }}</td>
+                    <td>{{ pending_request.user_data.affiliation }}</td>
+                    <td>{{ pending_request.comment }}</td>
+                    <td>
+                        <a href="#" class="i-button highlight right js-registration-request">
+                            {% trans %}Accept{% endtrans %}
+                        </a>
+                        <a href="#" class="i-button highlight right js-registration-request">
+                           {% trans %}Reject{% endtrans %}
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">{% trans %}There are no pending requests{% endtrans %}</td>
+                </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+    </div>
+{%- endblock %}
