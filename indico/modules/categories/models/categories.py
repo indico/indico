@@ -383,15 +383,8 @@ def _mappers_configured():
 @listens_for(Category.__table__, 'after_create')
 def _add_deletion_consistency_trigger(target, conn, **kw):
     sql = """
-        CREATE CONSTRAINT TRIGGER consistent_deleted_insert
-        AFTER INSERT
-        ON {table}
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE categories.check_consistency_deleted();
-
-        CREATE CONSTRAINT TRIGGER consistent_deleted_update
-        AFTER UPDATE OF parent_id, is_deleted
+        CREATE CONSTRAINT TRIGGER consistent_deleted
+        AFTER INSERT OR UPDATE OF parent_id, is_deleted
         ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
