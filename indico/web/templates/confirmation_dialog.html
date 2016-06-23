@@ -8,7 +8,8 @@
     </label>
 {% endmacro %}
 
-{% macro confirmation_dialog(type, content, message, extra_confirmation=true, ok_text=none, cancel_text=none) %}
+{% macro confirmation_dialog(type, content=none, message=none, extra_confirmation=true, ok_text=none, cancel_text=none,
+                             id_field_name='id', ids=[]) %}
     {# type can be any of the usual message_box types like 'warning', 'danger', 'info', 'highlight',... #}
     <form method="POST" class="confirmation-dialog">
         <div class="confirmation-dialog-content">
@@ -33,6 +34,9 @@
                 </button>
             </div>
         </div>
+        {% for id in ids %}
+            <input type="hidden" name="{{ id_field_name }}" value="{{ id }}">
+        {% endfor %}
     </form>
 
     <script>

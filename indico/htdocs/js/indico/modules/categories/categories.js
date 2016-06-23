@@ -149,6 +149,7 @@
             var $selectedRows = getSelectedRows();
             ajaxDialog({
                 url: $table.data('bulk-delete-url'),
+                method: 'POST',
                 title: $T.gettext("Delete categories"),
                 data: {
                     category_id: getSelectedCategories()

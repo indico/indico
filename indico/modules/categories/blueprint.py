@@ -40,7 +40,7 @@ _bp.add_url_rule('/manage/move', 'move-contents', RHCategoryMoveContents)
 
 # Subcategory management
 _bp.add_url_rule('/manage/subcategories/create', 'create_subcategory', RHCreateCategory, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/subcategories/delete', 'delete_subcategories', RHDeleteSubcategories, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/subcategories/delete', 'delete_subcategories', RHDeleteSubcategories, methods=('POST',))
 _bp.add_url_rule('/manage/subcategories/sort', 'sort_subcategories', RHSortSubcategories, methods=('POST',))
 
 # Display
