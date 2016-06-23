@@ -398,3 +398,16 @@ def _add_deletion_consistency_trigger(target, conn, **kw):
         EXECUTE PROCEDURE categories.check_consistency_deleted();
     """.format(table=target.fullname)
     DDL(sql).execute(conn)
+
+
+@listens_for(Category.__table__, 'after_create')
+def _add_cycle_check_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER no_cycles
+        AFTER INSERT OR UPDATE OF parent_id
+        ON {table}
+        NOT DEFERRABLE
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_cycles();
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
