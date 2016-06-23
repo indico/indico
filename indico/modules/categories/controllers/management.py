@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from io import BytesIO
+from operator import attrgetter
 
 from flask import flash, redirect, request, session
 from PIL import Image
@@ -227,19 +228,18 @@ class RHDeleteSubcategories(RHManageCategoryBase):
         RHManageCategoryBase._checkParams(self)
         self.subcategories = (Category.query
                               .with_parent(self.category)
-                              .filter(Category.id.in_(map(int, request.args.getlist('category_id'))))
+                              .filter(Category.id.in_(map(int, request.form.getlist('category_id'))))
                               .all())
 
-    def _process_GET(self):
-        return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories)
-
-    def _process_POST(self):
-        subcategories = self.subcategories
-        for subcategory in subcategories:
-            if not subcategory.is_empty:
-                raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
-            delete_category(subcategory)
-        return jsonify_data(flash=False)
+    def _process(self):
+        if 'confirmed' in request.form:
+            for subcategory in self.subcategories:
+                if not subcategory.is_empty:
+                    raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
+                delete_category(subcategory)
+            return jsonify_data(flash=False)
+        return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories,
+                                category_ids=[x.id for x in self.subcategories])
 
 
 class RHSortSubcategories(RHManageCategoryBase):
