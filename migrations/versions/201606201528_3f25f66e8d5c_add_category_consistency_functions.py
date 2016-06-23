@@ -70,34 +70,17 @@ def upgrade():
         $BODY$
         LANGUAGE plpgsql
     '''))
-    # deletion consistency
     op.execute('''
-        CREATE CONSTRAINT TRIGGER consistent_deleted_insert
-        AFTER INSERT
+        CREATE CONSTRAINT TRIGGER consistent_deleted
+        AFTER INSERT OR UPDATE OF parent_id, is_deleted
         ON categories.categories
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted()
     ''')
     op.execute('''
-        CREATE CONSTRAINT TRIGGER consistent_deleted_update
-        AFTER UPDATE OF parent_id, is_deleted
-        ON categories.categories
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE categories.check_consistency_deleted()
-    ''')
-    op.execute('''
-        CREATE CONSTRAINT TRIGGER consistent_deleted_insert
-        AFTER INSERT
-        ON events.events
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE categories.check_consistency_deleted()
-    ''')
-    op.execute('''
-        CREATE CONSTRAINT TRIGGER consistent_deleted_update
-        AFTER UPDATE OF category_id, is_deleted
+        CREATE CONSTRAINT TRIGGER consistent_deleted
+        AFTER INSERT OR UPDATE OF category_id, is_deleted
         ON events.events
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
@@ -106,8 +89,6 @@ def upgrade():
 
 
 def downgrade():
-    op.execute('DROP TRIGGER consistent_deleted_insert ON categories.categories')
-    op.execute('DROP TRIGGER consistent_deleted_update ON categories.categories')
-    op.execute('DROP TRIGGER consistent_deleted_insert ON events.events')
-    op.execute('DROP TRIGGER consistent_deleted_update ON events.events')
+    op.execute('DROP TRIGGER consistent_deleted ON categories.categories')
+    op.execute('DROP TRIGGER consistent_deleted ON events.events')
     op.execute('DROP FUNCTION categories.check_consistency_deleted()')
