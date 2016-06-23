@@ -23,7 +23,7 @@
 {% block javascript %}
     {{ super() }}
 
-    <script type="text/javascript">
+    <script>
         exportPopups["{{ item.id }}"] = new ExportIcalInterface(
             {{ api_mode|tojson }}, {{ persistent_user_enabled|tojson }}, {{ persistent_allowed|tojson }},
             {{ api_active|tojson }}, {{ user_logged|tojson }}, setURLs, 'event.api.getExportURLs',

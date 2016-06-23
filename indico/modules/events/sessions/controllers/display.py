@@ -65,7 +65,9 @@ class RHDisplaySession(RHDisplaySessionBase):
     view_class = WPDisplaySession
 
     def _process(self):
-        ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions', self.session)
+        ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions',
+                                               '/export/event/{0}/session/{1}.ics'.format(self.event_new.id,
+                                                                                          self.session.id))
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         contributions_strategy = subqueryload('contributions')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')

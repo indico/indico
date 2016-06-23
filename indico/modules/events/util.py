@@ -338,7 +338,7 @@ class ReporterBase(object):
         session.modified = True
 
 
-def get_base_ical_parameters(user, event, detail, session_=None):
+def get_base_ical_parameters(user, object, detail, path):
     """Returns a dict of all parameters expected by iCal template"""
 
     from indico.web.http_api.util import generate_public_auth_request
@@ -349,10 +349,6 @@ def get_base_ical_parameters(user, event, detail, session_=None):
     persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
     tpl = get_template_module('api/_messages.html')
     persistent_agreement = tpl.get_ical_persistent_msg()
-    if session_:
-        path = '/export/event/{0}/session/{1}.ics'.format(event.id, session_.id)
-    else:
-        path = '/export/event/{0}.ics'.format(event.id)
     top_urls = generate_public_auth_request(api_key, path)
     urls = generate_public_auth_request(api_key, path, {'detail': detail})
     request_urls = {
