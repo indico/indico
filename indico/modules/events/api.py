@@ -486,7 +486,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     def category(self, idlist):
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, idlist)),
+                         Event.category_chain_overlaps(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)

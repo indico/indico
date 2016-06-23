@@ -21,12 +21,11 @@
 
 import calendar
 from collections import defaultdict
-from BTrees.OOBTree import OOBTree
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 from MaKaC.errors import MaKaCError
-from MaKaC.common import Locators, indexes
+from MaKaC.common import Locators
 from MaKaC.conference import CategoryManager
 from MaKaC.i18n import _
 from flask import session

@@ -19,12 +19,14 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 
 import pytz
-from sqlalchemy import DDL
+from sqlalchemy import orm, DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
+from sqlalchemy.sql import select
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -70,14 +72,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        return (db.Index(None, 'category_chain', postgresql_using='gin'),
-                db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
+        return (db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
                 db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
-                db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
-                                   'category_data_set'),
-                db.CheckConstraint("category_id = category_chain[array_length(category_chain, 1)]",
-                                   'category_id_matches_chain'),
-                db.CheckConstraint("category_chain[1] = 0", 'category_chain_has_root'),
+                db.Index('ix_events_not_deleted_category', cls.is_deleted, cls.category_id),
+                db.Index('ix_events_not_deleted_category_dates',
+                         cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
+                db.CheckConstraint("category_id IS NOT NULL OR is_deleted", 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
@@ -113,11 +113,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('categories.categories.id'),
         nullable=True,
         index=True
-    )
-    #: The category chain of the event (from immediate parent to root)
-    category_chain = db.Column(
-        ARRAY(db.Integer),
-        nullable=True
     )
     #: If this event was cloned, the id of the parent event
     cloned_from_id = db.Column(
@@ -299,6 +294,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - surveys (Survey.event_new)
     # - timetable_entries (TimetableEntry.event_new)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
+
+    @classmethod
+    def category_chain_overlaps(cls, category_ids):
+        """
+        Create a filter that checks whether the event has any of the
+        provided category ids in its parent chain.
+
+        :param category_ids: A list of category ids or a single
+                             category id
+        """
+        from indico.modules.categories import Category
+        if not isinstance(category_ids, (list, tuple, set)):
+            category_ids = [category_ids]
+        cte = Category.get_tree_cte()
+        return (cte.c.id == Event.category_id) & cte.c.path.overlap(category_ids)
 
     @property
     @memoize_request
@@ -536,9 +546,15 @@ Event.register_location_events()
 Event.register_protection_events()
 
 
-@listens_for(Event.category, 'set')
-def _category_id_set(target, value, *unused):
-    target.category_chain = [x.id for x in value.chain_query]
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    from indico.modules.categories import Category
+
+    # Event.category_chain -- the category ids of the event, starting
+    # with the root category down to the event's immediate parent.
+    cte = Category.get_tree_cte()
+    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
+    Event.category_chain = column_property(query, deferred=True)
 
 
 @listens_for(Event.start_dt, 'set')
@@ -575,30 +591,10 @@ def _add_deletion_consistency_trigger(target, conn, **kw):
         EXECUTE PROCEDURE categories.check_consistency_deleted();
 
         CREATE CONSTRAINT TRIGGER consistent_deleted_update
-        AFTER UPDATE OF category_id, category_chain, is_deleted
+        AFTER UPDATE OF category_id, is_deleted
         ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted();
-    """.format(table=target.fullname)
-    DDL(sql).execute(conn)
-
-
-@listens_for(Event.__table__, 'after_create')
-def _add_category_chain_consistency_trigger(target, conn, **kw):
-    sql = """
-        CREATE CONSTRAINT TRIGGER consistent_category_chain_insert
-        AFTER INSERT
-        ON {table}
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE events.check_category_chain_consistency();
-
-        CREATE CONSTRAINT TRIGGER consistent_category_chain_update
-        AFTER UPDATE OF category_id, category_chain
-        ON {table}
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE events.check_category_chain_consistency();
     """.format(table=target.fullname)
     DDL(sql).execute(conn)
