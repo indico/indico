@@ -55,11 +55,11 @@ def serialize_category_ical(category, user, event_filter):
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
-             .filter(Event.category_chain.contains([int(category.getId())]),
+             .filter(Event.category_chain_overlaps(int(category.getId())),
                      ~Event.is_deleted,
                      event_filter)
-             .options(load_only('id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
-                                'own_room_name', 'protection_mode'),
+             .options(load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
+                                'own_room_name', 'protection_mode', 'access_key'),
                       subqueryload('acl_entries'),
                       joinedload('person_links'),
                       own_room_strategy,
@@ -114,10 +114,11 @@ def serialize_category_atom(category, url, user, event_filter):
                          involving the start/end date of the event.
     """
     query = (Event.query
-             .filter(Event.category_chain.contains([int(category.getId())]),
+             .filter(Event.category_chain_overlaps(int(category.getId())),
                      ~Event.is_deleted,
                      event_filter)
-             .options(load_only('id', 'start_dt', 'title', 'description', 'protection_mode'),
+             .options(load_only('id', 'category_id', 'start_dt', 'title', 'description', 'protection_mode',
+                                'access_key'),
                       subqueryload('acl_entries'))
              .order_by(Event.start_dt))
     events = [e for e in query if e.can_access(user)]
@@ -138,7 +139,7 @@ def get_events_by_year(category_id=None):
                         from subcategories are also included.
     :return: An `OrderedDict` mapping years to event counts.
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
              .query(db.cast(db.extract('year', Event.start_dt), db.Integer).label('year'),
                     db.func.count())
@@ -157,7 +158,7 @@ def get_contribs_by_year(category_id=None):
                         included.
     :return: An `OrderedDict` mapping years to contribution counts.
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
              .query(db.cast(db.extract('year', TimetableEntry.start_dt), db.Integer).label('year'),
                     db.func.count())
@@ -178,7 +179,7 @@ def get_attachment_count(category_id=None):
                         included.
     :return: The number of attachments
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     subcontrib_contrib = db.aliased(Contribution)
     query = (db.session
              .query(db.func.count(Attachment.id))

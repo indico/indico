@@ -139,23 +139,3 @@ def _create_check_timetable_consistency(sender, connection, **kwargs):
         LANGUAGE plpgsql
     """)
     DDL(sql).execute(connection)
-
-
-@signals.db_schema_created.connect_via('events')
-def _create_check_category_chain_consistency(sender, connection, **kwargs):
-    sql = textwrap.dedent("""
-        CREATE FUNCTION events.check_category_chain_consistency() RETURNS trigger AS
-        $BODY$
-        BEGIN
-            IF NOT categories.do_check_category_chain_consistency(NEW.category_id) THEN
-                RAISE EXCEPTION SQLSTATE 'INDX2' USING
-                MESSAGE = 'Categories inconsistent',
-                DETAIL = 'Invalid category chain';
-            END IF;
-
-            RETURN NULL;
-        END;
-        $BODY$
-        LANGUAGE plpgsql
-    """)
-    DDL(sql).execute(connection)
