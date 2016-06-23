@@ -106,14 +106,26 @@
 {% block sidebar %}
     {%- if category.is_root or category.attachment_count or managers %}
         {% if category.is_root %}
-            {% if show_news %}
+            {% if news_list %}
                 <h2 class="icon-bullhorn">
                     {% trans %}News{% endtrans %}
                     <a href="{{ url_for('misc.news') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
                 </h2>
-                {# TODO
-                <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
-                #}
+                <ul class="main-page-list">
+                    {% for news in news_list %}
+                        <li>
+                            {# FIXME: We currently have no way to link to a specific news. #}
+                            <a class="title" href="{{ url_for('misc.news') }}">
+                                {{ news.title }}
+                            </a>
+                            <span class="timing">
+                                {% trans date=news.creation_dt|format_date(format='medium') %}
+                                    Posted on {{ date }}
+                                {% endtrans %}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
             {% if upcoming_events %}
                 <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>

@@ -26,6 +26,7 @@ from werkzeug.exceptions import NotFound
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
+from indico.modules import ModuleHolder
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats, serialize_category_ical
@@ -186,8 +187,14 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         future_events = []
         past_events = []
         events = self.category.events
-        show_news = HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive()
-        return WPCategory.render_template('display/category.html', self.category, events=events,
+
+        if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
+            news_list = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
+                         in ModuleHolder().getById('news').getNewsItemsList()[:2]]
+        else:
+            news_list = []
+
+        return WPCategory.render_template('display/category.html', self.category, events=events, news_list=news_list,
                                           **get_base_ical_parameters(session.user, self.category, 'category',
                                                                      '/export/categ/{0}.ics'.format(self.category.id)))
 
