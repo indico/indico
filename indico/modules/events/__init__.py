@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash, session, g, render_template
+from flask import request, redirect, flash, session, render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -212,32 +212,6 @@ class SubmitterRole(ManagementRole):
 def _sidemenu_items(sender, **kwargs):
     yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
                        section='customization')
-
-
-@signals.event.moved.connect
-def _event_moved(conf, old_parent, new_parent, **kwargs):
-    if new_parent.getCategoryPath()[0] != '0':
-        g.setdefault('detached_events_moved', set()).add(conf.as_event)
-        return
-    event = conf.as_event
-    event.category = new_parent.as_new
-
-
-@signals.category.moved.connect
-def _category_moved(category, old_parent, new_parent, **kwargs):
-    raise Exception("Adapt to new code. Can probably go away.")
-    events = Event.find(Event.category_chain.contains([int(category.id)])).all()
-    # update the category chain of all events from the moved category
-    for event in events:
-        event.category_chain = map(int, event.category.getCategoryPath())
-    # update the category chain of all events from the target category
-    for event in g.get('detached_events_moved', set()):
-        # the event was in the target category of of the category move
-        assert event.category_id == int(new_parent.id)
-        # and it is now in the category that has just been moved
-        assert int(event.as_legacy.getOwner().id) == int(category.id)
-        # this will also update the chain (sqlalchemy hook)
-        event.category_id = int(category.id)
 
 
 @signals.app_created.connect

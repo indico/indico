@@ -137,7 +137,7 @@ class UserCategoryEventFetcher(IteratedDataFetcher):
         from indico.modules.events import Event
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, catIds)),
+                         Event.category_chain_overlaps(map(int, catIds)),
                          Event.happens_between(self._fromDT, self._toDT)))
         return self._process(x.as_legacy for x in query)
 

@@ -1,7 +1,7 @@
 """Make event timetable consistency trigger conditional
 
 Revision ID: 3bdd6bf0181a
-Revises: 18755f50c6e7
+Revises: 535f817f2533
 Create Date: 2016-06-20 15:28:37.547704
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3bdd6bf0181a'
-down_revision = '18755f50c6e7'
+down_revision = '535f817f2533'
 
 
 def upgrade():

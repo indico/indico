@@ -261,15 +261,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         assert not self.is_root
         self.parent = target
         db.session.flush()
-        self.sync_event_category_chains()
-
-    def sync_event_category_chains(self):
-        """Synchronize the category chains of all events in the category.
-
-        This operation synchronizes events in the category itself and
-        also within subcategories.
-        """
-        db.session.execute(db.func.categories.sync_event_category_chains(self.id))
+        # TODO: trigger category moved signal
 
     @classmethod
     def get_tree_cte(cls, col='id'):
@@ -404,18 +396,5 @@ def _add_deletion_consistency_trigger(target, conn, **kw):
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted();
-    """.format(table=target.fullname)
-    DDL(sql).execute(conn)
-
-
-@listens_for(Category.__table__, 'after_create')
-def _add_category_chain_consistency_trigger(target, conn, **kw):
-    sql = """
-        CREATE CONSTRAINT TRIGGER consistent_category_chain_update
-        AFTER UPDATE OF parent_id
-        ON {table}
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE PROCEDURE categories.check_category_chain_consistency();
     """.format(table=target.fullname)
     DDL(sql).execute(conn)
