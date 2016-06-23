@@ -126,7 +126,8 @@ class RHContributionDisplay(RHContributionDisplayBase):
             reviewing_status = paper_upload_form = paper_file_data = None
             show_paper = False
 
-        ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions')
+        ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions',
+                                               '/export/event/{0}.ics'.format(self.event_new.id))
         contrib = (Contribution.query
                    .filter_by(id=self.contrib.id)
                    .options(joinedload('type'),
