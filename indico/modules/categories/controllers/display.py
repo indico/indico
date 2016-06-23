@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
 from io import BytesIO
 from math import ceil
 
@@ -27,11 +28,14 @@ from sqlalchemy.orm import joinedload, undefer
 from indico.core.db import db
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.util import get_category_stats
+from indico.modules.categories.util import get_category_stats, serialize_category_ical
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
+from indico.modules.events.models.events import Event
+from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
@@ -183,4 +187,13 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         past_events = []
         events = self.category.events
         show_news = HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive()
-        return WPCategory.render_template('display/category.html', self.category, events=events)
+        return WPCategory.render_template('display/category.html', self.category, events=events,
+                                          **get_base_ical_parameters(session.user, self.category, 'category',
+                                                                     '/export/categ/{0}.ics'.format(self.category.id)))
+
+
+class RHExportCategoryICAL(RHDisplayCategoryBase):
+    def _process(self):
+        filename = '{}-category.ics'.format(secure_filename(self.category.title, str(self.category.id)))
+        buf = serialize_category_ical(self.category, session.user, Event.end_dt >= (now_utc() - timedelta(weeks=4)))
+        return send_file(filename, buf, 'text/calendar')

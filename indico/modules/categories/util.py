@@ -60,7 +60,7 @@ def serialize_category_ical(category, user, event_filter):
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
-             .filter(Event.category_chain_overlaps(int(category.getId())),
+             .filter(Event.category_chain_overlaps(category.id),
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',

@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
-                                                           RHCategoryInfo, RHCategorySearch, RHDisplayCategory)
+                                                           RHCategoryInfo, RHCategorySearch, RHDisplayCategory,
+                                                           RHExportCategoryICAL)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -59,6 +60,7 @@ _bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHCategoryIcon)
 _bp.add_url_rule('/logo-<slug>.png', 'display_logo', RHCategoryLogo)
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/info', 'info', RHCategoryInfo)
+_bp.add_url_rule('/events.ics', 'export_ical', RHExportCategoryICAL)
 
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
