@@ -63,6 +63,7 @@ def roombooking_occurrences_digest():
     digest_end = get_month_end(digest_start)
 
     occurrences = ReservationOccurrence.find(
+        Room.is_active,
         Room.notifications_enabled,
         Reservation.is_accepted,
         Reservation.repeat_frequency == RepeatFrequency.WEEK,
@@ -97,6 +98,7 @@ def roombooking_occurrences():
         return
 
     occurrences = ReservationOccurrence.find(
+        Room.is_active,
         Room.notifications_enabled,
         Reservation.is_accepted,
         Reservation.repeat_frequency != RepeatFrequency.WEEK,
