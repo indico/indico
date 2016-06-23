@@ -194,7 +194,16 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         else:
             news_list = []
 
+        legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
+        upcoming_events = [{'status': status,
+                            'start_dt': start_or_end_dt if not status == 'ongoing' else None,
+                            'end_dt': start_or_end_dt if status == 'ongoing' else None,
+                            'title': title,
+                            'id': event_id}
+                           for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
+
         return WPCategory.render_template('display/category.html', self.category, events=events, news_list=news_list,
+                                          upcoming_events=upcoming_events,
                                           **get_base_ical_parameters(session.user, self.category, 'category',
                                                                      '/export/categ/{0}.ics'.format(self.category.id)))
 

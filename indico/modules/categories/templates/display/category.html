@@ -129,7 +129,26 @@
             {% endif %}
             {% if upcoming_events %}
                 <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
-                {# TODO: render upcoming_events #}
+                <ul class="main-page-list">
+                    {% for event in upcoming_events %}
+                    <li>
+                        <a class="title" title="{{ event.title }}" href="{{ url_for('event.conferenceDisplay', confId=event.id)}}">
+                            {{ event.title }}
+                        </a>
+                        <span class="timing">
+                            {% if event.status == 'ongoing' %}
+                                {% trans time=event.end_dt|format_datetime(format='weekday') %}
+                                    ongoing till {{ time }}
+                                {% endtrans %}
+                            {% else %}
+                                {% trans time=event.start_dt|format_datetime(format='weekday') %}
+                                    starts {{ time }}
+                                {% endtrans %}
+                            {% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
         {% elif managers %}
             <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
