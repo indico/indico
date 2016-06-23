@@ -80,3 +80,40 @@ def _create_check_consistency_deleted(sender, connection, **kwargs):
         LANGUAGE plpgsql
     """)
     DDL(sql).execute(connection)
+
+
+@signals.db_schema_created.connect_via('categories')
+def _create_check_cycles(sender, connection, **kwargs):
+    sql = textwrap.dedent("""
+        CREATE FUNCTION categories.check_cycles() RETURNS trigger AS
+        $BODY$
+        DECLARE
+            rows int;
+        BEGIN
+            -- use dynamic sql to prevent pg from preparing the statement with a crappy query plan
+            EXECUTE $$
+                WITH RECURSIVE chains(id, path, is_cycle) AS (
+                    SELECT id, ARRAY[id], false
+                    FROM categories.categories
+
+                    UNION ALL
+
+                    SELECT cat.id, chains.path || cat.id, cat.id = ANY(chains.path)
+                    FROM categories.categories cat, chains
+                    WHERE cat.parent_id = chains.id AND NOT chains.is_cycle
+                )
+                SELECT 1 FROM chains WHERE is_cycle;
+            $$;
+            GET DIAGNOSTICS rows = ROW_COUNT;
+            IF rows != 0 THEN
+                RAISE EXCEPTION SQLSTATE 'INDX2' USING
+                    MESSAGE = 'Categories inconsistent',
+                    DETAIL = 'Cycle detected';
+            END IF;
+
+            RETURN NULL;
+        END;
+        $BODY$
+        LANGUAGE plpgsql
+    """)
+    DDL(sql).execute(connection)
