@@ -24,10 +24,11 @@
         {% endif %}
         <div class="form-group form-group-footer">
             <div class="form-field">
-                <button id="js-button-action" class="i-button big {{ type }} right" {% if extra_confirmation %}disabled{% endif %}>
+                <button type="submit" id="js-button-action" name="confirmed"
+                        class="i-button big {{ type }} right" {% if extra_confirmation %}disabled{% endif %}>
                     {{ ok_text|default(_("Perform action"), true) }}
                 </button>
-                <button id="js-button-close" class="i-button big right" data-button-back>
+                <button type="button" id="js-button-close" class="i-button big right" data-button-back>
                     {{ cancel_text|default(_("I've changed my mind!"), true) }}
                 </button>
             </div>
