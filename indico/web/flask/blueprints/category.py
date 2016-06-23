@@ -19,7 +19,7 @@ from indico.web.flask.util import redirect_view, make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-category = IndicoBlueprint('category', __name__, url_prefix='/category')
+category = IndicoBlueprint('category', __name__, url_prefix='/category-old')
 
 
 # Short URLs
