@@ -22,9 +22,8 @@ from math import ceil
 from operator import attrgetter
 
 from flask import jsonify, request, session
-from sqlalchemy.orm import subqueryload, load_only
+from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import NotFound
-from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
 from indico.modules import ModuleHolder
