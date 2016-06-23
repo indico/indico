@@ -100,6 +100,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     """
     if format == 'code':
         format = 'dd/MM/yyyy HH:mm'
+    elif format == 'weekday':
+        format = 'EEEE, HH:mm'
     if not locale:
         locale = get_current_locale()
     if keep_tz:
