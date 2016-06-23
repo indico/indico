@@ -166,8 +166,7 @@ $(document).ready(function() {
     });
 
     $('.js-dropdown').each(function() {
-        this.id = this.id || uniqueId();
-        $(this).parent().dropdown({selector: '#' + this.id});
+        $(this).parent().dropdown({selector: '.js-dropdown'});
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
