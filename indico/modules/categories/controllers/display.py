@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 from io import BytesIO
 from math import ceil
+from operator import attrgetter
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, load_only
@@ -202,8 +203,10 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                             'id': event_id}
                            for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
 
-        return WPCategory.render_template('display/category.html', self.category, events=events, news_list=news_list,
-                                          upcoming_events=upcoming_events,
+        managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
+
+        return WPCategory.render_template('display/category.html', self.category, events=events, managers=managers,
+                                          news_list=news_list, upcoming_events=upcoming_events,
                                           **get_base_ical_parameters(session.user, self.category, 'category',
                                                                      '/export/categ/{0}.ics'.format(self.category.id)))
 

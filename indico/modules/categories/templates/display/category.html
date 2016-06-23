@@ -154,8 +154,9 @@
             <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
             <ul id="manager-list">
                 {% for manager in managers %}
-                    {# TODO: sort and format managers #}
-                    <li>{{ manager }}</li>
+                    <li class="{{ 'icon-user' if manager.is_single_person else 'icon-users' }}">
+                        {{ manager.name }}
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}
