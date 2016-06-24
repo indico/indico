@@ -243,9 +243,12 @@ class RHMoveCategory(RHMoveCategoryBase):
             raise BadRequest(_("Cannot move the category in a descendant of itself."))
 
     def _process(self):
-        move_category(self.category, self.destination)
-        flash(_('Category "{}" moved in "{}".').format(self.category.title, self.destination.title), 'success')
-        return redirect(request.referrer) or url_for('.manage_settings')
+        if 'confirmed' in request.form:
+            move_category(self.category, self.destination)
+            flash(_('Category "{}" moved in "{}".').format(self.category.title, self.destination.title), 'success')
+            return jsonify_data(flash=False)
+        return jsonify_template('categories/management/move_categories.html', categories=[self.category],
+                                category_ids=[self.category.id], destination=self.destination)
 
 
 class RHCategoryMoveContents(RHManageCategoryBase):
@@ -287,10 +290,14 @@ class RHMoveSubcategories(RHMoveCategoryBase):
             raise BadRequest(_("Cannot move a category in a descendant of itself."))
 
     def _process(self):
-        map(lambda x: move_category(x, self.destination), self.subcategories)
-        flash(ngettext('{} category moved into "{}".', '{} categories moved in "{}".', len(self.subcategories))
-              .format(len(self.subcategories), self.destination.title), 'success')
-        return redirect(url_for('.manage_content', self.category))
+        if 'confirmed' in request.form:
+            for subcategory in self.subcategories:
+                move_category(subcategory, self.destination)
+            flash(ngettext('{} category moved to "{}".', '{} categories moved in "{}".', len(self.subcategories))
+                  .format(len(self.subcategories), self.destination.title), 'success')
+            return jsonify_data(flash=False)
+        return jsonify_template('categories/management/move_categories.html', categories=self.subcategories,
+                                category_ids=[x.id for x in self.subcategories], destination=self.destination)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
