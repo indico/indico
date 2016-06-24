@@ -62,10 +62,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     $this.closest(categoryRowSelector).remove();
-                    if (data.is_empty) {
-                        $('.banner .js-delete-category').removeClass('disabled')
-                            .attr('title', $T.gettext("Delete category"));
-                    }
+                    updateCategoryDeleteButton(data.is_parent_empty);
                 }
             });
         });
@@ -123,12 +120,13 @@
             });
         }
 
-        function updateCategoryDeleteButton() {
-            if ($table.find(categoryRowSelector).length) {
-                $('.banner .js-delete-category').addClass('disabled');
-            } else {
+        function updateCategoryDeleteButton(enabled) {
+            if (enabled) {
                 $('.banner .js-delete-category').removeClass('disabled')
                     .attr('title', $T.gettext("Delete category"));
+            } else {
+                $('.banner .js-delete-category').addClass('disabled')
+                    .attr('title', $T.gettext("This category cannot be deleted because it is not empty."));
             }
         }
 
@@ -161,7 +159,7 @@
                         // the page after deleting a selected category.
                         $selectedRows.find('input[type=checkbox]').prop('checked', false);
                         $selectedRows.remove();
-                        updateCategoryDeleteButton();
+                        updateCategoryDeleteButton(data.is_empty);
                     }
                 }
             });
