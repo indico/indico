@@ -40,13 +40,11 @@
         _cache: {},
 
         _typeaheadTemplate:
-        '<form>\
-            <div class="typeahead__container">\
-                <div class="typeahead__field">\
-                    <span class="typeahead__query"></span>\
-                </div>\
+        '<div class="typeahead__container">\
+            <div class="typeahead__field">\
+                <span class="typeahead__query"></span>\
             </div>\
-        </form>',
+        </div>',
 
         _create: function() {
             var self = this;
