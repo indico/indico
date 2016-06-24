@@ -70,7 +70,8 @@
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
             confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
             dialogClasses: '',  // extra classes to add to the dialog canvas
-            hidePageHeader: false  // if the default page header (title/subtitle/description) should be hidden
+            hidePageHeader: false,  // if the default page header (title/subtitle/description) should be hidden
+            fullyModal: false  // Makes the dialog the only scrollable element
         }, options);
 
         var confirmCloseMessage = $T('You have unsaved changes. Do you really want to close the dialog without saving?');
@@ -175,13 +176,8 @@
                 popup.canvas.on('ajaxDialog:reload', function() {
                     loadDialog();
                 });
-
                 injectJS(dialogData.js);
-
-                if (options.onOpen) {
-                    options.onOpen(popup);
-                }
-
+                _onOpen(popup);
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
@@ -209,7 +205,7 @@
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
             confirmDeferred.then(function() {
                 ignoreOnBeforeUnload = true;
-                var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData, customData);
+                var onCloseResult = _onClose(callbackData);
                 if (onCloseResult === false) {
                     ignoreOnBeforeUnload = false;
                     return;
@@ -234,6 +230,26 @@
                 window.onbeforeunload = oldOnBeforeUnload;
             }
             popup = null;
+        }
+
+        function _onOpen(popup) {
+            if (options.fullyModal) {
+                $('html, body').addClass('prevent-scrolling');
+            }
+            if (options.onOpen) {
+                options.onOpen(popup);
+            }
+        }
+
+        function _onClose(callbackData) {
+            if (options.fullyModal) {
+                $('html, body').removeClass('prevent-scrolling');
+            }
+            if (!options.onClose) {
+                return $.Deferred().resolve();
+            } else {
+                return options.onClose(callbackData, customData);
+            }
         }
 
         function ajaxifyForms() {

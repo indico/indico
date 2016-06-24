@@ -83,6 +83,7 @@
                 title: self.options.dialogTitle,
                 content: $('<div>', {class: 'categorynav-wrapper'}).append($('<div>'))[0].outerHTML,
                 closeButton: true,
+                fullyModal: true,
                 onOpen: function(dialog) {
                     self.element = dialog.contentContainer.children().first();
                     self.dialog = dialog;
