@@ -207,17 +207,18 @@
         });
 
         $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
-            var $this = $(this);
+            evt.preventDefault();
 
+            var $this = $(this);
             if ($this.hasClass('disabled')) {
                 return;
             }
 
             var data = {};
             if ($this.data('params') && $this.data('params').all_selected) {
-                data['all_selected'] = true;
+                data.all_selected = true;
             } else {
-                data['event_id'] = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
+                data.event_id = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
                     return obj.value;
                 });
             }
@@ -226,46 +227,56 @@
         });
 
         function deselectRows() {
-            $('.event-management-toolbar #selection-message').hide();
             $('.js-enabled-if-checked').data('params', {all_selected: false});
         }
 
         $('#event-management input[name=event_id]').on('change', function() {
-            if (!this.checked) {
-                deselectRows();
-            }
-        });
-
-        $('.event-management-toolbar [data-select-all]').on('click', function() {
             var $this = $(this);
-            var total = $this.data('total');
-            var isPaginated = $this.data('is-paginated');
+            var allSelectedInput = $('#event-management input[name=all-selected]');
+            var total = $('#event-management').data('total');
             var selectionMessage = $('#selection-message');
-            var selected = $($this.data('select-all'));
+            var notSelected = $('#event-management input[name=event_id]:not(:checked)').length;
+            var selected = $('#event-management input[name=event_id]:checked').length;
 
-            if (isPaginated && selected.length < total) {
-                var html = $('<span>', {
-                    text: $T.gettext('Only {0} out of {1} events are currently selected. ').format(selected.length, total)
+            if (selected < total) {
+                var message = $('<span>', {
+                    text: $T.ngettext('Only one out of {1} events is currently selected. ',
+                                      'Only {0} out of {1} events are currently selected. ', selected).format(selected, total)
                 });
-                var selectAll = $('<a>', {
-                    'href': '#',
-                    'text': $T.gettext('Click here to select them all.'),
-                    'on': {
-                        click: function(evt) {
-                            evt.preventDefault();
-                            $('.js-enabled-if-checked').data('params', {all_selected: true});
-                            selectionMessage.text($T.gettext('All {0} events contained within this category are currently selected.').format(total));
+
+                if (notSelected === 0) {
+                    $('<a>', {
+                        'href': '#',
+                        'text': $T.gettext('Click here to select them all.'),
+                        'on': {
+                            click: function(evt) {
+                                evt.preventDefault();
+                                $('.js-enabled-if-checked').data('params', {all_selected: 1});
+
+                                var allSelectedMessage = $('<span>', {
+                                    'text': $T.gettext('All {0} events contained within this category are currently selected. ').format(total)
+                                });
+                                $('<a>', {
+                                    'href': '#',
+                                    'text': $T.gettext('Select only current page.'),
+                                    'on': {
+                                        'click': function(evt) {
+                                            evt.preventDefault();
+                                            deselectRows();
+                                            selectionMessage.hide();
+                                        }
+                                    }
+                                }).appendTo(allSelectedMessage);
+                                selectionMessage.html(allSelectedMessage);
+                            }
                         }
-                    }
-                });
-
-                html.append(selectAll);
-                selectionMessage.html(html).show();
+                    }).appendTo(message);
+                    selectionMessage.html(message).show();
+                } else {
+                    selectionMessage.hide();
+                    deselectRows();
+                }
             }
-        });
-
-        $('.event-management-toolbar [data-select-none]').on('click', function() {
-            deselectRows();
         });
     };
 })(window);
