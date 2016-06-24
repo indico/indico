@@ -108,19 +108,14 @@
             </ul>
         </div>
         {% if events.total %}
-            <div class="group">
-                {% if page != 'all' %}
-                    {% if events.pages > 1 %}
-                        <a href="{{ url_for('.manage_content', category, page='all', order=order_column,
-                                            desc=(1 if direction == 'desc' else 0)) }}"
-                           class="i-button">{% trans %}Show all events{% endtrans %}</a>
-                    {% endif %}
-                {% else %}
+            {% if page == 'all' %}
+                <div class="group">
                     <a href="{{ url_for('.manage_content', category, page=1, order=order_column,
-                                        desc=(1 if direction == 'desc' else 0)) }}"
-                       class="i-button">{% trans %}Paginate the results{% endtrans %}</a>
-                {% endif %}
-            </div>
+                                        desc=(1 if direction == 'desc' else 0)) }}" class="i-button">
+                       {% trans %}Paginate the results{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
             <div class="group right">
                 <a href="#" class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
                    data-href="{{ url_for('.move_events', category) }}"></a>
