@@ -339,10 +339,17 @@
             self.$categoryResults.html('');
             _.each(categories, function(category) {
                 var $result = self._buildSubcategory(category, true);
-                $result.find('.icon-wrapper').append($('<i>', {
-                    class: 'icon-search',
-                    title: $T.gettext("Search result")
-                }));
+                if (category.is_favorite) {
+                    $result.find('.icon-wrapper').append($('<i>', {
+                        class: 'icon-star',
+                        title: $T.gettext("In favourite categories")
+                    }));
+                } else {
+                    $result.find('.icon-wrapper').append($('<i>', {
+                        class: 'icon-search',
+                        title: $T.gettext("Search result")
+                    }));
+                }
                 self.$categoryResults.append($result);
                 self._ellipsizeBreadcrumbs($result);
             });
