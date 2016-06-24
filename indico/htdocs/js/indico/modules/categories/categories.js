@@ -30,7 +30,7 @@
     }
 
     global.setupCategoryTable = function setupCategoryTable() {
-        var $table = $('table.categories-management');
+        var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var $bulkDeleteButton = $('.js-bulk-delete-category');
         var categoryRowSelector = 'tr[data-category-id]';
@@ -174,5 +174,112 @@
         function getSelectedRows() {
             return $table.find(categoryRowSelector).has(checkboxSelector + ':checked');
         }
+    };
+
+    global.setupCategoryEventList = function setupCategoryEventsList() {
+        enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
+
+        function moveCategory(element, data) {
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                selectLeafOnly: true,
+                onAction: function(category) {
+                    var txt = $T.gettext('You are about to move some of the events to category "{0}". Are you sure you want to proceed?').format(category.title);
+                    confirmPrompt(txt, $T.gettext('Move events')).then(function() {
+                        $.ajax({
+                            url: element.data('href'),
+                            type: 'POST',
+                            data: JSON.stringify($.extend({'category_id': category.id}, data || {})),
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            error: handleAjaxError,
+                            success: function(data) {
+                                if (data.success) {
+                                    location.reload();
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
+            evt.preventDefault();
+            moveCategory($(this));
+        });
+
+        $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            if ($this.hasClass('disabled')) {
+                return;
+            }
+
+            var data = {};
+            if ($this.data('params') && $this.data('params').all_selected) {
+                data.all_selected = true;
+            } else {
+                data.event_id = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
+                    return obj.value;
+                });
+            }
+
+            moveCategory($this, data);
+        });
+
+        function deselectRows() {
+            $('.js-enabled-if-checked').data('params', {all_selected: false});
+        }
+
+        $('#event-management input[name=event_id]').on('change', function() {
+            var $this = $(this);
+            var allSelectedInput = $('#event-management input[name=all-selected]');
+            var total = $('#event-management').data('total');
+            var selectionMessage = $('#selection-message');
+            var notSelected = $('#event-management input[name=event_id]:not(:checked)').length;
+            var selected = $('#event-management input[name=event_id]:checked').length;
+
+            if (selected < total) {
+                var message = $('<span>', {
+                    text: $T.ngettext('Only one out of {1} events is currently selected. ',
+                                      'Only {0} out of {1} events are currently selected. ', selected).format(selected, total)
+                });
+
+                if (notSelected === 0) {
+                    $('<a>', {
+                        'href': '#',
+                        'text': $T.gettext('Click here to select them all.'),
+                        'on': {
+                            click: function(evt) {
+                                evt.preventDefault();
+                                $('.js-enabled-if-checked').data('params', {all_selected: 1});
+
+                                var allSelectedMessage = $('<span>', {
+                                    'text': $T.gettext('All {0} events contained within this category are currently selected. ').format(total)
+                                });
+                                $('<a>', {
+                                    'href': '#',
+                                    'text': $T.gettext('Select only current page.'),
+                                    'on': {
+                                        'click': function(evt) {
+                                            evt.preventDefault();
+                                            deselectRows();
+                                            selectionMessage.hide();
+                                        }
+                                    }
+                                }).appendTo(allSelectedMessage);
+                                selectionMessage.html(allSelectedMessage);
+                            }
+                        }
+                    }).appendTo(message);
+                    selectionMessage.html(message).show();
+                } else {
+                    selectionMessage.hide();
+                    deselectRows();
+                }
+            }
+        });
     };
 })(window);
