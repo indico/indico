@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from io import BytesIO
 from math import ceil
 from operator import attrgetter
 
+from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import NotFound
@@ -35,12 +36,13 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_date, now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RH
 
@@ -184,9 +186,13 @@ class RHCategorySearch(RH):
 
 class RHDisplayCategory(RHDisplayCategoryBase):
     def _process(self):
-        future_events = []
-        past_events = []
-        events = self.category.events
+        now = datetime.now(DisplayTZ().getDisplayTZ(as_timezone=True))
+        past_threshold = now - relativedelta(months=2, day=1, hour=0, minute=0, second=0, microsecond=0)
+        future_threshold = now + relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        event_query = (Event.query.with_parent(self.category).filter(Event.start_dt >= past_threshold)
+                       .order_by(Event.start_dt.desc()))
+        events = event_query.filter(Event.start_dt < future_threshold).all()
+        future_events = event_query.filter(Event.start_dt >= future_threshold).all()
 
         if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
             news_list = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
@@ -204,8 +210,21 @@ class RHDisplayCategory(RHDisplayCategoryBase):
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
-        return WPCategory.render_template('display/category.html', self.category, events=events, managers=managers,
+        def format_event_date(event):
+            day_month = "dd MMM"
+            if event.start_dt.year != event.end_dt.year:
+                return "{} - {}".format(format_date(event.start_dt), format_date(event.end_dt))
+            elif (event.start_dt.month != event.end_dt.month) or (event.start_dt.day != event.end_dt.day):
+                return "{} - {}".format(format_date(event.start_dt, day_month), format_date(event.end_dt, day_month))
+            else:
+                return format_date(event.start_dt, day_month)
+
+        return WPCategory.render_template('display/category.html', self.category, events=events,
+                                          future_events=future_events, managers=managers,
                                           news_list=news_list, upcoming_events=upcoming_events,
+                                          is_recent=lambda dt: dt > now - relativedelta(weeks=1),
+                                          happening_now=lambda event: now > event.start_dt and now < event.end_dt,
+                                          format_event_date=format_event_date,
                                           **get_base_ical_parameters(session.user, self.category, 'category',
                                                                      '/export/categ/{0}.ics'.format(self.category.id)))
 
