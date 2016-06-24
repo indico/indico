@@ -179,12 +179,12 @@
     global.setupCategoryEventList = function setupCategoryEventsList() {
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
-        function createCategoryNavigator(element, data) {
+        function moveCategory(element, data) {
             $('<div>').categorynavigator({
                 openInDialog: true,
                 selectLeafOnly: true,
                 onAction: function(category) {
-                    var txt = $T.gettext('You are about to move some of the events to category "{0}". Are you sure you want to proceed?').format(category.title)
+                    var txt = $T.gettext('You are about to move some of the events to category "{0}". Are you sure you want to proceed?').format(category.title);
                     confirmPrompt(txt, $T.gettext('Move events')).then(function() {
                         $.ajax({
                             url: element.data('href'),
@@ -206,7 +206,7 @@
 
         $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
             evt.preventDefault();
-            createCategoryNavigator($(this));
+            moveCategory($(this));
         });
 
         $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
@@ -226,7 +226,7 @@
                 });
             }
 
-            createCategoryNavigator($this, data);
+            moveCategory($this, data);
         });
 
         function deselectRows() {
