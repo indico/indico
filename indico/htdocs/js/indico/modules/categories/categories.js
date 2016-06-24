@@ -53,7 +53,7 @@
             });
         });
 
-        $('.js-delete-category').on('indico:confirmed', function(evt) {
+        $table.find('.js-delete-category').on('indico:confirmed', function(evt) {
             evt.preventDefault();
             var $this = $(this);
             $.ajax({
