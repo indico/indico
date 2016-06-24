@@ -14,7 +14,7 @@
             {% trans %}This category cannot be deleted because it is not empty.{% endtrans %}
         {%- endset %}
     {% endif %}
-    <a class="{{ classes }} icon-remove"
+    <a class="{{ classes }} icon-remove js-delete-category"
        title="{{ tooltip|forceescape }}"
        data-confirm="{{ confirmation_message|forceescape }}"
        data-title="{% trans %}Delete category{% endtrans %}"
