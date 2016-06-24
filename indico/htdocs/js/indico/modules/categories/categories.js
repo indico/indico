@@ -31,11 +31,18 @@
                 selectLeafOnly: false, // FIXME: Select category without events only
                 actionButtonText: $T.gettext('Move here'),
                 onAction: function(category) {
-                    $('<form>').attr('action', $button.data('move-url')).attr('method', 'POST')
-                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
-                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
-                        .appendTo('body')
-                        .submit();
+                    ajaxDialog({
+                        url: $button.data('move-url'),
+                        method: 'POST',
+                        data: {
+                            destination_id: category.id
+                        },
+                        onClose: function(data) {
+                            if (data) {
+                                location.reload();
+                            }
+                        }
+                    });
                 }
             });
         });
@@ -76,24 +83,6 @@
                 success: function(data) {
                     $this.closest(categoryRowSelector).remove();
                     updateCategoryDeleteButton(data.is_parent_empty);
-                }
-            });
-        });
-
-        $('.js-move-category').on('click', function(evt) {
-            evt.preventDefault();
-            var $button = $(this);
-            evt.preventDefault();
-            $('<div>').categorynavigator({
-                openInDialog: true,
-                selectLeafOnly: false, // FIXME: Select category without events only
-                actionButtonText: $T.gettext('Move here'),
-                onAction: function(category) {
-                    $('<form>').attr('action', $button.data('move-url')).attr('method', 'POST')
-                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
-                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
-                        .appendTo('body')
-                        .submit();
                 }
             });
         });
@@ -230,14 +219,14 @@
                 selectLeafOnly: false, // FIXME: Select category without events only
                 actionButtonText: $T.gettext('Move here'),
                 onAction: function(category) {
-                    var $form = $('<form>').attr('action', $table.data('bulk-move-url')).attr('method', 'POST')
-                        .append($('<input>').attr('name', 'csrf_token').attr('value', $('#csrf-token').attr('content')))
-                        .append($('<input>').attr('name', 'destination_id').attr('value', category.id))
-                        .appendTo('body');
-                    $.each(getSelectedCategories(), function(index, value) {
-                        $('<input>').attr('name', 'category_id').attr('value', value).appendTo($form);
+                    ajaxDialog({
+                        url: $table.data('bulk-move-url'),
+                        method: 'POST',
+                        data: {
+                            destination_id: category.id,
+                            category_id: getSelectedCategories()
+                        }
                     });
-                    $form.submit();
                 }
             });
         }
