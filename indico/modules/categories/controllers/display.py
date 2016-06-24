@@ -150,11 +150,20 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 class RHCategorySearch(RH):
     def _process(self):
+        q = request.args['q'].lower()
         query = (Category.query
-                 .filter(Category.title_matches(request.args['q']))
+                 .filter(Category.title_matches(q))
                  .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries')))
         if session.user:
+            # Prefer favorite categories
             query = query.order_by(Category.favorite_of.any(favorite_category_table.c.user_id == session.user.id)
                                    .desc())
-        query = query.order_by(db.func.lower(Category.title)).limit(10)
+        # Prefer exact matches and matches at the beginning, then order by category title and if
+        # those are identical by the chain titles
+        query = (query
+                 .order_by((db.func.lower(Category.title) == q).desc(),
+                           db.func.lower(Category.title).startswith(q).desc(),
+                           db.func.lower(Category.title),
+                           Category.chain_titles)
+                 .limit(10))
         return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in query], flash=False)
