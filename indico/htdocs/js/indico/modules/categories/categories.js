@@ -34,6 +34,7 @@
         var $tbody = $table.find('tbody');
         var $bulkDeleteButton = $('.js-bulk-delete-category');
         var categoryRowSelector = 'tr[data-category-id]';
+        var checkboxSelector = 'input[name=category_id]';
 
         $('.js-sort-categories').on('click', function() {
             var currentOrder = getSortedCategories();
@@ -69,7 +70,7 @@
             });
         });
 
-        enableIfChecked($tbody, 'input[type=checkbox]', $bulkDeleteButton, function($checkboxes) {
+        enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {
             return $checkboxes.filter(':not([data-is-empty=true])').length == 0;
         });
         $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
@@ -167,13 +168,13 @@
         }
 
         function getSelectedCategories() {
-            return $table.find(categoryRowSelector).find('input[type=checkbox]:checked').map(function() {
+            return $table.find(categoryRowSelector).find(checkboxSelector + ':checked').map(function() {
                 return this.value;
             }).toArray();
         }
 
         function getSelectedRows() {
-            return $table.find(categoryRowSelector).has('input[type=checkbox]:checked');
+            return $table.find(categoryRowSelector).has(checkboxSelector + ':checked');
         }
     };
 })(window);
