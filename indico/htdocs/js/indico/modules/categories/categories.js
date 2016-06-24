@@ -184,18 +184,21 @@
                 openInDialog: true,
                 selectLeafOnly: true,
                 onAction: function(category) {
-                    $.ajax({
-                        url: element.data('href'),
-                        type: 'POST',
-                        data: JSON.stringify($.extend({'category_id': category.id}, data || {})),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        error: handleAjaxError,
-                        success: function(data) {
-                            if (data.success) {
-                                location.reload();
+                    var txt = $T.gettext('You are about to move some of the events to category "{0}". Are you sure you want to proceed?').format(category.title)
+                    confirmPrompt(txt, $T.gettext('Move events')).then(function() {
+                        $.ajax({
+                            url: element.data('href'),
+                            type: 'POST',
+                            data: JSON.stringify($.extend({'category_id': category.id}, data || {})),
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            error: handleAjaxError,
+                            success: function(data) {
+                                if (data.success) {
+                                    location.reload();
+                                }
                             }
-                        }
+                        });
                     });
                 }
             });
