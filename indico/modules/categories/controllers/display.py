@@ -30,6 +30,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats
 from indico.modules.categories.views import WPCategoryStatistics
 from indico.modules.users import User
+from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
@@ -151,7 +152,9 @@ class RHCategorySearch(RH):
     def _process(self):
         query = (Category.query
                  .filter(Category.title_matches(request.args['q']))
-                 .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries'))
-                 .order_by(db.func.lower(Category.title))
-                 .limit(10))
+                 .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries')))
+        if session.user:
+            query = query.order_by(Category.favorite_of.any(favorite_category_table.c.user_id == session.user.id)
+                                   .desc())
+        query = query.order_by(db.func.lower(Category.title)).limit(10)
         return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in query], flash=False)
