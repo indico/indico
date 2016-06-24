@@ -156,6 +156,9 @@
                 },
                 onClose: function(data) {
                     if (data && data.success) {
+                        // Prevent other categories from being selected when someone reloads
+                        // the page after deleting a selected category.
+                        $selectedRows.find('input[type=checkbox]').prop('checked', false);
                         $selectedRows.remove();
                         updateCategoryDeleteButton();
                     }
