@@ -118,7 +118,7 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category, with_path=False):
+def _serialize_category(category, with_path=False, with_favorite=False):
     data = {
         'id': category.id,
         'title': category.title,
@@ -127,11 +127,12 @@ def _serialize_category(category, with_path=False):
         'deep_category_count': category.deep_children_count,
         'deep_event_count': category.deep_events_count,
         'can_access': category.can_access(session.user),
-
     }
     if with_path:
         data['path'] = [{'id': c.id, 'title': c.title}
                         for c in category.parent_chain_query.options(load_only('id', 'title'))]
+    if with_favorite:
+        data['is_favorite'] = session.user and category in session.user.favorite_categories
     return data
 
 
@@ -168,4 +169,5 @@ class RHCategorySearch(RH):
                            db.func.lower(Category.title),
                            Category.chain_titles)
                  .limit(10))
-        return jsonify_data(categories=[_serialize_category(c, with_path=True) for c in query], flash=False)
+        return jsonify_data(categories=[_serialize_category(c, with_path=True, with_favorite=True) for c in query],
+                            flash=False)
