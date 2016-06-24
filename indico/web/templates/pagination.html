@@ -1,6 +1,6 @@
-{% macro render_pagination(pagination) %}
-    {% if pagination.pages > 1 %}
-        <div class="pagination">
+{% macro render_pagination(pagination, single_page=false) %}
+    <div class="pagination">
+        {% if not single_page %}
             {%- for page in pagination.iter_pages() %}
                 {% if page %}
                     <span class="page-number">
@@ -15,8 +15,16 @@
                 {% endif %}
             {%- endfor %}
             <span class="page-number">
-                <a href="{{ caller('all')|trim }}" class="i-button">{% trans %}Show all events{% endtrans %}</a>
+                <a href="{{ caller('all')|trim }}" class="i-button">
+                    {% trans %}Show all{% endtrans %}
+                </a>
             </span>
-        </div>
-    {% endif %}
+        {% else %}
+            <span class="page-number">
+                <a href="{{ caller('1')|trim }}" class="i-button">
+                    {% trans %}Paginate results{% endtrans %}
+                </a>
+            </span>
+        {% endif %}
+    </div>
 {% endmacro %}
