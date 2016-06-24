@@ -549,7 +549,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'roomFullname': event.room_name,
             'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
             'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
-            'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
+            'creationDate': self._serialize_date(event.created_dt),
             'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
             'hasAnyProtection': event.as_legacy.hasAnyProtection(),
             'roomMapURL': event.room.map_url if event.room else None,
