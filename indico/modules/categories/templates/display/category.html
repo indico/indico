@@ -30,11 +30,20 @@
             <div class="topBar" style="margin-bottom: 10px">
                 <div class="content smaller">
                     <span id="futureEventsShow">
-                        There are ${ numOfEventsInTheFuture } events in the <em>future</em>.
+                        {% trans count=future_events|count -%}
+                            There is {{ count }} event in the future.
+                        {%- pluralize -%}
+                            There are {{ count }} events in the future.
+                        {%- endtrans %}
                         <span class="fakeLink futureEventsLink">Show them.</span>
                     </span>
                     <span id="futureEventsHide" style="display: none;">
-                        <span class="fakeLink futureEventsLink">Hide</span> the events in the future (${ numOfEventsInTheFuture })
+                        {% trans count=future_events|count -%}
+                            {{ count }} event in the future.
+                        {%- pluralize -%}
+                            {{ count }} events in the future.
+                        {%- endtrans %}
+                        <span class="fakeLink futureEventsLink">{% trans %}Hide{% endtrans %}</span>
                     </span>
                 </div>
             </div>
@@ -70,13 +79,121 @@
             </div>
         {% endif %}
     </div>
+    <script type="text/javascript">
+        // Future events
+        $('.futureEventsLink').on('click', function() {
+            var fe = $('#futureEvents');
+            if (fe.is(':visible')) {
+                $('#futureEventsShow').show();
+                $('#futureEventsHide').hide();
+                fe.slideUp('medium');
+            }
+            else {
+                $('#futureEventsHide').show();
+                $('#futureEventsShow').hide();
+                fe.slideDown('medium');
+            }
+        });
+
+        {# TODO
+        // Past events
+        % if numOfEventsInThePast > 0:
+        var numOfEventsInThePast = ${ numOfEventsInThePast };
+
+        function setShowPastEventsForCateg(show){
+            indicoRequest('category.setShowPastEventsForCateg', {
+                categId: '${ categ.getId() }',
+                showPastEvents: show
+            }, function() { });
+        }
+
+        $('.pastEventsLink').click(function() {
+            if (numOfEventsInThePast) {
+                // We need to fetch the events
+                setShowPastEventsForCateg(true);
+                fetchPastEvents();
+            }
+            else {
+                if ($('#pastEvents').is(':visible')) {
+                    $('#pastEvents').hide();
+                    $('#pastEventsHide').hide();
+                    $('#pastEventsShow').show();
+                    setShowPastEventsForCateg(false);
+                }
+                else {
+                    $('#pastEvents').show();
+                    $('#pastEventsHide').show();
+                    $('#pastEventsShow').hide();
+                    setShowPastEventsForCateg(true);
+                }
+            }
+        });
+
+        function fetchPastEvents() {
+            $('#loadingPast').show();
+            $('.pastEventsControl').hide();
+            indicoRequest('category.getPastEventsList', {
+                categId: '${ categ.getId() }',
+                lastIdx: numOfEventsInThePast
+            }, function(result, error){
+                if (result) {
+                    numOfEventsInThePast -= result.num;
+                    $.each(result.events, function(i, month) {
+                        var id = 'eventList-' + month.year + '-' + month.month;
+                        var eventListUL = $('#' + id);
+                        if(!eventListUL.length) {
+                            eventListUL = $('<ul/>', {id: id});
+                            eventListUL.appendTo('#pastEvents').before($('<h4/>').html(month.title));
+                        }
+                        eventListUL.append($('<div/>').html(month.events.join('')).children());
+                    });
+                    if(numOfEventsInThePast > 0) {
+                        fetchPastEvents();
+                    }
+                    else {
+                        $('#loadingPast').hide();
+                        $('#pastEventsHide').show();
+                    }
+                }
+            });
+        }
+        % if showPastEvents:
+            fetchPastEvents();
+        % endif
+
+        % endif
+        #}
+
+    </script>
 {% endmacro %}
 
 {% macro event_list_block(events) %}
     {# TODO: list events grouped by month #}
     <ul>
         {% for event in events %}
-            <li>{{ event.title }}</li>
+            <li itemscope itemtype="http://data-vocabulary.org/Event">
+                <span class="ical">
+                    <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
+                </span>
+                <span class="listName">
+                    <span class="date {% if happening_now(event) %}today{% endif %}">
+                        {{ format_event_date(event) }}
+                        <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}" />
+                    </span>
+                    <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
+                        <span itemprop="summary">{{ event.title }}</span>
+                    </a>
+                    <span class="protected">
+                        {% if event.is_self_protected %}
+                            <span data-type="restricted">{% trans %}(protected){% endtrans %}</span>
+                        {% endif %}
+
+                        {% if is_recent(event.created_dt) %}
+                            <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                        {% endif %}
+                    </span>
+                </span>
+            </li>
         {% endfor %}
     </ul>
 {% endmacro %}
