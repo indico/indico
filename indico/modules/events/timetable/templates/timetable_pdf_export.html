@@ -28,7 +28,11 @@
         $form.find('[name=session_info][value=useSessionColorCodes], [name=session_info][value=showSessionDescription]')
              .prop('checked', true);
         $form.find('[name=document_settings][value=showTableContents]').on('change', function() {
-            $form.find('[name=document_settings][value=showSessionTOC]').closest('.i-checkbox').toggle(this.checked);
+            var $showSessionToc = $form.find('[name=document_settings][value=showSessionTOC]');
+            $showSessionToc.closest('.i-checkbox').toggle(this.checked);
+            if (!this.checked) {
+                $showSessionToc.prop('checked', false);
+            }
         }).trigger('change');
         $form.find('[name=contribution_info][value=showAbstract]').on('change', function() {
             $form.find('[name=contribution_info][value=dontShowPosterAbstract]').closest('.i-checkbox').toggle(this.checked);
