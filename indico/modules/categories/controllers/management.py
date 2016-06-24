@@ -210,7 +210,7 @@ class RHDeleteCategory(RHManageCategoryBase):
         delete_category(self.category)
         url = url_for('.manage_content', self.category.parent)
         if request.is_xhr:
-            return jsonify_data(flash=False, redirect=url, is_empty=self.category.is_empty)
+            return jsonify_data(flash=False, redirect=url, is_parent_empty=self.category.parent.is_empty)
         else:
             flash(_('Category "{}" has been deleted.').format(self.category.title), 'success')
             return redirect(url)
@@ -237,7 +237,7 @@ class RHDeleteSubcategories(RHManageCategoryBase):
                 if not subcategory.is_empty:
                     raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
                 delete_category(subcategory)
-            return jsonify_data(flash=False)
+            return jsonify_data(flash=False, is_empty=self.category.is_empty)
         return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories,
                                 category_ids=[x.id for x in self.subcategories])
 
