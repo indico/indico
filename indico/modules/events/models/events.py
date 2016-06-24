@@ -42,7 +42,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
-from indico.util.date_time import overlaps
+from indico.util.date_time import overlaps, now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
 from indico.web.flask.util import url_for
@@ -120,6 +120,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('events.events.id'),
         nullable=True,
         index=True,
+    )
+    #: The creation date of the event
+    created_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        index=True,
+        default=now_utc
     )
     #: The start date of the event
     start_dt = db.Column(

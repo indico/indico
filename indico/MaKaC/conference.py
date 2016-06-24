@@ -1015,7 +1015,7 @@ class Conference(CommonObjectBase):
         self.__programGenerator = Counter()
         self.__ac = AccessController(self)
         self.__owners = []
-        self._modificationDS = self._creationDS = nowutc()
+        self._modificationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
@@ -1354,13 +1354,13 @@ class Conference(CommonObjectBase):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS.astimezone(timezone(tz))
 
-    def getCreationDate( self ):
+    def getCreationDate(self):
         """Returns the date in which the conference was created"""
-        return self._creationDS
+        return self.as_new.created_dt
 
-    def getAdjustedCreationDate( self, tz ):
+    def getAdjustedCreationDate(self, tz):
         """Returns the date in which the conference was created"""
-        return self._creationDS.astimezone(timezone(tz))
+        return self.as_new.created_dt.astimezone(timezone(tz))
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
