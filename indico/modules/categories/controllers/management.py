@@ -237,18 +237,18 @@ class RHMoveCategory(RHMoveCategoryBase):
 
     def _checkParams(self):
         RHMoveCategoryBase._checkParams(self)
-        if self.destination == self.category:
+        if self.target_category == self.category:
             raise BadRequest(_("Cannot move the category inside itself."))
-        if self.destination.parent_chain_query.filter(Category.id == self.category.id).count():
+        if self.target_category.parent_chain_query.filter(Category.id == self.category.id).count():
             raise BadRequest(_("Cannot move the category in a descendant of itself."))
 
     def _process(self):
         if 'confirmed' in request.form:
-            move_category(self.category, self.destination)
-            flash(_('Category "{}" moved in "{}".').format(self.category.title, self.destination.title), 'success')
+            move_category(self.category, self.target_category)
+            flash(_('Category "{}" moved to "{}".').format(self.category.title, self.target_category.title), 'success')
             return jsonify_data(flash=False)
         return jsonify_template('categories/management/move_categories.html', categories=[self.category],
-                                category_ids=[self.category.id], destination=self.destination)
+                                category_ids=[self.category.id], target_category=self.target_category)
 
 
 class RHCategoryMoveContents(RHManageCategoryBase):
@@ -284,20 +284,20 @@ class RHMoveSubcategories(RHMoveCategoryBase):
         RHMoveCategoryBase._checkParams(self)
         subcategory_ids = map(int, request.values.getlist('category_id'))
         self.subcategories = Category.query.with_parent(self.category).filter(Category.id.in_(subcategory_ids)).all()
-        if self.destination.id in subcategory_ids:
+        if self.target_category.id in subcategory_ids:
             raise BadRequest(_("Cannot move a category inside itself."))
-        if self.destination.parent_chain_query.filter(Category.id.in_(subcategory_ids)).count():
+        if self.target_category.parent_chain_query.filter(Category.id.in_(subcategory_ids)).count():
             raise BadRequest(_("Cannot move a category in a descendant of itself."))
 
     def _process(self):
         if 'confirmed' in request.form:
             for subcategory in self.subcategories:
-                move_category(subcategory, self.destination)
-            flash(ngettext('{} category moved to "{}".', '{} categories moved in "{}".', len(self.subcategories))
-                  .format(len(self.subcategories), self.destination.title), 'success')
+                move_category(subcategory, self.target_category)
+            flash(ngettext('{} category moved in "{}".', '{} categories moved in "{}".', len(self.subcategories))
+                  .format(len(self.subcategories), self.target_category.title), 'success')
             return jsonify_data(flash=False)
         return jsonify_template('categories/management/move_categories.html', categories=self.subcategories,
-                                category_ids=[x.id for x in self.subcategories], destination=self.destination)
+                                category_ids=[x.id for x in self.subcategories], target_category=self.target_category)
 
 
 class RHSortSubcategories(RHManageCategoryBase):

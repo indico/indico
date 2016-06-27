@@ -35,7 +35,7 @@
                         url: $button.data('move-url'),
                         method: 'POST',
                         data: {
-                            destination_id: category.id
+                            target_category_id: category.id
                         },
                         onClose: function(data) {
                             if (data) {
@@ -223,7 +223,7 @@
                         url: $table.data('bulk-move-url'),
                         method: 'POST',
                         data: {
-                            destination_id: category.id,
+                            target_category_id: category.id,
                             category_id: getSelectedCategories()
                         }
                     });
