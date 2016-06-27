@@ -194,6 +194,25 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         events = event_query.filter(Event.start_dt < future_threshold).all()
         future_events = event_query.filter(Event.start_dt >= future_threshold).all()
 
+        def group_by_month(events):
+            def format_month(dt):
+                return format_date(dt, format='MMMM Y')
+            formatted_now = format_month(now)
+            months = []
+            current_month = {}
+            for event in events:
+                name = format_month(event.start_dt)
+                if current_month.get('name') != name:
+                    current_month = {'name': name,
+                                     'events': [event],
+                                     'is_current': name == formatted_now}
+                    months.append(current_month)
+                else:
+                    current_month['events'].append(event)
+            return months
+        events_by_month = group_by_month(events)
+        future_events_by_month = group_by_month(future_events)
+
         if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
             news_list = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
                          in ModuleHolder().getById('news').getNewsItemsList()[:2]]
@@ -219,8 +238,9 @@ class RHDisplayCategory(RHDisplayCategoryBase):
             else:
                 return format_date(event.start_dt, day_month)
 
-        return WPCategory.render_template('display/category.html', self.category, events=events,
-                                          future_events=future_events, managers=managers,
+        return WPCategory.render_template('display/category.html', self.category, event_count=len(events),
+                                          events_by_month=events_by_month, future_event_count=len(future_events),
+                                          future_events_by_month=future_events_by_month, managers=managers,
                                           news_list=news_list, upcoming_events=upcoming_events,
                                           is_recent=lambda dt: dt > now - relativedelta(weeks=1),
                                           happening_now=lambda event: now > event.start_dt and now < event.end_dt,

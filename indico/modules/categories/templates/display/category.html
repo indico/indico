@@ -26,11 +26,11 @@
 
 {% macro event_list() %}
     <div class="eventList">
-        {% if future_events %}
+        {% if future_event_count %}
             <div class="topBar" style="margin-bottom: 10px">
                 <div class="content smaller">
                     <span id="futureEventsShow">
-                        {% trans count=future_events|count -%}
+                        {% trans count=future_event_count -%}
                             There is {{ count }} event in the future.
                         {%- pluralize -%}
                             There are {{ count }} events in the future.
@@ -38,7 +38,7 @@
                         <span class="fakeLink futureEventsLink">Show them.</span>
                     </span>
                     <span id="futureEventsHide" style="display: none;">
-                        {% trans count=future_events|count -%}
+                        {% trans count=future_event_count -%}
                             {{ count }} event in the future.
                         {%- pluralize -%}
                             {{ count }} events in the future.
@@ -49,11 +49,11 @@
             </div>
 
             <div id="futureEvents" style="display: none;">
-                {{ event_list_block(future_events) }}
+                {{ event_list_block(future_events_by_month) }}
             </div>
         {% endif %}
         <div>
-            {{ event_list_block(events) }}
+            {{ event_list_block(events_by_month) }}
         </div>
         {% if past_events %}
             <div id="pastEvents"></div>
@@ -167,35 +167,39 @@
     </script>
 {% endmacro %}
 
-{% macro event_list_block(events) %}
-    {# TODO: list events grouped by month #}
-    <ul>
-        {% for event in events %}
-            <li itemscope itemtype="http://data-vocabulary.org/Event">
-                <span class="ical">
-                    <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
-                </span>
-                <span class="listName">
-                    <span class="date {% if happening_now(event) %}today{% endif %}">
-                        {{ format_event_date(event) }}
-                        <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}" />
+{% macro event_list_block(events_by_month) %}
+    {% for month in events_by_month %}
+        <h4 {% if month.is_current %}class="currentMonth"{% endif %}>
+            <span>{{ month.name }}</span>
+        </h4>
+        <ul>
+            {% for event in month.events %}
+                <li itemscope itemtype="http://data-vocabulary.org/Event">
+                    <span class="ical">
+                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
                     </span>
-                    <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
-                        <span itemprop="summary">{{ event.title }}</span>
-                    </a>
-                    <span class="protected">
-                        {% if event.is_self_protected %}
-                            <span data-type="restricted">{% trans %}(protected){% endtrans %}</span>
-                        {% endif %}
+                    <span class="listName">
+                        <span class="date {% if happening_now(event) %}today{% endif %}">
+                            {{ format_event_date(event) }}
+                            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}" />
+                        </span>
+                        <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
+                            <span itemprop="summary">{{ event.title }}</span>
+                        </a>
+                        <span class="protected">
+                            {% if event.is_self_protected %}
+                                <span data-type="restricted">{% trans %}(protected){% endtrans %}</span>
+                            {% endif %}
 
-                        {% if is_recent(event.created_dt) %}
-                            <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
-                        {% endif %}
+                            {% if is_recent(event.created_dt) %}
+                                <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                            {% endif %}
+                        </span>
                     </span>
-                </span>
-            </li>
-        {% endfor %}
-    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
 {% endmacro %}
 
 {% block content %}
