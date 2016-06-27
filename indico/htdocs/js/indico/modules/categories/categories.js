@@ -184,14 +184,12 @@
                 openInDialog: true,
                 selectLeafOnly: true,
                 onAction: function(category) {
-                    var txt = $T.gettext('You are about to move some of the events to category "{0}". Are you sure you want to proceed?').format(category.title);
-                    confirmPrompt(txt, $T.gettext('Move events')).then(function() {
+                    var msg = $T.gettext('You are about to move some events to the category "{0}". Are you sure you want to proceed?').format(category.title);
+                    confirmPrompt(msg, $T.gettext('Move events')).then(function() {
                         $.ajax({
                             url: element.data('href'),
                             type: 'POST',
-                            data: JSON.stringify($.extend({'category_id': category.id}, data || {})),
-                            dataType: 'json',
-                            contentType: 'application/json',
+                            data: $.extend({'category_id': category.id}, data || {}),
                             error: handleAjaxError,
                             success: function(data) {
                                 if (data.success) {
@@ -218,7 +216,7 @@
             }
 
             var data = {};
-            if ($this.data('params') && $this.data('params').all_selected) {
+            if (isEverythingSelected()) {
                 data.all_selected = true;
             } else {
                 data.event_id = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
@@ -229,7 +227,7 @@
             moveCategory($this, data);
         });
 
-        paginatedSelectAll({
+        var isEverythingSelected = paginatedSelectAll({
             containerSelector: '#event-management',
             checkboxSelector: 'input:checkbox[name=event_id]',
             allSelectedSelector: 'input:checkbox[name=all_selected]',
@@ -245,6 +243,6 @@
                                        selected).format(selected, total);
                 }
             }
-        });
+        }).isEverythingSelected;
     };
 })(window);

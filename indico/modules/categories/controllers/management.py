@@ -22,7 +22,7 @@ from io import BytesIO
 from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
 from indico.modules.categories import logger
@@ -265,8 +265,8 @@ class RHSortSubcategories(RHManageCategoryBase):
             subcategories[id_].position = position
 
 
-class RHDeleteEvents(RHManageCategoryBase):
-    """Delete multiple events"""
+class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
+    """Base RH to manage selected events in a category"""
 
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
@@ -276,6 +276,10 @@ class RHDeleteEvents(RHManageCategoryBase):
         if request.form.get('all_selected') != '1':
             query = query.filter(Event.id.in_(map(int, request.form.getlist('event_id'))))
         self.events = query.all()
+
+
+class RHDeleteEvents(RHManageCategorySelectedEventsBase):
+    """Delete multiple events"""
 
     def _process(self):
         is_submitted = 'confirmed' in request.form
@@ -288,59 +292,45 @@ class RHDeleteEvents(RHManageCategoryBase):
         return jsonify_data(flash=False, redirect=url_for('.manage_content', self.category))
 
 
-class RHSplitCategory(RHManageCategoryBase):
+class RHSplitCategory(RHManageCategorySelectedEventsBase):
     def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
-        self.category_events = {x.id: x for x in self.category.events}
-        if request.form.get('all_selected') == '1':
-            self.event_ids = self.category_events.viewkeys()
-        else:
-            self.event_ids = set(map(int, request.form.getlist('event_id')))
+        RHManageCategorySelectedEventsBase._checkParams(self)
+        self.cat_events = set(self.category.events)
+        self.sel_events = set(self.events)
 
     def _process(self):
-        all_selected = not bool(self.category_events.viewkeys() - self.event_ids)
-        form = SplitCategoryForm(move_all=all_selected, event_id=self.event_ids)
+        form = SplitCategoryForm(formdata=request.form)
         if form.validate_on_submit():
-            selected_events = self.category_events.viewkeys() & self.event_ids
-            not_selected_events = self.category_events.viewkeys() - self.event_ids
-            if selected_events:
-                self._move_events(selected_events, form.first_category.data)
-            if not_selected_events:
-                self._move_events(not_selected_events, form.second_category.data)
-            if all_selected:
-                flash(_('Your events have been moved successfully to category {}').format(form.first_category.data),
-                      'success')
+            self._move_events(self.sel_events, form.first_category.data)
+            if not form.all_selected.data:
+                self._move_events(self.cat_events - self.sel_events, form.second_category.data)
+            if form.all_selected.data:
+                flash(_('Your events have been moved successfully to the category "{}"')
+                      .format(form.first_category.data), 'success')
             else:
-                flash(_('Your events have been split between {} and {}').format(form.first_category.data,
-                                                                                form.second_category.data), 'success')
+                flash(_('Your events have been split into the categories "{}" and "{}"')
+                      .format(form.first_category.data, form.second_category.data), 'success')
             return jsonify_data(flash=False, redirect=url_for('.manage_content', self.category))
-        return jsonify_form(form)
+        return jsonify_form(form, submit=_('Split'))
 
-    def _move_events(self, event_ids, category_title):
-        category = Category(title=category_title, parent_id=self.category.id)
-        for event_id in event_ids:
-            event = self.category_events[event_id]
+    def _move_events(self, events, category_title):
+        category = create_category(self.category, {'title': category_title})
+        for event in events:
             event.move(category)
         db.session.flush()
 
 
-class RHMoveEvents(RHManageCategoryBase):
+class RHMoveEvents(RHManageCategorySelectedEventsBase):
     def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
-        self.category_events = {x.id: x for x in self.category.events}
-        if request.json.get('all_selected') == 1:
-            self.event_ids = self.category_events.viewkeys()
-        else:
-            self.event_ids = set(map(int, request.json.get('event_id')))
+        RHManageCategorySelectedEventsBase._checkParams(self)
+        self.target_category = Category.get_one(int(request.form['category_id']), is_deleted=False)
+        if not self.target_category.can_create_events(session.user):
+            raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
 
     def _process(self):
-        new_category = Category.find(id=request.json.get('category_id')).first_or_404()
-        count = 0
-        for event_id in self.event_ids:
-            if event_id in self.category_events:
-                self.category_events[event_id].move(new_category)
-                count += 1
-        flash(ngettext('You have moved one event to the category "{0}"',
-                       'You have moved {0} events to the category "{1}"', count).format(count,
-                                                                                        new_category.title), 'success')
+        for event in self.events:
+            event.move(self.target_category)
+        flash(ngettext('You have moved one event to the category "{cat}"',
+                       'You have moved {count{ events to the category "{cat}"', len(self.events))
+              .format(count=len(self.events), cat=self.target_category.title), 'success')
         return jsonify_data(flash=False)
