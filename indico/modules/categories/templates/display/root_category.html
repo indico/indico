@@ -1,0 +1,19 @@
+{% extends 'categories/display/category.html' %}
+{% from 'categories/display/sidebar.html' import render_news, render_upcoming_events %}
+
+{% block sidebar %}
+    {{ render_news(news) }}
+    {{ render_upcoming_events(upcoming_events) }}
+{% endblock %}
+
+
+{% block category_description %}
+    <p>
+        {% trans -%}
+            Welcome to Indico. The Indico tool allows you to manage complex conferences, workshops and meetings.
+        {%- endtrans %}
+    </p>
+    <p>
+        {% trans %}To start browsing, please select a category below.{% endtrans %}
+    </p>
+{% endblock %}

@@ -216,20 +216,6 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         show_past_events = (self.category.id in session.get('fetchPastEventsFrom', set()) or
                             (session.user and session.user.settings.get('show_past_events')))
 
-        if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
-            news_list = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
-                         in ModuleHolder().getById('news').getNewsItemsList()[:2]]
-        else:
-            news_list = []
-
-        legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
-        upcoming_events = [{'status': status,
-                            'start_dt': start_or_end_dt if not status == 'ongoing' else None,
-                            'end_dt': start_or_end_dt if status == 'ongoing' else None,
-                            'title': title,
-                            'id': event_id}
-                           for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
-
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
         def format_event_date(event):
@@ -241,16 +227,44 @@ class RHDisplayCategory(RHDisplayCategoryBase):
             else:
                 return format_date(event.start_dt, day_month)
 
-        return WPCategory.render_template('display/category.html', self.category, event_count=len(events),
-                                          events_by_month=events_by_month, future_event_count=len(future_events),
-                                          future_events_by_month=future_events_by_month, managers=managers,
-                                          news_list=news_list, upcoming_events=upcoming_events,
-                                          show_past_events=show_past_events, past_event_count=past_event_count,
-                                          is_recent=lambda dt: dt > now - relativedelta(weeks=1),
-                                          happening_now=lambda event: now > event.start_dt and now < event.end_dt,
-                                          format_event_date=format_event_date,
-                                          **get_base_ical_parameters(session.user, self.category, 'category',
-                                                                     '/export/categ/{0}.ics'.format(self.category.id)))
+        def is_recent(dt):
+            return dt > now - relativedelta(weeks=1)
+
+        def happening_now(event):
+            return now > event.start_dt and now < event.end_dt
+
+        params = {'event_count': len(events),
+                  'events_by_month': events_by_month,
+                  'format_event_date': format_event_date,
+                  'future_event_count': len(future_events),
+                  'future_events_by_month': future_events_by_month,
+                  'is_recent': is_recent,
+                  'managers': managers,
+                  'past_event_count': past_event_count,
+                  'show_past_events': show_past_events,
+                  'happening_now': happening_now}
+        params.update(get_base_ical_parameters(session.user, self.category, 'category',
+                                               '/export/categ/{0}.ics'.format(self.category.id)))
+
+        if self.category.is_root:
+            if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
+                news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
+                        in ModuleHolder().getById('news').getNewsItemsList()[:2]]
+            else:
+                news = []
+
+            legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
+            upcoming_events = [{'status': status,
+                                'start_dt': start_or_end_dt if not status == 'ongoing' else None,
+                                'end_dt': start_or_end_dt if status == 'ongoing' else None,
+                                'title': title,
+                                'id': event_id}
+                               for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
+
+            return WPCategory.render_template('display/root_category.html', self.category, news=news,
+                                              upcoming_events=upcoming_events, **params)
+
+        return WPCategory.render_template('display/category.html', self.category, **params)
 
 
 class RHExportCategoryICAL(RHDisplayCategoryBase):
