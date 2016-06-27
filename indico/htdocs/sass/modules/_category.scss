@@ -337,3 +337,75 @@ ul.category-resource-qtip {
         }
     }
 }
+
+.eventList {
+    h3 {
+        font-size: 26px;
+        color: #999999;
+        margin: 20px 10px;
+        padding: 0;
+    }
+
+    h4 {
+        color: #555555;
+        font-weight: normal;
+        font-size: 18px;
+        margin-top: 20px;
+        margin-left: 40px;
+        padding: 0;
+        border-bottom: 1px solid #EBEBEB;
+
+        &.currentMonth {
+            border-bottom: 1px solid #AAAAAA;
+
+            span {
+                padding: 5px 5px 0px 5px;
+                color: #2F2506;
+                background-color: #F6E8BD;
+                border-radius: 5px 5px 0 0;
+                border-bottom: 1px solid #AAAAAA;
+            }
+        }
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        display: block;
+    }
+
+    li {
+        margin: 0 0 10px 60px;
+        padding: 0;
+        display: block;
+
+        .date {
+            padding: 0 10px 0 0;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .ical {
+            padding: 0 15px;
+            font-size: 1.2em;
+
+            a, a:hover {
+                color: $dark-gray;
+            }
+        }
+
+        .listName a {
+            font-size: 17px;
+        }
+
+        .today {
+            margin: 0 10px 0 0;
+            padding: 5px;
+            font-size: 13px;
+            color: #444;
+            background-color:#F6E8BD;
+            border-radius: 5px;
+        }
+    }
+}
