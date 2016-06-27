@@ -270,11 +270,12 @@ class RHDeleteEvents(RHManageCategoryBase):
 
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
-        if request.form.get('all_selected') == '1':
-            self.events = self.category.events
-        else:
-            event_ids = map(int, request.form.getlist('event_id'))
-            self.events = Event.query.with_parent(self.category).filter(Event.id.in_(event_ids)).all()
+        query = (Event.query
+                 .with_parent(self.category)
+                 .order_by(Event.start_dt.desc()))
+        if request.form.get('all_selected') != '1':
+            query = query.filter(Event.id.in_(map(int, request.form.getlist('event_id'))))
+        self.events = query.all()
 
     def _process(self):
         is_submitted = 'confirmed' in request.form
