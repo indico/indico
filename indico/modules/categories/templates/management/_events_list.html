@@ -60,7 +60,7 @@
             {{ event_row(event) }}
         {% endfor %}
     </table>
-    {% call(page) render_pagination(events, single_page=(page == 'all' or events.total == events.items|length)) %}
+    {% call(page) render_pagination(events, single_page=(page == 'all')) %}
         {{ url_for('.manage_content', category, page=page,
                    desc=(1 if direction == 'desc' else 0), order=order_column) }}
     {% endcall %}
