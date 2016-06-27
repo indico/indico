@@ -22,7 +22,7 @@ from indico.modules.categories import Category
 
 
 @pytest.fixture
-def create_category():
+def create_category(db):
     """Returns a callable which lets you create dummy events"""
 
     def _create_category(id_=None, **kwargs):
