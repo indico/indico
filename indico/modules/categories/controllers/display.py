@@ -193,6 +193,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                        .order_by(Event.start_dt.desc()))
         events = event_query.filter(Event.start_dt < future_threshold).all()
         future_events = event_query.filter(Event.start_dt >= future_threshold).all()
+        past_event_count = Event.query.with_parent(self.category).filter(Event.start_dt < past_threshold).count()
 
         def group_by_month(events):
             def format_month(dt):
@@ -212,6 +213,8 @@ class RHDisplayCategory(RHDisplayCategoryBase):
             return months
         events_by_month = group_by_month(events)
         future_events_by_month = group_by_month(future_events)
+        show_past_events = (self.category.id in session.get('fetchPastEventsFrom', set()) or
+                            (session.user and session.user.settings.get('show_past_events')))
 
         if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
             news_list = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
@@ -242,6 +245,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                                           events_by_month=events_by_month, future_event_count=len(future_events),
                                           future_events_by_month=future_events_by_month, managers=managers,
                                           news_list=news_list, upcoming_events=upcoming_events,
+                                          show_past_events=show_past_events, past_event_count=past_event_count,
                                           is_recent=lambda dt: dt > now - relativedelta(weeks=1),
                                           happening_now=lambda event: now > event.start_dt and now < event.end_dt,
                                           format_event_date=format_event_date,
