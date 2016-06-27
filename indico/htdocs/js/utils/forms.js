@@ -174,6 +174,108 @@
         _update();
     };
 
+    /* Provide a "select really everything" option for paginated lists.
+     * When selecting all rows in such a list a message is shown indicating
+     * that only the current page is selected with the option to select all
+     * items (no matter on which page).
+     */
+    global.paginatedSelectAll = function paginatedSelectAll(options) {
+        options = $.extend(true, {
+            // the container element used as context for all other selectors.
+            // in case of dynamically updated rows, this must remain the same
+            // all the time as events are bound to it
+            containerSelector: null,
+            // the selector for the row selection checkboxes. used within the 
+            // context of containerSelector
+            checkboxSelector: null,
+            // the selector for the (usually hidden) all-items-on-all-pages-selected
+            // checkbox. used within the context of containerSelector
+            allSelectedSelector: null,
+            // the selector for the element where the message whether all items
+            // on the current page or really all items are selected.
+            // used within the global context, i.e. not restricted by the given
+            // containerSelector.
+            selectionMessageSelector: null,
+            // the total number of rows. may also be a function.
+            totalRows: 0,
+            messages: {
+                // message shown when all items on all pages are selected
+                allSelected: function(total) {
+                    // never used with total == 1. empty string is invalid so we use `*` instead
+                    return $T.ngettext('*', 'All {0} rows are currently selected.').format(total);
+                },
+                // message shown when all items on the current page are selected
+                pageSelected: function(selected, total) {
+                    // never used with total == 1
+                    return $T.ngettext('Only {0} out of {1} rows is currently selected',
+                                       'Only {0} out of {1} rows are currently selected.',
+                                       selected).format(selected, total);
+                }
+            }
+        }, options);
+
+        var container = $(options.containerSelector);
+        container.on('change', options.checkboxSelector, _update);
+        _update();
+
+        function _update() {
+            var messageContainer = $(options.selectionMessageSelector).empty();
+            var numChecked = container.find(options.checkboxSelector + ':checked').length;
+            var numUnchecked = container.find(options.checkboxSelector + ':not(:checked)').length;
+            var numRows = numChecked + numUnchecked;
+
+            if (numRows === options.totalRows || numChecked < numRows) {
+                // only one page or not everything selected
+                messageContainer.hide();
+                _setAllSelected(false);
+            } else if (numChecked === numRows) {
+                // all rows selected
+                if (_getAllSelected()) {
+                    $('<span>', {
+                        html: options.messages.allSelected(options.totalRows)
+                    }).appendTo(messageContainer);
+                    messageContainer.append(' ');
+                    $('<a>', {
+                        href: '#',
+                        text: $T.gettext('Select only the current page.'),
+                        click: function(evt) {
+                            evt.preventDefault();
+                            _setAllSelected(false);
+                            _update();
+                        }
+                    }).appendTo(messageContainer);
+                } else {
+                    $('<span>', {
+                        html: options.messages.pageSelected(numChecked, options.totalRows)
+                    }).appendTo(messageContainer);
+                    messageContainer.append(' ');
+                    $('<a>', {
+                        href: '#',
+                        text: $T.gettext('Click here to select them all.'),
+                        click: function(evt) {
+                            evt.preventDefault();
+                            _setAllSelected(true);
+                            _update();
+                        }
+                    }).appendTo(messageContainer);
+                }
+                messageContainer.show();
+            }
+        }
+
+        function _getAllSelected() {
+            return container.find(options.allSelectedSelector).prop('checked');
+        }
+
+        function _setAllSelected(selected) {
+            container.find(options.allSelectedSelector).prop('checked', selected).trigger('change');
+        }
+
+        return {
+            isEverythingSelected: _getAllSelected
+        };
+    };
+
     $(document).ready(function() {
         initForms($('form'));
     });

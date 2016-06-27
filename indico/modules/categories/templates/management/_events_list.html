@@ -72,12 +72,12 @@
             <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
             <ul class="dropdown">
                 <li>
-                    <a href="#" data-select-all="#event-management input:checkbox">
+                    <a href="#" data-select-all="#event-management input:checkbox[name=event_id]">
                         {% trans %}All{% endtrans %}
                     </a>
                 </li>
                 <li>
-                    <a href="#" data-select-none="#event-management input:checkbox">
+                    <a href="#" data-select-none="#event-management input:checkbox[name=event_id]">
                         {% trans %}None{% endtrans %}
                     </a>
                 </li>
@@ -112,7 +112,7 @@
                 <a href="#" class="i-button icon-remove js-enabled-if-checked"
                    data-href="{{ url_for('.delete_events', category) }}"
                    data-method="POST"
-                   data-params-selector="#event-management input[name=event_id]:checkbox:checked"
+                   data-params-selector="#event-management input[type=checkbox]:checked"
                    data-ajax-dialog></a>
             </div>
             <div class="group right">
@@ -121,13 +121,14 @@
                    data-method="POST"
                    data-href="{{ url_for('.split_category', category) }}"
                    data-title="{% trans %}Move selected events to a new category{% endtrans %}"
-                   data-params-selector="#event-management input[name=event_id]:checkbox:checked"
+                   data-params-selector="#event-management input[type=checkbox]:checked"
                    data-ajax-dialog></a>
             </div>
         {% endif %}
-        <div id="selection-message" class="action-box accept"></div>
+        <div id="selection-message" class="action-box highlight"></div>
     </div>
     <div id="event-management" data-total="{{ events.total }}">
+        <input type="checkbox" name="all_selected" style="display: none;" value="1">
         {% if events.total %}
             {{ events_table(category, page, order_column, direction, events) }}
         {% else %}
