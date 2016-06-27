@@ -183,8 +183,14 @@ class RHEventProtection(RHConferenceModifBase):
 class RHMoveEvent(RHConferenceModifBase):
     """Move event to a different category"""
 
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.target_category = Category.get_one(int(request.form['category_id']), is_deleted=False)
+        if not self.target_category.can_create_events(session.user):
+            raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
+
     def _process(self):
-        category = Category.get_one(request.json['category_id'], is_deleted=False)
-        self.event_new.move(category)
-        flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, category.title), 'success')
+        self.event_new.move(self.target_category)
+        flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
+              'success')
         return jsonify_data(flash=False)

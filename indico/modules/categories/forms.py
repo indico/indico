@@ -26,7 +26,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
                                      IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
                                      IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList)
-from indico.web.forms.widgets import DropzoneWidget, SwitchWidget
+from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
 
 
 def calculate_visibility_options(category):
@@ -127,13 +127,16 @@ class SplitCategoryForm(IndicoForm):
     second_category = StringField(_('Category name #2'), [DataRequired()],
                                   description=_('Events that were not selected will be moved into a new sub-category '
                                                 'with this title.'))
-    event_id = HiddenFieldList(validators=[DataRequired()])
+    event_id = HiddenFieldList()
+    all_selected = BooleanField(widget=HiddenCheckbox())
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         super(SplitCategoryForm, self).__init__(*args, **kwargs)
-        if kwargs.get('move_all', False):
+        if self.all_selected.data:
+            self.event_id.data = []
             self.first_category.label.text = _('Category name')
+            self.first_category.description = _('The events will be moved into a new sub-category with this title.')
             del self.second_category
 
     def is_submitted(self):
