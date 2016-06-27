@@ -1,0 +1,71 @@
+{% from 'attachments/_attachments.html' import render_attachments %}
+
+{% macro render_attachments(category) %}
+    {%- if category.attachment_count %}
+        {{ render_attachments(category.attached_items, linked_object=category,
+                              management=category.can_manage(session.user)) }}
+    {% endif -%}
+{% endmacro %}
+
+{% macro render_managers(managers) %}
+    {%- if managers %}
+        <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
+        <ul id="manager-list">
+            {% for manager in managers %}
+                <li class="{{ 'icon-user' if manager.is_single_person else 'icon-users' }}">
+                    {{ manager.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif -%}
+{% endmacro %}
+
+{% macro render_news(news_list) %}
+    {%- if news_list %}
+        <h2 class="icon-bullhorn">
+            {% trans %}News{% endtrans %}
+            <a href="{{ url_for('misc.news') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
+        </h2>
+        <ul class="main-page-list">
+            {% for news in news_list %}
+                <li>
+                    {# FIXME: We currently have no way to link to a specific news. #}
+                    <a class="title" href="{{ url_for('misc.news') }}">
+                        {{ news.title }}
+                    </a>
+                    <span class="timing">
+                        {% trans date=news.creation_dt|format_date(format='medium') -%}
+                            Posted on {{ date }}
+                        {%- endtrans %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif -%}
+{% endmacro %}
+
+{% macro render_upcoming_events(upcoming_events) %}
+    {%- if upcoming_events %}
+        <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
+        <ul class="main-page-list">
+            {% for event in upcoming_events %}
+                <li>
+                    <a class="title" title="{{ event.title }}" href="{{ url_for('event.conferenceDisplay', confId=event.id)}}">
+                        {{ event.title }}
+                    </a>
+                    <span class="timing">
+                        {% if event.status == 'ongoing' %}
+                            {% trans time=event.end_dt|format_datetime(format='weekday') -%}
+                                ongoing until {{ time }}
+                            {%- endtrans %}
+                        {% else %}
+                            {% trans time=event.start_dt|format_datetime(format='weekday') -%}
+                                starts {{ time }}
+                            {%- endtrans %}
+                        {% endif %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif -%}
+{% endmacro %}

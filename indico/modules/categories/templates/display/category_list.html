@@ -1,0 +1,24 @@
+{% macro category_list(categories) %}
+    {% if categories %}
+        <ul class="category-list">
+            {% for category in categories %}
+                <li>
+                    <span class="protection {{ 'icon-shield' if category.is_self_protected }}"></span>
+                    <span class="number-events">
+                        {% set event_count=category.deep_events_count %}
+                        {% if event_count %}
+                            {% trans count=event_count|format_number -%}
+                                {{ count }} event
+                            {%- pluralize -%}
+                                {{ count }} events
+                            {%- endtrans %}
+                        {% else %}
+                            {% trans %}empty{% endtrans %}
+                        {% endif %}
+                    </span>
+                    <a href="{{ url_for('.display', category) }}" class="name">{{ category.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
