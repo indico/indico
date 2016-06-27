@@ -40,9 +40,9 @@ def delete_category(category):
     logger.info('Category %s deleted by %s', category, session.user)
 
 
-def move_category(category, destination):
-    category.move(destination)
-    logger.info('Category %s moved to %s by %s', category, destination, session.user)
+def move_category(category, target_category):
+    category.move(target_category)
+    logger.info('Category %s moved to %s by %s', category, target_category, session.user)
 
 def update_category(category, data, skip=()):
     category.populate_from_dict(data, skip=skip)
