@@ -41,8 +41,7 @@ def delete_category(category):
 
 
 def move_category(category, destination):
-    category.parent = destination
-    db.session.flush()
+    category.move(destination)
     logger.info('Category %s moved to %s by %s', category, destination, session.user)
 
 def update_category(category, data, skip=()):
