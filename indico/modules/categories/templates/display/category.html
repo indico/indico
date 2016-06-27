@@ -55,13 +55,13 @@
         <div>
             {{ event_list_block(events_by_month) }}
         </div>
-        {% if past_events %}
+        {% if past_event_count %}
             <div id="pastEvents"></div>
             <div class="topBar">
                 <div class="content smaller">
                     <span id="pastEventsText">
                         <span id="pastEventsShow" class="pastEventsControl">
-                            {% trans count=past_events|count %}
+                            {% trans count=past_event_count %}
                                 There is {{ count }} event in the past.
                             {% pluralize %}
                                 There are {{ count }} events in the past.
@@ -69,7 +69,7 @@
                             <span class="fakeLink pastEventsLink">{% trans %}Show them.{% endtrans %}</span>
                         </span>
                         <span id="pastEventsHide" class="pastEventsControl" style="display: none;">
-                            {% trans count = past_events|count %}
+                            {% trans count = past_event_count %}
                                 <span class="fakeLink pastEventsLink">Hide</span> past events ({{ count }}).
                             {% endtrans %}
                         </span>
@@ -95,14 +95,14 @@
             }
         });
 
-        {# TODO
         // Past events
-        % if numOfEventsInThePast > 0:
-        var numOfEventsInThePast = ${ numOfEventsInThePast };
+        {% if past_event_count >0 %}
+            var numOfEventsInThePast = {{ past_event_count }};
+        {% endif %}
 
         function setShowPastEventsForCateg(show){
             indicoRequest('category.setShowPastEventsForCateg', {
-                categId: '${ categ.getId() }',
+                categId: '{{ category.id }}',
                 showPastEvents: show
             }, function() { });
         }
@@ -133,7 +133,7 @@
             $('#loadingPast').show();
             $('.pastEventsControl').hide();
             indicoRequest('category.getPastEventsList', {
-                categId: '${ categ.getId() }',
+                categId: '{{ category.id }}',
                 lastIdx: numOfEventsInThePast
             }, function(result, error){
                 if (result) {
@@ -157,13 +157,9 @@
                 }
             });
         }
-        % if showPastEvents:
+        {% if show_past_events %}
             fetchPastEvents();
-        % endif
-
-        % endif
-        #}
-
+        {% endif %}
     </script>
 {% endmacro %}
 
