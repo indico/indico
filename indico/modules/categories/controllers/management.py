@@ -365,7 +365,7 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
 class RHMoveEvents(RHManageCategorySelectedEventsBase):
     def _checkParams(self):
         RHManageCategorySelectedEventsBase._checkParams(self)
-        self.target_category = Category.get_one(int(request.form['category_id']), is_deleted=False)
+        self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
 
@@ -373,6 +373,6 @@ class RHMoveEvents(RHManageCategorySelectedEventsBase):
         for event in self.events:
             event.move(self.target_category)
         flash(ngettext('You have moved one event to the category "{cat}"',
-                       'You have moved {count{ events to the category "{cat}"', len(self.events))
+                       'You have moved {count} events to the category "{cat}"', len(self.events))
               .format(count=len(self.events), cat=self.target_category.title), 'success')
         return jsonify_data(flash=False)

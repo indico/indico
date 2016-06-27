@@ -255,7 +255,7 @@
                         $.ajax({
                             url: element.data('href'),
                             type: 'POST',
-                            data: $.extend({'category_id': category.id}, data || {}),
+                            data: $.extend({'target_category_id': category.id}, data || {}),
                             error: handleAjaxError,
                             success: function(data) {
                                 if (data.success) {
