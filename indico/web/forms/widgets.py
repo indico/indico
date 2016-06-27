@@ -16,7 +16,7 @@
 
 import re
 
-from wtforms.widgets import TextInput, TextArea, HiddenInput
+from wtforms.widgets import TextInput, TextArea, HiddenInput, CheckboxInput
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
@@ -50,7 +50,20 @@ class HiddenInputs(HiddenInput):
     item_widget = HiddenInput()
 
     def __call__(self, field, **kwargs):
-        return HTMLString('\n'.join(self.item_widget(field, value=item) for item in field._value()))
+        items = field._value() or []
+        return HTMLString('\n'.join(self.item_widget(field, value=item) for item in items))
+
+
+class HiddenCheckbox(CheckboxInput, HiddenInput):
+    """Renders an invisible checkbox.
+
+    This widget also inherits from HiddenInput to avoid creating
+    a form row when rendering the form containing it.
+    """
+
+    def __call__(self, field, **kwargs):
+        kwargs['style'] = 'display: none;'
+        return super(HiddenCheckbox, self).__call__(field, **kwargs)
 
 
 class JinjaWidget(object):
