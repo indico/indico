@@ -254,7 +254,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""
-        return user and (not self.event_creation_restricted or self.can_manage(user, role='create'))
+        # if creation is not restricted anyone who can access the category
+        # can also create events in it, otherwise only people with the
+        # creation role can
+        return user and ((not self.event_creation_restricted and self.can_access(user)) or
+                         self.can_manage(user, role='create'))
 
     def move(self, target):
         """Move the category into another category."""
