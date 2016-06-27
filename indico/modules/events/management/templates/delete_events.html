@@ -11,14 +11,16 @@
 
 {% if events %}
     {% call confirmation_dialog('danger', message=confirmation_message, ok_text=ok_text) %}
-        {% trans %}
-            You are about to <strong>delete</strong> the following events:
-        {% endtrans %}
+        {% trans count=events|length -%}
+            You are about to <strong>delete</strong> the following event:
+        {%- pluralize -%}
+            You are about to <strong>delete</strong> the following <strong>{{ count }}</strong> events:
+        {%- endtrans %}
         <ul>
             {% for event in events %}
                 <li>
                     <input type="hidden" name="event_id" value="{{ event.id }}">
-                    <a href="{{ url_for('event_mgmt.confModifAC', event) }}" target="_blank">
+                    <a href="{{ url_for('event_mgmt.conferenceModification-managementAccess', event) }}" target="_blank">
                         {{ event.title }}
                     </a>
                     ({{ event.start_dt|format_date(timezone=event.timezone) }})
