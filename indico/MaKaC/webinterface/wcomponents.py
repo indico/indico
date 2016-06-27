@@ -343,9 +343,9 @@ class WConferenceHeader(WHeader):
         from indico.web.http_api.util import generate_public_auth_request
 
         vars = WHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
 
-        vars["conf"] = vars["target"] = self._conf;
+        vars["conf"] = vars["target"] = self._conf
 
         vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
@@ -412,7 +412,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+        vars["categurl"] = self._conf.as_event.category.url
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -498,7 +498,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
 
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
         view_options = [{'id': tid, 'name': data['title']} for tid, data in
                         sorted(theme_settings.get_themes_for(vars["type"]).viewitems(), key=lambda x: x[1]['title'])]
 
