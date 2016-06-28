@@ -20,12 +20,14 @@ from flask import session, render_template
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.notifications import send_email, make_email
 from indico.core.settings.core import SettingsProxy
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -72,3 +74,19 @@ def _inject_login_as_header(**kwargs):
     login_as_data = session.get('login_as_orig_user')
     if login_as_data:
         return render_template('users/login_as_header.html', login_as_data=login_as_data)
+
+
+@signals.users.registration_requested.connect
+def _registration_requested(req, **kwargs):
+    from indico.modules.users.util import get_admin_emails
+    tpl = get_template_module('users/emails/profile_requested_admins.txt', req=req)
+    send_email(make_email(get_admin_emails(), template=tpl))
+
+
+@signals.users.registered.connect
+def _registered(user, identity, from_moderation, **kwargs):
+    from indico.modules.users.util import get_admin_emails
+    if from_moderation or identity.provider != 'indico' or not user_management_settings.get('notify_account_creation'):
+        return
+    tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
+    send_email(make_email(get_admin_emails(), template=tpl))

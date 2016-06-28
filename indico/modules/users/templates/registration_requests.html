@@ -5,69 +5,67 @@
 {% endblock %}
 
 {%- block content %}
-    <div class="registration-requests">
-        <table class="i-table-widget fixed-width">
-            <thead>
+    <table class="i-table-widget fixed-width">
+        <thead>
+            <tr>
+                <th>{% trans %}Email Address{% endtrans %}</th>
+                <th>{% trans %}First name{% endtrans %}</th>
+                <th>{% trans %}Last name{% endtrans %}</th>
+                <th>{% trans %}Affiliation{% endtrans %}</th>
+                <th>{% trans %}Comment{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="registration-requests">
+            {%- for req in pending_requests %}
                 <tr>
-                    <th>{% trans %}Email Address{% endtrans %}</th>
-                    <th>{% trans %}Username{% endtrans %}</th>
-                    <th>{% trans %}First name{% endtrans %}</th>
-                    <th>{% trans %}Last name{% endtrans %}</th>
-                    <th>{% trans %}Affiliation{% endtrans %}</th>
-                    <th>{% trans %}Comment{% endtrans %}</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            {%- for pending_request in pending_requests %}
-                <tr>
-                    <td>{{ pending_request.email }}</td>
-                    <td>{{ pending_request.user_data.username }}</td>
-                    <td>{{ pending_request.user_data.first_name }}</td>
-                    <td>{{ pending_request.user_data.last_name }}</td>
-                    <td>{{ pending_request.user_data.affiliation }}</td>
-                    <td>{{ pending_request.comment }}</td>
+                    <td>{{ req.email }}</td>
+                    <td>{{ req.user_data.first_name }}</td>
+                    <td>{{ req.user_data.last_name }}</td>
+                    <td>{{ req.user_data.affiliation }}</td>
+                    <td>{{ req.comment }}</td>
                     <td>
-                        <a href="#" class="i-button highlight right"
-                           data-method="POST"
-                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
-                            {% trans %}Accept{% endtrans %}
-                        </a>
-                        <a href="#" class="i-button highlight right js-reject"
-                           data-method="DELETE"
-                           data-href="{{ url_for('.registration_request_rest', pending_request) }}">
+                        <a href="#" class="i-button danger right js-process-request"
+                           data-href="{{ url_for('.reject_registration_request', req) }}"
+                           data-method="POST">
                            {% trans %}Reject{% endtrans %}
+                        </a>
+                        <a href="#" class="i-button accept right js-process-request"
+                           data-href="{{ url_for('.accept_registration_request', req) }}"
+                           data-method="POST">
+                            {% trans %}Accept{% endtrans %}
                         </a>
                     </td>
                 </tr>
-            {% else %}
-                <tr>
-                    <td colspan="7">{% trans %}There are no pending requests{% endtrans %}</td>
-                </tr>
             {%- endfor %}
-            </tbody>
-        </table>
-    </div>
+            <tr class="js-no-requests" {% if pending_requests %}style="display: none;"{% endif %}>
+                <td colspan="6">{% trans %}There are no pending requests{% endtrans %}</td>
+            </tr>
+        </tbody>
+    </table>
     <script>
         (function() {
             'use strict';
 
-            $('.registration-requests .js-reject').on('click', function(evt) {
+            var container = $('#registration-requests');
+            container.on('indico:confirmed', '.js-process-request', function(evt) {
                 evt.preventDefault();
 
                 var $this = $(this);
                 $.ajax({
                     url: $this.data('href'),
                     type: $this.data('method'),
+                    complete: IndicoUI.Dialogs.Util.progress(),
                     error: handleAjaxError,
                     success: function(data) {
-                        if (data.success) {
-                            IndicoUI.Dialogs.Util.progress();
-                            location.href = data.redirect;
+                        handleFlashes(data);
+                        $this.closest('tr').remove();
+                        if (!container.find('tr:not(.js-no-requests)').length) {
+                            container.find('.js-no-requests').show();
                         }
                     }
                 });
-            })
+            });
         })();
     </script>
 {%- endblock %}

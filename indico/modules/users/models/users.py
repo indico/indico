@@ -20,7 +20,6 @@ from operator import attrgetter
 
 from flask import flash
 from flask_multipass import IdentityRetrievalFailed
-from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -381,7 +380,7 @@ class User(PersonMixin, db.Model):
         """The local identities of the user except the main one"""
         return self.local_identities - {self.local_identity}
 
-    @property
+    @locator_property
     def locator(self):
         return {'user_id': self.id}
 
@@ -576,42 +575,3 @@ define_unaccented_lowercase_index(User.first_name)
 define_unaccented_lowercase_index(User.last_name)
 define_unaccented_lowercase_index(User.phone)
 define_unaccented_lowercase_index(User.address)
-
-
-class RegistrationRequest(db.Model):
-    __tablename__ = 'registration_requests'
-    __table_args__ = (
-        db.CheckConstraint('email = lower(email)', 'lowercase_email'),
-        {'schema': 'users'}
-    )
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    comment = db.Column(
-        db.String,
-        nullable=True
-    )
-    email = db.Column(
-        db.String,
-        unique=True,
-        nullable=False,
-        index=True
-    )
-    user_data = db.Column(
-        JSON,
-        nullable=False
-    )
-    identity_data = db.Column(
-        JSON,
-        nullable=False
-    )
-    settings = db.Column(
-        JSON,
-        nullable=False
-    )
-
-    @locator_property
-    def locator(self):
-        return {'request_id': self.id}

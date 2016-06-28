@@ -21,7 +21,7 @@
         <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
     {% else %}
         {{ form_header(form, id='register-form') }}
-        {% call form_fieldset(_('User information'), render_as_fieldset=show_extra_form) %}
+        {% call form_fieldset(_('User information'), render_as_fieldset=(show_extra_form or moderate_accounts)) %}
             {{ form_row(form.email, widget_attrs=widget_attrs.email) }}
             {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone'), widget_attrs=widget_attrs) }}
         {% endcall %}
@@ -29,30 +29,30 @@
             {% call form_fieldset(_('Login details')) %}
                 {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
             {% endcall %}
-            {% if account_moderation_enabled %}
-                {% call form_fieldset(_('Account moderation')) %}
-                    <div class="action-box highlight">
-                        <div class="section">
-                            <div class="icon icon-info"></div>
-                            <div class="text">
-                                <div>
-                                    {% trans -%}
-                                        Each account needs to be approved by an administrator.<br>
-                                        We will send you an email as soon as your request is approved.
-                                    {%- endtrans %}
-                                </div>
+        {% endif %}
+        {% if moderate_accounts and not must_verify_email %}
+            {% call form_fieldset(_('Account moderation')) %}
+                <div class="action-box highlight">
+                    <div class="section">
+                        <div class="icon icon-info"></div>
+                        <div class="text">
+                            <div>
+                                {% trans -%}
+                                    Each account needs to be approved by an administrator.<br>
+                                    We will send you an email as soon as your request is approved.
+                                {%- endtrans %}
                             </div>
                         </div>
                     </div>
-                    {{ form_row(form.comment) }}
-                {% endcall %}
-            {% endif %}
+                </div>
+                {{ form_row(form.comment) }}
+            {% endcall %}
         {% endif %}
         {% call form_footer(form) %}
             <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
             {% if must_verify_email %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Send me a verification email{% endtrans %}">
-            {% elif account_moderation_enabled %}
+            {% elif moderate_accounts %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Submit registration request{% endtrans %}">
             {% else %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico profile{% endtrans %}">
