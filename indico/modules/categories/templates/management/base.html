@@ -36,8 +36,10 @@
     <div class="action-menu">
         <div class="toolbar">
             <div class="group">
-                {{ move_category_button(category) }}
-                {{ delete_category_button(category) }}
+                {% if not category.is_root %}
+                    {{ move_category_button(category) }}
+                    {{ delete_category_button(category) }}
+                {% endif %}
             </div>
             <div class="group">
                 <a class="icon-switchon highlight i-button"
