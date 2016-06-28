@@ -1,142 +1,117 @@
-{% macro event_list(events_by_month, future_events_by_month, future_event_count, past_event_count, format_event_date, is_recent, happening_now, category_id) %}
-    <div class="eventList">
-        {% if future_event_count %}
-            <div class="topBar" style="margin-bottom: 10px">
-                <div class="content smaller">
-                    <span id="futureEventsShow">
-                        {% trans count=future_event_count -%}
-                            There is {{ count }} event in the future.
-                        {%- pluralize -%}
-                            There are {{ count }} events in the future.
-                        {%- endtrans %}
-                        <span class="fakeLink futureEventsLink">Show them.</span>
-                    </span>
-                    <span id="futureEventsHide" style="display: none;">
-                        {% trans count=future_event_count -%}
-                            {{ count }} event in the future.
-                        {%- pluralize -%}
-                            {{ count }} events in the future.
-                        {%- endtrans %}
-                        <span class="fakeLink futureEventsLink">{% trans %}Hide{% endtrans %}</span>
-                    </span>
-                </div>
+{% macro hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
+                             before=none, after=none, message_first=true) %}
+    {% set message=caller() %}
+    {% macro render_message() %}
+        <div class="topBar">
+            <div class="content smaller">
+                <span class="js-show-message">
+                    {{ message }}
+                    <a class="js-toggle-list" href="#">{% trans %}Show{% endtrans %}</a>
+                </span>
+                <span class="js-hide-message">
+                    {{ message }}
+                    <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
+                </span>
             </div>
+        </div>
+    {% endmacro %}
 
-            <div id="futureEvents" style="display: none;">
-                {{ event_list_block(future_events_by_month, format_event_date, is_recent, happening_now) }}
-            </div>
+    {% macro render_list() %}
+        <div class="events"
+             data-event-list-url="{{ url_for('.event_list', category) }}"
+             {% if after %}data-event-list-after="{{ after }}"{% endif %}
+             {% if before %}data-event-list-before="{{ before }}"{% endif %}>
+            {%- if events_by_month -%}
+                {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
+            {%- endif -%}
+        </div>
+    {% endmacro %}
+
+    <div class="{{ class }}">
+        {% if message_first %}
+            {{ render_message() }}
+            {{ render_list() }}
+        {% else %}
+            {{ render_list() }}
+            {{ render_message() }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
+                    past_event_count, future_threshold, past_threshold, future_events_by_month=[],
+                    past_events_by_month=[]) %}
+    <div class="event-list">
+        {% if future_event_count %}
+            {% call hidden_events_block('future-events', category, future_events_by_month, format_event_date,
+                                        is_recent, happening_now, after=future_threshold) %}
+                {% trans count=future_event_count -%}
+                    There is one event in the future.
+                {%- pluralize -%}
+                    There are {{ count }} events in the future.
+                {%- endtrans %}
+            {% endcall %}
         {% endif %}
         <div>
             {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
         </div>
         {% if past_event_count %}
-            <div id="pastEvents"></div>
-            <div class="topBar">
-                <div class="content smaller">
-                    <span id="pastEventsText">
-                        <span id="pastEventsShow" class="pastEventsControl">
-                            {% trans count=past_event_count -%}
-                                There is {{ count }} event in the past.
-                            {%- pluralize -%}
-                                There are {{ count }} events in the past.
-                            {%- endtrans %}
-                            <span class="fakeLink pastEventsLink">{% trans %}Show them.{% endtrans %}</span>
-                        </span>
-                        <span id="pastEventsHide" class="pastEventsControl" style="display: none;">
-                            {% trans count = past_event_count -%}
-                                <span class="fakeLink pastEventsLink">Hide</span> past events ({{ count }}).
-                            {%- endtrans %}
-                        </span>
-                        <span id="loadingPast" class="loadingPast"><em>{% trans %}fetching past events...{% endtrans %}</em></span>
-                    </span>
-                </div>
-            </div>
+            {% call hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
+                                        happening_now, before=past_threshold, message_first=false) %}
+                {% trans count=past_event_count -%}
+                    There is one event in the past.
+                {%- pluralize -%}
+                    There are {{ count }} events in the past.
+                {%- endtrans %}
+            {% endcall %}
         {% endif %}
     </div>
     <script>
         (function() {
             'use strict';
 
-            // Future events
-            $('.futureEventsLink').on('click', function() {
-                var fe = $('#futureEvents');
-                if (fe.is(':visible')) {
-                    $('#futureEventsShow').show();
-                    $('#futureEventsHide').hide();
-                    fe.slideUp('medium');
-                }
-                else {
-                    $('#futureEventsHide').show();
-                    $('#futureEventsShow').hide();
-                    fe.slideDown('medium');
-                }
-            });
+            var $eventList = $('.event-list');
+            var $futureEvents = $eventList.find('.future-events');
+            var $pastEvents = $eventList.find('.past-events');
 
-            // Past events
-            {% if past_event_count >0 %}
-                var numOfEventsInThePast = {{ past_event_count }};
-            {% endif %}
+            setupToggleEventListButton($futureEvents);
+            setupToggleEventListButton($pastEvents);
 
-            function setShowPastEventsForCateg(show){
-                indicoRequest('category.setShowPastEventsForCateg', {
-                    categId: '{{ category_id }}',
-                    showPastEvents: show
-                }, function() { });
-            }
+            function setupToggleEventListButton(wrapper) {
+                var $wrapper = $(wrapper);
+                var $content = $wrapper.find('.events');
 
-            $('.pastEventsLink').click(function() {
-                if (numOfEventsInThePast) {
-                    // We need to fetch the events
-                    setShowPastEventsForCateg(true);
-                    fetchPastEvents();
+                function updateMessage(visible) {
+                    $wrapper.find('.js-hide-message').toggle(visible);
+                    $wrapper.find('.js-show-message').toggle(!visible);
                 }
-                else {
-                    if ($('#pastEvents').is(':visible')) {
-                        $('#pastEvents').hide();
-                        $('#pastEventsHide').hide();
-                        $('#pastEventsShow').show();
-                        setShowPastEventsForCateg(false);
-                    }
-                    else {
-                        $('#pastEvents').show();
-                        $('#pastEventsHide').show();
-                        $('#pastEventsShow').hide();
-                        setShowPastEventsForCateg(true);
-                    }
-                }
-            });
+                updateMessage(!$content.is(':empty'));
 
-            function fetchPastEvents() {
-                $('#loadingPast').show();
-                $('.pastEventsControl').hide();
-                indicoRequest('category.getPastEventsList', {
-                    categId: '{{ category_id }}',
-                    lastIdx: numOfEventsInThePast
-                }, function(result, error){
-                    if (result) {
-                        numOfEventsInThePast -= result.num;
-                        $.each(result.events, function(i, month) {
-                            var id = 'eventList-' + month.year + '-' + month.month;
-                            var eventListUL = $('#' + id);
-                            if(!eventListUL.length) {
-                                eventListUL = $('<ul/>', {id: id});
-                                eventListUL.appendTo('#pastEvents').before($('<h4/>').html(month.title));
+                $wrapper.find('.js-toggle-list').on('click', function(evt) {
+                    evt.preventDefault();
+                    if ($content.is(':empty')) {
+                        $.ajax({
+                            url: $content.data('event-list-url'),
+                            data: {
+                                before: $content.data('event-list-before'),
+                                after: $content.data('event-list-after')
+                            },
+                            error: handleAjaxError,
+                            success: function(data) {
+                                $content.html(data.html);
+                                $content.show();
+                                updateMessage(true);
                             }
-                            eventListUL.append($('<div/>').html(month.events.join('')).children());
                         });
-                        if(numOfEventsInThePast > 0) {
-                            fetchPastEvents();
-                        }
-                        else {
-                            $('#loadingPast').hide();
-                            $('#pastEventsHide').show();
-                        }
+                    } else if ($content.is(':visible')) {
+                        $content.hide();
+                        updateMessage(false);
+                    } else {
+                        $content.show();
+                        updateMessage(true);
                     }
                 });
             }
-            {% if show_past_events %}
-                fetchPastEvents();
-            {% endif %}
         })();
     </script>
 {% endmacro %}
@@ -158,7 +133,17 @@
                             <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
                         </span>
                         <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
-                            <span itemprop="summary">{{ event.title }}</span>
+                            <span itemprop="summary">
+                                {% if event.type == 'lecture' %}
+                                    {% if event.person_links %}
+                                        {{ (event.person_links|map(attribute='full_name')|sort|join(', '), '"' + event.title + '"')|join(', ') }}
+                                    {% else %}
+                                        {{ event.title }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ event.title }}
+                                {% endif %}
+                            </span>
                         </a>
                         <span class="protected">
                             {% if event.is_self_protected %}

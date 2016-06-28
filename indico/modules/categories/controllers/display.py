@@ -24,7 +24,7 @@ from operator import attrgetter
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.modules import ModuleHolder
@@ -33,12 +33,13 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats, serialize_category_ical
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
-from indico.modules.events.util import get_base_ical_parameters
+from indico.modules.events.util import get_base_ical_parameters, preload_events
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
-from indico.util.date_time import format_date, now_utc
+from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
 from MaKaC.common.info import HelperMaKaCInfo
@@ -186,63 +187,41 @@ class RHCategorySearch(RH):
 
 class RHDisplayCategory(RHDisplayCategoryBase):
     def _process(self):
-        now = datetime.now(DisplayTZ().getDisplayTZ(as_timezone=True))
-        past_threshold = now - relativedelta(months=2, day=1, hour=0, minute=0, second=0, microsecond=0)
-        future_threshold = now + relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        event_query = (Event.query.with_parent(self.category).filter(Event.start_dt >= past_threshold)
-                       .order_by(Event.start_dt.desc()))
-        events = event_query.filter(Event.start_dt < future_threshold).all()
-        future_events = event_query.filter(Event.start_dt >= future_threshold).all()
-        past_event_count = Event.query.with_parent(self.category).filter(Event.start_dt < past_threshold).count()
+        past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        event_query = Event.query.with_parent(self.category).order_by(Event.start_dt.desc())
+        past_event_query = event_query.filter(Event.start_dt < past_threshold)
+        future_event_query = event_query.filter(Event.start_dt >= future_threshold)
+        current_event_query = event_query.filter(Event.start_dt >= past_threshold,
+                                                 Event.start_dt < future_threshold)
+        events = current_event_query.filter(Event.start_dt < future_threshold).all()
+        preload_events(events, persons=True)
+        events_by_month = self.group_by_month(events)
 
-        def group_by_month(events):
-            def format_month(dt):
-                return format_date(dt, format='MMMM Y')
-            formatted_now = format_month(now)
-            months = []
-            current_month = {}
-            for event in events:
-                name = format_month(event.start_dt)
-                if current_month.get('name') != name:
-                    current_month = {'name': name,
-                                     'events': [event],
-                                     'is_current': name == formatted_now}
-                    months.append(current_month)
-                else:
-                    current_month['events'].append(event)
-            return months
-        events_by_month = group_by_month(events)
-        future_events_by_month = group_by_month(future_events)
+        future_event_count = future_event_query.count()
+        past_event_count = past_event_query.count()
+
         show_past_events = (self.category.id in session.get('fetchPastEventsFrom', set()) or
                             (session.user and session.user.settings.get('show_past_events')))
+        if show_past_events:
+            past_events = past_event_query.all()
+            preload_events(past_events, persons=True)
+        past_events_by_month = self.group_by_month(past_events) if show_past_events else []
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
-        def format_event_date(event):
-            day_month = "dd MMM"
-            if event.start_dt.year != event.end_dt.year:
-                return "{} - {}".format(format_date(event.start_dt), format_date(event.end_dt))
-            elif (event.start_dt.month != event.end_dt.month) or (event.start_dt.day != event.end_dt.day):
-                return "{} - {}".format(format_date(event.start_dt, day_month), format_date(event.end_dt, day_month))
-            else:
-                return format_date(event.start_dt, day_month)
-
-        def is_recent(dt):
-            return dt > now - relativedelta(weeks=1)
-
-        def happening_now(event):
-            return now > event.start_dt and now < event.end_dt
-
+        threshold_format = '%Y-%m'
         params = {'event_count': len(events),
                   'events_by_month': events_by_month,
-                  'format_event_date': format_event_date,
-                  'future_event_count': len(future_events),
-                  'future_events_by_month': future_events_by_month,
-                  'is_recent': is_recent,
+                  'format_event_date': self.format_event_date,
+                  'future_event_count': future_event_count,
+                  'future_threshold': future_threshold.strftime(threshold_format),
+                  'happening_now': self.happening_now,
+                  'is_recent': self.is_recent,
                   'managers': managers,
                   'past_event_count': past_event_count,
-                  'show_past_events': show_past_events,
-                  'happening_now': happening_now}
+                  'past_events_by_month': past_events_by_month,
+                  'past_threshold': past_threshold.strftime(threshold_format)}
         params.update(get_base_ical_parameters(session.user, self.category, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id)))
 
@@ -265,6 +244,38 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                                               upcoming_events=upcoming_events, **params)
 
         return WPCategory.render_template('display/category.html', self.category, **params)
+
+
+class RHEventList(RHDisplayCategoryBase):
+    """Return the HTML for the event list before/after a specific month"""
+
+    @staticmethod
+    def _parse_year_month(string):
+        try:
+            dt = datetime.strptime(string, '%Y-%m')
+        except (TypeError, ValueError):
+            return None
+        return DisplayTZ().getDisplayTZ(as_timezone=True).localize(dt)
+
+    def _checkParams(self):
+        RHDisplayCategoryBase._checkParams(self)
+        before = self._parse_year_month(request.args.get('before'))
+        after = self._parse_year_month(request.args.get('after'))
+        if before is None and after is None:
+            raise BadRequest('"before" or "after" parameter must be specified')
+        event_query = Event.query.with_parent(self.category).order_by(Event.start_dt.desc())
+        if before:
+            event_query = event_query.filter(Event.start_dt < before)
+        if after:
+            event_query = event_query.filter(Event.start_dt >= after + relativedelta(months=1))
+        self.events = event_query.all()
+
+    def _process(self):
+        events_by_month = self.group_by_month(self.events)
+        tpl = get_template_module('categories/display/event_list.html')
+        html = tpl.event_list_block(events_by_month=events_by_month, format_event_date=self.format_event_date,
+                                    is_recent=self.is_recent, happening_now=self.happening_now)
+        return jsonify_data(flash=False, html=html)
 
 
 class RHExportCategoryICAL(RHDisplayCategoryBase):
