@@ -271,12 +271,17 @@ class RHRegister(RH):
 
     def _create_registration_request(self, form, handler):
         user_data = dict(form.data, emails=list(handler.get_all_emails(form)))
-        request = RegistrationRequest(comment=form.data.get('comment'), email=form.data.get('email'),
-                                      user_data=user_data)
+        del user_data['confirm_password']
+        user_data['password_hash'] = Identity.password.backend.hash(user_data.pop('password'))
+        email = form.data['email']
+        request = RegistrationRequest.find_first(email=email) or RegistrationRequest(email=email)
+        request.comment = form.data['comment']
+        request.user_data = user_data
         db.session.add(request)
         if 'register_verified_email' in session:
             del session['register_verified_email']
-        flash(_('Your request has been created. We will send you an email as soon as it gets approved.'))
+        flash(_('Your registration request has been received. We will send you an email once it has been processed.'),
+              'success')
         return redirect(url_for('misc.index'))
 
     def _create_user(self, form, handler, pending_user):
@@ -498,7 +503,12 @@ class LocalRegistrationHandler(RegistrationHandler):
     def create_identity(self, data):
         if 'register_verified_email' in session:
             del session['register_verified_email']
-        return Identity(provider='indico', identifier=data['username'], password=data['password'])
+        identity = Identity(provider='indico', identifier=data['username'])
+        if 'password' in data:
+            identity.password = data['password']
+        else:
+            identity.password_hash = data['password_hash']
+        return identity
 
     def redirect_success(self):
         return redirect(session.pop('register_next_url', url_for_index()))
