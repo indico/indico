@@ -24,26 +24,11 @@
 
     function setupCategoryMoveButton() {
         $('.js-move-category').on('click', function(evt) {
-            var $button = $(this);
             evt.preventDefault();
-            $('<div>').categorynavigator({
-                openInDialog: true,
-                selectLeafOnly: false, // FIXME: Select category without events only
-                actionButtonText: $T.gettext('Move here'),
-                onAction: function(category) {
-                    ajaxDialog({
-                        url: $button.data('move-url'),
-                        method: 'POST',
-                        data: {
-                            target_category_id: category.id
-                        },
-                        onClose: function(data) {
-                            if (data) {
-                                location.reload();
-                            }
-                        }
-                    });
-                }
+            ajaxDialog({
+                url: $(this).data('move-url'),
+                method: 'POST',
+                title: $T.gettext("Move category")
             });
         });
     }
@@ -214,19 +199,12 @@
         }
 
         function bulkMoveCategories() {
-            $('<div>').categorynavigator({
-                openInDialog: true,
-                selectLeafOnly: false, // FIXME: Select category without events only
-                actionButtonText: $T.gettext('Move here'),
-                onAction: function(category) {
-                    ajaxDialog({
-                        url: $table.data('bulk-move-url'),
-                        method: 'POST',
-                        data: {
-                            target_category_id: category.id,
-                            category_id: getSelectedCategories()
-                        }
-                    });
+            ajaxDialog({
+                url: $table.data('bulk-move-url'),
+                method: 'POST',
+                title: $T.gettext("Move categories"),
+                data: {
+                    category_id: getSelectedCategories()
                 }
             });
         }
