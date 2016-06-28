@@ -30,7 +30,8 @@ from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
                                        AddLocalIdentityForm, EditLocalIdentityForm)
-from indico.modules.auth.util import load_identity_info
+from indico.modules.auth.models.registration_requests import RegistrationRequest
+from indico.modules.auth.util import load_identity_info, register_user
 from indico.modules.auth.views import WPAuth, WPAuthUser
 from indico.modules.users import User
 from indico.modules.users.controllers import RHUserBase
@@ -248,17 +249,20 @@ class RHRegister(RH):
             return redirect(url_for('.register', provider=self.provider_name))
 
         form = handler.create_form()
+        if not handler.moderate_registrations and not handler.must_verify_email:
+            del form.comment
         # Check for pending users if we have verified emails
         pending = None
         if not handler.must_verify_email:
             pending = User.find_first(~User.is_deleted, User.is_pending,
                                       User.all_emails.contains(db.func.any(list(handler.get_all_emails(form)))))
-
         if form.validate_on_submit():
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
+            elif handler.moderate_registrations:
+                return self._create_registration_request(form, handler)
             else:
-                return self._create_user(form, handler, pending)
+                return self._create_user(form, handler)
         elif not form.is_submitted() and pending:
             # If we have a pending user, populate empty fields with data from that user
             for field in form:
@@ -270,44 +274,46 @@ class RHRegister(RH):
                     "We are going to link it automatically."), 'info')
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
-                                      email_sent=session.pop('register_verification_email_sent', False))
+                                      email_sent=session.pop('register_verification_email_sent', False),
+                                      moderate_accounts=handler.moderate_registrations)
 
     def _send_confirmation(self, email):
         session['register_verification_email_sent'] = True
         return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
                                   url_args={'provider': self.provider_name})
 
-    def _create_user(self, form, handler, pending_user):
-        data = form.data
-        if pending_user:
-            user = pending_user
-            user.is_pending = False
-        else:
-            user = User()
-        form.populate_obj(user, skip={'email'})
-        if form.email.data in user.secondary_emails:
-            # This can happen if there's a pending user who has a secondary email
-            # for some weird reason which should now become the primary email...
-            user.make_email_primary(form.email.data)
-        else:
-            user.email = form.email.data
-        identity = handler.create_identity(data)
-        user.identities.add(identity)
-        user.secondary_emails |= handler.get_all_emails(form) - {user.email}
-        user.favorite_users.add(user)
-        db.session.add(user)
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        timezone = session.timezone
-        if timezone == 'LOCAL':
-            timezone = Config.getInstance().getDefaultTimezone()
-        user.settings.set('timezone', timezone)
-        user.settings.set('lang', session.lang or minfo.getLang())
-        handler.update_user(user, form)
+    def _prepare_registration_data(self, form, handler):
+        email = form.email.data
+        extra_emails = handler.get_all_emails(form) - {email}
+        user_data = {k: v for k, v in form.data.viewitems() if k in {'first_name', 'last_name', 'affiliation',
+                                                                     'address', 'phone'}}
+        user_data.update(handler.get_extra_user_data(form))
+        identity_data = handler.get_identity_data(form)
+        # preserve MultiDict data -- Identity.data is a property backed by Identity._data
+        if 'data' in identity_data:
+            identity_data['_data'] = dict(identity_data.pop('data').lists())
+        settings = {
+            'timezone': Config.getInstance().getDefaultTimezone() if session.timezone == 'LOCAL' else session.timezone,
+            'lang': session.lang or HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+        }
+        return {'email': email, 'extra_emails': extra_emails, 'user_data': user_data, 'identity_data': identity_data,
+                'settings': settings}
+
+    def _create_registration_request(self, form, handler):
+        registration_data = self._prepare_registration_data(form, handler)
+        email = registration_data['email']
+        req = RegistrationRequest.find_first(email=email) or RegistrationRequest(email=email)
+        req.comment = form.comment.data
+        req.populate_from_dict(registration_data)
+        db.session.add(req)
         db.session.flush()
+        signals.users.registration_requested.send(req)
+        flash(_('Your registration request has been received. We will send you an email once it has been processed.'),
+              'success')
+        return handler.redirect_success()
 
-        # notify everyone of user creation
-        signals.users.registered.send(user)
-
+    def _create_user(self, form, handler):
+        user, identity = register_user(**self._prepare_registration_data(form, handler))
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')
@@ -405,6 +411,10 @@ class RegistrationHandler(object):
     def must_verify_email(self):
         raise NotImplementedError
 
+    @property
+    def moderate_registrations(self):
+        return False
+
     def get_all_emails(self, form):
         # All (verified!) emails that should be set on the user.
         # This MUST include the primary email from the form if available.
@@ -412,11 +422,11 @@ class RegistrationHandler(object):
         # The emails returned here are used to check for pending users
         return {form.email.data} if form.validate_on_submit() else set()
 
-    def create_identity(self, data):
+    def get_identity_data(self, form):
         raise NotImplementedError
 
-    def update_user(self, user, form):
-        pass
+    def get_extra_user_data(self, form):
+        return {}
 
     def redirect_success(self):
         raise NotImplementedError
@@ -461,18 +471,25 @@ class MultipassRegistrationHandler(RegistrationHandler):
     def must_verify_email(self):
         return not self.identity_info['email_verified']
 
+    @property
+    def moderate_registrations(self):
+        return self.identity_info['moderated']
+
     def get_all_emails(self, form):
         emails = super(MultipassRegistrationHandler, self).get_all_emails(form)
         return emails | set(self.identity_info['data'].getlist('email'))
 
-    def create_identity(self, data):
+    def get_identity_data(self, form):
         del session['login_identity_info']
-        return Identity(provider=self.identity_info['provider'], identifier=self.identity_info['identifier'],
-                        data=self.identity_info['data'], multipass_data=self.identity_info['multipass_data'])
+        return {'provider': self.identity_info['provider'], 'identifier': self.identity_info['identifier'],
+                'data': self.identity_info['data'], 'multipass_data': self.identity_info['multipass_data']}
 
-    def update_user(self, user, form):
+    def get_extra_user_data(self, form):
+        data = super(MultipassRegistrationHandler, self).get_extra_user_data(form)
         if self.from_sync_provider:
-            user.synced_fields = form.synced_fields | {field for field in multipass.synced_fields if field not in form}
+            data['synced_fields'] = form.synced_fields | {field for field in multipass.synced_fields
+                                                          if field not in form}
+        return data
 
     def redirect_success(self):
         return multipass.redirect_success()
@@ -492,6 +509,10 @@ class LocalRegistrationHandler(RegistrationHandler):
     @property
     def must_verify_email(self):
         return 'register_verified_email' not in session
+
+    @property
+    def moderate_registrations(self):
+        return Config.getInstance().getLocalModeration()
 
     def get_all_emails(self, form):
         emails = super(LocalRegistrationHandler, self).get_all_emails(form)
@@ -521,9 +542,10 @@ class LocalRegistrationHandler(RegistrationHandler):
             form.email.data = session['register_verified_email']
         return form
 
-    def create_identity(self, data):
+    def get_identity_data(self, form):
         del session['register_verified_email']
-        return Identity(provider='indico', identifier=data['username'], password=data['password'])
+        return {'provider': 'indico', 'identifier': form.username.data,
+                'password_hash': Identity.password.backend.hash(form.password.data)}
 
     def redirect_success(self):
         return redirect(session.pop('register_next_url', url_for_index()))

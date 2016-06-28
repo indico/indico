@@ -19,7 +19,11 @@ from __future__ import unicode_literals
 from flask import session, redirect, request
 from werkzeug.datastructures import MultiDict
 
+from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.auth import Identity
+from indico.modules.users import User
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 
@@ -34,7 +38,8 @@ def save_identity_info(identity_info, user):
         'multipass_data': identity_info.multipass_data,
         'data': dict(identity_info.data.lists()),
         'indico_user_id': user.id if user else None,
-        'email_verified': bool(identity_info.data.get('email') and trusted_email)
+        'email_verified': bool(identity_info.data.get('email') and trusted_email),
+        'moderated': identity_info.provider.settings.get('moderated', False)
     }
 
 
@@ -49,6 +54,41 @@ def load_identity_info():
     info['data'] = MultiDict()
     info['data'].update(data)
     return info
+
+
+def register_user(email, extra_emails, user_data, identity_data, settings, from_moderation=False):
+    """
+    Create a user based on the registration data provided during te
+    user registration process (via `RHRegister` and `RegistrationHandler`).
+
+    This method is not meant to be used for generic user creation, the
+    only reason why this is here is that approving a registration request
+    is handled by the `users` module.
+    """
+    user = User.find_first(~User.is_deleted, User.is_pending,
+                           User.all_emails.contains(db.func.any(list({email} | set(extra_emails)))))
+    if user:
+        user.is_pending = False
+    else:
+        user = User()
+    user.populate_from_dict(user_data)
+    if email in user.secondary_emails:
+        # This can happen if there's a pending user who has a secondary email
+        # for some weird reason which should now become the primary email...
+        user.make_email_primary(email)
+    else:
+        user.email = email
+    identity = Identity(**identity_data)
+    user.identities.add(identity)
+    user.secondary_emails |= extra_emails
+    user.favorite_users.add(user)
+    db.session.add(user)
+    user.settings.set('timezone', settings['timezone'])
+    user.settings.set('lang', settings['lang'])
+    db.session.flush()
+    signals.users.registered.send(user, from_moderation=from_moderation, identity=identity)
+    db.session.flush()
+    return user, identity
 
 
 def redirect_to_login(next_url=None, reason=None):

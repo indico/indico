@@ -36,6 +36,11 @@ from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
 
 
+def get_admin_emails():
+    """Get the email addresses of all Indico admins"""
+    return {u.email for u in User.find(is_admin=True, is_deleted=False)}
+
+
 def get_related_categories(user, detailed=True):
     """Gets the related categories of a user for the dashboard"""
     favorites = set(Category.query

@@ -352,6 +352,10 @@ MaxUploadFileSize = 0
 #   guaranteed that the emails actually belong to the user.  This should
 #   be enabled e.g. for corporate SSO systems so people do not have to go
 #   through an email verification step the first time they login/signup.
+# - `moderated`
+#   If set to True, account creation after logging in through this provider
+#   requires approval by an Indico administrator.  This results in the same
+#   workflow as the `LocalModeration` setting for local identities.
 # - `synced_fields`
 #   This may be set in no more than one identity provider and enables user
 #   data synchronization. Its value should be a set of user attributes that

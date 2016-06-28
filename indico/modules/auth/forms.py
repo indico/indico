@@ -97,6 +97,8 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
     email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
     address = StringField(_('Address'), widget=SyncedInputWidget(textarea=True))
     phone = StringField(_('Phone number'), widget=SyncedInputWidget())
+    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
+                                                        "administrators who will review your registration."))
 
 
 class LocalRegistrationForm(RegistrationForm):
@@ -104,8 +106,8 @@ class LocalRegistrationForm(RegistrationForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
-    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment to "
-                                                        "the administrators who will review your registration."))
+    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
+                                                        "administrators who will review your registration."))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
