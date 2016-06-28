@@ -41,13 +41,19 @@
                    data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li>
-                        <a href="{# TODO url_for('event.create', event_type='lecture') #}">{% trans %}Lecture{% endtrans %}</a>
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='lecture') }}">
+                            {% trans %}Lecture{% endtrans %}
+                        </a>
                     </li>
                     <li>
-                        <a href="{# TODO url_for('event.create', event_type='meeting') #}">{% trans %}Meeting{% endtrans %}</a>
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='meeting') }}">
+                            {% trans %}Meeting{% endtrans %}
+                        </a>
                     </li>
                     <li>
-                        <a href="{# TODO url_for('event.create', event_type='conference') #}">{% trans %}Conference{% endtrans %}</a>
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='conference') }}">
+                            {% trans %}Conference{% endtrans %}
+                        </a>
                     </li>
                 </ul>
                 {% if category.can_manage(session.user) %}
