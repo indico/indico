@@ -237,6 +237,8 @@ class RHMoveCategory(RHMoveCategoryBase):
 
     def _checkParams(self):
         RHMoveCategoryBase._checkParams(self)
+        if self.category.is_root:
+            raise BadRequest(_("Cannot move the root category."))
         if self.target_category is not None:
             if self.target_category == self.category:
                 raise BadRequest(_("Cannot move the category inside itself."))
