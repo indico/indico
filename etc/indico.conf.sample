@@ -313,6 +313,10 @@ MaxUploadFileSize = 0
 # disable that here.  Administrators can still create new indico accounts.
 # LocalRegistration = True
 
+# If you want to allow people to register themselves, but approve them before
+# their account is actually created, you can enable moderation.
+# LocalModeration = False
+
 # When `LocalIdentities` is set to False, a link to an external registration
 # page can be configured here:
 # ExternalRegistrationURL = ''

@@ -44,8 +44,7 @@ user_settings = UserSettingsProxy('users', {
 })
 
 user_management_settings = SettingsProxy('user_management', {
-    'notify_account_creation': False,
-    'moderate_account_creation': False
+    'notify_account_creation': False
 })
 
 
