@@ -331,9 +331,11 @@ class RHUsersAdminSettings(RHAdminBase):
             user_management_settings.set('notify_account_creation',
                                          user_mgt_form_data.get('notify_on_new_account', False))
 
+        num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', form=search_form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
-                                            user_management_form=user_management_form)
+                                            user_management_form=user_management_form,
+                                            num_reg_requests=num_reg_requests)
 
     def _load_management_settings(self):
         return {

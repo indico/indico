@@ -15,11 +15,14 @@
                     <div class="group">
                         <a class="i-button icon-plus" href="{{ url_for('.users_create') }}">{% trans %}Create a new account{% endtrans %}</a>
                     </div>
-                    <div class="group">
-                        <a class="i-button icon-info" href="{{ url_for('.registration_request_list') }}">
-                            {% trans %}Registration requests{% endtrans %}
-                        </a>
-                    </div>
+                    {% if num_reg_requests or indico_config.LocalModeration %}
+                        <div class="group">
+                            <a class="i-button icon-info" href="{{ url_for('.registration_request_list') }}">
+                                {% trans %}Registration requests{% endtrans %}
+                                <span class="badge">{{ num_reg_requests }}</span>
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="i-box-content">
