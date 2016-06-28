@@ -461,7 +461,7 @@ class RH(RequestHandlerBase):
 
     @jsonify_error(status=403)
     def _processForbidden(self, e):
-        if session.user is None and not request.is_xhr and not e.response:
+        if session.user is None and not request.is_xhr and not e.response and request.blueprint != 'auth':
             return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
         explanation = get_error_description(e)
