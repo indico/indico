@@ -205,7 +205,7 @@ def create_user(user_data, handler, pending_user=None):
     else:
         user = User()
 
-    user.populate_from_dict(user_data, skip={'email', 'password', 'username', 'confirm_password', 'comment', 'emails'})
+    user.populate_from_dict(user_data, skip={'email', 'password_hash', 'username', 'comment', 'emails'})
     if user_data['email'] in user.secondary_emails:
         user.make_email_primary(user_data['email'])
     else:
