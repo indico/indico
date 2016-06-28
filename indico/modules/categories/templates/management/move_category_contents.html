@@ -2,15 +2,52 @@
     <div class="section">
         <span class="icon icon-transmission"></span>
         <div class="text">
-            <div class="label">{% trans %}Selected categories to be moved{% endtrans %}:</div>
-            <div>{{ category.title }}</div>
+            <div class="label">
+                {% if categories %}
+                    {% trans count=categories|count, category=(categories|first).title -%}
+                        Select where you want to move "{{ category }}".
+                    {%- pluralize -%}
+                        Select where you want to move the following categories:
+                    {%- endtrans %}
+                {% endif %}
+            </div>
+            {% if categories|count > 1 %}
+            <ul>
+                {% for category in categories %}
+                    <li>{{ category.title }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
     </div>
 </div>
 <div id="categorynav-holder"></div>
 <script>
-    $('#categorynav-holder').categorynavigator({
-        categoryId: {{ category.parent.id if not category.is_root else category.id }},
-        selectLeafOnly: true
-    });
+    (function() {
+        'use strict';
+
+        var $categorynav = $('#categorynav-holder');
+        $categorynav.categorynavigator({
+            openInDialog: false,
+            selectLeafOnly: false, // FIXME: Select category without events only
+            actionButtonText: $T.gettext('Move here'),
+            onAction: function(category) {
+                ajaxDialog({
+                    url: {{ submit_url|tojson }},
+                    method: 'POST',
+                    data: {
+                        category_id: {{ category_ids|default(none)|tojson }},
+                        target_category_id: category.id
+                    },
+                    onClose: function(data) {
+                        if (data) {
+                            $categorynav.trigger('ajaxDialog:close');
+                            IndicoUI.Dialogs.Util.progress();
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        });
+    })();
 </script>
