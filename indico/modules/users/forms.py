@@ -101,9 +101,6 @@ class UserManagementForm(IndicoForm):
     notify_on_new_account = BooleanField(_('New account notifications'), widget=SwitchWidget(),
                                          description=_('Send notification to administrators whenever a new account is '
                                                        'created'))
-    account_moderation_workflow = BooleanField(_('Account moderation'), widget=SwitchWidget(),
-                                               description=_('Whether administrators should have possibility to '
-                                                             'every registration request'))
     submit_field = HiddenField()
 
     def is_submitted(self):

@@ -36,10 +36,10 @@
                             <div class="icon icon-info"></div>
                             <div class="text">
                                 <div>
-                                    {% trans %}
-                                        Each account needs to be approved by one of the moderators.</br>
+                                    {% trans -%}
+                                        Each account needs to be approved by an administrator.<br>
                                         We will send you an email as soon as your request is approved.
-                                    {% endtrans %}
+                                    {%- endtrans %}
                                 </div>
                             </div>
                         </div>
@@ -52,6 +52,8 @@
             <a class="i-button big" href="{{ url_for_logout() }}">{% trans %}Cancel{% endtrans %}</a>
             {% if must_verify_email %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Send me a verification email{% endtrans %}">
+            {% elif account_moderation_enabled %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Submit registration request{% endtrans %}">
             {% else %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico profile{% endtrans %}">
             {% endif %}

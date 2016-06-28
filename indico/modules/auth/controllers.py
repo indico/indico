@@ -224,7 +224,7 @@ class RHRegister(RH):
         if session.user:
             return redirect(url_for_index())
 
-        account_moderation_enabled = user_management_settings.get('moderate_account_creation')
+        account_moderation_enabled = Config.getInstance().getLocalModeration()
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email, prevalidated = self._get_verified_email()
         if verified_email is not None:

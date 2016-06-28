@@ -330,8 +330,6 @@ class RHUsersAdminSettings(RHAdminBase):
         if user_management_form.validate_on_submit():
             user_management_settings.set('notify_account_creation',
                                          user_mgt_form_data.get('notify_on_new_account', False))
-            user_management_settings.set('moderate_account_creation',
-                                         user_mgt_form_data.get('account_moderation_workflow', False))
 
         return WPUsersAdmin.render_template('users_admin.html', form=search_form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
@@ -339,8 +337,7 @@ class RHUsersAdminSettings(RHAdminBase):
 
     def _load_management_settings(self):
         return {
-            'notify_on_new_account': user_management_settings.get('notify_account_creation'),
-            'account_moderation_workflow': user_management_settings.get('moderate_account_creation')
+            'notify_on_new_account': user_management_settings.get('notify_account_creation')
         }
 
 

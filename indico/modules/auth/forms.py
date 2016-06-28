@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, SelectField, PasswordField
+from wtforms.fields import StringField, SelectField, PasswordField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
@@ -104,7 +104,8 @@ class LocalRegistrationForm(RegistrationForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
-    comment = StringField(_('Comment for the moderators'))
+    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment to "
+                                                        "the administrators who will review your registration."))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):

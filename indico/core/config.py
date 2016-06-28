@@ -342,6 +342,7 @@ class Config:
         'ProviderMap'               : {},
         'LocalIdentities'           : True,
         'LocalRegistration'         : True,
+        'LocalModeration'           : False,
         'ExternalRegistrationURL'   : '',
         'SecretKey'                 : None,
         'DefaultTimezone'           : 'UTC',

@@ -30,8 +30,7 @@ class UserManagementImporter(Importer):
     def _migrate_settings(self):
         self.print_step('Migrating user management settings')
         settings_dict = {
-            '_notifyAccountCreation': 'notify_account_creation',
-            '_moderateAccountCreation': 'moderate_account_creation'
+            '_notifyAccountCreation': 'notify_account_creation'
         }
 
         for old_setting_name, new_setting_name in settings_dict.iteritems():
