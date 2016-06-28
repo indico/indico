@@ -603,6 +603,14 @@ class RegistrationRequest(db.Model):
         JSON,
         nullable=False
     )
+    identity_data = db.Column(
+        JSON,
+        nullable=False
+    )
+    settings = db.Column(
+        JSON,
+        nullable=False
+    )
 
     @locator_property
     def locator(self):

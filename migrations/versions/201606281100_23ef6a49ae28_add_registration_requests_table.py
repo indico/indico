@@ -22,6 +22,8 @@ def upgrade():
         sa.Column('email', sa.String(), nullable=False, unique=True, index=True),
         sa.Column('comment', sa.String(), nullable=True),
         sa.Column('user_data', postgresql.JSON(), nullable=False),
+        sa.Column('identity_data', postgresql.JSON(), nullable=False),
+        sa.Column('settings', postgresql.JSON(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.CheckConstraint("email = lower(email)", name='lowercase_email'),
         schema='users'
