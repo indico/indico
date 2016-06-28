@@ -29,8 +29,7 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 from indico.core import signals
 from indico.core.db import db
 from indico.core.notifications import make_email
-from indico.modules.auth.forms import AdminAccountRegistrationForm, LocalRegistrationForm
-from indico.modules.auth.util import notify_of_registration_request_approval
+from indico.modules.auth.forms import AdminAccountRegistrationForm
 from indico.modules.categories import Category
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
@@ -48,7 +47,6 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
-from indico.util.user import create_user
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
