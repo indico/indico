@@ -31,7 +31,6 @@ class UserManagementImporter(Importer):
         self.print_step('Migrating user management settings')
         settings_dict = {
             '_notifyAccountCreation': 'notify_account_creation',
-            '_authorisedAccountCreation': 'authorised_account_creation',
             '_moderateAccountCreation': 'moderate_account_creation'
         }
 
