@@ -18,14 +18,14 @@
        title="{{ tooltip|forceescape }}"
        data-confirm="{{ confirmation_message|forceescape }}"
        data-title="{% trans %}Delete category{% endtrans %}"
-       data-href="{{ url_for('.delete', category) }}"
+       data-href="{{ url_for('categories.delete', category) }}"
        data-method="POST"></a>
 {% endmacro %}
 
 {% macro move_category_button(category, classes="i-button") %}
     <a class="{{ classes }} icon-transmission js-move-category"
        title="{% trans %}Move to another category{% endtrans %}"
-       data-move-url="{{ url_for('.move', category) }}"></a>
+       data-move-url="{{ url_for('categories.move', category) }}"></a>
 {% endmacro %}
 
 {% block banner_title %}
