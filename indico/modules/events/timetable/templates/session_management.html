@@ -1,9 +1,9 @@
 {% extends 'events/timetable/management.html' %}
 
 {% block subtitle %}
-    {% trans title=session_.title%}
+    {% trans title=session_.title -%}
         Session: {{ title }}
-    {% endtrans %}
+    {%- endtrans %}
 {% endblock %}
 
 {% block content %}

@@ -22,17 +22,17 @@
                 <div class="text">
                     <div class="label">{{ survey.title }}</div>
                     {% if survey.is_active %}
-                        {% trans %}
+                        {% trans -%}
                             The survey is live.
-                        {% endtrans %}
+                        {%- endtrans %}
                     {% elif survey.has_ended %}
-                        {% trans %}
+                        {% trans -%}
                             The survey finished.
-                        {% endtrans %}
+                        {%- endtrans %}
                     {% else %}
-                        {% trans %}
+                        {% trans -%}
                             The survey is not running.
-                        {% endtrans %}
+                        {%- endtrans %}
                     {% endif %}
                 </div>
                 <div class="toolbar">

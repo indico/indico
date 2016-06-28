@@ -14,9 +14,9 @@
 {% endmacro %}
 
 {% block title -%}
-    {% trans full_name=author.full_name %}
+    {% trans full_name=author.full_name -%}
         Details for {{ full_name }}
-    {% endtrans %}
+    {%- endtrans %}
 {%- endblock %}
 
 {% block content %}

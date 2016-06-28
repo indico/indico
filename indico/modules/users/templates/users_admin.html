@@ -33,7 +33,7 @@
                         <h3>
                             {% trans count=search_results|count -%}
                                 There is one user matching your search criteria.
-                            {% pluralize %}
+                            {%- pluralize -%}
                                 There are {{ count }} users matching your search criteria.
                             {%- endtrans %}
                         </h3>
