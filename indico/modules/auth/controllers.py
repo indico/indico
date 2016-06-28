@@ -21,27 +21,24 @@ from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
-from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
-from indico.core.notifications import make_email
 from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
                                        AddLocalIdentityForm, EditLocalIdentityForm)
-from indico.modules.auth.util import load_identity_info
+from indico.modules.auth.util import load_identity_info, send_confirmation
 from indico.modules.auth.views import WPAuth, WPAuthUser
-from indico.modules.users import User
+from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.models.users import RegistrationRequest
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
+from indico.util.user import create_user
 from indico.web.flask.util import url_for
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
-
-from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -60,6 +57,7 @@ class RHLogin(RH):
 
     def _process(self):
         login_reason = session.pop('login_reason', None)
+        local_registration_enabled = user_management_settings.get('authorised_account_creation')
 
         # User is already logged in
         if session.user is not None:
@@ -97,7 +95,7 @@ class RHLogin(RH):
 
         providers = multipass.auth_providers.values()
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
-                               login_reason=login_reason)
+                               login_reason=login_reason, local_registration_enabled=local_registration_enabled)
 
 
 class RHLoginForm(RH):
@@ -115,18 +113,6 @@ class RHLogout(RH):
 
     def _process(self):
         return multipass.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
-
-
-def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
-    template_args = template_args or {}
-    url_args = url_args or {}
-    token = secure_serializer.dumps(data or email, salt=salt)
-    url = url_for(endpoint, token=token, _external=True, _secure=True, **url_args)
-    template_module = get_template_module(template, email=email, url=url, **template_args)
-    GenericMailer.send(make_email(email, template=template_module))
-    flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '
-            'the link in that email.'))
-    return redirect(url_for(endpoint, **url_args))
 
 
 class RHLinkAccount(RH):
@@ -191,9 +177,9 @@ class RHLinkAccount(RH):
     def _send_confirmation(self, email):
         session['login_identity_info']['verification_email_sent'] = True
         session['login_identity_info']['data']['email'] = email  # throw away other emails
-        return _send_confirmation(email, 'link-identity-email', '.link_account',
-                                  'auth/emails/link_identity_verify_email.txt', {'user': self.user},
-                                  url_args={'provider': self.identity_info['provider']})
+        return send_confirmation(email, 'link-identity-email', '.link_account',
+                                 'auth/emails/link_identity_verify_email.txt', {'user': self.user},
+                                 url_args={'provider': self.identity_info['provider']})
 
 
 class RHRegister(RH):
@@ -232,6 +218,8 @@ class RHRegister(RH):
     def _process(self):
         if session.user:
             return redirect(url_for('misc.index'))
+
+        account_moderation_enabled = user_management_settings.get('moderate_account_creation')
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email, prevalidated = self._get_verified_email()
         if verified_email is not None:
@@ -253,6 +241,8 @@ class RHRegister(RH):
         if form.validate_on_submit():
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
+            elif account_moderation_enabled:
+                return self._create_registration_request(form, handler)
             else:
                 return self._create_user(form, handler, pending)
         elif not form.is_submitted() and pending:
@@ -266,44 +256,27 @@ class RHRegister(RH):
                     "We are going to link it automatically."), 'info')
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
-                                      email_sent=session.pop('register_verification_email_sent', False))
+                                      email_sent=session.pop('register_verification_email_sent', False),
+                                      account_moderation_enabled=account_moderation_enabled)
 
     def _send_confirmation(self, email):
         session['register_verification_email_sent'] = True
-        return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
-                                  url_args={'provider': self.provider_name})
+        return send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
+                                 url_args={'provider': self.provider_name})
+
+    def _create_registration_request(self, form, handler):
+        user_data = dict(form.data, emails=list(handler.get_all_emails(form)))
+        request = RegistrationRequest(comment=form.data.get('comment'), email=form.data.get('email'),
+                                      user_data=user_data)
+        db.session.add(request)
+        if 'register_verified_email' in session:
+            del session['register_verified_email']
+        flash(_('Your request has been created. We will send you an email as soon as it gets approved.'))
+        return redirect(url_for('misc.index'))
 
     def _create_user(self, form, handler, pending_user):
-        data = form.data
-        if pending_user:
-            user = pending_user
-            user.is_pending = False
-        else:
-            user = User()
-        form.populate_obj(user, skip={'email'})
-        if form.email.data in user.secondary_emails:
-            # This can happen if there's a pending user who has a secondary email
-            # for some weird reason which should now become the primary email...
-            user.make_email_primary(form.email.data)
-        else:
-            user.email = form.email.data
-        identity = handler.create_identity(data)
-        user.identities.add(identity)
-        user.secondary_emails |= handler.get_all_emails(form) - {user.email}
-        user.favorite_users.add(user)
-        db.session.add(user)
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        timezone = session.timezone
-        if timezone == 'LOCAL':
-            timezone = Config.getInstance().getDefaultTimezone()
-        user.settings.set('timezone', timezone)
-        user.settings.set('lang', session.lang or minfo.getLang())
-        handler.update_user(user, form)
-        db.session.flush()
-
-        # notify everyone of user creation
-        signals.users.registered.send(user)
-
+        user_data = dict(form.data, emails=handler.get_all_emails(form))
+        user, identity = create_user(user_data, handler, pending_user)
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')
@@ -517,7 +490,8 @@ class LocalRegistrationHandler(RegistrationHandler):
         return form
 
     def create_identity(self, data):
-        del session['register_verified_email']
+        if 'register_verified_email' in session:
+            del session['register_verified_email']
         return Identity(provider='indico', identifier=data['username'], password=data['password'])
 
     def redirect_success(self):
@@ -551,8 +525,8 @@ class RHResetPassword(RH):
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
             identity = next(iter(user.local_identities))
-            _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
-                               {'user': user, 'username': identity.identifier}, data=identity.id)
+            send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
+                              {'user': user, 'username': identity.identifier}, data=identity.id)
             session['resetpass_email_sent'] = True
             return redirect(url_for('.resetpass'))
         return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},

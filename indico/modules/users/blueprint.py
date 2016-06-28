@@ -24,7 +24,8 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
                                               RHUserFavoritesUserRemove, RHUserFavoritesCategoryAPI,
                                               RHUserSuggestionsRemove, RHUsersAdminSettings, RHUsersAdminCreate,
-                                              RHUsersAdminMerge, RHUsersAdminMergeCheck)
+                                              RHUsersAdminMerge, RHUsersAdminMergeCheck, RHRegistrationRequestList,
+                                              RHRegistrationRequestsREST)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('users', __name__, template_folder='templates', virtual_template_folder='users',
@@ -35,7 +36,10 @@ _bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdminSettings, methods=
 _bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/', 'users_merge', RHUsersAdminMerge, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/check/', 'users_merge_check', RHUsersAdminMergeCheck)
-
+_bp.add_url_rule('!/admin/users/registration-requests/', 'registration_request_list', RHRegistrationRequestList,
+                 methods=('GET', ))
+_bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>', 'registration_request_rest',
+                 RHRegistrationRequestsREST, methods=('POST', 'DELETE'))
 
 # User profile
 with _bp.add_prefixed_rules('/<int:user_id>'):
