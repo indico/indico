@@ -18,20 +18,17 @@ from __future__ import unicode_literals
 
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
                                                            RHCategoryInfo, RHCategorySearch)
-from indico.modules.categories.controllers.management import (RHCategoryMoveContents, RHCreateCategory,
-                                                              RHDeleteCategory, RHDeleteEvents, RHDeleteSubcategories,
-                                                              RHManageCategoryContent, RHManageCategoryIcon,
-                                                              RHManageCategoryLogo, RHManageCategoryProtection,
-                                                              RHManageCategorySettings, RHMoveCategory, RHMoveEvents,
-                                                              RHMoveSubcategories, RHSortSubcategories, RHSplitCategory)
+from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
+                                                              RHDeleteSubcategories, RHManageCategoryContent,
+                                                              RHManageCategoryIcon, RHManageCategoryLogo,
+                                                              RHManageCategoryProtection, RHManageCategorySettings,
+                                                              RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
+                                                              RHSortSubcategories, RHSplitCategory)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtual_template_folder='categories',
                       url_prefix='/category/<int:category_id>')
-
-# TODO: Remove when not used anymore
-_bp.add_url_rule('/manage/move-example', 'move_example', RHCategoryMoveContents)
 
 # Category management
 _bp.add_url_rule('/manage/', 'manage_content', RHManageCategoryContent)

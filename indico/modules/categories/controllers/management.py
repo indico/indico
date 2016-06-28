@@ -255,11 +255,6 @@ class RHMoveCategory(RHMoveCategoryBase):
                                 category_ids=[self.category.id], target_category=self.target_category)
 
 
-class RHCategoryMoveContents(RHManageCategoryBase):
-    def _process(self):
-        return jsonify_template('categories/management/move_category_contents.html', category=self.category)
-
-
 class RHDeleteSubcategories(RHManageCategoryBase):
     """Bulk-delete subcategories"""
 
