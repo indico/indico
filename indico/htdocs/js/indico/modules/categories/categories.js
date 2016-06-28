@@ -28,7 +28,8 @@
             ajaxDialog({
                 url: $(this).data('move-url'),
                 method: 'POST',
-                title: $T.gettext("Move category")
+                title: $T.gettext("Move category"),
+                closeButton: $T.gettext("Cancel")
             });
         });
     }
@@ -203,6 +204,7 @@
                 url: $table.data('bulk-move-url'),
                 method: 'POST',
                 title: $T.gettext("Move categories"),
+                closeButton: $T.gettext("Cancel"),
                 data: {
                     category_id: getSelectedCategories()
                 }
