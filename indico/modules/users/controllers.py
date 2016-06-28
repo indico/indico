@@ -330,8 +330,6 @@ class RHUsersAdminSettings(RHAdminBase):
         if user_management_form.validate_on_submit():
             user_management_settings.set('notify_account_creation',
                                          user_mgt_form_data.get('notify_on_new_account', False))
-            user_management_settings.set('authorised_account_creation',
-                                         user_mgt_form_data.get('local_account_creation', False))
             user_management_settings.set('moderate_account_creation',
                                          user_mgt_form_data.get('account_moderation_workflow', False))
 
@@ -342,7 +340,6 @@ class RHUsersAdminSettings(RHAdminBase):
     def _load_management_settings(self):
         return {
             'notify_on_new_account': user_management_settings.get('notify_account_creation'),
-            'local_account_creation': user_management_settings.get('authorised_account_creation'),
             'account_moderation_workflow': user_management_settings.get('moderate_account_creation')
         }
 

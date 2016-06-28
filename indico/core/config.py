@@ -341,6 +341,7 @@ class Config:
         'IdentityProviders'         : {},
         'ProviderMap'               : {},
         'LocalIdentities'           : True,
+        'LocalRegistration'         : True,
         'ExternalRegistrationURL'   : '',
         'SecretKey'                 : None,
         'DefaultTimezone'           : 'UTC',

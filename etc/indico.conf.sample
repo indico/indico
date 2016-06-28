@@ -309,6 +309,10 @@ MaxUploadFileSize = 0
 # anything here. Having local identities enabled is sufficient:
 # LocalIdentities = True
 
+# If you do not want people to register Indico accounts on their own you can
+# disable that here.  Administrators can still create new indico accounts.
+# LocalRegistration = True
+
 # When `LocalIdentities` is set to False, a link to an external registration
 # page can be configured here:
 # ExternalRegistrationURL = ''

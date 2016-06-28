@@ -61,7 +61,6 @@ class RHLogin(RH):
 
     def _process(self):
         login_reason = session.pop('login_reason', None)
-        local_registration_enabled = user_management_settings.get('authorised_account_creation')
 
         # User is already logged in
         if session.user is not None:
@@ -99,7 +98,7 @@ class RHLogin(RH):
 
         providers = multipass.auth_providers.values()
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
-                               login_reason=login_reason, local_registration_enabled=local_registration_enabled)
+                               login_reason=login_reason)
 
 
 class RHLoginForm(RH):
@@ -207,6 +206,8 @@ class RHRegister(RH):
                 raise BadRequest
         elif not Config.getInstance().getLocalIdentities():
             raise Forbidden('Local identities are disabled')
+        elif not Config.getInstance().getLocalRegistration():
+            raise Forbidden('Local registration is disabled')
 
     def _get_verified_email(self):
         """Checks if there is an email verification token."""
