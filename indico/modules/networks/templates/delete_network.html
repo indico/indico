@@ -11,13 +11,13 @@
 
 {% if categories or events %}
     {% call confirmation_dialog('danger', message=confirmation_message, ok_text=ok_text) %}
-        {% trans name=network_group.name, count=(categories|length + events|length)%}
+        {% trans name=network_group.name, count=(categories|length + events|length) -%}
             You are about to <strong>delete</strong> the network group <strong>{{ name }}</strong> which is currently
             in use by {{ count }} object:
-        {% pluralize count %}
+        {%- pluralize count -%}
             You are about to <strong>delete</strong> the network group <strong>{{ name }}</strong> which is currently
             in use by {{ count }} objects:
-        {% endtrans %}
+        {%- endtrans %}
         <ul>
             {% for category in categories %}
                 <li>

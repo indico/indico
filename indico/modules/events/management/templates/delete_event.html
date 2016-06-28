@@ -8,10 +8,10 @@
         <h2>{{ event.title }}</h2>
         <div class="form-group danger-message-box large-icon">
             <div class="message-text">
-                {% trans %}
+                {% trans -%}
                     Please note that if you delete the event you will lose all the information contained in it.<br>
                     <strong>This operation is irreversible!</strong>
-                {% endtrans %}
+                {%- endtrans %}
             </div>
             <div class="message-box-footer confirm-delete-block">
                 <input id="js-confirm-delete" type="checkbox">

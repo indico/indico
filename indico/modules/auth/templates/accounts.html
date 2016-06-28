@@ -45,7 +45,7 @@
                             <li>
                                 {% trans count = user.secondary_local_identities|count -%}
                                     You have another local account that has been used in the past.
-                                {% pluralize %}
+                                {%- pluralize -%}
                                     You have {{ count }} other local accounts that have been used in the past.
                                 {%- endtrans -%}
                                 <a href="#" class="js-toggle-secondary-accounts">

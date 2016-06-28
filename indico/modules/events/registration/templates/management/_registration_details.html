@@ -141,9 +141,9 @@
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
         </div>
-        {% trans submitted=registration.submitted_dt|format_date(timezone=registration.event_new.tzinfo) %}
+        {% trans submitted=registration.submitted_dt|format_date(timezone=registration.event_new.tzinfo) -%}
             Submitted: {{ submitted }}
-        {% endtrans %}
+        {%- endtrans %}
     </div>
     {% if registration.registration_form.tickets_enabled %}
         <div class="toolbar">
@@ -158,9 +158,9 @@
 {% macro _render_cancalled_actions(registration) %}
     <div class="text">
         <div class="label">
-            {% trans state=registration.state.title|lower %}
+            {% trans state=registration.state.title|lower -%}
                 This registration is {{ state }}
-            {% endtrans %}
+            {%- endtrans %}
         </div>
     </div>
 {% endmacro %}
