@@ -284,7 +284,10 @@ class RHMoveSubcategories(RHMoveCategoryBase):
     def _checkParams(self):
         RHMoveCategoryBase._checkParams(self)
         subcategory_ids = map(int, request.values.getlist('category_id'))
-        self.subcategories = Category.query.with_parent(self.category).filter(Category.id.in_(subcategory_ids)).all()
+        self.subcategories = (Category.query.with_parent(self.category)
+                              .filter(Category.id.in_(subcategory_ids))
+                              .order_by(Category.title)
+                              .all())
         if self.target_category is not None:
             if self.target_category.id in subcategory_ids:
                 raise BadRequest(_("Cannot move a category inside itself."))
