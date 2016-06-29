@@ -79,7 +79,7 @@
         $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
             suppress: false,
             content: {
-                text: bulkDeleteButtonTooltipContent
+                text: getBulkDeleteButtonTooltipContent
             }
         });
 
@@ -89,7 +89,7 @@
         $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
             suppress: false,
             content: {
-                text: bulkDeleteButtonTooltipContent
+                text: getBulkDeleteButtonTooltipContent
             }
         });
 
@@ -154,7 +154,7 @@
             }
         }
 
-        function bulkDeleteButtonTooltipContent() {
+        function getBulkDeleteButtonTooltipContent() {
             var $checked = getSelectedRows();
             if ($checked.length) {
                 if ($bulkDeleteButton.hasClass('disabled')) {
