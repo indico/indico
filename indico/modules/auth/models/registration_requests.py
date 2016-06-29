@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.util.locators import locator_property
@@ -54,7 +55,8 @@ class RegistrationRequest(db.Model):
         JSON,
         nullable=False
     )
-    identity_data = db.Column(
+    _identity_data = db.Column(
+        'identity_data',
         JSON,
         nullable=False
     )
@@ -66,6 +68,27 @@ class RegistrationRequest(db.Model):
     @locator_property
     def locator(self):
         return {'request_id': self.id}
+
+    @property
+    def identity_data(self):
+        identity_data = self._identity_data.copy()
+        # if we have data in identity_data, it was converted from a
+        # MultiDict so we need to convert it back.
+        if 'data' in identity_data:
+            tmp = MultiDict()
+            tmp.update(self._identity_data['data'])
+            identity_data['data'] = tmp
+        return identity_data
+
+    @identity_data.setter
+    def identity_data(self, identity_data):
+        identity_data = identity_data.copy()
+        # `identity_data['data']` for multipass-based identities is a
+        # MultiDict, but json-encoding it would lose all extra values
+        # for a key, so we convert it to a dict of lists first
+        if 'data' in identity_data:
+            identity_data['data'] = dict(identity_data['data'].lists())
+        self._identity_data = identity_data
 
     @return_ascii
     def __repr__(self):

@@ -289,9 +289,6 @@ class RHRegister(RH):
                                                                      'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
-        # preserve MultiDict data -- Identity.data is a property backed by Identity._data
-        if 'data' in identity_data:
-            identity_data['_data'] = dict(identity_data.pop('data').lists())
         settings = {
             'timezone': Config.getInstance().getDefaultTimezone() if session.timezone == 'LOCAL' else session.timezone,
             'lang': session.lang or HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
