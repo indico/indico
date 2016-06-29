@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import BadRequest, NotFound, Forbidden
+from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
 from indico.util.i18n import _

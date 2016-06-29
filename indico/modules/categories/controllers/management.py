@@ -22,7 +22,7 @@ from io import BytesIO
 from flask import flash, redirect, request, session
 from PIL import Image
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
 from indico.modules.categories import logger
