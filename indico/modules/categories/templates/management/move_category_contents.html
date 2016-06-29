@@ -30,6 +30,7 @@
             openInDialog: false,
             selectLeafOnly: false, // FIXME: Select category without events only
             actionButtonText: $T.gettext('Move here'),
+            categoryId: {{ (categories|first).parent.id }},
             onAction: function(category) {
                 ajaxDialog({
                     url: {{ submit_url|tojson }},

@@ -36,7 +36,7 @@
 {% endmacro %}
 
 {% macro events_table(category, page, order_column, direction, events) %}
-    <table class="i-table event-management">
+    <table class="i-table event-management" data-category-id="{{ category.id }}">
         <thead>
             <tr class="i-table">
                 <th class="i-table column-icon"></th>
