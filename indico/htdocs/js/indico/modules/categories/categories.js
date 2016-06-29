@@ -227,6 +227,7 @@
 
         function moveToCategory(element, data) {
             $('<div>').categorynavigator({
+                categoryId: $('.event-management').data('category-id'),
                 openInDialog: true,
                 selectLeafOnly: true,
                 onAction: function(category) {
