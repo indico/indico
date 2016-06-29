@@ -19,29 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-# legacy
-access_granted = _signals.signal('access-granted', """
-Called when a principal in an `AccessController` is granted access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-access_revoked = _signals.signal('access-revoked', """
-Called when a principal in an `AccessController` is revoked access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-modification_granted = _signals.signal('modification-granted', """
-Called when a principal in an `AccessController` is granted modification access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-modification_revoked = _signals.signal('modification-revoked', """
-Called when a principal in an `AccessController` is revoked modification access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-
-# new
 can_access = _signals.signal('can-access', """
 Called when `ProtectionMixin.can_access` is used to determine if a
 user can access something or not.

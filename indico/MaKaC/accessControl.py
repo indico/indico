@@ -132,7 +132,7 @@ class AccessController(Persistent):
         if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, GroupWrapper)):
             self.allowed.append(principal)
             self._p_changed = 1
-        signals.acl.access_granted.send(self, principal=principal)
+        # signals.acl.access_granted.send(self, principal=principal)
 
     def getAccessEmail(self):
         try:
@@ -153,7 +153,7 @@ class AccessController(Persistent):
         if principal in self.allowed:
             self.allowed.remove( principal )
             self._p_changed = 1
-        signals.acl.access_revoked.send(self, principal=principal)
+        # signals.acl.access_revoked.send(self, principal=principal)
 
     def setAccessKey( self, key="" ):
         self.accessKey = key
@@ -230,7 +230,7 @@ class AccessController(Persistent):
         if not email.lower() in map(lambda x: x.lower(), self.getModificationEmail()):
             self.getModificationEmail().append(email)
             self._p_changed = 1
-            signals.acl.modification_granted.send(self, principal=email)
+            # signals.acl.modification_granted.send(self, principal=email)
             return True
         return False
 
@@ -238,7 +238,7 @@ class AccessController(Persistent):
         if email in self.getModificationEmail():
             self.getModificationEmail().remove(email)
             self._p_changed = 1
-        signals.acl.modification_revoked.send(self, principal=email)
+        # signals.acl.modification_revoked.send(self, principal=email)
 
     def grantModification( self, principal ):
         """grants modification access for the related resource to the specified
@@ -247,7 +247,7 @@ class AccessController(Persistent):
         if principal not in self.managers and (isinstance(principal, (AvatarUserWrapper, GroupWrapper))):
             self.managers.append(principal)
             self._p_changed = 1
-        signals.acl.modification_granted.send(self, principal=principal)
+        # signals.acl.modification_granted.send(self, principal=principal)
 
     def revokeModification( self, principal ):
         """revokes modification access for the related resource to the
@@ -255,7 +255,7 @@ class AccessController(Persistent):
         if principal in self.managers:
             self.managers.remove( principal )
             self._p_changed = 1
-        signals.acl.modification_revoked.send(self, principal=principal)
+        # signals.acl.modification_revoked.send(self, principal=principal)
 
     def canModify(self, user):
         """tells whether the specified user has modification privileges"""
