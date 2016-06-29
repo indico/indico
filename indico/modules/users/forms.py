@@ -97,11 +97,7 @@ class MergeForm(IndicoForm):
                                  description=_('The user that will remain active in the end'))
 
 
-class UserManagementForm(IndicoForm):
-    notify_on_new_account = BooleanField(_('New account notifications'), widget=SwitchWidget(),
-                                         description=_('Send notification to administrators whenever a new account is '
-                                                       'created'))
-    submit_field = HiddenField()
-
-    def is_submitted(self):
-        return super(UserManagementForm, self).is_submitted() and 'submit_field' in request.form
+class AdminUserSettingsForm(IndicoForm):
+    notify_account_creation = BooleanField(_('Registration notifications'), widget=SwitchWidget(),
+                                           description=_('Send an email to all administrators whenever someone '
+                                                         'registers a new local account.'))

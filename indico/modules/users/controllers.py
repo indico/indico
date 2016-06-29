@@ -39,7 +39,7 @@ from indico.modules.users.util import (get_related_categories, get_suggested_cat
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
-                                        UserManagementForm)
+                                        AdminUserSettingsForm)
 from indico.util.date_time import timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
@@ -51,7 +51,7 @@ from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_form
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
@@ -294,52 +294,54 @@ class RHUserEmailsSetPrimary(RHUserBase):
         return redirect(url_for('.user_emails'))
 
 
-class RHUsersAdminSettings(RHAdminBase):
+class RHUsersAdmin(RHAdminBase):
     """Admin users overview"""
 
     def _process(self):
-        search_form = SearchForm(obj=FormDefaults(exact=True))
-        user_management_form = UserManagementForm(obj=FormDefaults(**self._load_management_settings()))
-        search_form_data = search_form.data
-        user_mgt_form_data = user_management_form.data
+        form = SearchForm(obj=FormDefaults(exact=True))
+        form_data = form.data
         search_results = None
         num_of_users = User.query.count()
         num_deleted_users = User.find(is_deleted=True).count()
 
-        if not user_management_form.is_submitted() and search_form.validate_on_submit():
+        if form.validate_on_submit():
             search_results = []
-            exact = search_form_data.pop('exact')
-            include_deleted = search_form_data.pop('include_deleted')
-            include_pending = search_form_data.pop('include_pending')
-            external = search_form_data.pop('external')
-            search_form_data = {k: v for (k, v) in search_form_data.iteritems() if v and v.strip()}
-
-            for entry in search_users(exact=exact, include_deleted=include_deleted,
-                                      include_pending=include_pending, external=external, **search_form_data):
+            exact = form_data.pop('exact')
+            include_deleted = form_data.pop('include_deleted')
+            include_pending = form_data.pop('include_pending')
+            external = form_data.pop('external')
+            form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
+            matches = search_users(exact=exact, include_deleted=include_deleted,
+                                   include_pending=include_pending, external=external, **form_data)
+            for entry in matches:
                 if isinstance(entry, User):
-                    search_results.append(UserEntry(profile_url=url_for('.user_profile', entry),
-                                                    **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}))
+                    search_results.append(UserEntry(
+                        profile_url=url_for('.user_profile', entry),
+                        **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}
+                    ))
                 else:
-                    search_results.append(UserEntry(profile_url=None,
-                                                    full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
-                                                    **{k: entry.data.get(k)
-                                                       for k in (IDENTITY_ATTRIBUTES - {'full_name'})}))
+                    search_results.append(UserEntry(
+                        profile_url=None,
+                        full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
+                        **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}
+                    ))
             search_results.sort(key=attrgetter('first_name', 'last_name'))
 
-        if user_management_form.validate_on_submit():
-            user_management_settings.set('notify_account_creation',
-                                         user_mgt_form_data.get('notify_on_new_account', False))
-
         num_reg_requests = RegistrationRequest.query.count()
-        return WPUsersAdmin.render_template('users_admin.html', form=search_form, search_results=search_results,
+        return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
-                                            user_management_form=user_management_form,
                                             num_reg_requests=num_reg_requests)
 
-    def _load_management_settings(self):
-        return {
-            'notify_on_new_account': user_management_settings.get('notify_account_creation')
-        }
+
+class RHUsersAdminSettings(RHAdminBase):
+    """Manage global suer-related settings."""
+
+    def _process(self):
+        form = AdminUserSettingsForm(obj=FormDefaults(**user_management_settings.get_all()))
+        if form.validate_on_submit():
+            user_management_settings.set_multi(form.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
 
 
 class RHUsersAdminCreate(RHAdminBase):

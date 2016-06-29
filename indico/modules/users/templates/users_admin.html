@@ -1,6 +1,23 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer, simple_form %}
 
+{% block title %}{% trans %}Users{% endtrans %}{% endblock %}
+
+{% block title_actions %}
+    <a class="i-button inconspicuous icon-settings arrow js-dropdown" data-toggle="dropdown"></a>
+    <ul class="dropdown">
+        <li>
+            <a href="#"
+               data-title="{% trans %}User settings{% endtrans %}"
+               data-href="{{ url_for('.users_admin_settings') }}"
+               data-qtip-position="right"
+               data-ajax-dialog>
+                {% trans %}User settings{% endtrans %}
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
 {%- block content %}
     <div class="i-box-group vert">
         <div class="i-box">
@@ -24,10 +41,6 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-            <div class="i-box-content">
-                <h2>{% trans %} Account creation settings {% endtrans %} </h2>
-                {{ simple_form(user_management_form, back_button=false) }}
             </div>
             <div class="i-box-content">
                 <div class="info-message-box">
