@@ -48,6 +48,9 @@ class WPCategory(WPJinjaMixin, WPMainBase):
     def _getBody(self, params):
         return self._getPageContent(params)
 
+    def _getNavigationDrawer(self):
+        return WNavigationDrawer({'target': self.category})
+
 
 class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
