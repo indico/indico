@@ -518,7 +518,7 @@ class Category(CommonObjectBase):
                 prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
-        signals.category.deleted.send(self)
+        # signals.category.deleted.send(self)
 
         return
 
@@ -536,7 +536,7 @@ class Category(CommonObjectBase):
         catDateIdx.indexCateg(self)
         catDateAllIdx.indexCateg(self)
 
-        signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
+        # signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
 
     def getName(self):
         return self.name
@@ -544,7 +544,7 @@ class Category(CommonObjectBase):
     def setName(self, newName):
         oldName = self.name
         self.name = newName.strip()
-        signals.category.title_changed.send(self, old=oldName, new=newName)
+        # signals.category.title_changed.send(self, old=oldName, new=newName)
 
     def getDescription(self):
         return self.description
@@ -598,7 +598,7 @@ class Category(CommonObjectBase):
         sc.setProtection(protection)
 
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
-        signals.category.created.send(sc, parent=self)
+        # signals.category.created.send(sc, parent=self)
 
         self._addSubCategory(sc)
         sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
@@ -878,8 +878,8 @@ class Category(CommonObjectBase):
         oldProtection = 1 if self.isProtected() else -1
 
         self.__ac.setProtection(private)
-        if oldProtection != private:
-            signals.category.protection_changed.send(self, old=oldProtection, new=private)
+        # if oldProtection != private:
+        #     signals.category.protection_changed.send(self, old=oldProtection, new=private)
 
     def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
@@ -974,11 +974,11 @@ class Category(CommonObjectBase):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        signals.category.domain_access_granted.send(self, domain=dom)
+        # signals.category.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        signals.category.domain_access_revoked.send(self, domain=dom)
+        # signals.category.domain_access_revoked.send(self, domain=dom)
 
 
     def getDomainList(self):
@@ -987,8 +987,8 @@ class Category(CommonObjectBase):
     def notifyModification(self, raiseEvent=True):
         """Method called to notify the current category has been modified.
         """
-        if raiseEvent:
-            signals.category.data_changed.send(self)
+        # if raiseEvent:
+        #     signals.category.data_changed.send(self)
         self._p_changed = 1
 
 
