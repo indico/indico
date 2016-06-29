@@ -263,6 +263,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def move(self, target):
         """Move the category into another category."""
         assert not self.is_root
+        self.position = (max(x.position for x in target.children) + 1) if target.children else 1
         self.parent = target
         db.session.flush()
         # TODO: trigger category moved signal
