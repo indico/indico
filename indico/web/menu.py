@@ -192,14 +192,12 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     return sorted(top_level, key=lambda x: (-x.weight, x.title))
 
 
-def render_sidemenu(menu_id, active_item=None, old_style=False, **kwargs):
+def render_sidemenu(menu_id, active_item=None, **kwargs):
     """Render a sidemenu with sections/items.
 
     :param menu_id: The identifier of the menu.
     :param active_item: The name of the currently-active menu item.
-    :param old_style: Whether the menu should be rendered using the
-                      "old" menu style.
     :param kwargs: Additional arguments passed to the menu signals.
     """
     items = build_menu_structure(menu_id, active_item=active_item, **kwargs)
-    return Markup(render_template('side_menu.html', items=items, old_style=old_style, menu_id=menu_id))
+    return Markup(render_template('side_menu.html', items=items, menu_id=menu_id))

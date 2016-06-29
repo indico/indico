@@ -34,10 +34,7 @@
     {% endif %}
 {% endmacro %}
 
-<div class="side-menu {{ 'old-style-menu' if old_style }}" id="side-menu-{{ menu_id }}">
-    {% if old_style %}
-        <div class="corner"></div>
-    {% endif %}
+<div class="side-menu" id="side-menu-{{ menu_id }}">
     <ul class="menu-items">
         {% for item in items %}
             {% if item.is_section %}
