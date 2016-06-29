@@ -225,7 +225,7 @@
     global.setupCategoryEventList = function setupCategoryEventsList() {
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
-        function moveCategory(element, data) {
+        function moveToCategory(element, data) {
             $('<div>').categorynavigator({
                 openInDialog: true,
                 selectLeafOnly: true,
@@ -250,7 +250,7 @@
 
         $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
             evt.preventDefault();
-            moveCategory($(this));
+            moveToCategory($(this));
         });
 
         $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
@@ -270,7 +270,7 @@
                 });
             }
 
-            moveCategory($this, data);
+            moveToCategory($this, data);
         });
 
         var isEverythingSelected = paginatedSelectAll({
