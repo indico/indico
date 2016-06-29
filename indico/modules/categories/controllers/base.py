@@ -57,17 +57,3 @@ class RHManageCategoryBase(RHCategoryBase):
     def _checkProtection(self):
         if not self.category.can_manage(session.user):
             raise Forbidden
-
-
-class RHMoveCategoryBase(RHManageCategoryBase):
-    def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
-        target_category_id = request.form.get('target_category_id')
-        if target_category_id is None:
-            self.target_category = None
-        else:
-            self.target_category = Category.get_one(int(target_category_id), is_deleted=False)
-            if not self.target_category.can_manage(session.user):
-                raise Forbidden(_("You are not allowed to manage the selected destination."))
-            if self.target_category.events:
-                raise BadRequest(_("The destination already contains an event."))
