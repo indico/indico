@@ -362,6 +362,13 @@ def _mappers_configured():
 
     from indico.modules.events import Event
 
+    # Category.event_count -- the number of events in the category itself,
+    # excluding deleted events
+    query = (db.select([db.func.count(Event.id)])
+             .where((Event.category_id == Category.id) & ~Event.is_deleted)
+             .correlate_except(Event))
+    Category.event_count = column_property(query, deferred=True)
+
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
     cte = Category.get_tree_cte('title')
