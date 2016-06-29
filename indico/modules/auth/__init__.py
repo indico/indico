@@ -28,7 +28,7 @@ from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem
+from indico.web.menu import SideMenuItem
 from MaKaC.common.timezoneUtils import SessionTZ
 
 
@@ -104,6 +104,6 @@ def login_user(user, identity=None):
     user.synchronize_data()
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Accounts'), 'auth.accounts')
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _extend_profile_sidemenu(sender, **kwargs):
+    yield SideMenuItem('accounts', _('Accounts'), url_for('auth.accounts'), 50)

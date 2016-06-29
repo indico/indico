@@ -12,13 +12,7 @@
 
 {% block side_menu -%}
     {% if show_nav %}
-        <nav class="menu vertical i-box">
-            {% for item in user_menu_items %}
-                <a class="item{% if item.active %} active{% endif %}" href="{{ item.url }}">
-                    {{- item.title -}}
-                </a>
-            {% endfor %}
-        </nav>
+        {{ render_sidemenu('user-profile-sidemenu', active_item=active_menu_item) }}
     {% endif %}
 {%- endblock %}
 

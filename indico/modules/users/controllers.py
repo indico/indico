@@ -96,7 +96,8 @@ class RHUserDashboard(RHUserBase):
 
         tz = timezone(DisplayTZ().getDisplayTZ())
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
-        return WPUserDashboard.render_template('dashboard.html', redis_enabled=bool(redis_client), timezone=unicode(tz),
+        return WPUserDashboard.render_template('dashboard.html', 'dashboard',
+                                               redis_enabled=bool(redis_client), timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                                categories=get_related_categories(self.user),
                                                suggested_categories=get_suggested_categories(self.user))
@@ -112,7 +113,7 @@ class RHPersonalData(RHUserBase):
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        return WPUser.render_template('personal_data.html', user=self.user, form=form)
+        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
 
 
 class RHUserPreferences(RHUserBase):
@@ -134,7 +135,7 @@ class RHUserPreferences(RHUserBase):
                                 else 'LOCAL')
             flash(_('Preferences saved'), 'success')
             return redirect(url_for('.user_preferences'))
-        return WPUser.render_template('preferences.html', user=self.user, form=form)
+        return WPUser.render_template('preferences.html', 'preferences', user=self.user, form=form)
 
 
 class RHUserFavorites(RHUserBase):
@@ -144,7 +145,7 @@ class RHUserFavorites(RHUserBase):
                  .options(undefer('chain_titles')))
         categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
                             key=lambda c: (c[0].title, c[1]))
-        return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
+        return WPUser.render_template('favorites.html', 'favorites', user=self.user, favorite_categories=categories)
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):
@@ -217,7 +218,7 @@ class RHUserEmails(RHUserBase):
             flash(_("We have sent an email to {email}. Please click the link in that email within 24 hours to "
                     "confirm your new email address.").format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
-        return WPUser.render_template('emails.html', user=self.user, form=form)
+        return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
 
 class RHUserEmailsVerify(RHUserBase):
