@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import pytz
+from indico.core import signals
 from sqlalchemy import orm, DDL
 from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
 from sqlalchemy.event import listens_for
@@ -263,10 +264,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def move(self, target):
         """Move the category into another category."""
         assert not self.is_root
+        old_parent = self.parent
         self.position = (max(x.position for x in target.children) + 1) if target.children else 1
         self.parent = target
         db.session.flush()
-        # TODO: trigger category moved signal
+        signals.category.moved.send(self, old_parent=old_parent)
 
     @classmethod
     def get_tree_cte(cls, col='id'):

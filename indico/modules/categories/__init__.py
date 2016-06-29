@@ -38,12 +38,6 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.categories.tasks
 
 
-@signals.category.deleted.connect
-def _category_deleted(category, **kwargs):
-    if hasattr(category, '_old_id'):
-        LegacyCategoryMapping.find(legacy_category_id=category._old_id).delete()
-
-
 @signals.app_created.connect
 def _app_created(app, **kwargs):
     """
