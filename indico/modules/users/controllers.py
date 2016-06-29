@@ -29,6 +29,7 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 from indico.core import signals
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
+from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
@@ -348,11 +349,24 @@ class RHUsersAdminCreate(RHAdminBase):
 
     CSRF_ENABLED = True
 
+    def _create_user(self, form):
+        user = User()
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.email = form.email.data
+        user.affiliation = form.affiliation.data
+        identity = Identity(provider='indico', identifier=form.username.data, password=form.password.data)
+        user.identities.add(identity)
+        user.favorite_users.add(user)
+        db.session.add(user)
+        db.session.flush()
+        signals.users.registered.send(user, from_moderation=True, identity=identity)
+        return user
+
     def _process(self):
         form = AdminAccountRegistrationForm()
         if form.validate_on_submit():
-            # TODO: create user
-            user = None
+            user = self._create_user(form)
             msg = Markup('{} <a href="{}">{}</a>').format(
                 escape(_('The account has been created.')),
                 url_for('users.user_profile', user),
