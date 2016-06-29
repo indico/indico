@@ -26,7 +26,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.categories import logger
-from indico.modules.categories.controllers.base import RHManageCategoryBase, RHMoveCategoryBase
+from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
@@ -230,6 +230,20 @@ class RHDeleteCategory(RHManageCategoryBase):
         else:
             flash(_('Category "{}" has been deleted.').format(self.category.title), 'success')
             return redirect(url)
+
+
+class RHMoveCategoryBase(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        target_category_id = request.form.get('target_category_id')
+        if target_category_id is None:
+            self.target_category = None
+        else:
+            self.target_category = Category.get_one(int(target_category_id), is_deleted=False)
+            if not self.target_category.can_manage(session.user):
+                raise Forbidden(_("You are not allowed to manage the selected destination."))
+            if self.target_category.events:
+                raise BadRequest(_("The destination already contains an event."))
 
 
 class RHMoveCategory(RHMoveCategoryBase):
