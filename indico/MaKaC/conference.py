@@ -1887,11 +1887,11 @@ class Conference(CommonObjectBase):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        signals.event.domain_access_granted.send(self, domain=dom)
+        # signals.event.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        signals.event.domain_access_revoked.send(self, domain=dom)
+        # signals.event.domain_access_revoked.send(self, domain=dom)
 
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
@@ -1937,9 +1937,8 @@ class Conference(CommonObjectBase):
 
         self.getAccessController().setProtection( private )
 
-        if oldValue != private:
-            # notify listeners
-            signals.event.protection_changed.send(self, old=oldValue, new=private)
+        # if oldValue != private:
+        #    signals.event.protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
