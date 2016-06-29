@@ -21,7 +21,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from flask import session, request, flash, jsonify, redirect
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from pytz import timezone
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
@@ -29,7 +29,6 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 from indico.core import signals
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
-from indico.modules.auth.forms import AdminAccountRegistrationForm
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
@@ -39,7 +38,7 @@ from indico.modules.users.util import (get_related_categories, get_suggested_cat
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
-                                        AdminUserSettingsForm)
+                                        AdminUserSettingsForm, AdminAccountRegistrationForm)
 from indico.util.date_time import timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
@@ -51,7 +50,7 @@ from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
@@ -347,15 +346,21 @@ class RHUsersAdminSettings(RHAdminBase):
 class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
-        from indico.modules.auth.controllers import LocalRegistrationHandler
         form = AdminAccountRegistrationForm()
         if form.validate_on_submit():
-            handler = LocalRegistrationHandler(self)
-            create_user(form, handler)
-            flash(_('Account has been successfully created.'), 'success')
-            return redirect(url_for('.users_create'))
-        return WPUsersAdmin.render_template('users_admin_create.html', form=form)
+            # TODO: create user
+            user = None
+            msg = Markup('{} <a href="{}">{}</a>').format(
+                escape(_('The account has been created.')),
+                url_for('users.user_profile', user),
+                escape(_('Show details'))
+            )
+            flash(msg, 'success')
+            return jsonify_data()
+        return jsonify_template('users/users_admin_create.html', form=form)
 
 
 def _get_merge_problems(source, target):

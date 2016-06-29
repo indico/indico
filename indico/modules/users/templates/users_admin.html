@@ -30,7 +30,13 @@
                         <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">{% trans %}Merge users{% endtrans %}</a>
                     </div>
                     <div class="group">
-                        <a class="i-button icon-plus" href="{{ url_for('.users_create') }}">{% trans %}Create a new account{% endtrans %}</a>
+                        <a href="#"
+                           class="i-button icon-plus"
+                           data-href="{{ url_for('.users_create') }}"
+                           data-title="{% trans %}Create new account{% endtrans %}"
+                           data-ajax-dialog>
+                            {% trans %}Create new account{% endtrans %}
+                        </a>
                     </div>
                     {% if num_reg_requests or indico_config.LocalModeration %}
                         <div class="group">
