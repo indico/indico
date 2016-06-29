@@ -16,15 +16,10 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import request
 
-from indico.core import signals
 from indico.modules.users import User
 from indico.util.i18n import _
-from indico.util.signals import values_from_signal
-from indico.web.menu import MenuItem
 
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
@@ -43,6 +38,10 @@ class WPUser(WPJinjaMixin, WPMainBase):
 
     template_prefix = 'users/'
 
+    def __init__(self, rh, active_menu_item, **kwargs):
+        kwargs['active_menu_item'] = active_menu_item
+        WPMainBase.__init__(self, rh, **kwargs)
+
     def _getNavigationDrawer(self):
         if 'user_id' in request.view_args:
             user = User.get(request.view_args['user_id'])
@@ -52,15 +51,6 @@ class WPUser(WPJinjaMixin, WPMainBase):
         return WSimpleNavigationDrawer(profile_breadcrumb)
 
     def _getBody(self, params):
-        extra_items = sorted(values_from_signal(signals.users.profile_sidemenu.send(params['user'])),
-                             key=attrgetter('title'))
-        params['user_menu_items'] = [
-            MenuItem(_('Dashboard'), 'users.user_dashboard'),
-            MenuItem(_('Personal data'), 'users.user_profile'),
-            MenuItem(_('Emails'), 'users.user_emails'),
-            MenuItem(_('Preferences'), 'users.user_preferences'),
-            MenuItem(_('Favorites'), 'users.user_favorites'),
-        ] + extra_items
         return self._getPageContent(params)
 
 

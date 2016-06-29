@@ -48,3 +48,12 @@ def _extend_admin_menu(sender, **kwargs):
 @signals.category.deleted.connect
 def _category_deleted(category, **kwargs):
     category.favorite_of.clear()
+
+
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100)
+    yield SideMenuItem('personal_data', _('Personal data'), url_for('users.user_profile'), 90)
+    yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80)
+    yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70)
+    yield SideMenuItem('favorites', _('Favorites'), url_for('users.user_favorites'), 60)

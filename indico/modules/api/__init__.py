@@ -23,7 +23,7 @@ from indico.modules.api.models.keys import APIKey
 from indico.util.i18n import _
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem, SideMenuItem
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('settings',)
@@ -71,6 +71,6 @@ def _extend_admin_menu(sender, **kwargs):
     return SideMenuItem('api', _("API"), url_for('api.admin_settings'), section='integration')
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('HTTP API'), 'api.user_profile')
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _extend_profile_sidemenu(sender, **kwargs):
+    yield SideMenuItem('api', _('HTTP API'), url_for('api.user_profile'), 30)
