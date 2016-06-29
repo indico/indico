@@ -24,9 +24,9 @@ _signals = Namespace()
 registered = _signals.signal('registered', """
 Called once a user registers (either locally or joins through a provider). The
 *sender* is the new user object.  The kwarg `from_moderation` indicates whether
-the user went through a moderation process or was created immediately on
-registration; the identity associated with the registration is passed in the
-`identity` kwarg.
+the user went through a moderation process (this also includes users created
+by an administrator manually) or was created immediately on registration;
+the identity associated with the registration is passed in the `identity` kwarg.
 """)
 
 registration_requested = _signals.signal('registration-requested', """
