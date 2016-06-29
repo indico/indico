@@ -36,12 +36,6 @@ class MaKaCInfo(Persistent):
         self._city = ""
         self._country = ""
 
-        # Account-related features
-        self._authorisedAccountCreation = True
-        self._notifyAccountCreation = False
-        self._moderateAccountCreation = False
-        self._moderators = []
-
         # Global poster/badge templates
         self._defaultConference = None
 
@@ -78,59 +72,6 @@ class MaKaCInfo(Persistent):
         msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
         warnings.warn(msg, DeprecationWarning, 2)
         return app.debug
-
-    def getModerators( self ):
-        try:
-            return self._moderators
-        except:
-            self._moderators = []
-            return self._moderators
-
-    def addModerator( self, av ):
-        if av not in self.getModerators():
-            self._moderators.append(av)
-            self._p_changed=1
-
-    def removeModerator( self, av ):
-        if av in self.getModerators():
-            self._moderators.remove( av )
-            self._p_changed=1
-
-    def isModerator( self, av ):
-        if av in self.getModerators():
-            return True
-        else:
-            return False
-
-    def getAuthorisedAccountCreation( self ):
-        try:
-            return self._authorisedAccountCreation
-        except:
-            self.setAuthorisedAccountCreation()
-            return self._authorisedAccountCreation
-
-    def setAuthorisedAccountCreation( self, flag=True ):
-        self._authorisedAccountCreation = flag
-
-    def getNotifyAccountCreation( self ):
-        try:
-            return self._notifyAccountCreation
-        except:
-            self.setNotifyAccountCreation()
-            return self._notifyAccountCreation
-
-    def setNotifyAccountCreation( self, flag=False ):
-        self._notifyAccountCreation = flag
-
-    def getModerateAccountCreation( self ):
-        try:
-            return self._moderateAccountCreation
-        except:
-            self.setModerateAccountCreation()
-            return self._moderateAccountCreation
-
-    def setModerateAccountCreation( self, flag=False ):
-        self._moderateAccountCreation = flag
 
     def getTitle( self ):
         return self._title
