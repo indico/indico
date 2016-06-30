@@ -23,9 +23,8 @@ from flask import request, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -51,9 +50,9 @@ class RHCategoryBase(RH):
 class RHDisplayCategoryBase(RHCategoryBase):
     """Base class for category display pages"""
 
-    def __init__(self):
-        RHCategoryBase.__init__(self)
-        self.now = datetime.now(DisplayTZ().getDisplayTZ(as_timezone=True))
+    def _checkParams(self):
+        RHCategoryBase._checkParams(self)
+        self.now = now_utc().astimezone(self.category.display_tzinfo)
 
     def _checkProtection(self):
         if not self.category.can_access(session.user):
