@@ -43,7 +43,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RH
 
@@ -251,13 +250,12 @@ class RHDisplayCategory(RHDisplayCategoryBase):
 class RHEventList(RHDisplayCategoryBase):
     """Return the HTML for the event list before/after a specific month"""
 
-    @staticmethod
-    def _parse_year_month(string):
+    def _parse_year_month(self, string):
         try:
             dt = datetime.strptime(string, '%Y-%m')
         except (TypeError, ValueError):
             return None
-        return DisplayTZ().getDisplayTZ(as_timezone=True).localize(dt)
+        return self.category.display_tzinfo.localize(dt)
 
     def _checkParams(self):
         RHDisplayCategoryBase._checkParams(self)
