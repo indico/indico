@@ -632,9 +632,9 @@ class WEventFooter(WFooter):
         v = WFooter.getVars(self)
 
         cid = self._conf.getUrlTag().strip() or self._conf.getId()
-        location = self._event.venue_name
+        location = self._event.venue_name.encode('utf-8')
         if self._event.room_name:
-            location = '{} ({})'.format(self._event.room_name, location)
+            location = '{} ({})'.format(self._event.room_name.encode('utf-8'), location)
 
         description = self._conf.getDescription()
 
