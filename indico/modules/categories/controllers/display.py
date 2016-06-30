@@ -30,7 +30,7 @@ from indico.core.db import db
 from indico.modules import ModuleHolder
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.util import get_category_stats, serialize_category_ical
+from indico.modules.categories.util import get_category_stats, serialize_category_atom, serialize_category_ical
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters, preload_events
@@ -40,7 +40,7 @@ from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -221,7 +221,9 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                   'managers': managers,
                   'past_event_count': past_event_count,
                   'past_events_by_month': past_events_by_month,
-                  'past_threshold': past_threshold.strftime(threshold_format)}
+                  'past_threshold': past_threshold.strftime(threshold_format),
+                  'atom_feed_url': url_for('.export_atom', self.category),
+                  'atom_feed_title': _('Events of "{}"').format(self.category.title)}
         params.update(get_base_ical_parameters(session.user, self.category, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id)))
 
@@ -283,3 +285,13 @@ class RHExportCategoryICAL(RHDisplayCategoryBase):
         filename = '{}-category.ics'.format(secure_filename(self.category.title, str(self.category.id)))
         buf = serialize_category_ical(self.category, session.user, Event.end_dt >= (now_utc() - timedelta(weeks=4)))
         return send_file(filename, buf, 'text/calendar')
+
+
+class RHExportCategoryAtom(RHDisplayCategoryBase):
+    def _process(self):
+        filename = '{}-category.atom'.format(secure_filename(self._target.getName(), str(self._target.id)))
+        buf = serialize_category_atom(self.category,
+                                      url_for(request.endpoint, self.category, _external=True),
+                                      session.user,
+                                      Event.end_dt >= now_utc())
+        return send_file(filename, buf, 'application/atom+xml')

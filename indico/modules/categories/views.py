@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from markupsafe import escape
+
+from indico.util.i18n import _
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
@@ -36,6 +39,8 @@ class WPCategory(WPJinjaMixin, WPMainBase):
     def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category
         self.category = category
+        self.atom_feed_url = kwargs.get('atom_feed_url')
+        self.atom_feed_title = kwargs.get('atom_feed_title')
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
 
@@ -47,6 +52,14 @@ class WPCategory(WPJinjaMixin, WPMainBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
+
+    def _getHeadContent(self):
+        head_content = WPMainBase._getHeadContent(self)
+        if self.atom_feed_url:
+            title = self.atom_feed_title or _("Indico Atom feed")
+            head_content += ('<link rel="alternate" type="application/atom+xml" title="{}" href="{}">'
+                             .format(escape(title), self.atom_feed_url))
+        return head_content
 
     def _getNavigationDrawer(self):
         return WNavigationDrawer({'target': self.category})
