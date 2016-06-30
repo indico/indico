@@ -123,7 +123,7 @@ def _serialize_category(category, with_path=False, with_favorite=False):
         'id': category.id,
         'title': category.title,
         'is_protected': category.is_protected,
-        'event_count': len(category.events),
+        'event_count': category.event_count,
         'deep_category_count': category.deep_children_count,
         'deep_event_count': category.deep_events_count,
         'can_access': category.can_access(session.user),
@@ -156,7 +156,8 @@ class RHCategorySearch(RH):
         q = request.args['q'].lower()
         query = (Category.query
                  .filter(Category.title_matches(q))
-                 .options(undefer('deep_children_count'), undefer('deep_events_count'), joinedload('acl_entries')))
+                 .options(undefer('deep_children_count'), undefer('deep_events_count'), undefer('event_count'),
+                          joinedload('acl_entries')))
         if session.user:
             # Prefer favorite categories
             query = query.order_by(Category.favorite_of.any(favorite_category_table.c.user_id == session.user.id)
