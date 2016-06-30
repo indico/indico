@@ -68,6 +68,13 @@ class CategorySettingsForm(IndicoForm):
         category = kwargs.pop('category')
         self.visibility.choices = get_visibility_options(category, allow_invisible=False)
 
+        # Check if category visibility would be affected by any of the parents
+        real_horizon = category.real_visibility_horizon
+        own_horizon = category.own_visibility_horizon
+        if real_horizon and real_horizon.is_descendant_of(own_horizon):
+            self.visibility.warning = _("This category's visibility is currently limited by that of '{}'.").format(
+                real_horizon.title)
+
 
 class CategoryIconForm(IndicoForm):
     icon = JSONField("Icon", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
