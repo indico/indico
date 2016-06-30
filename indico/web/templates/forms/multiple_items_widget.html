@@ -30,7 +30,7 @@
             'use strict';
 
             var uuidField = {{ field.uuid_field | tojson }};
-            var columns = {{ field.fields | tojson }};
+            var columns = {{ field._field_spec | tojson }};
             var sortable = {{ field.sortable | tojson }};
             var columnChoices = {{ field.choices | tojson }};
             var widget = $('#{{ field.id }}-widget');
