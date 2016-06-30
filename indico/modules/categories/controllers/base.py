@@ -17,6 +17,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from itertools import groupby
+from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import request, session
@@ -73,21 +75,13 @@ class RHDisplayCategoryBase(RHCategoryBase):
             return format_date(event.start_dt, day_month)
 
     def group_by_month(self, events):
-        def _format_month(dt):
-            return format_date(dt, format='MMMM Y')
-        formatted_now = _format_month(self.now)
-        months = []
-        current_month = {}
-        for event in events:
-            name = _format_month(event.start_dt)
-            if current_month.get('name') != name:
-                current_month = {'name': name,
-                                 'events': [event],
-                                 'is_current': name == formatted_now}
-                months.append(current_month)
-            else:
-                current_month['events'].append(event)
-        return months
+        def _format_tuple(x):
+            (year, month), events = x
+            return {'name': format_date(datetime(year=year, month=month, day=1), format='MMMM Y'),
+                    'events': list(events),
+                    'is_current': year == self.now.year and month == self.now.month}
+        months = groupby(events, key=attrgetter('start_dt.year', 'start_dt.month'))
+        return map(_format_tuple, months)
 
     def happening_now(self, event):
         return self.now > event.start_dt and self.now < event.end_dt
