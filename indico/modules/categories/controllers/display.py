@@ -203,9 +203,6 @@ class RHDisplayCategory(RHDisplayCategoryBase):
 
         show_past_events = (self.category.id in session.get('fetchPastEventsFrom', set()) or
                             (session.user and session.user.settings.get('show_past_events')))
-        if show_past_events:
-            past_events = past_event_query.all()
-        past_events_by_month = self.group_by_month(past_events) if show_past_events else []
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
@@ -219,7 +216,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                   'is_recent': self.is_recent,
                   'managers': managers,
                   'past_event_count': past_event_count,
-                  'past_events_by_month': past_events_by_month,
+                  'show_past_events': show_past_events,
                   'past_threshold': past_threshold.strftime(threshold_format),
                   'atom_feed_url': url_for('.export_atom', self.category),
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
