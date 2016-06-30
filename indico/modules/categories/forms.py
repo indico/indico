@@ -17,15 +17,17 @@
 from __future__ import unicode_literals
 
 from flask import request
-from wtforms.fields import BooleanField, SelectField, StringField, HiddenField
-from wtforms.validators import DataRequired, Optional
+from wtforms.fields import BooleanField, SelectField, StringField, HiddenField, IntegerField
+from wtforms.validators import DataRequired, Optional, InputRequired, NumberRange, ValidationError
 
-from indico.modules.categories.models.categories import EventMessageMode
+from indico.modules.categories.models.categories import EventMessageMode, Category
+from indico.modules.events import Event
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
                                      IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
-                                     IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList)
+                                     IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList,
+                                     MultipleItemsField)
 from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
 
 
@@ -141,3 +143,34 @@ class SplitCategoryForm(IndicoForm):
 
     def is_submitted(self):
         return super(SplitCategoryForm, self).is_submitted() and 'submitted' in request.form
+
+
+class UpcomingEventsForm(IndicoForm):
+    max_entries = IntegerField(_('Max. events'), [InputRequired(), NumberRange(min=0)],
+                               description=_("The maximum number of upcoming events to show. Events are sorted by "
+                                             "weight so events with a lower weight are more likely to be omitted if "
+                                             "there are too many events to show."))
+    entries = MultipleItemsField(_('Upcoming events'),
+                                 fields=[{'id': 'type', 'caption': _("Type"), 'required': True, 'type': 'select'},
+                                         {'id': 'id', 'caption': _("ID"), 'required': True, 'type': 'number',
+                                          'step': 1, 'coerce': int},
+                                         {'id': 'days', 'caption': _("Days"), 'required': True, 'type': 'number',
+                                          'step': 1, 'coerce': int},
+                                         {'id': 'weight', 'caption': _("Weight"), 'required': True, 'type': 'number',
+                                          'coerce': float}],
+                                 choices={'type': {'category': _('Category'), 'event': _('Event')}},
+                                 description=_("Specify categories/events shown in the 'upcoming events' list on the "
+                                               "home page."))
+
+    def validate_entries(self, field):
+        if field.errors:
+            return
+        for entry in field.data:
+            if entry['days'] < 0:
+                raise ValidationError(_("'Days' must be a positive integer"))
+            if entry['type'] not in {'category', 'event'}:
+                raise ValidationError(_('Invalid type'))
+            if entry['type'] == 'category' and not Category.get(entry['id'], is_deleted=False):
+                raise ValidationError(_('Invalid category: {}').format(entry['id']))
+            if entry['type'] == 'event' and not Event.get(entry['id'], is_deleted=False):
+                raise ValidationError(_('Invalid event: {}').format(entry['id']))

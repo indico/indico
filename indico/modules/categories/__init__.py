@@ -22,6 +22,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole
+from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
@@ -31,6 +32,11 @@ from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('categories')
+
+upcoming_events_settings = SettingsProxy('upcoming_events', {
+    'entries': [],
+    'max_entries': 10
+})
 
 
 @signals.import_tasks.connect
@@ -84,6 +90,12 @@ def _sidemenu_items(sender, category, **kwargs):
                        90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
+
+
+@signals.menu.items.connect_via('admin-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    yield SideMenuItem('upcoming_events', _('Upcoming events'), url_for('categories.manage_upcoming'),
+                       section='customization')
 
 
 @signals.app_created.connect

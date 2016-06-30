@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
                                                            RHCategoryInfo, RHCategorySearch)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
@@ -58,3 +59,6 @@ _bp.add_url_rule('/info', 'info', RHCategoryInfo)
 
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
+
+# Administration
+_bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))

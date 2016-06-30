@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from datetime import timedelta
 from io import BytesIO
 
 from lxml import html
@@ -24,12 +25,15 @@ from lxml.etree import ParserError
 
 import icalendar as ical
 from pyatom import AtomFeed
+from pytz import timezone
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.categories import upcoming_events_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -215,3 +219,33 @@ def get_category_stats(category_id=None):
             'contribs_by_year': get_contribs_by_year(category_id),
             'attachments': get_attachment_count(category_id),
             'updated': now_utc()}
+
+
+def get_upcoming_events():
+    """Get the global list of upcoming events"""
+    from indico.modules.events import Event
+    data = upcoming_events_settings.get_all()
+    if not data['max_entries'] or not data['entries']:
+        return []
+    tz = timezone(Config.getInstance().getDefaultTimezone())
+    now = now_utc(False).astimezone(tz)
+    base_query = (Event.query
+                  .filter(~Event.is_self_protected,
+                          ~Event.is_deleted,
+                          Event.end_dt.astimezone(tz) > now)
+                  .options(load_only('id', 'title', 'start_dt', 'end_dt')))
+    queries = []
+    cols = {'category': Event.category_id,
+            'event': Event.id}
+    for entry in data['entries']:
+        delta = timedelta(days=entry['days'])
+        query = (base_query
+                 .filter(cols[entry['type']] == entry['id'])
+                 .filter(db.cast(Event.start_dt.astimezone(tz), db.Date) > (now - delta).date())
+                 .with_entities(Event, db.literal(entry['weight']).label('weight')))
+        queries.append(query)
+
+    query = (queries[0].union(*queries[1:])
+             .order_by(db.desc('weight'), Event.start_dt, Event.title)
+             .limit(data['max_entries']))
+    return [x[0] for x in query]
