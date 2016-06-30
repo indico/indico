@@ -16,10 +16,16 @@
 
 from __future__ import unicode_literals
 
+from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer, WNavigationDrawer
+
+
+class WPManageUpcomingEvents(WPJinjaMixin, WPAdminsBase):
+    sidemenu_option = 'upcoming_events'
+    template_prefix = 'categories/'
 
 
 class WPCategory(WPJinjaMixin, WPMainBase):

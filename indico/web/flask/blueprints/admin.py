@@ -39,7 +39,7 @@ admin.add_url_rule('/announcement', 'adminAnnouncement-save', announcement.RHAnn
 admin.add_url_rule('/news', 'updateNews', admins.RHUpdateNews)
 
 # Upcoming events
-admin.add_url_rule('/upcoming-events', 'adminUpcomingEvents', admins.RHConfigUpcoming)
+admin.add_url_rule('/upcoming-events-old', 'adminUpcomingEvents', admins.RHConfigUpcoming)
 
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)
