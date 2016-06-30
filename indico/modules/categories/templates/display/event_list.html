@@ -118,7 +118,7 @@
 
 {% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
     {% for month in events_by_month %}
-        <h4 {% if month.is_current %}class="currentMonth"{% endif %}>
+        <h4 class="{% if month.is_current %}current-month{% endif %}">
             <span>{{ month.name }}</span>
         </h4>
         <ul>
@@ -127,7 +127,7 @@
                     <span class="ical">
                         <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
                     </span>
-                    <span class="listName">
+                    <span class="list-name">
                         <span class="date {% if happening_now(event) %}today{% endif %}">
                             {{ format_event_date(event) }}
                             <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
