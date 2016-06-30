@@ -367,6 +367,62 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """
         return self._get_chain_query(Category.id == self.parent_id)
 
+    def nth_parent(self, n_categs, fail_on_overflow=True):
+        """Return the nth parent of the category.
+
+        :param n_categs: the number of categories to go up
+        :param fail_on_overflow: whether to fail if we try to go above the root category
+        :return: `Category` object or None (only if ``fail_on_overflow`` is not set)
+        """
+        if n_categs == 0:
+            return self
+        chain = self.parent_chain_query.all()
+
+        assert n_categs >= 0
+        if n_categs > len(chain):
+            if fail_on_overflow:
+                raise IndexError("Root category has no parent!")
+            else:
+                return None
+        return chain[::-1][n_categs - 1]
+
+    def is_descendant_of(self, categ):
+        return categ != self and bool(self.parent_chain_query.filter(Category.id == categ.id).count())
+
+    @property
+    def visibility_horizon_query(self):
+        """Get a query object that returns the highest category this one is visible from."""
+        cte_query = (select([Category.id, Category.parent_id,
+                             db.case([(Category.visibility.is_(None), None)],
+                                     else_=(Category.visibility - 1)).label('n'),
+                             literal(0).label('level')])
+                     .where(Category.id == self.id)
+                     .cte('visibility_horizon', recursive=True))
+        parent_query = (select([Category.id, Category.parent_id,
+                                db.case([(Category.visibility.is_(None) & cte_query.c.n.is_(None), None)],
+                                        else_=db.func.least(Category.visibility, cte_query.c.n) - 1),
+                                cte_query.c.level + 1])
+                        .where(db.and_(Category.id == cte_query.c.parent_id,
+                                       (cte_query.c.n > 0) | cte_query.c.n.is_(None))))
+        cte_query = cte_query.union_all(parent_query)
+        return db.session.query(cte_query.c.id, cte_query.c.n).order_by(cte_query.c.level.desc()).limit(1)
+
+    @property
+    def own_visibility_horizon(self):
+        """Get the highest category this one would like to be visible from (configured visibility)."""
+        if self.visibility is None:
+            return Category.get_root()
+        else:
+            return self.nth_parent(self.visibility - 1)
+
+    @property
+    def real_visibility_horizon(self):
+        """Get the highest category this one is actually visible from (as limited by categories above)."""
+        horizon_id, final_visibility = self.visibility_horizon_query.one()
+        if final_visibility is not None and final_visibility < 0:
+            return None  # Category is invisible
+        return Category.get(horizon_id)
+
     @property
     def visible_categories_cte(self):
         """
