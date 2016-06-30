@@ -102,6 +102,12 @@ class RHManageCategorySettings(RHManageCategoryBase):
             flash(_("Category settings saved!"), 'success')
             return redirect(url_for('.manage_settings', self.category))
         else:
+            # Check if category visibility would be affected by any of the parents
+            real_horizon = self.category.real_visibility_horizon
+            own_horizon = self.category.own_visibility_horizon
+            if real_horizon and real_horizon.is_child_of(own_horizon):
+                form.visibility.warning = _("This category's visibility is currently limited by that of '{}'.").format(
+                    real_horizon.title)
             if self.category.icon_metadata:
                 icon_form.icon.data = _get_image_data(self.category, 'icon')
             if self.category.logo_metadata:
