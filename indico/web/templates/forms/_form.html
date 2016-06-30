@@ -1,3 +1,5 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro _render_errors(errors) -%}
     <ul>
         {%- for error in errors -%}
@@ -44,6 +46,11 @@
         {%- endif -%}
         {% if field.description %}
             <div class="form-field-description">{{ field.description | safe }}</div>
+        {% endif %}
+        {% if field.warning %}
+            {%- call message_box('warning', fixed_width=true, classes='i-form-field-fixed-width') -%}
+                {{ field.warning }}
+            {%- endcall -%}
         {% endif %}
     </div>
 {%- endmacro %}
