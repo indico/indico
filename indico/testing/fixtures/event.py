@@ -25,7 +25,7 @@ from MaKaC.conference import ConferenceHolder
 
 
 @pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
+def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, dummy_category, db):
     """Returns a callable which lets you create dummy events"""
     mocker.patch('MaKaC.conference.CategoryManager')
     monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
@@ -43,8 +43,8 @@ def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
         kwargs.setdefault('start_dt', now)
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1, **kwargs)
-        conf.as_event.category_chain = [1, 0]  # set after __init__ (setting category_id modifies it)
+        kwargs.setdefault('category', dummy_category)
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), **kwargs)
         db.session.flush()
         conf.id = str(conf.as_event.id)
         ch.add(conf)

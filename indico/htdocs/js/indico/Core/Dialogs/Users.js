@@ -1297,6 +1297,22 @@ $(function() {
  */
 type("UserListWidget", ["ListWidget"],
      {
+        _iteratingElement: function(attrs, item) {
+            var className;
+            var pairProperties = attrs.pair.get();
+            if (pairProperties.get('isGroup')) {
+                className = 'item-group';
+            } else if (pairProperties.get('_type') === 'IPNetworkGroup') {
+                className = 'icon-lan2';
+            } else if (pairProperties.get('_type') === 'Email') {
+                className = 'icon-mail';
+            } else {
+                className = 'icon-user';
+            }
+            attrs['className'] = className;
+            delete attrs['pair'];
+            return this.ListWidget.prototype._iteratingElement.call(this, attrs, item);
+        },
         _drawItem: function(user) {
             var self = this;
             var userData = user.get();
@@ -1322,11 +1338,26 @@ type("UserListWidget", ["ListWidget"],
             });
 
             var remove_button = $('<i class="remove-user icon-close">').click(function() {
-                self.removeProcess(userData, function(result) {
+                var currentUserId = $('body').data('user-id');
+                var userId = userData.get('id');
+                var confirmed;
+
+                function setResult(result) {
                     if (result) {
                         self.set(user.key, null);
                         self.userListField.inform();
                     }
+                }
+
+                if (currentUserId === userId) {
+                    confirmed = confirmPrompt($T.gettext('Are you sure you want to remove yourself from the list?'),
+                                              $T.gettext('Confirm action'));
+                } else {
+                    confirmed = $.Deferred().resolve();
+                }
+
+                confirmed.then(function() {
+                    self.removeProcess(userData, setResult);
                 });
             });
 
@@ -1352,6 +1383,11 @@ type("UserListWidget", ["ListWidget"],
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('email')));
                 } else {
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
+                }
+
+                if (userData.get('_type') !== 'Email') {
+                    userName.append(Html.span('email', userData.get('email')));
+                    userName.append(Html.span('affiliation', userData.get('affiliation')));
                 }
                 return [userName, buttonDiv];
             }
@@ -1386,7 +1422,6 @@ type("UserListWidget", ["ListWidget"],
  *
  */
 type("UserListField", ["IWidget"], {
-
     getUsers: function() {
         return $L(this.userList);
     },
@@ -1481,18 +1516,54 @@ type("UserListField", ["IWidget"], {
 
     draw: function() {
         var self = this;
-        var select;
-        var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
+        var buttonDiv = Html.div({style: {marginTop: pixels(10)}});
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
+            var chooseUserButton = Html.input("button", {style: {marginRight: pixels(5)},
+                                                         className: 'i-button', type: 'button'},
+                                              this.enableGroups ? $T('Add User / Group'): $T('Add user'));
+            var chooseIpNetwork = Html.a({href: '#', style: {marginRight: pixels(5)},
+                                          className: 'i-button arrow js-dropdown',
+                                          'data-toggle': 'dropdown'}, $T('Add IP Network'));
+            var ipNetworksContainer = Html.span({className: 'group'});
+            var ipNetworksList = Html.ul({className: 'dropdown'});
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
+            _.each(this.ipNetworks, function(network) {
+                var li = Html.li();
+                li.append(Html.a({href: '#'}, network.name));
+                li.observeClick(function() {
+                    self.newProcess([network], function(result) {
+                        if (result && !self.userList.get(network.identifier)) {
+                            var entries = self.userList.getAll();
+                            entries[network.identifier] = $O(network);
+                            updatePrincipalsList(entries);
+                        }
+                    });
+                });
+                ipNetworksList.append(li);
+            });
 
-            var title = "";
+            ipNetworksContainer.append(chooseIpNetwork);
+            ipNetworksContainer.append(ipNetworksList);
+            var title;
             if (this.includeFavourites || exists(this.suggestedUsers)) {
                 title = this.enableGroups ? $T("Add Users and Groups") : $T("Add Users");
             } else {
                 title = this.enableGroups ? $T("Search Users and Groups") : $T("Search Users");
+            }
+
+            function updatePrincipalsList(entries) {
+                var sortedKeys = _.sortBy(_.keys(entries), function(key) {
+                    var principal = entries[key].getAll();
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal._type == 'Email' ? 1 : (principal.isGroup ? 2 : 3));
+                    var name = principal._type !== 'Email' ? principal.name : principal.email;
+                    return [weight, name.toLowerCase()];
+                });
+
+                self.userList.clearList();
+                _.each(sortedKeys, function(key) {
+                    self.userList.set(key, $O(entries[key].getAll()));
+                });
             }
 
             var peopleAddedHandler = function(peopleList){
@@ -1501,7 +1572,7 @@ type("UserListField", ["IWidget"], {
                     if (value) {
                         each(results, function(person){
                             var key;
-                            if (person.isGroup || person._fossil === 'group') {
+                            if (person.isGroup || person._fossil === 'group' || person._type == 'IPNetworkGroup') {
                                 key = person.identifier;
                             } else if (person._type === "Avatar") {
                                 key = "existingAv" + person.id;
@@ -1510,14 +1581,12 @@ type("UserListField", ["IWidget"], {
                             } else {
                                 key = person.id;
                             }
-                            if (person._type === "Avatar" && self.userList.get(key)) {
-                                // it is an existing avatar, unchanged, and already exists: we do nothing
-                            } else {
-                                if (self.userList.get(key)) {
-                                    self.userList.set(key, null);
-                                }
-                                self.userList.set(key, $O(person));
-                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
+                            if (!self.userList.get(key)) {
+                                var entries = self.userList.getAll();
+                                entries[key] = $O(person);
+                                updatePrincipalsList(entries);
+                                $('.icon-shield[data-id="author_' + person.email + '"]')
+                                    .trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
                             }
                         });
                     }
@@ -1532,6 +1601,9 @@ type("UserListField", ["IWidget"], {
             });
 
             buttonDiv.append(chooseUserButton);
+            if (this.enableIpNetworks) {
+                buttonDiv.append(ipNetworksContainer);
+            }
         }
 
 
@@ -1617,10 +1689,11 @@ type("UserListField", ["IWidget"], {
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
              allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
-             newProcess, editProcess, removeProcess, allowExternal) {
+             newProcess, editProcess, removeProcess, allowExternal, enableIpNetworks, ipNetworks) {
 
         var self = this;
-        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess,
+                                           showToggleFavouriteButtons, this);
         self.newUserCounter = 0;
         this.userDivStyle = any(userDivStyle, "user-list");
         this.setUpParameters();
@@ -1631,7 +1704,7 @@ type("UserListField", ["IWidget"], {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else if (user._type === 'EventPerson') {
                     self.userList.set('existingEventPerson' + user.id, $O(user));
-                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup'].indexOf(user._type)) {
+                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup', 'IPNetworkGroup'].indexOf(user._type)) {
                     self.userList.set(user.identifier, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
@@ -1655,6 +1728,8 @@ type("UserListField", ["IWidget"], {
 
         this.allowSearch = any(allowSearch, true);
         this.enableGroups = any(enableGroups, false);
+        this.enableIpNetworks = any(enableIpNetworks, false);
+        this.ipNetworks = any(ipNetworks, []);
         this.conferenceId = any(conferenceId, null);
         this.privileges = any(privileges, {});
         this.selectedPrivileges = new WatchObject();
@@ -1666,4 +1741,3 @@ type("UserListField", ["IWidget"], {
         this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
      }
 );
-

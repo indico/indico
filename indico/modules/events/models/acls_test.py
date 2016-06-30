@@ -21,6 +21,7 @@ from mock import MagicMock
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.roles import get_available_roles
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
@@ -224,11 +225,29 @@ def test_update_principal_errors(create_event, dummy_user):
         event.update_principal(dummy_user, roles={'invalid'})
 
 
-@pytest.mark.parametrize(('allow_key', 'has_key', 'authenticated', 'expected'), bool_matrix('...', expect=all))
-def test_can_manage_key(create_event, dummy_user, allow_key, has_key, authenticated, expected):
-    event = create_event()
-    event.as_legacy.canKeyModify = lambda: has_key
-    assert event.can_manage(dummy_user if authenticated else None, allow_key=allow_key) == expected
+def test_can_access_key_outside_context(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.can_access(None)
+
+
+def test_check_access_key(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.check_access_key('foobar')
+    assert event.check_access_key('12345')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_can_access_key(create_event):
+    event = create_event(protection_mode=ProtectionMode.protected, access_key='12345')
+    assert not event.can_access(None)
+    event.set_session_access_key('12345')
+    assert event.can_access(None)
+    event.set_session_access_key('foobar')
+    assert not event.can_access(None)
+    # make sure we never accept empty access keys
+    event.access_key = ''
+    event.set_session_access_key('')
+    assert not event.can_access(None)
 
 
 @pytest.mark.usefixtures('request_context')
@@ -260,6 +279,64 @@ def test_can_manage_signal_override(create_event, dummy_user, signal_rv_1, signa
             assert event.can_manage(dummy_user) == allowed
 
 
+@pytest.mark.parametrize(('signal_rv_1', 'signal_rv_2', 'allowed'), (
+    (False, False, False),
+    (False, True,  False),
+    (True,  True,  True)
+))
+def test_can_access_signal_override(create_event, dummy_user, signal_rv_1, signal_rv_2, allowed):
+    event = create_event()
+
+    def _signal_fn(sender, obj, user, rv, **kwargs):
+        assert obj is event
+        assert user is dummy_user
+        return rv
+
+    with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_1), sender=Event):
+        with signals.acl.can_access.connected_to(partial(_signal_fn, rv=signal_rv_2), sender=Event):
+            assert event.can_access(dummy_user) == allowed
+
+
+def test_can_access_signal_override_calls(create_event, dummy_user):
+    event = create_event()
+
+    def _signal_fn_noreturn(sender, authorized,  **kwargs):
+        calls.append(authorized)
+
+    def _signal_fn_early(sender, authorized,  **kwargs):
+        calls.append(authorized)
+        return True if authorized is None else None
+
+    def _signal_fn_late(sender, authorized,  **kwargs):
+        calls.append(authorized)
+        return True if authorized is not None else None
+
+    # early check - signal only invoked once since we return something
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_early, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None]
+
+    # signal invoked twice (nothing returned)
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_noreturn, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, True]
+
+    # late check - signal invoked twice, once with the regular access state
+    calls = []
+    with signals.acl.can_access.connected_to(_signal_fn_late, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, True]
+
+    # late check - signal invoked twice, once with the regular access state
+    calls = []
+    event.protection_mode = ProtectionMode.protected
+    with signals.acl.can_access.connected_to(_signal_fn_late, sender=Event):
+        event.can_access(dummy_user)
+    assert calls == [None, False]
+
+
 @pytest.mark.parametrize(('is_admin', 'allow_admin', 'not_explicit', 'expected'), bool_matrix('...', expect=all))
 def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_explicit, expected):
     event = create_event()
@@ -267,36 +344,27 @@ def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_
     assert event.can_manage(user, allow_admin=allow_admin, explicit_role=not not_explicit) == expected
 
 
-def test_can_manage_guest(create_event):
+def test_can_manage_guest(create_event, dummy_category):
     event = create_event()
     # we grant explicit management access on the parent to ensure that
     # we don't even check there but bail out early
-    event.as_legacy.category = MagicMock(spec=['can_manage'])
-    event.as_legacy.category.can_manage.return_value = True
+    event.category = dummy_category
+    event.category.can_manage = MagicMock(return_value=True)
     assert not event.can_manage(None)
 
 
 @pytest.mark.parametrize('can_manage_parent', (True, False))
-def test_can_manage_parent(create_event, dummy_user, can_manage_parent):
+def test_can_manage_parent(create_event, dummy_category, dummy_user, can_manage_parent):
     event = create_event()
-    event.as_legacy.category = MagicMock(spec=['can_manage'])
-    event.as_legacy.category.can_manage.return_value = can_manage_parent
+    event.category = dummy_category
+    event.category.can_manage = MagicMock(return_value=can_manage_parent)
     assert event.can_manage(dummy_user) == can_manage_parent
-    event.as_legacy.category.can_manage.assert_called_once_with(dummy_user, allow_admin=True)
-
-
-@pytest.mark.parametrize('can_manage_parent', (True, False))
-def test_can_manage_parent_legacy(create_event, dummy_user, can_manage_parent):
-    event = create_event()
-    event.as_legacy.category = MagicMock(spec=['canUserModify'])
-    event.as_legacy.category.canUserModify.return_value = can_manage_parent
-    assert event.can_manage(dummy_user) == can_manage_parent
-    event.as_legacy.category.canUserModify.assert_called_once_with(dummy_user.as_avatar)
+    event.category.can_manage.assert_called_once_with(dummy_user, allow_admin=True)
 
 
 def test_can_manage_parent_invalid(create_event, dummy_user):
     event = create_event()
-    event.as_legacy.category = MagicMock(spec=[])
+    event.__dict__['category'] = MagicMock(spec=[])
     with pytest.raises(TypeError):
         event.can_manage(dummy_user)
 

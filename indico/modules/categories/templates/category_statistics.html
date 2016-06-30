@@ -5,13 +5,12 @@
     <div class="category-header">
         <div class="category-statistics center">
             <span class="right">
-                <a class="i-button icon-prev" style="margin-top:0.4em;"
-                   href="{{ url_for('misc.index') if cat.isRoot() else url_for('category.categoryDisplay', cat)  }}">
+                <a class="i-button icon-prev" style="margin-top:0.4em;" href="{{ cat.url }}">
                     {%- trans %}Category page{% endtrans -%}
                 </a>
             </span>
             <div class="category-title" style="margin-left:0px; text-align:left;">
-                {{ cat.getName() }}&nbsp;
+                {{ cat.title }}&nbsp;
                 <span style="font-style: italic; font-size: 0.8em;">({% trans %}statistics{% endtrans %})</span>
             </div>
         </div>

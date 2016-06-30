@@ -1,8 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
-{% block title %}{% trans %}Users{% endtrans %}{% endblock %}
-
 {%- block content %}
     <div class="i-box-group vert">
         <div class="i-box">
@@ -33,7 +31,7 @@
                         <h3>
                             {% trans count=search_results|count -%}
                                 There is one user matching your search criteria.
-                            {% pluralize %}
+                            {%- pluralize -%}
                                 There are {{ count }} users matching your search criteria.
                             {%- endtrans %}
                         </h3>

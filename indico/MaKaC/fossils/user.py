@@ -48,6 +48,8 @@ class IAvatarMinimalFossil(IFossil):
     def getStraightFullName(self):
         """ Avatar full name, the one usually displayed """
     getStraightFullName.name = "name"
+    getStraightFullName.produce = lambda x: x.getStraightFullName(upper=False)
+
 
 class IAvatarFossil(IAvatarMinimalFossil):
 

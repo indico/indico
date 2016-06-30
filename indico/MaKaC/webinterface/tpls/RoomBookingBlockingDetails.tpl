@@ -65,7 +65,7 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in sorted(blocking.allowed, key=lambda x: (not x.is_group, x.name)):
+                                        % for principal in sorted(blocking.allowed, key=lambda x: (x.is_single_person, x.name)):
                                             <tr class="blockingHover blockingPadding">
                                                 <td>
                                                     <i class="icon-${'users' if principal.is_group else 'user'}"></i>

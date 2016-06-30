@@ -123,7 +123,7 @@ class UserEventHook(HTTPAPIHook):
 
     def export_categ_events(self, aw):
         self._checkProtection(aw)
-        catIds = [item['categ'].getId() for item in get_related_categories(self._avatar.user).itervalues()]
+        catIds = [str(cat.id) for cat in get_related_categories(self._avatar.user, detailed=False)]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 
@@ -137,7 +137,7 @@ class UserCategoryEventFetcher(IteratedDataFetcher):
         from indico.modules.events import Event
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, catIds)),
+                         Event.category_chain_overlaps(map(int, catIds)),
                          Event.happens_between(self._fromDT, self._toDT)))
         return self._process(x.as_legacy for x in query)
 

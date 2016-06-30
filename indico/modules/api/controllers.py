@@ -63,7 +63,8 @@ class RHAPIUserProfile(RHUserBase):
                                                                APIMode.ALL_SIGNED}
         allow_persistent = api_settings.get('allow_persistent')
         old_keys = self.user.old_api_keys
-        return WPAPIUserProfile.render_template('user_profile.html', user=self.user, key=key, old_keys=old_keys,
+        return WPAPIUserProfile.render_template('user_profile.html', 'api',
+                                                user=self.user, key=key, old_keys=old_keys,
                                                 use_signatures=use_signatures, allow_persistent=allow_persistent,
                                                 can_modify=(not key or not key.is_blocked or session.user.is_admin))
 

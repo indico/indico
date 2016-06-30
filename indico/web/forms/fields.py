@@ -18,8 +18,9 @@ import json
 import uuid
 from collections import OrderedDict
 from datetime import time, timedelta
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
+import pytz
 from flask import render_template
 from markupsafe import escape, Markup
 from sqlalchemy import inspect
@@ -28,19 +29,23 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select, RadioInput
-from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
+from wtforms.fields.core import RadioField, SelectMultipleField, SelectField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.networks.models.networks import IPNetworkGroup
+from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.models.users import User, UserTitle
@@ -244,10 +249,34 @@ class IndicoPasswordField(PasswordField):
         super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 
+class CategoryField(HiddenField):
+    """Field that lets you select a category"""
+
+    widget = JinjaWidget('forms/category_picker_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.select_leaf_only = kwargs.pop('select_leaf_only', False)
+        super(CategoryField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        from indico.modules.categories import Category
+        if valuelist:
+            category_id = int(json.loads(valuelist[0])['id'])
+            self.data = Category.get(category_id, is_deleted=False)
+
+    def _value(self):
+        return {'id': self.data.id, 'title': self.data.title} if self.data else ''
+
+    def _get_data(self):
+        return self.data
+
+
 class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 
     :param groups: If groups should be selectable.
+    :param allow_networks: If ip networks should be selectable.
+    :param allow_emails: If emails should be allowed.
     :param allow_external: If "search users with no indico account"
                            should be available.  Selecting such a user
                            will automatically create a pending user once
@@ -260,13 +289,17 @@ class PrincipalListField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
+        self.allow_networks = kwargs.pop('allow_networks', False)
+        self.ip_networks = []
+        if self.allow_networks:
+            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
-                                     allow_emails=self.allow_emails)
+                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -279,13 +312,21 @@ class PrincipalListField(HiddenField):
     def _serialize_principal(self, principal):
         if principal.principal_type == PrincipalType.email:
             return principal.fossilize()
+        elif principal.principal_type == PrincipalType.network:
+            return serialize_ip_network_group(principal)
         elif principal.principal_type == PrincipalType.user:
             return serialize_user(principal)
-        else:
+        elif principal.is_group:
             return serialize_group(principal)
+        else:
+            raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
     def _value(self):
-        principals = sorted(self._get_data(), key=lambda x: x.name.lower())
+        def key(obj):
+            if isinstance(obj, PersonLinkBase):
+                return obj.name.lower()
+            return obj.principal_type, obj.name.lower()
+        principals = sorted(self._get_data(), key=key)
         return map(self._serialize_principal, principals)
 
     def _get_data(self):
@@ -830,12 +871,24 @@ class IndicoProtectionField(IndicoEnumRadioField):
         self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
         get_acl_message_url = kwargs.pop('acl_message_url', None)
         self.acl_message_url = get_acl_message_url(kwargs['_form']) if get_acl_message_url else None
+        self.can_inherit_protection = self.protected_object.protection_parent is not None
+        if not self.can_inherit_protection:
+            kwargs['skip'] = {ProtectionMode.inheriting}
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):
+        from indico.modules.categories.models.categories import Category
         protected_object = self.get_form().protected_object
-        non_inheriting_objects = protected_object.get_non_inheriting_objects()
-        parent_type = _('Event') if isinstance(protected_object.protection_parent, Event) else _('Session')
+        if hasattr(protected_object, 'get_non_inheriting_objects'):
+            non_inheriting_objects = protected_object.get_non_inheriting_objects()
+        else:
+            non_inheriting_objects = []
+        if isinstance(protected_object.protection_parent, Event):
+            parent_type = _('Event')
+        elif isinstance(protected_object.protection_parent, Category):
+            parent_type = _('Category')
+        else:
+            parent_type = _('Session')
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
                              parent_type=parent_type, non_inheriting_objects=non_inheriting_objects)
         return Markup(rv)
@@ -843,3 +896,33 @@ class IndicoProtectionField(IndicoEnumRadioField):
 
 class IndicoTagListField(HiddenFieldList):
     widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
+
+
+class IndicoMarkdownField(TextAreaField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('description', _("You can use Markdown or basic HTML formatting tags."))
+        super(IndicoMarkdownField, self).__init__(*args, **kwargs)
+
+    widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
+
+
+class IndicoTimezoneSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
+        config = Config.getInstance()
+        self.choices = [(v, v) for v in pytz.common_timezones]
+        self.default = config.getDefaultTimezone()
+
+    def process_data(self, value):
+        super(IndicoTimezoneSelectField, self).process_data(value)
+        if self.data is not None and self.data not in pytz.common_timezones_set:
+            self.choices.append((self.data, self.data))
+
+
+class IndicoThemeSelectField(SelectField):
+    def __init__(self, event_type, *args, **kwargs):
+        super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
+        self.choices = sorted([(tid, theme['title'])
+                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
+                              key=itemgetter(1))
+        self.default = theme_settings.defaults[event_type]

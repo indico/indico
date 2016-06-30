@@ -1,0 +1,92 @@
+{% extends 'categories/management/base.html' %}
+
+{% from 'categories/management/_events_list.html' import render_events_list %}
+
+{% macro subcategory_row(subcategory) %}
+    <tr class="i-table"
+        data-category-id="{{ subcategory.id }}"
+        data-category-title="{{ subcategory.title }}">
+        <td class="i-table column-icon js-handle handle">
+            <a class="i-button-icon icon-handle"></a>
+        </td>
+        <td class="i-table column-icon">
+            <input type="checkbox" name="category_id" value="{{ subcategory.id }}"
+                   data-is-empty="{{ subcategory.is_empty|tojson|forceescape }}">
+        </td>
+        <td class="i-table column-icon">
+            {% if subcategory.is_self_protected %}
+                <span class="icon-protection-self"></span>
+            {% elif subcategory.is_public %}
+                <span class="icon-protection-public"></span>
+            {% endif %}
+        </td>
+        <td class="i-table">
+            <a href="{{ url_for('.manage_content', subcategory) }}">
+                {{ subcategory.title }}
+            </a>
+        </td>
+        <td class="i-table actions">
+            {{ move_category_button(subcategory, 'i-button-icon') }}
+            {{ delete_category_button(subcategory, 'i-button-icon') }}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro subcategories_table(subcategories) %}
+    <div class="toolbar">
+        <div class="group">
+            <button class="i-button highlight icon-plus js-new-category"
+                    data-ajax-dialog
+                    data-href="{{ url_for('.create_subcategory', category) }}"
+                    data-title="{% trans %}New category{% endtrans %}">
+                {% trans %}New category{% endtrans %}
+            </button>
+        </div>
+        <div class="group">
+            <button class="i-button icon-sort-alpha-asc js-sort-categories"
+                    title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
+        </div>
+        <div class="group right">
+            <button class="i-button icon-transmission js-bulk-move-category"></button>
+            <button class="i-button icon-remove js-bulk-delete-category"></button>
+        </div>
+    </div>
+    <table class="i-table category-management"
+           data-sort-url="{{ url_for('.sort_subcategories', category) }}"
+           data-bulk-delete-url="{{ url_for('.delete_subcategories', category) }}"
+           data-bulk-move-url="{{ url_for('.move_subcategories', category) }}">
+        <thead>
+            <tr class="i-table">
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table column-icon"></th>
+                <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                <th class="i-table actions"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subcategory in subcategories %}
+                {{ subcategory_row(subcategory) }}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% block title %}
+    {% trans %}Content{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if subcategories or not events.total %}
+        {{ subcategories_table(subcategories) }}
+        <script>
+            setupCategoryTable();
+        </script>
+    {% endif %}
+    {% if events.total or not subcategories %}
+        {{ render_events_list(category, page, order_column, direction, events) }}
+        <script>
+            setupCategoryEventList();
+        </script>
+    {% endif %}
+{% endblock content %}

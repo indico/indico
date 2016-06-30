@@ -1,6 +1,9 @@
+{% from 'events/display/_event_header_message.html' import render_event_header_msg %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/notes/_note.html' import render_note %}
+
+{{ render_event_header_msg(event) }}
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}

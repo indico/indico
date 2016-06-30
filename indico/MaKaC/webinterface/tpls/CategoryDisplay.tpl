@@ -53,7 +53,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                     <li><a href="${urlHandlers.UHCategoryOverview.getWeekOverviewUrl(categ)}">${_("Week's events")}</a></li>
                     <li><a href="${urlHandlers.UHCalendar.getURL([categ])}">${_("Calendar")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryMap.getURL(categ)}">${_("Category map")}</a></li>
-                    <li><a href="${ url_for('categories.category-statistics', categ) }">${_("Category statistics")}</a></li>
+                    <li><a href="${ url_for('categories.statistics', categ.as_new) }">${_("Category statistics")}</a></li>
                 </ul>
                 <a id="createEventLink" class="i-button icon-plus arrow" data-toggle="dropdown" title="${_("Create new event")}"></a>
                 <ul class="dropdown">
@@ -64,7 +64,8 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 % if allowUserModif:
                 <a id="manageLink" class="i-button icon-edit arrow" data-toggle="dropdown" title="${_("Management options")}"></a>
                 <ul class="dropdown">
-                    <li><a href="${urlHandlers.UHCategoryModification.getURL(categ)}">${_("Edit category")}</a></li>
+                    <li><a href="${ url_for('categories.manage_content', categ.as_new) }">${_("Edit category")}</a></li>
+                    <li><a href="${urlHandlers.UHCategoryModification.getURL(categ)}">${_("Edit category (old)")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryCreation.getURL(categ)}">${_("Add subcategory")}</a></li>
                 </ul>
                 % endif
@@ -72,7 +73,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group">
                 <button type="button"
-                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in _session.user.favorite_categories else ''}"
+                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ.as_new in _session.user.favorite_categories else ''}"
                         data-href="${ url_for('users.user_favorites_category_api', category_id=categ.id) }"></button>
             </div>
             % endif

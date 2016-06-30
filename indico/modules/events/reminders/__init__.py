@@ -40,7 +40,7 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user, allow_key=True):
+    if not event.can_manage(session.user):
         return
     return SideMenuItem('reminders', _('Reminders'), url_for('event_reminders.list', event), section='organization')
 

@@ -45,6 +45,9 @@ class GroupProxy(object):
 
     # Useful when dealing with both users and groups in the same code
     is_group = True
+    is_network = False
+    is_single_person = False
+    principal_order = 2
 
     def __new__(cls, name_or_id, provider=None, _group=None):
         """Creates the correct GroupProxy for the group type"""
@@ -70,6 +73,8 @@ class GroupProxy(object):
         raise NotImplementedError
 
     def __contains__(self, user):
+        if not user:
+            return False
         return self.has_member(user)
 
     @cached_property

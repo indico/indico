@@ -1,0 +1,11 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_event_header_msg(event, meeting=true) %}
+    {% set category = event.category %}
+    {% if category.event_message_mode.name != 'disabled' and category.event_message %}
+        {%- call message_box(category.event_message_mode.name, large_icon=true,
+                             classes=('event-message' if meeting)) -%}
+            {{ category.event_message }}
+        {%- endcall %}
+    {% endif %}
+{% endmacro %}

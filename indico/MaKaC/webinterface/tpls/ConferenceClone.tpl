@@ -106,7 +106,6 @@
             <li><strong>${ _("Choose elements to clone:")}</strong></li>
 
             <li><input type="checkbox" name="cloneDetails" id="cloneDetails" checked disabled value="1">${ _("Main information")}</li>
-            <li><input type="checkbox" name="cloneAccess" id="cloneAccess" value="1" checked>${ _("Access and management privileges")}</li>
             ${ cloneOptions }
         </ul>
     </div>

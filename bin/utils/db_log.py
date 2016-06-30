@@ -108,9 +108,11 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
                                                                                                  obj['req_duration'])
                 print_linesep(True, 196)
             return
-        if self.server.ignore_selects and obj.get('sql_verb') == 'SELECT':
+        # XXX: `WITH` queries could be something different from SELECT but so far
+        # we only use CTEs for selecting
+        if self.server.ignore_selects and obj.get('sql_verb') in ('SELECT', 'WITH'):
             return
-        ignored = obj.get('sql_verb') == 'SELECT' and self._check_ignored_sources(obj['sql_source'])
+        ignored = obj.get('sql_verb') in ('SELECT', 'WITH') and self._check_ignored_sources(obj['sql_source'])
         if ignored:
             if sql_log_type == 'end':
                 with output_lock:

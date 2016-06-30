@@ -19,12 +19,14 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 
 import pytz
-from sqlalchemy import DDL
+from sqlalchemy import orm, DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.dialects.postgresql import JSON, ARRAY
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
+from sqlalchemy.sql import select
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -32,22 +34,22 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.core.db.sqlalchemy.util.queries import (preprocess_ts_string, escape_like, db_dates_overlap,
-                                                    get_related_object)
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
-from indico.util.date_time import overlaps
-from indico.util.decorators import classproperty, strict_classproperty
+from indico.util.date_time import overlaps, now_utc
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin,
-            PersonLinkDataMixin, db.Model):
+class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
+            AttachedNotesMixin, PersonLinkDataMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -58,6 +60,8 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     __tablename__ = 'events'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    allow_access_key = True
+    allow_no_access_contact = True
     location_backref_name = 'events'
     allow_location_inheritance = False
     description_wrapper = RichMarkup
@@ -68,20 +72,16 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        return (db.Index(None, 'category_chain', postgresql_using='gin'),
-                db.Index('ix_events_title_fts', db.func.to_tsvector('simple', cls.title), postgresql_using='gin'),
-                db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
+        return (db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
                 db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
-                db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
-                                   'category_data_set'),
-                db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),
-                db.CheckConstraint("category_chain[array_length(category_chain, 1)] = 0",
-                                   'category_chain_has_root'),
+                db.Index('ix_events_not_deleted_category', cls.is_deleted, cls.category_id),
+                db.Index('ix_events_not_deleted_category_dates',
+                         cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
+                db.CheckConstraint("category_id IS NOT NULL OR is_deleted", 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
                 db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
-                db.CheckConstraint("title != ''", 'valid_title'),
                 db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
                 {'schema': 'events'})
 
@@ -110,13 +110,9 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     #: The ID of immediate parent category of the event
     category_id = db.Column(
         db.Integer,
+        db.ForeignKey('categories.categories.id'),
         nullable=True,
         index=True
-    )
-    #: The category chain of the event (from immediate parent to root)
-    category_chain = db.Column(
-        ARRAY(db.Integer),
-        nullable=True
     )
     #: If this event was cloned, the id of the parent event
     cloned_from_id = db.Column(
@@ -124,6 +120,13 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         db.ForeignKey('events.events.id'),
         nullable=True,
         index=True,
+    )
+    #: The creation date of the event
+    created_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        index=True,
+        default=now_utc
     )
     #: The start date of the event
     start_dt = db.Column(
@@ -139,11 +142,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     )
     #: The timezone of the event
     timezone = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The title of the event
-    title = db.Column(
         db.String,
         nullable=False
     )
@@ -198,6 +196,17 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         default=0
     ))
 
+    #: The category containing the event
+    category = db.relationship(
+        'Category',
+        lazy=True,
+        backref=db.backref(
+            'events',
+            primaryjoin='(Category.id == Event.category_id) & ~Event.is_deleted',
+            order_by=start_dt,
+            lazy=True
+        )
+    )
     #: The user who created the event
     creator = db.relationship(
         'User',
@@ -218,7 +227,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             order_by=start_dt
         )
     )
-
     #: The event's default page (conferences only)
     default_page = db.relationship(
         'EventPage',
@@ -294,6 +302,21 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     # - timetable_entries (TimetableEntry.event_new)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
+    @classmethod
+    def category_chain_overlaps(cls, category_ids):
+        """
+        Create a filter that checks whether the event has any of the
+        provided category ids in its parent chain.
+
+        :param category_ids: A list of category ids or a single
+                             category id
+        """
+        from indico.modules.categories import Category
+        if not isinstance(category_ids, (list, tuple, set)):
+            category_ids = [category_ids]
+        cte = Category.get_tree_cte()
+        return (cte.c.id == Event.category_id) & cte.c.path.overlap(category_ids)
+
     @property
     @memoize_request
     def as_legacy(self):
@@ -305,11 +328,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     def event_new(self):
         """Convenience property so all event entities have it"""
         return self
-
-    @property
-    def category(self):
-        from MaKaC.conference import CategoryManager
-        return CategoryManager().getById(str(self.category_id), True) if self.category_id else None
 
     @property
     def has_logo(self):
@@ -324,10 +342,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         from indico.modules.events.layout import layout_settings, theme_settings
         return (layout_settings.get(self, 'timetable_theme') or
                 theme_settings.defaults[self.type])
-
-    @property
-    def is_protected(self):
-        return self.as_legacy.isProtected()
 
     @property
     def locator(self):
@@ -349,7 +363,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
 
     @property
     def protection_parent(self):
-        return self.as_legacy.getOwner()
+        return self.category
 
     @property
     def start_dt_local(self):
@@ -390,21 +404,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             yield
         finally:
             self.__logging_disabled = False
-
-    @classmethod
-    def title_matches(cls, search_string, exact=False):
-        """Check whether the title matches a search string.
-
-        To be used in a SQLAlchemy `filter` call.
-
-        :param search_string: A string to search for
-        :param exact: Whether to search for the exact string
-        """
-        crit = db.func.to_tsvector('simple', cls.title).match(preprocess_ts_string(search_string),
-                                                              postgresql_regconfig='simple')
-        if exact:
-            crit = crit & cls.title.ilike('%{}%'.format(escape_like(search_string)))
-        return crit
 
     @hybrid_method
     def happens_between(self, from_dt=None, to_dt=None):
@@ -461,17 +460,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     @hybrid_property
     def duration(self):
         return self.end_dt - self.start_dt
-
-    def can_access(self, user, allow_admin=True):
-        if not allow_admin:
-            raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
-        from MaKaC.accessControl import AccessWrapper
-        return self.as_legacy.canAccess(AccessWrapper(user.as_avatar if user else None))
-
-    def can_manage(self, user, role=None, allow_key=False, *args, **kwargs):
-        # XXX: Remove this method once modification keys are gone!
-        return (super(Event, self).can_manage(user, role, *args, **kwargs) or
-                bool(allow_key and user and self.as_legacy.canKeyModify()))
 
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
@@ -539,10 +527,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
                               data=data or {})
         self.log_entries.append(entry)
 
-    # XXX: Delete once event ACLs are in the new DB
-    def get_access_list(self, skip_managers=False, skip_self_acl=False):
-        return {x.as_new for x in self.as_legacy.getRecursiveAllowedToAccessList(skip_managers, skip_self_acl)}
-
     def get_contribution_field(self, field_id):
         return next((v for v in self.contribution_fields if v.id == field_id), '')
 
@@ -558,31 +542,31 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         db.m.Contribution.preload_acl_entries(self)
         db.m.Session.preload_acl_entries(self)
 
+    def move(self, category):
+        self.category = category
+        db.session.flush()
+        # TODO: trigger moved signal
+
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
                            _text=text_to_repr(self.title, max_length=75))
 
-    # TODO: Remove the next block of code once event acls (read access) are migrated
-    def _fail(self, *args, **kwargs):
-        raise NotImplementedError('These properties are not usable until event ACLs are in the new DB')
-    is_public = classproperty(classmethod(_fail))
-    is_inheriting = classproperty(classmethod(_fail))
-    is_self_protected = classproperty(classmethod(_fail))
-    protection_repr = property(_fail)
-    del _fail
-
 
 Event.register_location_events()
 Event.register_protection_events()
 
 
-@listens_for(Event.category_id, 'set')
-def _category_id_set(target, value, *unused):
-    from MaKaC.conference import CategoryManager
-    cat = CategoryManager().getById(str(value))
-    target.category_chain = map(int, reversed(cat.getCategoryPath()))
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    from indico.modules.categories import Category
+
+    # Event.category_chain -- the category ids of the event, starting
+    # with the root category down to the event's immediate parent.
+    cte = Category.get_tree_cte()
+    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
+    Event.category_chain = column_property(query, deferred=True)
 
 
 @listens_for(Event.start_dt, 'set')
@@ -599,10 +583,23 @@ def _set_start_end_dt(target, value, oldvalue, *unused):
 def _add_timetable_consistency_trigger(target, conn, **kw):
     sql = """
         CREATE CONSTRAINT TRIGGER consistent_timetable
-        AFTER UPDATE
-        ON {}
+        AFTER UPDATE OF start_dt, end_dt
+        ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('event');
-    """.format(target.fullname)
+    """.format(table=target.fullname)
+    DDL(sql).execute(conn)
+
+
+@listens_for(Event.__table__, 'after_create')
+def _add_deletion_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_deleted
+        AFTER INSERT OR UPDATE OF category_id, is_deleted
+        ON {table}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE categories.check_consistency_deleted();
+    """.format(table=target.fullname)
     DDL(sql).execute(conn)

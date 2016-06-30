@@ -48,8 +48,8 @@ def _render_protection_message(linked_object):
 
 
 def _get_parent_info(parent):
-    from MaKaC.conference import Category
-    parent_data = {'is_protected': parent.is_protected}
+    parent_data = {'is_protected': parent.is_protected,
+                   'title': parent.title}
     if isinstance(parent, db.m.Event):
         parent_data['type'] = _('Event')
     elif isinstance(parent, db.m.Session):
@@ -58,9 +58,8 @@ def _get_parent_info(parent):
         parent_data['type'] = _('Contribution')
     elif isinstance(parent, db.m.SubContribution):
         parent_data['type'] = _('Sub contribution')
-    elif isinstance(parent, Category):
+    elif isinstance(parent, db.m.Category):
         parent_data['type'] = _('Category')
-    parent_data['title'] = parent.name if isinstance(parent, Category) else parent.title
     return parent_data
 
 
@@ -76,8 +75,10 @@ class ManageAttachmentsMixin:
     def _process(self):
         tpl_args = {'linked_object': self.object, 'linked_object_type': self.object_type,
                     'attachments': get_attached_items(self.object)}
-        if self.object_type in ('event', 'category'):
+        if self.object_type == 'event':
             return self.wp.render_template('attachments.html', self._target, **tpl_args)
+        elif self.object_type == 'category' and not request.is_xhr:
+            return self.wp.render_template('management/attachments.html', self.category, 'attachments', **tpl_args)
         else:
             return jsonify_template('attachments/attachments.html', **tpl_args)
 

@@ -14,30 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db.sqlalchemy import db
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from __future__ import unicode_literals
+
+import pytest
+
+from indico.modules.categories import Category
 
 
-class IndexedCategory(db.Model):
+@pytest.fixture
+def create_category(db):
+    """Returns a callable which lets you create dummy events"""
 
-    __tablename__ = 'category_index'
-    __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
-                      {'schema': 'categories'})
+    def _create_category(id_=None, **kwargs):
+        kwargs.setdefault('title', u'cat#{}'.format(id_) if id_ is not None else u'dummy')
+        kwargs.setdefault('timezone', 'UTC')
+        if 'parent' not in kwargs:
+            kwargs['parent'] = Category.get_root()
+        return Category(id=id_, acl_entries=set(), **kwargs)
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=False
-    )
+    return _create_category
 
-    @property
-    def title(self):
-        return self.title_vector
 
-    @title.setter
-    def title(self, title):
-        self.title_vector = db.func.to_tsvector('simple', title)
-
-    title_vector = db.Column(
-        TSVECTOR
-    )
+@pytest.fixture
+def dummy_category(create_category):
+    """Creates a mocked dummy category"""
+    return create_category(title='dummy')

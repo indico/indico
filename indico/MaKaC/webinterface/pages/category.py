@@ -1021,8 +1021,13 @@ class WPCategoryModifBase( WPCategoryBase ):
     _userData = ['favorite-user-ids']
 
     def getJSFiles(self):
-        return WPCategoryBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+        return (WPCategoryBase.getJSFiles(self) +
+                main.WPMainBase.getJSFiles(self) +
+                self._includeJSPackage('Management') +
+                self._asset_env['modules_event_management_js'].urls())
+
+    def getCSSFiles(self):
+        return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW(), currentCategory=self._currentCategory())
@@ -1051,8 +1056,8 @@ class WPCategoryModifBase( WPCategoryBase ):
         return frame.getHTML({
             "category": self._target,
             "body": self._getPageContent(params),
-            "sideMenu": render_sidemenu('category-management-sidemenu', active_item=self.sidemenu_option,
-                                        category=self._target, old_style=True)
+            "sideMenu": render_sidemenu('category-management-sidemenu-old', active_item=self.sidemenu_option,
+                                        category=self._target)
         })
 
     def _getTabContent( self, params ):

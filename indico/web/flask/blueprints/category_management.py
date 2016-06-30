@@ -18,7 +18,7 @@ from MaKaC.webinterface.rh import categoryMod
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-category_mgmt = IndicoBlueprint('category_mgmt', __name__, url_prefix='/category/<categId>/manage')
+category_mgmt = IndicoBlueprint('category_mgmt', __name__, url_prefix='/category-old/<categId>/manage')
 
 
 # Creation

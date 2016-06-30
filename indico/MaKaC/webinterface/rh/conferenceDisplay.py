@@ -24,13 +24,11 @@ import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
-import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPError404
 from indico.core.config import Config
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.errors import MaKaCError
 from MaKaC.PDFinterface.conference import AbstractBook
 import zipfile
 from cStringIO import StringIO
@@ -58,9 +56,10 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         self._doNotSanitizeFields.append("accessKey")
 
     def _process(self):
-        access_keys = session.setdefault("accessKeys", {})
-        access_keys[self._conf.getUniqueId()] = self._accesskey
-        session.modified = True
+        # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message
+        # for that if there's an access key for the event in the session.
+        # this is pretty awful but eventually we'll do this properly :)
+        self.event_new.set_session_access_key(self._accesskey)
         url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         self._redirect(url)
 

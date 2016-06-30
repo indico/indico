@@ -586,14 +586,6 @@ class ConferenceProtectionSetAccessKey(ConferenceModifBase):
     def _getAnswer(self):
         self._conf.setAccessKey(self._accessKey)
 
-class ConferenceProtectionSetModifKey(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._modifKey = self._params.get("modifKey", "")
-
-    def _getAnswer(self):
-        self._conf.setModifKey(self._modifKey)
 
 class ConferenceContactInfoModification( ConferenceTextModificationBase ):
     """
@@ -715,7 +707,6 @@ methodMap = {
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
     "protection.toggleDomains": ConferenceProtectionToggleDomains,
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
-    "protection.setModifKey": ConferenceProtectionSetModifKey,
     "protection.changeContactInfo": ConferenceContactInfoModification,
     "protection.addExistingManager": ConferenceProtectionAddExistingManager,
     "protection.removeManager": ConferenceProtectionRemoveManager,

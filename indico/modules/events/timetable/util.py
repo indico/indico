@@ -22,7 +22,7 @@ from operator import attrgetter
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload, subqueryload
+from sqlalchemy.orm import joinedload, subqueryload, undefer
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -45,7 +45,7 @@ def is_visible_from(event, categ):
     """Check whether ``event`` is visible from ``categ``
     """
     visibility = event.as_legacy.getFullVisibility()
-    for cat_id in event.category_chain:
+    for cat_id in event.category_chain[::-1]:
         if visibility <= 0:
             return False
         if str(cat_id) == categ.id:
@@ -59,7 +59,7 @@ def _query_events(categ_ids, day_start, day_end):
     dates_overlap = lambda t: (t.start_dt >= day_start) & (t.start_dt <= day_end)
     return (db.session.query(Event.id, TimetableEntry.start_dt)
             .filter(
-                Event.category_chain.overlap(categ_ids),
+                Event.category_chain_overlaps(categ_ids),
                 ~Event.is_deleted,
                 ((Event.timetable_entries.any(dates_overlap(TimetableEntry))) |
                  (Event.query.exists().where(
@@ -187,7 +187,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     query = (Event.find(Event.id.in_(event_ids))
              .options(subqueryload(Event.person_links).joinedload(EventPersonLink.person),
                       joinedload(Event.own_room).noload('owner'),
-                      joinedload(Event.own_venue)))
+                      joinedload(Event.own_venue),
+                      undefer('category_chain')))
 
     scheduled_events = defaultdict(list)
     ongoing_events = []

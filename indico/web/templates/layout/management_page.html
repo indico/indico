@@ -1,0 +1,34 @@
+{% extends 'layout/base.html' %}
+
+{% set show_side_menu = self.side_menu() or self.display_view_button() %}
+
+{% block page %}
+    <div class="layout-side-menu">
+        {% if show_side_menu %}
+            <div class="menu-column">
+                {% block display_view_button %}{% endblock %}
+            </div>
+        {% endif %}
+        <div class="content-column">
+            <div class="banner {% block banner_class %}{% endblock %}">
+                <div class="title">
+                    {% block banner_title %}{% endblock %}
+                </div>
+                <div class="action-menu">
+                    {% block banner_actions %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layout-side-menu">
+        {% if show_side_menu %}
+            <div class="menu-column">
+                {% block side_menu %}{% endblock %}
+            </div>
+        {% endif %}
+        <div class="content-column">
+            {% include 'flashed_messages.html' %}
+            {{ super() }}
+        </div>
+    </div>
+{% endblock page %}

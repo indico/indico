@@ -122,6 +122,7 @@
 
                 // Handle AJAX dialog
                 if (dialog) {
+                    var closeButton = $this.data('close-button');
                     ajaxDialog({
                         trigger: $this,
                         url: url,
@@ -129,7 +130,7 @@
                         data: params,
                         title: $this.data('title'),
                         subtitle: $this.data('subtitle'),
-                        closeButton: $this.data('close-button'),
+                        closeButton: closeButton === undefined ? false : (closeButton || true),
                         dialogClasses: $this.data('dialog-classes'),
                         hidePageHeader: $this.data('hide-page-header') !== undefined,
                         onClose: function(data, customData) {
@@ -138,9 +139,11 @@
                                 if (update) {
                                     handleHtmlUpdate(data, update, $this);
                                 } else if (reload !== undefined && reload !== 'customData') {
+                                    IndicoUI.Dialogs.Util.progress();
                                     location.reload();
                                 }
                             } else if (reload === 'customData' && customData) {
+                                IndicoUI.Dialogs.Util.progress();
                                 location.reload();
                             }
                         }

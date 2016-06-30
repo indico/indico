@@ -26,14 +26,9 @@ from pytz import timezone
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
 from zope.index.text import textindex
-from sqlalchemy import func
 
-from indico.core.db.util import retry_request_on_conflict
 from indico.core.logger import Logger
-from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
-from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
@@ -971,62 +966,6 @@ class CategoryDayIndex(CategoryDateIndex):
                 yield problem
 
 
-class PendingQueuesUsersIndex( Index ):
-    _name = ""
-
-    def indexPendingUser( self, user ):
-        email = user.getEmail().lower()
-        self._addItem( email, user )
-        self.notifyModification()
-
-    def unindexPendingUser( self, user ):
-        email = user.getEmail().lower()
-        self._withdrawItem( email, user )
-        self.notifyModification()
-
-    def _withdrawItem( self, value, item ):
-        Index._withdrawItem( self, value, item )
-        if self._words.has_key(value):
-            if self._words[value]==[]:
-                del self._words[value]
-
-    def matchPendingUser( self, email, cs=0, exact=1 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
-
-class PendinQueuesTasksIndex( Index ):
-    _name = ""
-
-    def indexTask( self, email, task ):
-        email = email.lower().strip()
-        self._addItem( email, task )
-        self.notifyModification()
-
-    def unindexTask( self, email, task ):
-        email = email.lower().strip()
-        self._withdrawItem( email, task )
-        self.notifyModification()
-
-    def _withdrawItem( self, value, item ):
-        Index._withdrawItem( self, value, item )
-        if self._words.has_key(value):
-            if self._words[value]==[]:
-                del self._words[value]
-
-    def matchTask( self, email, cs=0, exact=1 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
-
-class PendingSubmittersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingSubmitters"
-    pass
-
-
-class PendingManagersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingManagers"
-    pass
-
-
 class IntStringMappedIndex(Persistent):
     def __init__(self):
         self._intToStrMap = {}
@@ -1118,49 +1057,11 @@ class TextIndex(IntStringMappedIndex):
         return [(self.getString(record[0]), record[1]) for record in records]
 
 
-class CategoryTitleIndex(object):
-
-    def index(self, obj):
-        if not obj.getId():  # newly created root category has id=''
-            return
-        self.unindex(obj)
-        category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
-        db.session.add(category)
-        with retry_request_on_conflict():
-            db.session.flush()
-
-    def unindex(self, obj):
-        if not obj.getId():  # newly created root category has id=''
-            return
-        IndexedCategory.find(id=obj.getId()).delete()
-        db.session.flush()
-
-    def search(self, search_string, limit=None, offset=None):
-        query = (db.session.query(IndexedCategory.id)
-                 .filter(IndexedCategory.title_vector.op('@@')(
-                     func.to_tsquery('simple', preprocess_ts_string(search_string))))
-                 .limit(limit)
-                 .offset(offset))
-        return [x[0] for x in query]
-
-    def initialize(self, items):
-        for i, categ in enumerate(items, 1):
-            cat = IndexedCategory(id=categ.getId(), title=categ.getTitle())
-            db.session.add(cat)
-            if i % 1000 == 0:
-                db.session.commit()
-        db.session.commit()
-
-    def clear(self):
-        IndexedCategory.query.delete()
-
-
 class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName',
-                     'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll']
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1184,12 +1085,4 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryDateAll":
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
-            elif id=="pendingSubmitters":
-                Idx[str(id)] = PendingSubmittersIndex()
-            elif id=="pendingManagers":
-                Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingCoordinators":
-                Idx[str(id)] = PendingManagersIndex()
-            elif id=="categoryName":
-                return CategoryTitleIndex()
             return Idx[str(id)]

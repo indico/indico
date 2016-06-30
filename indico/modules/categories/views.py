@@ -18,10 +18,46 @@ from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
-from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer, WNavigationDrawer
+
+
+class WPCategory(WPJinjaMixin, WPMainBase):
+    """WP for category display pages"""
+
+    template_prefix = 'categories/'
+
+    def __init__(self, rh, category, **kwargs):
+        kwargs['category'] = category
+        self.category = category
+        self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
+        WPMainBase.__init__(self, rh, **kwargs)
+
+    def getJSFiles(self):
+        return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
+
+
+class WPCategoryManagement(WPCategory):
+    """WP for category management pages"""
+
+    MANAGEMENT = True
+
+    def __init__(self, rh, category, active_menu_item, **kwargs):
+        kwargs['active_menu_item'] = active_menu_item
+        WPCategory.__init__(self, rh, category, **kwargs)
+
+    def getCSSFiles(self):
+        return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()
+
+    def _getNavigationDrawer(self):
+        return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 
 
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
+    # TODO: when moving category display to Jinja, inherit from WPCategory instead
     template_prefix = 'categories/'
 
     def _getBody(self, params):
@@ -31,8 +67,10 @@ class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
         return WSimpleNavigationDrawer(self._target.getName(), type='Statistics')
 
     def getJSFiles(self):
-        return (WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('jqplot_js', prefix='')
-                + self._asset_env['statistics_js'].urls() + self._asset_env['modules_category_statistics_js'].urls())
+        return (WPCategoryDisplayBase.getJSFiles(self) +
+                self._includeJSPackage('jqplot_js', prefix='') +
+                self._asset_env['statistics_js'].urls() +
+                self._asset_env['modules_category_statistics_js'].urls())
 
     def getCSSFiles(self):
         return WPCategoryDisplayBase.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()

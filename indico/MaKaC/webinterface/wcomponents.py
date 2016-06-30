@@ -252,12 +252,23 @@ class WHeader(WTemplated):
         Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
     """
     def _getProtection(self, target):
-        if target.isProtected():
-            return ["Restricted", _("Restricted")]
-        domain_list = target.getAccessController().getAnyDomainProtection()
-        if domain_list:
-            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
-        return ["Public", _("Public")]
+        if isinstance(target, Conference):
+            event = target.as_event
+            if not event.is_protected:
+                return ['Public', _('Public')]
+            else:
+                networks = [x.name for x in event.get_access_list() if x.is_network]
+                if networks:
+                    return ['DomainProtected', _('{} network only').format('/'.join(networks))]
+                else:
+                    return ["Restricted", _("Restricted")]
+        else:
+            if target.isProtected():
+                return ["Restricted", _("Restricted")]
+            domain_list = target.getAccessController().getAnyDomainProtection()
+            if domain_list:
+                return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
+            return ["Public", _("Public")]
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
@@ -332,9 +343,9 @@ class WConferenceHeader(WHeader):
         from indico.web.http_api.util import generate_public_auth_request
 
         vars = WHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
 
-        vars["conf"] = vars["target"] = self._conf;
+        vars["conf"] = vars["target"] = self._conf
 
         vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
@@ -356,9 +367,6 @@ class WConferenceHeader(WHeader):
         vars["showDLMaterial"] = True
         vars["showLayout"] = True
 
-        vars["usingModifKey"]=False
-        if self._conf.canKeyModify():
-            vars["usingModifKey"]=True
         vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
 
         # This is basically the same WICalExportBase, but we need some extra
@@ -397,22 +405,14 @@ class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
         WConferenceHeader.__init__(self, self._aw, conf)
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
-        url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-        vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
-        if self._conf.canKeyModify():
-            url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
-            url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-            vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
+        vars["categurl"] = self._conf.as_event.category.url
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -487,9 +487,8 @@ class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
         WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
@@ -499,7 +498,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
 
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
         view_options = [{'id': tid, 'name': data['title']} for tid, data in
                         sorted(theme_settings.get_themes_for(vars["type"]).viewitems(), key=lambda x: x[1]['title'])]
 
@@ -578,10 +577,6 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
 
     def getVars( self ):
         vars = WMenuMeetingHeader.getVars( self )
-        vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
-        if self._conf.canKeyModify():
-            vars["confModif"] = """<a href=%s>exit manage</a>"""%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
-
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
         vars["showExportToPDF"] = False
@@ -915,7 +910,6 @@ class WConfModificationControlFrame(WTemplated):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
         vars["confId"] = self.__target.getId()
-        vars["modifKey"] = self.__target.getModifKey()
         vars["managers"] = self._getManagersList()
         return vars
 

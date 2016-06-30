@@ -26,15 +26,16 @@ from MaKaC.common.cache import GenericCache
 def iter_acl(acl):
     """Iterates over an ACL in the most efficient order.
 
-    This first yields users, then local groups, and eventually
-    multipass groups as a remote group check is much more expensive
-    than checking if two users are the same (``==``) or if a user is
-    in a local group (SQL query).
+    This first yields users/emails, then ip networks, then local
+    groups, and eventually multipass groups as a remote group check
+    is much more expensive than checking if two users are the same
+    (``==``), if an ip is in a network (just some math) or if a user
+    is in a local group (SQL query).
 
     :param acl: any iterable containing users/groups or objects which
                 contain users/groups in a `principal` attribute
     """
-    return sorted(acl, key=lambda x: (getattr(x, 'principal', x).is_group,
+    return sorted(acl, key=lambda x: (getattr(x, 'principal', x).principal_order,
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 
@@ -92,8 +93,8 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
 
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False,
-                          allow_emails=False):
-    """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
+                          allow_emails=False, allow_networks=False):
+    from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -131,6 +132,11 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         return user.as_avatar if legacy else user
     elif allow_emails and type_ == 'Email':
         return EmailPrincipal(id_)
+    elif allow_networks and type_ == 'IPNetworkGroup':
+        group = IPNetworkGroup.get(int(id_))
+        if group is None:
+            raise ValueError('IP network group does not exist: {}'.format(id_))
+        return group
     elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
         group = GroupProxy(int(id_))
         if group.group is None:

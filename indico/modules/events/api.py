@@ -131,7 +131,7 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         id_list = set(self._idList)
         if self._wantFavorites and aw.getUser():
-            id_list.update(c.getId() for c in aw.getUser().user.favorite_categories)
+            id_list.update(str(c.id) for c in aw.getUser().user.favorite_categories)
         legacy_id_map = {m.legacy_category_id: m.category_id
                          for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
@@ -486,7 +486,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     def category(self, idlist):
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, idlist)),
+                         Event.category_chain_overlaps(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
@@ -544,12 +544,12 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': unicode(event.category_id),
-            'category': event.category.getTitle(),
+            'category': event.category.title,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
             'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
             'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
-            'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
+            'creationDate': self._serialize_date(event.created_dt),
             'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
             'hasAnyProtection': event.as_legacy.hasAnyProtection(),
             'roomMapURL': event.room.map_url if event.room else None,

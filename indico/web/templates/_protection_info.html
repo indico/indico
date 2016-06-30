@@ -3,7 +3,9 @@
 
 <div class="form-group" id="form-group-protected-{{ field.id }}" style="margin-top: 5px;">
     {{ render_public_protection_message() }}
-    {{ render_inherited_protection_message(protected_object.protection_parent, parent_type) }}
+    {% if field.can_inherit_protection %}
+        {{ render_inherited_protection_message(protected_object.protection_parent, parent_type) }}
+    {% endif %}
     {{ render_protected_protection_message() }}
     {{ render_non_inheriting_children_message(protected_object, non_inheriting_objects) }}
 </div>

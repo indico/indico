@@ -23,13 +23,12 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
-from indico.modules.categories import logger
+from indico.modules.categories import logger, Category
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis.suggestions import next_scheduled_check, suggest, unschedule_check
 from indico.util.suggestions import get_category_scores
-from MaKaC.conference import CategoryManager
 
 
 # Minimum score for a category to be suggested
@@ -56,19 +55,20 @@ def category_suggestions():
 
 @celery.periodic_task(name='category_cleanup', run_every=crontab(minute='0', hour='5'))
 def category_cleanup():
+    from indico.modules.events import Event
     cfg = Config.getInstance()
     janitor_user = User.get_one(cfg.getJanitorUserId())
 
     logger.debug("Checking whether any categories should be cleaned up")
     for categ_id, days in cfg.getCategoryCleanup().iteritems():
         try:
-            category = CategoryManager().getById(categ_id)
+            category = Category.get(int(categ_id), is_deleted=False)
         except KeyError:
             logger.warning("Category %s does not exist!", categ_id)
             continue
 
         now = now_utc()
-        to_delete = [ev for ev in category.conferences if (now - ev._creationDS) > timedelta(days=days)]
+        to_delete = Event.query.with_parent(category).filter(Event.created_dt < (now - timedelta(days=days))).all()
         if not to_delete:
             continue
 
@@ -76,7 +76,7 @@ def category_cleanup():
                     len(to_delete), days)
         for i, event in enumerate(to_delete, 1):
             logger.info("Deleting %s", event)
-            event.delete(user=janitor_user)
+            event.as_legacy.delete(user=janitor_user)
             if i % 100 == 0:
                 db.session.commit()
                 DBMgr.getInstance().commit()

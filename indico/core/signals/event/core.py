@@ -61,21 +61,6 @@ created = _signals.signal('created', """
 Called when a new event is created. The `sender` is the new Event.
 """)
 
-protection_changed = _signals.signal('protection-changed', """
-Called when the protection mode of the event changed. The `sender` is the event,
-`old`/`new` contain the corresponding values.
-""")
-
-domain_access_granted = _signals.signal('domain-access-granted', """
-Called when an IP restriction is added to an event. The `sender` is the event class,
-the `domain` is that domain that has been added.
-""")
-
-domain_access_revoked = _signals.signal('domain-access-revoked', """
-Called when an IP restriction is removed from an event. The `sender` is the event class,
-the `domain` is that domain that has been removed.
-""")
-
 session_deleted = _signals.signal('session-deleted', """
 Called when a session is deleted. The *sender* is the session.
 """)

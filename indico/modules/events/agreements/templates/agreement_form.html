@@ -75,9 +75,9 @@
                             <div class="question">
                                 {{ form.reason.label() }}:
                                 <span class="text-superfluous">
-                                    {% trans %}
+                                    {% trans -%}
                                         (optional)
-                                    {% endtrans %}
+                                    {%- endtrans %}
                                 </span>
                             </div>
                             {{ form.reason }}

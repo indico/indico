@@ -24,7 +24,7 @@ class WPPaymentJinjaMixin(WPJinjaMixin):
 
 
 class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'events/payment'
+    sidemenu_option = 'payment'
 
 
 class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):

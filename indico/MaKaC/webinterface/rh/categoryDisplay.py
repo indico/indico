@@ -40,6 +40,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -61,6 +62,9 @@ class RHCategDisplayBase(base.RHDisplayBaseProtected):
     def _checkParams(self, params, mustExist=True):
         if "categId" in params:
             params["categId"] = escape_html(str(params["categId"]))
+        # TODO: Workaround to avoid breaking the category navigation (display)
+        if 'category' in params:
+            params['categId'] = str(json.loads(params['category'])['id'])
         l = locators.CategoryWebLocator(params, mustExist)
         self._target = l.getObject()
 
@@ -232,12 +236,12 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
 
         eventAccessProtection = params.get("eventProtection", "inherit")
         if eventAccessProtection == "private" :
-            c.getAccessController().setProtection(1)
+            c.as_event.protection_mode = ProtectionMode.protected
         elif eventAccessProtection == "public" :
-            c.getAccessController().setProtection(-1)
+            c.as_event.protection_mode = ProtectionMode.public
 
-        allowedAvatars = self._getPersons()
-        UtilPersons.addToConf(allowedAvatars, c)
+        for legacy_principal in self._getPersons():
+            c.as_event.update_principal(legacy_principal.as_new, read_access=True)
 
         # Add EventPersonLinks to the Event
         person_links = self.get_event_person_links_data(c.as_event)
@@ -275,18 +279,18 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         room = conf.as_event.room_name
         text = """
 _Category_
-%s
+{}
 _Title_
-%s
+{}
 _Speaker/Chair_
-%s
+{}
 _Room_
-%s
+{}
 _Description_
-%s
+{}
 _Creator_
-%s (%s)""" % (conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
-              conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
+{} ({})""".format(conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
+                  conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
         if len(confs) == 1:
             text += """
 _Date_
@@ -303,25 +307,20 @@ _Access%s_
 %s """ % (i,c.getAdjustedStartDate(), c.getAdjustedEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
                 i+=1
 
-        msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\nFrom: %s\r\nReturn-Path: %s\r\nTo: %s\r\nCc: \r\nSubject: %s\r\n\r\n"%(fromAddr, fromAddr, addrs, subject))
+        msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\n"
+               "From: %s\r\n"
+               "Return-Path: %s\r\n"
+               "To: %s\r\nCc: \r\n"
+               "Subject: %s\r\n\r\n" % (fromAddr, fromAddr, addrs, subject))
         msg = msg + text
-        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+        maildata = {"fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text}
         GenericMailer.send(maildata)
         # Category notification
-        if conf.getOwner().getNotifyCreationList() != "":
-            addrs2 = [ conf.getOwner().getNotifyCreationList() ]
-            maildata2 = { "fromAddr": fromAddr, "toList": addrs2, "subject": subject, "body": text }
-            GenericMailer.send(maildata2)
-
-
-class UtilPersons:
-
-    @staticmethod
-    def addToConf(accessingAvatars, conf):
-        if accessingAvatars:
-            for person in accessingAvatars:
-                if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
-                    conf.grantAccess(person)
+        event_creation_notification_emails = conf.as_event.category.event_creation_notification_emails
+        if event_creation_notification_emails:
+            mail_data = {"fromAddr": fromAddr, "toList": event_creation_notification_emails,
+                         "subject": subject, "body": text}
+            GenericMailer.send(mail_data)
 
 
 class UtilsConference:

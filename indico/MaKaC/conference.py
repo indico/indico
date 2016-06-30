@@ -27,7 +27,6 @@ from MaKaC.common.PickleJar import Updates
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.sessions import session_settings
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.events.util import track_time_changes
 from indico.modules.users.legacy import AvatarUserWrapper
@@ -45,7 +44,7 @@ from operator import methodcaller
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
-from flask import session, request, has_request_context
+from flask import request, has_request_context
 from pytz import timezone
 from pytz import all_timezones
 
@@ -74,8 +73,6 @@ from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import utc_timestamp, format_datetime
 from indico.util.redis import write_client as redis_write_client
 from indico.util.user import unify_user_args
@@ -210,8 +207,9 @@ class CommonObjectBase(CoreObject, Fossilizable):
         CAUTION: this won't return empty directories (used by interface), nor things the
         current user can't see
         """
+        from indico.modules.attachments.util import get_attached_items
         if isinstance(self, Category):
-            return get_attached_items(self, include_empty=False, include_hidden=False)
+            return self.as_new.attached_items
         elif isinstance(self, Conference):
             return get_attached_items(self.as_event, include_empty=False, include_hidden=False, preload_event=True)
         else:
@@ -234,15 +232,9 @@ class CategoryManager(ObjectHolder):
 
     def add(self, category):
         ObjectHolder.add(self, category)
-        # Add category to the name index
-        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.index(category)
 
     def remove(self, category):
         ObjectHolder.remove(self, category)
-        # remove category from the name index
-        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.unindex(category)
         Catalog.getIdx('categ_conf_sd').remove_category(category.getId())
 
     def _newId(self):
@@ -294,6 +286,11 @@ class Category(CommonObjectBase):
         self._timezone = ""
         self._notifyCreationList = ""
 
+    @property
+    @memoize_request
+    def as_new(self):
+        return db.m.Category.get(int(self.id))
+
     def __cmp__(self, other):
         if type(self) is not type(other):
             # This is actually dangerous and the ZODB manual says not to do this
@@ -317,7 +314,7 @@ class Category(CommonObjectBase):
 
     @property
     def attachment_folders(self):
-        return AttachmentFolder.find(object=self)
+        return db.m.AttachmentFolder.find(object=self)
 
     @property
     def is_protected(self):
@@ -521,7 +518,7 @@ class Category(CommonObjectBase):
                 prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
-        signals.category.deleted.send(self)
+        # signals.category.deleted.send(self)
 
         return
 
@@ -539,7 +536,7 @@ class Category(CommonObjectBase):
         catDateIdx.indexCateg(self)
         catDateAllIdx.indexCateg(self)
 
-        signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
+        # signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
 
     def getName(self):
         return self.name
@@ -547,13 +544,7 @@ class Category(CommonObjectBase):
     def setName(self, newName):
         oldName = self.name
         self.name = newName.strip()
-
-        # Reindex when name changes
-        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.unindex(self)
-        nameIdx.index(self)
-
-        signals.category.title_changed.send(self, old=oldName, new=newName)
+        # signals.category.title_changed.send(self, old=oldName, new=newName)
 
     def getDescription(self):
         return self.description
@@ -607,7 +598,7 @@ class Category(CommonObjectBase):
         sc.setProtection(protection)
 
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
-        signals.category.created.send(sc, parent=self)
+        # signals.category.created.send(sc, parent=self)
 
         self._addSubCategory(sc)
         sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
@@ -643,9 +634,6 @@ class Category(CommonObjectBase):
     def getAccessKey(self):
         return ""
 
-    def getModifKey(self):
-        return ""
-
     def indexConf(self, conf):
         # Specific for category changes, calls Conference.indexConf()
         # (date-related indexes)
@@ -659,11 +647,11 @@ class Category(CommonObjectBase):
         conf.unindexConf()
 
     @unify_user_args
-    def newConference(self, creator, title, start_dt, end_dt, timezone):
+    def newConference(self, creator, title, start_dt, end_dt, timezone, add_creator_as_manager=True):
         conf = Conference()
-        event = Event(creator=creator, category_id=int(self.id), title=to_unicode(title).strip(),
+        event = Event(creator=creator, category=self.as_new, title=to_unicode(title).strip(),
                       start_dt=start_dt, end_dt=end_dt, timezone=timezone)
-        ConferenceHolder().add(conf, event)
+        ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
         self._addConference(conf)
 
         signals.event.created.send(event)
@@ -890,8 +878,8 @@ class Category(CommonObjectBase):
         oldProtection = 1 if self.isProtected() else -1
 
         self.__ac.setProtection(private)
-        if oldProtection != private:
-            signals.category.protection_changed.send(self, old=oldProtection, new=private)
+        # if oldProtection != private:
+        #     signals.category.protection_changed.send(self, old=oldProtection, new=private)
 
     def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
@@ -986,11 +974,11 @@ class Category(CommonObjectBase):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        signals.category.domain_access_granted.send(self, domain=dom)
+        # signals.category.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        signals.category.domain_access_revoked.send(self, domain=dom)
+        # signals.category.domain_access_revoked.send(self, domain=dom)
 
 
     def getDomainList(self):
@@ -999,8 +987,8 @@ class Category(CommonObjectBase):
     def notifyModification(self, raiseEvent=True):
         """Method called to notify the current category has been modified.
         """
-        if raiseEvent:
-            signals.category.data_changed.send(self)
+        # if raiseEvent:
+        #     signals.category.data_changed.send(self)
         self._p_changed = 1
 
 
@@ -1027,7 +1015,7 @@ class Conference(CommonObjectBase):
         self.__programGenerator = Counter()
         self.__ac = AccessController(self)
         self.__owners = []
-        self._modificationDS = self._creationDS = nowutc()
+        self._modificationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
@@ -1037,7 +1025,6 @@ class Conference(CommonObjectBase):
         self.___contribTypeGenerator = Counter()
         self._boa = BOAConfig(self)
         self._accessKey = ""
-        self._modifKey = ""
         self._closed = False
         self._visibility = 999
         self.__badgeTemplateManager = BadgeTemplateManager(self)
@@ -1122,6 +1109,8 @@ class Conference(CommonObjectBase):
         else:
             # use get() so sqlalchemy can make use of the identity cache
             return Event.get_one(event_id)
+
+    as_new = as_event
 
     @property
     @memoize_request
@@ -1365,13 +1354,13 @@ class Conference(CommonObjectBase):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS.astimezone(timezone(tz))
 
-    def getCreationDate( self ):
+    def getCreationDate(self):
         """Returns the date in which the conference was created"""
-        return self._creationDS
+        return self.as_new.created_dt
 
-    def getAdjustedCreationDate( self, tz ):
+    def getAdjustedCreationDate(self, tz):
         """Returns the date in which the conference was created"""
-        return self._creationDS.astimezone(timezone(tz))
+        return self.as_new.created_dt.astimezone(timezone(tz))
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
@@ -1757,18 +1746,6 @@ class Conference(CommonObjectBase):
             self._accessKey = ""
             return self._accessKey
 
-    def setModifKey(self, modifKey=""):
-        """sets the modification key of the conference"""
-        self._modifKey = modifKey
-        self.notifyModification()
-
-    def getModifKey(self):
-        try:
-            return self._modifKey
-        except AttributeError:
-            self._modifKey = ""
-            return self._modifKey
-
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
@@ -1910,11 +1887,11 @@ class Conference(CommonObjectBase):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        signals.event.domain_access_granted.send(self, domain=dom)
+        # signals.event.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        signals.event.domain_access_revoked.send(self, domain=dom)
+        # signals.event.domain_access_revoked.send(self, domain=dom)
 
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
@@ -1960,9 +1937,8 @@ class Conference(CommonObjectBase):
 
         self.getAccessController().setProtection( private )
 
-        if oldValue != private:
-            # notify listeners
-            signals.event.protection_changed.send(self, old=oldValue, new=private)
+        # if oldValue != private:
+        #    signals.event.protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -1987,65 +1963,8 @@ class Conference(CommonObjectBase):
                 return True
         return False
 
-    def isAllowedToAccess( self, av):
-        """tells if a user has privileges to access the current conference
-            (independently that it is protected or not)
-        """
-        if not av:
-            return False
-        if self.__ac.canUserAccess(av) or self.canUserModify(av):
-            return True
-
-        # if the conference is not protected by itself
-        if not self.isItselfProtected():
-            # then inherit behavior from parent category
-            for owner in self.getOwnerList():
-                if owner.isAllowedToAccess( av ):
-                    return True
-
-        # track coordinators are also allowed to access the conference
-        for track in self.getTrackList():
-            if track.isCoordinator( av ):
-                return True
-
-        # paper reviewing team should be also allowed to access
-        if self.getConfPaperReview().isInReviewingTeam(av):
-            return True
-
-        return False
-
-    def canAccess( self, aw ):
-        """Tells whether an access wrapper is allowed to access the current
-            conference: when the conference is protected, only if the user is a
-            chair or is granted to access the conference, when the client ip is
-            not restricted.
-        """
-
-        # Allow harvesters (Invenio, offline cache) to access
-        # protected pages
-        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
-            return True
-
-        if self.isProtected():
-            if self.isAllowedToAccess(aw.getUser()):
-                return True
-            else:
-                return self.canKeyAccess(aw) or self.canModify(aw)
-        else:
-            # Domain control is triggered just for PUBLIC events
-            return self.canIPAccess(request.remote_addr) or self.canModify(aw)
-
-    def canKeyAccess(self, aw, key=None):
-        accessKey = self.getAccessKey()
-        if not accessKey:
-            return False
-        return key == accessKey or session.get('accessKeys', {}).get(self.getUniqueId()) == accessKey
-
-    def canKeyModify(self):
-        modifKey = self.getModifKey()
-        if not modifKey or not session.user:
-            return False
-        return session.get('modifKeys', {}).get(self.id) == modifKey
+    def canAccess(self, aw):
+        return self.as_event.can_access(aw.user)
 
     @unify_user_args
     def canUserModify(self, user):
@@ -2060,17 +1979,17 @@ class Conference(CommonObjectBase):
             aw_or_user = aw_or_user.getUser()
         if isinstance(aw_or_user, AvatarUserWrapper):
             aw_or_user = aw_or_user.user
-        return self.as_event.can_manage(aw_or_user, allow_key=True)
+        return self.as_event.can_manage(aw_or_user)
 
     def getManagerList(self):
         managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
-                          key=lambda x: (not x.is_group, x.name.lower()))
+                          key=lambda x: (x.is_single_person, x.name.lower()))
         return [x.as_legacy for x in managers]
 
     def getRegistrarList(self):
         registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
                                                                                                      explicit=True)],
-                            key=lambda x: (not x.is_group, x.name.lower()))
+                            key=lambda x: (x.is_single_person, x.name.lower()))
         return [x.as_legacy for x in registrars]
 
     def getAllowedToAccessList( self ):
@@ -2088,10 +2007,7 @@ class Conference(CommonObjectBase):
         else:
             creator = self.as_event.creator
         conf = cat.newConference(creator, title=self.getTitle(), start_dt=self.getStartDate(), end_dt=self.getEndDate(),
-                                 timezone=self.getTimezone())
-        if managing is not None:
-            with conf.as_event.logging_disabled:
-                conf.as_event.update_principal(managing.user, full_access=True)
+                                 timezone=self.getTimezone(), add_creator_as_manager=False)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -2122,22 +2038,6 @@ class Conference(CommonObjectBase):
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
-            conf.setModifKey(self.getModifKey())
-        # Access Control cloning
-        if options.get("access", False):
-            conf.setProtection(self.getAccessController()._getAccessProtection())
-            for entry in self.as_event.acl_entries:
-                conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
-                                               full_access=entry.full_access, roles=entry.roles, quiet=True)
-            for user in self.getAllowedToAccessList():
-                conf.grantAccess(user)
-            session_settings_data = session_settings.get_all(self)
-            session_settings.set_multi(conf, {
-                'coordinators_manage_contributions': session_settings_data['coordinators_manage_contributions'],
-                'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
-            })
-            for domain in self.getDomainList():
-                conf.requireDomain(domain)
         conf.notifyModification()
 
         # Copy the list of enabled features
@@ -2149,6 +2049,13 @@ class Conference(CommonObjectBase):
         # Run the new modular cloning system
         EventCloner.run_cloners(self.as_event, conf.as_event)
         signals.event.cloned.send(self.as_event, new_event=conf.as_event)
+
+        # Grant access to the event creator -- must be done after modular cloners
+        # since cloning the event ACL would result in a duplicate entry
+        if managing is not None:
+            with conf.as_event.logging_disabled:
+                conf.as_event.update_principal(managing.user, full_access=True)
+
         return conf
 
     def getCoordinatedTracks( self, av ):
@@ -2260,15 +2167,16 @@ class ConferenceHolder( ObjectHolder ):
     def _newId(self):
         raise RuntimeError('Tried to get new event id from zodb')
 
-    def add(self, conf, event):
+    def add(self, conf, event, add_creator_as_manager=True):
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)
         if conf.id in self._getIdx():
             raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
         ObjectHolder.add(self, conf)
-        with event.logging_disabled:
-            event.update_principal(event.creator, full_access=True)
+        if add_creator_as_manager:
+            with event.logging_disabled:
+                event.update_principal(event.creator, full_access=True)
         db.session.flush()
 
     def getById(self, id, quiet=False):
@@ -2848,9 +2756,6 @@ class Track(CoreObject):
             return
         self._contributions[ newContrib.getId() ] = newContrib
         newContrib.setTrack( self )
-
-    def getModifKey( self ):
-        return self.getConference().getModifKey()
 
     def removeContribution( self, contrib ):
         """

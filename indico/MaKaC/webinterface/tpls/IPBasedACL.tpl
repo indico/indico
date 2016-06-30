@@ -1,8 +1,8 @@
-<span>${_("IPs with full access to any private and public event, session, contribution, material or file")}:</span>
+<span>${_("IPs with full access to all materials uploaded to indico")}:</span>
 % if len(ipList) == 0:
   <em>None - you can add one using the form below</em>
 % else:
-  <ul style="display: block; width: 150px;">
+  <ul style="display: block; width: 250px;">
     % for ip in ipList:
       <li style="display: block; height:20px;">
     <div style="float: left;">${ ip }</div>

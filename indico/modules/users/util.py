@@ -19,58 +19,76 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
+from sqlalchemy.orm import undefer
+
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
+from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.modules.categories import Category
+from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
-from MaKaC.accessControl import AccessWrapper
 
 
-def get_related_categories(user):
+def get_related_categories(user, detailed=True):
     """Gets the related categories of a user for the dashboard"""
-    favorites = user.favorite_categories
-    managed = user.get_linked_objects('category', 'manager')
+    favorites = set(Category.query
+                    .filter(Category.id.in_(c.id for c in user.favorite_categories))
+                    .options(undefer('chain_titles'))
+                    .all())
+    managed = set(Category.query
+                  .filter(Category.acl_entries.any(db.and_(CategoryPrincipal.type == PrincipalType.user,
+                                                           CategoryPrincipal.user == user)),
+                          ~Category.is_deleted)
+                  .options(undefer('chain_titles')))
+    if not detailed:
+        return favorites | managed
     res = {}
     for categ in favorites | managed:
-        res[(categ.getTitle(), categ.getId())] = {
+        res[(categ.title, categ.id)] = {
             'categ': categ,
             'favorite': categ in favorites,
             'managed': categ in managed,
-            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
+            'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
     return OrderedDict(sorted(res.items(), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):
     """Gets the suggested categories of a user for the dashboard"""
-    from MaKaC.conference import CategoryManager
-
     if not redis_write_client:
         return []
-    related = user.favorite_categories | user.get_linked_objects('category', 'manager')
+    related = {cat.id for cat in get_related_categories(user, detailed=False)}
     res = []
-    for id_, score in suggestions.get_suggestions(user, 'category').iteritems():
+    categ_suggestions = suggestions.get_suggestions(user, 'category')
+    query = (Category.query
+             .filter(Category.id.in_(categ_suggestions),
+                     ~Category.id.in_(related),
+                     ~Category.is_deleted,
+                     ~Category.suggestions_disabled)
+             .options(undefer('chain_titles')))
+    categories = {c.id: c for c in query}
+    for id_, score in categ_suggestions.iteritems():
         try:
-            categ = CategoryManager().getById(id_)
+            categ = categories[int(id_)]
         except KeyError:
             suggestions.unsuggest(user, 'category', id_)
             continue
-        if not categ or categ.isSuggestionsDisabled() or categ in related:
+        if any(p.suggestions_disabled for p in categ.parent_chain_query):
+            suggestions.unsuggest(user, 'category', id_)
             continue
-        if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
-            continue
-        if not categ.canAccess(AccessWrapper(user.as_avatar)):
+        if not categ.can_access(user):
             continue
         res.append({
             'score': score,
             'categ': categ,
-            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
+            'path': truncate_path(categ.chain_titles[:-1], chars=50)
         })
     return res
 

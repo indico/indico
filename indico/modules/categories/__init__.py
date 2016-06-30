@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect
+from flask import redirect, request
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.roles import check_roles, ManagementRole
+from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
@@ -34,12 +36,6 @@ logger = Logger.get('categories')
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.categories.tasks
-
-
-@signals.category.deleted.connect
-def _category_deleted(category, **kwargs):
-    if hasattr(category, '_old_id'):
-        LegacyCategoryMapping.find(legacy_category_id=category._old_id).delete()
 
 
 @signals.app_created.connect
@@ -68,8 +64,8 @@ def _app_created(app, **kwargs):
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
 
 
-@signals.menu.items.connect_via('category-management-sidemenu')
-def _sidemenu_items(sender, category, **kwargs):
+@signals.menu.items.connect_via('category-management-sidemenu-old')
+def _sidemenu_items_old(sender, category, **kwargs):
     yield SideMenuItem('view', _('View category'), url_for('category.categoryDisplay', category),
                        100, icon='eye')
     yield SideMenuItem('general', _('General Settings'), url_for('category_mgmt.categoryModification', category),
@@ -78,3 +74,29 @@ def _sidemenu_items(sender, category, **kwargs):
                        70, icon='shield')
     yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
                        60, icon='wrench')
+
+
+@signals.menu.items.connect_via('category-management-sidemenu')
+def _sidemenu_items(sender, category, **kwargs):
+    yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
+                       100, icon='eye')
+    yield SideMenuItem('settings', _('Settings'), url_for('categories.manage_settings', category),
+                       90, icon='settings')
+    yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
+                       70, icon='shield')
+
+
+@signals.app_created.connect
+def _check_roles(app, **kwargs):
+    check_roles(Category)
+
+
+@signals.acl.get_management_roles.connect_via(Category)
+def _get_management_roles(sender, **kwargs):
+    return CreatorRole
+
+
+class CreatorRole(ManagementRole):
+    name = 'create'
+    friendly_name = _('Event creation')
+    description = _('Allows creating events in the category')

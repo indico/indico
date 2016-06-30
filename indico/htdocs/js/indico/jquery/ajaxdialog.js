@@ -54,7 +54,8 @@
             subtitle: null, // subtitle of the dialog
             closeButton: undefined, // include a close button at the bottom of the dialog. the inner text of the button
                                     // is configurable
-            url: null, // url to get the form/dialog from
+            url: null, // url to get the content from
+            content: null, // content of the dialog (used instead of the url option)
             method: 'GET', // http method to get the form/dialog
             data: null, // object or callable to add data when loading the form/dialog
             backSelector: '[data-button-back]', // elements in the form which will close the form
@@ -81,6 +82,10 @@
         loadDialog();
 
         function loadDialog() {
+            if (options.content) {
+                showDialog({js: '', html: options.content});
+                return;
+            }
             $.ajax({
                 type: options.method,
                 url: options.url,
@@ -148,11 +153,12 @@
                         text: options.subtitle
                     }));
                 }
-                if (options.closeButton !== undefined) {
+                if (options.closeButton !== undefined && options.closeButton !== false) {
+                    var text = options.closeButton === true ? $T.gettext("Close") : options.closeButton;
                     this.contentContainer.append($('<button>', {
                         'class': 'i-button big right',
                         'type': 'button',
-                        'text': options.closeButton || $T("Close"),
+                        'text': text,
                         'data-button-back': ''
                     }));
                 }
@@ -214,7 +220,7 @@
                 onCloseResult.then(function() {
                     _doCloseDialog();
                     if (options.trigger) {
-                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData])
+                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData]);
                     }
                 }, function() {
                     ignoreOnBeforeUnload = false;
@@ -265,6 +271,10 @@
 
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);
+                        if (data.redirect) {
+                            IndicoUI.Dialogs.Util.progress();
+                            location.href = data.redirect;
+                        }
                     } else if (data.html) {
                         popup.contentContainer.html(data.html);
                         ajaxifyForms();
@@ -293,7 +303,7 @@
 
         function injectJS(js) {
             if (js) {
-                $('body').append(js)
+                $('body').append(js);
             }
         }
     };

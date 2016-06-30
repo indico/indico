@@ -130,3 +130,22 @@
     box-shadow: inset 0px 15px 20px -20px $gray;
     color: $black;
 }
+
+.confirmation-dialog-content {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+
+    strong {
+        font-size: 1.2em;
+    }
+
+    ul {
+        font-size: 0.85em;
+        max-height: 100px;
+        overflow: auto;
+    }
+}
+
+form.confirmation-dialog {
+    max-width: 800px;
+}

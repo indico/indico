@@ -146,34 +146,12 @@ class RHConfScreenDatesEdit(RHConferenceModifBase):
         return p.display()
 
 
-class RHConferenceModifKey(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._modifkey = params.get("modifKey", "").strip()
-        self._doNotSanitizeFields.append("modifKey")
-        self._redirectURL = params.get("redirectURL", "")
-
-    def _checkProtection(self):
-        modif_keys = session.setdefault('modifKeys', {})
-        modif_keys[self._conf.getId()] = self._modifkey
-        session.modified = True
-
-        RHConferenceModifBase._checkProtection(self)
-
-    def _process( self ):
-        if self._redirectURL != "":
-            url = self._redirectURL
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        self._redirect( url )
-
-class RHConferenceModifManagementAccess( RHConferenceModifKey ):
+class RHConferenceModifManagementAccess( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfManagementAccess
     _tohttps = True
 
     def _checkParams(self, params):
-        RHConferenceModifKey._checkParams(self, params)
+        RHConferenceModifBase._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
@@ -183,14 +161,11 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
 
     def _checkProtection(self):
         if not (self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
-            RHConferenceModifKey._checkProtection(self)
+            RHConferenceModifBase._checkProtection(self)
 
     def _process(self):
         url = None
-        if self._redirectURL != "":
-            url = self._redirectURL
-
-        elif self._conf.canModify(self.getAW()):
+        if self._conf.canModify(self.getAW()):
             url = urlHandlers.UHConferenceModification.getURL( self._conf )
 
         elif self._isPRM:
@@ -204,25 +179,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         if not url:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
 
-        self._redirect(url)
-
-
-class RHConferenceCloseModifKey(RHConferenceBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._modifkey = params.get("modifKey", "").strip()
-        self._doNotSanitizeFields.append("modifKey")
-        self._redirectURL = params.get("redirectURL", "")
-
-    def _process(self):
-        modif_keys = session.get("modifKeys")
-        if modif_keys and modif_keys.pop(self._conf.getId(), None):
-            session.modified = True
-        if self._redirectURL != "":
-            url = self._redirectURL
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         self._redirect(url)
 
 

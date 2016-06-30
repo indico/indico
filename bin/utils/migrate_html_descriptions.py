@@ -97,7 +97,7 @@ def main(event, category, dry_run, html_log, verbose):
     if event:
         contribs = contribs.filter(db.m.Contribution.event_id == event)
     elif category:
-        contribs = contribs.join(db.m.Event).filter(db.m.Event.category_chain.contains([category]))
+        contribs = contribs.join(db.m.Event).filter(db.m.Event.category_chain_overlaps(category))
 
     if log:
         log.write('<table style="width: 100%;">')

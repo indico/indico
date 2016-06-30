@@ -86,7 +86,7 @@ $toolbar-thin-height: 1.9em;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
         }
 
-        &.arrow:last-of-type {
+        &.arrow:last-of-type:not(.inconspicuous) {
             border-right-width: 1px;
             border-right-style: solid;
         }

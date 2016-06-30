@@ -19,50 +19,6 @@
             </table>
         </td>
     </tr>
-    <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Modification key")}</span></td>
-        <td class="blacktext">
-            <input name=modifKey id="modifKey" type="password" autocomplete="off" size=25 value="${ modifKey }">
-            <button id="setModifKey" type="button" class="btn">${ _("change")}</button> <span id="modifKeyChanged" class="successText"></span>
-            <div id="modif-key-warning" class="warning-message-box" style="margin-top: 1em; margin-bottom: 0; max-width: 600px; ${'display: none;' if not modifKey else ''}">
-                <div class="message-text">
-                    ${_("This event has a modification key set. Please note that modification keys are deprecated and will be removed in an upcoming version.")}
-                    ${_("It is more secure to use the manager list instead. Also note that only users who are logged in to an Indico account may use a modification key.")}
-                </div>
-            </div>
-            <script type="text/javascript">
-                $('#setModifKey').click(function(e) {
-                    var modifKey = $('#modifKey').val();
-                    var confirmed;
-                    if (modifKey) {
-                        confirmed = confirmPrompt(
-                            $T("Please note that modification keys are <strong>deprecated</strong> and will be removed in an upcoming Indico version. We recommend using the manager list instead."),
-                            $T("Set modification key")
-                        );
-                    } else {
-                        confirmed = $.Deferred().resolve();
-                    }
-                    confirmed.then(function() {
-                        indicoRequest('event.protection.setModifKey', {
-                            confId: ${target.getId()},
-                            modifKey: modifKey
-                        }, function(result, error) {
-                            if(error) {
-                                IndicoUtil.errorReport(error);
-                                return;
-                            }
-
-                            $("#modifKeyChanged").html(modifKey ? $T("Modification key saved") : $T("Modification key removed"));
-                            $('#modif-key-warning').toggle(!!modifKey);
-                            setTimeout(function() {
-                                $("#modifKeyChanged").html('');
-                            }, 3000);
-                        });
-                    });
-                });
-            </script>
-       </td>
-    </tr>
 </table>
 
 <script>

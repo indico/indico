@@ -51,7 +51,7 @@ def _sidemenu_items(sender, event, **kwargs):
     # Once those parts are modularized, we will be able to include them
     # conditionally from their respective modules.
 
-    can_modify = event.can_manage(session.user, allow_key=True)
+    can_modify = event.can_manage(session.user)
     rb_active = Config.getInstance().getIsRoomBookingActive()
     cfa_enabled = event.as_legacy.hasEnabledSection('cfa')
 
@@ -88,7 +88,7 @@ def _sidemenu_items(sender, event, **kwargs):
         yield SideMenuItem('utilities', _('Utilities'),
                            url_for('event_mgmt.confModifTools', event),
                            section='advanced')
-        yield SideMenuItem('protection', _('Protection'),
-                           url_for('event_mgmt.confModifAC', event),
-                           60,
-                           icon='shield')
+        yield SideMenuItem('protection-old', _('Protection (old)'), url_for('event_mgmt.confModifAC', event),
+                           60, icon='shield')
+        yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
+                           60, icon='shield')

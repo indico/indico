@@ -105,6 +105,9 @@ class WPBase():
     # required user-specific "data packages"
     _userData = []
 
+    #: Whether the WP is used for management (adds suffix to page title)
+    MANAGEMENT = False
+
     def __init__(self, rh, **kwargs):
         config = Config.getInstance()
         self._rh = rh
@@ -174,7 +177,7 @@ class WPBase():
         from MaKaC.webinterface.rh.admins import RHAdminBase
 
         area=""
-        if isinstance(self._rh, RHModificationBaseProtected):
+        if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):
             area=i18nformat(""" - _("Management area")""")
         elif isinstance(self._rh, RHAdminBase):
             area=i18nformat(""" - _("Administrator area")""")

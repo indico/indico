@@ -23,11 +23,12 @@ from operator import attrgetter
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup
 from pytz import timezone
+from sqlalchemy.orm import undefer
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.notifications import make_email
+from indico.modules.categories import Category
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
@@ -47,11 +48,9 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -97,7 +96,8 @@ class RHUserDashboard(RHUserBase):
 
         tz = timezone(DisplayTZ().getDisplayTZ())
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
-        return WPUserDashboard.render_template('dashboard.html', redis_enabled=bool(redis_client), timezone=unicode(tz),
+        return WPUserDashboard.render_template('dashboard.html', 'dashboard',
+                                               redis_enabled=bool(redis_client), timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                                categories=get_related_categories(self.user),
                                                suggested_categories=get_suggested_categories(self.user))
@@ -113,7 +113,7 @@ class RHPersonalData(RHUserBase):
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        return WPUser.render_template('personal_data.html', user=self.user, form=form)
+        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
 
 
 class RHUserPreferences(RHUserBase):
@@ -135,14 +135,17 @@ class RHUserPreferences(RHUserBase):
                                 else 'LOCAL')
             flash(_('Preferences saved'), 'success')
             return redirect(url_for('.user_preferences'))
-        return WPUser.render_template('preferences.html', user=self.user, form=form)
+        return WPUser.render_template('preferences.html', 'preferences', user=self.user, form=form)
 
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        categories = sorted([(cat, truncate_path(cat.getCategoryPathTitles()[:-1], chars=50))
-                             for cat in self.user.favorite_categories], key=lambda c: (c[0].name, c[1]))
-        return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
+        query = (Category.query
+                 .filter(Category.id.in_(c.id for c in self.user.favorite_categories))
+                 .options(undefer('chain_titles')))
+        categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
+                            key=lambda c: (c[0].title, c[1]))
+        return WPUser.render_template('favorites.html', 'favorites', user=self.user, favorite_categories=categories)
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):
@@ -169,23 +172,25 @@ class RHUserFavoritesUserRemove(RHUserBase):
 class RHUserFavoritesCategoryAPI(RHUserBase):
     CSRF_ENABLED = True
 
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.category = Category.get_one(request.view_args['category_id'])
+
     def _process_PUT(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category not in self.user.favorite_categories:
-            if not category.canAccess(AccessWrapper(self.user.as_avatar)):
+        if self.category not in self.user.favorite_categories:
+            if not self.category.can_access(self.user):
                 raise Forbidden()
-            self.user.favorite_categories.add(category)
+            self.user.favorite_categories.add(self.category)
             if redis_write_client:
-                suggestions.unignore(self.user, 'category', category.getId())
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unignore(self.user, 'category', str(self.category.id))
+                suggestions.unsuggest(self.user, 'category', str(self.category.id))
         return jsonify(success=True)
 
     def _process_DELETE(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category in self.user.favorite_categories:
-            self.user.favorite_categories.remove(category)
+        if self.category in self.user.favorite_categories:
+            self.user.favorite_categories.remove(self.category)
             if redis_write_client:
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unsuggest(self.user, 'category', self.category.id)
         return jsonify(success=True)
 
 
@@ -213,7 +218,7 @@ class RHUserEmails(RHUserBase):
             flash(_("We have sent an email to {email}. Please click the link in that email within 24 hours to "
                     "confirm your new email address.").format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
-        return WPUser.render_template('emails.html', user=self.user, form=form)
+        return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
 
 class RHUserEmailsVerify(RHUserBase):

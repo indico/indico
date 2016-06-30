@@ -343,7 +343,8 @@ class RHAccounts(RHUserBase):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
         provider_titles = {name: provider.title for name, provider in multipass.identity_providers.iteritems()}
-        return WPAuthUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
+        return WPAuthUser.render_template('accounts.html', 'accounts',
+                                          form=form, user=self.user, provider_titles=provider_titles)
 
 
 class RHRemoveAccount(RHUserBase):

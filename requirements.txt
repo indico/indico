@@ -24,7 +24,7 @@ pytest-cov==2.2.1
 pytest-localserver==0.3.5
 pytest-mock==0.11.0
 python-dateutil==1.5
-pytz==2015.7
+pytz
 reportlab==3.2
 simplejson==2.6.2
 termcolor==1.1.0
@@ -61,6 +61,7 @@ zope.sqlalchemy==0.7.6
 redis==2.10.3
 hiredis==0.1.5
 enum34
+py2-ipaddress
 blinker==1.3
 alembic==0.6.7
 Flask-Migrate==1.2.0

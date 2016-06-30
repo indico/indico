@@ -113,14 +113,6 @@ def setValidEmailSeparators(emailstr):
     # return the string obtained after replacing the separators
     return re.subn(r"[ ;,]+", ",", emails)[0]
 
-def validIP(ip):
-    """
-    Quick and dirty IP address validation
-    (not exact, but enough)
-    """
-    expr = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
-    return re.match(expr, ip) != None
-
 
 def isStringHTML(s):
     if not isinstance(s, basestring):
@@ -414,13 +406,25 @@ class OSSpecific(object):
 
 
 def getProtectionText(target):
-    if target.hasAnyProtection():
-        if target.isItselfProtected():
-            return "protected_own", None
-        elif target.hasProtectedOwner():
-            return "protected_parent", None
-        elif target.getDomainList() != []:
-            return "domain", list(x.getName() for x in target.getDomainList())
+    # XXX: the only relevant return values are domain / not falsy
+    from MaKaC.conference import Conference
+    if isinstance(target, Conference):
+        event = target.as_event
+        if not event.is_protected:
+            return '', None
+        networks = [x.name for x in event.get_access_list() if x.is_network]
+        if networks:
+            return 'domain', networks
         else:
-            return getProtectionText(target.getOwner())
-    return "", None
+            return 'protected', None
+    else:
+        if target.hasAnyProtection():
+            if target.isItselfProtected():
+                return "protected_own", None
+            elif target.hasProtectedOwner():
+                return "protected_parent", None
+            elif target.getDomainList() != []:
+                return "domain", list(x.getName() for x in target.getDomainList())
+            else:
+                return getProtectionText(target.getOwner())
+        return "", None
