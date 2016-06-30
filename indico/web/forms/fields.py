@@ -544,11 +544,15 @@ class MultipleItemsField(HiddenField):
     :param fields: A list of dicts with the following arguments:
                    'id': the unique ID of the field
                    'caption': the title of the column and the placeholder
-                   'type': 'text|select' the type of the field
+                   'type': 'text|number|select', the type of the field
+                   'coerce': callable to convert the value to a python type.
+                             the type must be comvertible back to a string,
+                             so usually you just want something like `int`
+                             or `float` here.
                    In case the type is 'select', the property 'choices' of the
-                   `MultipleItemsField` needs to be a dict where the key is the
-                   'id' of the select field and the value is another dict
-                   mapping the option's id to it's caption.
+                   `MultipleItemsField` or the 'choices' kwarg needs to be a dict
+                   where the key is the 'id' of the select field and the value is
+                   another dict mapping the option's id to it caption.
     :param uuid_field: If set, each item will have a UUID assigned and
                        stored in the field specified here.  The name
                        specified here may not be in `fields`.
@@ -568,7 +572,7 @@ class MultipleItemsField(HiddenField):
         self.uuid_field_opaque = kwargs.pop('uuid_field_opaque', False)
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
-        self.choices = getattr(self, 'choices', {})
+        self.choices = getattr(self, 'choices', kwargs.pop('choices', {}))
         self.serialized_data = {}
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
@@ -591,7 +595,8 @@ class MultipleItemsField(HiddenField):
     def pre_validate(self, form):
         unique_used = set()
         uuid_used = set()
-        for item in self.serialized_data:
+        coercions = {f['id']: f['coerce'] for f in self.fields if f.get('coerce') is not None}
+        for i, item in enumerate(self.serialized_data):
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             item_keys = set(item)
@@ -609,9 +614,21 @@ class MultipleItemsField(HiddenField):
                 # raises ValueError if uuid is invalid
                 uuid.UUID(item[self.uuid_field], version=4)
                 uuid_used.add(item[self.uuid_field])
+            for key, fn in coercions.viewitems():
+                try:
+                    self.data[i][key] = fn(self.data[i][key])
+                except ValueError:
+                    raise ValueError(u"Invalid value for field '{}': {}".format(self.field_names[key],
+                                                                                escape(item[key])))
 
     def _value(self):
         return self.data or []
+
+    @property
+    def _field_spec(self):
+        # Field data for the widget; skip non-json-serializable data
+        return [{k: v for k, v in field.iteritems() if k != 'coerce'}
+                for field in self.fields]
 
 
 class OverrideMultipleItemsField(HiddenField):
