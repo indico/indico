@@ -33,7 +33,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import get_category_stats, serialize_category_atom, serialize_category_ical
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
-from indico.modules.events.util import get_base_ical_parameters, preload_events
+from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import now_utc
@@ -188,13 +188,14 @@ class RHDisplayCategory(RHDisplayCategoryBase):
     def _process(self):
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        event_query = Event.query.with_parent(self.category).order_by(Event.start_dt.desc())
+        event_query = (Event.query.with_parent(self.category)
+                       .order_by(Event.start_dt.desc())
+                       .options(joinedload('person_links')))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
                                                  Event.start_dt < future_threshold)
         events = current_event_query.filter(Event.start_dt < future_threshold).all()
-        preload_events(events, persons=True)
         events_by_month = self.group_by_month(events)
 
         future_event_count = future_event_query.count()
@@ -204,7 +205,6 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                             (session.user and session.user.settings.get('show_past_events')))
         if show_past_events:
             past_events = past_event_query.all()
-            preload_events(past_events, persons=True)
         past_events_by_month = self.group_by_month(past_events) if show_past_events else []
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
@@ -263,7 +263,9 @@ class RHEventList(RHDisplayCategoryBase):
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
-        event_query = Event.query.with_parent(self.category).order_by(Event.start_dt.desc())
+        event_query = (Event.query.with_parent(self.category)
+                       .order_by(Event.start_dt.desc())
+                       .options(joinedload('person_links')))
         if before:
             event_query = event_query.filter(Event.start_dt < before)
         if after:
