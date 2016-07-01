@@ -6,9 +6,9 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Contribution ID")} : \textbf {${contrib.getId()}}
+    ${_(u"Contribution ID") | latex_escape} : \textbf {${contrib.getId()}}
     \hfill
-    ${_("Type")} : \textbf {${contrib.getType().getName() if contrib.getType() else _('not specified')}}
+    ${_("Type")} : \textbf {${latex_escape(contrib.getType().getName() if contrib.getType() else _('not specified'))}}
 }
 
 \vspace{2em}
@@ -27,7 +27,7 @@
         \em
         \small
         \color{gray}
-        ${formatDate(contrib.getAdjustedStartDate(tz), format="full")} ${formatTime(contrib.getAdjustedStartDate(tz), format="short")} (${':'.join(str(contrib.getDuration()).split(':')[:2])})
+        ${latex_escape(formatDate(contrib.getAdjustedStartDate(tz), format="full"))} ${latex_escape(formatTime(contrib.getAdjustedStartDate(tz), format="short"))} (${latex_escape(':'.join(str(contrib.getDuration()).split(':')[:2]))})
     }
 % endif
 
@@ -38,7 +38,7 @@
     {\bf
         \noindent
         \large
-        ${field.getCaption()}
+        ${field.getCaption() | latex_escape}
     }
     \vspace{0.5em}
 
@@ -66,9 +66,9 @@
 {
     {
         \bf
-        \noindent ${_("Session Classification")} :
+        \noindent ${_("Session Classification") | latex_escape} :
     }
-    ${latex_escape(contrib.getSession().getTitle()) or _("not yet classified")}
+    ${latex_escape(contrib.getSession().getTitle() or _("not yet classified"))}
 }
 
 % endif
@@ -79,8 +79,8 @@
 {
     {
         \bf
-        \noindent ${_("Track Classification")} :
+        \noindent ${_("Track Classification") | latex_escape} :
     }
-    ${latex_escape(contrib.getTrack().getTitle()) or _("not specified")}
+    ${latex_escape(contrib.getTrack().getTitle() or _("not specified"))}
 }
 % endif

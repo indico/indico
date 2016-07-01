@@ -13,14 +13,14 @@
 %if show_dates:
     \begin{center}
         \Large
-        ${conf.getAdjustedStartDate(tz).strftime("%A %d %B %Y")} - 
-        ${conf.getAdjustedEndDate(tz).strftime("%A %d %B %Y")}
+        ${conf.getAdjustedStartDate(tz).strftime("%A %d %B %Y") | latex_escape} -
+        ${conf.getAdjustedEndDate(tz).strftime("%A %d %B %Y") | latex_escape}
     \end{center}
 
     % if conf.getLocation():
         \begin{center}
             \Large
-            ${conf.getLocation().getName()}
+            ${conf.getLocation().getName() | latex_escape}
         \end{center}
     % endif
 
@@ -43,11 +43,11 @@
 \vspace{2em}
 
 \begin{center}
-    {\fontsize{35}{42}\selectfont \sffamily \textbf{${title}}}
+    {\fontsize{35}{42}\selectfont \sffamily \textbf{${title | latex_escape}}}
 \end{center}
 
 % if url:
-    \fancyfoot[C]{\tt ${url}}
+    \fancyfoot[C]{\tt ${url | latex_escape}}
 % else:
     \fancyfoot[C]{}
 % endif

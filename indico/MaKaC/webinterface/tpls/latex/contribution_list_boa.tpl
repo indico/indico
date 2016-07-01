@@ -57,13 +57,13 @@
     <%block name="book_body">
         % for contrib in contribs:
             % if contrib.canAccess(aw):
-                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{300pt} / ${_("Report of Abstracts")}}
+                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{300pt} / ${_("Report of Abstracts") | latex_escape}}
                 \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}}
 
                 \vspace{3em}
                 <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>
 
-                \fancyfoot[C]{\small \rmfamily \color{gray} ${ _("Page {0}").format(r"\thepage") }}
+                \fancyfoot[C]{\small \rmfamily \color{gray} ${ latex_escape(_("Page {0}"), ignore_braces=True).format(r"\thepage") }}
             %endif
         % endfor
     </%block>

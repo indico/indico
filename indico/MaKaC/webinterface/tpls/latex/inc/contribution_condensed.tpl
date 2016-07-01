@@ -8,7 +8,7 @@
     % if contrib.getSession():
         -
     % endif
-    ${_("Board:")} ${contrib.getBoardNumber()}
+    ${_("Board:") | latex_escape} ${contrib.getBoardNumber() | latex_escape}
 % endif
 % if contrib.getSession() or contrib.getBoardNumber():
 /
@@ -25,10 +25,10 @@
 % if affiliation_contribs[contrib.getId()]['authors_affil']:
     \footnotesize {
         % if affiliation_contribs[contrib.getId()]['coauthors_affil']:
-            \textbf {${_("Author(s):")}}
+            \textbf {${_("Author(s):") | latex_escape}}
         % endif
         % for author, affil_id in affiliation_contribs[contrib.getId()]['authors_affil']:
-            ${author.getFullName()}\textsuperscript{${affil_id}}
+            ${author.getFullName() | latex_escape}\textsuperscript{${affil_id}}
             % if not loop.last:
                 ;
             % endif
@@ -38,9 +38,9 @@
 
 % if affiliation_contribs[contrib.getId()]['coauthors_affil']:
     \footnotesize {
-        \textbf {${_("Co-author(s):")}}
+        \textbf {${_("Co-author(s):") | latex_escape}}
         % for author, affil_id in affiliation_contribs[contrib.getId()]['coauthors_affil']:
-            ${author.getFullName()}
+            ${author.getFullName() | latex_escape}
             % if affil_id is not None:
                 \textsuperscript{${affil_id}}
             % endif
@@ -61,8 +61,8 @@
 % endif
 
 % if corresp_authors.get(contrib.getId()):
-\textbf {${_("Corresponding Author(s):")}}
-        ${", ".join(corresp_authors[contrib.getId()])}
+\textbf {${_("Corresponding Author(s):") | latex_escape}}
+        ${", ".join(corresp_authors[contrib.getId()]) | latex_escape}
 % endif
 
 \vspace{0.5em}
