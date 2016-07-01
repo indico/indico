@@ -6,9 +6,9 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Contribution ID")} : \textbf {${contrib.friendly_id}}
+    ${_(u"Contribution ID") | latex_escape} : \textbf {${contrib.friendly_id}}
     \hfill
-    ${_("Type")} : \textbf {${contrib.type.name if contrib.type else _('not specified')}}
+    ${_("Type") | latex_escape} : \textbf {${latex_escape(contrib.type.name if contrib.type else _('not specified'))}}
 }
 
 \vspace{2em}
@@ -27,7 +27,7 @@
         \em
         \small
         \color{gray}
-        ${formatDate(contrib.start_dt, format="full", timezone=tz)} ${formatTime(contrib.start_dt, format="short", tz=tz)} (${formatDuration(contrib.duration)})
+        ${latex_escape(formatDate(contrib.start_dt, format="full", timezone=tz))} ${latex_escape(formatTime(contrib.start_dt, format="short", tz=tz))} (${latex_escape(str(formatDuration(contrib.duration)))})
     }
 % endif
 
@@ -38,7 +38,7 @@
     {\bf
         \noindent
         \large
-        ${field.title}
+        ${field.title | latex_escape}
     }
     \vspace{0.5em}
 
@@ -66,9 +66,9 @@
 {
     {
         \bf
-        \noindent ${_("Session Classification")} :
+        \noindent ${_("Session Classification") | latex_escape} :
     }
-    ${latex_escape(contrib.session.title) or _("not yet classified")}
+    ${latex_escape(contrib.session.title or _("not yet classified"))}
 }
 
 % endif
@@ -79,8 +79,8 @@
 {
     {
         \bf
-        \noindent ${_("Track Classification")} :
+        \noindent ${_("Track Classification") | latex_escape} :
     }
-    ${latex_escape(contrib.track.title) or _("not specified")}
+    ${latex_escape(contrib.track.title or _("not specified"))}
 }
 % endif
