@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, lang, resetTimezone, contact, errors
+from MaKaC.webinterface.rh import welcome, helpDisplay, lang, resetTimezone, contact, errors
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.handlers import tracker
 
@@ -23,7 +23,6 @@ misc = IndicoBlueprint('misc', __name__)
 
 misc.add_url_rule('/', 'index', welcome.RHWelcome)
 misc.add_url_rule('/help', 'help', helpDisplay.RHHelp)
-misc.add_url_rule('/news-old', 'news', newsDisplay.RHNews)
 misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=('POST',))
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
 misc.add_url_rule('/contact', 'contact', contact.RHContact)

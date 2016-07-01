@@ -15,32 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.conference import ICategoryFossil, IConferenceMinimalFossil
-
-
-class INewsItemFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getAdjustedCreationDate(self):
-        pass
-    getAdjustedCreationDate.convert = Conversion.datetime
-    getAdjustedCreationDate.name = "creationDate"
-
-    def getContent(self):
-        pass
-    getContent.name = "text"
-
-    def getTitle(self):
-        pass
-
-    def getType(self):
-        pass
-
-    def getHumanReadableType(self):
-        pass
 
 
 class IObservedObjectFossil(IFossil):
