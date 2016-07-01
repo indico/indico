@@ -144,11 +144,12 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
+        children_strategy.undefer('event_count')
         return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode')
 
     def _process(self):
         return jsonify_data(category=_serialize_category(self.category, with_path=True),
-                            subcategories=[_serialize_category(c) for c in self.category.children])
+                            subcategories=[_serialize_category(c) for c in self.category.children], flash=False)
 
 
 class RHCategorySearch(RH):
