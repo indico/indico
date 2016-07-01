@@ -134,8 +134,6 @@ indico_room_booking = rjs_bundle(
 indico_admin = rjs_bundle(
     'indico_admin',
     *namespace('js/indico/Admin',
-
-               'News.js',
                'Upcoming.js'))
 
 indico_legacy = rjs_bundle(

@@ -36,4 +36,4 @@ def _sidemenu_items(sender, **kwargs):
     yield SideMenuItem('ip_domains_old', _('IP Domains (old)'), url_for('admin.domainList'), section='security')
     yield SideMenuItem('ip_acl', _('IP-based ACL'), url_for('admin.adminServices-ipbasedacl'), section='security')
     yield SideMenuItem('layout', _('Layout'), url_for('admin.adminLayout'), section='customization')
-    yield SideMenuItem('homepage', _('Homepage'), url_for('admin.updateNews'), section='customization')
+    yield SideMenuItem('homepage', _('Homepage'), url_for('admin.adminAnnouncement'), section='customization')

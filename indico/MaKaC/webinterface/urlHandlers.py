@@ -163,10 +163,6 @@ class UHWelcome(URLHandler):
     _endpoint = 'misc.index'
 
 
-class UHIndicoNews(URLHandler):
-    _endpoint = 'misc.news'
-
-
 class UHConferenceHelp(URLHandler):
     _endpoint = 'misc.help'
 
@@ -963,10 +959,6 @@ class UHAbstractReviewingSetup(URLHandler):
 
 class UHAbstractReviewingTeam(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-reviewingTeam'
-
-
-class UHUpdateNews(URLHandler):
-    _endpoint = 'admin.updateNews'
 
 
 class UHMaintenance(URLHandler):

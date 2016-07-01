@@ -20,8 +20,6 @@ from cgi import escape
 from operator import methodcaller
 from urlparse import urljoin
 
-from pytz import timezone
-
 # MaKaC
 import MaKaC.common.info as info
 import MaKaC.conference as conference
@@ -29,10 +27,8 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC import domain
-from MaKaC.common import timezoneUtils
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.modules import INewsItemFossil
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
@@ -197,8 +193,6 @@ class WPHomepageCommon( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabNews = self._tabCtrl.newTab( "news", _("News"), \
-                urlHandlers.UHUpdateNews.getURL() )
         self._subTabAnnouncements = self._tabCtrl.newTab( "announcements", _("Announcements"), \
                 urlHandlers.UHAnnouncement.getURL() )
         self._subTabUpcoming = self._tabCtrl.newTab( "upcoming", _("Upcoming Events"), \
@@ -207,36 +201,6 @@ class WPHomepageCommon( WPAdminsBase ):
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
-class WPUpdateNews( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabNews.setActive()
-
-    def getCSSFiles(self):
-        return WPHomepageCommon.getCSSFiles(self) + self._asset_env['news_sass'].urls()
-
-    def _getTabContent( self, params ):
-        tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
-        wc = WUpdateNews()
-        newsModule = ModuleHolder().getById("news")
-
-        newslist = fossilize(newsModule.getNewsItemsList(), INewsItemFossil, tz=tz)
-        newsTypesList = newsModule.getNewsTypesAsDict()
-        recentDays = newsModule.getRecentDays()
-
-        pars = {"newslist": newslist,
-                "newsTypesList": newsTypesList,
-                "recentDays": recentDays }
-
-        return wc.getHTML( pars )
-
-class WUpdateNews(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["baseURL"] = Config.getInstance().getBaseURL()
-        vars["postURL"] = urlHandlers.UHUpdateNews.getURL()
-        return vars
 
 class WPConfigUpcomingEvents( WPHomepageCommon ):
 
