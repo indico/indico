@@ -46,12 +46,8 @@ class MaKaCInfo(Persistent):
         # Global poster/badge templates
         self._defaultConference = None
 
-        # News management
-        self._news = ""
-
         # special features
         self._newsActive = False
-        self._debugActive = False
 
         # template set
         self._defaultTemplateSet = None
@@ -86,16 +82,6 @@ class MaKaCInfo(Persistent):
         msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
         warnings.warn(msg, DeprecationWarning, 2)
         return app.debug
-
-    def getNews( self ):
-        try:
-            return self._news
-        except:
-            self._news = ""
-            return ""
-
-    def setNews( self, news ):
-        self._news = news
 
     def getModerators( self ):
         try:

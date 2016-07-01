@@ -22,7 +22,6 @@ from indico.util.i18n import _
 
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.common.info as info
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -56,9 +55,6 @@ class RHUpdateNews( RHAdminBase ):
         self._params = params
 
     def _process( self ):
-        if self._params.has_key("news") and self._params.has_key("save"):
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            minfo.setNews(self._params["news"])
         p = admins.WPUpdateNews( self )
         return p.display()
 
