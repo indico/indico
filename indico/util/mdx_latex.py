@@ -92,7 +92,7 @@ def unescape_html_entities(text):
     return out
 
 
-def latex_escape(text, ignore_math=True):
+def latex_escape(text, ignore_math=True, ignore_braces=False):
     chars = {
         "#": r"\#",
         "$": r"\$",
@@ -102,11 +102,14 @@ def latex_escape(text, ignore_math=True):
         "_": r"\_",
         "^": r"\^{}",
         "\\": r"\textbackslash{}",
-        "{": r"\{",
-        "}": r"\}",
         "\x0c": "",
         "\x0b": ""
     }
+
+    if not ignore_braces:
+        chars.update({
+            "{": r"\{",
+            "}": r"\}"})
 
     math_segments = []
 
