@@ -21,7 +21,9 @@
         <ul>
             {% for category in categories %}
                 <li>
-                    {{ category.title }}
+                    <a href="{{ url_for('categories.manage_protection', category) }}" target="_blank">
+                        {{ category.title }}
+                    </a>
                 </li>
             {% endfor %}
             {% for event in events %}
