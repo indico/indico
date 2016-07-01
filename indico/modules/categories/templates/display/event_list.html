@@ -149,12 +149,12 @@
                             <span itemprop="summary">
                                 {% if event.type == 'lecture' %}
                                     {% if event.person_links %}
-                                        {{ (event.person_links|map(attribute='full_name')|sort|join(', '), '"' + event.title + '"')|join(', ') }}
+                                        {{ (event.person_links|map(attribute='full_name')|sort|join(', '), '"' + (event.title|strip_tags) + '"')|join(', ') }}
                                     {% else %}
-                                        {{ event.title }}
+                                        {{ event.title|strip_tags }}
                                     {% endif %}
                                 {% else %}
-                                    {{ event.title }}
+                                    {{ event.title|strip_tags }}
                                 {% endif %}
                             </span>
                         </a>
