@@ -23,7 +23,7 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 from MaKaC.fossils.modules import INewsItemFossil
 
-from indico.modules import ModuleHolder, news
+from indico.modules import ModuleHolder, news_old
 
 class NewsRecentDays(TextModificationBase, AdminService):
     """ Set number of days that a news item is considered recent
@@ -55,7 +55,7 @@ class NewsAdd(AdminService):
 
     def _getAnswer(self):
         newsModule=ModuleHolder().getById("news")
-        ni = news.NewsItem(self._title, self._content, self._type)
+        ni = news_old.NewsItem(self._title, self._content, self._type)
         newsModule.addNewsItem(ni)
         tz = self.getAW().getUser().getTimezone() #this is an admin service so user is always logged in (or _checkProtection detects it before)
         return ni.fossilize(INewsItemFossil, tz=tz)
