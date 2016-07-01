@@ -223,25 +223,25 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         params.update(get_base_ical_parameters(session.user, self.category, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id)))
 
-        if self.category.is_root:
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
-                news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
-                        in ModuleHolder().getById('news').getNewsItemsList()[:2]]
-            else:
-                news = []
+        if not self.category.is_root:
+            return WPCategory.render_template('display/category.html', self.category, **params)
 
-            legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
-            upcoming_events = [{'status': status,
-                                'start_dt': start_or_end_dt if not status == 'ongoing' else None,
-                                'end_dt': start_or_end_dt if status == 'ongoing' else None,
-                                'title': title,
-                                'id': event_id}
-                               for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
+        if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
+            news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
+                    in ModuleHolder().getById('news').getNewsItemsList()[:2]]
+        else:
+            news = []
 
-            return WPCategory.render_template('display/root_category.html', self.category, news=news,
-                                              upcoming_events=upcoming_events, **params)
+        legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
+        upcoming_events = [{'status': status,
+                            'start_dt': start_or_end_dt if not status == 'ongoing' else None,
+                            'end_dt': start_or_end_dt if status == 'ongoing' else None,
+                            'title': title,
+                            'id': event_id}
+                           for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
 
-        return WPCategory.render_template('display/category.html', self.category, **params)
+        return WPCategory.render_template('display/root_category.html', self.category, news=news,
+                                          upcoming_events=upcoming_events, **params)
 
 
 class RHEventList(RHDisplayCategoryBase):
