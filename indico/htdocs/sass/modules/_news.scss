@@ -17,12 +17,6 @@
 
 @import 'base';
 
-.container {
-    padding-top: 2em;
-    width: 1024px;    
-    margin: auto;
-}
-
 .news-toolbar {
     padding: 1em;
 }
@@ -33,7 +27,10 @@
     border: 1px $gray solid;
     box-shadow: 0 2px 1px -1px $pastel-gray;
     padding: 1em;
-    margin-bottom: 1em;
+
+    &:not(:last-child) {
+        margin-bottom: 3em;
+    }
 
     .news-item-info {
         color: $gray;
@@ -55,8 +52,11 @@
     .content {
         color: $light-black;
         padding-left: 1em;
-    }
 
+        img {
+            max-width: 100%;
+        }
+    }
 }
 
 .news-item-edit {

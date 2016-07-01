@@ -36,7 +36,7 @@ admin.add_url_rule('/announcement', 'adminAnnouncement', announcement.RHAnnounce
 admin.add_url_rule('/announcement', 'adminAnnouncement-save', announcement.RHAnnouncementModifSave, methods=('POST',))
 
 # News
-admin.add_url_rule('/news', 'updateNews', admins.RHUpdateNews)
+admin.add_url_rule('/news-old', 'updateNews', admins.RHUpdateNews)
 
 # Upcoming events
 admin.add_url_rule('/upcoming-events-old', 'adminUpcomingEvents', admins.RHConfigUpcoming)

@@ -93,12 +93,16 @@ containsCategories = len(categ.getSubCategoryList()) > 0
     % if isRootCategory or categ.attached_items or managers or allowUserModif:
     <div class="category-sidebar">
         % if isRootCategory:
-            % if isNewsActive:
+            <%
+            from indico.modules.news.util import get_recent_news
+            news = get_recent_news()
+            %>
+            % if news:
                 <h2 class="icon-bullhorn">
                     ${_("News")}
-                    <a href="${ urlHandlers.UHIndicoNews.getURL()}" class="more-icon">${ _("more...") }</a>
+                    <a href="${ url_for('news.display') }" class="more-icon">${ _("show all...") }</a>
                 </h2>
-                <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
+                <%include file="WelcomeHeader.tpl" args="news=news"/>
             % endif
             % if upcomingEvents:
                 <h2 class="icon-alarm">${_("Upcoming events")}</h2>
