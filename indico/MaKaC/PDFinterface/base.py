@@ -752,6 +752,7 @@ class LatexRunner(object):
 
     def run_latex(self, source_file, log_file=None):
         pdflatex_cmd = [Config.getInstance().getPDFLatexProgram(),
+                        '-no-shell-escape',
                         '-interaction', 'nonstopmode',
                         '-output-directory', self._dir,
                         source_file]
