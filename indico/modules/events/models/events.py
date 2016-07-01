@@ -33,7 +33,7 @@ from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
@@ -567,6 +567,14 @@ def _mappers_configured():
     cte = Category.get_tree_cte()
     query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
     Event.category_chain = column_property(query, deferred=True)
+
+    # Event.effective_protection_mode -- the effective protection mode
+    # (public/protected) of the event, even if it's inheriting it from its
+    # parent category
+    query = (select([db.case({ProtectionMode.inheriting.value: Category.effective_protection_mode},
+                             else_=Event.protection_mode, value=Event.protection_mode)])
+             .where(Category.id == Event.category_id))
+    Event.effective_protection_mode = column_property(query, deferred=True)
 
 
 @listens_for(Event.start_dt, 'set')

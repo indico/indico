@@ -291,8 +291,19 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                              cte_query.c.path.op('||')(path_column),
                              cte_query.c.is_deleted | cat_alias.is_deleted])
                      .where(cat_alias.parent_id == cte_query.c.id))
-        cte_query = cte_query.union_all(rec_query)
-        return cte_query
+        return cte_query.union_all(rec_query)
+
+    @classmethod
+    def get_protection_cte(cls):
+        cat_alias = db.aliased(cls)
+        cte_query = (select([cat_alias.id, cat_alias.protection_mode])
+                     .where(cat_alias.parent_id.is_(None))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id,
+                             db.case({ProtectionMode.inheriting.value: cte_query.c.protection_mode},
+                                     else_=cat_alias.protection_mode, value=cat_alias.protection_mode)])
+                     .where(cat_alias.parent_id == cte_query.c.id))
+        return cte_query.union_all(rec_query)
 
     @property
     def deep_children_query(self):
@@ -361,6 +372,13 @@ def _mappers_configured():
     # the `undefer` query option, e.g. `.options(undefer('chain_titles'))`.
 
     from indico.modules.events import Event
+
+    # Category.effective_protection_mode -- the effective protection mode
+    # (public/protected) of the category, even if it's inheriting it from its
+    # parent category
+    cte = Category.get_protection_cte()
+    query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte)
+    Category.effective_protection_mode = column_property(query, deferred=True)
 
     # Category.event_count -- the number of events in the category itself,
     # excluding deleted events
