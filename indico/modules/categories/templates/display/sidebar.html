@@ -49,8 +49,9 @@
         <ul class="main-page-list">
             {% for event in upcoming_events %}
                 <li>
-                    <a class="title" title="{{ event.title }}" href="{{ url_for('event.conferenceDisplay', confId=event.id)}}">
-                        {{ event.title }}
+                    <a href="{{ url_for('event.conferenceDisplay', confId=event.id)}}"
+                       class="title" title="{{ event.title|strip_tags }}" >
+                        {{ event.title|strip_tags }}
                     </a>
                     <span class="timing">
                         {% if event.status == 'ongoing' %}

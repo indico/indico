@@ -14,7 +14,7 @@
         </td>
         <td class="i-table">
             <a href="{{ url_for('event_mgmt.conferenceModification-managementAccess', event) }}">
-                {{ event.title }}
+                {{ event.title|strip_tags }}
             </a>
         </td>
         <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
