@@ -42,7 +42,8 @@ globalname_dict = {
 }
 
 modulename_dict = {
-    "IndexedCatalog.BTrees.": "BTrees."
+    "IndexedCatalog.BTrees.": "BTrees.",
+    "indico.modules.news": "indico.modules.news_old",
 }
 
 
