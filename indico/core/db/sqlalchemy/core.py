@@ -63,7 +63,7 @@ def handle_sqlalchemy_database_error():
     :raise DatabaseError: any other database error is simply re-raised
     """
     exc_class, exc, tb = sys.exc_info()
-    if not exc.orig.pgcode.startswith('INDX'):
+    if exc.orig.pgcode is None or not exc.orig.pgcode.startswith('INDX'):
         # not an indico exception
         raise
     msg = exc.orig.diag.message_primary
