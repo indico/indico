@@ -18,7 +18,6 @@ from datetime import timedelta
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from indico.modules import ModuleHolder, Module
-from MaKaC.common.info import HelperMaKaCInfo
 from indico.util.i18n import _, L_
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, \
      isTimezoneAware, setAdjustedDate
@@ -45,11 +44,6 @@ class NewsModule(Module):
         self._newsCounter = Counter()
         # days to keep a 'New' tag on recent news items
         self._recentDays = 14
-        # fetch all news from the previous location.
-        self.addNewsItem(
-            NewsItem(_("Previous news"),
-                     HelperMaKaCInfo.getMaKaCInfoInstance().getNews(),
-                     "general"))
 
     def getNewsItemsList(self):
         return self._newsItems
