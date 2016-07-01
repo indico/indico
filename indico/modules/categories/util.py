@@ -31,6 +31,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories import upcoming_events_settings
@@ -230,7 +231,7 @@ def get_upcoming_events():
     tz = timezone(Config.getInstance().getDefaultTimezone())
     now = now_utc(False).astimezone(tz)
     base_query = (Event.query
-                  .filter(~Event.is_self_protected,
+                  .filter(Event.effective_protection_mode == ProtectionMode.public,
                           ~Event.is_deleted,
                           Event.end_dt.astimezone(tz) > now)
                   .options(load_only('id', 'title', 'start_dt', 'end_dt')))
