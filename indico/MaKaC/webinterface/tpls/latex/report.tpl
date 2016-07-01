@@ -29,7 +29,7 @@
 
     % for item in items:
         \newpage
-        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{80pt} / ${title}}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{80pt} / ${title | latex_escape}}
         \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.title | latex_escape}}{150pt}}
         \phantomsection
         \addcontentsline{toc}{section}{${item.title | latex_escape}}
@@ -55,6 +55,6 @@
 
         \fancyfoot[L]{\small \rmfamily \color{gray} \today}
         \fancyfoot[C]{}
-        \fancyfoot[R]{\small \rmfamily \color{gray} ${ _("Page") } \thepage}
+        \fancyfoot[R]{\small \rmfamily \color{gray} ${ latex_escape(_("Page {0}"), ignore_braces=True).format(r"\thepage") }}
     % endfor
 </%block>

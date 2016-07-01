@@ -21,7 +21,7 @@
 <%block name="book_body">
     % for contrib in contribs:
         % if contrib.can_access(_session.user):
-            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Book of Abstracts")}}
+            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Book of Abstracts") | latex_escape}}
             \fancyhead[R]{}
 
             \phantomsection
@@ -32,7 +32,7 @@
             \vspace{3em}
 
 
-            \fancyfoot[C]{\small \rmfamily \color{gray} ${ _("Page {0}").format(r"\thepage") }}
+            \fancyfoot[C]{\small \rmfamily \color{gray} ${ latex_escape(_("Page {0}"), ignore_braces=True).format(r"\thepage") }}
         %endif
     % endfor
 </%block>

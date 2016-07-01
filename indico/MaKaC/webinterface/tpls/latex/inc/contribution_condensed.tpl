@@ -9,7 +9,7 @@
     % if contrib.session:
         -
     % endif
-    ${_("Board:")} \verb|${contrib.board_number}|
+    ${_("Board:") | latex_escape} \verb|${contrib.board_number | latex_escape}|
 % endif
 % if contrib.session or contrib.board_number:
 /
@@ -26,7 +26,7 @@
 % if affiliation_contribs[contrib.id]['authors_affil']:
     \footnotesize {
         % if affiliation_contribs[contrib.id]['coauthors_affil']:
-            \textbf {${_("Author(s):")}}
+            \textbf {${_("Author(s):") | latex_escape}}
         % endif
         % for author, affil_id in affiliation_contribs[contrib.id]['authors_affil']:
             ${author.full_name | latex_escape}\textsuperscript{${affil_id}}
@@ -39,7 +39,7 @@
 
 % if affiliation_contribs[contrib.id]['coauthors_affil']:
     \footnotesize {
-        \textbf {${_("Co-author(s):")}}
+        \textbf {${_("Co-author(s):") | latex_escape}}
         % for author, affil_id in affiliation_contribs[contrib.id]['coauthors_affil']:
             ${author.full_name | latex_escape}
             % if affil_id is not None:
@@ -62,7 +62,7 @@
 % endif
 
 % if corresp_authors.get(contrib.id):
-\textbf {${_("Corresponding Author(s):")}}
+\textbf {${_("Corresponding Author(s):") | latex_escape}}
         ${", ".join(corresp_authors[contrib.id]) | latex_escape}
 % endif
 
@@ -84,7 +84,7 @@
 % endif
 
 % for field_value in contrib.field_values:
-    \textbf{${ field_value.contribution_field.title }}:
+    \textbf{${ field_value.contribution_field.title | latex_escape}}:
 
     %% Markdown content
     \rmfamily {

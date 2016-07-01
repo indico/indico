@@ -5,7 +5,7 @@
         \normalsize
         { \bf
           \noindent
-          ${caption} :
+          ${caption | latex_escape} :
         }\begin{itemize*}[label=,itemjoin={{;}}]
         % for person in list:
             \item {

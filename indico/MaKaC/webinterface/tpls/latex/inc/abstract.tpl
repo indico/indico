@@ -11,7 +11,7 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Abstract ID")} : \textbf {${abstract.getId()}}
+    ${_(u"Abstract ID") | latex_escape} : \textbf {${abstract.getId()}}
 }
 
 \vspace{2em}
@@ -20,7 +20,7 @@
     \textbf {
         \LARGE
         \sffamily
-        ${abstract.getTitle()}
+        ${abstract.getTitle() | latex_escape}
     }
 \end{center}
 
@@ -31,7 +31,7 @@
     {\bf
         \noindent
         \large
-        ${field.getCaption()}
+        ${field.getCaption() | latex_escape}
     }
     \vspace{0.5em}
 
@@ -65,7 +65,7 @@
 {
     {
         \bf
-        \noindent ${_("Track Classification")} :
+        \noindent ${_("Track Classification") | latex_escape} :
     }
     ${latex_escape(track_class)}
 }
@@ -75,7 +75,7 @@
 {
     {
         \bf
-        \noindent ${_("Contribution Type")} :
+        \noindent ${_("Contribution Type") | latex_escape} :
     }
     ${latex_escape(contrib_type.name)}
 }
@@ -83,9 +83,9 @@
 
 % if abstract.getComments():
     \vspace{0.5em}
-    \textbf{${_("Comments:")}}
+    \textbf{${_("Comments:") | latex_escape}}
     \begin{addmargin}[1em]{1em}
-        ${abstract.getComments()}
+        ${abstract.getComments() | latex_escape}
     \end{addmargin}
 % endif
 
@@ -94,7 +94,7 @@
 
 \vspace{0.5em}
 
-${_("Submitted by {0} on {1}").format(
-    r"\textbf{{{0}}}".format(abstract.getSubmitter().getFullName()),
-    r"\textbf{{{0}}}".format(abstract.getSubmissionDate().strftime("%A %d %B %Y")))}
-\fancyfoot[C]{\color{gray} ${_("Last modified:")} ${abstract.getModificationDate().strftime("%A %d %B %Y")}}
+${latex_escape(_("Submitted by {0} on {1}"), ignore_braces=True).format(
+    r"\textbf{{{0}}}".format(latex_escape(abstract.getSubmitter().getFullName())),
+    r"\textbf{{{0}}}".format(latex_escape(abstract.getSubmissionDate().strftime("%A %d %B %Y"))))}
+\fancyfoot[C]{\color{gray} ${_("Last modified:") | latex_escape} ${abstract.getModificationDate().strftime("%A %d %B %Y") | latex_escape}}
