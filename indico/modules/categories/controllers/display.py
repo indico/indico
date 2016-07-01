@@ -168,7 +168,8 @@ class RHCategorySearch(RH):
                  .order_by((db.func.lower(Category.title) == q).desc(),
                            db.func.lower(Category.title).startswith(q).desc(),
                            db.func.lower(Category.title),
-                           Category.chain_titles)
-                 .limit(10))
+                           Category.chain_titles))
+        total_count = query.count()
+        query = query.limit(10)
         return jsonify_data(categories=[_serialize_category(c, with_path=True, with_favorite=True) for c in query],
-                            flash=False)
+                            total_count=total_count, flash=False)

@@ -53,12 +53,8 @@
         // Shared between instances
         _cache: {},
 
-        _typeaheadTemplate:
-        '<div class="typeahead__container">\
-            <div class="typeahead__field">\
-                <span class="typeahead__query"></span>\
-            </div>\
-        </div>',
+        // The search request that is awaiting for response
+        _currentSearchRequest: null,
 
         _create: function() {
             var self = this;
@@ -96,12 +92,17 @@
             var self = this;
             self.$category = $('<div>');
             self.$categoryTree = $('<ul>', {class: 'group-list fixed-height'});
-            self.$categoryResults = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryResultsList = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryResultsInfo = $('<div>', {class: 'search-result-info'});
+            self.$categoryResults = $('<div>', {class: 'search-results'})
+                .append(self.$categoryResultsInfo)
+                .append(self.$categoryResultsList);
             self.$categoryList = $('<div>', {class: 'category-list i-box just-group-list with-hover-effect'})
                 .append($('<div>', {class: 'i-box-content'})
                     .append(self.$category)
                     .append(self.$categoryTree)
                     .append(self.$categoryResults));
+            self.$categoryResults.hide();
             self.element.append(self.$categoryList);
         },
 
@@ -110,51 +111,67 @@
 
             // Visible search field
             self.$searchInput = $('<input>', {
-                class: 'js-search-category js-typeahead',
+                class: 'js-search-category',
                 type: 'search',
                 name: 'q',
                 placeholder: $T.gettext("Search")
             }).attr('autocomplete', 'off');
+            self.element.prepend(self.$searchInput);
 
-            // Insert elements in DOM
-            var $typeaheadForm = $($.parseHTML(self._typeaheadTemplate)[0]);
-            $typeaheadForm.find('.typeahead__query').append(self.$searchInput);
-            self.element.prepend($typeaheadForm);
+            self.$searchInput.on('input', _.debounce(function(evt) {
+                var $this = $(this);
+                var inputValue = $this.val().trim();
 
-            // Typeahead init
-            self.$searchInput.typeahead({
-                dynamic: true,
-                filter: false,
-                source: {
-                    ajax: {
-                        url: build_url(Indico.Urls.Categories.search),
-                        path: 'categories',
-                        data: {
-                            q: "{{query}}"
+                if (!inputValue) {
+                    self._clearSearch();
+                }
+
+                if (inputValue.length < 3) {
+                    return;
+                }
+
+                self._currentSearchRequest = $.ajax({
+                    url: build_url(Indico.Urls.Categories.search),
+                    data: {q: inputValue},
+                    beforeSend: function() {
+                        if (self._currentSearchRequest != null) {
+                            self._currentSearchRequest.abort();
+                        }
+                        self._toggleLoading(true);
+                    },
+                    complete: function() {
+                        self._toggleLoading(false);
+                    },
+                    error: function(jqXHR) {
+                        if (jqXHR.statusText === 'abort') {
+                            return;
+                        }
+                        handleAjaxError(jqXHR);
+                    },
+                    success: function(data) {
+                        if ($.contains(document, self.$category[0])) {
+                            self.$category.hide();
+                            self.$categoryTree.hide();
+                            self._renderSearchResultInfo(data.categories.length, data.total_count);
+                            self._renderSearchResultList(data.categories);
                         }
                     }
-                },
-                resultContainer: false,
-                cancelButton: false,
-                display: 'title',
-                callback: {
-                    onClickAfter: function(node, a, item) {
-                        self.goToCategory(item.id);
-                    },
-                    onResult: function(node, query, result) {
-                        self._renderResults(result);
-                    },
-                    onHideLayout: function() {
-                        self.$categoryResults.html('');
-                        self.$category.show();
-                        self.$categoryTree.show();
-                    },
-                    onShowLayout: function(node, query) {
-                        self.$category.hide();
-                        self.$categoryTree.hide();
-                    }
-                }
-            });
+                });
+            }, 500));
+        },
+
+        _clearSearch: function() {
+            var self = this;
+
+            if (self._currentSearchRequest != null) {
+                self._currentSearchRequest.abort();
+            }
+            self.$searchInput.val('');
+            self.$categoryResults.hide();
+            self.$categoryResultsList.empty();
+            self.$categoryResultsInfo.empty();
+            self.$category.show();
+            self.$categoryTree.show();
         },
 
         _buildBreadcrumbs: function(path, clickable) {
@@ -336,7 +353,8 @@
         _renderResults: function(categories) {
             var self = this;
 
-            self.$categoryResults.html('');
+            self.$categoryResultsList.empty();
+            self.$categoryResults.show();
             _.each(categories, function(category) {
                 var $result = self._buildSubcategory(category, true);
                 if (category.is_favorite) {
@@ -350,9 +368,27 @@
                         title: $T.gettext("Search result")
                     }));
                 }
-                self.$categoryResults.append($result);
+                self.$categoryResultsList.append($result);
                 self._ellipsizeBreadcrumbs($result);
             });
+        },
+
+        _renderSearchResultInfo: function(count, totalCount) {
+            var self = this;
+            var $stats = $('<span>', {
+                class: 'result-stats',
+                text: totalCount ? $T.gettext("Displaying {0} out of {1} results. Make the search more specific for more accurate results.").format(count, totalCount)
+                                 : $T.gettext("There are no results. Make the search more specific for more accurate results.")
+            });
+            var $clear = $('<a>', {
+                class: 'clear',
+                text: $T.gettext("Clear search")
+            }).on('click', function() {
+                self._clearSearch();
+            });
+
+            self.$categoryResultsInfo.empty();
+            self.$categoryResultsInfo.append($stats).append($clear).show();
         },
 
         _bindGoToCategoryOnClick: function($element, id) {
@@ -377,10 +413,10 @@
                     url: build_url(Indico.Urls.Categories.info, {category_id: id}),
                     dataType: 'json',
                     beforeSend: function() {
-                        self._toggleLoading();
+                        self._toggleLoading(true, true);
                     },
                     complete: function() {
-                        self._toggleLoading();
+                        self._toggleLoading(false, true);
                     },
                     error: handleAjaxError,
                     success: function(data) {
@@ -410,10 +446,12 @@
             });
         },
 
-        _toggleLoading: function() {
+        _toggleLoading: function(state, disableInput) {
             var self = this;
-            self.$categoryList.toggleClass('loading');
-            self.element.find('input').prop('disabled', self.$categoryList.hasClass('loading'));
+            self.$categoryList.toggleClass('loading', state);
+            if (disableInput) {
+                self.element.find('input').prop('disabled', self.$categoryList.hasClass('loading'));
+            }
         },
 
         goToCategory: function(id) {
@@ -430,6 +468,7 @@
                 }
             }).addClass('hiding').find('.title').fadeOut();
 
+            self._clearSearch();
             self._getCategoryInfo(id).then(self._renderList.bind(self));
         }
     });
