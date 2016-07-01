@@ -54,7 +54,6 @@
     .category-list {
         position: relative;
         margin-top: 10px;
-        min-height: 55px;
 
         .group-list.fixed-height {
             max-height: 500px;
@@ -203,6 +202,25 @@
 
         .stats {
             font-size: 0.85em;
+        }
+
+        .search-result-info {
+            background-color: $light-gray;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e1e1e1;
+            margin: 0 -10px;
+            padding: 5px 10px;
+            color: $light-black;
+
+            .clear {
+                margin-left: auto;
+                flex-shrink: 0;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
         }
     }
 }
