@@ -23,7 +23,7 @@ misc = IndicoBlueprint('misc', __name__)
 
 misc.add_url_rule('/', 'index', welcome.RHWelcome)
 misc.add_url_rule('/help', 'help', helpDisplay.RHHelp)
-misc.add_url_rule('/news', 'news', newsDisplay.RHNews)
+misc.add_url_rule('/news-old', 'news', newsDisplay.RHNews)
 misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=('POST',))
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
 misc.add_url_rule('/contact', 'contact', contact.RHContact)

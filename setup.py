@@ -368,6 +368,7 @@ if __name__ == '__main__':
             event_acls = indico_zodbimport.modules.event_acls:EventACLImporter
             event_creation_times = indico_zodbimport.modules.event_creation_times:EventCreationTimeImporter
             upcoming_events = indico_zodbimport.modules.upcoming_events:UpcomingEventsImporter
+            news = indico_zodbimport.modules.news:NewsImporter
             """,
           zip_safe=False,
           packages=foundPackages,
