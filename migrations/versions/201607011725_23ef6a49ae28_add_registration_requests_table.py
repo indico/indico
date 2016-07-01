@@ -1,7 +1,7 @@
 """Add RegistrationRequest table
 
 Revision ID: 23ef6a49ae28
-Revises: 35a6ae289e03
+Revises: 4243b0738b4f
 Create Date: 2016-06-24 15:01:11.768469
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '23ef6a49ae28'
-down_revision = '35a6ae289e03'
+down_revision = '4243b0738b4f'
 
 
 def upgrade():
