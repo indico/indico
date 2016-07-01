@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+(function() {
     'use strict';
 
     $(document).ready(function() {
@@ -133,6 +133,7 @@
                         closeButton: closeButton === undefined ? false : (closeButton || true),
                         dialogClasses: $this.data('dialog-classes'),
                         hidePageHeader: $this.data('hide-page-header') !== undefined,
+                        confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
                         onClose: function(data, customData) {
                             if (data) {
                                 handleFlashes(data, true, $this);
@@ -200,4 +201,4 @@
             $elems.mathJax();
         }
     }
-})(window);
+})();
