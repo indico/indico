@@ -29,8 +29,7 @@
         <ul class="main-page-list">
             {% for news in news_list %}
                 <li>
-                    {# FIXME: We currently have no way to link to a specific news. #}
-                    <a class="title" href="{{ url_for('misc.news') }}">
+                    <a class="title" href="{{ url_for('misc.news', _anchor="news-" + news.id) }}">
                         {{ news.title }}
                     </a>
                     <span class="timing">

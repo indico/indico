@@ -227,8 +227,8 @@ class RHDisplayCategory(RHDisplayCategoryBase):
             return WPCategory.render_template('display/category.html', self.category, **params)
 
         if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
-            news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate()} for x
-                    in ModuleHolder().getById('news').getNewsItemsList()[:2]]
+            news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate(), 'id': x.getId()}
+                    for x in ModuleHolder().getById('news').getNewsItemsList()[:2]]
         else:
             news = []
 
