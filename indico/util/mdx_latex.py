@@ -89,6 +89,46 @@ end_double_quote_re = re.compile("\"(,|\.|\s|$)")
 Image.init()
 IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.viewitems()}
 
+safe_mathmode_commands = {
+    'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
+    'arctan', 'arg', 'array', 'Arrowvert', 'arrowvert', 'ast', 'asymp', 'atop', 'atopwithdelims', 'backslash',
+    'backslash', 'bar', 'Bbb', 'begin', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
+    'Biggl', 'biggl', 'Biggm', 'biggm', 'Biggr', 'biggr', 'Bigl', 'bigl', 'Bigm', 'bigm', 'bigodot', 'bigoplus',
+    'bigotimes', 'Bigr', 'bigr', 'bigsqcup', 'bigtriangledown', 'bigtriangleup', 'biguplus', 'bigvee', 'bigwedge',
+    'bmod', 'bot', 'bowtie', 'brace', 'bracevert', 'brack', 'breve', 'buildrel', 'bullet', 'cap', 'cases', 'cdot',
+    'cdotp', 'cdots', 'check', 'chi', 'choose', 'circ', 'clubsuit', 'colon', 'cong', 'coprod', 'cos', 'cosh', 'cot',
+    'coth', 'cr', 'csc', 'cup', 'dagger', 'dashv', 'ddagger', 'ddot', 'ddots', 'deg', 'Delta', 'delta', 'det',
+    'diamond', 'diamondsuit', 'dim', 'displaylines', 'displaystyle', 'div', 'dot', 'doteq', 'dots', 'dotsb', 'dotsc',
+    'dotsi', 'dotsm', 'dotso', 'Downarrow', 'downarrow', 'ell', 'emptyset', 'end', 'enspace', 'epsilon', 'eqalign',
+    'eqalignno', 'equiv', 'eta', 'exists', 'exp', 'fbox', 'flat', 'forall', 'frac', 'frak', 'frown', 'Gamma', 'gamma',
+    'gcd', 'ge', 'geq', 'gets', 'gg', 'grave', 'gt', 'gt', 'hat', 'hbar', 'hbox', 'hdashline', 'heartsuit', 'hline',
+    'hom', 'hookleftarrow', 'hookrightarrow', 'hphantom', 'hskip', 'hspace', 'Huge', 'huge', 'iff', 'iiint', 'iint',
+    'Im', 'imath', 'in', 'inf', 'infty', 'int', 'intop', 'iota', 'it', 'jmath', 'kappa', 'ker', 'kern', 'Lambda',
+    'lambda', 'land', 'langle', 'LARGE', 'Large', 'large', 'LaTeX', 'lbrace', 'lbrack', 'lceil', 'ldotp', 'ldots', 'le',
+    'left', 'Leftarrow', 'leftarrow', 'leftharpoondown', 'leftharpoonup', 'Leftrightarrow', 'leftrightarrow',
+    'leftroot', 'leq', 'leqalignno', 'lfloor', 'lg', 'lgroup', 'lim', 'liminf', 'limits', 'limsup', 'll', 'llap',
+    'lmoustache', 'ln', 'lnot', 'log', 'Longleftarrow', 'longleftarrow', 'Longleftrightarrow', 'longleftrightarrow',
+    'longmapsto', 'Longrightarrow', 'longrightarrow', 'lor', 'lower', 'lt', 'lt', 'mapsto', 'mathbb', 'mathbf',
+    'mathbin', 'mathcal', 'mathclose', 'mathfrak', 'mathinner', 'mathit', 'mathop', 'mathopen', 'mathord', 'mathpunct',
+    'mathrel', 'mathrm', 'mathscr', 'mathsf', 'mathstrut', 'mathtt', 'matrix', 'max', 'mbox', 'mid', 'middle', 'min',
+    'mit', 'mkern', 'mod', 'models', 'moveleft', 'moveright', 'mp', 'mskip', 'mspace', 'mu', 'nabla', 'natural', 'ne',
+    'nearrow', 'neg', 'negthinspace', 'neq', 'newline', 'ni', 'nolimits', 'normalsize', 'not', 'notin', 'nu', 'nwarrow',
+    'odot', 'oint', 'oldstyle', 'Omega', 'omega', 'omicron', 'ominus', 'oplus', 'oslash', 'otimes', 'over', 'overbrace',
+    'overleftarrow', 'overleftrightarrow', 'overline', 'overrightarrow', 'overset', 'overwithdelims', 'owns',
+    'parallel', 'partial', 'perp', 'phantom', 'Phi', 'phi', 'Pi', 'pi', 'pm', 'pmatrix', 'pmb', 'pmod', 'pod', 'Pr',
+    'prec', 'preceq', 'prime', 'prod', 'propto', 'Psi', 'psi', 'qquad', 'quad', 'raise', 'rangle', 'rbrace', 'rbrack',
+    'rceil', 'Re', 'rfloor', 'rgroup', 'rho', 'right', 'Rightarrow', 'rightarrow', 'rightharpoondown', 'rightharpoonup',
+    'rightleftharpoons', 'rlap', 'rm', 'rmoustache', 'root', 'S', 'scr', 'scriptscriptstyle', 'scriptsize',
+    'scriptstyle', 'searrow', 'sec', 'setminus', 'sf', 'sharp', 'Sigma', 'sigma', 'sim', 'simeq', 'sin', 'sinh', 'skew',
+    'small', 'smallint', 'smash', 'smile', 'Space', 'space', 'spadesuit', 'sqcap', 'sqcup', 'sqrt', 'sqsubseteq',
+    'sqsupseteq', 'stackrel', 'star', 'strut', 'subset', 'subseteq', 'succ', 'succeq', 'sum', 'sup', 'supset',
+    'supseteq', 'surd', 'swarrow', 'tan', 'tanh', 'tau', 'TeX', 'text', 'textbf', 'textit', 'textrm', 'textsf',
+    'textstyle', 'texttt', 'Theta', 'theta', 'thinspace', 'tilde', 'times', 'tiny', 'to', 'top', 'triangle',
+    'triangleleft', 'triangleright', 'tt', 'underbrace', 'underleftarrow', 'underleftrightarrow', 'underline',
+    'underrightarrow', 'underset', 'Uparrow', 'uparrow', 'Updownarrow', 'updownarrow', 'uplus', 'uproot', 'Upsilon',
+    'upsilon', 'varepsilon', 'varphi', 'varpi', 'varrho', 'varsigma', 'vartheta', 'vcenter', 'vdash', 'vdots', 'vec',
+    'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta'}
+
 
 class ImageURLException(Exception):
     pass
@@ -131,15 +171,26 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         return "[*LaTeXmath*]"
 
     if ignore_math:
+        # Extract math-mode segments and replace with placeholder
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
 
     pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
     res = pattern.sub(substitute, text)
 
     if ignore_math:
+        # Sanitize math-mode segments and put them back in place
+        math_segments = map(sanitize_mathmode, math_segments)
         res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: "\\protect " + math_segments.pop(0), res)
 
     return res
+
+
+def sanitize_mathmode(text):
+    def _escape_unsafe_command(m):
+        command = m.group(1)
+        return m.group(0) if command in safe_mathmode_commands else r'\\' + command
+
+    return re.sub(r'\\(\w+)', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):
