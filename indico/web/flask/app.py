@@ -188,6 +188,7 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_datetime))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_number))
     # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
