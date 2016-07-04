@@ -15,16 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import calendar, categoryDisplay
-from indico.web.flask.util import redirect_view, make_compat_redirect_func
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 category = IndicoBlueprint('category', __name__, url_prefix='/category-old')
 
-
-# Short URLs
-category.add_url_rule('!/categ/<categId>', view_func=redirect_view('.categoryDisplay'), strict_slashes=False)
-category.add_url_rule('!/c/<categId>', view_func=redirect_view('.categoryDisplay'), strict_slashes=False)
 
 # Display
 category.add_url_rule('/<categId>/', 'categoryDisplay', categoryDisplay.RHCategoryDisplay)
