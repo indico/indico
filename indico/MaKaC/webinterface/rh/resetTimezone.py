@@ -39,4 +39,4 @@ class RHResetTZ(base.RH):
                 session.user.settings.set('timezone', to_unicode(tz))
 
         session.timezone = tz
-        return redirect(request.referrer or url_for('misc.index'))
+        return redirect(request.referrer or url_for('categories.display'))

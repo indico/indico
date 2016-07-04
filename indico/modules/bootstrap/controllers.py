@@ -45,7 +45,7 @@ class RHBootstrap(RH):
 
     def _process_GET(self):
         if User.has_rows():
-            return redirect(url_for('misc.index'))
+            return redirect(url_for('categories.display'))
         return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(get_current_locale()).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
@@ -56,7 +56,7 @@ class RHBootstrap(RH):
 
     def _process_POST(self):
         if User.has_rows():
-            return redirect(url_for('misc.index'))
+            return redirect(url_for('categories.display'))
         setup_form = BootstrapForm(request.form)
         if not setup_form.validate():
             flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
@@ -113,4 +113,4 @@ class RHBootstrap(RH):
                 category = 'success'
             flash(Markup(message), category)
 
-        return redirect(url_for('misc.index'))
+        return redirect(url_for('categories.display'))

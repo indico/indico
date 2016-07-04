@@ -55,6 +55,7 @@ _bp.add_url_rule('/manage/subcategories/move', 'move_subcategories', RHMoveSubca
 _bp.add_url_rule('/manage/subcategories/sort', 'sort_subcategories', RHSortSubcategories, methods=('POST',))
 
 # Display
+_bp.add_url_rule('!/', 'display', RHDisplayCategory, defaults={'category_id': 0})
 _bp.add_url_rule('/', 'display', RHDisplayCategory)
 _bp.add_url_rule('/event-list', 'event_list', RHEventList)
 _bp.add_url_rule('/icon-<slug>.png', 'display_icon', RHCategoryIcon)

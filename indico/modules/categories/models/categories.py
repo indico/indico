@@ -224,10 +224,9 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def url(self):
         if self.is_root:
-            return url_for('misc.index')
+            return url_for('categories.display')
         else:
-            # XXX: change this when adapting the display pages
-            return url_for('category.categoryDisplay', categId=self.id)
+            return url_for('categories.display', self)
 
     @hybrid_property
     def is_root(self):
