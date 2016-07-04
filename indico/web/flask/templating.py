@@ -85,7 +85,7 @@ def groupby(environment, value, attribute, reverse=False):
 
 def strip_tags(value):
     """Strips provided text of html tags"""
-    return bleach.clean(value, tags=[], strip=True).strip()
+    return bleach.clean(value, tags=[], strip=True).strip() if u'<' in value else value
 
 
 def instanceof(value, type_):
