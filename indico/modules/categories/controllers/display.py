@@ -187,8 +187,8 @@ class RHCategorySearch(RH):
 
 class RHDisplayCategory(RHDisplayCategoryBase):
     def _process(self):
-        past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
+        future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
                        .order_by(Event.start_dt.desc())
                        .options(joinedload('person_links')))
