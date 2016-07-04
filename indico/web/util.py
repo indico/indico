@@ -141,3 +141,8 @@ def get_request_info(hide_passwords=True):
             'headers': _format_request_data(request.headers, False),
         }
     }
+
+
+def url_for_index(_external=False):
+    from indico.web.flask.util import url_for
+    return url_for('categories.display', _external=_external)
