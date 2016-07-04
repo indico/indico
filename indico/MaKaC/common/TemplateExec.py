@@ -32,6 +32,7 @@ from indico.util.date_time import format_number, format_datetime, format_date, f
 from indico.util.i18n import ngettext
 from indico.util.mdx_latex import latex_escape
 from indico.util.string import safe_upper
+from indico.web.util import url_for_index
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -399,5 +400,6 @@ def registerHelpers(objDict):
     objDict['url_rule_to_js'] = url_rule_to_js
     objDict['render_template'] = render_template
     objDict['template_hook'] = mako_call_template_hook
+    objDict['url_for_index'] = url_for_index
     objDict['url_for_login'] = url_for_login
     objDict['url_for_logout'] = url_for_logout
