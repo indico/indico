@@ -27,7 +27,7 @@ from indico.modules.categories.controllers.management import (RHCreateCategory, 
                                                               RHManageCategoryProtection, RHManageCategorySettings,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHSortSubcategories, RHSplitCategory)
-from indico.web.flask.util import make_compat_redirect_func
+from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -64,6 +64,10 @@ _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/info', 'info', RHCategoryInfo)
 _bp.add_url_rule('/events.ics', 'export_ical', RHExportCategoryICAL)
 _bp.add_url_rule('/events.atom', 'export_atom', RHExportCategoryAtom)
+
+# Short URLs
+_bp.add_url_rule('!/categ/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)
+_bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)
 
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
