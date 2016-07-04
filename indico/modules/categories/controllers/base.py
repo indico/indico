@@ -54,7 +54,7 @@ class RHDisplayCategoryBase(RHCategoryBase):
 
     def _checkParams(self):
         RHCategoryBase._checkParams(self)
-        self.now = now_utc().astimezone(self.category.display_tzinfo)
+        self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
 
     def _checkProtection(self):
         if not self.category.can_access(session.user):
