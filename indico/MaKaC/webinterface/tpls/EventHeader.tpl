@@ -36,7 +36,7 @@ else:
     % if 'needsBackButton' in locals() and needsBackButton:
         <a href="${ urlHandlers.UHConferenceDisplay.getURL(self_._conf) }" style=class="eventHeaderButtonBar">${ _('Go back to Conference') }<div class="leftCorner"></div></a>
     % elif conf.getType() != "conference" or displayNavigationBar:
-        <a id="homeButton" href="${ urlHandlers.UHWelcome.getURL() }"
+        <a id="homeButton" href="${ url_for_index() }"
            style="background-image: url(${ systemIcon('home') }); margin-left: 10px"></a>
 
         <div class="separator"></div>
