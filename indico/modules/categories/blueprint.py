@@ -64,6 +64,7 @@ _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/info', 'info', RHCategoryInfo)
 _bp.add_url_rule('/events.ics', 'export_ical', RHExportCategoryICAL)
 _bp.add_url_rule('/events.atom', 'export_atom', RHExportCategoryAtom)
+_bp.add_url_rule('/events.rss', 'export_rss', make_compat_redirect_func(_bp, 'export_atom'))
 
 # Short URLs
 _bp.add_url_rule('!/categ/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)
