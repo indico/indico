@@ -210,8 +210,8 @@ def remove_tags(text):
 def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
     """ Mako markdown to HTML filter
         :param text: Markdown source to convert to HTML
-        :param escape_latex_math: Whether math expression should
-                                  be left untouched
+        :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
+                                  to replace math-mode segments.
         :param md: An alternative markdown processor (can be used
                    to generate e.g. a different format)
         :param kwargs: Extra arguments to pass on to the markdown
@@ -221,7 +221,10 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
         math_segments = []
 
         def _math_replace(m):
-            math_segments.append(m.group(0))
+            segment = m.group(0)
+            if callable(escape_latex_math):
+                segment = escape_latex_math(segment)
+            math_segments.append(segment)
             return LATEX_MATH_PLACEHOLDER
 
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
