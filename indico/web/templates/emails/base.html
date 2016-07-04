@@ -22,7 +22,7 @@
         <br><br>
         {% block footer_content %}
             <hr>
-            <a href="{% block footer_url %}{{ url_for('categories.display', _external=true) }}{% endblock %}">Indico</a>
+            <a href="{% block footer_url %}{{ url_for_index(_external=true) }}{% endblock %}">Indico</a>
             :: {% block footer_title %}Email Notifier{% endblock %}<br>
         {% endblock %}
     {% endblock %}

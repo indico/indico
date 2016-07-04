@@ -18,7 +18,7 @@ from flask import session, request, redirect
 
 from indico.core.config import Config
 from indico.util.string import to_unicode
-from indico.web.flask.util import url_for
+from indico.web.util import url_for_index
 import MaKaC.webinterface.rh.base as base
 
 
@@ -39,4 +39,4 @@ class RHResetTZ(base.RH):
                 session.user.settings.set('timezone', to_unicode(tz))
 
         session.timezone = tz
-        return redirect(request.referrer or url_for('categories.display'))
+        return redirect(request.referrer or url_for_index())
