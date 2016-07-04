@@ -16,9 +16,6 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request
-from werkzeug.exceptions import BadRequest, NotFound
-
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole
@@ -26,7 +23,6 @@ from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.util.i18n import _
-from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -42,32 +38,6 @@ upcoming_events_settings = SettingsProxy('upcoming_events', {
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.categories.tasks
-
-
-@signals.app_created.connect
-def _app_created(app, **kwargs):
-    """
-    Handles the redirect from "broken" legacy category ids such as
-    1l234 which cannot be converted to an integer without an error.
-    """
-
-    @app.before_request
-    def _redirect_legacy_id():
-        if not request.view_args:
-            return
-
-        categ_id = request.view_args.get('categId')
-        if categ_id is None or not is_legacy_id(categ_id):
-            return
-        if request.method != 'GET':
-            raise BadRequest('Unexpected non-GET request with legacy category ID')
-
-        mapping = LegacyCategoryMapping.find_first(legacy_category_id=categ_id)
-        if mapping is None:
-            raise NotFound('Legacy category {} does not exist'.format(categ_id))
-
-        request.view_args['categId'] = unicode(mapping.category_id)
-        return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
 
 
 @signals.menu.items.connect_via('category-management-sidemenu-old')

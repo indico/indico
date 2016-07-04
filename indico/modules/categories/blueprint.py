@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
                                                            RHCategoryInfo, RHCategorySearch)
@@ -25,6 +26,7 @@ from indico.modules.categories.controllers.management import (RHCreateCategory, 
                                                               RHManageCategoryProtection, RHManageCategorySettings,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHSortSubcategories, RHSplitCategory)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -62,3 +64,11 @@ _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 
 # Administration
 _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))
+
+
+_compat_bp = IndicoBlueprint('compat_categories', __name__)
+_compat_bp.add_url_rule('/category/<legacy_category_id>/<path:path>', 'legacy_id', compat_category)
+_compat_bp.add_url_rule('/category/<legacy_category_id>/', 'legacy_id', compat_category)
+_compat_bp.add_url_rule('!/categoryDisplay.py', 'display_modpython',
+                        make_compat_redirect_func(_compat_bp, 'legacy_id',
+                                                  view_args_conv={'categId': 'legacy_category_id'}))
