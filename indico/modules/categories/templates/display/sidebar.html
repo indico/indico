@@ -24,16 +24,16 @@
     {%- if news_list %}
         <h2 class="icon-bullhorn">
             {% trans %}News{% endtrans %}
-            <a href="{{ url_for('misc.news') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
+            <a href="{{ url_for('news.display') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
         </h2>
         <ul class="main-page-list">
             {% for news in news_list %}
                 <li>
-                    <a class="title" href="{{ url_for('misc.news', _anchor="news-" + news.id) }}">
+                    <a class="title" href="{{ url_for('news.display', _anchor="news-{}".format(news.id)) }}">
                         {{ news.title }}
                     </a>
                     <span class="timing">
-                        {% trans date=news.creation_dt|format_date(format='medium') -%}
+                        {% trans date=news.created_dt|format_date(format='medium') -%}
                             Posted on {{ date }}
                         {%- endtrans %}
                     </span>
