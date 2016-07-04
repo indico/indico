@@ -112,7 +112,7 @@ li > table + .note-area-wrapper {
             overflow: hidden;
 
             .gradient-layer {
-                @include gradient(rgba(0,0,0,0.0), #ECECEC);
+                @include gradient(rgba(0,0,0,0.0), $light-gray);
                 display: block;
                 position: absolute;
                 bottom: 0;
