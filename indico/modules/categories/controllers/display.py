@@ -34,6 +34,7 @@ from indico.modules.categories.util import get_category_stats, serialize_categor
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters
+from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import now_utc
@@ -226,11 +227,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 
-        if HelperMaKaCInfo.getMaKaCInfoInstance().isNewsActive():
-            news = [{'title': x.getTitle(), 'creation_dt': x.getCreationDate(), 'id': x.getId()}
-                    for x in ModuleHolder().getById('news').getNewsItemsList()[:2]]
-        else:
-            news = []
+        news = get_recent_news()
 
         legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
         upcoming_events = [{'status': status,
