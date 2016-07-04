@@ -23,6 +23,7 @@ from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.timezoneUtils import nowutc
 
 from indico.core.config import Config
+from indico.web.flask.util import url_for
 
 
 class BooleanMixin:
@@ -157,10 +158,6 @@ def setSSLPort(url):
     # If there IS a port, it will be replaced with proper SSL one, taken from loginURL
     regexp = ':\d{2,5}'   # Examples:   :8080   :80   :65535
     return re.sub(regexp, sslPort, url)
-
-
-class UHWelcome(URLHandler):
-    _endpoint = 'categories.display'
 
 
 class UHConferenceHelp(URLHandler):
@@ -699,7 +696,7 @@ class UHCategoryDisplay(URLHandler):
         url = cls._getURL(**params)
         if target:
             if target.isRoot():
-                return UHWelcome.getURL()
+                return url_for('misc.index')
             url.setParams(target.getLocator())
         return url
 

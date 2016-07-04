@@ -23,12 +23,12 @@ urlMeeting.addParam("event_type","meeting")
         <!--
             set fixed height on anchor to assure that the height is
             corrected if the image cannot be retrieved (i.e. https problems) -->
-        <a style="min-height: 60px;" href="${ urlHandlers.UHWelcome.getURL() }">
+        <a style="min-height: 60px;" href="${ url_for_index() }">
             <img class="header-logo" src="${ systemIcon('logo_indico_bw.png') }" />
         </a>
 
     <div class="global-menu toolbar">
-        <a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a>
+        <a href="${ url_for_index() }">${ _("Home") }</a>
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Create event") }</a>
         <ul class="dropdown">
             <li><a id="create-lecture" href="${ urlLecture }">${ _("Create lecture") }</a></li>

@@ -24,7 +24,6 @@ from indico.web.flask.util import url_for
 
 
 class RHWelcome(base.RHDisplayBaseProtected):
-    _uh = urlHandlers.UHWelcome
 
     def _checkParams(self, params):
         self._target = conference.CategoryManager().getRoot()
