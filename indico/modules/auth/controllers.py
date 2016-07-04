@@ -39,6 +39,7 @@ from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.util import url_for_index
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
@@ -114,7 +115,7 @@ class RHLogout(RH):
     """Logs the user out"""
 
     def _process(self):
-        return multipass.logout(request.args.get('next') or url_for('categories.display'), clear_session=True)
+        return multipass.logout(request.args.get('next') or url_for_index(), clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):

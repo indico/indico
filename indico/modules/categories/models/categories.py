@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 import pytz
-from indico.core import signals
 from sqlalchemy import orm, DDL
 from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
 from sqlalchemy.event import listens_for
@@ -26,6 +25,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql import select, literal
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -39,6 +39,7 @@ from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, RichMarkup, text_to_repr, format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
+from indico.web.util import url_for_index
 
 
 def _get_next_position(context):
@@ -223,10 +224,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def url(self):
-        if self.is_root:
-            return url_for('categories.display')
-        else:
-            return url_for('categories.display', self)
+        return url_for('categories.display', self)
 
     @hybrid_property
     def is_root(self):

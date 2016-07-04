@@ -32,6 +32,7 @@ from indico.util.i18n import _, get_all_locales, get_current_locale, parse_local
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.util import url_for_index
 
 import MaKaC
 from MaKaC.webinterface.rh.base import RH
@@ -45,7 +46,7 @@ class RHBootstrap(RH):
 
     def _process_GET(self):
         if User.has_rows():
-            return redirect(url_for('categories.display'))
+            return redirect(url_for_index())
         return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(get_current_locale()).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
@@ -56,7 +57,7 @@ class RHBootstrap(RH):
 
     def _process_POST(self):
         if User.has_rows():
-            return redirect(url_for('categories.display'))
+            return redirect(url_for_index())
         setup_form = BootstrapForm(request.form)
         if not setup_form.validate():
             flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
@@ -113,4 +114,4 @@ class RHBootstrap(RH):
                 category = 'success'
             flash(Markup(message), category)
 
-        return redirect(url_for('categories.display'))
+        return redirect(url_for_index())
