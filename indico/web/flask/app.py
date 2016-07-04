@@ -136,7 +136,7 @@ def configure_multipass(app):
                                                   'address'}
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
-    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
     app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
 
 

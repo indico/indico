@@ -114,7 +114,7 @@ class RHLogout(RH):
     """Logs the user out"""
 
     def _process(self):
-        return multipass.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
+        return multipass.logout(request.args.get('next') or url_for('categories.display'), clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
@@ -231,7 +231,7 @@ class RHRegister(RH):
 
     def _process(self):
         if session.user:
-            return redirect(url_for('misc.index'))
+            return redirect(url_for_index())
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email, prevalidated = self._get_verified_email()
         if verified_email is not None:
@@ -522,7 +522,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         return Identity(provider='indico', identifier=data['username'], password=data['password'])
 
     def redirect_success(self):
-        return redirect(session.pop('register_next_url', url_for('misc.index')))
+        return redirect(session.pop('register_next_url', url_for_index()))
 
 
 class RHResetPassword(RH):

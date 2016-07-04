@@ -10,5 +10,5 @@
 
 --
 Indico :: {% block footer_title %}Email Notifier{% endblock %}
-{% block footer_url %}{{ url_for('misc.index', _external=true) }}{% endblock %}
+{% block footer_url %}{{ url_for('categories.display', _external=true) }}{% endblock %}
 {% endmacro %}

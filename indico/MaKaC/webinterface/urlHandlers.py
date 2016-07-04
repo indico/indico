@@ -160,7 +160,7 @@ def setSSLPort(url):
 
 
 class UHWelcome(URLHandler):
-    _endpoint = 'misc.index'
+    _endpoint = 'categories.display'
 
 
 class UHConferenceHelp(URLHandler):

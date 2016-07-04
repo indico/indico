@@ -21,7 +21,7 @@ from indico.web.handlers import tracker
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/', 'index', welcome.RHWelcome)
+misc.add_url_rule('/index-old', 'index', welcome.RHWelcome)
 misc.add_url_rule('/help', 'help', helpDisplay.RHHelp)
 misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=('POST',))
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
