@@ -190,7 +190,7 @@ def sanitize_mathmode(text):
         command = m.group(1)
         return m.group(0) if command in safe_mathmode_commands else r'\\' + command
 
-    return re.sub(r'\\(\w+)', _escape_unsafe_command, text)
+    return re.sub(r'(?:^|[^\\])\\(\w+)', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):
