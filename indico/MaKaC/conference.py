@@ -308,9 +308,9 @@ class Category(CommonObjectBase):
     @property
     def url(self):
         if self.isRoot():
-            return url_for('categories.display')
+            return url_for('misc.index')
         else:
-            return url_for('categories.display', self)
+            return url_for('category.categoryDisplay', self)
 
     @property
     def attachment_folders(self):
