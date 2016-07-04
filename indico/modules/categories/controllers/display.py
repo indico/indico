@@ -186,12 +186,16 @@ class RHCategorySearch(RH):
 
 
 class RHDisplayCategory(RHDisplayCategoryBase):
+    _category_query_options = (joinedload('children').undefer('deep_events_count'), undefer('attachment_count'),
+                               undefer('event_count'))
+
     def _process(self):
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
                        .order_by(Event.start_dt.desc())
-                       .options(joinedload('person_links')))
+                       .options(joinedload('person_links'), load_only('id', 'category_id', 'created_dt', 'end_dt',
+                                                                      'start_dt', 'title', 'protection_mode')))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
