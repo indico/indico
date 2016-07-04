@@ -319,22 +319,9 @@
             }
         },
 
-        refurbishUI: function() {
-            var self = this;
-            var statsMaxWidth = 0;
-
-            // Calculate and set the width of the category statistics information for horizontal alignment
-            self.$categoryList.find('.stats').each(function() {
-                var width = this.getBoundingClientRect().width;
-                if (width > statsMaxWidth) {
-                    statsMaxWidth = width;
-                }
-            });
-            self.$categoryList.find('.item:not(.hiding) .stats').width(Math.ceil(statsMaxWidth));
-        },
-
         _renderList: function(data) {
             var self = this;
+
             // Avoid infinite loops if dialog closed before rendering the results
             if ($.contains(document, self.$category[0])) {
                 if (data.category) {
@@ -346,13 +333,12 @@
                         self.$categoryTree.append(self._buildSubcategory(subcategory));
                     });
                 }
-                self.refurbishUI();
+                self._postRenderList();
             }
         },
 
-        _renderResults: function(categories) {
+        _renderSearchResultList: function(categories) {
             var self = this;
-
             self.$categoryResultsList.empty();
             self.$categoryResults.show();
             _.each(categories, function(category) {
@@ -371,6 +357,7 @@
                 self.$categoryResultsList.append($result);
                 self._ellipsizeBreadcrumbs($result);
             });
+            self._postRenderList();
         },
 
         _renderSearchResultInfo: function(count, totalCount) {
@@ -389,6 +376,24 @@
 
             self.$categoryResultsInfo.empty();
             self.$categoryResultsInfo.append($stats).append($clear).show();
+        },
+
+        _postRenderList: function() {
+            var self = this;
+            var statsMaxWidth = 0;
+
+            self.$categoryList.find('.stats').each(function() {
+                var width = this.getBoundingClientRect().width;
+                if (width > statsMaxWidth) {
+                    statsMaxWidth = width;
+                }
+            });
+
+            // Set uniform stats width for maintaining horizontal alignment
+            self.$categoryList.find('.item:not(.hiding) .stats').width(Math.ceil(statsMaxWidth));
+
+            // Make sure the list stays always scrolled at the top
+            self.$categoryTree.scrollTop(0);
         },
 
         _bindGoToCategoryOnClick: function($element, id) {
