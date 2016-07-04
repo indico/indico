@@ -27,10 +27,10 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
-from indico.modules import ModuleHolder
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.util import get_category_stats, serialize_category_atom, serialize_category_ical
+from indico.modules.categories.util import (get_category_stats, get_upcoming_events, serialize_category_atom,
+                                            serialize_category_ical)
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters
@@ -228,15 +228,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
             return WPCategory.render_template('display/category.html', self.category, **params)
 
         news = get_recent_news()
-
-        legacy_upcoming_events = ModuleHolder().getById('upcoming_events').getUpcomingEventList()
-        upcoming_events = [{'status': status,
-                            'start_dt': start_or_end_dt if not status == 'ongoing' else None,
-                            'end_dt': start_or_end_dt if status == 'ongoing' else None,
-                            'title': title,
-                            'id': event_id}
-                           for status, start_or_end_dt, title, event_id in legacy_upcoming_events]
-
+        upcoming_events = get_upcoming_events()
         return WPCategory.render_template('display/root_category.html', self.category, news=news,
                                           upcoming_events=upcoming_events, **params)
 
