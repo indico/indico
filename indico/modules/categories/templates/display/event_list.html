@@ -1,8 +1,10 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
                              before=none, after=none, message_first=true) %}
     {% set message=caller() %}
     {% macro render_message() %}
-        <div class="topBar">
+        {% call message_box('info', classes='no-icon') %}
             <div class="content smaller">
                 <span class="js-show-message">
                     {{ message }}
@@ -14,7 +16,7 @@
                     <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
                 </span>
             </div>
-        </div>
+        {% endcall %}
     {% endmacro %}
 
     {% macro render_list() %}
