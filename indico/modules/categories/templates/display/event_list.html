@@ -68,64 +68,7 @@
         {% endif %}
     </div>
     <script>
-        (function() {
-            'use strict';
-
-            var $eventList = $('.event-list');
-            var $futureEvents = $eventList.find('.future-events');
-            var $pastEvents = $eventList.find('.past-events');
-
-            setupToggleEventListButton($futureEvents);
-            setupToggleEventListButton($pastEvents);
-
-            {% if show_past_events and not past_events_by_month %}
-                $pastEvents.find('.js-toggle-list').first().trigger('click');
-            {% endif %}
-
-            function setupToggleEventListButton(wrapper) {
-                var $wrapper = $(wrapper);
-                var $content = $wrapper.find('.events');
-
-                function updateMessage(visible) {
-                    $wrapper.find('.js-hide-message').toggle(visible);
-                    $wrapper.find('.js-show-message').toggle(!visible);
-                }
-                updateMessage(!$content.is(':empty'));
-
-                function displaySpinner(visible) {
-                    $wrapper.find('.js-toggle-list').toggle(!visible);
-                    $wrapper.find('.js-spinner').toggle(visible);
-                }
-                displaySpinner(false);
-
-                $wrapper.find('.js-toggle-list').on('click', function(evt) {
-                    evt.preventDefault();
-                    if ($content.is(':empty')) {
-                        displaySpinner(true);
-                        $.ajax({
-                            url: $content.data('event-list-url'),
-                            data: {
-                                before: $content.data('event-list-before'),
-                                after: $content.data('event-list-after')
-                            },
-                            error: handleAjaxError,
-                            success: function(data) {
-                                $content.html(data.html);
-                                $content.show();
-                                updateMessage(true);
-                                displaySpinner(false);
-                            }
-                        });
-                    } else if ($content.is(':visible')) {
-                        $content.hide();
-                        updateMessage(false);
-                    } else {
-                        $content.show();
-                        updateMessage(true);
-                    }
-                });
-            }
-        })();
+        setupCategoryDisplayEventList({% if show_past_events and not past_events_by_month %}true{% else %}false{% endif %});
     </script>
 {% endmacro %}
 
