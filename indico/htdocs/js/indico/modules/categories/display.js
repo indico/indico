@@ -56,8 +56,9 @@
 
             $wrapper.find('.js-toggle-list').on('click', function(evt, triggeredAutomatically) {
                 evt.preventDefault();
-                var isEmpty = $content.is(':empty');
-                if (isEmpty) {
+                var visible;
+                if ($content.is(':empty')) {
+                    visible = true;
                     displaySpinner(true);
                     $.ajax({
                         url: $content.data('event-list-url'),
@@ -74,15 +75,17 @@
                         }
                     });
                 } else if ($content.is(':visible')) {
+                    visible = false;
                     $content.hide();
                     updateMessage(false);
 
                 } else {
+                    visible = true;
                     $content.show();
                     updateMessage(true);
                 }
-                if (!triggeredAutomatically) {
-                    callback(isEmpty);
+                if (!triggeredAutomatically && callback) {
+                    callback(visible);
                 }
             });
         }
