@@ -229,7 +229,6 @@
             $('<div>').categorynavigator({
                 categoryId: $('.event-management').data('category-id'),
                 openInDialog: true,
-                selectLeafOnly: true,
                 onAction: function(category) {
                     var msg = $T.gettext('You are about to move some events to the category "{0}". Are you sure you want to proceed?').format(category.title);
                     confirmPrompt(msg, $T.gettext('Move events')).then(function() {
