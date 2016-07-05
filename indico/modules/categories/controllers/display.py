@@ -229,7 +229,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         event_query = (Event.query.with_parent(self.category)
                        .order_by(Event.start_dt.desc())
                        .options(joinedload('person_links'), load_only('id', 'category_id', 'created_dt', 'end_dt',
-                                                                      'start_dt', 'title', 'protection_mode')))
+                                                                      'protection_mode', 'start_dt', 'title', 'type_')))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
