@@ -190,7 +190,12 @@ class RHMoveEvent(RHConferenceModifBase):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
 
     def _process(self):
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        old_path = sep.join(self.event_new.category.chain_titles)
+        new_path = sep.join(self.target_category.chain_titles)
         self.event_new.move(self.target_category)
+        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
+                           data={'From': old_path, 'To': new_path})
         flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
               'success')
         return jsonify_data(flash=False)
