@@ -215,7 +215,7 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
         return map(_format_tuple, months)
 
     def happening_now(self, event):
-        return self.now > event.start_dt and self.now < event.end_dt
+        return event.start_dt <= self.now < event.end_dt
 
     def is_recent(self, dt):
         return dt > self.now - relativedelta(weeks=1)
