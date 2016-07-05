@@ -17,7 +17,7 @@
 
 %categorynav-sizing {
     width: 800px;
-    min-height: 600px;
+    height: 600px;
 }
 
 %spinner {
@@ -35,12 +35,14 @@
     z-index: 2;
 }
 
-.categorynav-wrapper {
+.categorynav-dialog-content {
     @extend %categorynav-sizing;
 }
 
 .categorynav {
     @extend %categorynav-sizing;
+    display: flex;
+    flex-direction: column;
 
     a {
         color: $link;
@@ -49,20 +51,33 @@
     input[type='search'] {
         @extend %form-field-input;
         width: 100%;
+        flex-shrink: 0;
     }
 
     .category-list {
-        position: relative;
-        margin-top: 10px;
+        @extend .i-box;
+        @extend .i-box.no-shadow;
+        @extend .i-box.just-group-list;
+        @extend .i-box.just-group-list.with-hover-effect;
 
-        .group-list.fixed-height {
-            max-height: 500px;
+        background: lighten($gray, $color-variation);
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        margin-top: 10px;
+        position: relative;
+
+        // Needed for Firefox to actually overflow on .group-list
+        overflow: auto;
+
+        .group-list {
             overflow: auto;
             overflow-y: auto;
         }
 
         .item {
-            display: flex;
+            background: white;
+            display: flex !important;
             align-items: center;
 
             .action-button {
@@ -91,6 +106,7 @@
 
         .current-category {
             @include box-shadow(0 2px 2px 0 $light-gray);
+            border-bottom: 1px solid lighten($gray, $color-variation);
             min-height: 40px;
             margin-left: -10px;
             margin-right: -10px;
@@ -98,7 +114,6 @@
             position: relative;
             overflow: hidden;
             color: $light-black;
-            border-bottom: 1px solid #e1e1e1;
 
             &:hover {
                 background-color: $light-gray;
@@ -205,10 +220,10 @@
         }
 
         .search-result-info {
+            border-bottom: 1px solid lighten($gray, $color-variation);
             background-color: $light-gray;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #e1e1e1;
             margin: 0 -10px;
             padding: 5px 10px;
             color: $light-black;
