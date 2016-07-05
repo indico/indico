@@ -222,6 +222,7 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
+    """Show the contents of a category (events/subcategories)"""
 
     def _process(self):
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
@@ -320,6 +321,7 @@ class RHShowPastEventsInCategory(RHDisplayCategoryBase):
 
     def _process_PUT(self):
         self._show_past_events(True)
+
 
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):
