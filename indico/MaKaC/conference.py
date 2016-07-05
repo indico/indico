@@ -1197,10 +1197,6 @@ class Conference(CommonObjectBase):
     def getType(self):
         return self.as_event.type_.legacy_name
 
-    def getVerboseType(self):
-        # Like getType, but returns "Lecture" instead of "Simple_event"
-        return self.as_event.type_.title
-
     def setValues(self, confData):
         """
             Sets SOME values of the current conference object from a dictionary
