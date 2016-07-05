@@ -73,7 +73,7 @@ else:
             <%include file="MeetingFilter.tpl"/>
         % endif
         % if showExportToICal:
-            <a id="exportIcal${self_._conf.as_event.id}" href="#" class="exportIcal"
+            <a id="exportIcal${self_._conf.as_event.id}" href="#" class="js-export-ical"
                data-id="${self_._conf.as_event.id}">
                 ${ _("iCal export") }
                 <div class="leftCorner"></div>
@@ -134,7 +134,7 @@ $(function() {
     createTooltip($('#printButton'), '${ _("Printable version")}');
     createTooltip($('#manageEventButton'), '${ _("Switch to management area for this event")}');
 
-    $('.exportIcal').on('click', function(evt) {
+    $('.js-export-ical').on('click', function(evt) {
         evt.preventDefault();
         $(this).trigger('menu_select');
     });

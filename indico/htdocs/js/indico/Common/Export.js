@@ -245,7 +245,7 @@ var exportPopups= {};
 
 $(document).ready(function() {
 
-    $(".exportIcal").on('menu_select', function() {
+    $(".js-export-ical").on('menu_select', function() {
         var $button = $(this);
 
         if ($button.hasClass('open')) {

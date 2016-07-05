@@ -8,8 +8,8 @@
                     </a>
                 {% endif %}
                 {% if category.event_count %}
-                    <a href="#" id="exportIcal{{ category.id }}"
-                       class="i-button icon-calendar arrow exportIcal"
+                    <a href="#"
+                       class="i-button icon-calendar arrow js-export-ical"
                        title="{% trans %}Export to scheduling tool{% endtrans %}"
                        data-id="{{ category.id }}"></a>
                     {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
@@ -116,7 +116,7 @@
     </div>
 </div>
 <script>
-    $('.exportIcal').on('click', function(evt) {
+    $('.js-export-ical').on('click', function(evt) {
         evt.preventDefault();
         $(this).trigger('menu_select');
     });
