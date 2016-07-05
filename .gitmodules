@@ -68,3 +68,6 @@
 [submodule "ext_modules/typewatch"]
 	path = ext_modules/typewatch
 	url = https://github.com/dennyferra/TypeWatch.git
+[submodule "ext_modules/fullcalendar"]
+	path = ext_modules/fullcalendar
+	url = https://github.com/fullcalendar/fullcalendar.git

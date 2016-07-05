@@ -445,8 +445,19 @@ def install_typewatch():
         local('cp jquery.typewatch.js {}'.format(dest_js_dir))
 
 
-# Tasks
+@recipe('fullcalendar.js')
+def install_fullcalendar_js():
+    with node_env(), lcd(os.path.join(env.ext_dir, 'fullcalendar')):
+            local('npm install')
+            local('grunt lumbar:build')
+            dest_js_dir = lib_dir(env.src_dir, 'js')
+            dest_css_dir = lib_dir(env.src_dir, 'css')
+            local('mkdir -p {0}'.format(dest_js_dir))
+            local('cp dist/fullcalendar.js {0}'.format(dest_js_dir))
+            local('cp dist/fullcalendar.css {0}'.format(dest_css_dir))
 
+
+# Tasks
 @task
 def install(recipe_name):
     """
