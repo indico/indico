@@ -29,7 +29,7 @@
                         <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
                     </li>
                     <li>
-                        <a href="{# TODO url_for('.calendar', category) #}">{% trans %}Calendar{% endtrans %}</a>
+                        <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
                     </li>
                     <li>
                         <a href="{# TODO url_for('.map', category) #}">{% trans %}Category map{% endtrans %}</a>

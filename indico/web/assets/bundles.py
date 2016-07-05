@@ -232,7 +232,6 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
-fullcalendar_css = Bundle('css/')
 
 typewatch_js = rjs_bundle('dropzone_js', 'js/lib/jquery.typewatch.js')
 
@@ -500,10 +499,10 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
                    'lib/jquery.typeahead.css',
+                   'lib/fullcalendar.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
-                   'jquery.colorpicker.css',
-                   'lib/fullcalendar.css'),
+                   'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 

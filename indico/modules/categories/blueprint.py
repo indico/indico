@@ -23,7 +23,7 @@ from indico.modules.categories.controllers.display import (RHCategoryStatistics,
                                                            RHDisplayCategory, RHEventList, RHExportCategoryAtom,
                                                            RHExportCategoryICAL, RHReachableCategoriesInfo,
                                                            RHShowPastEventsInCategory, RHSubcatInfo,
-                                                           RHXMLExportCategoryInfo)
+                                                           RHXMLExportCategoryInfo, RHCategoryCalendarView)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -72,6 +72,7 @@ _bp.add_url_rule('/overview', 'overview', RHCategoryOverview)
 _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
+_bp.add_url_rule('/calendar', 'calendar', RHCategoryCalendarView)
 
 # TODO: remember to refactor it at some point
 _bp.add_url_rule('!/xmlGateway.py/getCategoryInfo', 'category_xml_info', RHXMLExportCategoryInfo)

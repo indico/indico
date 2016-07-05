@@ -43,6 +43,10 @@
     border-bottom: 1px solid #E6E6E6;
     border-top: 1px solid #FFFFFF;
     padding: 20px 20px 20px 20px;
+
+    .back-button {
+        margin-top: 0.4em;
+    }
 }
 
 .category-title {
@@ -51,8 +55,16 @@
     font-weight: normal;
     margin: auto;
     max-width: 850px;
+    margin-left: 0px;
+    text-align: left;
+
     &.sidebar-padding {
         padding-right: 340px;
+    }
+
+    .subtitle {
+        font-style: italic;
+        font-size: 0.8em;
     }
 }
 
@@ -84,16 +96,20 @@
 
 .category-statistics {
     max-width: 1600px;
+
     .i-box {
         margin-left: 0.8em;
         margin-right: 0.8em !important;
         width: 45%;
+
         &:first-child {
             margin-left: 0;
         }
+
         .i-box-header {
             text-align: left;
         }
+
         .i-box-content {
             display: inline-block;
 
@@ -102,6 +118,7 @@
             padding: 2% 2% 0 2%;
         }
     }
+
     .i-badges-list > .i-badge {
         width: 45%;
     }
@@ -577,5 +594,21 @@ ul.category-resource-qtip {
 .category-overview-side-menu {
     .ui-datepicker {
         width: 192px;
+    }
+}
+
+.category-calendar-view {
+    .category-content {
+        max-width: 70%;
+
+        .fc {
+            .fc-right {
+                .ui-datepicker-trigger {
+                    padding: 5px;
+                    margin-left: 0;
+                    right: 0;
+                }
+            }
+        }
     }
 }

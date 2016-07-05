@@ -24,8 +24,10 @@ from math import ceil
 from operator import attrgetter, itemgetter
 from time import mktime
 
+import dateutil
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session, Response
+from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -555,3 +557,23 @@ class _EventProxy(object):
 
     def __repr__(self):
         return '<_EventProxy({}, {})>'.format(self.start_dt, object.__getattribute__(self, '_real_event'))
+
+
+class RHCategoryCalendarView(RHDisplayCategoryBase):
+    def _process(self):
+        if not request.is_xhr:
+            return WPCategory.render_template('display/calendar.html', self.category)
+        tz = self.category.display_tzinfo
+        start = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
+        end = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
+        query = (Event.query
+                 .filter(Event.happens_between(start, end),
+                         Event.is_visible_in(self.category),
+                         ~Event.is_deleted)
+                 .options(load_only('id', 'title', 'start_dt', 'end_dt')))
+        events = [{'title': event.title,
+                   'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
+                   'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
+                   'url': url_for('event.conferenceDisplay', event)}
+                  for event in query]
+        return jsonify_data(flash=False, events=events)
