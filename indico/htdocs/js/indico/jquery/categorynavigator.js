@@ -308,6 +308,11 @@
             var $ellipsis = $('<li>', {class: 'ellipsis'});
             var shortened = false;
 
+            // Prevent infinite loop if for any reason $category is not in DOM
+            if (!availableSpace) {
+                return;
+            }
+
             while ($breadcrumbs.outerWidth() >= availableSpace) {
                 var $segments = $breadcrumbs.children(':not(.ellipsis)');
                 var middleIndex = Math.floor($segments.length / 2);
