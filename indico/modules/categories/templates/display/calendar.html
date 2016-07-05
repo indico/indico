@@ -1,0 +1,69 @@
+{% from 'forms/_form.html' import simple_form %}
+
+<div class="category-container">
+    <div class="category-header">
+        <div class="center">
+            <span class="right">
+                <a class="i-button icon-prev back-button" href="{{ category.url }}">
+                    {%- trans %}Category page{% endtrans -%}
+                </a>
+            </span>
+            <div class="category-title">
+                {{ category.title }}&nbsp;
+                <span class="subtitle">({% trans %}Calendar{% endtrans %})</span>
+            </div>
+        </div>
+    </div>
+    <div class="category-content-wrapper category-calendar-view">
+        <div class="category-content">
+            <div id="event-calendar"></div>
+            <script>
+                (function() {
+                    'use strict';
+
+                    var cachedEvents = {};
+
+                    $('#event-calendar').fullCalendar({
+                        firstDay: 1,
+                        height: 800,
+                        eventOrder: 'start',
+                        eventTextColor: '#FFF',
+                        eventLimit: 15,
+                        timeFormat: 'H:mm',
+                        nextDayThreshold: '00:00',
+                        buttonText: {
+                            'today': $T.gettext('Today')
+                        },
+                        events: function(start, end, timezone, callback) {
+                            var events = cachedEvents[[{{ category.id }}, start, end]];
+                            if (events) {
+                                callback(events);
+                            } else {
+                                $.ajax({
+                                    url: {{ url_for('categories.calendar', category) | tojson }},
+                                    data: {start: start.format('YYYY-MM-DD'), end: end.format('YYYY-MM-DD')},
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    error: handleAjaxError,
+                                    complete: IndicoUI.Dialogs.Util.progress(),
+                                    success: function(data) {
+                                        cachedEvents[[{{ category.id }}, start, end]] = data.events;
+                                        callback(data.events);
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    var datepickerTrigger = $('<input>', {'type': 'text', 'css': {'visibility': 'hidden'}});
+                    $('#event-calendar .fc-right').prepend(datepickerTrigger);
+                    datepickerTrigger.datepicker({
+                        onSelect: function(date) {
+                            $('#event-calendar').fullCalendar('gotoDate', new moment(date, 'DD/MM/YYYY'));
+                        }
+                    });
+                })();
+            </script>
+        </div>
+    </div>
+</div>
