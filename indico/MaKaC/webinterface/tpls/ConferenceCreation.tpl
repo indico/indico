@@ -158,7 +158,7 @@
         $category.on('indico:categorySelected', function(evt, category) {
             updateProtectionChooser(category.title, category.is_protected ? 'private' : 'public');
         });
-        protectionChooserExecOnLoad('', '');
+        protectionChooserExecOnLoad('${ categ["id"] }', '${ protection }');
 
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute'])
         $E('sDatePlace').set(startDate);
