@@ -119,7 +119,7 @@ def serialize_category_atom(category, url, user, event_filter):
                          involving the start/end date of the event.
     """
     query = (Event.query
-             .filter(Event.category_chain_overlaps(int(category.getId())),
+             .filter(Event.category_chain_overlaps(category.id),
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'title', 'description', 'protection_mode',
@@ -128,7 +128,7 @@ def serialize_category_atom(category, url, user, event_filter):
              .order_by(Event.start_dt))
     events = [e for e in query if e.can_access(user)]
 
-    feed = AtomFeed(feed_url=url, title='Indico Feed [{}]'.format(to_unicode(category.getTitle())))
+    feed = AtomFeed(feed_url=url, title='Indico Feed [{}]'.format(category.title))
     for event in events:
         feed.add(title=event.title,
                  summary=unicode(event.description),  # get rid of RichMarkup
