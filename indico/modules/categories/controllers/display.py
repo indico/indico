@@ -332,7 +332,7 @@ class RHExportCategoryICAL(RHDisplayCategoryBase):
 
 class RHExportCategoryAtom(RHDisplayCategoryBase):
     def _process(self):
-        filename = '{}-category.atom'.format(secure_filename(self._target.getName(), str(self._target.id)))
+        filename = '{}-category.atom'.format(secure_filename(self.category.title, str(self.category.id)))
         buf = serialize_category_atom(self.category,
                                       url_for(request.endpoint, self.category, _external=True),
                                       session.user,
