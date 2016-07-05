@@ -16,16 +16,10 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
-from itertools import groupby
-from operator import attrgetter
-
-from dateutil.relativedelta import relativedelta
 from flask import request, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
-from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.base import RH
 
@@ -52,10 +46,6 @@ class RHCategoryBase(RH):
 class RHDisplayCategoryBase(RHCategoryBase):
     """Base class for category display pages"""
 
-    def _checkParams(self):
-        RHCategoryBase._checkParams(self)
-        self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
-
     def _checkProtection(self):
         if not self.category.can_access(session.user):
             msg = [_("You are not authorized to access this category.")]
@@ -63,31 +53,6 @@ class RHDisplayCategoryBase(RHCategoryBase):
                 msg.append(_("If you believe you should have access, please contact {}")
                            .format(self.category.no_access_contact))
             raise Forbidden(' '.join(msg))
-
-    @staticmethod
-    def format_event_date(event):
-        day_month = 'dd MMM'
-        if event.start_dt.year != event.end_dt.year:
-            return '{} - {}'.format(format_date(event.start_dt), format_date(event.end_dt))
-        elif (event.start_dt.month != event.end_dt.month) or (event.start_dt.day != event.end_dt.day):
-            return '{} - {}'.format(format_date(event.start_dt, day_month), format_date(event.end_dt, day_month))
-        else:
-            return format_date(event.start_dt, day_month)
-
-    def group_by_month(self, events):
-        def _format_tuple(x):
-            (year, month), events = x
-            return {'name': format_date(datetime(year=year, month=month, day=1), format='MMMM Y'),
-                    'events': list(events),
-                    'is_current': year == self.now.year and month == self.now.month}
-        months = groupby(events, key=attrgetter('start_dt.year', 'start_dt.month'))
-        return map(_format_tuple, months)
-
-    def happening_now(self, event):
-        return self.now > event.start_dt and self.now < event.end_dt
-
-    def is_recent(self, dt):
-        return dt > self.now - relativedelta(weeks=1)
 
 
 class RHManageCategoryBase(RHCategoryBase):

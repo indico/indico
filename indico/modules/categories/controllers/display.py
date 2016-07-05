@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 from io import BytesIO
+from itertools import groupby
 from math import ceil
 from operator import attrgetter
 
@@ -37,13 +38,12 @@ from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_date, now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RH
 
@@ -185,9 +185,43 @@ class RHCategorySearch(RH):
                             total_count=total_count, flash=False)
 
 
-class RHDisplayCategory(RHDisplayCategoryBase):
-    _category_query_options = (joinedload('children').undefer('deep_events_count'), undefer('attachment_count'),
+class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
+    """Base class for display pages displaying an event list"""
+
+    _category_query_options = (joinedload('children'), undefer('attachment_count'), undefer('deep_events_count'),
                                undefer('event_count'))
+
+    def _checkParams(self):
+        RHDisplayCategoryBase._checkParams(self)
+        self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
+
+    @staticmethod
+    def format_event_date(event):
+        day_month = 'dd MMM'
+        if event.start_dt.year != event.end_dt.year:
+            return '{} - {}'.format(format_date(event.start_dt), format_date(event.end_dt))
+        elif (event.start_dt.month != event.end_dt.month) or (event.start_dt.day != event.end_dt.day):
+            return '{} - {}'.format(format_date(event.start_dt, day_month), format_date(event.end_dt, day_month))
+        else:
+            return format_date(event.start_dt, day_month)
+
+    def group_by_month(self, events):
+        def _format_tuple(x):
+            (year, month), events = x
+            return {'name': format_date(datetime(year=year, month=month, day=1), format='MMMM Y'),
+                    'events': list(events),
+                    'is_current': year == self.now.year and month == self.now.month}
+        months = groupby(events, key=attrgetter('start_dt.year', 'start_dt.month'))
+        return map(_format_tuple, months)
+
+    def happening_now(self, event):
+        return self.now > event.start_dt and self.now < event.end_dt
+
+    def is_recent(self, dt):
+        return dt > self.now - relativedelta(weeks=1)
+
+
+class RHDisplayCategory(RHDisplayCategoryEventsBase):
 
     def _process(self):
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
@@ -237,7 +271,7 @@ class RHDisplayCategory(RHDisplayCategoryBase):
                                           upcoming_events=upcoming_events, **params)
 
 
-class RHEventList(RHDisplayCategoryBase):
+class RHEventList(RHDisplayCategoryEventsBase):
     """Return the HTML for the event list before/after a specific month"""
 
     def _parse_year_month(self, string):
@@ -248,7 +282,7 @@ class RHEventList(RHDisplayCategoryBase):
         return self.category.display_tzinfo.localize(dt)
 
     def _checkParams(self):
-        RHDisplayCategoryBase._checkParams(self)
+        RHDisplayCategoryEventsBase._checkParams(self)
         before = self._parse_year_month(request.args.get('before'))
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
