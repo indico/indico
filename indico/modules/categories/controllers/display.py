@@ -206,8 +206,8 @@ class RHDisplayCategory(RHDisplayCategoryBase):
         future_event_count = future_event_query.count()
         past_event_count = past_event_query.count()
 
-        show_past_events = (self.category.id in session.get('fetchPastEventsFrom', set()) or
-                            (session.user and session.user.settings.get('show_past_events')))
+        show_past_events = bool(self.category.id in session.get('fetch_past_events_in', set()) or
+                                (session.user and session.user.settings.get('show_past_events', False)))
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
@@ -269,6 +269,23 @@ class RHEventList(RHDisplayCategoryBase):
                                     is_recent=self.is_recent, happening_now=self.happening_now)
         return jsonify_data(flash=False, html=html)
 
+
+class RHShowPastEventsInCategory(RHDisplayCategoryBase):
+    """Set whether the past events in a category are automatically displayed or not"""
+
+    def _show_past_events(self, show_past_events):
+        category_ids = session.setdefault('fetch_past_events_in', set())
+        if show_past_events:
+            category_ids.add(self.category.id)
+        else:
+            category_ids.discard(self.category.id)
+        session.modified = True
+
+    def _process_DELETE(self):
+        self._show_past_events(False)
+
+    def _process_PUT(self):
+        self._show_past_events(True)
 
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):

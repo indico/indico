@@ -42,7 +42,8 @@
 {% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
                     past_event_count, future_threshold, past_threshold, future_events_by_month=[],
                     past_events_by_month=[], show_past_events=false) %}
-    <div class="event-list">
+    <div class="event-list"
+         data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
         {% if future_event_count %}
             {% call hidden_events_block('future-events', category, future_events_by_month, format_event_date,
                                         is_recent, happening_now, after=future_threshold) %}
@@ -68,7 +69,7 @@
         {% endif %}
     </div>
     <script>
-        setupCategoryDisplayEventList({% if show_past_events and not past_events_by_month %}true{% else %}false{% endif %});
+        setupCategoryDisplayEventList({{ (show_past_events and not past_events_by_month) | tojson }});
     </script>
 {% endmacro %}
 

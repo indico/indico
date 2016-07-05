@@ -6,13 +6,21 @@ function setupCategoryDisplayEventList(show_past_events) {
     var $pastEvents = $eventList.find('.past-events');
 
     setupToggleEventListButton($futureEvents);
-    setupToggleEventListButton($pastEvents);
+    setupToggleEventListButton($pastEvents, onTogglePastEvents);
 
     if (show_past_events) {
         $pastEvents.find('.js-toggle-list').first().trigger('click');
     }
 
-    function setupToggleEventListButton(wrapper) {
+    function onTogglePastEvents(shown) {
+        $.ajax({
+            url: $eventList.data('show-past-events-url'),
+            method: shown ? 'PUT' : 'DELETE',
+            error: handleAjaxError
+        });
+    }
+
+    function setupToggleEventListButton(wrapper, callback) {
         var $wrapper = $(wrapper);
         var $content = $wrapper.find('.events');
 
@@ -44,14 +52,18 @@ function setupCategoryDisplayEventList(show_past_events) {
                         $content.show();
                         updateMessage(true);
                         displaySpinner(false);
+                        callback(true);
                     }
                 });
             } else if ($content.is(':visible')) {
                 $content.hide();
                 updateMessage(false);
+                callback(false);
+
             } else {
                 $content.show();
                 updateMessage(true);
+                callback(true);
             }
         });
     }
