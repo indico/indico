@@ -118,7 +118,7 @@
         $category.on('indico:categorySelected', function(evt, category) {
             updateProtectionChooser(category.title, category.is_protected ? 'private' : 'public');
         });
-        protectionChooserExecOnLoad('', '');
+        protectionChooserExecOnLoad('${ categ["id"] }', '${ protection }');
 
         injectValuesInForm($E('eventCreationForm'),function() {
                 if (verifyLectureDates()) {
