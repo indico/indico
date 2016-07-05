@@ -12,8 +12,10 @@
 
     <div>
         {{ category_list(category.children) }}
-        {{ event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
-                      past_event_count, future_threshold, past_threshold, show_past_events=show_past_events) }}
+        {{ event_list(events_by_month=events_by_month, format_event_date=format_event_date, is_recent=is_recent,
+                      happening_now=happening_now, category=category, future_event_count=future_event_count,
+                      past_event_count=past_event_count, future_threshold=future_threshold, past_threshold=past_threshold,
+                      show_past_events=show_past_events) }}
     </div>
 {% endblock %}
 

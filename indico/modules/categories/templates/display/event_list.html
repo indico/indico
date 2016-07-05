@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
+{% macro _hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
                              before=none, after=none, message_first=true) %}
     {% set message=caller() %}
     {% macro render_message() %}
@@ -47,7 +47,7 @@
     <div class="event-list"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
         {% if future_event_count %}
-            {% call hidden_events_block('future-events', category, future_events_by_month, format_event_date,
+            {% call _hidden_events_block('future-events', category, future_events_by_month, format_event_date,
                                         is_recent, happening_now, after=future_threshold) %}
                 {% trans count=future_event_count -%}
                     There is one event in the future.
@@ -60,7 +60,7 @@
             {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
         </div>
         {% if past_event_count %}
-            {% call hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
+            {% call _hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
                                         happening_now, before=past_threshold, message_first=false) %}
                 {% trans count=past_event_count -%}
                     There is one event in the past.
