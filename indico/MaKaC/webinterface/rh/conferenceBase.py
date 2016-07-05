@@ -19,7 +19,6 @@ from indico.util.contextManager import ContextManager
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface import locators
-from MaKaC.webinterface import webFactoryRegistry
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -32,10 +31,9 @@ class RHCustomizable(RH):
         RH.__init__(self)
         self._wf = ""
 
-    def getWebFactory( self ):
-        if self._wf == "":
-            wr = webFactoryRegistry.WebFactoryRegistry()
-            self._wf = wr.getFactory( self._conf )
+    def getWebFactory(self):
+        if self._wf == '':
+            self._wf = self._conf.as_event.web_factory
         return self._wf
 
 

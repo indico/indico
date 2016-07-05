@@ -53,6 +53,11 @@ layout_settings = EventSettingsProxy('layout', {
 theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
 
 
+@signals.event.type_changed.connect
+def _event_type_changed(event, **kwargs):
+    layout_settings.delete(event, 'timetable_theme')
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu_layout(sender, event, **kwargs):
     if not event.can_manage(session.user):

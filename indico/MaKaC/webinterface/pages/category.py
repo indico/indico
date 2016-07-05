@@ -33,6 +33,7 @@ import MaKaC.webinterface.wcalendar as wcalendar
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.events.models.events import EventType
 from indico.modules.events.util import preload_events
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -86,9 +87,8 @@ class WPCategoryDisplayBase(WPCategoryBase):
 
 class WCategoryDisplay(WICalExportBase):
 
-    def __init__(self, target, wfReg, tz):
+    def __init__(self, target, tz):
         self._target = target
-        self._wfReg = wfReg
         self._timezone = timezone(tz)
 
     def getHTML(self, aw, params):
@@ -116,7 +116,7 @@ class WCategoryDisplay(WICalExportBase):
             pastEvents = session.get('fetchPastEventsFrom', set())
             showPastEvents = (self._target.getId() in pastEvents or
                              (session.user and session.user.settings.get('show_past_events')))
-            cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
+            cl = wcomponents.WConferenceList(self._target, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
@@ -156,9 +156,8 @@ class WCategoryDisplay(WICalExportBase):
 
 class WPCategoryDisplay(WPCategoryDisplayBase):
 
-    def __init__(self, rh, target, wfReg):
+    def __init__(self, rh, target):
         WPCategoryDisplayBase.__init__(self, rh, target)
-        self._wfReg = wfReg
         tzUtil = DisplayTZ(self._getAW(), target)  # None,useServerTZ=1)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -170,7 +169,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         i18nformat("""<link rel="alternate" type="application/atom+xml" title="_('Indico Atom Feed')" href="%s">""") % url
 
     def _getBody( self, params ):
-        wc = WCategoryDisplay(self._target, self._wfReg, self._locTZ)
+        wc = WCategoryDisplay(self._target, self._locTZ)
         pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
                 "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
                 "allowUserModif": self._target.canModify( self._getAW() ), \
@@ -280,15 +279,7 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw).getDisplayTZ()
         vars["startTime"] = format_time(self._slot.timetable_entry.start_dt.astimezone(timezone(tz)))
-        conf = self._session.event_new
-        import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        wf = wr.getFactory(conf)
-        if wf != None:
-            type = wf.getId()
-        else:
-            type = "conference"
-        if type != 'meeting':
+        if self._session.event_new.type_ != EventType.meeting:
             vars["title"] = self._session.title
             vars["titleUrl"] = None
         else:
@@ -1006,8 +997,8 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
             pars = {"target": self._target, "isModif": False}
             return wcomponents.WNavigationDrawer( pars )
 
-    def _getWComponent( self ):
-        return WConferenceCreation( self._target, self._rh._event_type, self._rh )
+    def _getWComponent(self):
+        return WConferenceCreation(self._target, self._rh._event_type.name, self._rh)
 
     def _getBody( self, params ):
         ## TODO: TO REMOVE?????????

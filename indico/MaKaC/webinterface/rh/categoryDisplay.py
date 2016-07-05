@@ -26,7 +26,6 @@ from MaKaC.common.url import ShortURLMapper
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.wcalendar as wcalendar
-import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
@@ -47,12 +46,11 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories.util import serialize_category_ical, serialize_category_atom
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
-from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file, endpoint_for_url, url_for
@@ -79,9 +77,7 @@ class RHCategoryDisplay(RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryDisplay
 
     def _process(self):
-
-        wfReg = webFactoryRegistry.WebFactoryRegistry()
-        p = category.WPCategoryDisplay(self, self._target, wfReg)
+        p = category.WPCategoryDisplay(self, self._target)
         return p.display()
 
 
@@ -135,13 +131,8 @@ class RHConferenceCreationBase(RHCategoryDisplay):
         RHCategoryDisplay._checkParams( self, params, mustExist )
         #if self._target.getSubCategoryList():
         #    raise MaKaCError( _("Cannot add conferences to a category which already contains some sub-categories"))
-        self._wf = None
-        self._wfReg = webFactoryRegistry.WebFactoryRegistry()
-        self._event_type = params.get("event_type", "").strip()
-        if self._event_type == 'lecture':
-            self._event_type = 'simple_event'
-        if self._event_type and self._event_type != 'default':
-            self._wf = self._wfReg.getFactoryById(self._event_type)
+        self._event_type = EventType[params['event_type']]
+        self._wf = self._event_type.web_factory
 
 
 #-------------------------------------------------------------------------------------
@@ -189,7 +180,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
             params["title"]="No Title"
         # change number of dates (lecture)
         if self._confirm == True:
-            if self._event_type != "simple_event":
+            if self._event_type != EventType.lecture:
                 c = self._createEvent( self._params )
                 self.alertCreation([c])
             # lectures
@@ -227,12 +218,8 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         kwargs = UtilsConference.get_new_conference_kwargs(self._params)
         if kwargs['start_dt'] >= kwargs['end_dt']:
             raise FormValuesError(_('The start date cannot be after the end date.'))
-        c = self._target.newConference(self._getUser(), **kwargs)
-
+        c = self._target.newConference(self._getUser(), event_type=self._event_type, **kwargs)
         UtilsConference.setValues(c, self._params)
-
-        if self._wf:
-            self._wfReg.registerFactory( c, self._wf )
 
         eventAccessProtection = params.get("eventProtection", "inherit")
         if eventAccessProtection == "private" :
@@ -418,15 +405,10 @@ class UtilsConference:
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
         theme = confData.get('defaultStyle', '')
-        curType = c.getType()
-        newType = confData.get('eventType', '')
-        if newType != "" and newType != curType:
-            wr = webFactoryRegistry.WebFactoryRegistry()
-            factory = wr.getFactoryById(newType)
-            wr.registerFactory(c,factory)
-            # type changed. always revert to the default theme
-            layout_settings.delete(c, 'timetable_theme')
-        elif not theme or theme == theme_settings.defaults.get(newType):
+        new_type = EventType.legacy_map[confData['eventType']] if 'eventType' in confData else c.as_event.type_
+        if new_type != c.as_event.type_:
+            c.as_event.type_ = new_type
+        elif not theme or theme == theme_settings.defaults.get(new_type.legacy_name):
             # if it's the default theme or nothing was set (does this ever happen?!), we don't store it
             layout_settings.delete(c, 'timetable_theme')
         else:

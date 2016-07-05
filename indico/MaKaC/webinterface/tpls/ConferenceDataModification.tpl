@@ -110,7 +110,9 @@ ${ additionalInfo }
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Event type")}</span></td>
             <td bgcolor="white" width="100%">
               <select name="eventType">
-              ${ types }
+                % for type_value, type_name in types.iteritems():
+                 <option value="${ type_value }" ${'selected' if conference.getType() == type_value else ''}>${ type_name }</option>
+                % endfor
               </select>
         </td>
         </tr>

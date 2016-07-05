@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.sessions import session_settings
@@ -73,7 +74,7 @@ class EventPersonLinkCloner(EventCloner):
 
     @property
     def friendly_name(self):
-        if self.old_event.as_legacy.getType() == 'simple_event':
+        if self.old_event.type_ == EventType.lecture:
             return _('Speakers')
         else:
             return _('Chairpersons')

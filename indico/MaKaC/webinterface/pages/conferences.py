@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, render_template, request
 import os
 import posixpath
 import re
-
+from collections import OrderedDict
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
+
+from flask import session, render_template, request
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -42,6 +43,7 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
 from MaKaC.common.fossilize import fossilize
@@ -51,12 +53,10 @@ from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.TemplateExec import render, mako_call_template_hook
 
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
-from indico.modules.users.util import get_user_by_email
 from indico.util.string import encode_if_unicode, safe_upper, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
@@ -782,18 +782,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["supportEmail"] = i18nformat("""--_("not set")--""")
         if self._conf.getSupportInfo().hasEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
-        typeList = []
-        for ctype in self._conf.getContribTypeList():
-             # TODO: This will all go away soon
-            typeList.append("""<input type="checkbox" name="types" value="%s"><a href="%s">%s</a><br>
-<table><tr><td width="30"></td><td><font><pre>%s</pre></font></td></tr></table>"""%( \
-                ctype.id, \
-                '', \
-                ctype.name, \
-                ctype.description))
-        vars["typeList"] = "".join(typeList)
         #------------------------------------------------------
-        vars["eventType"] = self._conf.getType()
         vars["keywords"] = self._conf.getKeywords()
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
         vars["shortURLTag"] = self._conf.getUrlTag()
@@ -958,20 +947,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["conference"] = self._conf
         vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         vars["styleOptions"] = styleoptions
-        import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        types = [ "conference" ]
-        for fact in wr.getFactoryList():
-            types.append(fact.getId())
-        vars["types"] = ""
-        for id in types:
-            typetext = id
-            if typetext == "simple_event":
-                typetext = "lecture"
-            if self._conf.getType() == id:
-                vars["types"] += "<option value=\"%s\" selected>%s" % (id,typetext)
-            else:
-                vars["types"] += "<option value=\"%s\">%s" % (id,typetext)
+        vars['types'] = OrderedDict((t.legacy_name, t.title) for t in EventType)
         vars["title"] = quoteattr( self._conf.getTitle() )
         vars["description"] = self._conf.getDescription()
         vars["keywords"] = self._conf.getKeywords()

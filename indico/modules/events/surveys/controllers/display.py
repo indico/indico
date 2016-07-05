@@ -22,6 +22,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
@@ -45,10 +46,10 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 
     @property
     def view_class(self):
-        mapping = {'conference': WPDisplaySurveyConference,
-                   'meeting': WPDisplaySurveyMeeting,
-                   'simple_event': WPDisplaySurveyLecture}
-        return mapping[self.event.getType()]
+        mapping = {EventType.conference: WPDisplaySurveyConference,
+                   EventType.meeting: WPDisplaySurveyMeeting,
+                   EventType.lecture: WPDisplaySurveyLecture}
+        return mapping[self.event_new.type_]
 
 
 class RHSurveyList(RHSurveyBaseDisplay):

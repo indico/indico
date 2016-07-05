@@ -17,7 +17,6 @@
 import MaKaC.webinterface.rh.base as base
 import MaKaC.conference as conference
 import MaKaC.webinterface.pages.welcome as welcome
-import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 
 from indico.modules.users import User
@@ -34,6 +33,5 @@ class RHWelcome(base.RHDisplayBaseProtected):
         if not User.has_rows():
             self._redirect(url_for('bootstrap.index'))
         else:
-            wfReg = webFactoryRegistry.WebFactoryRegistry()
-            p = welcome.WPWelcome(self, self._target, wfReg)
+            p = welcome.WPWelcome(self, self._target)
             return p.display()

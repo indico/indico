@@ -647,10 +647,10 @@ class Category(CommonObjectBase):
         conf.unindexConf()
 
     @unify_user_args
-    def newConference(self, creator, title, start_dt, end_dt, timezone, add_creator_as_manager=True):
+    def newConference(self, creator, title, start_dt, end_dt, timezone, event_type, add_creator_as_manager=True):
         conf = Conference()
         event = Event(creator=creator, category=self.as_new, title=to_unicode(title).strip(),
-                      start_dt=start_dt, end_dt=end_dt, timezone=timezone)
+                      start_dt=start_dt, end_dt=end_dt, timezone=timezone, type_=event_type)
         ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
         self._addConference(conf)
 
@@ -1194,22 +1194,12 @@ class Conference(CommonObjectBase):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    def getType( self ):
-        import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        wf = wr.getFactory(self)
-        if wf != None:
-            type = wf.getId()
-        else:
-            type = "conference"
-        return type
+    def getType(self):
+        return self.as_event.type_.legacy_name
 
-    def getVerboseType( self ):
-        # Like getType, but returns "Lecture" instead of "simple_type"
-        type = self.getType()
-        if type == "simple_event":
-            type = "lecture"
-        return type.capitalize()
+    def getVerboseType(self):
+        # Like getType, but returns "Lecture" instead of "Simple_event"
+        return self.as_event.type_.title
 
     def setValues(self, confData):
         """
@@ -1356,11 +1346,11 @@ class Conference(CommonObjectBase):
 
     def getCreationDate(self):
         """Returns the date in which the conference was created"""
-        return self.as_new.created_dt
+        return self.as_event.created_dt
 
     def getAdjustedCreationDate(self, tz):
         """Returns the date in which the conference was created"""
-        return self.as_new.created_dt.astimezone(timezone(tz))
+        return self.as_event.created_dt.astimezone(timezone(tz))
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
@@ -2007,7 +1997,8 @@ class Conference(CommonObjectBase):
         else:
             creator = self.as_event.creator
         conf = cat.newConference(creator, title=self.getTitle(), start_dt=self.getStartDate(), end_dt=self.getEndDate(),
-                                 timezone=self.getTimezone(), add_creator_as_manager=False)
+                                 timezone=self.getTimezone(), event_type=self.as_event.type_,
+                                 add_creator_as_manager=False)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -2020,17 +2011,6 @@ class Conference(CommonObjectBase):
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
-
-        db_root = DBMgr.getInstance().getDBConnection().root()
-        if db_root.has_key( "webfactoryregistry" ):
-            confRegistry = db_root["webfactoryregistry"]
-        else:
-            confRegistry = OOBTree.OOBTree()
-            db_root["webfactoryregistry"] = confRegistry
-        # if the event is a meeting or a lecture
-        if confRegistry.get(str(self.getId()), None) is not None :
-            confRegistry[str(conf.getId())] = confRegistry[str(self.getId())]
-        # if it's a conference, no web factory is needed
         # Tracks in a conference
         if options.get("tracks",False) :
             for tr in self.getTrackList() :
