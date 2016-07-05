@@ -32,6 +32,11 @@ Called when an event is cloned. The *sender* is the `Event` object of
 the old event, the new event is passed in the `new_event` kwarg.
 """)
 
+type_changed = _signals.signal('type-changed', """
+Called when the type of an event is changed. The `sender` is the event,
+the old type is passed in the `old_type` kwarg.
+""")
+
 data_changed = _signals.signal('data-changed', """
 Called when the basic data of an event is changed. The `sender` is the event,
 and the following kwargs are available:

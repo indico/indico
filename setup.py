@@ -369,6 +369,7 @@ if __name__ == '__main__':
             event_creation_times = indico_zodbimport.modules.event_creation_times:EventCreationTimeImporter
             upcoming_events = indico_zodbimport.modules.upcoming_events:UpcomingEventsImporter
             news = indico_zodbimport.modules.news:NewsImporter
+            event_types = indico_zodbimport.modules.event_types:EventTypeImporter
             """,
           zip_safe=False,
           packages=foundPackages,

@@ -23,7 +23,6 @@ Asynchronous request handlers for conference-related data modification.
 from flask import session
 from indico.modules.events.layout import layout_settings
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
-from indico.core import signals
 
 import datetime
 
@@ -57,6 +56,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 # indico imports
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.layout import theme_settings
+from indico.modules.events.models.events import EventType
 from indico.modules.events.util import track_time_changes
 from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
@@ -182,19 +182,10 @@ class ConferenceTypeModification(ConferenceTextModificationBase):
     Event type modification
     """
     def _handleSet(self):
-        curType = self._target.getType()
-        newType = self._value
-        if newType != "" and newType != curType:
-            import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-            wr = webFactoryRegistry.WebFactoryRegistry()
-            factory = wr.getFactoryById(newType)
-            wr.registerFactory(self._target, factory)
-            # revert to the default theme for the event type
-            layout_settings.delete(self._conf, 'timetable_theme')
-            signals.event.data_changed.send(self._target, attr=None, old=None, new=None)
+        self._target.as_event.type_ = EventType[self._value]
 
     def _handleGet(self):
-        return self._target.getType()
+        return self._target.as_event.type
 
 
 class ConferenceShortURLModification(ConferenceTextModificationBase):

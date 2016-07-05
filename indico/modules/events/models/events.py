@@ -28,7 +28,8 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
-from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core import signals
+from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
@@ -44,8 +45,38 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps, now_utc
 from indico.util.decorators import strict_classproperty
+from indico.util.i18n import _
 from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
+from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
+
+
+class EventType(TitledIntEnum):
+    __titles__ = [None, _('Lecture'), _('Meeting'), _('Conference')]
+    lecture = 1
+    meeting = 2
+    conference = 3
+
+    @property
+    def legacy_name(self):
+        return 'simple_event' if self == EventType.lecture else self.name
+
+    @property
+    def web_factory(self):
+        if self == EventType.meeting:
+            from MaKaC.webinterface.meeting import WebFactory
+            return WebFactory
+        elif self == EventType.lecture:
+            from MaKaC.webinterface.simple_event import WebFactory
+            return WebFactory
+        else:
+            # conferences have no WebFactory
+            return None
+
+
+EventType.legacy_map = {'simple_event': EventType.lecture,
+                        'meeting': EventType.meeting,
+                        'conference': EventType.conference}
 
 
 class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
@@ -143,6 +174,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     #: The timezone of the event
     timezone = db.Column(
         db.String,
+        nullable=False
+    )
+    #: The type of the event
+    _type = db.Column(
+        'type',
+        PyIntEnum(EventType),
         nullable=False
     )
     #: The metadata of the logo (hash, size, filename, content_type)
@@ -375,10 +412,25 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def type(self):
-        event_type = self.as_legacy.getType()
-        if event_type == 'simple_event':
-            event_type = 'lecture'
-        return event_type
+        # XXX: this should eventually be replaced with the type_
+        # property returning the enum - but there are too many places
+        # right now that rely on the type string
+        return self.type_.name
+
+    @hybrid_property
+    def type_(self):
+        return self._type
+
+    @type_.setter
+    def type_(self, value):
+        old_type = self._type
+        self._type = value
+        if old_type is not None and old_type != value:
+            signals.event.type_changed.send(self, old_type=old_type)
+
+    @property
+    def web_factory(self):
+        return self.type_.web_factory
 
     @property
     def tzinfo(self):

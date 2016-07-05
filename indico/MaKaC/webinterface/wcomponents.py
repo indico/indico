@@ -1010,7 +1010,7 @@ class WEmptyCategory(WTemplated):
 
 class WConferenceList(WTemplated):
 
-    def __init__( self, category, wfRegm, showPastEvents ):
+    def __init__(self, category, showPastEvents):
         self._categ = category
         self._showPastEvents = showPastEvents
 

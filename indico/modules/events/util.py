@@ -66,8 +66,8 @@ def preload_events(ids, lightweight=True, persons=False):
     ids = {int(getattr(id_, 'id', id_)) for id_ in ids} - cache.viewkeys()
     query = Event.find(Event.id.in_(ids))
     if lightweight:
-        query = query.options(load_only('id', 'category_id', 'title', 'created_dt', 'start_dt', 'end_dt', 'timezone',
-                                        'protection_mode'))
+        query = query.options(load_only('id', 'type_', 'category_id', 'title', 'created_dt', 'start_dt', 'end_dt',
+                                        'timezone', 'protection_mode'))
         query = query.options(subqueryload('acl_entries'))
     if persons:
         query = query.options(joinedload('person_links'))

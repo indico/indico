@@ -20,8 +20,8 @@ import MaKaC.conference as conference
 
 class WPWelcome(category.WPCategoryDisplay):
 
-    def __init__(self, rh, target, wfReg):
-        category.WPCategoryDisplay.__init__(self, rh, conference.CategoryManager().getRoot(), wfReg)
+    def __init__(self, rh, target):
+        category.WPCategoryDisplay.__init__(self, rh, conference.CategoryManager().getRoot())
 
     def _isFrontPage(self):
         return True

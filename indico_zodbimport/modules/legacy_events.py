@@ -26,7 +26,6 @@ from indico.modules.events.models.settings import EventSetting, EventSettingPrin
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import is_legacy_id
 from indico_zodbimport import Importer
-from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
 
 
 class Dummy(object):
@@ -53,7 +52,7 @@ class LegacyEventImporter(Importer):
 
         # XXX: removed display manager / internal page manager update
         # don't forget to handle them when updating this for 2.0!
-        wfr = WebFactoryRegistry()._getConfRegistry()
+        wfr = self.zodb_root['webfactoryregistry']
         for event in self._committing_iterator(self._get_events()):
             if not hasattr(event, '_old_id'):
                 new_id = self.gen_event_id()

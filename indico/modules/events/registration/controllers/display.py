@@ -24,6 +24,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.models.events import EventType
 from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -52,11 +53,11 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
     @property
     def view_class(self):
         mapping = {
-            'conference': WPDisplayRegistrationFormConference,
-            'meeting': WPDisplayRegistrationFormMeeting,
-            'simple_event': WPDisplayRegistrationFormLecture
+            EventType.conference: WPDisplayRegistrationFormConference,
+            EventType.meeting: WPDisplayRegistrationFormMeeting,
+            EventType.lecture: WPDisplayRegistrationFormLecture
         }
-        return mapping[self.event.getType()]
+        return mapping[self.event_new.type_]
 
 
 class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):

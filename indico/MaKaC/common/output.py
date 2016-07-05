@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
 from datetime import datetime
 from flask import request
 from hashlib import md5
@@ -26,13 +27,9 @@ import StringIO
 
 from lxml import etree
 
-import MaKaC.conference as conference
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xmlGen import XMLGen
-import os
-from math import ceil
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.common.TemplateExec import escapeHTMLForJS
@@ -41,13 +38,10 @@ from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.legacy import XMLEventSerializer
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users import User
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.util.event import uniqueId, unify_event_args
-from indico.util.json import dumps
 from indico.web.flask.util import url_for
 
 
@@ -96,9 +90,6 @@ class outputGenerator(object):
         self.time_XML = 0
         self.time_HTML = 0
         self.cache = XMLCache()
-
-        from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
-        self.webFactory = WebFactoryRegistry()
 
     def _getRecordCollection(self, obj):
         if obj.is_protected:
