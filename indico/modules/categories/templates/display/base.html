@@ -41,17 +41,17 @@
                    data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='lecture') }}">
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='lecture', categId=category.id) }}">
                             {% trans %}Lecture{% endtrans %}
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='meeting') }}">
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='meeting', categId=category.id) }}">
                             {% trans %}Meeting{% endtrans %}
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='conference') }}">
+                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='conference', categId=category.id) }}">
                             {% trans %}Conference{% endtrans %}
                         </a>
                     </li>
