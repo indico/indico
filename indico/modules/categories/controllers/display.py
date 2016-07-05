@@ -127,7 +127,7 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category, with_path=False, with_favorite=False):
+def _serialize_category(category, with_favorite=False, with_path=False, parent_data=None):
     data = {
         'id': category.id,
         'title': category.title,
@@ -138,8 +138,12 @@ def _serialize_category(category, with_path=False, with_favorite=False):
         'can_access': category.can_access(session.user),
     }
     if with_path:
-        data['path'] = [{'id': c.id, 'title': c.title}
-                        for c in category.parent_chain_query.options(load_only('id', 'title'))]
+        if parent_data and 'path' in parent_data:
+            data['path'] = parent_data['path'][:]
+            data['path'].append({'id': parent_data['id'], 'title': parent_data['title']})
+        else:
+            data['path'] = [{'id': c.id, 'title': c.title}
+                            for c in category.parent_chain_query.options(load_only('id', 'title'))]
     if with_favorite:
         data['is_favorite'] = session.user and category in session.user.favorite_categories
     return data
@@ -158,8 +162,11 @@ class RHCategoryInfo(RHDisplayCategoryBase):
                                                                          'has_events')
 
     def _process(self):
-        return jsonify_data(category=_serialize_category(self.category, with_path=True),
-                            subcategories=[_serialize_category(c) for c in self.category.children], flash=False)
+        category_data = _serialize_category(self.category, with_path=True)
+        return jsonify_data(category=category_data,
+                            subcategories=[_serialize_category(c, with_path=True, parent_data=category_data)
+                                           for c in self.category.children],
+                            flash=False)
 
 
 class RHCategorySearch(RH):
@@ -182,7 +189,7 @@ class RHCategorySearch(RH):
                            Category.chain_titles))
         total_count = query.count()
         query = query.limit(10)
-        return jsonify_data(categories=[_serialize_category(c, with_path=True, with_favorite=True) for c in query],
+        return jsonify_data(categories=[_serialize_category(c, with_favorite=True, with_path=True) for c in query],
                             total_count=total_count, flash=False)
 
 
