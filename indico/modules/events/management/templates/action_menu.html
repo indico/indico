@@ -29,6 +29,12 @@
                         {% trans %}Lock{% endtrans %}</button>
                 {% endif %}
 
+                <button class="i-button icon-transmission js-ajax-dialog-move"
+                        title="{% trans %}Move event to another category{% endtrans %}"
+                        data-href="{{ url_for('event_management.move', event) }}"
+                        data-category-id="{{ event.category.id }}">
+                    {% trans %}Move{% endtrans %}
+                </button>
                 <button class="i-button icon-remove js-ajax-dialog-delete danger"
                         data-href="{{ url_for('event_management.delete', event) }}"
                         title="{% trans %}Delete event{% endtrans %}"
@@ -56,6 +62,7 @@
 <script>
     (function() {
         'use strict';
+
         $('.js-ajax-dialog-delete, .js-ajax-dialog-lock').ajaxDialog({
             onClose: function(data) {
                 if (data && data.url) {
@@ -63,6 +70,40 @@
                 }
                 return true;
             }
+        });
+
+        $('.js-ajax-dialog-move').on('click', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                actionOn: {
+                    categoriesWithSubcategories: {
+                        disabled: true
+                    },
+                    categories: {
+                        disabled: true,
+                        ids: [$this.data('category-id')]
+                    }
+                },
+                onAction: function(category) {
+                    var msg = $T.gettext('You are about to move the event to the category "{0}". Are you sure you want to proceed?').format(category.title);
+                    confirmPrompt(msg, $T.gettext('Move event')).then(function() {
+                        $.ajax({
+                            url: $this.data('href'),
+                            type: 'POST',
+                            data: {'target_category_id': category.id},
+                            error: handleAjaxError,
+                            success: function(data) {
+                                if (data.success) {
+                                    location.reload();
+                                }
+                            }
+                        });
+                    });
+                }
+            });
         });
 
         $('#action-menu-clones-target').qbubble({
