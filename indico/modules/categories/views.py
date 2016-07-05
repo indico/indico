@@ -48,7 +48,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
+        return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()
 
     def _getBody(self, params):
         return self._getPageContent(params)
