@@ -140,7 +140,7 @@ def find_next_start_dt(duration, obj, day=None, force=False):
 
 
 def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz=utc, from_categ=None, grouped=True):
-    """Retrieve time blocks that fall within an specific time interval
+    """Retrieve time blocks that fall within a specific time interval
        for a given set of categories.
 
        :param categ_ids: iterable containing list of category IDs
@@ -153,7 +153,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
        :param tz: the ``timezone`` information should be displayed in
        :param from_categ: ``Category`` that will be taken into account to calculate
                           visibility
-       :returns: a dictionary containing timetable information is a
+       :returns: a dictionary containing timetable information in a
                  structured way. See source code for examples.
     """
     day_start = start_dt.astimezone(utc)
