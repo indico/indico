@@ -1934,30 +1934,6 @@ div.filterDiv strong {
 {
 }
 
-.topBar {
-    margin-bottom: 0px;
-}
-
-.topBar h1 {
-    margin: 0;
-    padding: 0;
-    color: #777;
-    font-size: 15px;
-}
-
-.topBar .content {
-    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
-    padding: 10px;
-    font-size: 12px;
-    color: #444;
-    border: 1px solid #AAA;
-}
-
-.topBar .smaller {
-    padding: 10px;
-    margin-top: 10px;
-}
-
 h1.active
 {
     background: rgb(255,123,45);

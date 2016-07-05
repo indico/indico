@@ -56,6 +56,16 @@
         padding: 0.5em 0.5em;
         clear: both;
     }
+
+    &.no-icon {
+        &:before {
+            content: "";
+        }
+
+        .message-text {
+            padding-left: 0;
+        }
+    }
 }
 
 %message-box.large-icon {
