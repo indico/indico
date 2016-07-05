@@ -77,7 +77,7 @@
             var self = this;
             ajaxDialog({
                 title: self.options.dialogTitle,
-                content: $('<div>', {class: 'categorynav-wrapper'}).append($('<div>'))[0].outerHTML,
+                content: $('<div>', {class: 'categorynav-dialog-content'}).append($('<div>'))[0].outerHTML,
                 closeButton: true,
                 fullyModal: true,
                 onOpen: function(dialog) {
@@ -91,17 +91,16 @@
         _createList: function() {
             var self = this;
             self.$category = $('<div>');
-            self.$categoryTree = $('<ul>', {class: 'group-list fixed-height'});
-            self.$categoryResultsList = $('<ul>', {class: 'group-list fixed-height'});
+            self.$categoryTree = $('<ul>', {class: 'group-list'});
+            self.$categoryResultsList = $('<ul>', {class: 'group-list'});
             self.$categoryResultsInfo = $('<div>', {class: 'search-result-info'});
             self.$categoryResults = $('<div>', {class: 'search-results'})
                 .append(self.$categoryResultsInfo)
                 .append(self.$categoryResultsList);
-            self.$categoryList = $('<div>', {class: 'category-list i-box just-group-list with-hover-effect'})
-                .append($('<div>', {class: 'i-box-content'})
-                    .append(self.$category)
-                    .append(self.$categoryTree)
-                    .append(self.$categoryResults));
+            self.$categoryList = $('<div>', {class: 'category-list'})
+                .append(self.$category)
+                .append(self.$categoryTree)
+                .append(self.$categoryResults);
             self.$categoryResults.hide();
             self.element.append(self.$categoryList);
         },
@@ -327,7 +326,9 @@
         _renderList: function(data) {
             var self = this;
             if (data.category) {
-                self.$category.html(self._buildCurrentCategory(data.category));
+                var $currentCategory = self._buildCurrentCategory(data.category);
+                self.$category.replaceWith($currentCategory);
+                self.$category = $currentCategory;
                 self._ellipsizeBreadcrumbs(self.$category);
             }
             if (data.subcategories) {
