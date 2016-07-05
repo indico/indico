@@ -49,7 +49,8 @@
                 <div class="group">
                     <button type="button"
                             class="i-button fav-button icon-only icon-bookmark {{ 'enabled' if category in session.user.favorite_categories }}"
-                            data-href="{{ url_for('users.user_favorites_category_api', category) }}"></button>
+                            data-href="{{ url_for('users.user_favorites_category_api', category) }}"
+                            data-favorites-href="{{ url_for('users.user_favorites') }}"></button>
                 </div>
             {% endif %}
         </div>
@@ -88,4 +89,5 @@
         evt.preventDefault();
         $(this).trigger('menu_select');
     });
+    setupCategoryDisplay();
 </script>
