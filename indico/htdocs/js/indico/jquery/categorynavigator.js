@@ -381,8 +381,9 @@
         _postRenderList: function() {
             var self = this;
             var statsMaxWidth = 0;
+            var $stats = self.$categoryList.find('.item:not(.hiding) .stats:visible');
 
-            self.$categoryList.find('.stats').each(function() {
+            $stats.each(function() {
                 var width = this.getBoundingClientRect().width;
                 if (width > statsMaxWidth) {
                     statsMaxWidth = width;
@@ -390,7 +391,7 @@
             });
 
             // Set uniform stats width for maintaining horizontal alignment
-            self.$categoryList.find('.item:not(.hiding) .stats').width(Math.ceil(statsMaxWidth));
+            $stats.width(Math.ceil(statsMaxWidth));
 
             // Make sure the list stays always scrolled at the top
             self.$categoryTree.scrollTop(0);
