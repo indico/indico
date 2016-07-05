@@ -90,4 +90,42 @@
             });
         }
     };
+
+    global.setupCategoryDisplay = function setupCategoryDisplay() {
+        'use strict';
+
+        $('.fav-button').on('click', function() {
+            var $this = $(this);
+            var isFavorite = $this.hasClass('enabled');
+            $this.prop('disabled', true);
+            $.ajax({
+                url: $this.data('href'),
+                method: isFavorite ? 'DELETE' : 'PUT',
+                error: handleAjaxError,
+                success: function() {
+                    $this.toggleClass('enabled', !isFavorite);
+                },
+                complete: function() {
+                    $this.prop('disabled', false);
+                }
+            });
+        }).qtip({
+            hide: {
+                fixed: true,
+                delay: 500
+            },
+            content: {
+                text: function() {
+                    var $this = $(this);
+                    if ($this.hasClass('enabled')) {
+                        return $T.gettext("Remove from your favourites");
+                    } else {
+                        return $T.gettext('<h3>Add to your favourites</h3>') +
+                               $T.gettext('<p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>')
+                                 .format($this.data('favorites-href'));
+                    }
+                }
+            }
+        });
+    };
 })(window);
