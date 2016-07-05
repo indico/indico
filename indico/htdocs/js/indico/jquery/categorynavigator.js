@@ -149,7 +149,7 @@
                         handleAjaxError(jqXHR);
                     },
                     success: function(data) {
-                        if ($.contains(document, self.$category[0])) {
+                        if (self._isInDOM()) {
                             self.$category.hide();
                             self.$categoryTree.hide();
                             self._renderSearchResultInfo(data.categories.length, data.total_count);
@@ -321,20 +321,16 @@
 
         _renderList: function(data) {
             var self = this;
-
-            // Avoid infinite loops if dialog closed before rendering the results
-            if ($.contains(document, self.$category[0])) {
-                if (data.category) {
-                    self.$category.html(self._buildCurrentCategory(data.category));
-                    self._ellipsizeBreadcrumbs(self.$category);
-                }
-                if (data.subcategories) {
-                    _.each(data.subcategories, function(subcategory) {
-                        self.$categoryTree.append(self._buildSubcategory(subcategory));
-                    });
-                }
-                self._postRenderList();
+            if (data.category) {
+                self.$category.html(self._buildCurrentCategory(data.category));
+                self._ellipsizeBreadcrumbs(self.$category);
             }
+            if (data.subcategories) {
+                _.each(data.subcategories, function(subcategory) {
+                    self.$categoryTree.append(self._buildSubcategory(subcategory));
+                });
+            }
+            self._postRenderList();
         },
 
         _renderSearchResultList: function(categories) {
@@ -426,7 +422,7 @@
                     },
                     error: handleAjaxError,
                     success: function(data) {
-                        if (data) {
+                        if (data && self._isInDOM()) {
                             self._cache[id] = data;
                             dfd.resolve(data);
                         }
@@ -458,6 +454,11 @@
             if (disableInput) {
                 self.element.find('input').prop('disabled', self.$categoryList.hasClass('loading'));
             }
+        },
+
+        _isInDOM: function() {
+            var self = this;
+            return $.contains(document, self.element[0]);
         },
 
         goToCategory: function(id) {
