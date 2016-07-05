@@ -231,6 +231,8 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                        filters='cssmin', output='css/selectize_css_%(version)s.min.css')
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
+fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
+fullcalendar_css = Bundle('css/')
 
 typewatch_js = rjs_bundle('dropzone_js', 'js/lib/jquery.typewatch.js')
 
@@ -362,7 +364,7 @@ abstracts_js = rjs_bundle(
                'Markdown.Sanitizer.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js)
+                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js)
 
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
@@ -500,7 +502,8 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.typeahead.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
-                   'jquery.colorpicker.css'),
+                   'jquery.colorpicker.css',
+                   'lib/fullcalendar.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
