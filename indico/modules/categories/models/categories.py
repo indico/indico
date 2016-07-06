@@ -36,7 +36,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, RichMarkup, text_to_repr, format_repr, return_ascii
+from indico.util.string import MarkdownText, text_to_repr, format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
@@ -61,7 +61,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     __tablename__ = 'categories'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
-    description_wrapper = RichMarkup
+    description_wrapper = MarkdownText
     allow_no_access_contact = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'category_id'
 
