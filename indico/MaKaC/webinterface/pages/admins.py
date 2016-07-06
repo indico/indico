@@ -60,7 +60,7 @@ class WPAdminsBase(WPMainBase):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WHeader( self._getAW() )
+        wc = wcomponents.WHeader(self._getAW(), prot_obj=self._protected_object)
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \

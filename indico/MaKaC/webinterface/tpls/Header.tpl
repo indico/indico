@@ -2,23 +2,16 @@
     <%include file="MobileDetection.tpl"/>
 % endif
 
-<%include file="Announcement.tpl"/>
-
 <%
-urlConference = urlHandlers.UHConferenceCreation.getURL(currentCategory)
-urlConference.addParam("event_type","conference")
-
-urlLecture = urlHandlers.UHConferenceCreation.getURL(currentCategory)
-urlLecture.addParam("event_type","lecture")
-
-urlMeeting = urlHandlers.UHConferenceCreation.getURL(currentCategory)
-urlMeeting.addParam("event_type","meeting")
+    category = getattr(currentCategory, 'as_new', currentCategory) if currentCategory else None
 %>
+
+<%include file="Announcement.tpl"/>
 
 <div class="page-header clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>
 
-        ${ template_hook('page-header', category=currentCategory) }
+        ${ template_hook('page-header', category=category) }
 
         <!--
             set fixed height on anchor to assure that the height is
@@ -31,9 +24,27 @@ urlMeeting.addParam("event_type","meeting")
         <a href="${ url_for_index() }">${ _("Home") }</a>
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Create event") }</a>
         <ul class="dropdown">
-            <li><a id="create-lecture" href="${ urlLecture }">${ _("Create lecture") }</a></li>
-            <li><a id="create-meeting" href="${ urlMeeting }">${ _("Create meeting") }</a></li>
-            <li><a id="create-conference" href="${ urlConference }">${ _("Create conference") }</a></li>
+            <li>
+                <a id="create-lecture" href="${ url_for('event_creation.conferenceCreation',
+                                                        (category.locator.legacy if category and not category.is_root else None),
+                                                        event_type='lecture') }">
+                    ${ _("Create lecture") }
+                </a>
+            </li>
+            <li>
+                <a id="create-meeting" href="${ url_for('event_creation.conferenceCreation',
+                                                        (category.locator.legacy if category and not category.is_root else None),
+                                                        event_type='meeting') }">
+                    ${ _("Create meeting") }
+                </a>
+            </li>
+            <li>
+                <a id="create-conference" href="${ url_for('event_creation.conferenceCreation',
+                                                        (category.locator.legacy if category and not category.is_root else None),
+                                                        event_type='conference') }">
+                    ${ _("Create conference") }
+                </a>
+            </li>
         </ul>
 
         % if roomBooking:

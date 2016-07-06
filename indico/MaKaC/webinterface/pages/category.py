@@ -66,7 +66,7 @@ def format_location(item):
 
 class WPCategoryBase (main.WPMainBase):
     def __init__(self, rh, categ, **kwargs):
-        main.WPMainBase.__init__(self, rh, **kwargs)
+        main.WPMainBase.__init__(self, rh, _protected_object=categ.as_new, _current_category=categ.as_new, **kwargs)
         self._target = categ
         title = "Indico"
         if self._target:
@@ -76,9 +76,6 @@ class WPCategoryBase (main.WPMainBase):
 
     def getCSSFiles(self):
         return main.WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
-
-    def _currentCategory(self):
-        return self._target
 
 
 class WPCategoryDisplayBase(WPCategoryBase):
@@ -978,6 +975,10 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
 
     _userData = ['favorite-user-list', 'favorite-user-ids']
 
+    def __init__(self, *args, **kwargs):
+        WPCategoryDisplayBase.__init__(self, *args, **kwargs)
+        self._protected_object = None
+
     def getJSFiles(self):
         return WPCategoryDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
@@ -985,7 +986,8 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WHeader( self._getAW() )
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category,
+                                 prot_obj=self._protected_object)
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
@@ -1021,7 +1023,8 @@ class WPCategoryModifBase( WPCategoryBase ):
         return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def _getHeader(self):
-        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._currentCategory())
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category,
+                                 prot_obj=self._protected_object)
         return wc.getHTML({
             'subArea': self._getSiteArea(),
             'loginURL': self._escapeChars(str(self.getLoginURL())),
