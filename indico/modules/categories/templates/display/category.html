@@ -2,6 +2,7 @@
 {% from 'categories/display/category_list.html' import category_list %}
 {% from 'categories/display/event_list.html' import event_list %}
 {% from 'categories/display/sidebar.html' import render_attachments, render_managers %}
+{% from 'message_box.html' import message_box %}
 
 {% block content %}
     <div class="category-info">
@@ -10,13 +11,17 @@
         {% endblock %}
     </div>
 
-    <div>
+    {% if not category.children and not events_by_month %}
+        {% call message_box('info', classes='no-icon') %}
+            {% trans %}This category is empty.{% endtrans %}
+        {% endcall %}
+    {% else %}
         {{ category_list(category.children) }}
         {{ event_list(events_by_month=events_by_month, format_event_date=format_event_date, is_recent=is_recent,
                       happening_now=happening_now, category=category, future_event_count=future_event_count,
                       past_event_count=past_event_count, future_threshold=future_threshold, past_threshold=past_threshold,
                       show_past_events=show_past_events) }}
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block sidebar -%}
