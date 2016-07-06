@@ -51,20 +51,17 @@ class SettingsProxyBase(object):
                    `acls` is illegal and triggers a `ValueError`
     :param acls: setting names which are referencing ACLs in a
                  separate table
-    :param preload: Whether to preload all settings (except ACLs) for
-                    the given module as soon as one of them is accessed.
     """
 
     acl_proxy_class = None
     default_sentinel = object()
 
-    def __init__(self, module, defaults=None, strict=True, acls=None, preload=False):
+    def __init__(self, module, defaults=None, strict=True, acls=None):
         self.module = module
         self.defaults = defaults or {}
         self.strict = strict
         self.acl_names = set(acls or ())
         self.acls = self.acl_proxy_class(self) if self.acl_proxy_class else None
-        self.preload = preload
         self._bound_args = None
         if strict and not defaults and not acls:
             raise ValueError('cannot use strict mode with no defaults')

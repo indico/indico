@@ -24,4 +24,4 @@ abstracts_settings = EventSettingsProxy('abstracts', {
         'max_length': None,
         'max_words': None
     }
-}, preload=True)
+})

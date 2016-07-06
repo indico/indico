@@ -181,6 +181,8 @@ def _transaction_ended(session, transaction):
             del g.memoize_cache
         if 'settings_cache' in g:
             del g.settings_cache
+        if 'global_settings_cache' in g:
+            del g.global_settings_cache
         if 'event_notes' in g:
             del g.event_notes
         if 'event_attachments' in g:
