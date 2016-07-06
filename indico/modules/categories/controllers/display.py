@@ -196,15 +196,18 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
         RHDisplayCategoryBase._checkParams(self)
         self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
 
-    @staticmethod
-    def format_event_date(event):
+    def format_event_date(self, event):
         day_month = 'dd MMM'
-        if event.start_dt.year != event.end_dt.year:
-            return '{} - {}'.format(format_date(event.start_dt), format_date(event.end_dt))
-        elif (event.start_dt.month != event.end_dt.month) or (event.start_dt.day != event.end_dt.day):
-            return '{} - {}'.format(format_date(event.start_dt, day_month), format_date(event.end_dt, day_month))
+        tzinfo = self.category.display_tzinfo
+        start_dt = event.start_dt.astimezone(tzinfo)
+        end_dt = event.end_dt.astimezone(tzinfo)
+        if start_dt.year != end_dt.year:
+            return '{} - {}'.format(format_date(start_dt, timezone=tzinfo), format_date(end_dt, timezone=tzinfo))
+        elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
+            return '{} - {}'.format(format_date(start_dt, day_month, timezone=tzinfo),
+                                    format_date(end_dt, day_month, timezone=tzinfo))
         else:
-            return format_date(event.start_dt, day_month)
+            return format_date(start_dt, day_month, timezone=tzinfo)
 
     def group_by_month(self, events):
         def _format_tuple(x):
@@ -212,7 +215,12 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
             return {'name': format_date(datetime(year=year, month=month, day=1), format='MMMM Y'),
                     'events': list(events),
                     'is_current': year == self.now.year and month == self.now.month}
-        months = groupby(events, key=attrgetter('start_dt.year', 'start_dt.month'))
+
+        def _key(event):
+            start_dt = event.start_dt.astimezone(self.category.tzinfo)
+            return start_dt.year, start_dt.month
+
+        months = groupby(events, key=_key)
         return map(_format_tuple, months)
 
     def happening_now(self, event):
