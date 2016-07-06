@@ -127,23 +127,32 @@
     padding: 1em;
     width: 340px;
 
-    h2 {
+    > .title {
         border-bottom: 1px solid #EBEBEB;
         box-shadow: 0 1px 0 #FAFAFA;
-        color: #999;
-        font-weight: normal;
         margin-top: 20px;
+        margin-bottom: 10px;
         padding-bottom: 0.2em;
+
+        h2 {
+            display: inline;
+            color: #999;
+            font-weight: normal;
+
+            &:before {
+                margin-right: 0.5em;
+                vertical-align: -10%;
+            }
+        }
+
+        .actions {
+            float: right;
+        }
 
         .more-icon {
             float: right;
             font-size: 0.6em;
             margin: 0.8em 1em 0 0;
-        }
-
-        &:before {
-            margin-right: 0.5em;
-            vertical-align: -10%;
         }
     }
 
