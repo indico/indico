@@ -49,9 +49,10 @@
             onAction: function() {}
         },
 
-        // Cache for data of already visited categories
+        // Caches for data of already visited categories
         // Shared between instances
         _cache: {},
+        _cacheSubcategories: {},
 
         // The search request that is awaiting for response
         _currentSearchRequest: null,
@@ -152,7 +153,7 @@
                             self.$category.hide();
                             self.$categoryTree.hide();
                             self._renderSearchResultInfo(data.categories.length, data.total_count);
-                            self._renderSearchResultList(data.categories);
+                            self._renderSearchResults(data.categories);
                         }
                     }
                 });
@@ -323,23 +324,23 @@
             }
         },
 
-        _renderList: function(data) {
+        _renderCurrentCategory: function(category) {
             var self = this;
-            if (data.category) {
-                var $currentCategory = self._buildCurrentCategory(data.category);
-                self.$category.replaceWith($currentCategory);
-                self.$category = $currentCategory;
-                self._ellipsizeBreadcrumbs(self.$category);
-            }
-            if (data.subcategories) {
-                _.each(data.subcategories, function(subcategory) {
-                    self.$categoryTree.append(self._buildSubcategory(subcategory));
-                });
-            }
+            var $currentCategory = self._buildCurrentCategory(category);
+            self.$category.replaceWith($currentCategory);
+            self.$category = $currentCategory;
+            self._ellipsizeBreadcrumbs(self.$category);
+        },
+
+        _renderCategoryTree: function(subcategories) {
+            var self = this;
+            _.each(subcategories, function(subcategory) {
+                self.$categoryTree.append(self._buildSubcategory(subcategory));
+            });
             self._postRenderList();
         },
 
-        _renderSearchResultList: function(categories) {
+        _renderSearchResults: function(categories) {
             var self = this;
             self.$categoryResultsList.empty();
             self.$categoryResults.show();
@@ -408,35 +409,72 @@
             });
         },
 
-        _getCategoryInfo: function(id) {
+        _getCurrentCategory: function(id) {
             var self = this;
             var dfd = $.Deferred();
 
+            function resolve() {
+                dfd.resolve(self._cache[id]);
+            }
+
             if (self._cache[id]) {
-                _.defer(function() {
-                    dfd.resolve(self._cache[id]);
-                });
+                _.defer(resolve);
             } else {
-                $.ajax({
-                    url: build_url(Indico.Urls.Categories.info, {category_id: id}),
-                    dataType: 'json',
-                    beforeSend: function() {
-                        self._toggleLoading(true, true);
-                    },
-                    complete: function() {
-                        self._toggleLoading(false, true);
-                    },
-                    error: handleAjaxError,
-                    success: function(data) {
-                        if (data && self._isInDOM()) {
-                            self._cache[id] = data;
-                            dfd.resolve(data);
-                        }
-                    }
-                });
+                self._fetchCategory(id, resolve);
             }
 
             return dfd.promise();
+        },
+
+        _getCategoryTree: function(id) {
+            var self = this;
+            var dfd = $.Deferred();
+
+            function resolve() {
+                var subcategories = [];
+                _.each(self._cacheSubcategories[id], function(id) {
+                    subcategories.push(self._cache[id]);
+                });
+                dfd.resolve(subcategories);
+            }
+
+            if (self._cacheSubcategories[id]) {
+                _.defer(resolve);
+            } else {
+                self._fetchCategory(id, resolve);
+            }
+
+            return dfd.promise();
+        },
+
+        _fetchCategory: function(id, callback) {
+            var self = this;
+            $.ajax({
+                url: build_url(Indico.Urls.Categories.info, {category_id: id}),
+                dataType: 'json',
+                beforeSend: function() {
+                    self._toggleLoading(true, true);
+                },
+                complete: function() {
+                    self._toggleLoading(false, true);
+                },
+                error: handleAjaxError,
+                success: function(data) {
+                    if (data && self._isInDOM()) {
+                        self._fillCache(data);
+                        callback();
+                    }
+                }
+            });
+        },
+
+        _fillCache: function(data) {
+            var self = this;
+            self._cache[data.category.id] = _.omit(data.category, 'subcategories');
+            self._cacheSubcategories[data.category.id] = _.pluck(data.subcategories, 'id');
+            _.each(data.subcategories, function(subcategory) {
+                self._cache[subcategory.id] = $.extend(self._cache[subcategory.id], subcategory);
+            });
         },
 
         _onAction: function(category) {
@@ -470,7 +508,7 @@
         goToCategory: function(id) {
             var self = this;
 
-            $('.category-list .item').animate({
+            self.$categoryList.find('.group-list .item').animate({
                 height: 0,
                 paddingTop: 0,
                 paddingBottom: 0,
@@ -482,7 +520,8 @@
             }).addClass('hiding').find('.title').fadeOut();
 
             self._clearSearch();
-            self._getCategoryInfo(id).then(self._renderList.bind(self));
+            self._getCurrentCategory(id).then(self._renderCurrentCategory.bind(self));
+            self._getCategoryTree(id).then(self._renderCategoryTree.bind(self));
         }
     });
 })(jQuery);
