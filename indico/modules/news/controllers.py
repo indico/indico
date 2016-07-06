@@ -24,6 +24,7 @@ from indico.core.db import db
 from indico.modules.news import news_settings, logger
 from indico.modules.news.forms import NewsSettingsForm, NewsForm
 from indico.modules.news.models.news import NewsItem
+from indico.modules.news.util import get_recent_news
 from indico.modules.news.views import WPNews, WPManageNews
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -64,6 +65,7 @@ class RHNewsSettings(RHManageNewsBase):
         form = NewsSettingsForm(obj=FormDefaults(**news_settings.get_all()))
         if form.validate_on_submit():
             news_settings.set_multi(form.data)
+            get_recent_news.clear_cached()
             flash(_('Settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
@@ -77,6 +79,7 @@ class RHCreateNews(RHManageNewsBase):
             form.populate_obj(item)
             db.session.add(item)
             db.session.flush()
+            get_recent_news.clear_cached()
             logger.info('News %r created by %s', item, session.user)
             flash(_("News '{title}' has been posted").format(title=item.title), 'success')
             return jsonify_data(flash=False)
@@ -96,6 +99,7 @@ class RHEditNews(RHManageNewsItemBase):
             old_title = self.item.title
             form.populate_obj(self.item)
             db.session.flush()
+            get_recent_news.clear_cached()
             logger.info('News %r modified by %s', self.item, session.user)
             flash(_("News '{title}' has been updated").format(title=old_title), 'success')
             return jsonify_data(flash=False)
@@ -105,6 +109,7 @@ class RHEditNews(RHManageNewsItemBase):
 class RHDeleteNews(RHManageNewsItemBase):
     def _process(self):
         db.session.delete(self.item)
+        get_recent_news.clear_cached()
         flash(_("News '{title}' has been deleted").format(title=self.item.title), 'success')
         logger.info('News %r deleted by %r', self.item, session.user)
         return redirect(url_for('news.manage'))

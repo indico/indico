@@ -21,9 +21,11 @@ from datetime import timedelta
 from indico.core.db import db
 from indico.modules.news import news_settings
 from indico.modules.news.models.news import NewsItem
+from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 
 
+@memoize_redis(3600)
 def get_recent_news():
     """Get a list of recent news for the home page"""
     settings = news_settings.get_all()

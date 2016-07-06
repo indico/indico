@@ -27,6 +27,7 @@ import icalendar as ical
 from pyatom import AtomFeed
 from pytz import timezone
 from sqlalchemy.orm import joinedload, load_only, subqueryload
+from sqlalchemy.orm.attributes import set_committed_value
 
 from indico.core.config import Config
 from indico.core.db import db
@@ -42,7 +43,7 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
-from indico.util.string import to_unicode
+from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 
 
@@ -222,12 +223,14 @@ def get_category_stats(category_id=None):
             'updated': now_utc()}
 
 
+@memoize_redis(3600)
+@materialize_iterable()
 def get_upcoming_events():
     """Get the global list of upcoming events"""
     from indico.modules.events import Event
     data = upcoming_events_settings.get_all()
     if not data['max_entries'] or not data['entries']:
-        return []
+        return
     tz = timezone(Config.getInstance().getDefaultTimezone())
     now = now_utc(False).astimezone(tz)
     base_query = (Event.query
@@ -249,4 +252,9 @@ def get_upcoming_events():
     query = (queries[0].union(*queries[1:])
              .order_by(db.desc('weight'), Event.start_dt, Event.title)
              .limit(data['max_entries']))
-    return [x[0] for x in query]
+    for row in query:
+        event = row[0]
+        # we cache the result of the function and is_deleted is used in the repr
+        # and having a broken repr on the cached objects would be ugly
+        set_committed_value(event, 'is_deleted', False)
+        yield event
