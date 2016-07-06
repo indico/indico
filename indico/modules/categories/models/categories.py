@@ -39,7 +39,6 @@ from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, RichMarkup, text_to_repr, format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
-from indico.web.util import url_for_index
 
 
 def _get_next_position(context):
