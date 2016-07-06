@@ -467,19 +467,13 @@ class ProtectionManagersMixin(ProtectionMixin):
         return managers
 
     def get_access_list(self, skip_managers=False, skip_self_acl=False):
-        from MaKaC.conference import Category
         read_access_list = {x.principal for x in self.acl_entries if x.read_access} if not skip_self_acl else set()
         if self.is_self_protected:
             return (read_access_list | self.get_manager_list(recursive=True)) if not skip_managers else read_access_list
         elif self.is_inheriting and self.is_protected:
             access_list = (read_access_list | self.get_manager_list()) if not skip_managers else read_access_list
             if self.protection_parent:
-                # XXX: Remove this condition check when moving Category to new models
-                if isinstance(self.protection_parent, Category):
-                    recursive_acl = self.protection_parent.getRecursiveAllowedToAccessList(skip_managers=skip_managers)
-                    access_list.update(x.as_new for x in recursive_acl)
-                else:
-                    access_list.update(self.protection_parent.get_access_list(skip_managers=skip_managers))
+                access_list.update(self.protection_parent.get_access_list(skip_managers=skip_managers))
             return access_list
         else:
             return set()
