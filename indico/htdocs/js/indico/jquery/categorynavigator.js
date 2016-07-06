@@ -98,10 +98,13 @@
             self.$categoryResults = $('<div>', {class: 'search-results'})
                 .append(self.$categoryResultsInfo)
                 .append(self.$categoryResultsList);
+            self.$spinner = $('<div>', {class: 'spinner-wrapper'})
+                .append($('<div>', {class: 'i-spinner'}));
             self.$categoryList = $('<div>', {class: 'category-list'})
                 .append(self.$category)
                 .append(self.$categoryTree)
-                .append(self.$categoryResults);
+                .append(self.$categoryResults)
+                .append(self.$spinner);
             self.$categoryResults.hide();
             self.element.append(self.$categoryList);
         },
@@ -499,7 +502,7 @@
             var self = this;
             self.$categoryList.toggleClass('loading', state);
             if (disableInput) {
-                self.element.find('input').prop('disabled', self.$categoryList.hasClass('loading'));
+                self.element.find('input').prop('disabled', state);
             }
         },
 
