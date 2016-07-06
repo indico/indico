@@ -42,7 +42,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         self.atom_feed_url = kwargs.get('atom_feed_url')
         self.atom_feed_title = kwargs.get('atom_feed_title')
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
-        WPMainBase.__init__(self, rh, **kwargs)
+        WPMainBase.__init__(self, rh, _protected_object=category, _current_category=category, **kwargs)
         self._locTZ = category.display_tzinfo.zone
 
     def getCSSFiles(self):
@@ -74,6 +74,8 @@ class WPCategoryManagement(WPCategory):
     def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
         WPCategory.__init__(self, rh, category, **kwargs)
+        # don't show protection header in management; anything besides 'restricted' would be misleading
+        self._protected_object = None
 
     def getCSSFiles(self):
         return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()

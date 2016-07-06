@@ -46,7 +46,7 @@ from MaKaC.common.Announcement import getAnnoucementMgrInstance
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
@@ -228,13 +228,15 @@ class WHeader(WTemplated):
     """Templating web component for generating a common HTML header for
         the web interface.
     """
-    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, tpl_name=None):
+    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, tpl_name=None, prot_obj=None):
         WTemplated.__init__(self, tpl_name=tpl_name)
         self._currentuser = aw.getUser()
         self._locTZ = locTZ
         self._aw = aw
         self._isFrontPage = isFrontPage
         self.__currentCategory = currentCategory
+        # The object for which to show the protection indicator
+        self._prot_obj = prot_obj
 
     """
         Returns timezone string that is show to the user.
@@ -248,21 +250,26 @@ class WHeader(WTemplated):
         else:
             return timezone
 
-    """
-        Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
-    """
-    def _getProtection(self, target):
-        if isinstance(target, Conference):
-            event = target.as_event
-            if not event.is_protected:
-                return ['Public', _('Public')]
-            else:
-                networks = [x.name for x in event.get_access_list() if x.is_network]
-                if networks:
-                    return ['DomainProtected', _('{} network only').format('/'.join(networks))]
-                else:
-                    return ["Restricted", _("Restricted")]
+    def _get_protection_new(self, obj):
+        if not obj.is_protected:
+            return ['Public', _('Public')]
         else:
+            networks = [x.name for x in obj.get_access_list() if x.is_network]
+            if networks:
+                return ['DomainProtected', _('{} network only').format('/'.join(networks))]
+            else:
+                return ["Restricted", _("Restricted")]
+
+    def _getProtection(self, target):
+        """
+        Return a list with the status (Public, Protected, Restricted)
+        and extra info (domain list).
+        """
+        if isinstance(target, Conference):
+            return self._get_protection_new(target.as_event)
+        elif isinstance(target, db.m.Category):
+            return self._get_protection_new(target)
+        else:  # legacy Category
             if target.isProtected():
                 return ["Restricted", _("Restricted")]
             domain_list = target.getAccessController().getAnyDomainProtection()
@@ -280,7 +287,8 @@ class WHeader(WTemplated):
 
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
-        vars["target"] = vars["currentCategory"] = self.__currentCategory
+        vars["currentCategory"] = self.__currentCategory
+        vars['prot_obj'] = self._prot_obj
 
         current_locale = get_current_locale()
         vars["ActiveTimezone"] = session.timezone
@@ -303,8 +311,6 @@ class WHeader(WTemplated):
         else:
             vars["title"] = "Indico"
             vars["organization"] = ""
-
-        vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
 
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
         vars['protectionDisclaimerProtected'] = legal_settings.get('network_protected_disclaimer')
@@ -335,7 +341,7 @@ class WConferenceHeader(WHeader):
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
-        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -490,7 +496,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw=aw
-        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 

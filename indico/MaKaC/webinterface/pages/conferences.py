@@ -93,7 +93,8 @@ def stringToDate(str):
 class WPConferenceBase(base.WPDecorated):
 
     def __init__(self, rh, conference, **kwargs):
-        WPDecorated.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, _protected_object=conference, _current_category=conference.as_event.category,
+                             **kwargs)
         self._navigationTarget = self._conf = conference
         tz = self._tz = DisplayTZ(rh._aw, self._conf).getDisplayTZ()
         sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
@@ -148,7 +149,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WConferenceHeader( self._getAW(), self._conf )
+        wc = wcomponents.WConferenceHeader(self._getAW(), self._conf)
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(), \
@@ -664,9 +665,7 @@ class WPConferenceModifBase(main.WPMainBase):
         return "ModificationArea"
 
     def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader( self._getAW() )
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category, prot_obj=self._protected_object)
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )

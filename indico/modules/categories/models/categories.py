@@ -213,6 +213,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def locator(self):
         return {'category_id': self.id}
 
+    @locator.legacy
+    def locator(self):
+        # legacy locator, used for event creation links until they are
+        # adapted tu use category_id
+        return {'categId': self.id}
+
     @classmethod
     def get_root(cls):
         """Get the root category or create if if needed"""

@@ -108,7 +108,7 @@ class WPBase():
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
 
-    def __init__(self, rh, **kwargs):
+    def __init__(self, rh, _protected_object=None, _current_category=None, **kwargs):
         config = Config.getInstance()
         self._rh = rh
         self._kwargs = kwargs
@@ -116,6 +116,8 @@ class WPBase():
 
         self._dir = config.getTPLDir()
         self._asset_env = assets.core_env
+        self._protected_object = _protected_object
+        self._current_category = _current_category
 
         #store page specific CSS and JS
         self._extraCSS = []
@@ -247,11 +249,9 @@ class WPDecorated(WPBase):
     def getLogoutURL( self ):
         return url_for_logout(next_url=request.relative_url)
 
-
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader( self._getAW(), isFrontPage=self._isFrontPage(), currentCategory=self._currentCategory(), locTZ=self._locTZ )
+    def _getHeader(self):
+        wc = wcomponents.WHeader(self._getAW(), isFrontPage=self._isFrontPage(), locTZ=self._locTZ,
+                                 currentCategory=self._current_category, prot_obj=self._protected_object)
 
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
@@ -291,12 +291,6 @@ class WPDecorated(WPBase):
 
     def _isRoomBooking(self):
         return False
-
-    def _currentCategory(self):
-        """
-            Whenever in category display mode this is overloaded with the current category
-        """
-        return None
 
 
 class WPNotDecorated(WPBase):
