@@ -66,7 +66,8 @@ def format_location(item):
 
 class WPCategoryBase (main.WPMainBase):
     def __init__(self, rh, categ, **kwargs):
-        main.WPMainBase.__init__(self, rh, _protected_object=categ.as_new, _current_category=categ.as_new, **kwargs)
+        new_categ = categ.as_new if categ else None
+        main.WPMainBase.__init__(self, rh, _protected_object=new_categ, _current_category=new_categ, **kwargs)
         self._target = categ
         title = "Indico"
         if self._target:
