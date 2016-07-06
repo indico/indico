@@ -423,3 +423,160 @@ ul.category-resource-qtip {
         }
     }
 }
+
+.category-overview {
+    > .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+
+        .text {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .navigation a {
+            padding: 5px;
+        }
+    }
+
+    > table:not(.day) {
+        border: 1px solid #aaa;
+        border-collapse: separate;
+        border-spacing: 1px;
+
+        tr {
+            background-color: #eee;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th {
+            background-color: #444;
+            color: #fff;
+            text-align: center;
+            font-weight: normal;
+            white-space: nowrap;
+            padding: 1px 15px;
+        }
+    }
+
+    td {
+        padding: 0;
+        vertical-align: top;
+
+        &.day {
+            vertical-align: top;
+            padding: 5px;
+
+            &:not(:empty) {
+                min-width: 180px;
+            }
+
+            > .calendar-date {
+                font-size: 1.5em;
+                font-weight: bold;
+                text-align: center;
+
+                a {
+                    color: #aaa;
+                }
+            }
+
+            table {
+                tr {
+                    background-color: white;
+
+                    td {
+                        font-size: inherit;
+
+                        &.content-info {
+                            padding-left: 10px;
+                        }
+
+                        .location-info, .persons {
+                            font-size: 0.8em;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.other-month {
+            background-color: white;
+        }
+    }
+
+    tr.event {
+        & > td {
+            padding: 8px 3px;
+            font-size: 1.1em;
+        }
+
+        &:not(:first-of-type) td {
+            border-top: 1px dotted #aaa;
+        }
+    }
+
+    td.time {
+        font-style: italic;
+        white-space: nowrap;
+        width: 40px;
+    }
+
+    td.content-info {
+        padding-left: 20px;
+
+        table.timetable-entries {
+            tr {
+                &.contribution {
+                    background-color: #deebf8;
+                }
+
+                &.session {
+                    background-color: #fff1d5;
+                }
+
+                &.break {
+                    background-color: #e0ecd2;
+                }
+
+                &:not(:first-of-type) {
+                    td {
+                        border-top: 1px dashed #aaa;
+                    }
+                }
+
+                td {
+                    padding: 3px 2px;
+                }
+
+            }
+        }
+    }
+
+    .location-info {
+        color: darkblue;
+    }
+
+    .persons {
+        color: darkgreen;
+    }
+}
+
+.category-overview-side-menu {
+    #calendar-container {
+        display: block;
+        text-align: center;
+
+        .calendar {
+            display: inline-block !important;
+        }
+    }
+}

@@ -1,0 +1,91 @@
+{% from 'events/display/indico/_common.html' import render_location %}
+
+{% macro render_event(event, timezone, detail) %}
+    {% set category = event.category %}
+    <tr class="event">
+        <td class="time">{{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}</td>
+        <td class="title">
+            <a href="{{ url_for('event.conferenceDisplay', event) }}">{{ event.title }}</a>
+            <span class="details">
+                {% if show_chairpersons and event.person_links %}
+                    ({{ event.person_links|map(attribute='full_name')|sort|join('; ') }})
+                {% endif %}
+                {% if event.is_protected %}
+                    <span class="protection icon-shield" data-type="restricted"></span>
+                {% endif %}
+                {% if event.has_location_info %}
+                    {{ render_location(event) }}
+                {% endif %}
+                {% if category.has_icon %}
+                    <img src="{{ url_for('categories.display_icon', category, slug=category.icon_metadata['hash']) }}"
+                         title="{{ category.title }}">
+                {% endif %}
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td class="content-info" colspan="2">
+            {% if detail == 'session' %}
+                {{ _render_timetable(event, timezone, show_session=true) }}
+            {% elif detail == 'contribution' %}
+                {{ _render_timetable(event, timezone, show_session=true, show_contribution=true, show_break=true) }}
+            {% endif %}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro _render_timetable(event, timezone, show_session=true, show_contribution=false, show_break=false) %}
+    <table class="timetable-entries">
+        <tbody>
+            {% for entry in event.timetable_entries.all() %}
+                {% if show_session and entry.type.name == 'SESSION_BLOCK' %}
+                    {{ _session_info(entry, timezone) }}
+                {% elif show_contribution and entry.type.name == 'CONTRIBUTION' %}
+                    {{ _contribution_info(entry, timezone) }}
+                {% elif show_break and entry.type.name == 'BREAK' %}
+                    {{ _break_info(entry, timezone) }}
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro _session_info(session_entry, timezone) %}
+    {% set session_block = session_entry.session_block %}
+    {% set session = session_block.session %}
+    {% set title %}
+        {% if session_block.title %}
+            {{ session_block.title }} ({{ session.title }})
+        {% else %}
+            {{ session.title }}
+        {% endif %}
+    {% endset %}
+    {{ _render_block('session', session_entry.start_dt, timezone, title, location=session, persons=session.conveners) }}
+{% endmacro %}
+
+{% macro _contribution_info(contribution_entry, timezone) %}
+    {% set contribution = contribution_entry.contribution %}
+    {{ _render_block('contribution', contribution_entry.start_dt, timezone, contribution.title, location=contribution, persons=contribution.speakers ) }}
+{% endmacro %}
+
+{% macro _break_info(break_entry, timezone) %}
+    {% set break = break_entry.break_ %}
+    {{ _render_block('break', break_entry.start_dt, timezone, break.title, location=break) }}
+{% endmacro %}
+
+{% macro _render_block(class, time, timezone, title, location=none, persons=[]) %}
+    <tr class="{{ class }}">
+        <td class="time">{{ time|format_time(format='HH:mm', timezone=timezone) }}</td>
+        <td class="title">
+            {{ title }}
+            {% if persons %}
+                <span class="persons">
+                    ({{ persons|map(attribute='full_name')|join('; ') }})
+                </span>
+            {% endif %}
+            {% if location and location.has_location_info %}
+                {{ render_location(location) }}
+            {% endif %}
+        </td>
+    </tr>
+{% endmacro %}

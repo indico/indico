@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import groupby
 from math import ceil
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session, Response
@@ -384,3 +384,112 @@ class RHXMLExportCategoryInfo(RH):
     def _process(self):
         category_xml_info = XMLCategorySerializer(self.category).serialize_category()
         return Response(category_xml_info, mimetype='text/xml')
+
+
+class RHCategoryOverview(RHDisplayCategoryBase):
+    """Display the events for a particular day, week or month"""
+
+    def _checkParams(self):
+        RHDisplayCategoryBase._checkParams(self)
+        self.detail = request.args.get('detail', 'event')
+        if self.detail not in ('event', 'session', 'contribution'):
+            raise BadRequest('Invalid detail argument')
+        self.period = request.args.get('period', 'day')
+        if self.period not in ('day', 'month', 'week'):
+            raise BadRequest('Invalid period argument')
+        if 'date' in request.args:
+            try:
+                date = datetime.strptime(request.args['date'], '%Y-%m-%d')
+            except ValueError:
+                raise BadRequest('Invalid date argument')
+        else:
+            date = datetime.now()
+        date = self.category.display_tzinfo.localize(date)
+        date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        if self.period == 'day':
+            self.start_dt = date
+            self.end_dt = self.start_dt + relativedelta(days=1)
+        elif self.period == 'week':
+            self.start_dt = date - relativedelta(days=date.weekday())
+            self.end_dt = self.start_dt + relativedelta(days=7)
+        elif self.period == 'month':
+            self.start_dt = date + relativedelta(day=1)
+            self.end_dt = self.start_dt + relativedelta(months=1)
+
+    def _process(self):
+        # TODO take in consideration protection and visibility
+        events = (Event.query.with_parent(self.category)
+                  .filter(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt, Event.is_deleted is not False)
+                  .order_by(Event.start_dt)).all()
+
+        # Only categories with icons are listed in the sidebar
+        subcategories = {event.category for event in events if event.category.has_icon}
+
+        params = {
+            'detail': self.detail,
+            'period': self.period,
+            'subcategories': subcategories,
+            'start_dt': self.start_dt,
+            'end_dt': self.end_dt - relativedelta(days=1),  # Display a close-ended interval
+            'previous_day_url': self._other_day_url(self.start_dt - relativedelta(days=1)),
+            'next_day_url': self._other_day_url(self.start_dt + relativedelta(days=1)),
+            'previous_month_url': self._other_day_url(self.start_dt - relativedelta(months=1)),
+            'next_month_url': self._other_day_url(self.start_dt + relativedelta(months=1)),
+            'previous_year_url': self._other_day_url(self.start_dt - relativedelta(years=1)),
+            'next_year_url': self._other_day_url(self.start_dt + relativedelta(years=1))
+        }
+
+        if self.period == 'day':
+            return WPCategory.render_template('display/overview/day.html', self.category, events=events, **params)
+        elif self.period == 'week':
+            days = self._get_week_days()
+            template = 'display/overview/week.html'
+            params['previous_week_url'] = self._other_day_url(self.start_dt - relativedelta(days=7))
+            params['next_week_url'] = self._other_day_url(self.start_dt + relativedelta(days=7))
+        elif self.period == 'month':
+            days = self._get_calendar_days()
+            template = 'display/overview/month.html'
+
+        events_by_day = []
+        for day in days:
+            events_by_day.append((day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events)))
+
+        # Check whether all weekends are empty
+        hide_weekend = (not any(map(itemgetter(1), events_by_day[5::7])) and
+                        not any(map(itemgetter(1), events_by_day[6::7])))
+        if hide_weekend:
+            events_by_day = [x for x in events_by_day if x[0].weekday() not in (5, 6)]
+
+        return WPCategory.render_template(template, self.category, events_by_day=events_by_day,
+                                          hide_weekend=hide_weekend, **params)
+
+    def _get_week_days(self):
+        # Return the days shown in the weekly overview
+        return self._get_days(self.start_dt, self.end_dt)
+
+    def _get_calendar_days(self):
+        # Return the days shown in the monthly overview
+        start_dt = self.start_dt - relativedelta(days=self.start_dt.weekday())
+        end_dt = self.end_dt + relativedelta(days=(7 - self.end_dt.weekday()) % 7)
+        return self._get_days(start_dt, end_dt)
+
+    @staticmethod
+    def _get_days(start_dt, end_dt):
+        # Return all days in the open-ended interval
+        current_dt = start_dt
+        while current_dt < end_dt:
+            yield current_dt
+            current_dt = current_dt + relativedelta(days=1)
+
+    @staticmethod
+    def _pop_head_while(predicate, list_):
+        # Pop the head of the list while the predicate is true and return the popped elements
+        res = []
+        while len(list_) and predicate(list_[0]):
+            res.append(list_[0])
+            list_.pop(0)
+        return res
+
+    def _other_day_url(self, date):
+        return url_for('.overview', self.category, detail=self.detail, period=self.period,
+                       date=format_date(date, 'YYYY-MM-dd'))
