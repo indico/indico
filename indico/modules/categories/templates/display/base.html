@@ -23,10 +23,10 @@
                    data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li>
-                        <a href="{# TODO url_for('.today', category) #}">{% trans %}Today's events{% endtrans %}</a>
+                        <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
                     </li>
                     <li>
-                        <a href="{# TODO url_for('.week', category) #}">{% trans %}Week's events{% endtrans %}</a>
+                        <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
                     </li>
                     <li>
                         <a href="{# TODO url_for('.calendar', category) #}">{% trans %}Calendar{% endtrans %}</a>

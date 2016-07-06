@@ -1,0 +1,123 @@
+{% extends 'layout/management_page.html' %}
+
+{% block side_menu %}
+    <div class="category-overview-side-menu">
+        <form action="{{ url_for('.overview', category) }}" method="GET" id="category-overview-options">
+            <span id="calendar-container"></span>
+            <input type="hidden" id="date" name="date" value="{{ start_dt|format_date(format="YYYY-MM-dd") }}">
+            <h3>{% trans %}Display options{% endtrans %}</h3>
+            <table cellpadding="0" cellspacing="0" style="width:100%">
+                <tr>
+                    <td>{% trans %}Period:{% endtrans %}</td>
+                    <td>
+                        <select name="period">
+                            <option value="day" {% if period == 'day' %}selected{% endif %}>
+                                {% trans %}day{% endtrans %}
+                            </option>
+                            <option value="week" {% if period == 'week' %}selected{% endif %}>
+                                {% trans %}week{% endtrans %}
+                            </option>
+                            <option value="month" {% if period == 'month' %}selected{% endif %}>
+                                {% trans %}month{% endtrans %}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% trans %}Detail level{% endtrans %}</td>
+                    <td>
+                        <select name="detail">
+                            <option value="event" {% if detail == 'event' %}selected{% endif %}>
+                                {% trans %}event{% endtrans %}
+                            </option>
+                            <option value="session" {% if detail == 'session' %}selected{% endif %}>
+                                {% trans %}session{% endtrans %}
+                            </option>
+                            <option value="contribution" {% if detail == 'contribution' %}selected{% endif %}>
+                                {% trans %}contribution{% endtrans %}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <span id="applyButtonWrapper">
+                <input type="button" value="{% trans %}Apply{% endtrans %}" class="apply-options">
+            </span>
+        </form>
+        {% if subcategories %}
+            <br>
+            <h3>{% trans %}Legend{% endtrans %}</h3>
+            <div>
+                {% for subcategory in subcategories|sort(attribute='title') %}
+                    <a href="{{ url_for('categories.overview', subcategory, period=period,
+                                        date=start_dt|format_date(format="YYYY-MM-dd"), detail=detail) }}">
+                        <img src="{{ url_for('categories.display_icon', subcategory, slug=subcategory.icon_metadata['hash']) }}">
+                        {{ subcategory.title }}
+                    </a>
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            $('#category-overview-options .apply-options').on('click', function() {
+                var applyButtonWrapper = $E("applyButtonWrapper");
+                applyButtonWrapper.set(progressIndicator(true, false));
+                submitForm();
+            });
+
+            function submitForm() {
+                $('#category-overview-options').submit();
+            };
+
+
+            function dateChanged(calendar) {
+                if (calendar.dateClicked) {
+                    submitForm();
+                }
+            };
+
+            Calendar.setup({
+                inputField: $('#category-overview-options #date')[0],
+                ifFormat: '%Y-%m-%d',
+                flat: "calendar-container",
+                flatCallback: dateChanged
+            });
+        })();
+    </script>
+{% endblock %}
+
+{% block display_view_button %}
+    <div class="group">
+        <a href="{{ url_for('categories.display', category) }}" class="icon-arrow-left highlight i-button">
+            {% trans %}Back to category page{% endtrans %}
+        </a>
+    </div>
+{% endblock %}
+
+{% block banner_title %}
+    {{ category.title }}
+{% endblock %}
+
+{% block title %}
+    {% trans %}Events overview{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="category-overview">
+        <div class="title">
+            <div class="navigation">
+                {% block overview_navigation_left %}{% endblock %}
+            </div>
+            <div class="text">{% block overview_title %}{% endblock %}</div>
+            <div class="navigation">
+                {% block overview_navigation_right %}{% endblock %}
+            </div>
+        </div>
+        {% block overview %}{% endblock %}
+    </div>
+{% endblock %}
