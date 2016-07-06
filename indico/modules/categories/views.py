@@ -63,7 +63,8 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         return head_content
 
     def _getNavigationDrawer(self):
-        return WNavigationDrawer({'target': self.category})
+        if not self.category.is_root:
+            return WNavigationDrawer({'target': self.category})
 
 
 class WPCategoryManagement(WPCategory):
@@ -84,7 +85,8 @@ class WPCategoryManagement(WPCategory):
         return WPCategory.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()
 
     def _getNavigationDrawer(self):
-        return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
+        if not self.category.is_root:
+            return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 
 
 class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
