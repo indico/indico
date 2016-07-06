@@ -43,6 +43,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         self.atom_feed_title = kwargs.get('atom_feed_title')
         self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, **kwargs)
+        self._locTZ = category.display_tzinfo.zone
 
     def getCSSFiles(self):
         return WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
