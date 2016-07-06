@@ -100,8 +100,6 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     """
     if format == 'code':
         format = 'dd/MM/yyyy HH:mm'
-    elif format == 'weekday':
-        format = 'EEEE, HH:mm'
     if not locale:
         locale = get_current_locale()
     if keep_tz:
@@ -229,6 +227,28 @@ def format_human_date(dt, format='medium', locale=None):
         return _("tomorrow")
     else:
         return format_date(dt, format, locale=locale)
+
+
+def format_human_datetime(dt, locale=None, timezone=None):
+    """
+    Return the date and time in a human-like format for yesterday, today and tomorrow.
+    Format the date otherwise.
+    """
+    now = now_utc()
+    if timezone is not None:
+        now = now.astimezone(timezone)
+        dt = dt.astimezone(timezone)
+
+    if dt.date() == now.date():
+        return _("today") + " " + format_time(dt.time(), locale=locale, timezone=timezone)
+    elif dt.date() == (now + timedelta(days=1)).date():
+        return _("tomorrow") + " " + format_time(dt.time(), locale=locale, timezone=timezone)
+    elif dt < (now + timedelta(days=6)):
+        return format_datetime(dt, format="EEEE H:mm", timezone=timezone)
+    elif dt.date().year == now.date().year:
+        return format_datetime(dt, format="d MMM", timezone=timezone)
+    else:
+        return format_datetime(dt, format="d MMM yyyy", timezone=timezone)
 
 
 def format_number(number, locale=None):

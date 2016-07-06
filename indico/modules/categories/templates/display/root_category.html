@@ -2,8 +2,8 @@
 {% from 'categories/display/sidebar.html' import render_news, render_upcoming_events %}
 
 {% block sidebar %}
-    {{ render_news(news) }}
-    {{ render_upcoming_events(upcoming_events) }}
+    {{ render_news(news, tzinfo=category.display_tzinfo) }}
+    {{ render_upcoming_events(upcoming_events, tzinfo=category.display_tzinfo, happening_now=happening_now) }}
 {% endblock %}
 
 

@@ -20,7 +20,7 @@
     {% endif -%}
 {% endmacro %}
 
-{% macro render_news(news_list) %}
+{% macro render_news(news_list, tzinfo) %}
     {%- if news_list %}
         <h2 class="icon-bullhorn">
             {% trans %}News{% endtrans %}
@@ -33,7 +33,7 @@
                         {{ news.title }}
                     </a>
                     <span class="timing">
-                        {% trans date=news.created_dt|format_date(format='medium') -%}
+                        {% trans date=news.created_dt|format_human_date() -%}
                             Posted on {{ date }}
                         {%- endtrans %}
                     </span>
@@ -43,7 +43,7 @@
     {% endif -%}
 {% endmacro %}
 
-{% macro render_upcoming_events(upcoming_events) %}
+{% macro render_upcoming_events(upcoming_events, tzinfo, happening_now) %}
     {%- if upcoming_events %}
         <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
         <ul class="main-page-list">
@@ -54,12 +54,12 @@
                         {{ event.title|strip_tags }}
                     </a>
                     <span class="timing">
-                        {% if event.status == 'ongoing' %}
-                            {% trans time=event.end_dt|format_datetime(format='weekday') -%}
+                        {% if happening_now(event) %}
+                            {% trans time=event.end_dt|format_human_datetime(timezone=tzinfo) -%}
                                 ongoing until {{ time }}
                             {%- endtrans %}
                         {% else %}
-                            {% trans time=event.start_dt|format_datetime(format='weekday') -%}
+                            {% trans time=event.start_dt|format_human_datetime(timezone=tzinfo) -%}
                                 starts {{ time }}
                             {%- endtrans %}
                         {% endif %}
