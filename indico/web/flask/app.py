@@ -63,6 +63,7 @@ from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, List
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
 from indico.web.menu import render_sidemenu
+from indico.web.util import url_for_index
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
@@ -177,6 +178,7 @@ def setup_jinja(app):
     app.add_template_global(iter_form_fields, '_iter_form_fields')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)
+    app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
     app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
