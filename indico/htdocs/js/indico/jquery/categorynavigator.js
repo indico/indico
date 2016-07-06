@@ -216,8 +216,8 @@
                 class: 'title',
                 text: category.title
             }));
-            if (withBreadcrumbs && category.path.length > 0) {
-                $categoryTitle.append(self._buildBreadcrumbs(category.path, clickableBreadcrumbs));
+            if (withBreadcrumbs && category.parent_path.length) {
+                $categoryTitle.append(self._buildBreadcrumbs(category.parent_path, clickableBreadcrumbs));
             }
 
             $category.append($('<div>', {class: 'icon-wrapper'}));
@@ -278,8 +278,8 @@
 
             $buttonWrapper.append($('<div>').append($button));
 
-            if (!forSubcategory && category.path && category.path.length) {
-                var parent = _.last(category.path);
+            if (!forSubcategory && category.parent_path && category.parent_path.length) {
+                var parent = _.last(category.parent_path);
                 var $arrowUp = $('<a>', {
                     class: 'icon-arrow-up navigate-up',
                     title: $T.gettext("Go to parent: {0}".format(parent.title))
@@ -474,6 +474,9 @@
             self._cacheSubcategories[data.category.id] = _.pluck(data.subcategories, 'id');
             _.each(data.subcategories, function(subcategory) {
                 self._cache[subcategory.id] = $.extend(self._cache[subcategory.id], subcategory);
+            });
+            _.each(data.supercategories, function(supercategory) {
+                self._cache[supercategory.id] = $.extend(self._cache[supercategory.id], supercategory);
             });
         },
 
