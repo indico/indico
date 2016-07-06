@@ -127,7 +127,7 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category, with_favorite=False, with_path=False, parent_data=None):
+def _serialize_category(category, with_favorite=False, with_path=False, parent_path=None, child_path=None):
     data = {
         'id': category.id,
         'title': category.title,
@@ -138,12 +138,19 @@ def _serialize_category(category, with_favorite=False, with_path=False, parent_d
         'can_access': category.can_access(session.user),
     }
     if with_path:
-        if parent_data and 'path' in parent_data:
-            data['path'] = parent_data['path'][:]
-            data['path'].append({'id': parent_data['id'], 'title': parent_data['title']})
+        if child_path:
+            data['path'] = child_path[:]
+            for segment in reversed(child_path):
+                data['path'].pop()
+                if not data['path'] or data['path'][-1]['id'] == category.id:
+                    break
+        elif parent_path:
+            data['path'] = parent_path[:]
+            data['path'].append({'id': category.id, 'title': category.title})
         else:
             data['path'] = [{'id': c.id, 'title': c.title}
-                            for c in category.parent_chain_query.options(load_only('id', 'title'))]
+                            for c in category.chain_query.options(load_only('id', 'title'))]
+        data['parent_path'] = data['path'][:-1]
     if with_favorite:
         data['is_favorite'] = session.user and category in session.user.favorite_categories
     return data
@@ -161,12 +168,16 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode',
                                                                          'has_events')
 
-    def _process(self):
+    def _serialize_category_chain(self):
         category_data = _serialize_category(self.category, with_path=True)
-        return jsonify_data(category=category_data,
-                            subcategories=[_serialize_category(c, with_path=True, parent_data=category_data)
-                                           for c in self.category.children],
-                            flash=False)
+        return {'category': category_data,
+                'subcategories': [_serialize_category(c, with_path=True, parent_path=category_data['path'])
+                                  for c in self.category.children],
+                'supercategories': [_serialize_category(c, with_path=True, child_path=category_data['path'])
+                                    for c in self.category.parent_chain_query]}
+
+    def _process(self):
+        return jsonify_data(flash=False, **self._serialize_category_chain())
 
 
 class RHCategorySearch(RH):
