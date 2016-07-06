@@ -257,7 +257,7 @@
             if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
                 $button.addClass('disabled').attr('title', categoriesWithSubcategories.message);
             }
-            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.event_count) {
+            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.has_events) {
                 $button.addClass('disabled').attr('title', categoriesWithEvents.message);
             }
             if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {

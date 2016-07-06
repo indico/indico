@@ -132,7 +132,7 @@ def _serialize_category(category, with_path=False, with_favorite=False):
         'id': category.id,
         'title': category.title,
         'is_protected': category.is_protected,
-        'event_count': category.event_count,
+        'has_events': category.has_events,
         'deep_category_count': category.deep_children_count,
         'deep_event_count': category.deep_events_count,
         'can_access': category.can_access(session.user),
@@ -153,8 +153,9 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
-        children_strategy.undefer('event_count')
-        return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode')
+        children_strategy.undefer('has_events')
+        return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode',
+                                                                         'has_events')
 
     def _process(self):
         return jsonify_data(category=_serialize_category(self.category, with_path=True),
@@ -166,7 +167,7 @@ class RHCategorySearch(RH):
         q = request.args['q'].lower()
         query = (Category.query
                  .filter(Category.title_matches(q))
-                 .options(undefer('deep_children_count'), undefer('deep_events_count'), undefer('event_count'),
+                 .options(undefer('deep_children_count'), undefer('deep_events_count'), undefer('has_events'),
                           joinedload('acl_entries')))
         if session.user:
             # Prefer favorite categories
@@ -188,8 +189,8 @@ class RHCategorySearch(RH):
 class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     """Base class for display pages displaying an event list"""
 
-    _category_query_options = (joinedload('children'), undefer('attachment_count'), undefer('deep_events_count'),
-                               undefer('event_count'))
+    _category_query_options = (joinedload('children').undefer('deep_events_count'), undefer('attachment_count'),
+                               undefer('has_events'))
 
     def _checkParams(self):
         RHDisplayCategoryBase._checkParams(self)
