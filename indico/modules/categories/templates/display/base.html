@@ -57,24 +57,9 @@
                     </li>
                 </ul>
                 {% if category.can_manage(session.user) %}
-                    <a class="i-button icon-edit arrow js-dropdown"
-                       title="{% trans %}Management options{% endtrans %}"
-                       data-toggle="dropdown"></a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="{{ url_for('categories.manage_content', category) }}">
-                                {% trans %}Edit category{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               data-ajax-dialog
-                               data-href="{{ url_for('.create_subcategory', category) }}"
-                               data-title="{% trans %}New category{% endtrans %}">
-                                {% trans %}Add subcategory{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="{{ url_for('categories.manage_content', category) }}"
+                       class="i-button icon-edit"
+                       title="{% trans %}Manage category{% endtrans %}"></a>
                 {% endif %}
             </div>
             {% if session.user and not category.is_root %}
