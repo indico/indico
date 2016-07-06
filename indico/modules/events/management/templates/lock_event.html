@@ -1,28 +1,13 @@
-{% extends 'layout/base.html' %}
+{% from 'confirmation_dialog.html' import confirmation_dialog %}
 
-{% block title %}{% trans %}You are about to lock this event!{% endtrans %}{% endblock %}
+{% set confirmation_message %}
+    {% trans -%}
+        Please note that if you lock this event, you will not be able to change it anymore.
+        Only the creator of the event or a category manager will be able to unlock it.
+    {%- endtrans %}
+{% endset %}
 
-{% block content %}
-    <form method="POST" class="i-form vertical js-form-confirm-lock">
-        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <h2>{{ event.title }}</h2>
-        <div class="form-group warning-message-box large-icon">
-            <div class="message-text">
-                {% trans -%}
-                    Please note that if you lock this event, you will not be able to change it anymore.<br>
-                    Only the event owner or an administrator will be able to unlock it.
-                {%- endtrans %}
-            </div>
-        </div>
-        <div class="form-group form-group-footer">
-            <div class="form-field">
-                <button id="js-button-lock" class="i-button big warning right">
-                    {% trans %}Lock event{% endtrans %}
-                </button>
-                <button id="js-button-close" class="i-button big right" data-button-back>
-                    {% trans %}I've changed my mind!{% endtrans %}
-                </button>
-            </div>
-        </div>
-    </form>
-{% endblock %}
+{% call confirmation_dialog('warning', message=confirmation_message, ok_text=_('Lock event'),
+                            extra_confirmation=false) %}
+    {% trans %}You are about to lock this event!{% endtrans %}
+{% endcall %}
