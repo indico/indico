@@ -1,3 +1,5 @@
+{% from 'events/management/create_event.html' import create_event_button %}
+
 <div class="category-container">
     <div class="category-header">
         <div id="category-toolbar" class="toolbar right">
@@ -36,26 +38,7 @@
                         <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
                     </li>
                 </ul>
-                <a class="i-button icon-plus arrow js-dropdown"
-                   title="{% trans %}Create new event{% endtrans %}"
-                   data-toggle="dropdown"></a>
-                <ul class="dropdown">
-                    <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='lecture', categId=category.id) }}">
-                            {% trans %}Lecture{% endtrans %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='meeting', categId=category.id) }}">
-                            {% trans %}Meeting{% endtrans %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('event_creation.conferenceCreation', event_type='conference', categId=category.id) }}">
-                            {% trans %}Conference{% endtrans %}
-                        </a>
-                    </li>
-                </ul>
+                {{ create_event_button(category, classes="icon-plus") }}
                 {% if category.can_manage(session.user) %}
                     <a href="{{ url_for('categories.manage_content', category) }}"
                        class="i-button icon-edit"
