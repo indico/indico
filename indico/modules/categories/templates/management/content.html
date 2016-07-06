@@ -1,6 +1,16 @@
 {% extends 'categories/management/base.html' %}
 
 {% from 'categories/management/_events_list.html' import render_events_list %}
+{% from 'events/management/create_event.html' import create_event_button %}
+
+{% macro _create_category_button(classes='') %}
+    <button class="i-button js-new-category {{ classes }}"
+            data-ajax-dialog
+            data-href="{{ url_for('.create_subcategory', category) }}"
+            data-title="{% trans %}New category{% endtrans %}">
+        {% trans %}New category{% endtrans %}
+    </button>
+{% endmacro %}
 
 {% macro subcategory_row(subcategory) %}
     <tr class="i-table"
@@ -35,12 +45,7 @@
 {% macro subcategories_table(subcategories) %}
     <div class="toolbar">
         <div class="group">
-            <button class="i-button highlight icon-plus js-new-category"
-                    data-ajax-dialog
-                    data-href="{{ url_for('.create_subcategory', category) }}"
-                    data-title="{% trans %}New category{% endtrans %}">
-                {% trans %}New category{% endtrans %}
-            </button>
+            {{ _create_category_button(classes='highlight icon-plus') }}
         </div>
         <div class="group">
             <button class="i-button icon-sort-alpha-asc js-sort-categories"
@@ -73,20 +78,44 @@
 {% endmacro %}
 
 {% block title %}
-    {% trans %}Content{% endtrans %}
+    {% if subcategories %}
+        {% trans %}Categories{% endtrans %}
+        {# If the category also contains events, a second title will be displayed further down the page. #}
+    {% elif events.total %}
+        {% trans %}Events{% endtrans %}
+    {% else %}
+        {% trans %}Content{% endtrans %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if subcategories or not events.total %}
-        {{ subcategories_table(subcategories) }}
-        <script>
-            setupCategoryTable();
-        </script>
-    {% endif %}
-    {% if events.total or not subcategories %}
-        {{ render_events_list(category, page, order_column, direction, events) }}
-        <script>
-            setupCategoryEventList();
-        </script>
+    {% if not subcategories and not events.total %}
+        <p>
+            {% trans %}This category is empty. A category can either hold categories or events.{% endtrans %}
+        </p>
+        {{ _create_category_button() }}
+        {{ create_event_button(category, text=_("New event")) }}
+    {% else %}
+        {% if subcategories %}
+            {{ subcategories_table(subcategories) }}
+            <script>
+                setupCategoryTable();
+            </script>
+        {% endif %}
+        {% if events.total %}
+            {% if subcategories %}
+                <header>
+                    <div class="title">
+                        <div class="text">
+                            <h2>{% trans %}Events{% endtrans %}</h2>
+                        </div>
+                    </div>
+                </header>
+            {% endif %}
+            {{ render_events_list(category, page, order_column, direction, events) }}
+            <script>
+                setupCategoryEventList();
+            </script>
+        {% endif %}
     {% endif %}
 {% endblock content %}
