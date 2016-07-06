@@ -43,7 +43,7 @@ settings = SettingsProxy('api', {
     'security_mode': APIMode.KEY.value,
     'cache_ttl': 600,
     'signature_ttl': 600
-}, preload=True)
+})
 
 
 @signals.users.merged.connect

@@ -48,7 +48,7 @@ layout_settings = EventSettingsProxy('layout', {
     'use_custom_menu': False,
     'timetable_by_room': False,
     'timetable_detailed': False
-}, preload=True)
+})
 
 theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
 

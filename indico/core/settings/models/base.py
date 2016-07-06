@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from enum import Enum
+from flask import has_request_context, g
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
@@ -62,11 +63,35 @@ class SettingsBase(object):
             return
         cls.find(cls.name.in_(names), cls.module == module, **kwargs).delete(synchronize_session='fetch')
         db.session.flush()
+        cls._clear_cache()
 
     @classmethod
     def delete_all(cls, module, **kwargs):
         cls.find(module=module, **kwargs).delete()
         db.session.flush()
+        cls._clear_cache()
+
+    @classmethod
+    def _get_cache(cls, kwargs):
+        if not has_request_context():
+            # disable the cache by always returning an empty one
+            return defaultdict(dict), False
+        key = (cls, frozenset(kwargs.viewitems()))
+        try:
+            return g.global_settings_cache[key], True
+        except AttributeError:
+            # no cache at all
+            g.global_settings_cache = cache = dict()
+            cache[key] = rv = defaultdict(dict)
+            return rv, False
+        except KeyError:
+            # no cache for this settings class / kwargs
+            return g.global_settings_cache.setdefault(key, defaultdict(dict)), False
+
+    @staticmethod
+    def _clear_cache():
+        if has_request_context():
+            g.pop('global_settings_cache', None)
 
 
 class JSONSettingsBase(SettingsBase):
@@ -89,7 +114,13 @@ class JSONSettingsBase(SettingsBase):
 
     @classmethod
     def get_all(cls, module, **kwargs):
-        return {s.name: s.value for s in cls.find(module=module, **kwargs)}
+        cache, hit = cls._get_cache(kwargs)
+        if hit:
+            return cache[module]
+        else:
+            for s in cls.find(**kwargs):
+                cache[s.module][s.name] = s.value
+            return cache[module]
 
     @classmethod
     def get(cls, module, name, default=None, **kwargs):
@@ -106,6 +137,7 @@ class JSONSettingsBase(SettingsBase):
             db.session.add(setting)
         setting.value = _coerce_value(value)
         db.session.flush()
+        cls._clear_cache()
 
     @classmethod
     def set_multi(cls, module, items, **kwargs):
@@ -116,6 +148,7 @@ class JSONSettingsBase(SettingsBase):
         for name in items.viewkeys() & existing.viewkeys():
             existing[name].value = _coerce_value(items[name])
         db.session.flush()
+        cls._clear_cache()
 
 
 class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
