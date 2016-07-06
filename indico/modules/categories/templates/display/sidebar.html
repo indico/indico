@@ -1,15 +1,30 @@
-{% from 'attachments/_attachments.html' import render_attachments %}
+{% from 'attachments/_attachments.html' import render_attachments as _render_attachments %}
 
 {% macro render_attachments(category) %}
-    {%- if category.attachment_count %}
-        {{ render_attachments(category.attached_items, linked_object=category,
-                              management=category.can_manage(session.user)) }}
+    {%- set can_manage = category.can_manage(session.user) -%}
+    {%- if category.attachment_count or can_manage %}
+        <div class="title">
+            <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
+            {% if can_manage %}
+                <div class="actions">
+                    <a href="#" class="i-button icon-edit js-manage-attachments"
+                       title="{% trans %}Manage materials{% endtrans %}"
+                       data-title="{% trans title=category.title %}Manage category materials{% endtrans %}"
+                       data-locator="{{ category.locator|tojson|forceescape }}"
+                       data-attachment-editor
+                       data-reload-on-change></a>
+                </div>
+            {% endif %}
+        </div>
+        {{ _render_attachments(category.attached_items, linked_object=category, management=false) }}
     {% endif -%}
 {% endmacro %}
 
 {% macro render_managers(managers) %}
     {%- if managers %}
-        <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
+        <div class="title">
+            <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
+        </div>
         <ul id="manager-list">
             {% for manager in managers %}
                 <li class="{{ 'icon-user' if manager.is_single_person else 'icon-users' }}">
@@ -22,10 +37,12 @@
 
 {% macro render_news(news_list, tzinfo) %}
     {%- if news_list %}
-        <h2 class="icon-bullhorn">
-            {% trans %}News{% endtrans %}
-            <a href="{{ url_for('news.display') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
-        </h2>
+        <div class="title">
+            <h2 class="icon-bullhorn">
+                {% trans %}News{% endtrans %}
+                <a href="{{ url_for('news.display') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
+            </h2>
+        </div>
         <ul class="main-page-list">
             {% for news in news_list %}
                 <li>
@@ -45,7 +62,9 @@
 
 {% macro render_upcoming_events(upcoming_events, tzinfo, happening_now) %}
     {%- if upcoming_events %}
-        <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
+        <div class="title">
+            <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
+        </div>
         <ul class="main-page-list">
             {% for event in upcoming_events %}
                 <li>
