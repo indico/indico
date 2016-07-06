@@ -7,7 +7,7 @@
                         {% trans %}Parent category{% endtrans %}
                     </a>
                 {% endif %}
-                {% if category.event_count %}
+                {% if category.has_events %}
                     <a href="#"
                        class="i-button icon-calendar arrow js-export-ical"
                        title="{% trans %}Export to scheduling tool{% endtrans %}"

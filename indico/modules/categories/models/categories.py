@@ -23,7 +23,7 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
-from sqlalchemy.sql import select, literal
+from sqlalchemy.sql import select, literal, exists
 
 from indico.core import signals
 from indico.core.db import db
@@ -385,10 +385,17 @@ def _mappers_configured():
 
     # Category.event_count -- the number of events in the category itself,
     # excluding deleted events
-    query = (db.select([db.func.count(Event.id)])
+    query = (select([db.func.count(Event.id)])
              .where((Event.category_id == Category.id) & ~Event.is_deleted)
              .correlate_except(Event))
     Category.event_count = column_property(query, deferred=True)
+
+    # Category.has_events -- whether the category itself contains any
+    # events, excluding deleted events
+    query = (exists([1])
+             .where((Event.category_id == Category.id) & ~Event.is_deleted)
+             .correlate_except(Event))
+    Category.has_events = column_property(query, deferred=True)
 
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
