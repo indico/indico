@@ -50,8 +50,8 @@
                         {{ news.title }}
                     </a>
                     <span class="timing">
-                        {% trans date=news.created_dt|format_human_date() -%}
-                            Posted on {{ date }}
+                        {% trans date=news.created_dt.astimezone(tzinfo).date()|format_human_date() -%}
+                            Posted {{ date }}
                         {%- endtrans %}
                     </span>
                 </li>
