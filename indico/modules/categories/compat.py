@@ -16,18 +16,19 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from flask import abort, request, redirect
 from werkzeug.exceptions import NotFound
 
 from indico.modules.categories import LegacyCategoryMapping
-from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function
 def compat_category(legacy_category_id, path=None):
-    if not is_legacy_id(legacy_category_id):
+    if not re.match(r'^\d+l\d+$', legacy_category_id):
         abort(404)
     mapping = LegacyCategoryMapping.find_first(legacy_category_id=legacy_category_id)
     if mapping is None:
