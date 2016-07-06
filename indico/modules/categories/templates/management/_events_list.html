@@ -1,4 +1,5 @@
 {% from 'pagination.html' import render_pagination %}
+{% from 'events/management/create_event.html' import create_event_button %}
 
 {% macro event_row(event) %}
     <tr class="i-table">
@@ -84,26 +85,7 @@
             </ul>
         </div>
         <div class="group">
-            <a href="#" class="i-button js-dropdown arrow" data-toggle="dropdown">
-                {% trans %}Create event{% endtrans %}
-            </a>
-            <ul class="dropdown">
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='lecture') }}">
-                        {% trans %}Create lecture{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='meeting') }}">
-                        {% trans %}Create meeting{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('event_creation.conferenceCreation', categId=category.id, event_type='conference') }}">
-                        {% trans %}Create conference{% endtrans %}
-                    </a>
-                </li>
-            </ul>
+            {{ create_event_button(category, classes='icon-plus highlight', text=_("Create event")) }}
         </div>
         {% if events.total %}
             <div class="group right">

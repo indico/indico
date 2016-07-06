@@ -1,0 +1,26 @@
+{% macro create_event_button(category, classes="", text="") %}
+    <a class="{{ classes }} i-button arrow js-dropdown"
+       title="{% trans %}Create new event{% endtrans %}"
+       data-toggle="dropdown">{{ text }}</a>
+    <ul class="dropdown">
+        <li>
+            <a href="{{ _create_event_url(category, 'lecture') }}">
+                {% trans %}Lecture{% endtrans %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ _create_event_url(category, 'meeting') }}">
+                {% trans %}Meeting{% endtrans %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ _create_event_url(category, 'conference') }}">
+                {% trans %}Conference{% endtrans %}
+            </a>
+        </li>
+    </ul>
+{% endmacro %}
+
+{% macro _create_event_url(category, type) %}
+    {{ url_for('event_creation.conferenceCreation', category.locator.legacy, event_type=type) }}
+{% endmacro %}
