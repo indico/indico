@@ -11,16 +11,17 @@ from indico.modules.events.models.events import EventType
 event_types = {t.name: str(t.title) for t in EventType}
 
 visibilityList = {}
-topcat = confObj.getOwnerList()[0]
-level = 0
-visibilityList[0] = 'Nowhere'
-while topcat:
-    level += 1
-    if topcat.getId() != "0":
-        from MaKaC.common.TemplateExec import truncateTitle
-        visibilityList[level] = truncateTitle(topcat.getName(), 50)
-    topcat = topcat.getOwner()
-visibilityList[999] = 'Everywhere'
+#topcat = confObj.getOwnerList()[0]
+#level = 0
+#visibilityList[0] = 'Nowhere'
+#while topcat:
+#    level += 1
+#    if topcat.getId() != "0":
+#        from MaKaC.common.TemplateExec import truncateTitle
+#        visibilityList[level] = truncateTitle(topcat.getName(), 50)
+#    topcat = topcat.getOwner()
+#visibilityList[999] = 'Everywhere'
+visibilityList[0] = 'TODO: adapt to new categories'
 
 numRows = 11
 

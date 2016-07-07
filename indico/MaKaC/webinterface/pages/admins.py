@@ -271,10 +271,6 @@ class WPTemplatesCommon( WPAdminsBase ):
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-        if self._showAdmin:
-            return WPAdminsBase._getBody( self, params )
-        else:
-            return self._getTabContent( params )
 
 
 class WPBadgeTemplatesBase(WPTemplatesCommon):

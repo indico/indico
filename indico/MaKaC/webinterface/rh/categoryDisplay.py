@@ -368,8 +368,9 @@ class UtilsConference:
 
         c.getSupportInfo().setEmail(emailstr)
         c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
-        if c.getVisibility() != confData.get("visibility",999):
-            c.setVisibility( confData.get("visibility",999) )
+        # TODO: remove TODO once visibility has been updated
+        if c.getVisibility() != confData.get("visibility", 999) and confData.get('visibility') != 'TODO':
+            c.setVisibility(confData.get("visibility", 999))
         theme = confData.get('defaultStyle', '')
         new_type = EventType.legacy_map[confData['eventType']] if 'eventType' in confData else c.as_event.type_
         if new_type != c.as_event.type_:

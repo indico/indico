@@ -20,7 +20,7 @@ from flask import request
 from hashlib import md5
 from indico.modules.groups import GroupProxy
 from pytz import timezone
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, load_only
 
 import string
 import StringIO
@@ -236,6 +236,12 @@ class outputGenerator(object):
             self.cache.cacheObject(version, xml, event.as_legacy)
         out.writeXML(xml)
 
+    def _generate_category_path(self, event, out):
+        path = [unicode(c.id) for c in event.category.chain_query.options(load_only('id'))]
+        out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
+        out.writeTag("subfield", ":".join(path), [["code", "a"]])
+        out.closeTag("datafield")
+
     def _event_to_xml_marc_21(self, event, includeSession=1, includeContribution=1, includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
@@ -265,10 +271,7 @@ class outputGenerator(object):
         out.writeTag("subfield", uniqueId(event), [["code", "g"]])
         out.closeTag("datafield")
 
-        for path in event.as_legacy.getCategoriesPath():
-            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("subfield", ":".join(path), [["code","a"]])
-            out.closeTag("datafield")
+        self._generate_category_path(event, out)
 
         ####################################
         # Fermi timezone awareness         #
@@ -415,10 +418,7 @@ class outputGenerator(object):
         out.writeTag("subfield", datetime.now().strftime('%Y-%m-%dT'), [["code", "c"]])
         out.closeTag("datafield")
 
-        for path in contrib.event_new.as_legacy.getCategoriesPath():
-            out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
-            out.writeTag("subfield", ":".join(path), [["code", "a"]])
-            out.closeTag("datafield")
+        self._generate_category_path(contrib.event_new, out)
 
         self._generate_contrib_location_and_time(contrib, out)
 
@@ -554,7 +554,6 @@ class outputGenerator(object):
             self.cache.cacheObject(version, xml, subCont)
         out.writeXML(xml)
 
-
     def _subcontrib_to_marc_xml_21(self, subcontrib, includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
@@ -582,12 +581,7 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         self._generate_references(subcontrib, out)
-
-        for path in subcontrib.event_new.as_legacy.getCategoriesPath():
-            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("subfield", ":".join(path), [["code","a"]])
-            out.closeTag("datafield")
-
+        self._generate_category_path(subcontrib.event_new, out)
         self._generate_contrib_location_and_time(subcontrib.contribution, out)
     #
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])

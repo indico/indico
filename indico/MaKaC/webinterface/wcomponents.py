@@ -354,7 +354,7 @@ class WConferenceHeader(WHeader):
         vars["conf"] = vars["target"] = self._conf
 
         vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
-        vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["MaKaCHomeURL"] = self._conf.as_event.category.url
 
         # Default values to avoid NameError while executing the template
         styles = theme_settings.get_themes_for("conference")

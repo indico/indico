@@ -63,8 +63,6 @@ class RHFileBase(RHConferenceSite):
 #        if not isinstance(self._file, LocalFile):
 #            raise MaKaCError("No file found, %s found instead"%type(self._file))
         self._conf = self._file.getConference()
-        if self._conf is None:
-            self._categ = self._file.getCategory()
 
 
 class RHTrackBase( RHConferenceSite ):

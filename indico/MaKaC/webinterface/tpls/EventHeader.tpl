@@ -1,14 +1,5 @@
 <%
-owner = conf.getOwnerList()[0]
-
-first = owner.getRelativeEvent('first')
-last = owner.getRelativeEvent('last')
-
-if first == conf:
-   first = None
-if last == conf:
-   last = None
-
+rel = conf.as_event.get_relative_events_ids()
 # If printURL is set then show the print button
 if printURL is not UNDEFINED:
     showPrintButton = True
@@ -41,21 +32,25 @@ else:
 
         <div class="separator"></div>
 
-        %if first != None:
-            <a id="firstEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(first) }"
+        %if rel['first'] is not None:
+            <a id="firstEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['first']) }"
                style="background-image: url(${ systemIcon('first_arrow') })"></a>
-            <a id="previousEventButton" href="${ urlHandlers.UHPreviousEvent.getURL(conf) }"
+        % endif
+        % if rel['prev'] is not None:
+        <a id="previousEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['prev']) }"
                style="background-image: url(${ systemIcon('left_arrow') })"></a>
         % endif
 
         <a id="upToCategoryButton" href="${ categurl }"
            style="background-image: url(${ systemIcon('upCategory') })"></a>
 
-        %if last != None:
-            <a id="nextEventButton" href="${ urlHandlers.UHNextEvent.getURL(conf) }"
+        %if rel['next'] is not None:
+            <a id="nextEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['next']) }"
                style="background-image: url(${ systemIcon('right_arrow') })"></a>
-            <a id="lastEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(last) }"
-               style="background-image: url(${ systemIcon('last_arrow') })"></a>
+        % endif
+        % if rel['last'] is not None:
+            <a id="lastEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['last']) }"
+                   style="background-image: url(${ systemIcon('last_arrow') })"></a>
         % endif
 
         % if showPrintButton or showMoreButton or showFilterButton:
