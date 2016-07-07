@@ -45,7 +45,7 @@
         @extend .i-box.just-group-list;
         @extend .i-box.just-group-list.with-hover-effect;
 
-        background: lighten($gray, $color-variation);
+        background: $light-gray;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -230,6 +230,29 @@
     align-self: center;
     flex-grow: 1;
     font-size: 6em;
+}
+
+.category-list .placeholder {
+    align-items: center;
+    align-self: center;
+    color: $gray;
+    display: flex;
+    flex-grow: 1;
+    text-align: center;
+
+    &:empty {
+        display: none;
+    }
+
+    .placeholder-text {
+        font-size: 1.5em;
+        font-weight: bold;
+
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
 }
 
 .category-list:not(.loading) {

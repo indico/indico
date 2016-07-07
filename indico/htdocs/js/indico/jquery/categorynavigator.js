@@ -22,8 +22,10 @@
         options: {
             // ID of the current category
             categoryId: 0,
-            // The text contained in action buttons
+            // Text for action buttons
             actionButtonText: $T.gettext("Select"),
+            // Text for placeholder in empty categories
+            emptyCategoryText: $T.gettext("This category doesn't contain any subcategory"),
             // A dialog opens with the navigator rendered on it
             openInDialog: false,
             // The title for the category navigator dialog
@@ -71,6 +73,7 @@
             self.element.addClass('categorynav');
             self._createList();
             self._createSearchField();
+            self._createBindings();
             self.goToCategory(self.options.categoryId);
         },
 
@@ -100,11 +103,15 @@
                 .append(self.$categoryResultsList);
             self.$spinner = $('<div>', {class: 'spinner-wrapper'})
                 .append($('<div>', {class: 'i-spinner'}));
+            self.$placeholderEmpty = $('<div>', {class: 'placeholder'});
+            self.$placeholderNoResults = $('<div>', {class: 'placeholder'});
             self.$categoryList = $('<div>', {class: 'category-list'})
                 .append(self.$category)
                 .append(self.$categoryTree)
                 .append(self.$categoryResults)
-                .append(self.$spinner);
+                .append(self.$spinner)
+                .append(self.$placeholderEmpty)
+                .append(self.$placeholderNoResults);
             self.$categoryResults.hide();
             self.element.append(self.$categoryList);
         },
@@ -124,43 +131,35 @@
             self.$searchInput.on('input', _.debounce(function(evt) {
                 var $this = $(this);
                 var inputValue = $this.val().trim();
-
-                if (!inputValue) {
-                    self._clearSearch();
-                }
-
-                if (inputValue.length < 3) {
-                    return;
-                }
-
-                self._currentSearchRequest = $.ajax({
-                    url: build_url(Indico.Urls.Categories.search),
-                    data: {q: inputValue},
-                    beforeSend: function() {
-                        if (self._currentSearchRequest != null) {
-                            self._currentSearchRequest.abort();
-                        }
-                        self._toggleLoading(true);
-                    },
-                    complete: function() {
-                        self._toggleLoading(false);
-                    },
-                    error: function(jqXHR) {
-                        if (jqXHR.statusText === 'abort') {
-                            return;
-                        }
-                        handleAjaxError(jqXHR);
-                    },
-                    success: function(data) {
-                        if (self._isInDOM()) {
-                            self.$category.hide();
-                            self.$categoryTree.hide();
-                            self._renderSearchResultInfo(data.categories.length, data.total_count);
-                            self._renderSearchResults(data.categories);
-                        }
-                    }
-                });
+                self.searchCategories(inputValue);
             }, 500));
+        },
+
+        _createBindings: function() {
+            var self = this;
+            self.element.on('click', '.js-action', function(evt) {
+                var $this = $(this);
+                evt.stopPropagation();
+                if (!$this.hasClass('disabled')) {
+                    self._onAction($this.data('categoryId'));
+                }
+            });
+            self.element.on('click', '.js-go-to', function(evt) {
+                var categoryId = $(this).data('categoryId');
+                self.goToCategory(categoryId);
+                evt.preventDefault();
+            });
+            self.element.on('click', '.js-navigate-up', function() {
+                var parentId = $(this).data('parentId');
+                self.goToCategory(parentId);
+            });
+            self.element.on('click', '.js-search', function() {
+                self.$searchInput.focus();
+                self.$searchInput.effect('highlight', {color: '#5D95EA'});
+            });
+            self.element.on('click', '.js-clear-search', function() {
+                self._clearSearch();
+            });
         },
 
         _clearSearch: function() {
@@ -173,8 +172,10 @@
             self.$categoryResults.hide();
             self.$categoryResultsList.empty();
             self.$categoryResultsInfo.empty();
+            self.$placeholderNoResults.empty();
             self.$category.show();
             self.$categoryTree.show();
+            self.$placeholderEmpty.removeClass('hidden');
         },
 
         _buildBreadcrumbs: function(path, clickable) {
@@ -184,7 +185,11 @@
 
             _.each(path, function(category, idx) {
                 var $item = $('<li>');
-                var $segment = $(tag, {text: category.title});
+                var $segment = $(tag, {
+                    text: category.title,
+                    class: 'js-go-to',
+                    'data-category-id': category.id
+                });
                 if (idx == 0) {
                     $item.text($T.gettext("in "));
                 }
@@ -192,7 +197,6 @@
                     $segment.attr('href', '');
                     $segment.attr('title', $T.gettext("Go to: {0}".format(category.title)));
                 }
-                self._bindGoToCategoryOnClick($segment, category.id);
                 $breadcrumbs.append($item.append($segment));
             });
 
@@ -240,8 +244,8 @@
             var $subcategory = self._buildCategory(category, true, withBreadcrumbs);
 
             if (category.can_access) {
-                self._bindGoToCategoryOnClick($subcategory, category.id);
-                $subcategory.addClass('can-access');
+                $subcategory.addClass('can-access js-go-to');
+                $subcategory.data('categoryId', category.id);
             }
 
             return $subcategory;
@@ -254,8 +258,9 @@
             var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
 
             var $button = $('<span>', {
-                class: 'action-button',
-                text: self.options.actionButtonText
+                class: 'action-button js-action',
+                text: self.options.actionButtonText,
+                'data-category-id': category.id
             });
 
             if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
@@ -267,27 +272,14 @@
             if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {
                 $button.addClass('disabled').attr('title', self.options.actionOn.categories.message);
             }
-            if (!$button.hasClass('disabled')) {
-                $button.on('click', function(evt) {
-                    evt.stopPropagation();
-                    self._onAction(category);
-                });
-            } else {
-                $button.on('click', function(evt) {
-                    evt.stopPropagation();
-                    evt.preventDefault();
-                });
-            }
-
             $buttonWrapper.append($('<div>').append($button));
 
             if (!forSubcategory && category.parent_path && category.parent_path.length) {
                 var parent = _.last(category.parent_path);
                 var $arrowUp = $('<a>', {
-                    class: 'icon-arrow-up navigate-up',
-                    title: $T.gettext("Go to parent: {0}".format(parent.title))
-                }).on('click', function() {
-                    self.goToCategory(parent.id);
+                    class: 'icon-arrow-up navigate-up js-navigate-up',
+                    title: $T.gettext("Go to parent: {0}".format(parent.title)),
+                    'data-parent-id': parent.id
                 });
                 $buttonWrapper.append($arrowUp);
             }
@@ -302,6 +294,33 @@
             }
 
             return $buttonWrapper;
+        },
+
+        _buildPlaceholder: function(category) {
+            var self = this;
+            var $placeholder = $('<div>')
+                .append($('<div>', {class: 'placeholder-text', text: self.options.emptyCategoryText}));
+            if (category.parent_path.length) {
+                var parent = _.last(category.parent_path);
+                $placeholder.append($('<div>', {html: $T.gettext('You can <a class="js-action" data-category-id="{0}">{1}</a> this one, ' +
+                                                                 '<a class="js-navigate-up" data-parent-id="{2}">navigate up</a> ' +
+                                                                 'or <a class="js-search">search</a>.')
+                                                        .format(category.id, self.options.actionButtonText.toLowerCase(), parent.id)}));
+            } else {
+                // Root category is empty
+                $placeholder.append($('<div>', {html: $T.gettext('You can only <a class="js-action" data-category-id="{0}">{1}</a> this one.')
+                                                        .format(category.id, self.options.actionButtonText)}));
+            }
+            return $placeholder;
+        },
+
+        _buildNoResultsPlaceholder: function() {
+            var self = this;
+            var $placeholder = $('<div>')
+                .append($('<div>', {class: 'placeholder-text', text: $T.gettext("Your search doesn't match any category")}))
+                .append($('<div>', {html: $T.gettext('You can <a class="js-search">modify</a> ' +
+                                                     'or <a class="js-clear-search">clear</a> your search.')}));
+            return $placeholder;
         },
 
         _ellipsizeBreadcrumbs: function($category) {
@@ -335,11 +354,14 @@
             self._ellipsizeBreadcrumbs(self.$category);
         },
 
-        _renderCategoryTree: function(subcategories) {
+        _renderCategoryTree: function(subcategories, category) {
             var self = this;
             _.each(subcategories, function(subcategory) {
                 self.$categoryTree.append(self._buildSubcategory(subcategory));
             });
+            if (!subcategories.length) {
+                self.$placeholderEmpty.html(self._buildPlaceholder(category));
+            }
             self._postRenderList();
         },
 
@@ -363,6 +385,9 @@
                 self.$categoryResultsList.append($result);
                 self._ellipsizeBreadcrumbs($result);
             });
+            if (!categories.length) {
+                self.$placeholderNoResults.html(self._buildNoResultsPlaceholder());
+            }
             self._postRenderList();
         },
 
@@ -374,12 +399,9 @@
                                  : $T.gettext("There are no results. Make the search more specific for more accurate results.")
             });
             var $clear = $('<a>', {
-                class: 'clear',
+                class: 'clear js-clear-search',
                 text: $T.gettext("Clear search")
-            }).on('click', function() {
-                self._clearSearch();
             });
-
             self.$categoryResultsInfo.empty();
             self.$categoryResultsInfo.append($stats).append($clear).show();
         },
@@ -401,15 +423,6 @@
 
             // Make sure the list stays always scrolled at the top
             self.$categoryTree.scrollTop(0);
-        },
-
-        _bindGoToCategoryOnClick: function($element, id) {
-            var self = this;
-
-            $element.on('click', function(evt) {
-                evt.preventDefault();
-                self.goToCategory(id);
-            });
         },
 
         _getCurrentCategory: function(id) {
@@ -438,7 +451,7 @@
                 _.each(self._cacheSubcategories[id], function(id) {
                     subcategories.push(self._cache[id]);
                 });
-                dfd.resolve(subcategories);
+                dfd.resolve(subcategories, self._cache[id]);
             }
 
             if (self._cacheSubcategories[id]) {
@@ -483,9 +496,9 @@
             });
         },
 
-        _onAction: function(category) {
+        _onAction: function(categoryId) {
             var self = this;
-            var res = self.options.onAction(category);
+            var res = self.options.onAction(self._cache[categoryId]);
 
             if (res === undefined) {
                 res = $.Deferred().resolve();
@@ -514,6 +527,7 @@
         goToCategory: function(id) {
             var self = this;
 
+            self.$placeholderEmpty.empty();
             self.$categoryList.find('.group-list .item').animate({
                 height: 0,
                 paddingTop: 0,
@@ -528,6 +542,47 @@
             self._clearSearch();
             self._getCurrentCategory(id).then(self._renderCurrentCategory.bind(self));
             self._getCategoryTree(id).then(self._renderCategoryTree.bind(self));
+        },
+
+        searchCategories: function(query) {
+            var self = this;
+
+            if (!query) {
+                self._clearSearch();
+            }
+
+            if (query.length < 3) {
+                return;
+            }
+
+            self._currentSearchRequest = $.ajax({
+                url: build_url(Indico.Urls.Categories.search),
+                data: {q: query},
+                beforeSend: function() {
+                    if (self._currentSearchRequest != null) {
+                        self._currentSearchRequest.abort();
+                    }
+                    self._toggleLoading(true);
+                },
+                complete: function() {
+                    self._toggleLoading(false);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.statusText === 'abort') {
+                        return;
+                    }
+                    handleAjaxError(jqXHR);
+                },
+                success: function(data) {
+                    if (self._isInDOM()) {
+                        self.$category.hide();
+                        self.$categoryTree.hide();
+                        self.$placeholderEmpty.addClass('hidden');
+                        self._renderSearchResultInfo(data.categories.length, data.total_count);
+                        self._renderSearchResults(data.categories);
+                    }
+                }
+            });
         }
     });
 })(jQuery);
