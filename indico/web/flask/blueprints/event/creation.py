@@ -31,10 +31,13 @@ event_creation = IndicoBlueprint('event_creation', __name__, url_prefix='/event/
 event_creation.add_url_rule('/simple_event', view_func=_redirect_simple_event)
 event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>', 'conferenceCreation',
                             categoryDisplay.RHConferenceCreation)
-event_creation.add_url_rule('/save', 'conferenceCreation-createConference', categoryDisplay.RHConferencePerformCreation,
-                            methods=('POST',))
+event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>/save', 'conferenceCreation-createConference',
+                            categoryDisplay.RHConferencePerformCreation, methods=('POST',))
 
 # Event creation - category specified
-event_creation.add_url_rule('!/category/<categId>/create/event/simple_event', view_func=_redirect_simple_event)
-event_creation.add_url_rule('!/category/<categId>/create/event/<any(lecture,meeting,conference):event_type>',
+event_creation.add_url_rule('!/category/<int:category_id>/create/event/simple_event', view_func=_redirect_simple_event)
+event_creation.add_url_rule('!/category/<int:category_id>/create/event/<any(lecture,meeting,conference):event_type>',
                             'conferenceCreation', categoryDisplay.RHConferenceCreation)
+event_creation.add_url_rule(
+    '!/category/<int:category_id>/create/event/<any(lecture,meeting,conference):event_type>/save',
+    'conferenceCreation-createConference', categoryDisplay.RHConferencePerformCreation, methods=('POST',))

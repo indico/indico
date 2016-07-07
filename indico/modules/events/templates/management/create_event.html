@@ -22,5 +22,5 @@
 {% endmacro %}
 
 {% macro _create_event_url(category, type) %}
-    {{ url_for('event_creation.conferenceCreation', category.locator.legacy, event_type=type) }}
+    {{ url_for('event_creation.conferenceCreation', category, event_type=type) }}
 {% endmacro %}

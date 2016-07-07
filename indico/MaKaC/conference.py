@@ -646,18 +646,6 @@ class Category(CommonObjectBase):
         catIdx.unindexConf(conf)
         conf.unindexConf()
 
-    @unify_user_args
-    def newConference(self, creator, title, start_dt, end_dt, timezone, event_type, add_creator_as_manager=True):
-        conf = Conference()
-        event = Event(creator=creator, category=self.as_new, title=to_unicode(title).strip(),
-                      start_dt=start_dt, end_dt=end_dt, timezone=timezone, type_=event_type)
-        ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
-        self._addConference(conf)
-
-        signals.event.created.send(event)
-
-        return conf
-
     def removeConference(self, conf, notify=True, delete=False):
         if not (conf in self.conferences):
             return
@@ -1000,6 +988,16 @@ class Conference(CommonObjectBase):
     """
 
     fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
+
+    @classmethod
+    @unify_user_args
+    def new(cls, category, creator, title, start_dt, end_dt, timezone, event_type, add_creator_as_manager=True):
+        conf = cls()
+        event = Event(creator=creator, category=category, title=to_unicode(title).strip(),
+                      start_dt=start_dt, end_dt=end_dt, timezone=timezone, type_=event_type)
+        ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
+        signals.event.created.send(event)
+        return conf
 
     def __init__(self, id=''):
         self.id = id
@@ -1992,9 +1990,9 @@ class Conference(CommonObjectBase):
             creator = managing
         else:
             creator = self.as_event.creator
-        conf = cat.newConference(creator, title=self.getTitle(), start_dt=self.getStartDate(), end_dt=self.getEndDate(),
-                                 timezone=self.getTimezone(), event_type=self.as_event.type_,
-                                 add_creator_as_manager=False)
+        conf = Conference.new(self.as_event.category, title=self.getTitle(), start_dt=self.getStartDate(),
+                              end_dt=self.getEndDate(), timezone=self.getTimezone(), event_type=self.as_event.type_,
+                              add_creator_as_manager=False)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())

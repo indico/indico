@@ -49,6 +49,7 @@ from MaKaC.common.fossilize import fossilize
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
+from indico.modules.categories.views import WPCategory
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.upcoming import WUpcomingEvents
@@ -921,18 +922,17 @@ class WConferenceCreation( wcomponents.WTemplated ):
         vars["nbDates"] = vars.get("nbDates",1)
         seltitle = Config.getInstance().getDefaultTimezone()
         if self._categ:
-            seltitle= self._categ.getTimezone()
+            seltitle = self._categ.timezone
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(seltitle)
         vars["locationName"] = vars.get("locationName","")
         vars["locationAddress"] = vars.get("locationAddress","")
         vars["roomName"] = vars.get("locationRoom","")
-        #vars["locator"] = self._categ.getLocator().getWebForm()
         vars["protection"] = "public"
         vars["categ"] = {"id":"", "title":_("-- please, choose a category --")}
-        if self._categ and not self._categ.hasSubcategories():
-            if self._categ.isProtected() :
+        if self._categ and not self._categ.children:
+            if self._categ.is_protected:
                 vars["protection"] = "private"
-            vars["categ"] = {"id":self._categ.getId(), "title":self._categ.getTitle()}
+            vars["categ"] = {"id": str(self._categ.id), "title": self._categ.title}
         vars["nocategs"] = False
         if not CategoryManager().getRoot().hasSubcategories():
             vars["nocategs"] = True
@@ -953,7 +953,7 @@ class WConferenceCreation( wcomponents.WTemplated ):
         styleoptions = ""
         defStyle = ""
         if self._categ:
-            defStyle = self._categ.getDefaultStyle(self._type)
+            defStyle = self._categ.default_event_themes.get(self._type, '')
         if defStyle == "":
             defStyle = theme_settings.defaults[self._type]
         for theme_id, theme_data in styles.viewitems():
@@ -972,43 +972,18 @@ class WConferenceCreation( wcomponents.WTemplated ):
 
 #---------------------------------------------------------------------------
 
-class WPConferenceCreationMainData( WPCategoryDisplayBase ):
 
-    _userData = ['favorite-user-list', 'favorite-user-ids']
-
+class WPConferenceCreationMainData(WPCategory):
     def __init__(self, *args, **kwargs):
-        WPCategoryDisplayBase.__init__(self, *args, **kwargs)
-        self._protected_object = None
-
-    def getJSFiles(self):
-        return WPCategoryDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
-
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category,
-                                 prot_obj=self._protected_object)
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
-
-    def _getNavigationDrawer(self):
-        if self._target and self._target.isRoot():
-            return
-        else:
-            pars = {"target": self._target, "isModif": False}
-            return wcomponents.WNavigationDrawer( pars )
+        WPCategory.__init__(self, *args, **kwargs)
+        self._protected_object = None  # don't show protection icon in the top bar
 
     def _getWComponent(self):
-        return WConferenceCreation(self._target, self._rh._event_type.name, self._rh)
+        return WConferenceCreation(self.category, self._rh._event_type.name, self._rh)
 
-    def _getBody( self, params ):
-        ## TODO: TO REMOVE?????????
-        #p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL }
-        wc = self._getWComponent()
-        params.update({"postURL": urlHandlers.UHConferencePerformCreation.getURL() })
-        return "%s"%wc.getHTML( params )
+    def _getBody(self, params):
+        return self._getWComponent().getHTML(params)
+
 
 class WPCategoryModifBase( WPCategoryBase ):
 

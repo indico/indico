@@ -26,22 +26,22 @@
         <ul class="dropdown">
             <li>
                 <a id="create-lecture" href="${ url_for('event_creation.conferenceCreation',
-                                                        (category.locator.legacy if category and not category.is_root else None),
+                                                        (category if category and not category.is_root else None),
                                                         event_type='lecture') }">
                     ${ _("Create lecture") }
                 </a>
             </li>
             <li>
                 <a id="create-meeting" href="${ url_for('event_creation.conferenceCreation',
-                                                        (category.locator.legacy if category and not category.is_root else None),
+                                                        (category if category and not category.is_root else None),
                                                         event_type='meeting') }">
                     ${ _("Create meeting") }
                 </a>
             </li>
             <li>
                 <a id="create-conference" href="${ url_for('event_creation.conferenceCreation',
-                                                        (category.locator.legacy if category and not category.is_root else None),
-                                                        event_type='conference') }">
+                                                           (category if category and not category.is_root else None),
+                                                           event_type='conference') }">
                     ${ _("Create conference") }
                 </a>
             </li>

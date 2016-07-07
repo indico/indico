@@ -1,6 +1,5 @@
 <div class="container" style="max-width: 1000px; overflow: visible;">
-<form class="i-form" id="eventCreationForm" action="${ postURL }"  method="POST">
-    <input type="hidden" name="event_type" value="${ event_type }">
+<form class="i-form" id="eventCreationForm" action="#" method="POST" data-event-type="${ event_type }">
     <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
 
     <em>${ _("Please follow the steps to create a meeting")}</em>
@@ -145,9 +144,11 @@
 
         var $category = $('#event-creation-category-field #category');
         $category.on('indico:categorySelected', function(evt, category) {
+            updateFormAction();
             updateProtectionChooser(category.title, category.is_protected ? 'private' : 'public');
         });
         protectionChooserExecOnLoad('${ categ["id"] }', '${ protection }');
+        updateFormAction();
 
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
@@ -176,9 +177,9 @@
                 } else {
                     var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
-                    return false
+                    return false;
                 }
-                if (!$category.val()) {
+                if (getSelectedCategoryID() === undefined) {
                     var popup = new ErrorPopup($T('Missing mandatory data'), [$T('Please, choose a category (step 1)')], "");
                     popup.open();
                     return false;

@@ -20,6 +20,7 @@ from flask import request, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.base import RH
 
@@ -59,3 +60,30 @@ class RHManageCategoryBase(RHCategoryBase):
     def _checkProtection(self):
         if not self.category.can_manage(session.user):
             raise Forbidden
+
+
+class RHCreateEventBase(RHDisplayCategoryBase):
+    # XXX: This is here because when used within a category it kind of is
+    # category-related.  When properly rewriting event creation it should
+    # be split:
+    # - A mixin to handle the actual event creation logic with WTForms and everything
+    # - A RH in the category module that handles the event creation page within a category,
+    #   where we check permissions etc on page load
+    # - A RH in the event module that handles the evetn creation page with no category
+    #   associated that simply doesn't prefill anything category-related.
+
+    def _checkParams(self):
+        if 'category_id' not in request.view_args:
+            self.category = None
+        else:
+            RHDisplayCategoryBase._checkParams(self)
+        self._event_type = EventType[request.view_args['event_type']]
+        self._wf = self._event_type.web_factory
+
+    def _checkProtection(self):
+        if not session.user:
+            raise Forbidden
+        if self.category:
+            RHDisplayCategoryBase._checkProtection(self)
+            if not self.category.can_create_events(session.user):
+                raise Forbidden(_('You are not allowed to create events in this category.'))
