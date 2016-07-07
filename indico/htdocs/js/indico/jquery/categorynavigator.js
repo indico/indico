@@ -168,6 +168,7 @@
             if (self._currentSearchRequest != null) {
                 self._currentSearchRequest.abort();
             }
+            self.$category.show();
             self.$searchInput.val('');
             self.$categoryResults.hide();
             self.$categoryResultsList.empty();
@@ -367,6 +368,7 @@
 
         _renderSearchResults: function(categories) {
             var self = this;
+            self.$category.hide();
             self.$categoryResultsList.empty();
             self.$categoryResults.show();
             _.each(categories, function(category) {

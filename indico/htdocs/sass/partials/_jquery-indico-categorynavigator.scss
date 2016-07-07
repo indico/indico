@@ -61,7 +61,7 @@
 
         .item {
             background: white;
-            display: flex !important;
+            display: flex;
             align-items: center;
 
             .action-button {
@@ -73,6 +73,10 @@
             &:hover .action-button {
                 visibility: visible;
             }
+        }
+
+        li.item {
+            display: flex !important;
         }
 
         .subcategory {
