@@ -801,14 +801,6 @@ class Category(CommonObjectBase):
         self._icon = None
         self.notifyModification()
 
-    def recoverIcon(self, icon):
-        icon.setOwner(self)
-        if self.getIcon() is not None:
-            self._icon.delete()
-        self._icon = icon
-        icon.recover()
-        self.notifyModification()
-
     def getManagerList(self):
         return self.__ac.getModifierList()
 
@@ -1012,7 +1004,6 @@ class Conference(CommonObjectBase):
         self.program = []
         self.__programGenerator = Counter()
         self.__ac = AccessController(self)
-        self.__owners = []
         self._modificationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
@@ -1229,16 +1220,11 @@ class Conference(CommonObjectBase):
             return 999
 
     def getFullVisibility( self ):
+        raise NotImplementedError('getFullVisibility')
         return max(0,min(self.getVisibility(), self.getOwnerList()[0].getVisibility()))
 
-    def setVisibility( self, visibility=999 ):
+    def setVisibility(self, visibility=999):
         self._visibility = int(visibility)
-        catIdx = indexes.IndexesHolder().getIndex('category')
-        catIdx.reindexConf(self)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
-        catDateIdx.reindexConf(self)
-        catDateAllIdx.reindexConf(self)
 
     def isClosed( self ):
         try:
@@ -1250,16 +1236,11 @@ class Conference(CommonObjectBase):
     def setClosed( self, closed=True ):
         self._closed = closed
 
-    def indexConf( self ):
-        # called when event dates change
-        # see also Category.indexConf()
+    def indexConf(self):
+        pass
 
-        calIdx = indexes.IndexesHolder().getIndex('calendar')
-        calIdx.indexConf(self)
-
-    def unindexConf( self ):
-        calIdx = indexes.IndexesHolder().getIndex('calendar')
-        calIdx.unindexConf(self)
+    def unindexConf(self):
+        pass
 
     @memoize_request
     def getContribTypeList(self):
@@ -1360,10 +1341,13 @@ class Conference(CommonObjectBase):
             return None
         return self.getOwnerList()[0]
 
-    def getOwnerList( self ):
-        return self.__owners
+    def getOwnerList(self):
+        # TODO: check places where this is called whether to remove/adapt them
+        raise NotImplementedError('getOwnerList')
 
-    def getOwnerPath( self ):
+    def getOwnerPath(self):
+        # TODO: check places where this is called whether to remove/adapt them
+        raise NotImplementedError('getOwnerPath')
         l=[]
         owner = self.getOwnerList()[0]
         while owner != None and owner.getId() != "0":
@@ -1371,38 +1355,12 @@ class Conference(CommonObjectBase):
             owner = owner.getOwner()
         return l
 
-    def addOwner( self, newOwner ):
-        if newOwner == None:
-            return
-        self.__owners.append( newOwner )
-        self.notifyModification()
-
-    def removeOwner( self, owner, notify=True ):
-        if not (owner in self.__owners):
-            return
-        self.__owners.remove( owner )
-        owner.removeConference( self )
-        if notify:
-            self.notifyModification()
-
-    def getCategoriesPath(self):
-        return [self.getOwnerList()[0].getCategoryPath()]
-
     def delete(self, user=None):
-        """deletes the conference from the system.
-        """
         signals.event.deleted.send(self, user=user)
-
-        # will have to remove it from all the owners (categories) and the
-        #   conference registry
         ConferenceHolder().remove(self)
-        for owner in self.__owners[:]:
-            owner.removeConference(self, notify=False)
-
         # Remove all links in redis
         if redis_write_client:
             avatar_links.delete_event(self)
-
         # Remote short URL mappings
         ShortURLMapper().remove(self)
         TrashCanManager().add(self)
@@ -1990,8 +1948,7 @@ class Conference(CommonObjectBase):
             conf.setDates(startDate, endDate, moveEntries=1, enforce_constraints=False)
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
-        # TODO adapt the setVisibility method as soon as the property is in Postgres
-        # conf.setVisibility(self.getVisibility())
+        conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
         # Tracks in a conference
         if options.get("tracks",False) :
@@ -2194,9 +2151,6 @@ class Resource(CommonObjectBase):
     def getOwner(self):
         return self._owner
 
-    def getCategory(self):
-        return self.getOwner() if isinstance(self.getOwner(), Category) else None
-
     def getConference(self):
         if self._owner is not None:
             return self._owner.getConference()
@@ -2355,15 +2309,6 @@ class LocalFile(Resource):
             return _("Nothing to archive")
         repository.storeFile( self, forcedFileId = forcedFileId)
         self.filePath = ""
-        self.notifyModification()
-
-    def recover(self):
-        if not self.isArchived():
-            raise Exception( _("File is not archived, so it cannot be recovered."))
-        if not self.__repository:
-            raise Exception( _("Destination repository not set."))
-        self.__repository.recoverFile(self)
-        Resource.recover(self)
         self.notifyModification()
 
     def delete( self ):

@@ -430,10 +430,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars['INCLUDE'] = '../include'
 
         wvars['accessWrapper'] = accessWrapper = self._rh._aw
-        if conf.getOwnerList():
-            wvars['category'] = conf.getOwnerList()[0].getName()
-        else:
-            wvars['category'] = ''
+        wvars['category'] = conf.as_event.category.title
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
