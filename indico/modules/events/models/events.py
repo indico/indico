@@ -240,7 +240,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         backref=db.backref(
             'events',
             primaryjoin='(Category.id == Event.category_id) & ~Event.is_deleted',
-            order_by=start_dt,
+            order_by=(start_dt, id),
             lazy=True
         )
     )
@@ -512,6 +512,35 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @hybrid_property
     def duration(self):
         return self.end_dt - self.start_dt
+
+    def get_relative_events_ids(self):
+        """Get the first, last, previous and next event IDs.
+
+        Any of those values may be ``None`` if there is no matching
+        event or if it would be the current event.
+
+        :return: A dict containing ``first``, ``last``, ``prev`` and ``next``.
+        """
+        subquery = (select([Event.id,
+                            db.func.first_value(Event.id).over(order_by=(Event.start_dt, Event.id)).label('first'),
+                            # XXX, use this after updating to sqlalchemy 1.1:
+                            # db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
+                            #                                range_=(None, None)).label('last')
+                            db.literal_column('last_value(id) OVER (ORDER BY start_dt ASC RANGE '
+                                              'BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)').label('last'),
+                            db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
+                            db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
+                    .where((Event.category_id == self.category_id) & ~Event.is_deleted)
+                    .alias())
+        rv = (db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
+              .filter(subquery.c.id == self.id)
+              .one()
+              ._asdict())
+        if rv['first'] == self.id:
+            rv['first'] = None
+        if rv['last'] == self.id:
+            rv['last'] = None
+        return rv
 
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
