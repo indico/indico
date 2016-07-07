@@ -51,10 +51,11 @@
             onAction: function() {}
         },
 
-        // Caches for data of already visited categories
+        // Caches for data of already visited categories and search results
         // Shared between instances
-        _cache: {},
-        _cacheSubcategories: {},
+        _categories: {},
+        _subcategories: {},
+        _searchResultData: {},
 
         // The search request that is awaiting for response
         _currentSearchRequest: null,
@@ -160,23 +161,6 @@
             self.element.on('click', '.js-clear-search', function() {
                 self._clearSearch();
             });
-        },
-
-        _clearSearch: function() {
-            var self = this;
-
-            if (self._currentSearchRequest != null) {
-                self._currentSearchRequest.abort();
-            }
-            self.$category.show();
-            self.$searchInput.val('');
-            self.$categoryResults.hide();
-            self.$categoryResultsList.empty();
-            self.$categoryResultsInfo.empty();
-            self.$placeholderNoResults.empty();
-            self.$category.show();
-            self.$categoryTree.show();
-            self.$placeholderEmpty.removeClass('hidden');
         },
 
         _buildBreadcrumbs: function(path, clickable) {
@@ -432,10 +416,10 @@
             var dfd = $.Deferred();
 
             function resolve() {
-                dfd.resolve(self._cache[id]);
+                dfd.resolve(self._categories[id]);
             }
 
-            if (self._cache[id]) {
+            if (self._categories[id]) {
                 _.defer(resolve);
             } else {
                 self._fetchCategory(id, resolve);
@@ -450,13 +434,13 @@
 
             function resolve() {
                 var subcategories = [];
-                _.each(self._cacheSubcategories[id], function(id) {
-                    subcategories.push(self._cache[id]);
+                _.each(self._subcategories[id], function(id) {
+                    subcategories.push(self._categories[id]);
                 });
-                dfd.resolve(subcategories, self._cache[id]);
+                dfd.resolve(subcategories, self._categories[id]);
             }
 
-            if (self._cacheSubcategories[id]) {
+            if (self._subcategories[id]) {
                 _.defer(resolve);
             } else {
                 self._fetchCategory(id, resolve);
@@ -465,8 +449,33 @@
             return dfd.promise();
         },
 
+        _getSearchResults: function(query) {
+            var self = this;
+            var dfd = $.Deferred();
+
+            function resolve() {
+                dfd.resolve(self._searchResultData[query]);
+            }
+
+            if (self._searchResultData[query]) {
+                _.defer(resolve);
+            } else {
+                self._fetchSearchResults(query, resolve);
+            }
+
+            return dfd.promise();
+        },
+
         _fetchCategory: function(id, callback) {
             var self = this;
+
+            function fillCache(data) {
+                self._categories[data.category.id] = _.omit(data.category, 'subcategories');
+                self._subcategories[data.category.id] = _.pluck(data.subcategories, 'id');
+                _.each(data.subcategories, self._fillCategoryCache.bind(self));
+                _.each(data.supercategories, self._fillCategoryCache.bind(self));
+            }
+
             $.ajax({
                 url: build_url(Indico.Urls.Categories.info, {category_id: id}),
                 dataType: 'json',
@@ -479,28 +488,71 @@
                 error: handleAjaxError,
                 success: function(data) {
                     if (data && self._isInDOM()) {
-                        self._fillCache(data);
+                        fillCache(data);
                         callback();
                     }
                 }
             });
         },
 
-        _fillCache: function(data) {
+        _fetchSearchResults: function(query, callback) {
             var self = this;
-            self._cache[data.category.id] = _.omit(data.category, 'subcategories');
-            self._cacheSubcategories[data.category.id] = _.pluck(data.subcategories, 'id');
-            _.each(data.subcategories, function(subcategory) {
-                self._cache[subcategory.id] = $.extend(self._cache[subcategory.id], subcategory);
+
+            function fillCache(data) {
+                self._searchResultData[query] = data;
+                _.each(data.categories, self._fillCategoryCache.bind(self));
+            }
+
+            self._currentSearchRequest = $.ajax({
+                url: build_url(Indico.Urls.Categories.search),
+                data: {q: query},
+                beforeSend: function() {
+                    if (self._currentSearchRequest != null) {
+                        self._currentSearchRequest.abort();
+                    }
+                    self._toggleLoading(true);
+                },
+                complete: function() {
+                    self._toggleLoading(false);
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.statusText === 'abort') {
+                        return;
+                    }
+                    handleAjaxError(jqXHR);
+                },
+                success: function(data) {
+                    if (data && self._isInDOM()) {
+                        fillCache(data);
+                        callback();
+                    }
+                }
             });
-            _.each(data.supercategories, function(supercategory) {
-                self._cache[supercategory.id] = $.extend(self._cache[supercategory.id], supercategory);
-            });
+        },
+
+        _fillCategoryCache: function(category) {
+            var self = this;
+            self._categories[category.id] = $.extend(self._categories[category.id], category);
+        },
+
+        _clearSearch: function() {
+            var self = this;
+
+            if (self._currentSearchRequest != null) {
+                self._currentSearchRequest.abort();
+            }
+            self.$category.show();
+            self.$searchInput.val('');
+            self.$categoryResults.hide();
+            self.$categoryResultsList.empty();
+            self.$categoryResultsInfo.empty();
+            self.$placeholderNoResults.empty();
+            self._toggleTreeView(true);
         },
 
         _onAction: function(categoryId) {
             var self = this;
-            var res = self.options.onAction(self._cache[categoryId]);
+            var res = self.options.onAction(self._categories[categoryId]);
 
             if (res === undefined) {
                 res = $.Deferred().resolve();
@@ -518,6 +570,19 @@
             self.$categoryList.toggleClass('loading', state);
             if (disableInput) {
                 self.element.find('input').prop('disabled', state);
+            }
+        },
+
+        _toggleTreeView: function(visible) {
+            var self = this;
+            if (visible) {
+                self.$category.show();
+                self.$categoryTree.show();
+                self.$placeholderEmpty.removeClass('hidden');
+            } else {
+                self.$category.hide();
+                self.$categoryTree.hide();
+                self.$placeholderEmpty.addClass('hidden');
             }
         },
 
@@ -557,33 +622,10 @@
                 return;
             }
 
-            self._currentSearchRequest = $.ajax({
-                url: build_url(Indico.Urls.Categories.search),
-                data: {q: query},
-                beforeSend: function() {
-                    if (self._currentSearchRequest != null) {
-                        self._currentSearchRequest.abort();
-                    }
-                    self._toggleLoading(true);
-                },
-                complete: function() {
-                    self._toggleLoading(false);
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.statusText === 'abort') {
-                        return;
-                    }
-                    handleAjaxError(jqXHR);
-                },
-                success: function(data) {
-                    if (self._isInDOM()) {
-                        self.$category.hide();
-                        self.$categoryTree.hide();
-                        self.$placeholderEmpty.addClass('hidden');
-                        self._renderSearchResultInfo(data.categories.length, data.total_count);
-                        self._renderSearchResults(data.categories);
-                    }
-                }
+            self._toggleTreeView(false);
+            self._getSearchResults(query).then(function(data) {
+                self._renderSearchResultInfo(data.categories.length, data.total_count);
+                self._renderSearchResults(data.categories);
             });
         }
     });
