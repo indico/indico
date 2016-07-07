@@ -40,9 +40,9 @@ from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.categories.controllers.base import RHCreateEventBase
 from indico.modules.categories.serialize import serialize_category_ical, serialize_category_atom
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
@@ -117,62 +117,32 @@ class RHCategOverviewDisplay(RHCategDisplayBase):
         return p.display()
 
 
-class RHConferenceCreationBase(RHCategoryDisplay):
-    def _checkProtection(self):
-        self._checkSessionUser()
-        if self._target is not None:
-            RHCategoryDisplay._checkProtection(self)
-            if not self._target.isConferenceCreationRestricted():
-                return
-            if not self._target.canCreateConference(self._getUser()):
-                raise MaKaCError(_("You are not allowed to create conferences inside this category"))
-
-    def _checkParams( self, params, mustExist=1 ):
-        RHCategoryDisplay._checkParams( self, params, mustExist )
-        #if self._target.getSubCategoryList():
-        #    raise MaKaCError( _("Cannot add conferences to a category which already contains some sub-categories"))
-        self._event_type = EventType[params['event_type']]
-        self._wf = self._event_type.web_factory
-
-
 #-------------------------------------------------------------------------------------
 
-class RHConferenceCreation(RHConferenceCreationBase):
-    _uh = urlHandlers.UHConferenceCreation
-
-    def _checkProtection(self):
-        try:
-            RHConferenceCreationBase._checkProtection(self)
-        except (MaKaCError, IndicoError):
-            self._target = None
-
-    def _checkParams( self, params ):
+class RHConferenceCreation(RHCreateEventBase):
+    def _checkParams(self, params):
         self._params = params
-        RHConferenceCreationBase._checkParams( self, params, mustExist=0 )
+        RHCreateEventBase._checkParams(self)
 
     def _process(self):
         if not self._event_type:
             raise MaKaCError("No event type specified")
         else:
-            p = category.WPConferenceCreationMainData( self, self._target )
-            if self._wf != None:
-                p = self._wf.getEventCreationPage( self, self._target )
+            p = category.WPConferenceCreationMainData(self, self.category)
+            if self._wf is not None:
+                p = self._wf.getEventCreationPage(self, self.category)
             return p.display(**self._params)
 
-#-------------------------------------------------------------------------------------
 
-class RHConferencePerformCreation(RHConferenceCreationBase):
-    _uh = urlHandlers.UHConferencePerformCreation
-
-    def _checkParams( self, params ):
-        self._params =params
-        RHConferenceCreationBase._checkParams( self, params )
+class RHConferencePerformCreation(RHCreateEventBase):
+    def _checkParams(self, params):
+        self._params = params
+        RHCreateEventBase._checkParams(self)
         self._datecheck = False
         self._confirm = False
         self._performedAction = ""
         if "ok" in params:
             self._confirm = True
-        return
 
     def _process( self ):
         params = self._getRequestParams()
@@ -218,7 +188,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         kwargs = UtilsConference.get_new_conference_kwargs(self._params)
         if kwargs['start_dt'] >= kwargs['end_dt']:
             raise FormValuesError(_('The start date cannot be after the end date.'))
-        c = self._target.newConference(self._getUser(), event_type=self._event_type, **kwargs)
+        c = conference.Conference.new(self.category, creator=session.user, event_type=self._event_type, **kwargs)
         UtilsConference.setValues(c, self._params)
 
         eventAccessProtection = params.get("eventProtection", "inherit")
@@ -249,6 +219,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
 
     def alertCreation(self, confs):
         conf = confs[0]
+        event = conf.as_event
         fromAddr = Config.getInstance().getSupportEmail()
         addrs = [ Config.getInstance().getSupportEmail() ]
         eventType = conf.getType()
@@ -261,9 +232,9 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
         if conf.getChairmanText():
             chair = conf.getChairmanText()
         else:
-            chair = '; '.join(x.full_name.encode('utf-8') for x in conf.as_event.person_links)
+            chair = '; '.join(x.full_name.encode('utf-8') for x in event.person_links)
         subject = "New %s in indico (%s)" % (type,conf.getId())
-        room = conf.as_event.room_name
+        room = event.room_name
         text = """
 _Category_
 {}
@@ -276,8 +247,9 @@ _Room_
 _Description_
 {}
 _Creator_
-{} ({})""".format(conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
-                  conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
+{} ({})""".format(u' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '.join(event.category.chain_titles).encode('utf-8'),
+                  event.title.encode('utf-8'), chair, room, conf.getDescription(),
+                  event.creator.full_name.encode('utf-8'), event.creator.id)
         if len(confs) == 1:
             text += """
 _Date_
@@ -294,16 +266,10 @@ _Access%s_
 %s """ % (i,c.getAdjustedStartDate(), c.getAdjustedEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
                 i+=1
 
-        msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\n"
-               "From: %s\r\n"
-               "Return-Path: %s\r\n"
-               "To: %s\r\nCc: \r\n"
-               "Subject: %s\r\n\r\n" % (fromAddr, fromAddr, addrs, subject))
-        msg = msg + text
         maildata = {"fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text}
         GenericMailer.send(maildata)
         # Category notification
-        event_creation_notification_emails = conf.as_event.category.event_creation_notification_emails
+        event_creation_notification_emails = event.category.event_creation_notification_emails
         if event_creation_notification_emails:
             mail_data = {"fromAddr": fromAddr, "toList": event_creation_notification_emails,
                          "subject": subject, "body": text}

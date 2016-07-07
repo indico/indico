@@ -111,8 +111,8 @@ class WPSEConfClone(conferences.WPConfClone):
 #################### Event Creation #####################################
 class WPSimpleEventCreation( WPConferenceCreationMainData):
 
-    def _getWComponent( self ):
-        return WSimpleEventCreation( self._target, rh = self._rh )
+    def _getWComponent(self):
+        return WSimpleEventCreation(self.category, rh=self._rh)
 
 
 class WSimpleEventCreation(category.WConferenceCreation):

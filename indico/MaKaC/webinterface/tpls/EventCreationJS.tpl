@@ -54,6 +54,22 @@
     $('#advancedOptionsText').click(showAdvancedOptions);
 
 
+    function getSelectedCategoryID() {
+        var field = $('#event-creation-category-field #category');
+        return JSON.parse(field.val()).id;
+    }
+
+    function updateFormAction() {
+        var id = getSelectedCategoryID();
+        var url = '#';
+        var form = $('#eventCreationForm');
+        if (id !== undefined) {
+            url = build_url(Indico.Urls.EventCreation, {category_id: id, event_type: form.data('event-type')});
+        }
+        form.attr('action', url);
+    }
+
+
     //------ LECTURES --------
 
     var currentOccurrences = 1;

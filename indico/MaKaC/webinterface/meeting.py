@@ -71,10 +71,12 @@ class WebFactory(WebFactory):
 MeetingWebFactory = WebFactory
 
 #################### Event Creation #####################################
-class WPMeetingEventCreation( WPConferenceCreationMainData):
 
-    def _getWComponent( self ):
-        return WMeetingCreation( self._target, rh = self._rh )
+
+class WPMeetingEventCreation(WPConferenceCreationMainData):
+    def _getWComponent(self):
+        return WMeetingCreation(self.category, rh=self._rh)
+
 
 class WMeetingCreation(category.WConferenceCreation):
     def __init__( self, targetCateg, type="meeting", rh = None ):

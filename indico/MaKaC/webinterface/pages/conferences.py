@@ -904,6 +904,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         self._rh = rh
 
     def _getVisibilityHTML(self):
+        return '<option value="TODO">TODO: adapt to new categories</option>'
         visibility = self._conf.getVisibility()
         topcat = self._conf.getOwnerList()[0]
         level = 0

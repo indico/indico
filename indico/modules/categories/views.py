@@ -21,7 +21,6 @@ from markupsafe import escape
 from indico.util.i18n import _
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer, WNavigationDrawer
 
@@ -41,9 +40,11 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         self.category = category
         self.atom_feed_url = kwargs.get('atom_feed_url')
         self.atom_feed_title = kwargs.get('atom_feed_title')
-        self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
+        if category:
+            self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
         WPMainBase.__init__(self, rh, _protected_object=category, _current_category=category, **kwargs)
-        self._locTZ = category.display_tzinfo.zone
+        if category:
+            self._locTZ = category.display_tzinfo.zone
 
     def getCSSFiles(self):
         return WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
@@ -63,7 +64,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         return head_content
 
     def _getNavigationDrawer(self):
-        if not self.category.is_root:
+        if self.category and not self.category.is_root:
             return WNavigationDrawer({'target': self.category})
 
 
@@ -89,21 +90,15 @@ class WPCategoryManagement(WPCategory):
             return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
 
 
-class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
-    # TODO: when moving category display to Jinja, inherit from WPCategory instead
-    template_prefix = 'categories/'
-
-    def _getBody(self, params):
-        return self._getPageContent(params)
-
+class WPCategoryStatistics(WPCategory):
     def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(self._target.getName(), type='Statistics')
+        return WSimpleNavigationDrawer(self.category.title, type='Statistics')
 
     def getJSFiles(self):
-        return (WPCategoryDisplayBase.getJSFiles(self) +
+        return (WPCategory.getJSFiles(self) +
                 self._includeJSPackage('jqplot_js', prefix='') +
                 self._asset_env['statistics_js'].urls() +
                 self._asset_env['modules_category_statistics_js'].urls())
 
     def getCSSFiles(self):
-        return WPCategoryDisplayBase.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
+        return WPCategory.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
