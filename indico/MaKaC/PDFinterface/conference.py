@@ -81,8 +81,7 @@ def extract_affiliations(contrib):
         auth_list = []
 
         for person_link in person_links:
-            person = person_link.person
-            affil = person.affiliation
+            affil = person_link.affiliation
             if affil and affil not in affiliations:
                 affiliations[affil] = len(affiliations) + 1
             auth_list.append((person_link, affiliations[affil] if affil else None))
