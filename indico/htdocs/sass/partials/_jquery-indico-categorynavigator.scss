@@ -57,6 +57,7 @@
         .group-list {
             overflow: auto;
             overflow-y: auto;
+            margin-bottom: -1px !important;  // Needed to avoid double border in case of overflow
 
             &.with-protected .item {
                 padding-left: 30px;
