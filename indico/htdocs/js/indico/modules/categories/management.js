@@ -226,8 +226,18 @@
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
         function moveToCategory(element, data) {
+            var categoryId = $('.event-management').data('category-id');
             $('<div>').categorynavigator({
-                categoryId: $('.event-management').data('category-id'),
+                categoryId: categoryId,
+                actionOn: {
+                    categoriesWithSubcategories: {
+                        disabled: true
+                    },
+                    categories: {
+                        disabled: true,
+                        ids: [categoryId]
+                    }
+                },
                 openInDialog: true,
                 onAction: function(category) {
                     var msg = $T.gettext('You are about to move some events to the category "{0}". Are you sure you want to proceed?').format(category.title);
