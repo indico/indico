@@ -196,24 +196,32 @@
                 id: 'category-' + category.id
             });
 
-            var $protection = $('<div>', {class: 'protection-wrapper'});
-            if (isSubcategory || category.is_protected) {
-                $protection.append($('<span>', {class: 'protection'}).toggleClass('icon-shield', category.is_protected));
-            }
-
             var $categoryTitle = $('<div>', {class: 'title-wrapper'});
             $categoryTitle.append($('<span>', {
                 class: 'title',
                 text: category.title
             }));
+
             if (withBreadcrumbs && category.parent_path.length) {
-                $categoryTitle.append(self._buildBreadcrumbs(category.parent_path, clickableBreadcrumbs));
+                var $breadcrumbs = self._buildBreadcrumbs(category.parent_path, clickableBreadcrumbs);
+                $categoryTitle.append($breadcrumbs);
             }
 
             $category.append($('<div>', {class: 'icon-wrapper'}));
-            $category.append($protection);
             $category.append($categoryTitle);
             $category.append(self._buildSidePanel(category, isSubcategory));
+
+            var $protectionIcon = $('<span>', {
+                class: 'protection',
+                title: $T.gettext("This category is protected")
+            }).toggleClass('icon-shield', category.is_protected);
+            if (isSubcategory) {
+                var $protection = $('<div>', {class: 'protection-wrapper'}).append($protectionIcon);
+                $categoryTitle.before($protection);
+            } else if (category.is_protected) {
+                $breadcrumbs.before($protectionIcon);
+            }
+
             return $category;
         },
 
