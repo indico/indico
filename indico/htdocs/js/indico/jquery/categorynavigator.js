@@ -614,21 +614,19 @@
         goToCategory: function(id) {
             var self = this;
 
-            self.$placeholderEmpty.empty();
-            self.$categoryList.find('.group-list .item').animate({
-                height: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                border: 0
-            }, {
-                complete: function() {
-                    $(this).remove();
-                }
-            }).addClass('hiding').find('.title').fadeOut();
+            function render() {
+                self._clearSearch();
+                self.$categoryTree.empty();
+                self._getCurrentCategory(id).then(self._renderCurrentCategory.bind(self));
+                self._getCategoryTree(id).then(self._renderCategoryTree.bind(self));
+            }
 
-            self._clearSearch();
-            self._getCurrentCategory(id).then(self._renderCurrentCategory.bind(self));
-            self._getCategoryTree(id).then(self._renderCategoryTree.bind(self));
+            self.$placeholderEmpty.empty();
+            if (!self.$categoryTree.is(':empty')) {
+                self.$categoryTree.slideUp(300, render);
+            } else {
+                render();
+            }
         },
 
         searchCategories: function(query) {
