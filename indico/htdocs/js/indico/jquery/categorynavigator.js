@@ -268,11 +268,26 @@
             }
 
             if (forSubcategory) {
-                var $info = $('<div>', {class: 'stats'})
-                    .append($('<div>', {text: $T.ngettext("{0} category", "{0} categories", category.deep_category_count)
-                                                .format(category.deep_category_count)}))
-                    .append($('<div>', {text: $T.ngettext("{0} event", "{0} events", category.deep_event_count)
-                                                .format(category.deep_event_count)}));
+                var $info = $('<div>', {
+                    class: 'stats icon-list',
+                    title: $T.ngettext("{0} category", "{0} categories", category.deep_category_count)
+                             .format(category.deep_category_count) + ' | ' +
+                           $T.ngettext("{0} event", "{0} events", category.deep_event_count)
+                             .format(category.deep_event_count)
+                });
+                var $categories = $('<span>', {
+                    class: 'categories-count',
+                    text: category.deep_category_count
+                });
+                var $events = $('<span>', {
+                    class: 'events-count',
+                    text: category.deep_event_count
+                });
+                var $separator = $('<span>', {
+                    class: 'stats-separator',
+                    text: ' | '
+                });
+                $info.append($categories).append($separator).append($events);
                 $buttonWrapper.append($info);
             }
 

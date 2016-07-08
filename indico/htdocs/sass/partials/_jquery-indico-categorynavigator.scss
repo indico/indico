@@ -205,6 +205,15 @@
 
         .stats {
             font-size: 0.85em;
+            line-height: 0.85;
+
+            &:before {
+                margin-right: 5px;
+            }
+
+            .events-count {
+                color: $dark-gray;
+            }
         }
 
         .search-result-info {
