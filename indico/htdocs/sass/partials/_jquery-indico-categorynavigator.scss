@@ -60,7 +60,7 @@
             margin-bottom: -1px !important;  // Needed to avoid double border in case of overflow
 
             &.with-protected .item {
-                padding-left: 30px;
+                padding-left: 27px;
             }
         }
 
@@ -121,6 +121,11 @@
                 font-weight: bold;
                 color: $dark-blue;
             }
+
+            .protection:after {
+                // Adds whitespace
+                content: '\00a0';
+            }
         }
 
         ul.breadcrumbs {
@@ -171,8 +176,11 @@
             }
         }
 
-        .protection {
+        .protection-wrapper .protection {
             margin-right: 0.5rem;
+        }
+
+        .protection {
             min-width: 13px;
             display: inline-block;
 
