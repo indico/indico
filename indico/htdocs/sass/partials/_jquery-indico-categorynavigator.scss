@@ -82,6 +82,10 @@
             &:last-child {
                 border-bottom: 1px solid lighten($gray, $color-variation);
             }
+
+            &:hover {
+                @include inner-border-left($indico-blue, $width: 3px);
+            }
         }
 
         li.item {
@@ -103,6 +107,7 @@
 
         .current-category {
             @include box-shadow(0 2px 2px 0 $light-gray);
+            @include inner-border-left($indico-blue, $width: 3px);
             border-bottom: 1px solid lighten($gray, $color-variation);
             min-height: 40px;
             margin-left: -10px;
@@ -111,10 +116,6 @@
             position: relative;
             overflow: hidden;
             color: $light-black;
-
-            &:hover {
-                background-color: $light-gray;
-            }
 
             .title {
                 font-size: 1.2em;
