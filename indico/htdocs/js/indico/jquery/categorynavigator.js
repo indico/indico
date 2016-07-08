@@ -99,9 +99,6 @@
             self.$categoryTree = $('<ul>', {class: 'group-list'});
             self.$categoryResultsList = $('<ul>', {class: 'group-list'});
             self.$categoryResultsInfo = $('<div>', {class: 'search-result-info'});
-            self.$categoryResults = $('<div>', {class: 'search-results'})
-                .append(self.$categoryResultsInfo)
-                .append(self.$categoryResultsList);
             self.$spinner = $('<div>', {class: 'spinner-wrapper'})
                 .append($('<div>', {class: 'i-spinner'}));
             self.$placeholderEmpty = $('<div>', {class: 'placeholder'});
@@ -109,11 +106,12 @@
             self.$categoryList = $('<div>', {class: 'category-list'})
                 .append(self.$category)
                 .append(self.$categoryTree)
-                .append(self.$categoryResults)
+                .append(self.$categoryResultsInfo)
+                .append(self.$categoryResultsList)
                 .append(self.$spinner)
                 .append(self.$placeholderEmpty)
                 .append(self.$placeholderNoResults);
-            self.$categoryResults.hide();
+            self._toggleSearchResultsView(false);
             self.element.append(self.$categoryList);
         },
 
@@ -353,8 +351,7 @@
         _renderSearchResults: function(categories) {
             var self = this;
             self.$category.hide();
-            self.$categoryResultsList.empty();
-            self.$categoryResults.show();
+            self._toggleSearchResultsView(true);
             _.each(categories, function(category) {
                 var $result = self._buildSubcategory(category, true);
                 if (category.is_favorite) {
@@ -543,9 +540,7 @@
             }
             self.$category.show();
             self.$searchInput.val('');
-            self.$categoryResults.hide();
-            self.$categoryResultsList.empty();
-            self.$categoryResultsInfo.empty();
+            self._toggleSearchResultsView(false);
             self.$placeholderNoResults.empty();
             self._toggleTreeView(true);
         },
@@ -575,14 +570,20 @@
 
         _toggleTreeView: function(visible) {
             var self = this;
-            if (visible) {
-                self.$category.show();
-                self.$categoryTree.show();
-                self.$placeholderEmpty.removeClass('hidden');
-            } else {
-                self.$category.hide();
-                self.$categoryTree.hide();
-                self.$placeholderEmpty.addClass('hidden');
+
+            self.$category.toggle(visible);
+            self.$categoryTree.toggle(visible);
+            self.$placeholderEmpty.toggleClass('hidden', !visible);
+        },
+
+        _toggleSearchResultsView: function(visible) {
+            var self = this;
+
+            self.$categoryResultsList.empty();
+            self.$categoryResultsInfo.toggle(visible);
+            self.$categoryResultsList.toggle(visible);
+            if (!visible) {
+                self.$categoryResultsInfo.empty();
             }
         },
 
