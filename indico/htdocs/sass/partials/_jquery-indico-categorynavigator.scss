@@ -73,6 +73,10 @@
             &:hover .action-button {
                 visibility: visible;
             }
+
+            &:last-child {
+                border-bottom: 1px solid lighten($gray, $color-variation);
+            }
         }
 
         li.item {
