@@ -57,6 +57,10 @@
         .group-list {
             overflow: auto;
             overflow-y: auto;
+
+            &.with-protected .item {
+                padding-left: 30px;
+            }
         }
 
         .item {

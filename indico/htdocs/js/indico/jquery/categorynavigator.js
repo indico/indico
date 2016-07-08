@@ -419,6 +419,10 @@
             // Set uniform stats width for maintaining horizontal alignment
             $stats.width(Math.ceil(statsMaxWidth));
 
+            // Indents subcategories when protection icon is visible
+            var hasProtectedCategories = !!self.$categoryTree.find('.icon-shield').length;
+            self.$categoryTree.toggleClass('with-protected', hasProtectedCategories);
+
             // Make sure the list stays always scrolled at the top
             self.$categoryTree.scrollTop(0);
         },
