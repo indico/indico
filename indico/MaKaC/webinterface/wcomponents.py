@@ -653,7 +653,7 @@ class WEventFooter(WFooter):
             'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
                                 self._gCalDateFormat(self._conf.getEndDate())),
             'details': description,
-            'location': location,
+            'location': location.encode('utf-8'),
             'trp': False,
             'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
                       'name:indico']
