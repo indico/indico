@@ -39,6 +39,7 @@
             $dialogTrigger.on('click', function(evt) {
                 evt.preventDefault();
                 $('<div>').categorynavigator({
+                    category: {{ field.category | tojson }},
                     openInDialog: true,
                     actionOn: actionOn,
                     onAction: function(category) {
