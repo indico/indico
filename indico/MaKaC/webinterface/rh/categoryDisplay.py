@@ -43,7 +43,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.categories.util import serialize_category_ical, serialize_category_atom
+from indico.modules.categories.serialize import serialize_category_ical, serialize_category_atom
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
