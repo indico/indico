@@ -12,7 +12,7 @@
     </div>
 
     {% if not category.children and not events_by_month %}
-        {% call message_box('info', classes='no-icon') %}
+        {% call message_box('info', icon=false) %}
             {% trans %}This category is empty.{% endtrans %}
         {% endcall %}
     {% else %}

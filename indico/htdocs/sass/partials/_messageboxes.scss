@@ -15,26 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$default-spacing: 5px;
+
 %message-box {
     @include border-radius();
-
-    color: #777;
-    padding: 0 0.5em;
+    display: flex;
+    flex-flow: row wrap;
+    color: $light-black;
+    padding: $default-spacing;
     margin-bottom: 18px;
 
-    &:before {
-        color: #BBB;
-        display: block;
-        float: left;
-        font-size: 1.5em;
-        padding-top: 0.3em;
+    .message-box-content {
+        display: flex;
     }
 
     .message-text {
+        flex-grow: 1;
+        align-self: center;
         font-size: 1.2em;
-        padding-left: 2em;
-        padding-top: 1px;
-        margin: 0.5em 0;
 
         p:first-child {
             margin-top: 0;
@@ -49,36 +47,27 @@
         }
     }
 
-    .message-box-footer {
-        @include single-box-shadow($light-gray, 0, 5px, 5px, -5px, inset);
-        display: block;
-        margin: 0 -0.5em;
-        padding: 0.5em 0.5em;
-        clear: both;
+    .icon {
+        flex-shrink: 0;
+        font-size: 1.5em;
+        color: $gray;
+        margin-right: $default-spacing;
     }
 
-    &.no-icon {
-        &:before {
-            content: "";
-        }
-
-        .message-text {
-            padding-left: 0;
-        }
+    .message-box-footer {
+        @include single-box-shadow($light-gray, 0, $default-spacing, $default-spacing, -$default-spacing, inset);
+        flex: 1 100%;
+        margin: $default-spacing -$default-spacing -$default-spacing -$default-spacing;
+        padding: $default-spacing;
     }
 }
 
 %message-box.large-icon {
-    &:before {
+    .icon {
         font-size: 2.7em;
-        margin: 0 0.25em 0.1em 0;
-    }
-
-    .message-text {
-        padding-left: 0.1em;
+        margin-bottom: $default-spacing;
     }
 }
-
 
 %message-tag {
     @include border-radius();
@@ -140,10 +129,12 @@
 .info-message-box,
 .message-message-box {      // Needed for default category 'message' of flash() in flashed_messages.html
     @extend %message-box;
-    @include icon-before('icon-info');
-
     background-color: #FAFAFA;
     border: 1px solid #DDD;
+
+    .icon {
+        @include icon-before('icon-info');
+    }
 
     .message-box-footer {
         background: darken(#FAFAFA, 5%);
@@ -152,12 +143,11 @@
 
 .highlight-message-box {
     @extend %message-box;
-    @include icon-before('icon-lamp');
-
     background-color: $light-blue;
     border: 1px solid $dark-blue;
 
-    &:before {
+    .icon {
+        @include icon-before('icon-lamp');
         color: $dark-blue;
     }
 
@@ -168,10 +158,12 @@
 
 .success-message-box {
     @extend %message-box;
-    @include icon-before('icon-checkmark');
-
     background-color: #EEFAEE;
     border: 1px solid #CDC;
+
+    .icon {
+        @include icon-before('icon-checkmark');
+    }
 
     &:before {
         color: #CDC;
@@ -184,12 +176,11 @@
 
 .warning-message-box {
     @extend %message-box;
-    @include icon-before('icon-warning');
-
     background-color: #FFF3E2;
     border: 1px solid #BE9056;
 
-    &:before {
+    .icon {
+        @include icon-before('icon-warning');
         color: #BE9056;
     }
 
@@ -200,12 +191,11 @@
 
 .error-message-box {
     @extend %message-box;
-    @include icon-before('icon-disable');
-
     background-color: $light-red;
     border: 1px solid $dark-red;
 
-    &:before {
+    .icon {
+        @include icon-before('icon-disable');
         color: $dark-red;
     }
 
@@ -216,12 +206,11 @@
 
 .danger-message-box {
     @extend %message-box;
-    @include icon-before('icon-warning');
-
     background-color: $light-red;
     border: 1px solid $dark-red;
 
-    &:before {
+    .icon {
+        @include icon-before('icon-warning');
         color: $dark-red;
     }
 
@@ -235,7 +224,7 @@
     @extend %message-tag;
     background-color: $red;
     color: $light-gray;
-    margin-left: 5px;
+    margin-left: $default-spacing;
 }
 
 .error-message-underline {

@@ -4,7 +4,7 @@
                              before=none, after=none, message_first=true) %}
     {% set message=caller() %}
     {% macro render_message() %}
-        {% call message_box('info', classes='no-icon') %}
+        {% call message_box('info', icon=false) %}
             <div class="content smaller">
                 <span class="js-show-message">
                     {{ message }}
