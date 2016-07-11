@@ -20,8 +20,7 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
-class WErrorWSGI(WPDecorated, WPJinjaMixin):
-
+class WPErrorWSGI(WPDecorated, WPJinjaMixin):
     def __init__(self, message, description):
         WPDecorated.__init__(self, None)
         self._message = message

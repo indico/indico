@@ -33,7 +33,7 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
-from MaKaC.webinterface.pages.error import WErrorWSGI
+from MaKaC.webinterface.pages.error import WPErrorWSGI
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
@@ -317,14 +317,14 @@ def handle_404(exception):
             description = _("The page you are looking for doesn't exist.")
         else:
             description = exception.description
-        return WErrorWSGI(_("Page not found"), description).getHTML(), 404
+        return WPErrorWSGI(_("Page not found"), description).getHTML(), 404
 
 
 def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
     if current_app.debug:
         raise
-    return WErrorWSGI(str(exception), _("An unexpected error ocurred.")).getHTML(), 500
+    return WPErrorWSGI(str(exception), _("An unexpected error occurred.")).getHTML(), 500
 
 
 def make_app(set_path=False, db_setup=True, testing=False):

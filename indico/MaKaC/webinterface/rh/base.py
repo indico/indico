@@ -57,7 +57,7 @@ from MaKaC.errors import (
     NotFoundError)
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.pages.errors as errors
-from MaKaC.webinterface.pages.error import WErrorWSGI
+from MaKaC.webinterface.pages.error import WPErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
@@ -465,17 +465,17 @@ class RH(RequestHandlerBase):
             return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
         explanation = get_error_description(e)
-        return WErrorWSGI(message, explanation).getHTML()
+        return WPErrorWSGI(message, explanation).getHTML()
 
     @jsonify_error(status=400)
     def _processBadRequest(self, e):
         message = _("Bad Request")
-        return WErrorWSGI(message, e.description).getHTML()
+        return WPErrorWSGI(message, e.description).getHTML()
 
     @jsonify_error(status=400)
     def _processBadData(self, e):
         message = _("Invalid or expired token")
-        return WErrorWSGI(message, e.message).getHTML()
+        return WPErrorWSGI(message, e.message).getHTML()
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
@@ -542,7 +542,7 @@ class RH(RequestHandlerBase):
         else:
             message = e.getMessage()
             explanation = e.getExplanation()
-        return WErrorWSGI(message, explanation).getHTML()
+        return WPErrorWSGI(message, explanation).getHTML()
 
     @jsonify_error
     def _processFormValuesError(self, e):
