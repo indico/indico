@@ -29,16 +29,22 @@
     display: flex;
     flex-direction: column;
 
-    a {
-        color: $link;
-    }
-
     input[type='search'] {
         @extend %form-field-input;
         width: 100%;
         flex-shrink: 0;
         padding-left: 10px;
-        padding-right: 10px;
+        padding-right: 35px !important;
+    }
+
+    .clearableinput {
+        .button-box {
+            padding-right: 10px;
+
+            a {
+                padding-right: 0;
+            }
+        }
     }
 }
 
@@ -63,6 +69,10 @@
 
     &.loading {
         pointer-events: none;
+    }
+
+    a {
+        color: $link;
     }
 
     .group-list {

@@ -19,12 +19,12 @@
     $.widget("indico.realtimefilter", {
 
         options: {
-            callback: function() {},
+            callback: function(value) {},
             validation: function(e) { return true; },
             clearable: true,
             disableenter: true,
             emptyvalue: "",
-            invalidclass: "invalid",
+            invalidclass: 'invalid',
             wait: 250
         },
 
@@ -45,17 +45,17 @@
             if (opt.clearable) {
                 element.clearableinput({
                     onClear: function() {
-                        self._delayedCallback();
+                        self._callback();
                     },
                     emptyvalue: opt.emptyvalue
                 });
             }
 
-            element.on("cut paste", function() {
+            element.on('cut paste', function() {
                 self._delayedCallback();
             });
 
-            element.on("focusout", function() {
+            element.on('focusout', function() {
                 if ($(this).val() === "") {
                     $(this).val(opt.emptyvalue);
                 }
@@ -98,7 +98,7 @@
 
             if (opt.validation(element)) {
                 element.removeClass(opt.invalidclass);
-                opt.callback();
+                opt.callback(element.val().trim());
             } else {
                 element.addClass(opt.invalidclass);
             }
