@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 from io import BytesIO
-from itertools import groupby
+from itertools import chain, groupby
 from math import ceil
 from operator import attrgetter, itemgetter
 
@@ -419,11 +419,21 @@ class RHCategoryOverview(RHDisplayCategoryBase):
     def _process(self):
         # TODO take in consideration protection and visibility
         events = (Event.query.with_parent(self.category)
-                  .filter(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt, Event.is_deleted is not False)
+                  .filter(or_(and_(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt),
+                              and_(Event.end_dt >= self.start_dt, Event.end_dt < self.end_dt),
+                              and_(Event.start_dt < self.start_dt, Event.end_dt > self.end_dt)),
+                          ~Event.is_deleted)
                   .order_by(Event.start_dt)).all()
 
         # Only categories with icons are listed in the sidebar
         subcategories = {event.category for event in events if event.category.has_icon}
+
+        # Python doesn't have flat_map() and it improves the readability of the line bellow greatly
+        def flat_map(func, list_):
+            return chain.from_iterable(map(func, list_))
+
+        # Events spanning multiple days must appear on all days
+        events = sorted(flat_map(self._process_multiday_events, events), key=attrgetter('start_dt'))
 
         params = {
             'detail': self.detail,
@@ -493,3 +503,42 @@ class RHCategoryOverview(RHDisplayCategoryBase):
     def _other_day_url(self, date):
         return url_for('.overview', self.category, detail=self.detail, period=self.period,
                        date=format_date(date, 'YYYY-MM-dd'))
+
+    def _process_multiday_events(self, event):
+        # Add "fake" proxy events for events spanning multiple days such that there is one event per day
+        # Function type: Event -> List[Event]
+        tzinfo = self.category.display_tzinfo
+
+        class _EventProxy(object):
+            def __init__(self, event, date):
+                start_dt = datetime.combine(date, event.start_dt.astimezone(tzinfo).timetz())
+                assert date >= event.start_dt
+                assert date <= event.end_dt
+                object.__setattr__(self, '_start_dt', start_dt)
+                object.__setattr__(self, '_real_event', event)
+
+            def __getattribute__(self, name):
+                if name == 'start_dt':
+                    return object.__getattribute__(self, '_start_dt')
+                event = object.__getattribute__(self, '_real_event')
+                if name == 'timetable_entries':
+                    return [entry for entry in event.timetable_entries
+                            if entry.start_dt.astimezone(tzinfo).date() == self.start_dt.astimezone(tzinfo).date()]
+                return getattr(event, name)
+
+            def __setattr__(self, name, value):
+                raise AttributeError('This instance is read-only')
+
+            def __repr__(self):
+                return '<_EventProxy({}, {})>'.format(self.start_dt, object.__getattribute__(self, '_real_event'))
+
+        event_start_dt = event.start_dt.astimezone(tzinfo)
+        event_end_dt = event.end_dt.astimezone(tzinfo)
+        if event_start_dt.date() == event_end_dt.date():
+            return [event]
+        else:
+            # All the days of the event shown in the overview
+            event_days = self._get_days(max(self.start_dt, event_start_dt),
+                                        min(self.end_dt, event_end_dt))
+            # Generate a proxy object with adjusted start_dt and timetable_entries for each day
+            return [_EventProxy(event, day) for day in event_days]
