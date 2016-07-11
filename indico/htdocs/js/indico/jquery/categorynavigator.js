@@ -117,21 +117,21 @@
 
         _createSearchField: function() {
             var self = this;
-
-            // Visible search field
             self.$searchInput = $('<input>', {
-                class: 'js-search-category',
                 type: 'search',
-                name: 'q',
                 placeholder: $T.gettext("Search")
-            }).attr('autocomplete', 'off');
+            });
             self.element.prepend(self.$searchInput);
-
-            self.$searchInput.on('input', _.debounce(function(evt) {
-                var $this = $(this);
-                var inputValue = $this.val().trim();
-                self.searchCategories(inputValue);
-            }, 500));
+            self.$searchInput.realtimefilter({
+                wait: 500,
+                callback: function(value) {
+                    if (!value) {
+                        self._clearSearch();
+                    } else {
+                        self.searchCategories(value);
+                    }
+                }
+            });
         },
 
         _createBindings: function() {
@@ -639,10 +639,6 @@
 
         searchCategories: function(query) {
             var self = this;
-
-            if (!query) {
-                self._clearSearch();
-            }
 
             if (query.length < 3) {
                 return;
