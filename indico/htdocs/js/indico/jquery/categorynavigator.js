@@ -57,7 +57,8 @@
         _subcategories: {},
         _searchResultData: {},
 
-        // The search request that is awaiting for response
+        // Requests awaiting for response
+        _currentCategoryRequest: null,
         _currentSearchRequest: null,
 
         _create: function() {
@@ -500,7 +501,13 @@
                 _.each(data.supercategories, self._fillCategoryCache.bind(self));
             }
 
-            $.ajax({
+            // Don't send another request if one for the same ID is ongoing
+            if (self._currentCategoryRequest && self._currentCategoryRequest.categoryId == id) {
+                self._currentCategoryRequest.then(callback);
+                return;
+            }
+
+            self._currentCategoryRequest = $.ajax({
                 url: build_url(Indico.Urls.Categories.info, {category_id: id}),
                 dataType: 'json',
                 beforeSend: function() {
@@ -508,6 +515,7 @@
                 },
                 complete: function() {
                     self._toggleLoading(false, true);
+                    self._currentCategoryRequest = null;
                 },
                 error: handleAjaxError,
                 success: function(data) {
@@ -517,6 +525,8 @@
                     }
                 }
             });
+
+            self._currentCategoryRequest.categoryId = id;
         },
 
         _fetchSearchResults: function(query, callback) {
