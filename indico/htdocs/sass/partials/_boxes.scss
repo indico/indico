@@ -440,3 +440,30 @@ $i-box-padding: 10px;
         }
     }
 }
+
+.error-box {
+    font-size: 1.2em;
+    padding: 2em;
+    background-color: #e4e4e4;
+    width: 400px;
+    margin: 50px auto;
+    padding-top: 20px;
+    text-align: center;
+    border-radius: .5em;
+    border: 1px solid #d3d3d3;
+
+    h1 {
+        color: #007CAC;
+        font-size: 2em;
+        padding-bottom: 10px;
+    }
+
+    p {
+        color: #666;
+    }
+
+    .error-box-small {
+        margin-top: 2em;
+        font-size: 0.8em;
+    }
+}

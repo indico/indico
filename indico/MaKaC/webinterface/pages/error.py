@@ -14,17 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.wcomponents import WTemplated
+from flask import session
+
+from MaKaC.accessControl import AccessWrapper
+from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
-class WErrorWSGI(WTemplated):
+class WErrorWSGI(WPDecorated, WPJinjaMixin):
 
     def __init__(self, ex):
-        WTemplated.__init__(self)
+        WPDecorated.__init__(self, None)
         self._ex = ex
 
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["errorTitle"] = str(self._ex[0])
-        vars["errorText"] = str(self._ex[1])
-        return vars
+    def _getBody(self, params):
+        return self._getPageContent({
+            '_jinja_template': 'error.html',
+            'error_title': self._ex[0],
+            'error_text': self._ex[1]
+        })
+
+    def _getAW(self):
+        return AccessWrapper(session.avatar)
+
+    def getHTML(self):
+        return self.display()
