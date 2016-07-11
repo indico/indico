@@ -37,6 +37,8 @@
         @extend %form-field-input;
         width: 100%;
         flex-shrink: 0;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .category-list {
@@ -166,7 +168,7 @@
                 border: 2px solid $blue;
                 color: $blue;
                 font-size: 16px;
-                margin-right: 1rem;
+                margin-right: 10px;
                 text-align: center;
                 height: 1.5em;
                 width: 1.5em;
