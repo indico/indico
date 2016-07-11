@@ -20,8 +20,8 @@
 
     $.widget('indico.categorynavigator', {
         options: {
-            // ID of the current category
-            categoryId: 0,
+            // ID or serialized data of the current category
+            category: 0,
             // Text for action buttons
             actionButtonText: $T.gettext("Select"),
             // Text for placeholder in empty categories
@@ -63,6 +63,12 @@
 
         _create: function() {
             var self = this;
+            if (_.isObject(self.options.category)) {
+                self._fillCache(self.options.category);
+                self._categoryId = self.options.category.category.id;
+            } else {
+                self._categoryId = self.options.category;
+            }
             if (self.options.openInDialog) {
                 self._createInDialog();
             } else {
@@ -76,7 +82,7 @@
             self._createList();
             self._createSearchField();
             self._createBindings();
-            self.goToCategory(self.options.categoryId);
+            self.goToCategory(self._categoryId);
         },
 
         _createInDialog: function() {
@@ -361,6 +367,12 @@
             }
         },
 
+        _renderInitialCategory: function(data) {
+            var self = this;
+            self._renderCurrentCategory(data.category);
+            self._renderCategoryTree(data.subcategories, data.category);
+        },
+
         _renderCurrentCategory: function(category) {
             var self = this;
             var $currentCategory = self._buildCurrentCategory(category);
@@ -502,13 +514,6 @@
         _fetchCategory: function(id, callback) {
             var self = this;
 
-            function fillCache(data) {
-                self._categories[data.category.id] = _.omit(data.category, 'subcategories');
-                self._subcategories[data.category.id] = _.pluck(data.subcategories, 'id');
-                _.each(data.subcategories, self._fillCategoryCache.bind(self));
-                _.each(data.supercategories, self._fillCategoryCache.bind(self));
-            }
-
             // Don't send another request if one for the same ID is ongoing
             if (self._currentCategoryRequest && self._currentCategoryRequest.categoryId == id) {
                 self._currentCategoryRequest.then(callback);
@@ -528,7 +533,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     if (data && self._isInDOM()) {
-                        fillCache(data);
+                        self._fillCache(data);
                         callback();
                     }
                 }
@@ -542,7 +547,7 @@
 
             function fillCache(data) {
                 self._searchResultData[query] = data;
-                _.each(data.categories, self._fillCategoryCache.bind(self));
+                _.each(data.categories, self._fillSingleCategoryCache.bind(self));
             }
 
             self._currentSearchRequest = $.ajax({
@@ -572,7 +577,15 @@
             });
         },
 
-        _fillCategoryCache: function(category) {
+        _fillCache: function(data) {
+            var self = this;
+            self._categories[data.category.id] = _.omit(data.category, 'subcategories');
+            self._subcategories[data.category.id] = _.pluck(data.subcategories, 'id');
+            _.each(data.subcategories, self._fillSingleCategoryCache.bind(self));
+            _.each(data.supercategories, self._fillSingleCategoryCache.bind(self));
+        },
+
+        _fillSingleCategoryCache: function(category) {
             var self = this;
             self._categories[category.id] = $.extend(self._categories[category.id], category);
         },
