@@ -30,8 +30,9 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core.db import db
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.util import (get_category_stats, get_upcoming_events, serialize_category_atom,
-                                            serialize_category_ical)
+from indico.modules.categories.serialize import (serialize_category_atom, serialize_category_ical,
+                                                 serialize_category_chain, serialize_category)
+from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters
@@ -127,35 +128,6 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
         return User.find(is_deleted=False, is_pending=False).count()
 
 
-def _serialize_category(category, with_favorite=False, with_path=False, parent_path=None, child_path=None):
-    data = {
-        'id': category.id,
-        'title': category.title,
-        'is_protected': category.is_protected,
-        'has_events': category.has_events,
-        'deep_category_count': category.deep_children_count,
-        'deep_event_count': category.deep_events_count,
-        'can_access': category.can_access(session.user),
-    }
-    if with_path:
-        if child_path:
-            data['path'] = child_path[:]
-            for segment in reversed(child_path):
-                data['path'].pop()
-                if not data['path'] or data['path'][-1]['id'] == category.id:
-                    break
-        elif parent_path:
-            data['path'] = parent_path[:]
-            data['path'].append({'id': category.id, 'title': category.title})
-        else:
-            data['path'] = [{'id': c.id, 'title': c.title}
-                            for c in category.chain_query.options(load_only('id', 'title'))]
-        data['parent_path'] = data['path'][:-1]
-    if with_favorite:
-        data['is_favorite'] = session.user and category in session.user.favorite_categories
-    return data
-
-
 class RHCategoryInfo(RHDisplayCategoryBase):
     @property
     def _category_query_options(self):
@@ -168,16 +140,9 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode',
                                                                          'has_events')
 
-    def _serialize_category_chain(self):
-        category_data = _serialize_category(self.category, with_path=True)
-        return {'category': category_data,
-                'subcategories': [_serialize_category(c, with_path=True, parent_path=category_data['path'])
-                                  for c in self.category.children],
-                'supercategories': [_serialize_category(c, with_path=True, child_path=category_data['path'])
-                                    for c in self.category.parent_chain_query]}
-
     def _process(self):
-        return jsonify_data(flash=False, **self._serialize_category_chain())
+        return jsonify_data(flash=False,
+                            **serialize_category_chain(self.category, include_children=True, include_parents=True))
 
 
 class RHCategorySearch(RH):
@@ -200,7 +165,7 @@ class RHCategorySearch(RH):
                            Category.chain_titles))
         total_count = query.count()
         query = query.limit(10)
-        return jsonify_data(categories=[_serialize_category(c, with_favorite=True, with_path=True) for c in query],
+        return jsonify_data(categories=[serialize_category(c, with_favorite=True, with_path=True) for c in query],
                             total_count=total_count, flash=False)
 
 
