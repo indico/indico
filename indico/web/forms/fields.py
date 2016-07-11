@@ -252,6 +252,9 @@ class IndicoPasswordField(PasswordField):
 class CategoryField(HiddenField):
     """WTForms field that lets you select a category.
 
+    :param category_id: The ID of the category to initialize the category
+                        navigator with. The root category is used in case the
+                        category_id is not provided.
     :param allow_events: Whether to allow selecting a category that
                          contains events.
     :param allow_subcats: Whether to allow selecting a category that
@@ -261,6 +264,12 @@ class CategoryField(HiddenField):
     widget = JinjaWidget('forms/category_picker_widget.html')
 
     def __init__(self, *args, **kwargs):
+        from indico.modules.categories import Category
+        from indico.modules.categories.serialize import serialize_category_chain
+
+        category_id = kwargs.pop('category_id', None)
+        category = Category.get(category_id, is_deleted=False) if category_id else Category.get_root()
+        self.category = serialize_category_chain(category, include_children=True)
         self.allow_events = kwargs.pop('allow_events', True)
         self.allow_subcats = kwargs.pop('allow_subcats', True)
         super(CategoryField, self).__init__(*args, **kwargs)
