@@ -1982,17 +1982,16 @@ class Conference(CommonObjectBase):
     def getDefaultStyle(self):
         return self.as_event.theme
 
-    def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
+    def clone(self, startDate, options, eventManager=None, userPerformingClone=None):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
-        cat = self.getOwnerList()[0]
-        managing = options.get("managing",None)
+        managing = options.get("managing", None)
         if managing is not None:
             creator = managing
         else:
             creator = self.as_event.creator
-        conf = Conference.new(self.as_event.category, title=self.getTitle(), start_dt=self.getStartDate(),
-                              end_dt=self.getEndDate(), timezone=self.getTimezone(), event_type=self.as_event.type_,
-                              add_creator_as_manager=False)
+        conf = Conference.new(self.as_event.category, creator=creator, title=self.getTitle(),
+                              start_dt=self.getStartDate(), end_dt=self.getEndDate(), timezone=self.getTimezone(),
+                              event_type=self.as_event.type_, add_creator_as_manager=False)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -2003,7 +2002,8 @@ class Conference(CommonObjectBase):
             conf.setDates(startDate, endDate, moveEntries=1, enforce_constraints=False)
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
-        conf.setVisibility(self.getVisibility())
+        # TODO adapt the setVisibility method as soon as the property is in Postgres
+        # conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
         # Tracks in a conference
         if options.get("tracks",False) :
