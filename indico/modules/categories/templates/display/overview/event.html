@@ -37,7 +37,7 @@
 {% macro _render_timetable(event, timezone, show_session=true, show_contribution=false, show_break=false) %}
     <table class="timetable-entries">
         <tbody>
-            {% for entry in event.timetable_entries.all() %}
+            {% for entry in event.timetable_entries %}
                 {% if show_session and entry.type.name == 'SESSION_BLOCK' %}
                     {{ _session_info(entry, timezone) }}
                 {% elif show_contribution and entry.type.name == 'CONTRIBUTION' %}
