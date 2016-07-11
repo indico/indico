@@ -22,15 +22,16 @@ from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 class WErrorWSGI(WPDecorated, WPJinjaMixin):
 
-    def __init__(self, ex):
+    def __init__(self, message, description):
         WPDecorated.__init__(self, None)
-        self._ex = ex
+        self._message = message
+        self._description = description
 
     def _getBody(self, params):
         return self._getPageContent({
             '_jinja_template': 'error.html',
-            'error_title': self._ex[0],
-            'error_text': self._ex[1]
+            'error_message': self._message,
+            'error_description': self._description
         })
 
     def _getAW(self):

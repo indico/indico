@@ -314,18 +314,17 @@ def handle_404(exception):
     except NotFound:
         if exception.description == NotFound.description:
             # The default reason is too long and not localized
-            msg = (_("Page not found"), _("The page you are looking for doesn't exist."))
+            description = _("The page you are looking for doesn't exist.")
         else:
-            msg = (_("Page not found"), exception.description)
-        return WErrorWSGI(msg).getHTML(), 404
+            description = exception.description
+        return WErrorWSGI(_("Page not found"), description).getHTML(), 404
 
 
 def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
     if current_app.debug:
         raise
-    msg = (str(exception), _("An unexpected error ocurred."))
-    return WErrorWSGI(msg).getHTML(), 500
+    return WErrorWSGI(str(exception), _("An unexpected error ocurred.")).getHTML(), 500
 
 
 def make_app(set_path=False, db_setup=True, testing=False):
