@@ -1256,22 +1256,10 @@ class Conference(CommonObjectBase):
 
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.indexConf(self)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
-        catDateIdx.indexConf(self)
-        catDateAllIdx.indexConf(self)
-
-        Catalog.getIdx('categ_conf_sd').index_obj(self)
 
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
-        catDateIdx.unindexConf(self)
-        catDateAllIdx.unindexConf(self)
-
-        Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
     @memoize_request
     def getContribTypeList(self):
