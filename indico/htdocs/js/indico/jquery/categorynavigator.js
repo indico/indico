@@ -307,17 +307,25 @@
             var self = this;
             var $placeholder = $('<div>')
                 .append($('<div>', {class: 'placeholder-text', text: self.options.emptyCategoryText}));
-            if (category.parent_path.length) {
-                var parent = _.last(category.parent_path);
-                $placeholder.append($('<div>', {html: $T.gettext('You can <a class="js-action" data-category-id="{0}">{1}</a> this one, ' +
-                                                                 '<a class="js-navigate-up" data-parent-id="{2}">navigate up</a> ' +
-                                                                 'or <a class="js-search">search</a>.')
-                                                        .format(category.id, self.options.actionButtonText.toLowerCase(), parent.id)}));
-            } else {
+            var actionButtonText = self.options.actionButtonText.toLowerCase();
+            var html;
+            if (!category.parent_path.length) {
                 // Root category is empty
-                $placeholder.append($('<div>', {html: $T.gettext('You can only <a class="js-action" data-category-id="{0}">{1}</a> this one.')
-                                                        .format(category.id, self.options.actionButtonText)}));
+                if (self._canActOn(category)) {
+                    html = $T.gettext('You can only <a class="js-action" data-category-id="{0}">{1}</a> this one.')
+                             .format(category.id, actionButtonText);
+                }
+            } else if (self._canActOn(category)) {
+                html = $T.gettext('You can <a class="js-action" data-category-id="{0}">{1}</a> this one, ' +
+                                  '<a class="js-navigate-up" data-parent-id="{2}">navigate up</a> ' +
+                                  'or <a class="js-search">search</a>.')
+                         .format(category.id, actionButtonText, parent.id);
+            } else {
+                html = $T.gettext('You can <a class="js-navigate-up" data-parent-id="{2}">navigate up</a> ' +
+                                  'or <a class="js-search">search</a>.')
+                         .format(category.id, actionButtonText, parent.id);
             }
+            $placeholder.append($('<div>', {html: html}));
             return $placeholder;
         },
 
@@ -595,6 +603,14 @@
                     self.dialog.close();
                 }
             });
+        },
+
+        _canActOn(category) {
+            var self = this;
+            var ids = self.options.actionOn.categories.ids;
+            return !(self.options.actionOn.categoriesWithSubcategories.disabled && category.deep_category_count) &&
+                   !(self.options.actionOn.categoriesWithEvents.disabled && category.has_events) &&
+                   !(self.options.actionOn.categories.disabled && _.contains(ids, category.id));
         },
 
         _toggleLoading: function(state, disableInput) {
