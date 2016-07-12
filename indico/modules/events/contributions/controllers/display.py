@@ -153,8 +153,8 @@ class RHAuthorList(RHDisplayProtectionBase):
 
     def _process(self):
         authors = _get_persons(self.event_new, ContributionPersonLink.author_type != AuthorType.none)
-        return self.view_class.render_template('display/author_list.html', self._conf,
-                                            authors=authors, event=self.event_new)
+        return self.view_class.render_template('display/author_list.html', self._conf, authors=authors,
+                                               event=self.event_new)
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
@@ -164,8 +164,8 @@ class RHSpeakerList(RHDisplayProtectionBase):
 
     def _process(self):
         speakers = _get_persons(self.event_new, ContributionPersonLink.is_speaker)
-        return self.view_class.render_template('display/speaker_list.html', self._conf,
-                                             speakers=speakers, event=self.event_new)
+        return self.view_class.render_template('display/speaker_list.html', self._conf, speakers=speakers,
+                                               event=self.event_new)
 
 
 class RHContributionAuthor(RHContributionDisplayBase):
