@@ -50,7 +50,6 @@
                 <input type="hidden" id="eYear" name="eYear" value="${ eYear }">
                 <input type="hidden" id="eHour" name="eHour" value="${ eHour }">
                 <input type="hidden" id="eMinute" name="eMinute" value="${ eMinute }">
-                <span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()">${ _("Show existing events during these dates")}</a></span>
             </td>
         </tr>
         <!-- Fermi timezone awareness -->

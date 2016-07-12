@@ -477,39 +477,6 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
 #############################
 
 
-class ShowConcurrentEvents(ServiceBase):
-
-    def _checkParams(self):
-        ServiceBase._checkParams(self)
-
-        pm = ParameterManager(self._params)
-
-        self._tz = pm.extract("timezone", pType=str, allowEmpty=False)
-        pm.setTimezone(self._tz)
-        self._sDate = pm.extract("sDate", pType=datetime.datetime, allowEmpty=False)
-        self._eDate = pm.extract("eDate", pType=datetime.datetime, allowEmpty=False)
-
-    def _getAnswer(self):
-        im = indexes.IndexesHolder()
-        ch = conference.ConferenceHolder()
-        calIdx = im.getIndex("calendar")
-        evtIds = calIdx.getObjectsIn(self._sDate, self._eDate)
-
-        evtsByCateg = {}
-        for evtId in evtIds:
-            try:
-                evt = ch.getById(evtId)
-                categs = evt.getOwnerList()
-                categname = categs[0].getName()
-                if not evtsByCateg.has_key(categname):
-                    evtsByCateg[categname] = []
-                evtsByCateg[categname].append((evt.getTitle().strip(), evt.getAdjustedStartDate().strftime('%d/%m/%Y %H:%M '),evt.getAdjustedEndDate().strftime('%d/%m/%Y %H:%M '), evt.getTimezone()))
-
-            except Exception:
-                continue
-        return evtsByCateg
-
-
 class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
     def _getAnswer(self):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
@@ -691,7 +658,6 @@ methodMap = {
     "main.changeTimezone": ConferenceTimezoneModification,
     "program.changeDescription": ConferenceProgramDescriptionModification,
     "contributions.list": ConferenceListContributionsReview,
-    "showConcurrentEvents": ShowConcurrentEvents,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
     "protection.addAllowedUsers": ConferenceProtectionAddUsers,
