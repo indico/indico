@@ -60,6 +60,7 @@ class AccessController(Persistent):
         self.contactInfo = ""
 
     def getOwner(self):
+        raise NotImplementedError('getOwner')
         return self.owner
 
     def setOwner(self, owner):
@@ -79,6 +80,7 @@ class AccessController(Persistent):
             return 0
 
     def getAccessProtectionLevel( self ):
+        raise NotImplementedError('getAccessProtectionLevel')
         return self._getAccessProtection()
 
     def _getFatherProtection( self ):
@@ -109,16 +111,20 @@ class AccessController(Persistent):
 
     def isProtected( self ):
         """tells whether the associated resource is read protected or not"""
+        raise NotImplementedError('isProtected')
         return (self._getAccessProtection() + self._getFatherProtection()) > 0
 
     def isItselfProtected(self):
+        raise NotImplementedError('itItselfProtected')
         return self._getAccessProtection() > 0
 
     def setProtection( self, protected ):
+        raise NotImplementedError('setProtection')
         self._accessProtection = protected
         self._p_changed = 1
 
     def isFatherProtected(self):
+        raise NotImplementedError('isFatherProtected')
         return self._getFatherProtection()
 
     def setFatherProtection( self, protected ):
@@ -128,13 +134,13 @@ class AccessController(Persistent):
     def grantAccess(self, principal):
         """grants read access for the related resource to the specified
             principal"""
-
         if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, GroupWrapper)):
             self.allowed.append(principal)
             self._p_changed = 1
         # signals.acl.access_granted.send(self, principal=principal)
 
     def getAccessEmail(self):
+        raise NotImplementedError('getAccessEmail')
         try:
             return self.allowedEmail
         except:
@@ -181,16 +187,18 @@ class AccessController(Persistent):
         return ip in ipList
 
     def canIPAccess(self, ip):
-
+        raise NotImplementedError('canIPAccess')
         # Domain protection
         if not self.getRequiredDomainList():
             return True
         return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
     def isAdmin(self, av):
+        raise NotImplementedError('isAdmin')
         return av and av.user and av.user.is_admin
 
     def canUserAccess(self, av):
+        raise NotImplementedError('canUserAccess')
         if self.isAdmin(av):
             return True
         for principal in self.allowed:
@@ -208,6 +216,7 @@ class AccessController(Persistent):
 
     def getAccessList(self):
         """returns a list of those principals which have access privileges"""
+        raise NotImplementedError('getAccessList')
         for principal in list(self.allowed):
             if principal is None:
                 self.revokeAccess(principal)
@@ -216,6 +225,7 @@ class AccessController(Persistent):
         return self.allowed
 
     def getModificationEmail(self):
+        raise NotImplementedError('getModificationEmail')
         try:
             return self.managersEmail
         except:
@@ -259,6 +269,7 @@ class AccessController(Persistent):
 
     def canModify(self, user):
         """tells whether the specified user has modification privileges"""
+        raise NotImplementedError('canModify')
         if user and user.user.is_admin:
             return True
 
@@ -278,6 +289,7 @@ class AccessController(Persistent):
     def getModifierList( self ):
         """returns a list of those principals which have modification
             privileges"""
+        raise NotImplementedError('getModifierList')
         for principal in list(self.managers):
             if principal is None:
                 self.revokeModification(principal)
@@ -304,6 +316,7 @@ class AccessController(Persistent):
     def getRequiredDomainList( self ):
         """
         """
+        raise NotImplementedError('getRequiredDomainList')
         return self.requiredDomains
 
     def getAnyDomainProtection(self):
@@ -313,7 +326,7 @@ class AccessController(Persistent):
 
         Returns the list of domains from which the item can be accessed.
         """
-
+        raise NotImplementedError('getAnyDomainProtection')
         if self.getAccessProtectionLevel() == 0:
             owner = self.getOwner().getOwner()
 
@@ -329,11 +342,13 @@ class AccessController(Persistent):
             return self.getRequiredDomainList()
 
     def isDomainProtected(self):
+        raise NotImplementedError('isDomainProtected')
         if self.getRequiredDomainList():
             return 1
         return 0
 
     def getAnyContactInfo(self):
+        raise NotImplementedError('getAnyContactInfo')
         parent = self.getOwner().getOwner()
         if not self.getContactInfo() and parent and  hasattr(parent, 'getAccessController'):
             return parent.getAccessController().getAnyContactInfo()
@@ -343,6 +358,7 @@ class AccessController(Persistent):
     def getContactInfo(self):
         """Defines who to contact in case of access control error.
         One can use this info to display it along with the exception message"""
+        raise NotImplementedError('getContactInfo')
         try:
             if self.contactInfo:
                 pass
