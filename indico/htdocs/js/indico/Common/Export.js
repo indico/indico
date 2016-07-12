@@ -1,65 +1,59 @@
 type("ExportIcalInterface", [], {
     _getExportURLs: function(progressTarget) {
         var self = this;
-        indicoRequest(self.getURLsMethod, self.getURLsParams,
-                function(result, error) {
-                    $(progressTarget).html('');
-                    if (error){
-                        IndicoUI.Dialogs.Util.error(error);
-                    }
-                    else{
-                        self.requestURLs = result;
-                        self.setURLsFunction(self.requestURLs);
-                        switch(self.apiMode){
-
-                            case 0:
-                                if(self.apiActive){
-                                    self._postAcceptAgreements('#agreementApiKey'+self.id);
-                                }
-                                break;
-                            case 1:
-                                if(self.apiActive){
-                                    $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-                                    self._postAcceptAgreements('#agreementApiKey'+self.id);
-
-                                }
-                                break;
-
-                            case 2:
-                                if(self.apiActive){
-                                    $('#agreementApiKey'+self.id).hide();
-                                    if(self.persistentUserEnabled && self.persistentAllowed){
-                                        self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
-                                    }
-                                }
-                                break;
-
-                            case 3:
-                                if(self.apiActive){
-                                    $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-                                    if(self.persistentUserEnabled && self.persistentAllowed){
-                                        self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
-                                    }
-                                    else {
-                                        $('#extraInformation'+self.id).insertAfter('#publicLinkWrapper'+self.id);
-                                    }
-                                    $('#agreementApiKey'+self.id).hide();
-                                }
-
-                                break;
-
-                            case 4:
-                                if(self.apiActive){
-                                    $('#agreementApiKey'+self.id).hide();
-                                    if(self.persistentUserEnabled && self.persistentAllowed){
-                                        $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-                                        self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
-                                    }
-                                }
-                                break;
-                    };
-                    }
-                });
+        $.ajax({
+            url: self.getURLsMethod,
+            type: 'POST',
+            data: JSON.stringify(self.getURLsParams),
+            dataType: 'json',
+            contentType: 'application/json',
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress(),
+            success: function(data) {
+                self.setURLsFunction(data.urls);
+                switch (self.apiMode) {
+                    case 0:
+                        if (self.apiActive) {
+                            self._postAcceptAgreements('#agreementApiKey' + self.id);
+                        }
+                        break;
+                    case 1:
+                        if (self.apiActive) {
+                            $('#publicLinkWrapper' + self.id).append($("#publicLink" + self.id)).show();
+                            self._postAcceptAgreements('#agreementApiKey' + self.id);
+                        }
+                        break;
+                    case 2:
+                        if (self.apiActive) {
+                            $('#agreementApiKey' + self.id).hide();
+                            if (self.persistentUserEnabled && self.persistentAllowed) {
+                                self._postAcceptAgreements('#agreementPersistentSignatures' + self.id);
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (self.apiActive) {
+                            $('#publicLinkWrapper' + self.id).append($("#publicLink" + self.id)).show();
+                            if (self.persistentUserEnabled && self.persistentAllowed) {
+                                self._postAcceptAgreements('#agreementPersistentSignatures' + self.id);
+                            } else {
+                                $('#extraInformation' + self.id).insertAfter('#publicLinkWrapper' + self.id);
+                            }
+                            $('#agreementApiKey' + self.id).hide();
+                        }
+                        break;
+                    case 4:
+                        if (self.apiActive) {
+                            $('#agreementApiKey' + self.id).hide();
+                            if (self.persistentUserEnabled && self.persistentAllowed) {
+                                $('#publicLinkWrapper' + self.id).append($("#publicLink" + self.id)).show();
+                                self._postAcceptAgreements('#agreementPersistentSignatures' + self.id);
+                            }
+                        }
+                        break;
+                }
+            }
+        });
     },
 
     _showPrivatePanel: function(question){
@@ -220,8 +214,8 @@ type("ExportIcalInterface", [], {
         };
     }
 
-}, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod, getURLsParams, requestURLs, id, userId){
-
+}, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod,
+            getURLsParams, requestURLs, id, userId) {
     this.apiMode = any(apiMode, 0);
     this.persistentUserEnabled = any(persistentUserEnabled, false);
     this.persistentAllowed = any(persistentAllowed, false);
@@ -231,20 +225,16 @@ type("ExportIcalInterface", [], {
     this.getURLsMethod = any(getURLsMethod, "");
     this.getURLsParams = any(getURLsParams, {});
     this.requestURLs = any(requestURLs, {});
-    this.id = any(id,"");
+    this.id = any(id, "");
     this.userId = any(userId, "");
 
-    var self = this;
-
-    self.showContent();
-
+    this.showContent();
 });
 
 
-var exportPopups= {};
+var exportPopups = {};
 
 $(document).ready(function() {
-
     $(".js-export-ical").on('menu_select', function() {
         var $button = $(this);
 
@@ -253,7 +243,7 @@ $(document).ready(function() {
         } else {
             $button.addClass('open');
 
-            $("<a/>").qtip({
+            $("<a>").qtip({
                 style: {
                     width: '350px',
                     classes: 'qtip-rounded qtip-shadow qtip-popup',
