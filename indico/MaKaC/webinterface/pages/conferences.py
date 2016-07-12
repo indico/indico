@@ -649,7 +649,7 @@ class WPConferenceModifBase(main.WPMainBase):
 
     def __init__(self, rh, conference, **kwargs):
         conference = getattr(conference, 'as_legacy', conference)
-        main.WPMainBase.__init__(self, rh, **kwargs)
+        main.WPMainBase.__init__(self, rh, _current_category=conference.as_event.category, **kwargs)
         self._navigationTarget = self._conf = conference
 
     def getJSFiles(self):
