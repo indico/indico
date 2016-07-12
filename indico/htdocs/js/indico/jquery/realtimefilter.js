@@ -103,6 +103,8 @@
             } else {
                 self.element.val(value);
             }
+            // Needed for typeWatch to refresh its timer
+            self.element.trigger('input');
         },
 
         update: function(delayed) {
