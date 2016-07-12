@@ -44,6 +44,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
+MAX_CATEGORY_LOGO_DIMENSIONS = (200, 200)
 
 
 def _get_image_data(category, image_type):
@@ -177,6 +178,21 @@ class RHManageCategoryLogo(RHCategoryImageUploadBase):
     IMAGE_TYPE = 'logo'
     SAVED_FLASH_MSG = _('New logo saved')
     DELETED_FLASH_MSG = _('Logo deleted')
+
+    def _resize(self, logo):
+        width, height = logo.size
+        max_width, max_height = MAX_CATEGORY_LOGO_DIMENSIONS
+        if width > max_width:
+            ratio = max_width / float(width)
+            width = int(width * ratio)
+            height = int(height * ratio)
+        if height > max_height:
+            ratio = max_height / float(height)
+            width = int(width * ratio)
+            height = int(height * ratio)
+        if (width, height) != logo.size:
+            logo = logo.resize((width, height), Image.ANTIALIAS)
+        return logo
 
     def _set_image(self, data, metadata):
         self.category.logo = data
