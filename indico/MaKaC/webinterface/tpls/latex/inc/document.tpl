@@ -13,6 +13,7 @@
 \usepackage{lmodern}
 \usepackage{hyperref}
 \usepackage{textgreek}
+\usepackage{amssymb}
 
 \usepackage[english]{babel}
 \usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
