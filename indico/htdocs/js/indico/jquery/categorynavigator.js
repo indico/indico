@@ -366,6 +366,17 @@
             }
         },
 
+        _highlightQuery: function(query, $result) {
+            var self = this;
+            var $title = $result.find('.title');
+            var title = $title.text();
+            var indexStart = title.toLowerCase().search(query.toLowerCase());
+            var indexEnd = indexStart + query.length;
+
+            $title.html(title.substring(0, indexStart) + '<strong>' + title.substring(indexStart, indexEnd) +
+                        '</strong>' + title.substring(indexEnd));
+        },
+
         _renderInitialCategory: function(data) {
             var self = this;
             self._renderCurrentCategory(data.category);
@@ -391,7 +402,7 @@
             self._postRenderList();
         },
 
-        _renderSearchResults: function(categories) {
+        _renderSearchResults: function(categories, query) {
             var self = this;
             self.$category.hide();
             self.$categoryResultsList.empty();
@@ -409,6 +420,7 @@
                         title: $T.gettext("Search result")
                     }));
                 }
+                self._highlightQuery(query, $result);
                 self.$categoryResultsList.append($result);
                 self._ellipsizeBreadcrumbs($result);
             });
@@ -501,7 +513,7 @@
             var dfd = $.Deferred();
 
             function resolve() {
-                dfd.resolve(self._searchResultData[query]);
+                dfd.resolve(self._searchResultData[query], query);
             }
 
             if (self._searchResultData[query]) {
@@ -681,9 +693,9 @@
 
             self._toggleTreeView(false);
             self._toggleSearchResultsView(false);
-            self._getSearchResults(query).then(function(data) {
+            self._getSearchResults(query).then(function(data, query) {
                 self._renderSearchResultInfo(data.categories.length, data.total_count);
-                self._renderSearchResults(data.categories);
+                self._renderSearchResults(data.categories, query);
             });
         }
     });

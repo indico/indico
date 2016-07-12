@@ -308,4 +308,8 @@
         color: $dark-gray;
         font-size: 0.85em;
     }
+
+    .title strong {
+        @extend %font-family-title;
+    }
 }
