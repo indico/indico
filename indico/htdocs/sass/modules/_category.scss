@@ -571,12 +571,7 @@ ul.category-resource-qtip {
 }
 
 .category-overview-side-menu {
-    #calendar-container {
-        display: block;
-        text-align: center;
-
-        .calendar {
-            display: inline-block !important;
-        }
+    .ui-datepicker {
+        width: 192px;
     }
 }
