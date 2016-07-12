@@ -241,8 +241,10 @@ class Evaluation(Persistent):
             self.setEndDate(self._conf.getEndDate() + timedelta(days=8))
         return timezone(self.getTimezone()).localize(self.endDate)
 
-    def inEvaluationPeriod(self, date=nowutc()):
-        return date>=self.getStartDate() and date<=self.getEndDate()
+    def inEvaluationPeriod(self, date=None):
+        if date is None:
+            date = nowutc()
+        return date >= self.getStartDate() and date <= self.getEndDate()
 
     def setContactInfo( self, contactInfo ):
         self.contactInfo = utils.removeQuotes(contactInfo)
