@@ -3,7 +3,7 @@
 {% block side_menu %}
     <div class="category-overview-side-menu">
         <form action="{{ url_for('.overview', category) }}" method="GET" id="category-overview-options">
-            <span id="calendar-container"></span>
+            <div class="js-datepicker"></div>
             <input type="hidden" id="date" name="date" value="{{ start_dt|format_date(format="YYYY-MM-dd") }}">
             <h3>{% trans %}Display options{% endtrans %}</h3>
             <table cellpadding="0" cellspacing="0" style="width:100%">
@@ -41,7 +41,7 @@
                 </tr>
             </table>
             <span id="applyButtonWrapper">
-                <input type="button" value="{% trans %}Apply{% endtrans %}" class="apply-options">
+                <input type="submit" value="{% trans %}Apply{% endtrans %}">
             </span>
         </form>
         {% if subcategories %}
@@ -64,28 +64,19 @@
         (function() {
             'use strict';
 
-            $('#category-overview-options .apply-options').on('click', function() {
-                var applyButtonWrapper = $E("applyButtonWrapper");
-                applyButtonWrapper.set(progressIndicator(true, false));
-                submitForm();
+            var $form = $('#category-overview-options');
+
+            $form.find('.js-datepicker').datepicker({
+                'dateFormat': $.datepicker.ATOM,
+                'defaultDate': {{ start_dt|format_date(format="YYYY-MM-dd")|tojson }},
+                'onSelect': function(dateText) {
+                    $('#category-overview-options #date').val(dateText);
+                    $form.trigger('submit');
+                }
             });
 
-            function submitForm() {
-                $('#category-overview-options').submit();
-            };
-
-
-            function dateChanged(calendar) {
-                if (calendar.dateClicked) {
-                    submitForm();
-                }
-            };
-
-            Calendar.setup({
-                inputField: $('#category-overview-options #date')[0],
-                ifFormat: '%Y-%m-%d',
-                flat: "calendar-container",
-                flatCallback: dateChanged
+            $form.on('submit', function() {
+                IndicoUI.Dialogs.Util.progress();
             });
         })();
     </script>
