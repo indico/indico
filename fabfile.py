@@ -436,6 +436,15 @@ def install_tagging_js():
         local('mkdir -p {0}'.format(dest_js_dir))
         local('cp src/taggle.js {0}'.format(dest_js_dir))
 
+
+@recipe('typewatch')
+def install_typewatch():
+    with lcd(os.path.join(env.ext_dir, 'typewatch')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {}'.format(dest_js_dir))
+        local('cp jquery.typewatch.js {}'.format(dest_js_dir))
+
+
 # Tasks
 
 @task
