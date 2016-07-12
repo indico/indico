@@ -1829,18 +1829,22 @@ class Conference(CommonObjectBase):
     def isProtected(self):
         """Tells whether a conference is protected for accessing or not
         """
+        raise NotImplementedError('isProtected')
         return self.__ac.isProtected()
 
     def getAccessProtectionLevel( self ):
+        raise NotImplementedError('getAccessProtectionLevel')
         return self.__ac.getAccessProtectionLevel()
 
     def isItselfProtected( self ):
+        raise NotImplementedError('isItselfProtected')
         return self.__ac.isItselfProtected()
 
     def hasAnyProtection( self ):
         """Tells whether a conference has any kind of protection over it:
             access or domain protection.
         """
+        raise NotImplementedError('hasAnyProtection')
         if self.isProtected():
             return True
         if self.getDomainList():
@@ -1856,6 +1860,7 @@ class Conference(CommonObjectBase):
         return False
 
     def hasProtectedOwner( self ):
+        raise NotImplementedError('hasProtectedOwner')
         return self.__ac._getFatherProtection()
 
     def setProtection( self, private ):
