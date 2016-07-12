@@ -61,7 +61,7 @@
     margin-top: 10px;
 
     // Needed for Firefox to actually overflow on .group-list
-    overflow: auto;
+    overflow: hidden;
 
     &:not(.loading) .spinner-wrapper {
         display: none;
