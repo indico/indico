@@ -92,7 +92,8 @@ class CategoryLogoForm(IndicoForm):
     logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
                                                    max_files=1, submit_form=False, submit_if_empty=False,
                                                    add_remove_links=False, handle_flashes=True),
-                     description=_("Logo that will show up next to the category description."))
+                     description=_("Logo that will show up next to the category description. Will be "
+                                   "automatically resized to at most 200x200 pixels."))
 
 
 class CategoryProtectionForm(IndicoForm):
