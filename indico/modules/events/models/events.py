@@ -513,7 +513,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def duration(self):
         return self.end_dt - self.start_dt
 
-    def get_relative_events_ids(self):
+    def get_relative_event_ids(self):
         """Get the first, last, previous and next event IDs.
 
         Any of those values may be ``None`` if there is no matching
@@ -526,7 +526,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                             # XXX, use this after updating to sqlalchemy 1.1:
                             # db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
                             #                                range_=(None, None)).label('last')
-                            db.literal_column('last_value(id) OVER (ORDER BY start_dt ASC RANGE '
+                            db.literal_column('last_value(id) OVER (ORDER BY start_dt ASC, id ASC RANGE '
                                               'BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)').label('last'),
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
