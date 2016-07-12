@@ -166,22 +166,11 @@
 }
 
 ul.menu-items li.active {
+    @include inner-border-left($link, $width: 2px);
     position: relative;
     background-color: $light-blue;
 
     > a {
         font-weight: normal;
-    }
-
-    &:before {
-        display: block;
-        content: ".";
-        color: transparent;
-        font-size: 0;
-        border-left: 2px solid $link;
-        height: 100%;
-        position: absolute;
-        left: 0;
-        top: 0;
     }
 }
