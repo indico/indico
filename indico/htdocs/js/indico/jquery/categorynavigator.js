@@ -559,6 +559,26 @@
             self._currentCategoryRequest.categoryId = id;
         },
 
+        _fetchReachableCategories: function(id) {
+            var self = this;
+            $.ajax({
+                url: build_url(Indico.Urls.Categories.infoFrom, {category_id: id}),
+                method: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    exclude: _.map(_.keys(self._subcategories), function(n) { return +n; })
+                }),
+                success: function(data) {
+                    if (data) {
+                        _.each(data.categories, function(category) {
+                            self._fillCache(category);
+                        });
+                    }
+                }
+            });
+        },
+
         _fetchSearchResults: function(query, callback) {
             var self = this;
 
@@ -635,7 +655,7 @@
             });
         },
 
-        _canActOn(category) {
+        _canActOn: function(category) {
             var self = this;
             var ids = self.options.actionOn.categories.ids;
             return !(self.options.actionOn.categoriesWithSubcategories.disabled && category.deep_category_count) &&
@@ -677,6 +697,7 @@
                 self.$categoryTree.empty();
                 self._getCurrentCategory(id).then(self._renderCurrentCategory.bind(self));
                 self._getCategoryTree(id).then(self._renderCategoryTree.bind(self));
+                self._fetchReachableCategories(id);
             }
 
             self.$placeholderEmpty.empty();

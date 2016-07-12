@@ -140,6 +140,7 @@ def generate_global_file(config):
 
             'Categories': {
                 'info': url_rule_to_js('categories.info'),
+                'infoFrom': url_rule_to_js('categories.info_from'),
                 'search': url_rule_to_js('categories.search')
             }
         },
