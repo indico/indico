@@ -395,6 +395,7 @@
         _renderSearchResults: function(categories) {
             var self = this;
             self.$category.hide();
+            self.$categoryResultsList.empty();
             self._toggleSearchResultsView(true);
             _.each(categories, function(category) {
                 var $result = self._buildSubcategory(category, true);
@@ -414,6 +415,8 @@
             });
             if (!categories.length) {
                 self.$placeholderNoResults.html(self._buildNoResultsPlaceholder());
+            } else {
+                self.$placeholderNoResults.empty();
             }
             self._postRenderList();
         },
@@ -636,7 +639,6 @@
 
         _toggleTreeView: function(visible) {
             var self = this;
-
             self.$category.toggle(visible);
             self.$categoryTree.toggle(visible);
             self.$placeholderEmpty.toggleClass('hidden', !visible);
@@ -644,13 +646,8 @@
 
         _toggleSearchResultsView: function(visible) {
             var self = this;
-
-            self.$categoryResultsList.empty();
             self.$categoryResultsInfo.toggle(visible);
             self.$categoryResultsList.toggle(visible);
-            if (!visible) {
-                self.$categoryResultsInfo.empty();
-            }
         },
 
         _isInDOM: function() {
@@ -684,6 +681,7 @@
             }
 
             self._toggleTreeView(false);
+            self._toggleSearchResultsView(false);
             self._getSearchResults(query).then(function(data) {
                 self._renderSearchResultInfo(data.categories.length, data.total_count);
                 self._renderSearchResults(data.categories);
