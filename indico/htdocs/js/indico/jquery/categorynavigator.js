@@ -181,7 +181,7 @@
                     'data-category-id': category.id
                 });
                 if (idx == 0) {
-                    $item.text($T.gettext("in "));
+                    $item.text($T.gettext("in") + " ");
                 }
                 if (clickable) {
                     $segment.attr('href', '');
