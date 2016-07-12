@@ -599,7 +599,7 @@
                 self._currentSearchRequest.abort();
             }
             self.$category.show();
-            self.$searchInput.val('');
+            self.$searchInput.realtimefilter('clear');
             self._toggleSearchResultsView(false);
             self.$placeholderNoResults.empty();
             self._toggleTreeView(true);
