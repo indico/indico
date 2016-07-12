@@ -25,11 +25,17 @@ from indico.modules.api import settings as api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
+from indico.modules.categories.models.categories import Category
+from indico.modules.events.models.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
-
+from indico.web.http_api.util import generate_public_auth_request
+from indico.web.util import jsonify_data
+from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -151,3 +157,42 @@ class RHAPIBlockKey(RHUserBase):
         else:
             flash(_('The API key has been unblocked.'), 'success')
         return redirect(url_for('api.user_profile'))
+
+
+class RHAPIBuildURLs(RH):
+    CSRF_ENABLED = True
+
+    def _checkParams(self):
+        data = request.json
+        self.object = None
+        if 'categId' in data:
+            self.object = Category.get_one(data['categId'])
+        elif 'contribId' in data:
+            self.object = Contribution.get_one(data['contribId'])
+        elif 'sessionId' in data:
+            self.object = Session.get_one(data['sessionId'])
+        elif 'confId' in data:
+            self.object = Event.get_one(data['confId'])
+
+        if self.object is None:
+            raise BadRequest
+
+    def _process(self):
+        urls = {}
+        api_key = session.user.api_key if session.user else None
+        url_format = '/export/event/{0}/{1}/{2}.ics'
+        if isinstance(self.object, Contribution):
+            event = self.object.event_new
+            urls = generate_public_auth_request(api_key, url_format.format(event.id, 'contribution', self.object.id))
+        elif isinstance(self.object, Session):
+            event = self.object.event_new
+            urls = generate_public_auth_request(api_key, url_format.format(event.id, 'session', self.object.id))
+        elif isinstance(self.object, Category):
+            urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id))
+        elif isinstance(self.object, Event):
+            urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id))
+            event_urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id),
+                                                      {'detail': 'contribution'})
+            urls['publicRequestDetailedURL'] = event_urls['publicRequestURL']
+            urls['authRequestDetailedURL'] = event_urls['authRequestURL']
+        return jsonify_data(flash=False, urls=urls)
