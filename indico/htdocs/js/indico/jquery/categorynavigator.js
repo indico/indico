@@ -104,7 +104,7 @@
             var self = this;
             self.$category = $('<div>');
             self.$categoryTree = $('<ul>', {class: 'group-list'});
-            self.$categoryResultsList = $('<ul>', {class: 'group-list'});
+            self.$categoryResultsList = $('<ul>', {class: 'group-list search-results-list'});
             self.$categoryResultsInfo = $('<div>', {class: 'search-result-info'});
             self.$spinner = $('<div>', {class: 'spinner-wrapper'})
                 .append($('<div>', {class: 'i-spinner'}));
@@ -177,9 +177,8 @@
                 var $item = $('<li>');
                 var $segment = $(tag, {
                     text: category.title,
-                    class: 'js-go-to',
                     'data-category-id': category.id
-                });
+                }).toggleClass('js-go-to', clickable);
                 if (idx == 0) {
                     $item.text($T.gettext("in") + " ");
                 }
@@ -239,7 +238,7 @@
 
         _buildSubcategory: function(category, withBreadcrumbs) {
             var self = this;
-            var $subcategory = self._buildCategory(category, true, withBreadcrumbs);
+            var $subcategory = self._buildCategory(category, true, withBreadcrumbs, false);
 
             if (category.can_access) {
                 $subcategory.addClass('can-access js-go-to');
