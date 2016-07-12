@@ -21,7 +21,7 @@ from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
                                                            RHCategoryInfo, RHCategorySearch, RHDisplayCategory,
                                                            RHEventList, RHExportCategoryAtom, RHExportCategoryICAL,
-                                                           RHShowPastEventsInCategory)
+                                                           RHShowPastEventsInCategory, RHReachableCategoriesInfo)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -64,6 +64,7 @@ _bp.add_url_rule('/logo-<slug>.png', 'display_logo', RHCategoryLogo)
 _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/info', 'info', RHCategoryInfo)
+_bp.add_url_rule('/info-from', 'info_from', RHReachableCategoriesInfo, methods=('GET', 'POST'))
 _bp.add_url_rule('/events.ics', 'export_ical', RHExportCategoryICAL)
 _bp.add_url_rule('/events.atom', 'export_atom', RHExportCategoryAtom)
 _bp.add_url_rule('/events.rss', 'export_rss', make_compat_redirect_func(_bp, 'export_atom'))
