@@ -120,9 +120,12 @@
                     if ($this.hasClass('enabled')) {
                         return $T.gettext("Remove from your favourites");
                     } else {
-                        return $T.gettext('<h3>Add to your favourites</h3>') +
-                               $T.gettext('<p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>')
-                                 .format($this.data('favorites-href'));
+
+                        return '<h3>{0}</h3><p>{1}</p>'.format(
+                            $T.gettext("Add to your favourites"),
+                            $T.gettext('This will make events in this category visible on your <a href="{0}">Dashboard</a>.')
+                                 .format($this.data('favorites-href'))
+                        );
                     }
                 }
             }
