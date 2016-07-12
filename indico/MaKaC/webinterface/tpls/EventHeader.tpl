@@ -1,5 +1,5 @@
 <%
-rel = conf.as_event.get_relative_events_ids()
+rel = conf.as_event.get_relative_event_ids()
 # If printURL is set then show the print button
 if printURL is not UNDEFINED:
     showPrintButton = True
