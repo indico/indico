@@ -436,9 +436,12 @@
             var self = this;
             var $stats = $('<span>', {
                 class: 'result-stats',
-                text: totalCount ? $T.gettext("Displaying {0} out of {1} results. Make the search more specific for more accurate results.").format(count, totalCount)
-                                 : $T.gettext("There are no results. Make the search more specific for more accurate results.")
+                text: totalCount ? $T.gettext("Displaying {0} out of {1} results.").format(count, totalCount)
+                                 : $T.gettext("There are no results.")
             });
+            if (totalCount != count || !totalCount) {
+                $stats.text($stats.text() + ' ' + $T("Make the search more specific for more accurate results"));
+            }
             var $clear = $('<a>', {
                 class: 'clear js-clear-search',
                 text: $T.gettext("Clear search")
