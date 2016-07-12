@@ -70,27 +70,6 @@
             }
         },
 
-        setValue: function(value) {
-            var self = this;
-
-            self.element.clearableinput('setValue', value);
-        },
-
-        update: function(delayed) {
-            var self = this;
-
-            if (delayed) {
-                self._delayedCallback();
-            } else {
-                self._callback();
-            }
-        },
-
-        validate: function() {
-            var self = this;
-            return self.options.validation(self.element);
-        },
-
         _callback: function() {
             var self = this;
             var element = self.element;
@@ -110,6 +89,35 @@
             setTimeout(function() {
                 self._callback();
             }, self.options.wait);
+        },
+
+        clear: function() {
+            var self = this;
+            self.setValue('');
+        },
+
+        setValue: function(value) {
+            var self = this;
+            if (self.options.clearable) {
+                self.element.clearableinput('setValue', value);
+            } else {
+                self.element.val(value);
+            }
+        },
+
+        update: function(delayed) {
+            var self = this;
+
+            if (delayed) {
+                self._delayedCallback();
+            } else {
+                self._callback();
+            }
+        },
+
+        validate: function() {
+            var self = this;
+            return self.options.validation(self.element);
         }
     });
 })(jQuery);
