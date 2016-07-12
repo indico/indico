@@ -238,6 +238,8 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 
+typewatch_js = rjs_bundle('dropzone_js', 'js/lib/jquery.typewatch.js')
+
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -260,7 +262,6 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'date.js',
               'jquery.colorpicker.js',
               'jquery-extra-selectors.js',
-              'jquery.typewatch.js',
               'jstorage.js')))
 
 utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
@@ -367,7 +368,7 @@ abstracts_js = rjs_bundle(
                'Markdown.Sanitizer.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js)
+                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js)
 
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
