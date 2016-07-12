@@ -6,6 +6,11 @@
 
 {% block content %}
     <div class="category-info">
+        {% if category.has_logo %}
+            <div class="category-logo">
+                <img src="{{ category.logo_url }}" alt="">
+            </div>
+        {% endif %}
         {% block category_description %}
             {{ category.description }}
         {% endblock %}
