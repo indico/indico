@@ -84,3 +84,83 @@ def test_effective_protection_mode(db):
         10: ProtectionMode.protected,
         11: ProtectionMode.public
     }
+
+
+@pytest.fixture
+def category_family(create_category, db):
+    grandpa = create_category(0, title='Grandpa', protection_mode=ProtectionMode.public, parent=None)
+    dad = create_category(1, title='Dad', parent=grandpa)
+    son = create_category(2, title='Son', parent=dad)
+    sibling = create_category(3, title='Sibling', parent=dad)
+
+    db.session.add(son)
+    db.session.flush()
+
+    return grandpa, dad, son, sibling
+
+
+def test_nth_parent(category_family):
+    grandpa, dad, son, sibling = category_family
+
+    assert son.nth_parent(0) == son
+    assert son.nth_parent(1) == dad
+    assert son.nth_parent(2) == grandpa
+    assert dad.nth_parent(0) == dad
+    assert dad.nth_parent(1) == grandpa
+
+    assert sibling.nth_parent(2) == grandpa
+    assert sibling.nth_parent(0) != son.nth_parent(0)
+    assert sibling.nth_parent(1) == son.nth_parent(1)
+    assert sibling.nth_parent(2) == son.nth_parent(2)
+
+    pytest.raises(IndexError, grandpa.nth_parent, 1)
+    pytest.raises(IndexError, dad.nth_parent, 2)
+    pytest.raises(IndexError, son.nth_parent, 3)
+    pytest.raises(IndexError, grandpa.nth_parent, 100)
+
+
+def test_is_descendant_of(category_family):
+    grandpa, dad, son, sibling = category_family
+
+    assert not dad.is_descendant_of(dad)
+    assert not dad.is_descendant_of(son)
+    assert son.is_descendant_of(dad)
+    assert son.is_descendant_of(grandpa)
+    assert dad.is_descendant_of(grandpa)
+
+
+def test_visibility_horizon_default(category_family):
+    grandpa, dad, son, sibling = category_family
+
+    # default settings, no overriding
+    assert son.own_visibility_horizon == grandpa
+    assert dad.own_visibility_horizon == grandpa
+    assert grandpa.own_visibility_horizon == grandpa
+    assert son.real_visibility_horizon == grandpa
+    assert dad.real_visibility_horizon == grandpa
+    assert grandpa.real_visibility_horizon == grandpa
+
+
+def test_visibility_horizon_limitation(category_family, create_category):
+    grandpa, dad, son, sibling = category_family
+    grandson = create_category(4, title='Grandson', parent=son)
+
+    son.visibility = 1  # itself
+
+    assert son.own_visibility_horizon == son.real_visibility_horizon
+    assert son.own_visibility_horizon == son
+
+    son.visibility = 2  # dad
+
+    # 'son' and 'grandson' shouldn't be visible from above 'dad'
+    assert son.real_visibility_horizon == dad
+    assert grandson.real_visibility_horizon == dad
+
+    # sibling should be visible from top, though
+    assert sibling.real_visibility_horizon == grandpa
+
+    dad.visibility = 1  # everything limited to 'dad'
+
+    assert son.real_visibility_horizon == dad
+    assert grandson.real_visibility_horizon == dad
+    assert sibling.real_visibility_horizon == dad
