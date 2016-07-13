@@ -40,6 +40,7 @@ from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
 from indico.util.date_time import format_date, now_utc
+from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -129,16 +130,22 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
 
 
 class RHCategoryInfo(RHDisplayCategoryBase):
-    @property
-    def _category_query_options(self):
-        children_strategy = joinedload('children')
+    @classproperty
+    @classmethod
+    def _category_query_options(cls):
+        children_strategy = subqueryload('children')
         children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode')
         children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
         children_strategy.undefer('has_events')
-        return children_strategy, subqueryload('acl_entries'), load_only('id', 'parent_id', 'title', 'protection_mode',
-                                                                         'has_events')
+        return (children_strategy,
+                load_only('id', 'parent_id', 'title', 'protection_mode'),
+                subqueryload('acl_entries'),
+                undefer('deep_children_count'),
+                undefer('deep_events_count'),
+                undefer('has_events'),
+                undefer('chain'))
 
     def _process(self):
         return jsonify_data(flash=False,
@@ -146,20 +153,16 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 
 class RHReachableCategoriesInfo(RH):
-    def get_reachable_categories(self, id_, excluded_ids=None):
+    def _get_reachable_categories(self, id_, excluded_ids):
         cat = Category.query.filter_by(id=id_).options(joinedload('children').load_only('id')).one()
         ids = {c.id for c in cat.children} | {c.id for c in cat.parent_chain_query}
         return (Category.query
-                .filter(Category.id.in_(ids))
-                .options(load_only('id', 'parent_id', 'title', 'protection_mode'),
-                         subqueryload('acl_entries'),
-                         undefer('deep_children_count'),
-                         undefer('deep_events_count'),
-                         undefer('has_events')))
+                .filter(Category.id.in_(ids - excluded_ids))
+                .options(*RHCategoryInfo._category_query_options))
 
     def _process(self):
-        excluded_ids = request.json.get('exclude')
-        categories = self.get_reachable_categories(request.view_args['category_id'], excluded_ids=excluded_ids)
+        excluded_ids = set(request.json.get('exclude', set())) if request.json else set()
+        categories = self._get_reachable_categories(request.view_args['category_id'], excluded_ids=excluded_ids)
         return jsonify_data(categories=[serialize_category_chain(c, include_children=True) for c in categories],
                             flash=False)
 
