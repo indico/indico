@@ -558,7 +558,7 @@ class Category(CommonObjectBase):
         """
         self.removeConference(conf)
         toCateg._addConference(conf)
-        signals.event.moved.send(conf, old_parent=self, new_parent=toCateg)
+        # signals.event.moved.send(conf, old_parent=self, new_parent=toCateg)
 
     def _addSubCategory(self, newSc):
         #categories can only contain either conferences either other categories
