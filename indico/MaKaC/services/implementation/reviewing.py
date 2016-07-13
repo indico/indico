@@ -167,7 +167,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingPRMBase):
         date = self._setParam()
         if self._apply:
             for contrib in self._event.contributions:
-                lastReview = self._conf.getReviewManager(contrib)
+                lastReview = self._conf.getReviewManager(contrib).getLastReview()
                 if self._dueDateToChange == "Referee":
                     lastReview.setRefereeDueDate(date)
                 elif self._dueDateToChange == "Editor":
