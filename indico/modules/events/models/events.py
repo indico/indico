@@ -624,9 +624,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
+        old_category = self.category
         self.category = category
         db.session.flush()
-        # TODO: trigger moved signal
+        signals.event.moved.send(self, old_category=old_category)
 
     @return_ascii
     def __repr__(self):
