@@ -200,14 +200,6 @@ class UHConferenceDisplay(URLHandler):
     _endpoint = 'event.conferenceDisplay'
 
 
-class UHNextEvent(URLHandler):
-    _endpoint = 'event.conferenceDisplay-next'
-
-
-class UHPreviousEvent(URLHandler):
-    _endpoint = 'event.conferenceDisplay-prev'
-
-
 class UHConferenceOverview(URLHandler):
     _endpoint = 'event.conferenceDisplay-overview'
 

@@ -53,13 +53,13 @@ class ConferenceAddress:
     getValue = classmethod (getValue)
 
 class LectureCategory:
+    @classmethod
     def getArgumentType(cls):
         return Conference
-    getArgumentType = classmethod (getArgumentType)
 
+    @classmethod
     def getValue(cls, conf):
-        return conf.getOwner().getTitle()
-    getValue = classmethod (getValue)
+        return conf.as_event.category.title.encode('utf-8')
 
 class Organisers:
     def getArgumentType(cls):
