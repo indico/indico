@@ -49,7 +49,7 @@ def category_suggestions():
                 if score < SUGGESTION_MIN_SCORE:
                     continue
                 logger.debug('Suggesting %s with score %.03f for %s', category, score, user)
-                suggest(user, 'category', category.getId(), score)
+                suggest(user, 'category', category.id, score)
         unschedule_check(user_id)
 
 
