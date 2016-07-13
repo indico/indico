@@ -282,10 +282,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                       the category itself
         - ``is_deleted`` -- whether the category is deleted
 
-        :param col: The name of the column to use in the path
+        :param col: The name of the column to use in the path or a
+                    callable receiving the category alias that must
+                    return the expression used for the 'path'
+                    retrieved by the CTE.
         """
         cat_alias = db.aliased(cls)
-        path_column = getattr(cat_alias, col)
+        if callable(col):
+            path_column = col(cat_alias)
+        else:
+            path_column = getattr(cat_alias, col)
         cte_query = (select([cat_alias.id, array([path_column]).label('path'), cat_alias.is_deleted])
                      .where(cat_alias.parent_id.is_(None))
                      .cte(recursive=True))
@@ -401,6 +407,13 @@ def _mappers_configured():
     cte = Category.get_tree_cte('title')
     query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
     Category.chain_titles = column_property(query, deferred=True)
+
+    # Category.chain -- a list of the ids and titles in the parent
+    # chain, starting with the root category down to the current
+    # category.  Each chain entry is a dict containing 'id' and `title`.
+    cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
+    Category.chain = column_property(query, deferred=True)
 
     # Category.deep_events_count -- the number of events in the category
     # or any child category (excluding deleted events)
