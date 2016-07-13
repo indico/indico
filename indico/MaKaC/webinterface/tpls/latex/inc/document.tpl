@@ -14,6 +14,7 @@
 \usepackage{hyperref}
 \usepackage{textgreek}
 \usepackage{amssymb}
+\usepackage{amsmath}
 
 \usepackage[english]{babel}
 \usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
