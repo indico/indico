@@ -17,8 +17,8 @@
         </form>
     </div>
     % if currentUser:
-        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard') }">${ _("My profile") }</a></div>
-        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences') }">${ _("My preferences") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard', user_id=currentUser.getId()) }">${ _("My profile") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences', user_id=currentUser.getId()) }">${ _("My preferences") }</a></div>
         % if _session.user.is_admin:
             <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
         % endif

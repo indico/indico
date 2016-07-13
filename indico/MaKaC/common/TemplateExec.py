@@ -339,7 +339,7 @@ def registerHelpers(objDict):
         objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
-            objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."
+            objDict['user'] = None
         else:
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:

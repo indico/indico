@@ -1,4 +1,4 @@
-% if self_._rh.isMobile() and Config.getInstance().getMobileURL():
+% if self_._rh and self_._rh.isMobile() and Config.getInstance().getMobileURL():
     <%include file="MobileDetection.tpl"/>
 % endif
 
