@@ -105,14 +105,14 @@ class IBasicConferenceMetadataFossil(IFossil):
     def getType(self):
         pass
 
-    def getOwner(self):
+    def getCategoryTitle(self):
         pass
-    getOwner.convert = lambda x: x.getTitle()
-    getOwner.name = 'category'
+    getCategoryTitle.produce = lambda x: x.as_event.category.title
+    getCategoryTitle.name = 'category'
 
     def getCategoryId(self):
         pass
-    getCategoryId.produce = lambda x: x.getOwner().getId()
+    getCategoryId.produce = lambda x: str(x.as_event.category_id)
 
     def getLocator(self):
         pass
