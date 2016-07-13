@@ -276,8 +276,8 @@ MaxUploadFileSize = 0
 #------------------------------------------------------------------------------
 # LATEX/PDF GENERATION
 #------------------------------------------------------------------------------
-# Set the path to pdflatex if it's not within PATH:
-# PDFLatexProgram = 'pdflatex'
+# Set the path to xelatex if it's not within PATH:
+# PDFLatexProgram = 'xelatex'
 #
 # In strict mode, a non-zero status code is considered failure. Disable this if
 # you have old contributions that contain invalid LaTeX and you prefer possibly
