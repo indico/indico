@@ -10,7 +10,7 @@
     <script>
        exportPopups["{{ item.id }}"] = new ExportIcalInterface(
            {{ api_mode|tojson }}, {{ persistent_user_enabled|tojson }}, {{ persistent_allowed|tojson }}, {{ api_active|tojson }},
-           {{ user_logged|tojson }}, setURLs, 'category.api.getExportURLs', {categId: "{{ item.id }}"},
+           {{ user_logged|tojson }}, setURLs, {{ url_for('api.build_urls')|tojson }}, {categId: "{{ item.id }}"},
            {{ request_urls|tojson }}, "{{ item.id }}", "{{ session.user.id if session.user else '' }}"
        );
     </script>
