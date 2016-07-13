@@ -75,10 +75,8 @@ event.add_url_rule('!/e/<path:confId>', 'shorturl', _event_or_shorturl, strict_s
                    defaults={'shorturl_namespace': True})
 event.add_url_rule('!/event/<confId>/', 'conferenceDisplay', _event_or_shorturl)
 
-# Event overview and navigation
+# Event overview
 event.add_url_rule('/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})
-event.add_url_rule('/next', 'conferenceDisplay-next', conferenceDisplay.RHRelativeEvent, defaults={'which': 'next'})
-event.add_url_rule('/prev', 'conferenceDisplay-prev', conferenceDisplay.RHRelativeEvent, defaults={'which': 'prev'})
 
 # Event access
 event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDisplay.RHConferenceAccessKey,

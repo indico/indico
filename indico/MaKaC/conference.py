@@ -1337,9 +1337,7 @@ class Conference(CommonObjectBase):
         return d
 
     def getOwner( self ):
-        if self.getOwnerList() == []:
-            return None
-        return self.getOwnerList()[0]
+        raise NotImplementedError('getOwner')
 
     def getOwnerList(self):
         # TODO: check places where this is called whether to remove/adapt them

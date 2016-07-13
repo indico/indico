@@ -419,7 +419,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
+            self._redirect(self._conf.as_event.category.url)
             return "done"
         else:
             return nbClones
@@ -564,7 +564,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     year = year + 1
                 date = datetime(year,month,int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
+            self._redirect(self._conf.as_event.category.url)
         else:
             return nbClones
 

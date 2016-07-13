@@ -134,19 +134,6 @@ class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
         return warningText + (p if isinstance(p, basestring) else p.display(**params))
 
 
-class RHRelativeEvent(RHConferenceBaseDisplay):
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._which = params['which']
-
-    def _process(self):
-        evt = self._conf.getOwner().getRelativeEvent(self._which, conf=self._conf)
-        if evt:
-            self._redirect(urlHandlers.UHConferenceDisplay.getURL(evt))
-        else:
-            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
-
-
 class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
     """
     this class is for the conference type objects only
