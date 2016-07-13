@@ -318,19 +318,6 @@ class CategoryRemoveControlUser(CategoryControlUserListBase):
             self._categ.revokeConferenceCreation(self._principal)
         return self._getControlUserList()
 
-class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        ExportToICalBase._checkParams(self)
-
-    def _getAnswer(self):
-        result = {}
-
-        urls = generate_public_auth_request(self._apiKey, '/export/categ/%s.ics' % self._target.getId())
-        result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] = urls["authRequestURL"]
-        return result
 
 class CategoryProtectionToggleDomains(CategoryModifBase):
 
@@ -362,6 +349,5 @@ methodMap = {
     "protection.removeManager": CategoryRemoveControlUser,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
     "protection.removeConfCreator": CategoryRemoveControlUser,
-    "protection.toggleDomains": CategoryProtectionToggleDomains,
-    "api.getExportURLs": CategoryExportURLs,
+    "protection.toggleDomains": CategoryProtectionToggleDomains
 }

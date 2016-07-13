@@ -625,23 +625,6 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
         return fossilize(self._conf.getRegistrarList())
 
 
-class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
-
-    def _checkParams(self):
-        ConferenceDisplayBase._checkParams(self)
-        ExportToICalBase._checkParams(self)
-
-    def _getAnswer(self):
-        result = {}
-        urls = generate_public_auth_request(self._apiKey, '/export/event/%s.ics' % self._target.getId())
-        result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] = urls["authRequestURL"]
-        urls = generate_public_auth_request(self._apiKey, '/export/event/%s.ics' % self._target.getId(),
-                                            {'detail': 'contribution'})
-        result["publicRequestDetailedURL"] = urls["publicRequestURL"]
-        result["authRequestDetailedURL"] = urls["authRequestURL"]
-        return result
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,
@@ -668,6 +651,5 @@ methodMap = {
     "protection.addExistingManager": ConferenceProtectionAddExistingManager,
     "protection.removeManager": ConferenceProtectionRemoveManager,
     "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
-    "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
-    "api.getExportURLs": ConferenceExportURLs,
+    "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar
 }
