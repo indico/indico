@@ -24,7 +24,7 @@ from lxml.etree import ParserError
 import icalendar as ical
 from flask import session
 from pyatom import AtomFeed
-from sqlalchemy.orm import joinedload, load_only, subqueryload
+from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
@@ -135,7 +135,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
     if with_path:
         if child_path:
             data['path'] = child_path[:]
-            for segment in reversed(child_path):
+            for __ in reversed(child_path):
                 data['path'].pop()
                 if not data['path'] or data['path'][-1]['id'] == category.id:
                     break
@@ -143,8 +143,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
             data['path'] = parent_path[:]
             data['path'].append({'id': category.id, 'title': category.title})
         else:
-            data['path'] = [{'id': c.id, 'title': c.title}
-                            for c in category.chain_query.options(load_only('id', 'title'))]
+            data['path'] = category.chain
         data['parent_path'] = data['path'][:-1]
     if with_favorite:
         data['is_favorite'] = session.user and category in session.user.favorite_categories
@@ -157,6 +156,8 @@ def serialize_category_chain(category, include_children=False, include_parents=F
         data['subcategories'] = [serialize_category(c, with_path=True, parent_path=data['category']['path'])
                                  for c in category.children]
     if include_parents:
+        query = (category.parent_chain_query
+                 .options(undefer('deep_events_count'), undefer('deep_children_count')))
         data['supercategories'] = [serialize_category(c, with_path=True, child_path=data['category']['path'])
-                                   for c in category.parent_chain_query]
+                                   for c in query]
     return data
