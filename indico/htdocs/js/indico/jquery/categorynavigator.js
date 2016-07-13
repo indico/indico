@@ -312,6 +312,7 @@
             var self = this;
             var $placeholder = $('<div>')
                 .append($('<div>', {class: 'placeholder-text', text: self.options.emptyCategoryText}));
+            var parent = _.last(category.parent_path);
             var actionButtonText = self.options.actionButtonText.toLowerCase();
             var html;
             if (!category.parent_path.length) {
