@@ -22,6 +22,7 @@ from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
 from flask import session, render_template, request
+from markupsafe import escape
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -43,6 +44,7 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
+from indico.modules.categories.forms import calculate_visibility_options
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
@@ -901,29 +903,12 @@ class WConferenceDataModification(wcomponents.WTemplated):
         self._rh = rh
 
     def _getVisibilityHTML(self):
-        return '<option value="TODO">TODO: adapt to new categories</option>'
-        visibility = self._conf.getVisibility()
-        topcat = self._conf.getOwnerList()[0]
-        level = 0
-        selected = ""
-        if visibility == 0:
-            selected = "selected"
-        vis = [ i18nformat("""<option value="0" %s> _("Nowhere")</option>""") % selected]
-        while topcat:
-            level += 1
-            selected = ""
-            if level == visibility:
-                selected = "selected"
-            if topcat.getId() != "0":
-                from MaKaC.common.TemplateExec import truncateTitle
-                vis.append("""<option value="%s" %s>%s</option>""" % (level, selected, truncateTitle(topcat.getName(), 120)))
-            topcat = topcat.getOwner()
-        selected = ""
-        if visibility > level:
-            selected = "selected"
-        vis.append( i18nformat("""<option value="999" %s> _("Everywhere")</option>""") % selected)
-        vis.reverse()
-        return "".join(vis)
+        options = [(val or 999,
+                    label,
+                    'selected' if self._conf.getVisibility() == (val or 999) else '')
+                   for val, label in calculate_visibility_options(self._conf.as_event.category)]
+        return '\n'.join('<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
+                         for val, label, selected in options)
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )

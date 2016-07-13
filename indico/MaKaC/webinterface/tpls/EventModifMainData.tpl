@@ -6,22 +6,12 @@
 from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import escape
+from indico.modules.categories.forms import calculate_visibility_options
 from indico.modules.events.models.events import EventType
 
 event_types = {t.name: str(t.title) for t in EventType}
-
-visibilityList = {}
-#topcat = confObj.getOwnerList()[0]
-#level = 0
-#visibilityList[0] = 'Nowhere'
-#while topcat:
-#    level += 1
-#    if topcat.getId() != "0":
-#        from MaKaC.common.TemplateExec import truncateTitle
-#        visibilityList[level] = truncateTitle(topcat.getName(), 50)
-#    topcat = topcat.getOwner()
-#visibilityList[999] = 'Everywhere'
-visibilityList[0] = 'TODO: adapt to new categories'
+visibilityList = dict(calculate_visibility_options(confObj.as_event.category))
+visibilityList[999] = visibilityList.pop('')
 
 numRows = 11
 
@@ -191,7 +181,7 @@ $E('inPlaceEditDefaultStyle').set(new SelectEditWidget('event.main.changeDefault
         {'conference':'${ conferenceId }'}, ${ styleOptions }, ${ jsonEncode(defaultStyle) }, null).draw());
 
 $E('inPlaceEditVisibility').set(new SelectEditWidget('event.main.changeVisibility',
-        {'conference':'${ conferenceId }'}, ${ visibilityList }, ${ jsonEncode(visibility) }, null).draw());
+        {'conference':'${ conferenceId }'}, ${ visibilityList|n,j }, ${ jsonEncode(visibility) }, null).draw());
 
 $E('inPlaceEditType').set(new SelectEditWidget('event.main.changeType',
         {'conference':'${ conferenceId }'}, ${ event_types }, ${ jsonEncode(confObj.as_event.type) }, null).draw());
