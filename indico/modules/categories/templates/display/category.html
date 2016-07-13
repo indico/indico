@@ -16,7 +16,7 @@
         {% endblock %}
     </div>
 
-    {% if not category.children and not events_by_month %}
+    {% if not category.children and not events_by_month and not past_event_count and not future_event_count %}
         {% call message_box('info', icon=false) %}
             {% trans %}This category is empty.{% endtrans %}
         {% endcall %}
