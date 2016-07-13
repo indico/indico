@@ -25,7 +25,7 @@ else:
                             % endif
                             <span itemprop="title">${ confTitle }</span>
                         </span>
-      </a>
+                    </a>
                 </h1>
            </div>
         </div>
