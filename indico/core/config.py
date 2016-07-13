@@ -328,7 +328,7 @@ class Config:
         'UseProxy'                  : False,
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
-        'PDFLatexProgram'           : 'pdflatex',
+        'PDFLatexProgram'           : 'xelatex',
         'StrictLatex'               : True,
         'WorkerName'                : socket.getfqdn(),
         'Loggers'                   : ['files'],

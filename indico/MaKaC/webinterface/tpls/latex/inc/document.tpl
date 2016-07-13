@@ -1,3 +1,12 @@
+<%
+    import os
+    import pkg_resources
+    distribution = pkg_resources.get_distribution('indico-fonts')
+    font_dir = os.path.join(distribution.location, 'indico_fonts')
+    # Trailing slash is necessary
+    font_dir = os.path.join(font_dir, '')
+%>
+
 <%block name="document_class">
 \documentclass[a4paper, 15pt]{article} %% document type
 </%block>
@@ -6,15 +15,10 @@
 \usepackage[a4paper, top=1em, bottom=10em]{geometry}
 </%block>
 
-\usepackage{cmbright}
-\usepackage[T1]{fontenc}
-\usepackage[utf8x]{inputenc}
-\usepackage{ucs}
-\usepackage{lmodern}
 \usepackage{hyperref}
-\usepackage{textgreek}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{fontspec}
 
 \usepackage[english]{babel}
 \usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
@@ -35,8 +39,15 @@
 \begin{document}
 
     %% set fonts
-    \renewcommand{\sfdefault}{cmbr}
-    \renewcommand*{\familydefault}{\sfdefault}
+    \setmainfont{LinLibertine_R.otf}[
+        BoldFont = LinLibertine_RB.otf,
+        ItalicFont = LinLibertine_RI.otf,
+        BoldItalicFont = LinLibertine_RBI.otf,
+        Path = ${ font_dir }]
+    \setsansfont{LinBiolinum_R.otf}[
+        BoldFont = LinBiolinum_RB.otf,
+        ItalicFont = LinBiolinum_RI.otf,
+        Path = ${ font_dir }]
 
     %% no indentation
     \setlength{\parindent}{0cm}
