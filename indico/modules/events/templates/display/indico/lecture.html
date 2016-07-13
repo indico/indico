@@ -5,9 +5,13 @@
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}
         <div class="event-header event-header-lecture">
-            <a class="lecture-category" href="{{ url_for('category.categoryDisplay', categId=event.category.id) }}">
-                {{ category }}
-            </a>
+            {% if not g.static_site %}
+                <a class="lecture-category" href="{{ url_for('categories.display', event.category) }}">
+                    {{ category }}
+                </a>
+            {% else %}
+                <div>{{ category }}</div>
+            {% endif %}
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
