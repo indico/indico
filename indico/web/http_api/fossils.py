@@ -67,25 +67,6 @@ class IPeriodFossil(IFossil):
     endDT.convert = Conversion.datetime
 
 
-class ICategoryMetadataFossil(IFossil):
-    def getId(self):
-        pass
-
-    def getName(self):
-        pass
-
-    def getLocator(self):
-        pass
-    getLocator.convert = Conversion.url(urlHandlers.UHCategoryDisplay)
-    getLocator.name = 'url'
-
-
-class ICategoryProtectedMetadataFossil(ICategoryMetadataFossil):
-    def getName(self):
-        pass
-    getName.produce = lambda x: None
-
-
 class IBasicConferenceMetadataFossil(IFossil):
 
     def getId(self):
