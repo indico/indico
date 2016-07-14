@@ -31,7 +31,7 @@ from indico.web.forms.fields import (AccessControlListField, PrincipalListField,
 from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
 
 
-def calculate_visibility_options(category):
+def calculate_visibility_options(category, allow_invisible=True):
     def _category_above_message(number):
         return ngettext('From category above', 'From {} categories above', number).format(number)
 
@@ -44,7 +44,8 @@ def calculate_visibility_options(category):
     if category.visibility > len(options):
         options.append((category.visibility, _category_above_message(category.visibility) + ' ' + _("(Everywhere)")))
 
-    options.insert(0, (0, _("Invisible")))
+    if allow_invisible or category.visibility == 0:
+        options.insert(0, (0, _("Invisible")))
     return options
 
 
@@ -82,7 +83,7 @@ class CategorySettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(CategorySettingsForm, self).__init__(*args, **kwargs)
         category = kwargs.pop('category')
-        self.visibility.choices = calculate_visibility_options(category)
+        self.visibility.choices = calculate_visibility_options(category, allow_invisible=False)
 
 
 class CategoryIconForm(IndicoForm):
