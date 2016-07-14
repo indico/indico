@@ -32,13 +32,19 @@ from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbo
 
 
 def calculate_visibility_options(category):
-    options = [(n + 1, (ngettext('From category above',
-                                 'From {} categories above', n).format(n) + ' ' +
-                        '\N{RIGHTWARDS ARROW} "{}"'.format(title)))
+    def _category_above_message(number):
+        return ngettext('From category above', 'From {} categories above', number).format(number)
+
+    options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
                for n, title in enumerate(category.chain_titles[::-1])]
-    options.insert(0, (0, _("Invisible")))
-    options[1] = (1, _("From this category only"))
+    options[0] = (1, _("From this category only"))
     options[-1] = ('', _("From everywhere"))
+
+    # In case the current visibility is higher than the distance to the root category
+    if category.visibility > len(options):
+        options.append((category.visibility, _category_above_message(category.visibility) + ' ' + _("(Everywhere)")))
+
+    options.insert(0, (0, _("Invisible")))
     return options
 
 
