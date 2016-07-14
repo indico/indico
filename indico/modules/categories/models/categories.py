@@ -160,6 +160,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    notify_managers = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     children = db.relationship(
         'Category',

@@ -36,6 +36,7 @@ def upgrade():
         sa.Column('default_event_themes', pg.JSON(), nullable=False),
         sa.Column('event_creation_restricted', sa.Boolean(), nullable=False),
         sa.Column('event_creation_notification_emails', pg.ARRAY(sa.String()), nullable=False),
+        sa.Column('notify_managers', sa.Boolean(), nullable=False),
         sa.Column('event_message_mode', PyIntEnum(EventMessageMode), nullable=False),
         sa.Column('event_message', sa.Text(), nullable=False),
         sa.Column('no_access_contact', sa.String(), nullable=False),
