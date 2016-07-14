@@ -183,12 +183,12 @@ def get_visibility_options(category_or_event, allow_invisible=True):
         options[0] = (1, '{} \N{RIGHTWARDS ARROW} "{}"'.format(_("From the current category only"), category.title))
     options[-1] = ('', _("From everywhere"))
 
+    if allow_invisible:
+        options.insert(0, (0, _("Invisible")))
+
     # In case the current visibility is higher than the distance to the root category
-    if not any(category_or_event.visibility == x[0] for x in options):
+    if category_or_event.visibility is not None and not any(category_or_event.visibility == x[0] for x in options):
         options.append((category_or_event.visibility,
                         '({} \N{RIGHTWARDS ARROW} {})'.format(_category_above_message(category_or_event.visibility),
                                                               _("Everywhere"))))
-
-    if allow_invisible:
-        options.insert(0, (0, _("Invisible")))
     return options
