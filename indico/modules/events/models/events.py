@@ -114,6 +114,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                    'valid_stylesheet'),
                 db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
                 db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
+                db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
                 {'schema': 'events'})
 
     @declared_attr
@@ -181,6 +182,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         'type',
         PyIntEnum(EventType),
         nullable=False
+    )
+    #: The visibility depth in category overviews
+    visibility = db.Column(
+        db.Integer,
+        nullable=True,
+        default=None
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
