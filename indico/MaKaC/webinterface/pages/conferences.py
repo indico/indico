@@ -44,7 +44,7 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
-from indico.modules.categories.forms import calculate_visibility_options
+from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
@@ -906,7 +906,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         options = [(val or 999,
                     label,
                     'selected' if self._conf.getVisibility() == (val or 999) else '')
-                   for val, label in calculate_visibility_options(self._conf.as_event.category)]
+                   for val, label in get_visibility_options(self._conf.as_event)]
         return '\n'.join('<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
                          for val, label, selected in options)
 
