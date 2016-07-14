@@ -199,6 +199,9 @@ class CategoryImporter(Importer):
         # unlimited visibility is 999 but we have a 994 for some reason.. since nobody
         # has 900 levels of nesting we can just go for that threshold instead
         visibility = None if old_cat._visibility > 900 else old_cat._visibility
+        if visibility == 0:
+            self.print_warning("Raising visibility from 'invisible' to 'category-only'", event_id=old_cat.id)
+            visibility = 1
         emails = re.split(r'[\s;,]+', convert_to_unicode(getattr(old_cat, '_notifyCreationList', '')))
         emails = {sanitize_email(email).lower() for email in emails}
         emails = sorted(email for email in emails if is_valid_mail(email, False))

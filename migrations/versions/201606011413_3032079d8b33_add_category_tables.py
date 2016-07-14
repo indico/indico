@@ -49,6 +49,7 @@ def upgrade():
         sa.CheckConstraint('(id != 0) OR NOT is_deleted', name='root_not_deleted'),
         sa.CheckConstraint('(id != 0) OR (protection_mode != 1)', name='root_not_inheriting'),
         sa.CheckConstraint('(parent_id IS NULL) = (id = 0)', name='valid_parent'),
+        sa.CheckConstraint('visibility IS NULL OR visibility > 0', name='valid_visibility'),
         sa.ForeignKeyConstraint(['parent_id'], ['categories.categories.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='categories'
