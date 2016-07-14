@@ -513,16 +513,17 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         return map(self._build_event_api_data, events)
 
     def _serialize_category_path(self, category):
-        visibility_title = None
+        visibility = {'id': None, 'name': 'Everywhere'}
         path = [self._serialize_path_entry(category_data) for category_data in category.chain]
-        if category.visibility is None:
-            visibility_title = 'Everywhere'
-        else:
+        if category.visibility is not None:
             try:
-                visibility_title = path[-category.visibility]['name']
+                path_segment = path[-category.visibility]
             except IndexError:
-                visibility_title = 'Everywhere'
-        path.append({'visibility': {'name': visibility_title}})
+                pass
+            else:
+                visibility['id'] = path_segment['id']
+                visibility['name'] = path_segment['name']
+        path.append({'visibility': visibility})
         return path
 
     def _serialize_path_entry(self, category_data):
