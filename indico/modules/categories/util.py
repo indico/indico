@@ -189,6 +189,6 @@ def get_visibility_options(category_or_event, allow_invisible=True):
                         '({} \N{RIGHTWARDS ARROW} {})'.format(_category_above_message(category_or_event.visibility),
                                                               _("Everywhere"))))
 
-    if allow_invisible or category.visibility == 0:
+    if allow_invisible:
         options.insert(0, (0, _("Invisible")))
     return options
