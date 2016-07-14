@@ -6,11 +6,11 @@
 from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import escape
-from indico.modules.categories.forms import calculate_visibility_options
+from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType
 
 event_types = {t.name: str(t.title) for t in EventType}
-visibilityList = dict(calculate_visibility_options(confObj.as_event.category))
+visibilityList = dict(get_visibility_options(confObj.as_event))
 visibilityList[999] = visibilityList.pop('')
 
 numRows = 11

@@ -37,6 +37,7 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
+from indico.util.i18n import _, ngettext
 from indico.util.struct.iterables import materialize_iterable
 
 
@@ -160,3 +161,34 @@ def get_upcoming_events():
         # and having a broken repr on the cached objects would be ugly
         set_committed_value(event, 'is_deleted', False)
         yield event
+
+
+def get_visibility_options(category_or_event, allow_invisible=True):
+    """Return the visibility options available for the category or event."""
+    if isinstance(category_or_event, Event):
+        category = category_or_event.category
+        event = category_or_event
+    else:
+        category = category_or_event
+        event = None
+
+    def _category_above_message(number):
+        return ngettext('From the category above', 'From {} categories above', number).format(number)
+
+    options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
+               for n, title in enumerate(category.chain_titles[::-1])]
+    if event is None:
+        options[0] = (1, _("From this category only"))
+    else:
+        options[0] = (1, '{} \N{RIGHTWARDS ARROW} "{}"'.format(_("From the current category only"), category.title))
+    options[-1] = ('', _("From everywhere"))
+
+    # In case the current visibility is higher than the distance to the root category
+    if not any(category_or_event.visibility == x[0] for x in options):
+        options.append((category_or_event.visibility,
+                        '({} \N{RIGHTWARDS ARROW} {})'.format(_category_above_message(category_or_event.visibility),
+                                                              _("Everywhere"))))
+
+    if allow_invisible or category.visibility == 0:
+        options.insert(0, (0, _("Invisible")))
+    return options

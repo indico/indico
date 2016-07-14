@@ -21,32 +21,15 @@ from wtforms.fields import BooleanField, SelectField, StringField, HiddenField, 
 from wtforms.validators import DataRequired, Optional, InputRequired, NumberRange, ValidationError
 
 from indico.modules.categories.models.categories import EventMessageMode, Category
+from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
                                      IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
                                      IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList,
                                      MultipleItemsField)
 from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
-
-
-def calculate_visibility_options(category, allow_invisible=True):
-    def _category_above_message(number):
-        return ngettext('From category above', 'From {} categories above', number).format(number)
-
-    options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
-               for n, title in enumerate(category.chain_titles[::-1])]
-    options[0] = (1, _("From this category only"))
-    options[-1] = ('', _("From everywhere"))
-
-    # In case the current visibility is higher than the distance to the root category
-    if category.visibility > len(options):
-        options.append((category.visibility, _category_above_message(category.visibility) + ' ' + _("(Everywhere)")))
-
-    if allow_invisible or category.visibility == 0:
-        options.insert(0, (0, _("Invisible")))
-    return options
 
 
 class CategorySettingsForm(IndicoForm):
@@ -83,7 +66,7 @@ class CategorySettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(CategorySettingsForm, self).__init__(*args, **kwargs)
         category = kwargs.pop('category')
-        self.visibility.choices = calculate_visibility_options(category, allow_invisible=False)
+        self.visibility.choices = get_visibility_options(category, allow_invisible=False)
 
 
 class CategoryIconForm(IndicoForm):
