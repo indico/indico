@@ -1212,19 +1212,16 @@ class Conference(CommonObjectBase):
         self.setContactInfo(confData.get("contactInfo", ""))
         self.notifyModification()
 
-    def getVisibility ( self ):
-        try:
-            return int(self._visibility)
-        except:
-            self._visibility = 999
-            return 999
+    def getVisibility(self):
+        return self.as_event.visibility if self.as_event.visibility is not None else 999
 
     def getFullVisibility( self ):
         raise NotImplementedError('getFullVisibility')
         return max(0,min(self.getVisibility(), self.getOwnerList()[0].getVisibility()))
 
     def setVisibility(self, visibility=999):
-        self._visibility = int(visibility)
+        visibility = int(visibility)
+        self.as_event.visibility = visibility if visibility != 999 else None
 
     def isClosed( self ):
         try:
