@@ -367,6 +367,30 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return self._get_chain_query(Category.id == self.parent_id)
 
     @property
+    def visible_categories_cte(self):
+        """
+        Get a sqlalchemy select for the visible categories within
+        this category, including the category itself.
+        """
+        cte_query = (select([Category.id, literal(0).label('level')])
+                     .where((Category.id == self.id) & (Category.visibility.is_(None) | (Category.visibility > 0)))
+                     .cte('visibility_chain', recursive=True))
+        parent_query = (select([Category.id, cte_query.c.level + 1])
+                        .where(db.and_(Category.parent_id == cte_query.c.id,
+                                       db.or_(Category.visibility.is_(None),
+                                              Category.visibility > cte_query.c.level + 1))))
+        return cte_query.union_all(parent_query)
+
+    @property
+    def visible_categories_query(self):
+        """
+        Get a query object for the visible categories within
+        this category, including the category itself.
+        """
+        cte_query = self.visible_categories_cte
+        return Category.query.join(cte_query, Category.id == cte_query.c.id)
+
+    @property
     def icon_url(self):
         """Get the HTTP URL of the icon."""
         return url_for('categories.display_icon', self, slug=self.icon_metadata['hash'])
