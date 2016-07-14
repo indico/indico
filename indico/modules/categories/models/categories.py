@@ -74,6 +74,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
                 db.CheckConstraint("(id != 0) OR (protection_mode != {})".format(ProtectionMode.inheriting),
                                    'root_not_inheriting'),
+                db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
                 {'schema': 'categories'})
 
     @declared_attr
