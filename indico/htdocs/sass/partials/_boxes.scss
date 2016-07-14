@@ -444,22 +444,22 @@ $i-box-padding: 10px;
 .error-box {
     font-size: 1.2em;
     padding: 2em;
-    background-color: #e4e4e4;
+    background-color: $light-gray;
     width: 400px;
     margin: 50px auto;
     padding-top: 20px;
     text-align: center;
     border-radius: .5em;
-    border: 1px solid #d3d3d3;
+    border: 1px solid $gray;
 
     h1 {
-        color: #007CAC;
+        color: $dark-blue;
         font-size: 2em;
         padding-bottom: 10px;
     }
 
     p {
-        color: #666;
+        color: $light-black;
     }
 
     .error-box-small {
