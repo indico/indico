@@ -30,6 +30,8 @@
             openInDialog: false,
             // The title for the category navigator dialog
             dialogTitle: $T.gettext("Select a category"),
+            // The subtitle for the category navigator dialog
+            dialogSubtitle: null,
             // Disallow action on specific categories
             actionOn: {
                 categoriesWithSubcategories: {
@@ -87,13 +89,15 @@
 
         _createInDialog: function() {
             var self = this;
+            var $content = $('<div>', {class: 'categorynav-dialog-content'});
             ajaxDialog({
                 title: self.options.dialogTitle,
-                content: $('<div>', {class: 'categorynav-dialog-content'}).append($('<div>'))[0].outerHTML,
+                subtitle: self.options.dialogSubtitle,
+                content: $content[0].outerHTML,
                 closeButton: true,
                 fullyModal: true,
                 onOpen: function(dialog) {
-                    self.element = dialog.contentContainer.children().first();
+                    self.element = dialog.contentContainer.children('.categorynav-dialog-content');
                     self.dialog = dialog;
                     self._createInline();
                 }
