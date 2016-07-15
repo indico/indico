@@ -50,7 +50,6 @@ from pytz import all_timezones
 
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree, OOTreeSet
-from MaKaC.common import indexes
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.fileRepository as fileRepository
 import MaKaC.review as review
@@ -65,15 +64,11 @@ from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.i18n import _
 
-import zope.interface
-
 from indico.core import signals
 from indico.core.db import DBMgr, db
 from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
-from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.util.date_time import utc_timestamp, format_datetime
 from indico.util.redis import write_client as redis_write_client
 from indico.util.user import unify_user_args
 from indico.util.redis import avatar_links
@@ -85,9 +80,6 @@ class CoreObject(Persistent):
     CoreObjects are Persistent objects that are employed by Indico's core
     """
 
-    zope.interface.implements(IUniqueIdProvider,
-                              IIndexableByStartDateTime)
-
     def setModificationDate(self, date=None):
         """
         Method called to notify the current object has been modified.
@@ -95,13 +87,6 @@ class CoreObject(Persistent):
         if not date:
             date = nowutc()
         self._modificationDS = date
-
-    def __conform__(self, proto):
-
-        if proto == IIndexableByStartDateTime:
-            return utc_timestamp(self.getStartDate())
-        else:
-            return None
 
 
 class CommonObjectBase(CoreObject, Fossilizable):
@@ -235,7 +220,6 @@ class CategoryManager(ObjectHolder):
 
     def remove(self, category):
         ObjectHolder.remove(self, category)
-        Catalog.getIdx('categ_conf_sd').remove_category(category.getId())
 
     def _newId(self):
         """
@@ -387,12 +371,7 @@ class Category(CommonObjectBase):
         self._suggestions_disabled = value
 
     def _reindex(self):
-        catIdx = indexes.IndexesHolder().getIndex('category')
-        catIdx.reindexCateg(self)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateIdx.reindexCateg(self)
-        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
-        catDateAllIdx.reindexCateg(self)
+        pass
 
     def isRoot(self):
         #to be improved
@@ -523,20 +502,7 @@ class Category(CommonObjectBase):
         return
 
     def move(self, newOwner):
-        oldOwner = self.getOwner()
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
-
-        catDateIdx.unindexCateg(self)
-        catDateAllIdx.unindexCateg(self)
-
-        self.getOwner()._removeSubCategory(self)
-        newOwner._addSubCategory(self)
-        self._reindex()
-        catDateIdx.indexCateg(self)
-        catDateAllIdx.indexCateg(self)
-
-        # signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
+        pass
 
     def getName(self):
         return self.name
@@ -589,22 +555,6 @@ class Category(CommonObjectBase):
             self._p_changed = True
             sc.setOwner(None)
 
-    def newSubCategory(self, protection):
-        cm = CategoryManager()
-        sc = Category()
-        cm.add(sc)
-
-        # set the protection
-        sc.setProtection(protection)
-
-        Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
-        # signals.category.created.send(sc, parent=self)
-
-        self._addSubCategory(sc)
-        sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
-
-        return sc
-
     def _incNumConfs(self, num=1):
         """Increases the number of conferences for the current category in a given number.
             WARNING: Only Categories must use this method!!!"""
@@ -622,38 +572,10 @@ class Category(CommonObjectBase):
             self.getOwner()._decNumConfs(num)
 
     def _addConference(self, newConf):
-        if len(self.subcategories) > 0:
-            raise MaKaCError(_("Cannot add event: the current category already contains some sub-categories"), _("Category"))
-        if newConf.getId() == "":
-            raise MaKaCError(_("Cannot add to a category an event which is not registered"), _("Category"))
-        self.conferences.insert(newConf)
-        newConf.addOwner(self)
-        self._incNumConfs(1)
-        self.indexConf(newConf)
-
-    def indexConf(self, conf):
-        # Specific for category changes, calls Conference.indexConf()
-        # (date-related indexes)
-        catIdx = indexes.IndexesHolder().getIndex('category')
-        catIdx.indexConf(conf)
-        conf.indexConf()
-
-    def unindexConf(self, conf):
-        catIdx = indexes.IndexesHolder().getIndex('category')
-        catIdx.unindexConf(conf)
-        conf.unindexConf()
+        pass
 
     def removeConference(self, conf, notify=True, delete=False):
-        if not (conf in self.conferences):
-            return
-
-        self.unindexConf(conf)
-
-        self.conferences.remove(conf)
-        if delete:
-            conf.delete()
-        conf.removeOwner(self, notify)
-        self._decNumConfs(1)
+        pass
 
     def getSubCategoryList(self):
         subcategs = self.subcategories.values()
@@ -715,30 +637,6 @@ class Category(CommonObjectBase):
             for subcateg in subcategs:
                 res.extend(subcateg.getAllConferenceList())
         return res
-
-    def getRelativeEvent(self, which, conf=None):
-        index = Catalog.getIdx('categ_conf_sd').getCategory(self.getId())
-        if which == 'first':
-            return list(index[index.minKey()])[0]
-        elif which == 'last':
-            return list(index[index.maxKey()])[-1]
-        elif which in ('next', 'prev'):
-            categIter = index.itervalues()
-            if conf:
-                prev = None
-                for c in categIter:
-                    if c == conf:
-                        break
-                    prev = c
-                nextEvt = next(categIter, None)
-                if which == 'next':
-                    return nextEvt
-                else:
-                    return prev
-            else:
-                raise AttributeError("'conf' parameter missing")
-        else:
-            raise AttributeError("Unknown argument value: '%s'" % which)
 
     def _setNumConferences(self):
         self._numConferences = 0
@@ -1226,12 +1124,6 @@ class Conference(CommonObjectBase):
     def setClosed( self, closed=True ):
         self._closed = closed
 
-    def indexConf(self):
-        pass
-
-    def unindexConf(self):
-        pass
-
     @memoize_request
     def getContribTypeList(self):
         return self.as_event.contribution_types.all()
@@ -1380,10 +1272,6 @@ class Conference(CommonObjectBase):
         if sDate == oldStartDate:
             moveEntries = 0
 
-        # Pre-check for moveEntries
-
-        self.unindexConf()
-
         # set the dates
         with db.session.no_autoflush:
             self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
@@ -1396,9 +1284,6 @@ class Conference(CommonObjectBase):
                     raise TimingError(_("The start/end dates were not changed since the selected timespan is not large "
                                         "enough to accomodate the contained timetable entries and spacings."),
                                       explanation=_("You should try using a larger timespan."))
-
-        # reindex the conference
-        self.indexConf()
 
         # notify observers
         old_data = (oldStartDate, oldEndDate)
@@ -1413,17 +1298,11 @@ class Conference(CommonObjectBase):
             raise MaKaCError("date should be timezone aware")
         if sDate == self.getStartDate():
             return
-        if not indexes.BTREE_MIN_UTC_DATE <= sDate <= indexes.BTREE_MAX_UTC_DATE:
-            raise FormValuesError(_("The start date must be between {} and {}.").format(
-                format_datetime(indexes.BTREE_MIN_UTC_DATE),
-                format_datetime(indexes.BTREE_MAX_UTC_DATE)))
         if check != 0:
             self.verifyStartDate(sDate)
         oldSdate = self.getStartDate()
         diff = sDate - oldSdate
 
-        if index:
-            self.unindexConf()
         if moveEntries:
             # If the start date changed, we move entries inside the timetable
             self.as_event.move_start_dt(sDate)
@@ -1432,8 +1311,6 @@ class Conference(CommonObjectBase):
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
-        if index:
-            self.indexConf()
 
         # Update redis link timestamp
         if redis_write_client:
@@ -1504,22 +1381,14 @@ class Conference(CommonObjectBase):
             raise MaKaCError("date should be timezone aware")
         if eDate == self.getEndDate():
             return
-        if not indexes.BTREE_MIN_UTC_DATE <= eDate <= indexes.BTREE_MAX_UTC_DATE:
-            raise FormValuesError(_("The end date must be between {} and {}.").format(
-                format_datetime(indexes.BTREE_MIN_UTC_DATE),
-                format_datetime(indexes.BTREE_MAX_UTC_DATE)))
         if check != 0:
             self.verifyEndDate(eDate)
-        if index:
-            self.unindexConf()
 
         oldEdate = self.endDate
         self.endDate  = eDate
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
-        if index:
-            self.indexConf()
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
@@ -2030,9 +1899,6 @@ class DefaultConference(Conference):
     """ 'default' conference, which stores the
      default templates for posters and badges
     """
-
-    def indexConf(self):
-        pass
 
     def notifyModification(self, *args, **kwargs):
         pass
