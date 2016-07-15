@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import admins, maintenance, domains, templates, conferenceModif, services
+from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -40,15 +40,6 @@ admin.add_url_rule('/maintenance/clean-tmp', 'adminMaintenance-tmpCleanup', main
                    methods=('GET', 'POST'))
 admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTmpCleanup',
                    maintenance.RHMaintenancePerformTmpCleanup, methods=('POST',))
-
-# IP domains (let's call them "networks" in the URL - that's more fitting)
-admin.add_url_rule('/networks-old/create', 'domainCreation', domains.RHDomainCreation)
-admin.add_url_rule('/networks-old/create', 'domainCreation-create', domains.RHDomainPerformCreation, methods=('POST',))
-admin.add_url_rule('/networks-old/<domainId>/modify', 'domainDataModification', domains.RHDomainModification)
-admin.add_url_rule('/networks-old/<domainId>/modify', 'domainDataModification-modify',
-                   domains.RHDomainPerformModification, methods=('POST',))
-admin.add_url_rule('/networks-old/<domainId>/details', 'domainDetails', domains.RHDomainDetails)
-admin.add_url_rule('/networks-old/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))

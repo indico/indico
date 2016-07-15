@@ -16,7 +16,6 @@
 
 import os
 import re
-from cgi import escape
 from operator import methodcaller
 from urlparse import urljoin
 
@@ -26,7 +25,6 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC import domain
 from MaKaC.common.fossilize import fossilize
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -36,7 +34,7 @@ from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
-from indico.util.i18n import _, i18nformat, get_all_locales
+from indico.util.i18n import _, get_all_locales
 from indico.web.menu import render_sidemenu
 
 
@@ -446,181 +444,6 @@ class WPosterTemplates(WBadgePosterTemplatingBase):
         }
 
         return data
-
-
-class WPDomainBase( WPAdminsBase ):
-    sidemenu_option = 'ip_domains'
-
-    def __init__( self, rh ):
-        WPAdminsBase.__init__( self, rh )
-
-
-class WBrowseDomains( wcomponents.WTemplated ):
-
-    def __init__( self, letter=None ):
-        self._letter = letter
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        dh = domain.DomainHolder()
-        letters = dh.getBrowseIndex()
-        vars["browseIndex"] = i18nformat("""
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.disable=1;document.browseForm.submit();return false;">_("clear")</a></span>""")
-        if self._letter == "all":
-            vars["browseIndex"] += """
-        [all] """
-        else:
-            vars["browseIndex"] += i18nformat("""
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='all';document.browseForm.submit();return false;">_("all")</a></span> """)
-        for letter in letters:
-            if self._letter == letter:
-                vars["browseIndex"] += """\n[%s] """ % letter
-            else:
-                vars["browseIndex"] += """\n<span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter,True),letter)
-        vars["browseResult"] = ""
-        if self._letter not in [ None, "" ]:
-            if self._letter != "all":
-                res = dh.matchFirstLetter(self._letter)
-            else:
-                res = dh.getValuesToList()
-            res.sort(key=lambda x: x.getName().lower())
-            vars["browseResult"] = WHTMLDomainList(vars,res).getHTML()
-        return vars
-
-class WDomainList(wcomponents.WTemplated):
-
-    def __init__( self, criteria, params ):
-        self._criteria = criteria
-        self._params = params
-
-    def _performSearch( self, criteria ):
-        dh = domain.DomainHolder()
-        res = dh.match(criteria)
-        return res
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["createDomainURL"] = urlHandlers.UHNewDomain.getURL()
-        vars["nbDomains"] = domain.DomainHolder().getLength()
-        vars["browseDomains"] = WBrowseDomains(self._params.get("letter",None)).getHTML(vars)
-        vars["browseDomainsURL"] = urlHandlers.UHDomains.getURL()
-        vars["searchDomainsURL"] = urlHandlers.UHDomains.getURL()
-        vars["domains"] = ""
-        if self._criteria:
-            domainList = self._performSearch(self._criteria)
-            vars["domains"] = WHTMLDomainList(vars,domainList).getHTML()
-        return vars
-
-class WHTMLDomainList:
-
-    def __init__(self, vars, list):
-        self._vars = vars
-        self._list = list
-
-    def getHTML(self):
-        text = """<tr>
-                              <td>
-                    <br>
-                <table width="100%%" align="left" style="border-top: 1px solid #777777; padding-top:10px">"""
-        color="white"
-        ul = []
-        for dom in self._list:
-            if color=="white":
-                color="#F6F6F6"
-            else:
-                color="white"
-            url = self._vars["domainDetailsURLGen"]( dom )
-            ul.append("""<tr>
-                            <td bgcolor="%s"><a href="%s">%s</a></td>
-                        </tr>"""%(color, url, dom.getName() or _("no name") ) )
-        if ul:
-            text += "".join( ul )
-        else:
-            text += """<tr>
-                        <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp;No domains for this search</span></td></tr>"""
-        text += """    </table>
-                      </td>
-                </tr>"""
-        return text
-
-class WPDomainList( WPDomainBase ):
-
-    def __init__( self, rh, params ):
-        WPDomainBase.__init__( self, rh )
-        self._params = params
-
-    def _getPageContent( self, params ):
-        criteria = {}
-        if self._params.get("sName","") != "":
-            criteria["name"] = self._params.get("sName","")
-        comp = WDomainList(criteria,self._params)
-        pars = {"domainDetailsURLGen": urlHandlers.UHDomainDetails.getURL }
-        return comp.getHTML(pars)
-
-
-class WDomainDetails(wcomponents.WTemplated):
-
-    def __init__( self, dom):
-        self._domain = dom
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._domain.getName()
-        vars["description"] = self._domain.getDescription()
-        vars["filters"] = "<br>".join(self._domain.getFilterList())
-        return vars
-
-
-class WPDomainDetails( WPDomainBase ):
-
-    def __init__(self, rh, domain):
-        WPDomainBase.__init__(self, rh)
-        self._domain = domain
-
-    def _getPageContent( self, params ):
-        comp = WDomainDetails( self._domain )
-        pars = {"modifyURL": urlHandlers.UHDomainModification.getURL( self._domain ) }
-        return comp.getHTML( pars )
-
-
-class WDomainDataModification(wcomponents.WTemplated):
-
-    def __init__( self, dom ):
-        self._domain = dom
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._domain.getName()
-        vars["description"] = self._domain.getDescription()
-        vars["filters"] = ";".join( self._domain.getFilterList() )
-        vars["locator"] = self._domain.getLocator().getWebForm()
-        return vars
-
-
-class WPDomainModification( WPDomainBase ):
-
-    def __init__(self, rh, domain):
-        WPDomainBase.__init__(self, rh)
-        self._domain = domain
-
-    def _getPageContent( self, params ):
-        comp = WDomainDataModification( self._domain )
-        pars = {
-            'postURL': urlHandlers.UHDomainPerformModification.getURL(self._domain)
-        }
-        return comp.getHTML( pars )
-
-
-class WDomainCreation(wcomponents.WTemplated):
-    pass
-
-
-class WPDomainCreation( WPDomainBase ):
-
-    def _getPageContent( self, params ):
-        comp = WDomainCreation()
-        pars = {"postURL": urlHandlers.UHDomainPerformCreation.getURL()}
-        return comp.getHTML( pars )
 
 
 class WPAdminsSystemBase(WPAdminsBase):

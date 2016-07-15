@@ -22,7 +22,6 @@ from flask import g, has_request_context, request
 from MaKaC.common.url import URL, EndpointURL
 
 from indico.core.config import Config
-from indico.web.flask.util import url_for
 
 
 class BooleanMixin:
@@ -556,30 +555,6 @@ class UHConfEnterAccessKey(UHConfUser):
 
 class UHConfManagementAccess(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-managementAccess'
-
-
-class UHDomains(URLHandler):
-    _endpoint = 'admin.domainList'
-
-
-class UHNewDomain(URLHandler):
-    _endpoint = 'admin.domainCreation'
-
-
-class UHDomainPerformCreation(URLHandler):
-    _endpoint = 'admin.domainCreation-create'
-
-
-class UHDomainDetails(URLHandler):
-    _endpoint = 'admin.domainDetails'
-
-
-class UHDomainModification(URLHandler):
-    _endpoint = 'admin.domainDataModification'
-
-
-class UHDomainPerformModification(URLHandler):
-    _endpoint = 'admin.domainDataModification-modify'
 
 
 class UHAdminArea(URLHandler):
