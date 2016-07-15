@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 import os
 import exceptions
 import urllib
@@ -24,8 +23,7 @@ from flask import session
 from lxml import etree
 from pytz import timezone
 from speaklater import _LazyString
-from datetime import timedelta, datetime
-from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
@@ -36,7 +34,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.url import URL
 from indico.core.config import Config
 from MaKaC.conference import Conference, Category
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common import utils
 from MaKaC.errors import MaKaCError
 from MaKaC.common.ContextHelp import ContextHelp
@@ -50,12 +48,10 @@ from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.util import preload_events
 from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
-from indico.util.date_time import utc_timestamp, is_same_month, format_date
+from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
-from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
@@ -796,38 +792,6 @@ class WConferenceModifFrame(WTemplated):
 
         return vars
 
-class WCategoryModifFrame(WTemplated):
-
-    def __init__( self, conference):
-        self.__conf = conference
-
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["creator"] = ""
-        vars["context"] = ""
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
-        vars["categDisplayURL"] = vars["categDisplayURLGen"]( self.__conf )
-        vars["title"] = escape(self.__conf.getTitle())
-        vars["titleTabPixels"] = self.getTitleTabPixels()
-        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-        return vars
-
-
-    def getIntermediateVTabPixels( self ):
-        return 0
-
-    def getTitleTabPixels( self ):
-        return 260
-
-    def getCloseHeaderTags( self ):
-        return ""
-
-
 class WAccessControlFrameBase(WTemplated):
 
     def _getAccessControlFrametParams( self ):
@@ -992,102 +956,6 @@ class WConfirmation(WTemplated):
 
 class WClosed(WTemplated):
     pass
-
-
-class WConferenceListItem(WTemplated):
-    def __init__(self, event, aw):
-        self._event = event
-        self._aw = aw
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["lItem"] = self._event
-        vars["conferenceDisplayURLGen"] = urlHandlers.UHConferenceDisplay.getURL
-        vars["aw"] = self._aw
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
-
-
-class WEmptyCategory(WTemplated):
-    def getVars(self):
-        return {}
-
-
-class WConferenceList(WTemplated):
-
-    def __init__(self, category, showPastEvents):
-        self._categ = category
-        self._showPastEvents = showPastEvents
-
-    def getHTML( self, aw, params ):
-        self._aw = aw
-        return WTemplated.getHTML( self, params )
-
-    def getEventTimeline(self, tz):
-        # Getting current and previous at the beggining
-        index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
-        today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
-        thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
-        nextMonthTS = utc_timestamp(thisMonth + relativedelta(months=1))
-        previousMonthTS = utc_timestamp(thisMonth - relativedelta(months=1))
-        twoMonthTS = utc_timestamp((today - timedelta(days=60)).replace(day=1))
-        future = []
-        present = []
-
-
-        # currentMonth will be used to ensure that when the OPTIMAL_PRESENT_EVENTS is reached
-        # the events of that month are still displayed in the present list
-        currentMonth = utctimestamp2date(previousMonthTS)
-        for ts, conf in index.iteritems(previousMonthTS):
-            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS or is_same_month(currentMonth, utctimestamp2date(ts)):
-                present.append(conf)
-                currentMonth = utctimestamp2date(ts)
-            else:
-                future.append(conf)
-
-        if len(present) < MIN_PRESENT_EVENTS:
-            present = index.values(twoMonthTS, previousMonthTS) + present
-
-        if not present:
-            maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
-            prevMonthTS = utc_timestamp(maxDT.replace(day=1))
-            present = index.values(prevMonthTS)
-        numPast = self._categ.getNumConferences() - len(present) - len(future)
-        preload_events(itertools.chain(present, future), persons=True)
-        return present, future, len(future), numPast
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        displayTZ = DisplayTZ(self._aw, self._categ, useServerTZ=1).getDisplayTZ()
-        vars["ActiveTimezone"] = displayTZ
-        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] =  self.getEventTimeline(displayTZ)
-        vars["categ"] = self._categ
-
-        vars["showPastEvents"] = self._showPastEvents
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
-
-
-class WCategoryList(WTemplated):
-
-    def __init__( self, categ ):
-        self._categ = categ
-        self._list = categ.getSubCategoryList()
-
-    def getHTML( self, aw, params ):
-        self._aw = aw
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-
-        vars = WTemplated.getVars( self )
-        vars["items"] = self._list
-        vars["categ"] = self._categ;
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
 
 
 class TabControl:
