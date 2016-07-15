@@ -67,8 +67,7 @@ from indico.web.util import url_for_index
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
-AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt',
-                          'misc', 'rooms', 'rooms_admin'}
+AUTO_COMPAT_BLUEPRINTS = {'admin', 'event', 'event_creation', 'event_mgmt', 'misc', 'rooms', 'rooms_admin'}
 
 
 def fix_root_path(app):

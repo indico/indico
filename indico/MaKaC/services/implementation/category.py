@@ -37,7 +37,6 @@ from indico.util.user import principal_from_fossil
 from MaKaC import domain
 from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
-from MaKaC.webinterface.urlHandlers import UHCategModifAC
 
 class CategoryBase(object):
     """

@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.category import WPCategoryModifBase
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
@@ -28,11 +27,6 @@ class AttachmentsMixin(WPJinjaMixin):
 
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
-
-
-class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
-    base_wp = WPCategoryModifBase
-    sidemenu_option = 'attachments'
 
 
 class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):

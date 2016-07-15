@@ -1090,26 +1090,6 @@ class WCategoryList(WTemplated):
         return vars
 
 
-class WConfCreationControlFrame(WTemplated):
-
-    def __init__( self, categ ):
-        self._categ = categ
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self._categ.getLocator().getWebForm()
-        vars["status"] =  _("OPENED")
-        vars["changeStatus"] =  i18nformat("""( <input type="submit" class="btn" name="RESTRICT" value="_("RESTRICT it")"> )""")
-        if self._categ.isConferenceCreationRestricted():
-            vars["status"] =  _("RESTRICTED")
-            vars["changeStatus"] = i18nformat("""( <input type="submit" class="btn" name="OPEN" value="_("OPEN it")"> )""")
-        vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
-        vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
-        vars["categoryId"] = self._categ.getId()
-        vars["confCreators"] = fossilize(self._categ.getConferenceCreatorList())
-        return vars
-
-
 class TabControl:
 
     def __init__( self, parent=None, child=None ):
