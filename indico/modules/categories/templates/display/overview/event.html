@@ -3,7 +3,18 @@
 {% macro render_event(event, timezone, detail) %}
     {% set category = event.category %}
     <tr class="event">
-        <td class="time">{{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}</td>
+        <td class="time">
+            {% if event.ongoing %}
+                {% set ongoing_message %}
+                    {% trans start=event.first_occurence_start_dt|format_datetime(timezone=timezone),
+                             end=event.end_dt|format_datetime(timezone=timezone) -%}
+                        Ongoing from {{ start }} until {{ end }}.
+                    {%- endtrans %}
+                {% endset %}
+                <span title="{{ ongoing_message }}">ongoing</span>
+            {% else %}
+                {{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}
+            {% endif %}
         <td class="title">
             <a href="{{ url_for('event.conferenceDisplay', event) }}">{{ event.title }}</a>
             <span class="details">
