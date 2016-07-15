@@ -16,12 +16,15 @@
 
 from __future__ import unicode_literals
 
+from flask import session, render_template
+
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -57,3 +60,10 @@ def _sidemenu_items(sender, **kwargs):
     yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80)
     yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70)
     yield SideMenuItem('favorites', _('Favourites'), url_for('users.user_favorites'), 60)
+
+
+@template_hook('global-announcement', priority=-1)
+def _inject_login_as_header(**kwargs):
+    login_as_data = session.get('login_as_orig_user')
+    if login_as_data:
+        return render_template('users/login_as_header.html', login_as_data=login_as_data)

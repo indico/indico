@@ -54,7 +54,7 @@ from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
-from indico.util.string import alpha_enum
+from indico.util.string import alpha_enum, crc32
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          subclassof, call_template_hook, groupby, strip_tags)
@@ -202,6 +202,7 @@ def setup_jinja(app):
     app.add_template_filter(any)
     app.add_template_filter(strip_tags)
     app.add_template_filter(alpha_enum)
+    app.add_template_filter(crc32)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
     app.add_template_test(subclassof)  # only use this test if you really have to!
