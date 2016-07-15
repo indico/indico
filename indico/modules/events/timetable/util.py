@@ -139,7 +139,7 @@ def find_next_start_dt(duration, obj, day=None, force=False):
     return start_dt
 
 
-def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz=utc, from_categ=None):
+def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz=utc, from_categ=None, grouped=True):
     """Retrieve time blocks that fall within an specific time interval
        for a given set of categories.
 
@@ -182,37 +182,48 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                       undefer('category_chain')))
     scheduled_events = defaultdict(list)
     ongoing_events = []
+    events = []
     for e in query:
-        local_start_dt = e.start_dt.astimezone(tz).date()
-        local_end_dt = e.end_dt.astimezone(tz).date()
-        if items[e.id] is None:
-            # if there is no TimetableEntry, this means the event has not timetable on that interval
-            for day in iterdays(max(start_dt.date(), local_start_dt), min(end_dt.date(), local_end_dt)):
-                # if the event starts on this date, we've got a time slot
-                if day.date() == local_start_dt:
-                    scheduled_events[day.date()].append((e.start_dt, e))
-                else:
-                    ongoing_events.append(e)
+        if grouped:
+            local_start_dt = e.start_dt.astimezone(tz).date()
+            local_end_dt = e.end_dt.astimezone(tz).date()
+            if items[e.id] is None:
+                # if there is no TimetableEntry, this means the event has not timetable on that interval
+                for day in iterdays(max(start_dt.date(), local_start_dt), min(end_dt.date(), local_end_dt)):
+                    # if the event starts on this date, we've got a time slot
+                    if day.date() == local_start_dt:
+                        scheduled_events[day.date()].append((e.start_dt, e))
+                    else:
+                        ongoing_events.append(e)
+            else:
+                for start_d, start_dts in items[e.id].viewitems():
+                    scheduled_events[start_d].append((start_dts[0], e))
         else:
-            for start_d, start_dts in items[e.id].viewitems():
-                scheduled_events[start_d].append((start_dts[0], e))
+            events.append(e)
 
     # result['events'][date(...)] -> [(datetime(....), Event(...))]
     # result[event_id]['contribs'][date(...)] -> [(TimetableEntry(...), Contribution(...))]
     # result['ongoing_events'] = [Event(...)]
-    result = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    if grouped:
+        result = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    else:
+        result = defaultdict(lambda: defaultdict(list))
 
     result.update({
-        'events': scheduled_events,
+        'events': scheduled_events if grouped else events,
         'ongoing_events': ongoing_events
     })
 
     # according to detail level, ask for extra information from the DB
     if detail_level != 'event':
         query = _query_blocks(event_ids, dates_overlap, detail_level)
-        for b in query:
-            start_date = b.timetable_entry.start_dt.astimezone(tz).date()
-            result[b.session.event_id]['blocks'][start_date].append((b.timetable_entry, b))
+        if grouped:
+            for b in query:
+                start_date = b.timetable_entry.start_dt.astimezone(tz).date()
+                result[b.session.event_id]['blocks'][start_date].append((b.timetable_entry, b))
+        else:
+            for b in query:
+                result[b.session.event_id]['blocks'].append(b)
 
     if detail_level == 'contribution':
         query = (Contribution.find(Contribution.event_id.in_(event_ids),
@@ -221,16 +232,24 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                  .options(contains_eager(Contribution.timetable_entry),
                           joinedload(Contribution.person_links))
                  .join(TimetableEntry))
-        for c in query:
-            start_date = c.timetable_entry.start_dt.astimezone(tz).date()
-            result[c.event_id]['contribs'][start_date].append((c.timetable_entry, c))
+        if grouped:
+            for c in query:
+                start_date = c.timetable_entry.start_dt.astimezone(tz).date()
+                result[c.event_id]['contribs'][start_date].append((c.timetable_entry, c))
+        else:
+            for c in query:
+                result[c.event_id]['contributions'].append(c)
 
         query = (Break.find(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
                  .options(contains_eager(Break.timetable_entry))
                  .join(TimetableEntry))
-        for b in query:
-            start_date = b.timetable_entry.start_dt.astimezone(tz).date()
-            result[b.timetable_entry.event_id]['breaks'][start_date].append((b.timetable_entry, b))
+        if grouped:
+            for b in query:
+                start_date = b.timetable_entry.start_dt.astimezone(tz).date()
+                result[b.timetable_entry.event_id]['breaks'][start_date].append((b.timetable_entry, b))
+        else:
+            for b in query:
+                result[b.timetable_entry.event_id]['breaks'].append(b)
     return result
 
 

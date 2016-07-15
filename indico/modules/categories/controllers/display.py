@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from functools import partial
 from io import BytesIO
 from itertools import chain, groupby
 from math import ceil
@@ -37,6 +38,7 @@ from indico.modules.categories.serialize import (serialize_category_atom, serial
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
+from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
@@ -418,14 +420,9 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             self.end_dt = self.start_dt + relativedelta(months=1)
 
     def _process(self):
-        events = (Event.query
-                  .filter(Event.is_visible_in(self.category), ~Event.is_deleted,
-                          or_(and_(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt),
-                              and_(Event.end_dt >= self.start_dt, Event.end_dt < self.end_dt),
-                              and_(Event.start_dt < self.start_dt, Event.end_dt > self.end_dt)))
-                  .order_by(Event.start_dt)
-                  .all())
-        events = [event for event in events if event.can_access(session.user)]
+        info = get_category_timetable([self.category.id], self.start_dt, self.end_dt, detail_level=self.detail,
+                                      tz=self.category.display_tzinfo, from_categ=self.category, grouped=False)
+        events = info['events']
 
         # Only categories with icons are listed in the sidebar
         subcategories = {event.category for event in events if event.category.has_icon}
@@ -435,7 +432,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             return chain.from_iterable(map(func, list_))
 
         # Events spanning multiple days must appear on all days
-        events = flat_map(self._process_multiday_events, events)
+        events = flat_map(partial(self._process_multiday_events, info), events)
 
         def _event_sort_key(event):
             # Ongoing events are shown after all other events on the same day and are sorted by start_date
@@ -514,26 +511,26 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         return url_for('.overview', self.category, detail=self.detail, period=self.period,
                        date=format_date(date, 'YYYY-MM-dd'))
 
-    def _process_multiday_events(self, event):
+    def _process_multiday_events(self, info, event):
         # Add "fake" proxy events for events spanning multiple days such that there is one event per day
         # Function type: Event -> List[Event]
         tzinfo = self.category.display_tzinfo
 
         class _EventProxy(object):
-            def __init__(self, event, date):
+            def __init__(self, event, date, timetable_objects):
                 start_dt = datetime.combine(date, event.start_dt.astimezone(tzinfo).timetz())
                 assert date >= event.start_dt
                 assert date <= event.end_dt
                 object.__setattr__(self, '_start_dt', start_dt)
                 object.__setattr__(self, '_real_event', event)
+                object.__setattr__(self, '_timetable_objects', timetable_objects)
 
             def __getattribute__(self, name):
                 if name == 'start_dt':
                     return object.__getattribute__(self, '_start_dt')
                 event = object.__getattribute__(self, '_real_event')
-                if name == 'timetable_entries':
-                    return [entry for entry in event.timetable_entries
-                            if entry.start_dt.astimezone(tzinfo).date() == self.start_dt.astimezone(tzinfo).date()]
+                if name == 'timetable_objects':
+                    return object.__getattribute__(self, '_timetable_objects')
                 if name == 'ongoing':
                     return event.start_dt.date() != self.start_dt.date()
                 if name == 'first_occurence_start_dt':
@@ -546,13 +543,14 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             def __repr__(self):
                 return '<_EventProxy({}, {})>'.format(self.start_dt, object.__getattribute__(self, '_real_event'))
 
-        event_start_dt = event.start_dt.astimezone(tzinfo)
-        event_end_dt = event.end_dt.astimezone(tzinfo)
-        if event_start_dt.date() == event_end_dt.date():
-            return [event]
-        else:
-            # All the days of the event shown in the overview
-            event_days = self._get_days(max(self.start_dt, event_start_dt),
-                                        min(self.end_dt, event_end_dt))
-            # Generate a proxy object with adjusted start_dt and timetable_entries for each day
-            return [_EventProxy(event, day) for day in event_days]
+        # Breaks, contributions and sessions grouped by start_dt. Each EventProxy will return the relevant ones only
+        timetable_objects = sorted(chain(*info[event.id].values()), key=attrgetter('timetable_entry.start_dt'))
+        timetable_objects_by_date = {x[0]: list(x[1]) for x
+                                     in groupby(timetable_objects, key=lambda x: x.start_dt.astimezone(tzinfo).date())}
+
+        # All the days of the event shown in the overview
+        event_days = self._get_days(max(self.start_dt, event.start_dt.astimezone(tzinfo)),
+                                    min(self.end_dt, event.end_dt.astimezone(tzinfo)))
+
+        # Generate a proxy object with adjusted start_dt and timetable_objects for each day
+        return [_EventProxy(event, day, timetable_objects_by_date.get(day.date(), [])) for day in event_days]
