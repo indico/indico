@@ -41,7 +41,6 @@ from indico.util.i18n import _, i18nformat, get_all_locales
 from indico.web.menu import render_sidemenu
 
 
-
 class WPAdminsBase(WPMainBase):
 
     _userData = ['favorite-user-ids']
@@ -53,9 +52,7 @@ class WPAdminsBase(WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + \
-               self._includeJSPackage('Admin') + \
-               self._includeJSPackage('Management')
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _getHeader( self ):
         """
@@ -195,31 +192,9 @@ class WPHomepageCommon( WPAdminsBase ):
 
         self._subTabAnnouncements = self._tabCtrl.newTab( "announcements", _("Announcements"), \
                 urlHandlers.UHAnnouncement.getURL() )
-        self._subTabUpcoming = self._tabCtrl.newTab( "upcoming", _("Upcoming Events"), \
-                urlHandlers.UHConfigUpcomingEvents.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-
-class WPConfigUpcomingEvents( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabUpcoming.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WConfigUpcomingEvents()
-        pars = {}
-        return wc.getHTML( pars )
-
-class WConfigUpcomingEvents(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        module = ModuleHolder().getById("upcoming_events")
-        vars["cacheTTL"] = module.getCacheTTL().seconds/60
-        vars["numberItems"] = module.getNumberItems()
-        return vars
 
 
 class WPAnnouncementModif( WPHomepageCommon ):

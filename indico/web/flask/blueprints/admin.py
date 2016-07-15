@@ -35,9 +35,6 @@ admin.add_url_rule('/settings/system/modify', 'adminSystem-modify', admins.RHSys
 admin.add_url_rule('/announcement', 'adminAnnouncement', announcement.RHAnnouncementModif)
 admin.add_url_rule('/announcement', 'adminAnnouncement-save', announcement.RHAnnouncementModifSave, methods=('POST',))
 
-# Upcoming events
-admin.add_url_rule('/upcoming-events-old', 'adminUpcomingEvents', admins.RHConfigUpcoming)
-
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)
 admin.add_url_rule('/maintenance/pack-db', 'adminMaintenance-pack', maintenance.RHMaintenancePack,

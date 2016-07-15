@@ -900,10 +900,6 @@ class UHAnnouncementSave(URLHandler):
     _endpoint = 'admin.adminAnnouncement-save'
 
 
-class UHConfigUpcomingEvents(URLHandler):
-    _endpoint = 'admin.adminUpcomingEvents'
-
-
 # URL Handlers for Printing and Design
 class UHConfModifBadgePrinting(URLHandler):
     _endpoint = "event_mgmt.confModifTools-badgePrinting"

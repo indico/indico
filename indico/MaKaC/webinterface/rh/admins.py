@@ -47,18 +47,6 @@ class RHAdminArea(RHAdminBase):
         return p.display()
 
 
-class RHConfigUpcoming( RHAdminBase ):
-    _uh = urlHandlers.UHConfigUpcomingEvents
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        p = admins.WPConfigUpcomingEvents( self )
-        return p.display()
-
-
 class RHGeneralInfoModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoModification
 

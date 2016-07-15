@@ -130,11 +130,6 @@ indico_room_booking = rjs_bundle(
                'roomselector.js',
                'validation.js'))
 
-indico_admin = rjs_bundle(
-    'indico_admin',
-    *namespace('js/indico/Admin',
-               'Upcoming.js'))
-
 indico_legacy = rjs_bundle(
     'indico_legacy',
     *namespace('js/indico/Legacy',
@@ -447,7 +442,6 @@ def register_all_js(env):
     env.register('indico_core', indico_core)
     env.register('indico_management', indico_management)
     env.register('indico_roombooking', indico_room_booking)
-    env.register('indico_admin', indico_admin)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
     env.register('indico_materialeditor', indico_materialeditor)

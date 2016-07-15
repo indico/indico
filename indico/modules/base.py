@@ -42,11 +42,9 @@ class ModuleHolder( ObjectHolder ):
         ObjectHolder.__init__(self)
         # These imports are done like this in order to avoid circular imports problems.
         from indico.modules import cssTpls
-        from indico.modules import upcoming
 
         ModuleHolder._availableModules = {
-            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id: upcoming.UpcomingEventsModule,
+            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule
         }
 
     def _newId( self ):
