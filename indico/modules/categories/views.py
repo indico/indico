@@ -22,7 +22,7 @@ from indico.util.i18n import _
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer, WNavigationDrawer
+from MaKaC.webinterface.wcomponents import WNavigationDrawer
 
 
 class WPManageUpcomingEvents(WPJinjaMixin, WPAdminsBase):
@@ -91,9 +91,6 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryStatistics(WPCategory):
-    def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(self.category.title, type='Statistics')
-
     def getJSFiles(self):
         return (WPCategory.getJSFiles(self) +
                 self._includeJSPackage('jqplot_js', prefix='') +
