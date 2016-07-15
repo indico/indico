@@ -34,7 +34,7 @@ from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbo
 
 class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
-                    'suggestions_disabled', 'event_creation_notification_emails')
+                    'suggestions_disabled', 'event_creation_notification_emails', 'notify_managers')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_("Title"), [DataRequired()])
@@ -58,10 +58,14 @@ class CategorySettingsForm(IndicoForm):
                                                description=_("This message will show up at the top of every event page "
                                                              "in this category"))
     event_message = IndicoMarkdownField(_("Content"))
+    notify_managers = BooleanField(_("Notify managers"), widget=SwitchWidget(),
+                                   description=_("Whether to send email notifications to all managers of this category "
+                                                 "when an event is created inside it or in any of its subcategories."))
     event_creation_notification_emails = EmailListField(_("Notification E-mails"),
-                                                        description=_("List of e-mails that will receive a notification"
-                                                                      " every time a new event is created. One e-mail "
-                                                                      "per line."))
+                                                        description=_("List of emails that will receive a notification "
+                                                                      "every time a new event is created inside the "
+                                                                      "category or one of its subcategories. "
+                                                                      "One email address per line."))
 
     def __init__(self, *args, **kwargs):
         super(CategorySettingsForm, self).__init__(*args, **kwargs)

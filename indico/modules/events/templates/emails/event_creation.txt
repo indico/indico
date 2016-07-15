@@ -1,0 +1,57 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    New {{ event.type }} in Indico
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+_Title_
+    {{ event.title }}
+
+_Category_
+    {{ event.category.chain_titles|join(' » ') }}
+
+{% if event.person_links -%}
+{{ '_Speakers_' if event.type == 'lecture' else '_Chairpersons_' }}
+    {{ event.person_links|sort(attribute='full_name')|join('; ', attribute='full_name') }}
+{%- endif %}
+
+{% if event.room_name -%}
+    _Room_
+    {{ event.room_name }}
+{%- endif %}
+
+{% if event.description -%}
+    _Description_
+    {{ event.description|strip_tags|indent }}
+{%- endif %}
+
+_Creator_
+    {{ event.creator.full_name }}
+
+_Date_
+    {{ event.start_dt|format_date(timezone=event.timezone) }}
+
+_Time_
+    {{ event.start_dt|format_time(timezone=event.timezone) }}
+
+_Link_
+    {{ url_for('event.conferenceDisplay', event, _external=true) }}
+
+{% if following_events %}
+_Other Occurrences_
+{% for following_event in following_events %}
+    {%- set start_dt = event.start_dt %}
+    {{ start_dt|format_date(timezone=event.timezone) }}, {{ start_dt|format_time(timezone=event.timezone) }} to {{ event.end_dt|format_time(timezone=event.timezone) }}: {{ url_for('event.conferenceDisplay', event, _external=true) -}}
+{% endfor %}
+{% endif %}
+
+{% endblock %}
+
+{% block footer_title -%}
+    Events
+{%- endblock %}
+
+{% block footer_url %}{% endblock %}

@@ -31,7 +31,6 @@ from indico.core.config import Config
 from MaKaC.i18n import _
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
-from MaKaC.common.mail import GenericMailer
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -41,6 +40,7 @@ from indico.modules.categories.controllers.base import RHCreateEventBase
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
+from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
@@ -146,62 +146,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
         return UserListModificationBase.retrieveUsers({"userList": allowedUsersDict})[0] if allowedUsersDict else []
 
     def alertCreation(self, confs):
-        conf = confs[0]
-        event = conf.as_event
-        fromAddr = Config.getInstance().getSupportEmail()
-        addrs = [ Config.getInstance().getSupportEmail() ]
-        eventType = conf.getType()
-        if eventType == "conference":
-            type = "conference"
-        elif eventType == "meeting":
-            type = "meeting"
-        else:
-            type = "lecture"
-        if conf.getChairmanText():
-            chair = conf.getChairmanText()
-        else:
-            chair = '; '.join(x.full_name.encode('utf-8') for x in event.person_links)
-        subject = "New %s in indico (%s)" % (type,conf.getId())
-        room = event.room_name
-        text = """
-_Category_
-{}
-_Title_
-{}
-_Speaker/Chair_
-{}
-_Room_
-{}
-_Description_
-{}
-_Creator_
-{} ({})""".format(u' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '.join(event.category.chain_titles).encode('utf-8'),
-                  event.title.encode('utf-8'), chair, room, conf.getDescription(),
-                  event.creator.full_name.encode('utf-8'), event.creator.id)
-        if len(confs) == 1:
-            text += """
-_Date_
-%s -> %s
-_Access_
-%s""" % ( conf.getAdjustedStartDate(), conf.getAdjustedEndDate(), urlHandlers.UHConferenceDisplay.getURL(conf))
-        else:
-            i = 1
-            for c in confs:
-                text += """
-_Date%s_
-%s -> %s
-_Access%s_
-%s """ % (i,c.getAdjustedStartDate(), c.getAdjustedEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
-                i+=1
-
-        maildata = {"fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text}
-        GenericMailer.send(maildata)
-        # Category notification
-        event_creation_notification_emails = event.category.event_creation_notification_emails
-        if event_creation_notification_emails:
-            mail_data = {"fromAddr": fromAddr, "toList": event_creation_notification_emails,
-                         "subject": subject, "body": text}
-            GenericMailer.send(mail_data)
+        notify_event_creation(confs[0].as_event, [conf.as_event for conf in confs[1:]])
 
 
 class UtilsConference:
