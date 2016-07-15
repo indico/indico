@@ -14,28 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh.admins import RHAdminBase
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
-import MaKaC.webinterface.pages.admins as admins
+from __future__ import unicode_literals
+
+from indico.core import signals
+
+from indico.core.settings import SettingsProxy
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
+from indico.util.i18n import _
+
+announcement_settings = SettingsProxy('announcement', {
+    'enabled': False,
+    'message': ''
+})
 
 
-class RHAnnouncementModif(RHAdminBase):
-
-    def _process( self ):
-        p = admins.WPAnnouncementModif( self )
-        return p.display()
-
-class RHAnnouncementModifSave(RHAdminBase):
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-        self.text = params.get("announcement", "")
-
-
-    def _process( self ):
-        an = getAnnoucementMgrInstance()
-        an.setText(self.text)
-        self._redirect(urlHandlers.UHAnnouncement.getURL())
-
-
+@signals.menu.items.connect_via('admin-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    yield SideMenuItem('announcement', _('Announcement'), url_for('announcement.manage'), section='homepage')
