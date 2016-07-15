@@ -602,62 +602,6 @@ class UHAdminsSystemModif(URLHandler):
     _endpoint = 'admin.adminSystem-modify'
 
 
-class UHCategoryModification(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification'
-
-    @classmethod
-    def getActionURL(cls):
-        return ''
-
-
-class UHCategoryActionSubCategs(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification-actionSubCategs'
-
-
-class UHCategoryActionConferences(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification-actionConferences'
-
-
-class UHCategModifAC(URLHandler):
-    _endpoint = 'category_mgmt.categoryAC'
-
-
-class UHCategorySetConfCreationControl(URLHandler):
-    _endpoint = 'category_mgmt.categoryConfCreationControl-setCreateConferenceControl'
-
-
-class UHCategorySetNotifyCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryConfCreationControl-setNotifyCreation'
-
-
-class UHCategModifTools(URLHandler):
-    _endpoint = 'category_mgmt.categoryTools'
-
-
-class UHCategoryDeletion(URLHandler):
-    _endpoint = 'category_mgmt.categoryTools-delete'
-
-
-class UHCategoryDataModif(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification'
-
-
-class UHCategoryPerformModification(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification-modify'
-
-
-class UHCategorySetVisibility(URLHandler):
-    _endpoint = 'category_mgmt.categoryAC-setVisibility'
-
-
-class UHCategoryCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryCreation'
-
-
-class UHCategoryPerformCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryCreation-create'
-
-
 class UHCategoryDisplay(URLHandler):
     _endpoint = 'category.categoryDisplay'
 
