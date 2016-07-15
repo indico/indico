@@ -598,19 +598,6 @@ class UHAdminsSystemModif(URLHandler):
     _endpoint = 'admin.adminSystem-modify'
 
 
-class UHCategoryDisplay(URLHandler):
-    _endpoint = 'category.categoryDisplay'
-
-    @classmethod
-    def getURL(cls, target=None, **params):
-        url = cls._getURL(**params)
-        if target:
-            if target.isRoot():
-                return url_for('misc.index')
-            url.setParams(target.getLocator())
-        return url
-
-
 class UHGeneralInfoModification(URLHandler):
     _endpoint = 'admin.generalInfoModification'
 

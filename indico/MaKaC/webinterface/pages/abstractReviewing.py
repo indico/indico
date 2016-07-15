@@ -269,20 +269,10 @@ class WPModCFANotifTplBase(WPConferenceModifAbstractBase):
                 urlHandlers.UHAbstractModNotifTplDisplay.getURL( self._notifTpl ) )
         self._tabPreview = self._tabCtrl.newTab( "preview", _("Preview"), \
                 urlHandlers.UHAbstractModNotifTplPreview.getURL( self._notifTpl ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):
         pass
-
-#    def _applyFrame( self, body ):
-#        frame = wcomponents.WNotifTPLModifFrame( self._notifTpl, self._getAW() )
-#        p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-#            "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
-#            "confModifURLGen": urlHandlers.UHConfModifCFA.getURL}
-#        return frame.getHTML( body, **p )
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
@@ -308,7 +298,6 @@ class WPModCFANotifTplDisplay(WPModCFANotifTplBase):
         return wc.getHTML()
 
 
-
 class WPModCFANotifTplEdit(WPModCFANotifTplBase):
 
     def __init__(self, rh, notifTpl):
@@ -324,8 +313,6 @@ class WPModCFANotifTplEdit(WPModCFANotifTplBase):
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \
             self._includeJSPackage('Management')
-
-
 
 
 class WPModCFANotifTplPreview(WPModCFANotifTplBase):
