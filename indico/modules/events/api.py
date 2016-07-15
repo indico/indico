@@ -444,6 +444,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             options.append(contributions_strategy)
         if detail_level == 'sessions':
             options.append(sessions_strategy)
+        options.append(undefer('effective_protection_mode'))
         return options
 
     def category(self, idlist):
