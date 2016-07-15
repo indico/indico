@@ -24,6 +24,8 @@
             category: 0,
             // Text for action buttons
             actionButtonText: $T.gettext("Select"),
+            // Prompt confirmation before action
+            confirmation: false,
             // Text for placeholder in empty categories
             emptyCategoryText: $T.gettext("This category doesn't contain any subcategory"),
             // A dialog opens with the navigator rendered on it
@@ -647,17 +649,27 @@
 
         _onAction: function(categoryId) {
             var self = this;
-            var res = self.options.onAction(self._categories[categoryId]);
 
-            if (res === undefined) {
-                res = $.Deferred().resolve();
+            function callback() {
+                var res = self.options.onAction(self._categories[categoryId]);
+                if (res === undefined) {
+                    res = $.Deferred().resolve();
+                }
+
+                res.then(function() {
+                    if (self.dialog) {
+                        self.dialog.close();
+                    }
+                });
             }
 
-            res.then(function() {
-                if (self.dialog) {
-                    self.dialog.close();
-                }
-            });
+            if (self.options.confirmation) {
+                var text = $T.gettext("You selected category <em>{0}</em>. Are you sure you want to proceed?")
+                             .format(self._categories[categoryId].title);
+                confirmPrompt(text, $T.gettext("Confirm action")).then(callback);
+            } else {
+                callback();
+            }
         },
 
         _canActOn: function(category) {
