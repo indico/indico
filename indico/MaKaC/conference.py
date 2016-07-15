@@ -45,7 +45,6 @@ from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository, review
 from MaKaC.abstractReviewing import ConferenceAbstractReview
-from MaKaC.accessControl import AccessController
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.common.Counter import Counter
 from MaKaC.common.fossilize import fossilizes, Fossilizable
@@ -135,7 +134,6 @@ class Conference(CommonObjectBase):
         self.programDescription = ""
         self.program = []
         self.__programGenerator = Counter()
-        self.__ac = AccessController(self)
         self._modificationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
@@ -1001,9 +999,6 @@ class Conference(CommonObjectBase):
         # available for the time being, but we keep the previous code for
         # further improvements
         return True
-
-    def getAccessController(self):
-        return self.__ac
 
     def getBadgeTemplateManager(self):
         try:

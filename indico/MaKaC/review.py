@@ -1650,9 +1650,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         conf = self.getConference()
         return conf.canUserModify(av)
 
-    def getAccessController(self):
-        return self.getConference().getAccessController()
-
     def delete(self):
         if self._owner:
             self.getOwner().unregisterParticipation(self._submitter)
