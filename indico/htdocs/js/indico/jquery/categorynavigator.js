@@ -267,7 +267,7 @@
             if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
                 $button.addClass('disabled').attr('title', categoriesWithSubcategories.message);
             }
-            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.has_events) {
+            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.has_events && category.deep_category_count === 0) {
                 $button.addClass('disabled').attr('title', categoriesWithEvents.message);
             }
             if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {
@@ -663,9 +663,17 @@
         _canActOn: function(category) {
             var self = this;
             var ids = self.options.actionOn.categories.ids;
-            return !(self.options.actionOn.categoriesWithSubcategories.disabled && category.deep_category_count) &&
-                   !(self.options.actionOn.categoriesWithEvents.disabled && category.has_events) &&
-                   !(self.options.actionOn.categories.disabled && _.contains(ids, category.id));
+            var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
+            var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
+            var hasOnlyEvents = (category.has_events && !category.deep_category_count);
+            var hasSubcategories = !!category.deep_category_count;
+
+            if ((categoriesWithSubcategories.disabled && hasSubcategories) ||
+                (categoriesWithEvents.disabled && hasOnlyEvents) ||
+                (self.options.actionOn.categories.disabled && _.contains(ids, category.id))) {
+                return false;
+            }
+            return true;
         },
 
         _toggleLoading: function(state, disableInput) {
