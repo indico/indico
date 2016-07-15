@@ -51,29 +51,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
 
-def preload_events(ids, lightweight=True, persons=False):
-    """Preload events so they are in SA's identity cache
-
-    This is useful for legacy pages where we have to show large
-    numbers of events without being able to query them from the
-    db cleanly.
-
-    :param ids: An iterable of IDs or Conference objects
-    :param lightweight: Only load dates and title
-    :param persons: Also load the person links
-    """
-    cache = g.setdefault('_event_cache', {})
-    ids = {int(getattr(id_, 'id', id_)) for id_ in ids} - cache.viewkeys()
-    query = Event.find(Event.id.in_(ids))
-    if lightweight:
-        query = query.options(load_only('id', 'type_', 'category_id', 'title', 'created_dt', 'start_dt', 'end_dt',
-                                        'timezone', 'protection_mode'))
-        query = query.options(subqueryload('acl_entries'))
-    if persons:
-        query = query.options(joinedload('person_links'))
-    cache.update((e.id, e) for e in query)
-
-
 def get_object_from_args(args=None):
     """Retrieves an event object from request arguments.
 
