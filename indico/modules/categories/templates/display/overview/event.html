@@ -48,21 +48,20 @@
 {% macro _render_timetable(event, timezone, show_session=true, show_contribution=false, show_break=false) %}
     <table class="timetable-entries">
         <tbody>
-            {% for entry in event.timetable_entries %}
-                {% if show_session and entry.type.name == 'SESSION_BLOCK' %}
-                    {{ _session_info(entry, timezone) }}
-                {% elif show_contribution and entry.type.name == 'CONTRIBUTION' %}
-                    {{ _contribution_info(entry, timezone) }}
-                {% elif show_break and entry.type.name == 'BREAK' %}
-                    {{ _break_info(entry, timezone) }}
+            {% for object in event.timetable_objects %}
+                {% if show_session and object.timetable_entry.type.name == 'SESSION_BLOCK' %}
+                    {{ _session_info(object, timezone) }}
+                {% elif show_contribution and object.timetable_entry.type.name == 'CONTRIBUTION' %}
+                    {{ _contribution_info(object, timezone) }}
+                {% elif show_break and object.timetable_entry.type.name == 'BREAK' %}
+                    {{ _break_info(object, timezone) }}
                 {% endif %}
             {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
 
-{% macro _session_info(session_entry, timezone) %}
-    {% set session_block = session_entry.session_block %}
+{% macro _session_info(session_block, timezone) %}
     {% set session = session_block.session %}
     {% set title %}
         {% if session_block.title %}
@@ -71,17 +70,15 @@
             {{ session.title }}
         {% endif %}
     {% endset %}
-    {{ _render_block('session', session_entry.start_dt, timezone, title, location=session, persons=session.conveners) }}
+    {{ _render_block('session', session_block.timetable_entry.start_dt, timezone, title, location=session, persons=session.conveners) }}
 {% endmacro %}
 
-{% macro _contribution_info(contribution_entry, timezone) %}
-    {% set contribution = contribution_entry.contribution %}
-    {{ _render_block('contribution', contribution_entry.start_dt, timezone, contribution.title, location=contribution, persons=contribution.speakers ) }}
+{% macro _contribution_info(contribution, timezone) %}
+    {{ _render_block('contribution', contribution.timetable_entry.start_dt, timezone, contribution.title, location=contribution, persons=contribution.speakers ) }}
 {% endmacro %}
 
-{% macro _break_info(break_entry, timezone) %}
-    {% set break = break_entry.break_ %}
-    {{ _render_block('break', break_entry.start_dt, timezone, break.title, location=break) }}
+{% macro _break_info(break, timezone) %}
+    {{ _render_block('break', break.timetable_entry.start_dt, timezone, break.title, location=break) }}
 {% endmacro %}
 
 {% macro _render_block(class, time, timezone, title, location=none, persons=[]) %}
