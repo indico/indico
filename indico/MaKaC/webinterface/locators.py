@@ -16,7 +16,6 @@
 
 import MaKaC.conference as conference
 import MaKaC.errors as errors
-import MaKaC.domain as domain
 from MaKaC.i18n import _
 
 
@@ -46,19 +45,6 @@ class CategoryWebLocator:
         if len(self.getObjectList()) == 1:
             return self.getObjectList()[0]
         return self.getObjectList()
-
-
-class DomainWebLocator:
-
-    def __init__( self, params ):
-        domId = params.get("domainId", "")
-        if domId == "":
-            raise errors.MaKaCError( _("domain id not set"))
-        dh = domain.DomainHolder()
-        self._dom = dh.getById( domId )
-
-    def getObject( self ):
-        return self._dom
 
 
 class WebLocator:
