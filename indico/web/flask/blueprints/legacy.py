@@ -14,21 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
-
-from indico.web.flask.wrappers import IndicoBlueprint
-
-
-legacy = IndicoBlueprint('legacy', __name__)
-
-
-# Routes for xmlGateway.py
-legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
-                    'xmlGateway-getCategoryInfo',
-                    mod_rh_xmlGateway.RHCategInfo,
-                    methods=('GET', 'POST'))
-
-
 # Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)
 # Note: When removing/renaming endpoints, feel free to remove them in here, too, but
 # it's not absolutely necessary - if there's no non-legacy endpoint with that name
