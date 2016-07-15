@@ -17,12 +17,12 @@
 from pytz import timezone
 
 from indico.core.config import Config
+from indico.modules.categories import Category
 from indico.modules.categories.views import WPCategory
 from indico.modules.events.layout import theme_settings
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 
-from MaKaC.conference import CategoryManager
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 
@@ -83,13 +83,12 @@ class WConferenceCreation( wcomponents.WTemplated ):
             if self._categ.is_protected:
                 vars["protection"] = "private"
             vars["categ"] = {"id": str(self._categ.id), "title": self._categ.title}
-        vars["nocategs"] = False
-        if not CategoryManager().getRoot().hasSubcategories():
-            vars["nocategs"] = True
-            rootcateg = CategoryManager().getRoot()
-            if rootcateg.isProtected():
-                vars["protection"] = "private"
-            vars["categ"] = {"id":rootcateg.getId(), "title":rootcateg.getTitle()}
+        elif not self._categ:
+            root = Category.get_root()
+            if not root.deep_children_count:
+                if root.is_protected:
+                    vars["protection"] = "private"
+                vars["categ"] = {"id": root.id, "title": root.title}
         vars["navigator"] = navigator
         vars["orgText"] = ""
         if vars.get("orgText","") != "":
