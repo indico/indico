@@ -111,12 +111,6 @@ class WAdmins(wcomponents.WTemplated):
                 wvars['address'] = minfo.getCountry()
         wvars['timezone'] = Config.getInstance().getDefaultTimezone()
         wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
-        iconDisabled = str(Config.getInstance().getSystemIconURL('disabledSection'))
-        iconEnabled = str(Config.getInstance().getSystemIconURL('enabledSection'))
-        url = urlHandlers.UHAdminSwitchNewsActive.getURL()
-        icon = iconEnabled if minfo.isNewsActive() else iconDisabled
-        wvars['features'] = i18nformat('<a href="{}"><img src="{}" border="0"'
-                                       'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
         wvars['tracker_url'] = urljoin(Config.getInstance().getTrackerURL(),

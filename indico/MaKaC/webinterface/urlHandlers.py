@@ -586,10 +586,6 @@ class UHAdminArea(URLHandler):
     _endpoint = 'admin.adminList'
 
 
-class UHAdminSwitchNewsActive(URLHandler):
-    _endpoint = 'admin.adminList-switchNewsActive'
-
-
 class UHAdminsConferenceStyles(URLHandler):
     _endpoint = 'admin.adminConferenceStyles'
 
