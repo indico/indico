@@ -22,10 +22,7 @@ from collections import defaultdict
 
 import pytz
 
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.groups.legacy import GroupWrapper
-from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class Conversion(object):
@@ -97,43 +94,3 @@ class Conversion(object):
         def _url(locator):
             return str(handler.getURL(**locator))
         return _url
-
-    @classmethod
-    def visibility(cls, conf):
-        visibility = conf.getVisibility()
-        path = conf.getOwnerPath()
-        if visibility == 0:
-            id = ""
-            name = "Nowhere"
-        elif visibility > len(path):
-            id = ""
-            name = "Everywhere"
-        else:
-            categ = path[conf.getVisibility()-1]
-            id = categ.getId()
-            name = categ.getTitle()
-        return {'id': id,
-                'name': name}
-
-    @classmethod
-    def allowedList(cls, obj):
-        allowed_emails = []
-        allowed_groups = []
-        for allowed in obj.getRecursiveAllowedToAccessList():
-            if isinstance(allowed, AvatarUserWrapper):
-                allowed_emails.extend(allowed.getEmails())
-            elif isinstance(allowed, EmailPrincipal):
-                allowed_emails.append(allowed.email)
-            elif isinstance(allowed, GroupWrapper):
-                allowed_groups.append(allowed.getId())
-
-        return {'users': allowed_emails,
-                'groups': allowed_groups}
-
-    @classmethod
-    def addLegacyMinutes(cls, result, _obj=None):
-        from indico.modules.events.notes.util import build_note_legacy_api_data
-        data = build_note_legacy_api_data(_obj.note)
-        if data:
-            result.append(data)
-        return result
