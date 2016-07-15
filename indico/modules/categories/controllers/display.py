@@ -455,7 +455,8 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             'previous_month_url': self._other_day_url(self.start_dt - relativedelta(months=1)),
             'next_month_url': self._other_day_url(self.start_dt + relativedelta(months=1)),
             'previous_year_url': self._other_day_url(self.start_dt - relativedelta(years=1)),
-            'next_year_url': self._other_day_url(self.start_dt + relativedelta(years=1))
+            'next_year_url': self._other_day_url(self.start_dt + relativedelta(years=1)),
+            'mathjax': self.detail != 'event'
         }
 
         if self.period == 'day':

@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from markupsafe import escape
 
 from indico.util.i18n import _
+from MaKaC.common.TemplateExec import render
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -45,6 +46,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
         WPMainBase.__init__(self, rh, _protected_object=category, _current_category=category, **kwargs)
         if category:
             self._locTZ = category.display_tzinfo.zone
+        self._mathjax = kwargs.pop('mathjax', False)
 
     def getCSSFiles(self):
         return WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
@@ -61,6 +63,10 @@ class WPCategory(WPJinjaMixin, WPMainBase):
             title = self.atom_feed_title or _("Indico Atom feed")
             head_content += ('<link rel="alternate" type="application/atom+xml" title="{}" href="{}">'
                              .format(escape(title), self.atom_feed_url))
+        if self._mathjax:
+            head_content += render('js/mathjax.config.js.tpl')
+            head_content += '\n'.join('<script src="{0}"></script>'.format(url)
+                                      for url in self._asset_env['mathjax_js'].urls())
         return head_content
 
     def _getNavigationDrawer(self):

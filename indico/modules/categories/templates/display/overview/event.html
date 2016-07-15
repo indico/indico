@@ -16,7 +16,7 @@
                 {{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}
             {% endif %}
         <td class="title">
-            <a href="{{ url_for('event.conferenceDisplay', event) }}">{{ event.title }}</a>
+            <a class="js-mathjax" href="{{ url_for('event.conferenceDisplay', event) }}">{{ event.title }}</a>
             <span class="details">
                 {% if show_chairpersons and event.person_links %}
                     ({{ event.person_links|map(attribute='full_name')|sort|join('; ') }})
@@ -88,7 +88,7 @@
     <tr class="{{ class }}">
         <td class="time">{{ time|format_time(format='HH:mm', timezone=timezone) }}</td>
         <td class="title">
-            {{ title }}
+            <span class="js-mathjax">{{ title }}</span>
             {% if persons %}
                 <span class="persons">
                     ({{ persons|map(attribute='full_name')|join('; ') }})
