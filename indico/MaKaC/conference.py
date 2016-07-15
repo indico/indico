@@ -201,46 +201,6 @@ class CommonObjectBase(CoreObject, Fossilizable):
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
 
-class CategoryManager(ObjectHolder):
-    idxName = "categories"
-    counterName = "CATEGORY"
-
-    def getById(self, id_, quiet=False):
-        orig_id = id_ = str(id_)
-        if is_legacy_id(id_):
-            mapping = LegacyCategoryMapping.find_first(legacy_category_id=id_)
-            id_ = str(mapping.category_id) if mapping is not None else None
-        category = self._getIdx().get(id_) if id_ is not None else None
-        if category is None and not quiet:
-            raise KeyError(id_ if id_ is not None else orig_id)
-        return category
-
-    def add(self, category):
-        ObjectHolder.add(self, category)
-
-    def remove(self, category):
-        ObjectHolder.remove(self, category)
-
-    def _newId(self):
-        """
-        returns a new id for the category
-        the id must not already exist in the collection
-        """
-        id = ObjectHolder._newId(self)
-        while self.hasKey(id):
-            id = ObjectHolder._newId(self)
-        return id
-
-    def getRoot(self):
-        root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key("rootCategory"):
-            r = Category()
-            r.setName("Home")
-            self.add(r)
-            root["rootCategory"] = r
-        return root["rootCategory"]
-
-
 class Category(CommonObjectBase):
     fossilizes(ICategoryFossil)
 
@@ -464,35 +424,6 @@ class Category(CommonObjectBase):
             breadcrumbs.insert(0, cat.getTitle())
             cat = cat.getOwner()
         return breadcrumbs
-
-    def delete(self, deleteConferences=0):
-        """removes completely a category (and all its sub-items) from the
-            system"""
-
-        oldOwner = self.getOwner()
-
-        if self.isRoot():
-            raise MaKaCError(_("Root category cannot be deleted"), _("Category"))
-        if not deleteConferences:
-            if self.getNumConferences() > 0:
-                raise MaKaCError(_("This category still contains some conferences, please remove them first"), _("Category"))
-        for subcateg in self.getSubCategoryList():
-            subcateg.delete(deleteConferences)
-        for conference in self.getConferenceList():
-            self.removeConference(conference, delete=True)
-        self.getOwner()._removeSubCategory(self)
-        CategoryManager().remove(self)
-        for prin in self.__ac.getAccessList():
-            if isinstance(prin, AvatarUserWrapper):
-                prin.unlinkTo(self, "access")
-        for prin in self.__ac.getModifierList():
-            if isinstance(prin, AvatarUserWrapper):
-                prin.unlinkTo(self, "manager")
-        TrashCanManager().add(self)
-
-        # signals.category.deleted.send(self)
-
-        return
 
     def move(self, newOwner):
         pass
