@@ -55,14 +55,6 @@ class RHGeneralInfoModification(RHAdminBase):
         return p.display()
 
 
-class RHAdminSwitchNewsActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchNewsActive
-
-    def _process( self ):
-        self._minfo.setNewsActive( not self._minfo.isNewsActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
-
-
 class RHGeneralInfoPerformModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoPerformModification
 

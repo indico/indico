@@ -46,9 +46,6 @@ class MaKaCInfo(Persistent):
         # Global poster/badge templates
         self._defaultConference = None
 
-        # special features
-        self._newsActive = False
-
         # template set
         self._defaultTemplateSet = None
 
@@ -138,16 +135,6 @@ class MaKaCInfo(Persistent):
 
     def getTitle( self ):
         return self._title
-
-    def isNewsActive( self ):
-        if hasattr( self, "_newsActive" ):
-            return self._newsActive
-        else:
-            self._newsActive = False
-            return False
-
-    def setNewsActive( self, bool=True ):
-        self._newsActive = bool
 
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
