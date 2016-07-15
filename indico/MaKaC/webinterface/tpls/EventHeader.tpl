@@ -16,7 +16,7 @@ else:
 % if Config.getInstance().getMobileURL():
     <%include file="MobileDetection.tpl" args="conf=conf"/>
 % endif
-<%include file="Announcement.tpl"/>
+${ template_hook('global-announcement') }
 
 <div class="page-header ${"page-header-dark" if dark_ else ""}">
 

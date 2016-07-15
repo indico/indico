@@ -6,7 +6,7 @@
     category = getattr(currentCategory, 'as_new', currentCategory) if currentCategory else None
 %>
 
-<%include file="Announcement.tpl"/>
+${ template_hook('global-announcement') }
 
 <div class="page-header clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>

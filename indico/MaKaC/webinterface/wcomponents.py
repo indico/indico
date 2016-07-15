@@ -43,7 +43,6 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.db import DBMgr, db
-from indico.modules.announcement import announcement_settings
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
@@ -51,7 +50,6 @@ from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
-from indico.util.string import crc32
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
@@ -321,9 +319,6 @@ class WHeader(WTemplated):
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
         vars["getProtection"] = lambda x: self._getProtection(x)
 
-        announcement_header = announcement_settings.get('message') if announcement_settings.get('enabled') else ''
-        vars["announcement_header"] = announcement_header
-        vars["announcement_header_hash"] = crc32(announcement_header)
         vars["show_contact"] = config.getPublicSupportEmail() is not None
 
         return vars
