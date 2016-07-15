@@ -18,23 +18,20 @@
 (function(global) {
     'use strict';
 
-    $(document).ready(function() {
-        setupCategoryMoveButton();
-    });
+    // Category cache
+    var _categories = {};
 
-    function setupCategoryMoveButton() {
+    global.setupCategoryMoveButton = function setupCategoryMoveButton(parentCategoryId) {
+        if (parentCategoryId) {
+            _fetchSourceCategory(parentCategoryId);
+        }
         $('.js-move-category').on('click', function(evt) {
-            evt.preventDefault();
-            ajaxDialog({
-                url: $(this).data('move-url'),
-                method: 'POST',
-                title: $T.gettext("Move category"),
-                closeButton: $T.gettext("Cancel")
-            });
+            _moveCategories(_categories[parentCategoryId], $(this).data('href'));
         });
-    }
+    };
 
-    global.setupCategoryTable = function setupCategoryTable() {
+    global.setupCategoryTable = function setupCategoryTable(categoryId) {
+        _fetchSourceCategory(categoryId);
         var $table = $('table.category-management');
         var $tbody = $table.find('tbody');
         var $bulkDeleteButton = $('.js-bulk-delete-category');
@@ -57,6 +54,20 @@
                 duration: 10000,
                 message: $T.gettext("The category list has been sorted.")
             });
+        });
+
+        $bulkMoveButton.on('click', function(evt) {
+            evt.preventDefault();
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            _moveCategories(_categories[categoryId], $(this).data('href'), {
+                category_id: getSelectedCategories()
+            });
+        });
+
+        $table.find('.js-move-category').on('click', function(evt) {
+            _moveCategories(_categories[categoryId], $(this).data('href'));
         });
 
         $table.find('.js-delete-category').on('indico:confirmed', function(evt) {
@@ -94,7 +105,7 @@
         });
 
         enableIfChecked($tbody, checkboxSelector, $bulkMoveButton);
-        $bulkMoveButton.on('click', bulkMoveCategories).qtip({
+        $bulkMoveButton.qtip({
             suppress: false,
             content: {
                 text: getBulkMoveButtonTooltipContent
@@ -199,18 +210,6 @@
             }
         }
 
-        function bulkMoveCategories() {
-            ajaxDialog({
-                url: $table.data('bulk-move-url'),
-                method: 'POST',
-                title: $T.gettext("Move categories"),
-                closeButton: $T.gettext("Cancel"),
-                data: {
-                    category_id: getSelectedCategories()
-                }
-            });
-        }
-
         function getSelectedCategories() {
             return $table.find(categoryRowSelector).find(checkboxSelector + ':checked').map(function() {
                 return this.value;
@@ -222,52 +221,19 @@
         }
     };
 
-    global.setupCategoryEventList = function setupCategoryEventsList() {
+    global.setupCategoryEventList = function setupCategoryEventList(categoryId) {
+        _fetchSourceCategory(categoryId);
         enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
-
-        function moveToCategory(element, data) {
-            var categoryId = $('.event-management').data('category-id');
-            $('<div>').categorynavigator({
-                categoryId: categoryId,
-                actionOn: {
-                    categoriesWithSubcategories: {
-                        disabled: true
-                    },
-                    categories: {
-                        disabled: true,
-                        ids: [categoryId]
-                    }
-                },
-                openInDialog: true,
-                onAction: function(category) {
-                    var msg = $T.gettext('You are about to move some events to the category "{0}". Are you sure you want to proceed?').format(category.title);
-                    confirmPrompt(msg, $T.gettext('Move events')).then(function() {
-                        $.ajax({
-                            url: element.data('href'),
-                            type: 'POST',
-                            data: $.extend({'target_category_id': category.id}, data || {}),
-                            error: handleAjaxError,
-                            success: function(data) {
-                                if (data.success) {
-                                    location.reload();
-                                }
-                            }
-                        });
-                    });
-                }
-            });
-        }
 
         $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
             evt.preventDefault();
-            moveToCategory($(this));
+            _moveEvents(_categories[categoryId], $(this).data('href'));
         });
 
         $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
             evt.preventDefault();
 
-            var $this = $(this);
-            if ($this.hasClass('disabled')) {
+            if ($(this).hasClass('disabled')) {
                 return;
             }
 
@@ -280,7 +246,7 @@
                 });
             }
 
-            moveToCategory($this, data);
+            _moveEvents(_categories[categoryId], $(this).data('href'), data);
         });
 
         var isEverythingSelected = paginatedSelectAll({
@@ -301,4 +267,99 @@
             }
         }).isEverythingSelected;
     };
+
+    function _fetchSourceCategory(categoryId) {
+        if (_categories[categoryId] === undefined) {
+            _categories[categoryId] = categoryId;
+            $.ajax({
+                url: build_url(Indico.Urls.Categories.info, {category_id: categoryId}),
+                dataType: 'json',
+                error: handleAjaxError,
+                success: function(data) {
+                    _categories[categoryId] = data;
+                }
+            });
+        }
+    }
+
+    function _moveCategories(source, endpoint, data) {
+        var sourceId = _.isObject(source) ? source.category.id : source;
+        var category_count = data ? data.category_id.length : 1;
+
+        $('<div>').categorynavigator({
+            category: source,
+            confirmation: true,
+            openInDialog: true,
+            actionButtonText: $T.gettext("Move here"),
+            dialogTitle: $T.ngettext("Move category", "Move categories", category_count),
+            dialogSubtitle: $T.ngettext("Select new category parent for the category",
+                                        "Select new category parent for {0} selected categories".format(category_count),
+                                         category_count),
+            actionOn: {
+                categoriesWithEvents: {disabled: true},
+                categories: {
+                    disabled: true,
+                    // TODO disable also selected categories
+                    ids: [sourceId],
+                    message: $T.ngettext("The category is already here",
+                                         "Selected categories are already here",
+                                         category_count)
+                }
+            },
+            onAction: function(category) {
+                $.ajax({
+                    url: endpoint,
+                    type: 'POST',
+                    data: $.extend({'target_category_id': category.id}, data || {}),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        if (data.success) {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function _moveEvents(source, endpoint, data) {
+        var sourceId = _.isObject(source) ? source.category.id : source;
+        var eventCount = data ? data.event_id.length : 1;
+
+        $('<div>').categorynavigator({
+            category: source,
+            confirmation: true,
+            openInDialog: true,
+            actionButtonText: $T.gettext("Move here"),
+            dialogTitle: $T.ngettext("Move event", "Move events", eventCount),
+            dialogSubtitle: $T.ngettext("Select category destination for the event",
+                                        "Select category destination for {0} selected events".format(eventCount),
+                                        eventCount),
+            actionOn: {
+                categoriesWithSubcategories: {
+                    disabled: true
+                },
+                categories: {
+                    disabled: true,
+                    ids: [sourceId],
+                    message: $T.ngettext("The event is already here",
+                                         "The selected events are already here",
+                                         eventCount)
+                }
+            },
+            onAction: function(category) {
+                $.ajax({
+                    url: endpoint,
+                    type: 'POST',
+                    data: $.extend({'target_category_id': category.id}, data || {}),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        if (data.success) {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        });
+    }
 })(window);
