@@ -505,26 +505,6 @@ class UHTrackAbstractModIntComments(UHTrackAbstractBase):
     _endpoint = 'event_mgmt.trackAbstractModif-comments'
 
 
-class UHConfModifAC(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC'
-
-
-class UHConfSetVisibility(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-setVisibility'
-
-
-class UHConfGrantSubmissionToAllSpeakers(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-grantSubmissionToAllSpeakers'
-
-
-class UHConfRemoveAllSubmissionRights(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-removeAllSubmissionRights'
-
-
-class UHConfGrantModificationToAllConveners(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-grantModificationToAllConveners'
-
-
 class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 

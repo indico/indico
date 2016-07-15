@@ -26,18 +26,15 @@ from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
-from MaKaC import conference
 from MaKaC.common import info
-from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.url import URL
 from indico.core.config import Config
-from MaKaC.conference import Conference, Category
+from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common import utils
 from MaKaC.errors import MaKaCError
 from MaKaC.common.ContextHelp import ContextHelp
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.TemplateExec as templateEngine
 
@@ -263,13 +260,8 @@ class WHeader(WTemplated):
             return self._get_protection_new(target.as_event)
         elif isinstance(target, db.m.Category):
             return self._get_protection_new(target)
-        else:  # legacy Category
-            if target.isProtected():
-                return ["Restricted", _("Restricted")]
-            domain_list = target.getAccessController().getAnyDomainProtection()
-            if domain_list:
-                return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
-            return ["Public", _("Public")]
+        else:
+            raise TypeError('Unexpected object: {}'.format(target))
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
@@ -317,7 +309,7 @@ class WHeader(WTemplated):
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
-        vars["getProtection"] = lambda x: self._getProtection(x)
+        vars["getProtection"] = self._getProtection
 
         vars["show_contact"] = config.getPublicSupportEmail() is not None
 
@@ -786,151 +778,6 @@ class WConferenceModifFrame(WTemplated):
         vars["endDate"] = utils.formatDateTime(self.__conf.getAdjustedEndDate(), format="d MMM")
 
         return vars
-
-class WAccessControlFrameBase(WTemplated):
-
-    def _getAccessControlFrametParams( self ):
-        vars = {}
-        if self._target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "PUBLIC"
-            vars["statusColor"] = "#128F33"
-        elif self._target.isItselfProtected():
-            vars["privacy"] = "RESTRICTED"
-            vars["statusColor"] = "#B02B2C"
-        else :
-            vars["privacy"] = "INHERITING"
-            vars["statusColor"] = "#444444"
-
-        if isinstance(self._target, Category) and self._target.isRoot():
-            vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
-        else:
-            if isinstance(self._target, Conference):
-                vars["parentName"] = self._target.getOwner().getName()
-            else:
-                vars["parentName"] = self._target.getOwner().getTitle()
-            if self._target.hasProtectedOwner():
-                    vars["parentPrivacy"] = "RESTRICTED"
-                    vars["parentStatusColor"] = "#B02B2C"
-            else :
-                    vars["parentPrivacy"] = "PUBLIC"
-                    vars["parentStatusColor"] = "#128F33"
-
-        vars["locator"] = self._target.getLocator().getWebForm()
-        return vars
-
-class WAccessControlFrame(WAccessControlFrameBase):
-
-    def getHTML( self, target, setVisibilityURL, type ):
-        self._target = target
-
-        params = { "setPrivacyURL": setVisibilityURL,\
-                   "target": target,\
-                   "type": type }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars.update(self._getAccessControlFrametParams())
-        return vars
-
-
-class WConfAccessControlFrame(WAccessControlFrameBase):
-
-    def getHTML( self, target, setVisibilityURL):
-        self._target = target
-        params = { "target": target,\
-                   "setPrivacyURL": setVisibilityURL,\
-                   "type": "Event" }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["accessKey"] = self._target.getAccessKey()
-        vars.update(self._getAccessControlFrametParams())
-        return vars
-
-class WModificationControlFrame(WTemplated):
-
-    def getHTML( self, target ):
-        self.__target = target
-        return  WTemplated.getHTML( self )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        return vars
-
-
-class WConfModificationControlFrame(WTemplated):
-
-    def _getManagersList(self):
-        return fossilize(self.__target.getManagerList())
-
-    def getHTML(self, target):
-        self.__target = target
-        params = { "target": target }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["confId"] = self.__target.getId()
-        vars["managers"] = self._getManagersList()
-        return vars
-
-class WConfRegistrarsControlFrame(WTemplated):
-
-    def getHTML(self, target):
-        self.__target = target
-        params = {}
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["confId"] = self.__target.getId()
-        vars["registrars"] = fossilize(self.__target.getRegistrarList())
-        return vars
-
-
-class WConfProtectionToolsFrame(WTemplated):
-
-    def __init__( self, target ):
-        self._target = target
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["grantSubmissionToAllSpeakersURL"] = str(urlHandlers.UHConfGrantSubmissionToAllSpeakers.getURL(self._target))
-        vars["removeAllSubmissionRightsURL"] = str(urlHandlers.UHConfRemoveAllSubmissionRights.getURL(self._target))
-        vars["grantModificationToAllConvenersURL"] = str(urlHandlers.UHConfGrantModificationToAllConveners.getURL(self._target))
-        return vars
-
-class WDomainControlFrame(WTemplated):
-
-    def __init__(self, target):
-        self._target = target
-
-    def getVars(self):
-        tpl_vars = WTemplated.getVars(self)
-
-        if isinstance(self._target, conference.Conference):
-            tpl_vars['method'] = 'event.protection.toggleDomains'
-            event = self._target
-        else:
-            tpl_vars['method'] = 'category.protection.toggleDomains'
-            event = None
-
-        ac = self._target.getAccessController()
-        inheriting = (ac.getAccessProtectionLevel() == 0) and (self._target.getOwner() is not None)
-        domain_list = ac.getAnyDomainProtection() if inheriting else self._target.getDomainList()
-
-        tpl_vars["inheriting"] = inheriting
-        tpl_vars["domains"] = dict((dom, dom in domain_list)
-                                   for dom in domain.DomainHolder().getList())
-        tpl_vars["locator"] = self._target.getLocator().getWebForm()
-        tpl_vars["target"] = self._target
-        tpl_vars["event"] = event
-
-        return tpl_vars
 
 
 class WConfirmation(WTemplated):

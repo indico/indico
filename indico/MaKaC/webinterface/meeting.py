@@ -14,20 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import urllib
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
-from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
-from MaKaC.i18n import _
 from indico.modules.events.cloning import EventCloner
-from indico.util.i18n import i18nformat
-from indico.util.date_time import format_date
 
 
 class WebFactory(WebFactory):
@@ -58,10 +53,6 @@ class WebFactory(WebFactory):
     @staticmethod
     def getConfModif(rh, conf):
         return WPMConfModif(rh, conf)
-
-    @staticmethod
-    def getConfModifAC(rh, conf):
-        return WPMConfModifAC(rh, conf)
 
     @staticmethod
     def getConfClone(rh, conf):
@@ -101,11 +92,6 @@ class WPMConfModif(conferences.WPConferenceModification):
 
 
 class WMConfModifMainData(conferences.WConfModifMainData):
-    pass
-
-
-##Access Control ##
-class WPMConfModifAC(conferences.WPConfModifAC):
     pass
 
 

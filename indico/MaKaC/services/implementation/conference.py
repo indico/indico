@@ -19,48 +19,34 @@
 Asynchronous request handlers for conference-related data modification.
 """
 
-# 3rd party imports
-from flask import session
-from indico.modules.events.layout import layout_settings
-from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
-
 import datetime
 
 from sqlalchemy.orm import joinedload
 
-# legacy indico imports
-from MaKaC.i18n import _
-from MaKaC import domain, conference as conference
+from indico.core.logger import Logger
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.models.events import EventType
+from indico.modules.events.util import track_time_changes
+from indico.util.string import to_unicode
+from indico.util.i18n import _
 
-from MaKaC.common import indexes, filters
+from MaKaC import conference as conference
+from MaKaC.common import filters
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
-from indico.core.logger import Logger
-
 from MaKaC.errors import TimingError
 from MaKaC.fossils.reviewing import IReviewManagerFossil
-
+from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
-
 from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
-                                                ProtectedDisplayService, ServiceBase, TextModificationBase,
-                                                HTMLModificationBase, ExportToICalBase)
+                                                TextModificationBase, HTMLModificationBase)
 from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning, ServiceError,
                                                  TimingNoReportError, Warning)
-
-
-# indico imports
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.layout import theme_settings
-from indico.modules.events.models.events import EventType
-from indico.modules.events.util import track_time_changes
-from indico.util.string import to_unicode
-from indico.util.user import principal_from_fossil, principal_is_only_for_user
-from indico.web.http_api.util import generate_public_auth_request
 
 
 def _serialize_contribution(contrib):
@@ -116,13 +102,6 @@ class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
     def _checkParams(self):
         ConferenceBase._checkParams(self)
         ProtectedModificationService._checkParams(self)
-
-
-class ConferenceDisplayBase(ProtectedDisplayService, ConferenceBase):
-
-    def _checkParams(self):
-        ConferenceBase._checkParams(self)
-        ProtectedDisplayService._checkParams(self)
 
 
 class ConferenceTextModificationBase(TextModificationBase, ConferenceModifBase):
@@ -477,84 +456,6 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
 #############################
 
 
-class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
-    def _getAnswer(self):
-        afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
-        afmDict = dict([(i, fossilize(f)) for i, f in enumerate(afm.getFields())])
-        cTypes = self._target.getContribTypeList()
-        cTypesDict = dict([(ct.getId(), ct.getName()) for ct in cTypes])
-        return [afmDict, cTypesDict]
-
-
-class ConferenceProtectionUserList(ConferenceModifBase):
-
-    def _getAnswer(self):
-        # will use IAvatarFossil or IGroupFossil
-        return fossilize(self._conf.getAllowedToAccessList())
-
-
-class ConferenceProtectionAddUsers(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
-        self._user = self.getAW().getUser()
-
-    def _getAnswer(self):
-        for principal in self._principals:
-            self._conf.grantAccess(principal)
-        return fossilize(self._conf.getAccessController().getAccessList())
-
-
-class ConferenceProtectionRemoveUser(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
-        self._user = self.getAW().getUser()
-
-    def _getAnswer(self):
-        self._conf.revokeAccess(self._principal)
-
-
-class ConferenceProtectionToggleDomains(ConferenceModifBase):
-
-    def _checkParams(self):
-        self._params['confId'] = self._params['targetId']
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._domainId = pm.extract("domainId", pType=str)
-        self._add = pm.extract("add", pType=bool)
-
-    def _getAnswer(self):
-        dh = domain.DomainHolder()
-        d = dh.getById(self._domainId)
-        if self._add:
-            self._target.requireDomain(d)
-        elif not self._add:
-            self._target.freeDomain(d)
-
-
-class ConferenceProtectionSetAccessKey(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._accessKey = self._params.get("accessKey", "")
-
-    def _getAnswer(self):
-        self._conf.setAccessKey(self._accessKey)
-
-
-class ConferenceContactInfoModification( ConferenceTextModificationBase ):
-    """
-    Conference contact email modification
-    """
-    def _handleSet(self):
-        self._target.getAccessController().setContactInfo(self._value)
-    def _handleGet(self):
-        return self._target.getAccessController().getContactInfo()
-
-
 class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
     """
     Conference program description modification
@@ -572,59 +473,6 @@ class ConferenceManagerListBase(ConferenceModifBase):
         return fossilize(self._conf.getManagerList())
 
 
-class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
-
-    def _checkParams(self):
-        ConferenceManagerListBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._principals = (principal_from_fossil(f, allow_pending=True, legacy=False)
-                            for f in pm.extract("userList", pType=list, allowEmpty=False))
-
-    def _getAnswer(self):
-        for principal in self._principals:
-            self._conf.as_event.update_principal(principal, full_access=True)
-        return self._getManagersList()
-
-
-class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
-    def _getAnswer(self):
-        principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True,
-                                          allow_emails=True)
-        event = self._conf.as_event
-        if not self._params.get('force') and principal_is_only_for_user(event.acl_entries, session.user, principal):
-            # this is pretty ugly, but the user list manager widget is used in multiple
-            # places so like this we keep the changes to the legacy widget to a minimum
-            return 'confirm_remove_self'
-        event.update_principal(principal, full_access=False)
-        return self._getManagersList()
-
-
-class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._principals = [principal_from_fossil(f, allow_pending=True, legacy=False)
-                            for f in pm.extract("userList", pType=list, allowEmpty=False)]
-
-    def _getAnswer(self):
-        for principal in self._principals:
-            self._conf.as_event.update_principal(principal, add_roles={'registration'})
-        return fossilize(self._conf.getRegistrarList())
-
-
-class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
-
-    def _checkParams(self):
-        ConferenceManagerListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True,
-                                                allow_emails=True)
-
-    def _getAnswer(self):
-        self._conf.as_event.update_principal(self._principal, del_roles={'registration'})
-        return fossilize(self._conf.getRegistrarList())
-
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,
@@ -640,16 +488,5 @@ methodMap = {
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
     "program.changeDescription": ConferenceProgramDescriptionModification,
-    "contributions.list": ConferenceListContributionsReview,
-    "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
-    "protection.getAllowedUsersList": ConferenceProtectionUserList,
-    "protection.addAllowedUsers": ConferenceProtectionAddUsers,
-    "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
-    "protection.toggleDomains": ConferenceProtectionToggleDomains,
-    "protection.setAccessKey": ConferenceProtectionSetAccessKey,
-    "protection.changeContactInfo": ConferenceContactInfoModification,
-    "protection.addExistingManager": ConferenceProtectionAddExistingManager,
-    "protection.removeManager": ConferenceProtectionRemoveManager,
-    "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
-    "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar
+    "contributions.list": ConferenceListContributionsReview
 }

@@ -258,45 +258,14 @@ class ServiceBase(RequestHandlerBase):
 
 
 class ProtectedService(ServiceBase):
-    """
-    ProtectedService is a parent class for ProtectedDisplayService and ProtectedModificationService
-    """
-
     def _checkSessionUser(self):
         """
         Checks that the current user exists (is authenticated)
         """
 
-        if self._getUser() == None:
+        if self._getUser() is None:
             self._doProcess = False
             raise ServiceAccessError("You are currently not authenticated. Please log in again.")
-
-
-class ProtectedDisplayService(ProtectedService):
-    """
-    A ProtectedDisplayService can only be accessed by users that
-    are authorized to "see" the target resource
-    """
-
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection, assuring that
-        the user is authorized to view the target resource
-        """
-        if not self._target.canAccess( self.getAW() ):
-            from MaKaC.conference import Resource
-            # in some cases, the target does not directly have an owner
-            if isinstance(self._target, Resource):
-                target = self._target.getOwner()
-            else:
-                target = self._target
-            if not isinstance(target, Category):
-                if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
-                    raise ServiceAccessError("You are currently not authenticated or cannot access this service. Please log in again if necessary.")
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise ServiceAccessError("You cannot access this service. Please log in again if necessary.")
 
 
 class LoggedOnlyService(ProtectedService):

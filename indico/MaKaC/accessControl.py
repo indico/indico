@@ -161,24 +161,6 @@ class AccessController(Persistent):
             self._p_changed = 1
         # signals.acl.access_revoked.send(self, principal=principal)
 
-    def setAccessKey( self, key="" ):
-        self.accessKey = key
-
-    def getAccessKey( self ):
-        try:
-            return self.accessKey
-        except:
-            self.setAccessKey()
-            return ""
-
-    def canKeyAccess( self, key ):
-        """
-        """
-        if self.getAccessKey()!="":
-            if key == self.getAccessKey():
-                return True
-        return False
-
     @classmethod
     def isHarvesterIP( cls, ip ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

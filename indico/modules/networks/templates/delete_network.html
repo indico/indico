@@ -28,7 +28,7 @@
             {% endfor %}
             {% for event in events %}
                 <li>
-                    <a href="{{ url_for('event_mgmt.confModifAC', event) }}" target="_blank">
+                    <a href="{{ url_for('event_management.protection', event) }}" target="_blank">
                         {{ event.title|strip_tags }}
                     </a>
                 </li>
