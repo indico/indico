@@ -25,7 +25,7 @@
 {% macro move_category_button(category, classes="i-button") %}
     <a class="{{ classes }} icon-transmission js-move-category"
        title="{% trans %}Move to another category{% endtrans %}"
-       data-move-url="{{ url_for('categories.move', category) }}"></a>
+       data-href="{{ url_for('categories.move', category) }}"></a>
 {% endmacro %}
 
 {% block banner_title %}
@@ -41,6 +41,9 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        setupCategoryMoveButton({{ category.parent.id }});
+    </script>
 {% endblock %}
 
 {% block side_menu %}

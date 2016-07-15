@@ -52,7 +52,8 @@
                     title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
         </div>
         <div class="group right">
-            <button class="i-button icon-transmission js-bulk-move-category"></button>
+            <button class="i-button icon-transmission js-bulk-move-category"
+                    data-href="{{ url_for('categories.move_subcategories', category) }}"></button>
             <button class="i-button icon-remove js-bulk-delete-category"></button>
         </div>
     </div>
@@ -99,7 +100,7 @@
         {% if subcategories %}
             {{ subcategories_table(subcategories) }}
             <script>
-                setupCategoryTable();
+                setupCategoryTable({{ category.id }});
             </script>
         {% endif %}
         {% if events.total %}
@@ -114,7 +115,7 @@
             {% endif %}
             {{ render_events_list(category, page, order_column, direction, events) }}
             <script>
-                setupCategoryEventList();
+                setupCategoryEventList({{ category.id }});
             </script>
         {% endif %}
     {% endif %}

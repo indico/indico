@@ -276,15 +276,9 @@ class RHMoveCategory(RHMoveCategoryBase):
                 raise BadRequest(_("Cannot move the category in a descendant of itself."))
 
     def _process(self):
-        if self.target_category is None:
-            return jsonify_template('categories/management/move_category_contents.html', categories=[self.category],
-                                    submit_url=url_for('.move', self.category))
-        if 'confirmed' in request.form:
-            move_category(self.category, self.target_category)
-            flash(_('Category "{}" moved to "{}".').format(self.category.title, self.target_category.title), 'success')
-            return jsonify_data(flash=False)
-        return jsonify_template('categories/management/move_categories.html', categories=[self.category],
-                                category_ids=[self.category.id], target_category=self.target_category)
+        move_category(self.category, self.target_category)
+        flash(_('Category "{}" moved to "{}".').format(self.category.title, self.target_category.title), 'success')
+        return jsonify_data(flash=False)
 
 
 class RHDeleteSubcategories(RHManageCategoryBase):
@@ -325,18 +319,11 @@ class RHMoveSubcategories(RHMoveCategoryBase):
                 raise BadRequest(_("Cannot move a category in a descendant of itself."))
 
     def _process(self):
-        if self.target_category is None:
-            return jsonify_template('categories/management/move_category_contents.html', categories=self.subcategories,
-                                    submit_url=url_for('.move_subcategories', self.category),
-                                    category_ids=[x.id for x in self.subcategories])
-        if 'confirmed' in request.form:
-            for subcategory in self.subcategories:
-                move_category(subcategory, self.target_category)
-            flash(ngettext('{} category moved in "{}".', '{} categories moved in "{}".', len(self.subcategories))
-                  .format(len(self.subcategories), self.target_category.title), 'success')
-            return jsonify_data(flash=False)
-        return jsonify_template('categories/management/move_categories.html', categories=self.subcategories,
-                                category_ids=[x.id for x in self.subcategories], target_category=self.target_category)
+        for subcategory in self.subcategories:
+            move_category(subcategory, self.target_category)
+        flash(ngettext('{0} category moved to "{1}".', '{0} categories moved to "{1}".', len(self.subcategories))
+              .format(len(self.subcategories), self.target_category.title), 'success')
+        return jsonify_data(flash=False)
 
 
 class RHSortSubcategories(RHManageCategoryBase):
