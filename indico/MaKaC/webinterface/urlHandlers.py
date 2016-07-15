@@ -20,7 +20,6 @@ import urlparse
 from flask import g, has_request_context, request
 
 from MaKaC.common.url import URL, EndpointURL
-from MaKaC.common.timezoneUtils import nowutc
 
 from indico.core.config import Config
 from indico.web.flask.util import url_for
@@ -164,23 +163,6 @@ class UHConferenceHelp(URLHandler):
     _endpoint = 'misc.help'
 
 
-class UHCalendar(URLHandler):
-    _endpoint = 'category.wcalendar'
-
-    @classmethod
-    def getURL(cls, categList=None):
-        url = cls._getURL()
-        if not categList:
-            categList = []
-        lst = [categ.getId() for categ in categList]
-        url.addParam('selCateg', lst)
-        return url
-
-
-class UHCalendarSelectCategories(URLHandler):
-    _endpoint = 'category.wcalendar-select'
-
-
 class UHConferenceCreation(URLHandler):
     _endpoint = 'event_creation.conferenceCreation'
 
@@ -212,10 +194,6 @@ class UHConferenceOverview(URLHandler):
 
 class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
-
-
-class UHCategoryIcon(URLHandler):
-    _endpoint = 'category.categoryDisplay-getIcon'
 
 
 class UHConferenceModification(URLHandler):
@@ -693,42 +671,6 @@ class UHCategoryDisplay(URLHandler):
         return url
 
 
-class UHCategoryMap(URLHandler):
-    _endpoint = 'category.categoryMap'
-
-
-class UHCategoryOverview(URLHandler):
-    _endpoint = 'category.categOverview'
-
-    @classmethod
-    def getURLFromOverview(cls, ow):
-        url = cls.getURL()
-        url.setParams(ow.getLocator())
-        return url
-
-    @classmethod
-    def getWeekOverviewUrl(cls, categ):
-        url = cls.getURL(categ)
-        p = {"day": nowutc().day,
-             "month": nowutc().month,
-             "year": nowutc().year,
-             "period": "week",
-             "detail": "conference"}
-        url.addParams(p)
-        return url
-
-    @classmethod
-    def getMonthOverviewUrl(cls, categ):
-        url = cls.getURL(categ)
-        p = {"day": nowutc().day,
-             "month": nowutc().month,
-             "year": nowutc().year,
-             "period": "month",
-             "detail": "conference"}
-        url.addParams(p)
-        return url
-
-
 class UHGeneralInfoModification(URLHandler):
     _endpoint = 'admin.generalInfoModification'
 
@@ -1016,10 +958,6 @@ class UHAnnouncementSave(URLHandler):
 
 class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
-
-
-class UHCategoryCalendarOverview(URLHandler):
-    _endpoint = 'category.wcalendar'
 
 
 # URL Handlers for Printing and Design
@@ -1360,7 +1298,6 @@ class UHHelper(object):
     """
 
     modifUHs = {
-        "Category": UHCategoryModification,
         "Conference": UHConferenceModification,
         "DefaultConference": UHConferenceModification,
         "Track": UHTrackModification,
@@ -1368,10 +1305,6 @@ class UHHelper(object):
     }
 
     displayUHs = {
-        "Category": UHCategoryDisplay,
-        "CategoryMap": UHCategoryMap,
-        "CategoryOverview": UHCategoryOverview,
-        "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
         "Abstract": UHAbstractDisplay
     }

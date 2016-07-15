@@ -269,116 +269,6 @@ a.img:active {
    margin-bottom: 2px;
 }
 
-.categoryTitle {
-    border-bottom: 2px solid rgb(170, 170, 170);
-    font-size: 34px;
-    font-family: Georgia, Times, Times New Roman;
-    color: #B14300;
-    font-weight: normal;
-    margin: 0;
-    margin-bottom: 10px;
-    padding: 0;
-}
-
-
-.categoryHeader {
-    margin-bottom: 0px;
-}
-
-.categoryHeader a {
-    font-size: 14px;
-}
-
-.categoryHeader ul {
-    color: #AAA;
-    margin: 20px 0 0 0;
-    float: right;
-    list-style-type: none;
-}
-
-.categoryHeader li {
-    display: inline;
-    padding: 3px 0;
-}
-
-.categoryMap {
-}
-
-.categoryMap a {
-    font-size: 14px;
-    line-height: 1.6em;
-}
-
-/* styles used for the category overview page */
-
-.categoryOverview {
-    margin-top: 0px;
-}
-
-.categoryOverview table.item {
-    border-bottom: 1px dotted #AAAAAA;
-    margin-bottom: 0px;
-    background-color: white;
-    width: 100%;
-}
-
-.categoryOverview table.item td.time {
-    vertical-align: top;
-    text-align: left;
-    padding: 3px;
-    padding-right: 5px;
-    font-style: italic;
-    font-size: 1.0em;
-}
-
-.categoryOverview table.item td.title {
-    vertical-align: top;
-    text-align: left;
-    padding: 3px;
-    width: 100%;
-    font-size: 1.0em;
-}
-
-.categoryOverview table.subItem {
-    border-top: 1px dashed #AAA;
-    padding: 3px 0;
-    width: 100%;
-}
-
-.categoryOverview table.subItem td.time {
-    vertical-align: top;
-    text-align: left;
-    padding: 2px 5px;
-    font-style: italic;
-    font-size: 0.85em;
-}
-
-.categoryOverview table.subItem td.title {
-    vertical-align: top;
-    text-align: left;
-    width: 100%;
-    padding: 2px;
-    font-size: 0.9em;
-    text-align: left;
-}
-
-.categoryOverview table.subItem td.title a {
-    font-size: 1.0em;
-}
-
-.categoryOverview table.subItem td.title span {
-    font-size: 0.9em;
-}
-
-.categoryOverview .dayOverview table.item {
-    font-size: 1.2em;
-}
-
-.categoryOverview .dayOverview table.subItem {
-    font-size: 1.2em;
-    margin-left: 20px;
-}
-
 .menutitle {
 
    font-weight: bold;
@@ -1066,12 +956,6 @@ a.confSubSection:hover {
    color:#444;
    cursor:pointer;
    font-weight: bold;
-}
-
-.categoryManagers {
-    font-size: 13px;
-    color: #444;
-    margin-top: 5px;
 }
 
 .ACtab {
@@ -2733,14 +2617,6 @@ ul.keywordList li.multipleLinesListItem_last {
     color: #881122;
 }
 
-.categoryWarning p.warningText {
-    padding: 15px;
-    border: 1px solid #ddd;
-    margin-left: 15%;
-    width: 600px;
-    border-radius: 5px;
-}
-
 .successText {
     color: #118822;
 }
@@ -3642,10 +3518,6 @@ ul.globalMenuPopupList li a:hover {
     list-style-type:none;
     color: white;
     background: #5fa5d4;
-}
-
-ul.categoryDisplayPopupList li a {
-    font-size: 14px;
 }
 
 ul.popupListCheckboxes {

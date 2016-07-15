@@ -18,17 +18,13 @@ import json
 import re
 from datetime import timedelta, datetime
 
-from flask import session, request
+from flask import session
 from pytz import timezone
 
-from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.url import ShortURLMapper
-import MaKaC.webinterface.rh.base as base
-import MaKaC.webinterface.locators as locators
-import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
-from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
+from MaKaC.errors import MaKaCError, FormValuesError
 import MaKaC.conference as conference
 from indico.core import signals
 from indico.core.config import Config
@@ -36,14 +32,12 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories.controllers.base import RHCreateEventBase
-from indico.modules.categories.serialize import serialize_category_ical, serialize_category_atom
 from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
@@ -51,73 +45,8 @@ from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
-from indico.util.date_time import now_utc
-from indico.util.fs import secure_filename
-from indico.web.flask.util import send_file, endpoint_for_url, url_for
+from indico.web.flask.util import endpoint_for_url
 
-
-class RHCategDisplayBase(base.RHDisplayBaseProtected):
-    def _checkParams(self, params, mustExist=True):
-        if "categId" in params:
-            params["categId"] = escape_html(str(params["categId"]))
-        # TODO: Workaround to avoid breaking the category navigation (display)
-        if 'category' in params:
-            params['categId'] = str(json.loads(params['category'])['id'])
-        l = locators.CategoryWebLocator(params, mustExist)
-        self._target = l.getObject()
-
-        # throw an error if the category was not found
-        if mustExist and self._target is None:
-            raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
-                                params["categId"]),
-                                title=_("Category not found"))
-
-
-class RHCategoryDisplay(RHCategDisplayBase):
-    _uh = urlHandlers.UHCategoryDisplay
-
-    def _process(self):
-        p = category.WPCategoryDisplay(self, self._target)
-        return p.display()
-
-
-class RHCategoryMap( RHCategDisplayBase ):
-    _uh = urlHandlers.UHCategoryMap
-
-    def _process( self ):
-        p = category.WPCategoryMap( self, self._target )
-        return p.display()
-
-
-class RHCategOverviewDisplay(RHCategDisplayBase):
-
-    def _checkParams( self, params ):
-        id = params.get("selCateg", "")
-        if id != "" and not params.has_key("categId"):
-            params["categId"] = id
-        RHCategDisplayBase._checkParams( self, params )
-        if not self._target:
-            raise MaKaCError( _("wrong category identifier"))
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        month = int( params.get("month", nowutc().astimezone(timezone(tz)).month) )
-        year = int( params.get("year", nowutc().astimezone(timezone(tz)).year) )
-        day = int( params.get("day", nowutc().astimezone(timezone(tz)).day) )
-        sd = timezone(tz).localize(datetime( year, month, day ))
-        period = params.get("period", "day")
-        if period == "month":
-            self._cal = wcalendar.MonthOverview( self._aw, sd, [self._target] )
-        elif period == "week":
-            self._cal = wcalendar.WeekOverview( self._aw, sd, [self._target] )
-        else:
-            self._cal = wcalendar.Overview( self._aw, sd, [self._target] )
-        self._cal.setDetailLevel( params.get("detail", "conference") )
-
-    def _process( self ):
-        p = category.WPCategOverview( self, self._target, self._cal )
-        return p.display()
-
-
-#-------------------------------------------------------------------------------------
 
 class RHConferenceCreation(RHCreateEventBase):
     def _checkParams(self, params):
@@ -181,8 +110,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
                 c = lectures[0]
             self._redirect(urlHandlers.UHConferenceModification.getURL( c ) )
         else :
-            url = urlHandlers.UHCategoryDisplay.getURL(self._target)
-            self._redirect(url)
+            self._redirect(self.category.url)
 
     def _createEvent(self, params):
         kwargs = UtilsConference.get_new_conference_kwargs(self._params)
@@ -405,36 +333,6 @@ class UtilsConference:
             # This shouldn't happen anymore with the /e/ namespace but we keep the check just to be safe
             raise ValueError(
                 _("Short URL tag conflicts with an URL used by Indico: '%s'. Please select another one.") % tag)
-
-
-class RHCategoryGetIcon(RHCategDisplayBase):
-    def _checkProtection(self):
-        # icons were always set to fully public during upload, so no need for an access check
-        pass
-
-    def _process(self):
-        icon = self._target.getIcon()
-        return send_file(icon.getFileName(), icon.getFilePath(), icon.getFileType())
-
-
-class RHCategoryToiCal(RHCategDisplayBase):
-    def _process(self):
-        from indico.modules.events import Event
-        filename = '{}-category.ics'.format(secure_filename(self._target.getName(), str(self._target.id)))
-        buf = serialize_category_ical(self._target, session.user,
-                                      Event.end_dt >= (now_utc() - timedelta(weeks=4)))
-        return send_file(filename, buf, 'text/calendar')
-
-
-class RHCategoryToAtom(RHCategDisplayBase):
-    def _process(self):
-        from indico.modules.events import Event
-        filename = '{}-category.atom'.format(secure_filename(self._target.getName(), str(self._target.id)))
-        buf = serialize_category_atom(self._target,
-                                      url_for(request.endpoint, self._target, _external=True),
-                                      session.user,
-                                      Event.end_dt >= now_utc())
-        return send_file(filename, buf, 'application/atom+xml')
 
 
 def sortByStartDate(conf1,conf2):
