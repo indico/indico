@@ -14,63 +14,53 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
+import stat
+from datetime import datetime
+
+from BTrees.OOBTree import OOBTree
+from flask import request, has_request_context
+from persistent import Persistent
+from pytz import all_timezones, timezone
 from sqlalchemy.orm import joinedload
 
+from indico.core import signals
+from indico.core.config import Config
+from indico.core.db import DBMgr, db
+from indico.core.db.event import SupportInfo
+from indico.core.db.sqlalchemy.core import ConstraintViolated
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
-from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
-from MaKaC.fossils.conference import (IConferenceMinimalFossil, IConferenceEventInfoFossil, IConferenceFossil)
-from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.common.url import ShortURLMapper
-from MaKaC.common.PickleJar import Updates
-from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.util import track_time_changes
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.modules.groups.legacy import GroupWrapper
 from indico.util.caching import memoize_request
-from indico.util.i18n import L_
-from indico.util.string import return_ascii, is_legacy_id, to_unicode
-
-
-import os
-import stat
-from datetime import datetime
-from operator import methodcaller
-
-from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
-from MaKaC.abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
-
-from flask import request, has_request_context
-from pytz import timezone
-from pytz import all_timezones
-
-from persistent import Persistent
-from BTrees.OOBTree import OOBTree, OOTreeSet
-from MaKaC.common.timezoneUtils import nowutc
-import MaKaC.fileRepository as fileRepository
-import MaKaC.review as review
-from MaKaC.common.Counter import Counter
-from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.common.Locators import Locator
-from MaKaC.accessControl import AccessController, AccessWrapper
-from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
-from MaKaC.trashCan import TrashCanManager
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.badge import BadgeTemplateManager
-from MaKaC.poster import PosterTemplateManager
-from MaKaC.i18n import _
-
-from indico.core import signals
-from indico.core.db import DBMgr, db
-from indico.core.db.sqlalchemy.core import ConstraintViolated
-from indico.core.db.event import SupportInfo
-from indico.core.config import Config
-from indico.util.redis import write_client as redis_write_client
-from indico.util.user import unify_user_args
+from indico.util.i18n import L_, _
 from indico.util.redis import avatar_links
-from indico.web.flask.util import url_for
+from indico.util.redis import write_client as redis_write_client
+from indico.util.string import return_ascii, is_legacy_id, to_unicode
+from indico.util.user import unify_user_args
+
+from MaKaC import fileRepository, review
+from MaKaC.abstractReviewing import ConferenceAbstractReview
+from MaKaC.accessControl import AccessController
+from MaKaC.badge import BadgeTemplateManager
+from MaKaC.common.Counter import Counter
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.Locators import Locator
+from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.common.PickleJar import Updates
+from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
+from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.url import ShortURLMapper
+from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
+from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil, IConferenceFossil
+from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
+from MaKaC.poster import PosterTemplateManager
+from MaKaC.trashCan import TrashCanManager
 
 
 class CoreObject(Persistent):
