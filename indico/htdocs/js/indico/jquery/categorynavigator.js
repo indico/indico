@@ -47,7 +47,9 @@
                 categories: {
                     disabled: false,
                     message: $T.gettext("Not possible for this category"),
-                    ids: []
+                    ids: [],
+                    // Expects an Array of {ids: [...], message: '...'} for more specific messages
+                    groups: []
                 }
             },
             // Callback for action button
@@ -266,14 +268,25 @@
                 'data-category-id': category.id
             });
 
+            function disableActionButton(message) {
+                $button.addClass('disabled').attr('title', message);
+            }
+
             if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
-                $button.addClass('disabled').attr('title', categoriesWithSubcategories.message);
+                disableActionButton(categoriesWithSubcategories.message);
             }
             if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.has_events && category.deep_category_count === 0) {
-                $button.addClass('disabled').attr('title', categoriesWithEvents.message);
+                disableActionButton(categoriesWithEvents.message);
             }
             if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {
-                $button.addClass('disabled').attr('title', self.options.actionOn.categories.message);
+                disableActionButton(self.options.actionOn.categories.message);
+            }
+            if (self.options.actionOn.categories.disabled && self.options.actionOn.categories.groups.length) {
+                _.each(self.options.actionOn.categories.groups, function(group) {
+                    if (_.contains(group.ids, category.id)) {
+                        disableActionButton(group.message);
+                    }
+                });
             }
             $buttonWrapper.append($('<div>').append($button));
 
@@ -681,10 +694,21 @@
             var hasSubcategories = !!category.deep_category_count;
 
             if ((categoriesWithSubcategories.disabled && hasSubcategories) ||
-                (categoriesWithEvents.disabled && hasOnlyEvents) ||
-                (self.options.actionOn.categories.disabled && _.contains(ids, category.id))) {
+                (categoriesWithEvents.disabled && hasOnlyEvents)) {
                 return false;
             }
+
+            if (self.options.actionOn.categories.disabled) {
+                if (_.contains(self.options.actionOn.categories.ids, category.id)) {
+                    return false;
+                }
+                for (var i in self.options.actionOn.categories.groups) {
+                    if (_.contains(self.options.actionOn.categories.groups[i].ids, category.id)) {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         },
 
