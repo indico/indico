@@ -52,7 +52,7 @@ from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
-from MaKaC.common.TemplateExec import render, mako_call_template_hook
+from MaKaC.common.TemplateExec import render
 
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings

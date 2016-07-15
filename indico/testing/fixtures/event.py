@@ -26,9 +26,8 @@ from MaKaC.conference import ConferenceHolder
 
 
 @pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, dummy_category, db):
+def create_event(monkeypatch, monkeypatch_methods, dummy_user, dummy_category, db):
     """Returns a callable which lets you create dummy events"""
-    mocker.patch('MaKaC.conference.CategoryManager')
     monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
     monkeypatch.setattr('MaKaC.conference.Conference', MockConference)  # for some isinstance checks
 
