@@ -417,13 +417,14 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             self.end_dt = self.start_dt + relativedelta(months=1)
 
     def _process(self):
-        # TODO take in consideration protection and visibility
-        events = (Event.query.with_parent(self.category)
-                  .filter(or_(and_(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt),
+        events = (Event.query
+                  .filter(Event.is_visible_in(self.category), ~Event.is_deleted,
+                          or_(and_(Event.start_dt >= self.start_dt, Event.start_dt < self.end_dt),
                               and_(Event.end_dt >= self.start_dt, Event.end_dt < self.end_dt),
-                              and_(Event.start_dt < self.start_dt, Event.end_dt > self.end_dt)),
-                          ~Event.is_deleted)
-                  .order_by(Event.start_dt)).all()
+                              and_(Event.start_dt < self.start_dt, Event.end_dt > self.end_dt)))
+                  .order_by(Event.start_dt)
+                  .all())
+        events = [event for event in events if event.can_access(session.user)]
 
         # Only categories with icons are listed in the sidebar
         subcategories = {event.category for event in events if event.category.has_icon}
