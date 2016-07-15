@@ -972,56 +972,6 @@ class WPConfDataModif( WPConferenceModification ):
         return p.getHTML( pars )
 
 
-class WConfModifAC:
-
-    def __init__(self, conference, eventType, user):
-        self.__conf = conference
-        self._eventType = eventType
-        self.__user = user
-
-    def getHTML( self, params ):
-        ac = wcomponents.WConfAccessControlFrame().getHTML( self.__conf,\
-                                            params["setVisibilityURL"])
-        dc = ""
-        if not self.__conf.isProtected():
-            dc = "<br>%s"%wcomponents.WDomainControlFrame( self.__conf ).getHTML()
-
-        mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf) + "<br>"
-
-        if self._eventType == "conference":
-            rc = wcomponents.WConfRegistrarsControlFrame().getHTML(self.__conf) + "<br>"
-        else:
-            rc = ""
-
-        tf = ""
-        if self._eventType in ["conference", "meeting"]:
-            tf = "<br>%s" % wcomponents.WConfProtectionToolsFrame(self.__conf).getHTML()
-        cr = ""
-        if self._eventType == "conference":
-            cr = "<br>" + mako_call_template_hook('conference-protection', event=self.__conf.as_event)
-
-        return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>""" % (mc, rc, ac, dc, tf, cr)
-
-
-class WPConfModifAC(WPConferenceModifBase):
-
-    sidemenu_option = 'protection'
-
-    def __init__(self, rh, conf):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._eventType = "conference"
-        if self._rh.getWebFactory() is not None:
-            self._eventType = self._rh.getWebFactory().getId()
-        self._user = self._rh._getUser()
-
-    def _getPageContent(self, params):
-        wc = WConfModifAC(self._conf, self._eventType, self._user)
-        p = {
-            'setVisibilityURL': urlHandlers.UHConfSetVisibility.getURL(self._conf)
-        }
-        return wc.getHTML(p)
-
-
 class WPConfModifToolsBase(WPConferenceModifBase):
 
     sidemenu_option = 'utilities'

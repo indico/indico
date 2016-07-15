@@ -1664,9 +1664,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         conf = self.getConference()
         return conf.canUserModify(av)
 
-    def getAccessKey(self):
-        return ""
-
     def getAccessController(self):
         return self.getConference().getAccessController()
 

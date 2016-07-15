@@ -22,11 +22,7 @@ from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
-from MaKaC.i18n import _
 from indico.modules.events.cloning import EventCloner
-from indico.util.date_time import format_date
-import MaKaC.common.timezoneUtils as timezoneUtils
-from pytz import timezone
 
 
 class WebFactory(WebFactory):
@@ -52,20 +48,9 @@ class WebFactory(WebFactory):
         return WPSEConfModif(rh, conf)
     getConfModif = staticmethod(getConfModif)
 
-    def getConfModifAC(rh, conf):
-        return WPSEConfModifAC(rh, conf)
-    getConfModifAC = staticmethod(getConfModifAC)
-
     def getConfClone(rh, conf):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
-
-
-#################### Participants #####################################
-
-    def getConfModifParticipantsNewPending(rh, conf):
-        return WPSEConfModifParticipantsNewPending(rh, conf)
-    getConfModifParticipantsNewPending = staticmethod(getConfModifParticipantsNewPending)
 
 
 SimpleEventWebFactory = WebFactory
@@ -82,11 +67,6 @@ class WPSEConfModif(conferences.WPConferenceModification):
 
 
 class WSEConfModifMainData(meeting.WMConfModifMainData):
-    pass
-
-
-#####Access Control # stays the same as conference for now
-class WPSEConfModifAC(conferences.WPConfModifAC):
     pass
 
 

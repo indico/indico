@@ -631,9 +631,6 @@ class Category(CommonObjectBase):
         self._incNumConfs(1)
         self.indexConf(newConf)
 
-    def getAccessKey(self):
-        return ""
-
     def indexConf(self, conf):
         # Specific for category changes, calls Conference.indexConf()
         # (date-related indexes)
@@ -827,10 +824,6 @@ class Category(CommonObjectBase):
 
     def getAllowedToAccessList(self):
         return self.__ac.getAccessList()
-
-    def canKeyAccess(self, aw):
-        # Categories don't allow access keys
-        return False
 
     def isProtected(self):
         return self.__ac.isProtected()
@@ -1659,18 +1652,6 @@ class Conference(CommonObjectBase):
         self.contactInfo = contactInfo
         self.notifyModification()
 
-    def setAccessKey(self, accessKey=""):
-        """sets the access key of the conference"""
-        self._accessKey = accessKey
-        self.notifyModification()
-
-    def getAccessKey(self):
-        try:
-            return self._accessKey
-        except AttributeError:
-            self._accessKey = ""
-            return self._accessKey
-
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
@@ -1858,18 +1839,6 @@ class Conference(CommonObjectBase):
         raise NotImplementedError('hasProtectedOwner')
         return self.__ac._getFatherProtection()
 
-    def setProtection( self, private ):
-        """
-        Allows to change the conference access protection
-        """
-
-        oldValue = 1 if self.isProtected() else -1
-
-        self.getAccessController().setProtection( private )
-
-        # if oldValue != private:
-        #    signals.event.protection_changed.send(self, old=oldValue, new=private)
-
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
         if isinstance(prin, AvatarUserWrapper):
@@ -1954,9 +1923,6 @@ class Conference(CommonObjectBase):
         if options.get("tracks",False) :
             for tr in self.getTrackList() :
                 conf.addTrack(tr.clone(conf))
-        # access and modification keys
-        if options.get("keys", False) :
-            conf.setAccessKey(self.getAccessKey())
         conf.notifyModification()
 
         # Copy the list of enabled features

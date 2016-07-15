@@ -404,27 +404,3 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-
-def getProtectionText(target):
-    # XXX: the only relevant return values are domain / not falsy
-    from MaKaC.conference import Conference
-    if isinstance(target, Conference):
-        event = target.as_event
-        if not event.is_protected:
-            return '', None
-        networks = [x.name for x in event.get_access_list() if x.is_network]
-        if networks:
-            return 'domain', networks
-        else:
-            return 'protected', None
-    else:
-        if target.hasAnyProtection():
-            if target.isItselfProtected():
-                return "protected_own", None
-            elif target.hasProtectedOwner():
-                return "protected_parent", None
-            elif target.getDomainList() != []:
-                return "domain", list(x.getName() for x in target.getDomainList())
-            else:
-                return getProtectionText(target.getOwner())
-        return "", None
