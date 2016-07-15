@@ -467,12 +467,6 @@ class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase )
         return self._target.getProgramDescription()
 
 
-class ConferenceManagerListBase(ConferenceModifBase):
-
-    def _getManagersList(self):
-        return fossilize(self._conf.getManagerList())
-
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,

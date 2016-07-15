@@ -90,89 +90,6 @@ class CommonObjectBase(CoreObject, Fossilizable):
       * Resource
     """
 
-    def getRecursiveManagerList(self):
-        av_set = set()
-
-        # Get the AccessProtectionLevel for this
-        apl = self.getAccessProtectionLevel()
-
-        if apl == -1:
-            pass
-        elif apl == 1:
-            for av in self.getManagerList():
-                av_set.add(av)
-            for av in self.getOwner().getRecursiveManagerList():
-                av_set.add(av)
-        else:
-            for av in self.getManagerList():
-                av_set.add(av)
-
-            if self.getOwner():
-                for av in self.getOwner().getRecursiveManagerList():
-                    av_set.add(av)
-
-        return list(av_set)
-
-    def getRecursiveAllowedToAccessList(self, skip_managers=False, skip_self_acl=False):
-        """Returns a set of Avatar resp. Group objects for those people resp.
-        e-groups allowed to access this object as well as all parent objects.
-        """
-
-        # Initialize set of avatars/groups: this will hold those
-        # people/groups explicitly
-        # allowed to access this object
-        av_set = set()
-
-        # Get the AccessProtectionLevel for this
-        apl = self.getAccessProtectionLevel()
-
-        # If this object is "absolutely public", then return an empty set
-        if apl == -1:
-            pass
-
-        # If this object is protected "all by itself", then get the list of
-        # people/groups allowed to access it, plus managers of owner(s)
-        elif apl == 1:
-            al = None
-            if not skip_self_acl:
-                al = self.getAllowedToAccessList()
-            if not skip_managers:
-                al = al + self.getManagerList() + self.getOwner().getRecursiveManagerList()
-            if al is not None:
-                for av in al:
-                    av_set.add(av)
-
-        # If access settings are inherited (and PRIVATE) from its owners, look at those.
-        elif apl == 0 and self.isProtected():
-            # If event is protected, then get list of people/groups allowed
-            # to access, and add that to the set of avatars.
-            al = None
-            if not skip_self_acl:
-                al = self.getAllowedToAccessList()
-            if not skip_managers:
-                al = al + self.getManagerList()
-            if al is not None:
-                for av in al:
-                    av_set.add(av)
-
-            # Add list of avatars/groups allowed to access parents objects.
-            owner = self.getOwner()
-            if owner is not None:
-                owner_al = owner.getRecursiveAllowedToAccessList(skip_managers=skip_managers)
-                if owner_al is not None:
-                    for av in owner_al:
-                        av_set.add(av)
-
-        # return set containing whatever avatars/groups we may have collected
-        return av_set
-
-    def canIPAccess(self, ip):
-        domains = self.getAccessController().getAnyDomainProtection()
-        if domains:
-            return any(domain.belongsTo(ip) for domain in domains)
-        else:
-            return True
-
     @property
     @memoize_request
     def attached_items(self):
@@ -877,13 +794,9 @@ class Conference(CommonObjectBase):
         self.programDescription = txt
 
     def _generateNewTrackId( self ):
-        """
-        """
         return str(self.__programGenerator.newCount())
 
     def addTrack( self, newTrack ):
-        """
-        """
         #XXX: The conference program shoul be isolated in a separated object
         if newTrack in self.program:
             return
@@ -908,58 +821,40 @@ class Conference(CommonObjectBase):
         track.recover()
 
     def newTrack( self ):
-        """
-        """
         t = Track()
         self.addTrack( t )
         return t
 
     def getTrackById( self, id ):
-        """
-        """
         for track in self.program:
             if track.getId() == id.strip():
                 return track
         return None
 
     def getTrackList( self ):
-        """
-        """
         return self.program
 
     def isLastTrack(self,track):
-        """
-        """
         return self.getTrackPos(track)==(len(self.program)-1)
 
     def isFirstTrack(self,track):
-        """
-        """
         return self.getTrackPos(track)==0
 
     def getTrackPos(self,track):
-        """
-        """
         return self.program.index(track)
 
     def moveTrack(self,track,newPos):
-        """
-        """
         self.program.remove(track)
         self.program.insert(newPos,track)
         self.notifyModification()
 
     def moveUpTrack(self,track):
-        """
-        """
         if self.isFirstTrack(track):
             return
         newPos=self.getTrackPos(track)-1
         self.moveTrack(track,newPos)
 
     def moveDownTrack(self,track):
-        """
-        """
         if self.isLastTrack(track):
             return
         newPos = self.getTrackPos(track) + 1
@@ -984,64 +879,6 @@ class Conference(CommonObjectBase):
             res.sort(self._cmpTracks)
             return res
 
-    def requireDomain(self, dom):
-        self.__ac.requireDomain(dom)
-        # signals.event.domain_access_granted.send(self, domain=dom)
-
-    def freeDomain(self, dom):
-        self.__ac.freeDomain(dom)
-        # signals.event.domain_access_revoked.send(self, domain=dom)
-
-    def getDomainList(self):
-        return self.__ac.getRequiredDomainList()
-
-    def isProtected(self):
-        """Tells whether a conference is protected for accessing or not
-        """
-        raise NotImplementedError('isProtected')
-        return self.__ac.isProtected()
-
-    def getAccessProtectionLevel( self ):
-        raise NotImplementedError('getAccessProtectionLevel')
-        return self.__ac.getAccessProtectionLevel()
-
-    def isItselfProtected( self ):
-        raise NotImplementedError('isItselfProtected')
-        return self.__ac.isItselfProtected()
-
-    def hasAnyProtection( self ):
-        """Tells whether a conference has any kind of protection over it:
-            access or domain protection.
-        """
-        raise NotImplementedError('hasAnyProtection')
-        if self.isProtected():
-            return True
-        if self.getDomainList():
-            return True
-
-        if self.getAccessProtectionLevel() == -1:
-            return False
-
-        for owner in self.getOwnerList():
-            if owner.hasAnyProtection():
-                return True
-
-        return False
-
-    def hasProtectedOwner( self ):
-        raise NotImplementedError('hasProtectedOwner')
-        return self.__ac._getFatherProtection()
-
-    def grantAccess( self, prin ):
-        self.__ac.grantAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.linkTo(self, "access")
-
-    def revokeAccess( self, prin ):
-        self.__ac.revokeAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.unlinkTo(self, "access")
-
     def canAccess(self, aw):
         return self.as_event.can_access(aw.user)
 
@@ -1059,20 +896,6 @@ class Conference(CommonObjectBase):
         if isinstance(aw_or_user, AvatarUserWrapper):
             aw_or_user = aw_or_user.user
         return self.as_event.can_manage(aw_or_user)
-
-    def getManagerList(self):
-        managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
-                          key=lambda x: (x.is_single_person, x.name.lower()))
-        return [x.as_legacy for x in managers]
-
-    def getRegistrarList(self):
-        registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
-                                                                                                     explicit=True)],
-                            key=lambda x: (x.is_single_person, x.name.lower()))
-        return [x.as_legacy for x in registrars]
-
-    def getAllowedToAccessList( self ):
-        return self.__ac.getAccessList()
 
     def getDefaultStyle(self):
         return self.as_event.theme
@@ -1665,8 +1488,6 @@ class Track(CoreObject):
         self._code=str(newCode).strip()
 
     def getAbstractList( self ):
-        """
-        """
         try:
             if self._abstracts:
                 pass
@@ -1683,8 +1504,6 @@ class Track(CoreObject):
         return self._abstracts.get(str(id).strip())
 
     def hasAbstract( self, abstract ):
-        """
-        """
         try:
             if self._abstracts:
                 pass
@@ -1798,8 +1617,6 @@ class Track(CoreObject):
         return self.isCoordinator( aw.getUser() ) or self.canModify( aw )
 
     def addContribution( self, newContrib ):
-        """
-        """
         try:
             if self._contributions:
                 pass
@@ -1811,8 +1628,6 @@ class Track(CoreObject):
         newContrib.setTrack( self )
 
     def removeContribution( self, contrib ):
-        """
-        """
         try:
             if self._contributions:
                 pass
