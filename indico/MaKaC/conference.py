@@ -1893,14 +1893,17 @@ class DefaultConference(Conference):
      default templates for posters and badges
     """
 
-    def notifyModification(self, *args, **kwargs):
-        pass
-
     def __init__(self):
         Conference.__init__(self, id='default')
 
     def __repr__(self):
         return '<DefaultConference()>'
+
+    def getType(self):
+        return 'conference'
+
+    def notifyModification(self, *args, **kwargs):
+        pass
 
 
 class ConferenceHolder( ObjectHolder ):
