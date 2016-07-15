@@ -1644,11 +1644,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         #if the conference is protected, then only allowed AW can access
         return self.isAllowedToAccess(aw.getUser())
 
-    def canView(self, aw):
-        #in the future it would be possible to add an access control
-        #only those users allowed to access are allowed to view
-        return self.isAllowedToAccess(aw.getUser())
-
     def canModify(self, aw_or_user):
         if hasattr(aw_or_user, 'getUser'):
             aw_or_user = aw_or_user.getUser()

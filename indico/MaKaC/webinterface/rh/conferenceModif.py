@@ -1280,7 +1280,6 @@ class RHAbstractsToXML(RHConfModifCFABase):
         self._abstracts = []
         abMgr = self._conf.getAbstractMgr()
         for id in self._abstractIds:
-            #if abMgr.getAbstractById(id).canView( self._aw ):
             self._abstracts.append(abMgr.getAbstractById(id))
 
     def _process(self):

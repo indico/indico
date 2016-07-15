@@ -1042,19 +1042,6 @@ class Conference(CommonObjectBase):
         if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
-    def canView( self, aw ):
-        """tells whether the specified access wrappers has access to the current
-        object or any of its parts"""
-        if self.canAccess( aw ):
-            return True
-        for session in self.getSessionList():
-            if session.canView( aw ):
-                return True
-        for contrib in self.getContributionList():
-            if contrib.canView( aw ):
-                return True
-        return False
-
     def canAccess(self, aw):
         return self.as_event.can_access(aw.user)
 
@@ -1620,9 +1607,6 @@ class Track(CoreObject):
 
     def canUserModify( self, av ):
         return self.conference.canUserModify( av )
-
-    def canView( self, aw ):
-        return self.conference.canView( aw )
 
     def notifyModification( self ):
         parent = self.getConference()
