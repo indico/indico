@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
+from MaKaC.webinterface.rh import admins, maintenance, domains, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -29,10 +29,6 @@ admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admin
 # System settings
 admin.add_url_rule('/settings/system', 'adminSystem', admins.RHSystem)
 admin.add_url_rule('/settings/system/modify', 'adminSystem-modify', admins.RHSystemModify, methods=('GET', 'POST'))
-
-# Announcement
-admin.add_url_rule('/announcement', 'adminAnnouncement', announcement.RHAnnouncementModif)
-admin.add_url_rule('/announcement', 'adminAnnouncement-save', announcement.RHAnnouncementModifSave, methods=('POST',))
 
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)

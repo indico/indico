@@ -1,0 +1,14 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Announcement{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    {% trans %}The announcement is a message shown on top of each Indico page.{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_button=false) }}
+{% endblock %}

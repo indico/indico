@@ -27,7 +27,6 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC import domain
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -176,38 +175,6 @@ class WPGenInfoModification(WPAdmins):
         wc = WGeneralInfoModification()
         pars = {"postURL": urlHandlers.UHGeneralInfoPerformModification.getURL()}
         return wc.getHTML(pars)
-
-
-class WPHomepageCommon( WPAdminsBase ):
-    sidemenu_option = 'homepage'
-
-    def _createTabCtrl( self ):
-        self._tabCtrl = wcomponents.TabControl()
-
-        self._subTabAnnouncements = self._tabCtrl.newTab( "announcements", _("Announcements"), \
-                urlHandlers.UHAnnouncement.getURL() )
-
-    def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-
-class WPAnnouncementModif( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabAnnouncements.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WAnnouncementModif()
-        pars = {"saveURL": urlHandlers.UHAnnouncementSave.getURL() }
-        return wc.getHTML( pars )
-
-class WAnnouncementModif(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        an = getAnnoucementMgrInstance()
-        vars["announcement"] = escape(an.getText()).replace("\"", "&#34;")
-        return vars
 
 
 class WPServicesCommon(WPAdminsBase):

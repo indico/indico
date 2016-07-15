@@ -16,28 +16,24 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.core.logger import Logger
-from indico.core.settings import SettingsProxy
+from flask import flash, redirect
+
+from indico.modules.announcement import announcement_settings
+from indico.modules.announcement.forms import AnnouncementForm
+from indico.modules.announcement.views import WPAnnouncement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
+from indico.web.forms.base import FormDefaults
+from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
-logger = Logger.get('news')
+class RHAnnouncement(RHAdminBase):
+    CSRF_ENABLED = True
 
-news_settings = SettingsProxy('news', {
-    # Whether to show the recent news on the home page
-    'show_recent': True,
-    # The number of recent news to show on the home page
-    'max_entries': 3,
-    # How old a news may be to be shown on the home page
-    'max_age': 0,
-    # How long a news is labelled as 'new'
-    'new_days': 14
-})
-
-
-@signals.menu.items.connect_via('admin-sidemenu')
-def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('news', _('News'), url_for('news.manage'), section='homepage')
+    def _process(self):
+        form = AnnouncementForm(obj=FormDefaults(**announcement_settings.get_all()))
+        if form.validate_on_submit():
+            announcement_settings.set_multi(form.data)
+            flash(_('Settings have been saved'), 'success')
+            return redirect(url_for('announcement.manage'))
+        return WPAnnouncement.render_template('settings.html', form=form)

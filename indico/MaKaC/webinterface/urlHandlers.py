@@ -888,14 +888,6 @@ class UHPosterTemplates(URLHandler):
     _endpoint = 'admin.posterTemplates'
 
 
-class UHAnnouncement(URLHandler):
-    _endpoint = 'admin.adminAnnouncement'
-
-
-class UHAnnouncementSave(URLHandler):
-    _endpoint = 'admin.adminAnnouncement-save'
-
-
 # URL Handlers for Printing and Design
 class UHConfModifBadgePrinting(URLHandler):
     _endpoint = "event_mgmt.confModifTools-badgePrinting"

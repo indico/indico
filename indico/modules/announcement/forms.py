@@ -14,27 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from persistent import Persistent
-from indico.core.db import DBMgr
+from __future__ import unicode_literals
+
+from wtforms.fields import BooleanField, TextAreaField
+from wtforms.validators import DataRequired
+
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.validators import UsedIf
+from indico.web.forms.widgets import SwitchWidget
 
 
-class AnnoucementMgr(Persistent):
-    def __init__(self):
-        self.text = ""
-
-    def setText(self, text):
-        self.text = text
-
-    def getText(self):
-        return self.text
-
-
-def getAnnoucementMgrInstance():
-    dbmgr = DBMgr.getInstance()
-    root = dbmgr.getDBConnection().root()
-    try:
-        am = root["AnnoucementMgr"]
-    except KeyError, e:
-        am = AnnoucementMgr()
-        root["AnnoucementMgr"] = am
-    return am
+class AnnouncementForm(IndicoForm):
+    enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
+    message = TextAreaField(_('Message'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()])
