@@ -33,7 +33,6 @@ from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
-from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
@@ -41,8 +40,7 @@ from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common.indexes import IndexesHolder
-from MaKaC.conference import Conference, ConferenceHolder, CategoryManager
+from MaKaC.conference import Conference, ConferenceHolder
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
@@ -163,7 +161,7 @@ class IndicoShell(Shell):
                                  color='yellow')
             # Legacy Indico
             self._info.append(cformat('*** %{magenta!}Legacy%{reset} ***'))
-            add_to_context_multi([Conference, ConferenceHolder, CategoryManager, Catalog, IndexesHolder], color='green')
+            add_to_context_multi([Conference, ConferenceHolder], color='green')
             add_to_context(LocalProxy(HelperMaKaCInfo.getMaKaCInfoInstance), 'minfo', color='green')
             # Models
             self._info.append(cformat('*** %{magenta!}Models%{reset} ***'))
