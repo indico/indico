@@ -46,7 +46,6 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
-from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -82,11 +81,8 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
 
     def _get_stats_html(self, stats):
         plots, values, updated = self._process_stats(stats, root=self.category.is_root)
-        return WPCategoryStatistics.render_template('category_statistics.html',
-                                                    # TODO: use self.category once we don't use the legacy WP anymore
-                                                    CategoryManager().getById(self.category.id, True),
-                                                    cat=self.category, plots=plots, values=values, updated=updated,
-                                                    has_stats=True)
+        return WPCategoryStatistics.render_template('category_statistics.html', self.category,
+                                                    plots=plots, values=values, updated=updated, has_stats=True)
 
     def _process(self):
         stats = get_category_stats(self.category.id)
