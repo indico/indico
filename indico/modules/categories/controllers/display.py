@@ -21,6 +21,7 @@ from io import BytesIO
 from itertools import chain, groupby
 from math import ceil
 from operator import attrgetter, itemgetter
+from time import mktime
 
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session, Response
@@ -434,7 +435,14 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             return chain.from_iterable(map(func, list_))
 
         # Events spanning multiple days must appear on all days
-        events = sorted(flat_map(self._process_multiday_events, events), key=attrgetter('start_dt'))
+        events = flat_map(self._process_multiday_events, events)
+
+        def _event_sort_key(event):
+            # Ongoing events are shown after all other events on the same day and are sorted by start_date
+            ongoing = getattr(event, 'ongoing', False)
+            return (event.start_dt.date(), ongoing,
+                    -mktime(event.first_occurence_start_dt.timetuple()) if ongoing else event.start_dt.time())
+        events = sorted(events, key=_event_sort_key)
 
         params = {
             'detail': self.detail,
@@ -525,6 +533,10 @@ class RHCategoryOverview(RHDisplayCategoryBase):
                 if name == 'timetable_entries':
                     return [entry for entry in event.timetable_entries
                             if entry.start_dt.astimezone(tzinfo).date() == self.start_dt.astimezone(tzinfo).date()]
+                if name == 'ongoing':
+                    return event.start_dt.date() != self.start_dt.date()
+                if name == 'first_occurence_start_dt':
+                    return event.start_dt
                 return getattr(event, name)
 
             def __setattr__(self, name, value):
