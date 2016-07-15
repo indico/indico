@@ -25,8 +25,6 @@ from flask import request, session
 from pytz import timezone
 
 
-from MaKaC.conference import Category
-from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
 from MaKaC.common.utils import parseDateTime
@@ -41,12 +39,9 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.i18n import _
 from MaKaC.common.contextManager import ContextManager
-import MaKaC.common.info as info
 
 from indico.core.config import Config
 from indico.util.string import unicode_struct_to_utf8
-
-# base module for asynchronous server requests
 
 
 class ExpectedParameterException(ServiceError):
@@ -403,17 +398,3 @@ class ListModificationBase:
             self._handleSet()
 
         return self._value
-
-
-class ExportToICalBase(object):
-
-    def _checkParams(self):
-        user = self._getUser()
-        if not user:
-            raise ServiceAccessError("User is not logged in!")
-        apiKey = user.api_key
-        if not apiKey:
-            raise ServiceAccessError("User has no API key!")
-        elif apiKey.is_blocked:
-            raise ServiceAccessError("This API key is blocked!")
-        self._apiKey = apiKey
