@@ -841,15 +841,20 @@ class RHProtected(RH):
 
 
 class RHDisplayBaseProtected(RHProtected):
-
     def _checkProtection(self):
-        if not self._target.canAccess(self.getAW()):
-            if isinstance(self._target, Conference) and self._target.as_event.access_key:
+        if isinstance(self._target, Conference):
+            event = self._target.as_event
+            can_access = event.can_access(session.user)
+            if not can_access and event.access_key:
                 raise KeyAccessError()
-            if self._getUser() is None:
-                self._checkSessionUser()
-            else:
-                raise AccessError()
+        else:
+            can_access = self._target.canAccess(self.getAW())
+        if can_access:
+            return
+        elif self._getUser() is None:
+            self._checkSessionUser()
+        else:
+            raise AccessError()
 
 
 class RHModificationBaseProtected(RHProtected):
