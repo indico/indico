@@ -19,49 +19,14 @@ import MaKaC.errors as errors
 from MaKaC.i18n import _
 
 
-class CategoryWebLocator:
-
-    def __init__( self, params, mustExist=1 ):
-        self._categList = []
-        categIds = params.get("categId", [])
-        if categIds == [] or params["categId"] == "":
-            if mustExist:
-                raise errors.MaKaCError( _("category ids not set"))
-        if isinstance(categIds, basestring):
-            categIds = [categIds]
-        ch = conference.CategoryManager()
-        for id in categIds:
-            try:
-                self._categList.append(ch.getById(id))
-            except KeyError:
-                continue
-
-    def getObjectList( self ):
-        return self._categList
-
-    def getObject( self ):
-        if len(self.getObjectList()) == 0:
-            return None
-        if len(self.getObjectList()) == 1:
-            return self.getObjectList()[0]
-        return self.getObjectList()
-
-
 class WebLocator:
     def __init__(self):
-        self.__categId = None
         self.__confId = None
         self.__materialId = None
         self.__resId = None
         self.__trackId = None
         self.__abstractId = None
         self.__notifTplId = None
-
-    def setCategory( self, params, mustExist=1 ):
-        if not ("categId" in params.keys()) or params["categId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("category id not set"))
-        self.__categId = params["categId"]
 
     def setConference( self, params ):
         if not ("confId" in params.keys()) and "confid" in params.keys():
@@ -122,13 +87,6 @@ class WebLocator:
             self.__resId = params["resId"]
 
     def getObject(self):
-        if self.__categId:
-            if not conference.CategoryManager().hasKey(self.__categId):
-                raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
-            obj = conference.CategoryManager().getById(self.__categId)
-            if self.__materialId is not None or self.__resId is not None:
-                return None  # obsolete - attachments don't use WebLocator
-            return obj
         if not self.__confId:
             return None
         obj = conference.ConferenceHolder().getById(self.__confId)
