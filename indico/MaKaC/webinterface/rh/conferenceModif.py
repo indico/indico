@@ -29,7 +29,6 @@ from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
@@ -40,6 +39,7 @@ from indico.core.config import Config
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
+from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 import MaKaC.common.filters as filters
@@ -1965,7 +1965,7 @@ class RHConfPosterDesign(RHConferenceModifBase):
                 p = admins.WPPosterTemplateDesign(self, self._target, self.__templateId, self.__new)
             else:
                 if self.__new == True and self.__baseTemplate != 'blank':
-                    dconf = conference.CategoryManager().getDefaultConference()
+                    dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
                     templMan = self._target.getPosterTemplateManager()
                     newId = self.__templateId
                     dconf.getPosterTemplateManager().getTemplateById(self.__baseTemplate).clone(templMan, newId)
@@ -1987,7 +1987,8 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
             raise FormValuesError(_("Poster not selected"))
         if self.__templateId.find('global') != -1:
             self.__templateId = self.__templateId.replace('global','')
-            self.__template = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplateById(self.__templateId)
+            self.__template = (HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                               .getPosterTemplateManager().getTemplateById(self.__templateId))
         else:
             self.__template = self._conf.getPosterTemplateManager().getTemplateById(self.__templateId)
         try:

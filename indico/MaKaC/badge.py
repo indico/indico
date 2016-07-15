@@ -18,9 +18,10 @@ import os
 from persistent import Persistent
 import tempfile
 
-from indico.util.json import loads
-from MaKaC.common.Counter import Counter
 from indico.core.config import Config
+from indico.util.json import loads
+from MaKaC.common import HelperMaKaCInfo
+from MaKaC.common.Counter import Counter
 
 
 class BadgeTemplateManager(Persistent):
@@ -482,8 +483,8 @@ class BadgePDFOptions(Persistent):
             self._landscape = False
             self._drawDashedRectangles = True
         else:
-            from MaKaC.conference import CategoryManager
-            defaultConferencePDFOptions = CategoryManager().getDefaultConference().getBadgeTemplateManager().getPDFOptions()
+            defaultConferencePDFOptions = (HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                                           .getBadgeTemplateManager().getPDFOptions())
             self.__topMargin = defaultConferencePDFOptions.getTopMargin()
             self.__bottomMargin = defaultConferencePDFOptions.getBottomMargin()
             self.__leftMargin = defaultConferencePDFOptions.getLeftMargin()

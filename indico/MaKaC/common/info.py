@@ -165,16 +165,13 @@ class MaKaCInfo(Persistent):
         warnings.warn(msg, DeprecationWarning, 2)
         return Config.getInstance().getDefaultTimezone()
 
-    def getDefaultConference( self ):
+    def getDefaultConference(self):
+        from MaKaC.conference import DefaultConference
         try:
             self._defaultConference
         except AttributeError:
-            self._defaultConference = None
+            self._defaultConference = DefaultConference()
 
-        return self._defaultConference
-
-    def setDefaultConference( self, dConf ):
-        self._defaultConference = dConf
         return self._defaultConference
 
     def getDefaultTemplateSet( self ):
