@@ -695,7 +695,10 @@ class ContributionFetcher(SessionContribFetcher):
 class EventSearchFetcher(IteratedDataFetcher):
     def event(self, query):
         def _iterate_objs(query_string):
-            query = Event.find(Event.title_matches(to_unicode(query_string)), ~Event.is_deleted)
+            query = (Event.query
+                     .filter(Event.title_matches(to_unicode(query_string)),
+                             ~Event.is_deleted)
+                     .options(undefer('effective_protection_mode')))
             if self._orderBy == 'start':
                 query = query.order_by(Event.start_dt)
             elif self._orderBy == 'id':
@@ -722,5 +725,5 @@ class EventSearchFetcher(IteratedDataFetcher):
                 'id': event.id,
                 'title': event.title,
                 'startDate': event.start_dt,
-                'hasAnyProtection': event.as_legacy.hasAnyProtection()
+                'hasAnyProtection': event.effective_protection_mode == ProtectionMode.protected
             }

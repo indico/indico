@@ -168,13 +168,6 @@ class AccessController(Persistent):
 
         return ip in ipList
 
-    def canIPAccess(self, ip):
-        raise NotImplementedError('canIPAccess')
-        # Domain protection
-        if not self.getRequiredDomainList():
-            return True
-        return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
-
     def isAdmin(self, av):
         raise NotImplementedError('isAdmin')
         return av and av.user and av.user.is_admin
