@@ -240,13 +240,6 @@ class CategoryManager(ObjectHolder):
             root["rootCategory"] = r
         return root["rootCategory"]
 
-    def getDefaultConference(self):
-        dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
-        if dconf == None:
-            return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
-        else:
-            return dconf
-
 
 class Category(CommonObjectBase):
     fossilizes(ICategoryFossil)
@@ -1906,6 +1899,9 @@ class DefaultConference(Conference):
     def __init__(self):
         Conference.__init__(self, id='default')
 
+    def __repr__(self):
+        return '<DefaultConference()>'
+
 
 class ConferenceHolder( ObjectHolder ):
     """Specialised ObjectHolder dealing with conference objects. It gives a
@@ -1932,7 +1928,7 @@ class ConferenceHolder( ObjectHolder ):
 
     def getById(self, id, quiet=False):
         if id == 'default':
-            return CategoryManager().getDefaultConference()
+            return HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
 
         id = str(id)
         if is_legacy_id(id):

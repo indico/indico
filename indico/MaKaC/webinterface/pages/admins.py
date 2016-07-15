@@ -21,7 +21,6 @@ from urlparse import urljoin
 
 # MaKaC
 import MaKaC.common.info as info
-import MaKaC.conference as conference
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -298,7 +297,7 @@ class WPBadgeTemplates(WPBadgeTemplatesBase):
         WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
-        wp = WBadgeTemplates(conference.CategoryManager().getDefaultConference())
+        wp = WBadgeTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
         return wp.getHTML(params)
 
     def _setActiveTab( self ):
@@ -312,7 +311,7 @@ class WPPosterTemplates(WPBadgeTemplatesBase):
         WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
-        wp = WPosterTemplates(conference.CategoryManager().getDefaultConference())
+        wp = WPosterTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
         return wp.getHTML(params)
 
     def _setActiveTab(self):

@@ -26,7 +26,6 @@ from markupsafe import escape
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.conference as conference
 import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML
 import MaKaC.common.utils
@@ -221,7 +220,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
     def getVars(self):
         v = wcomponents.WTemplated.getVars( self )
-        minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
@@ -1870,7 +1869,7 @@ class WConfModifBadgePrinting(wcomponents.WTemplated):
         self._user = user
 
     def _getBaseTemplateOptions(self):
-        dconf = conference.CategoryManager().getDefaultConference()
+        dconf = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         templates = dconf.getBadgeTemplateManager().getTemplates()
 
         options = [{'value': 'blank', 'label': _('Blank Page')}]
@@ -2061,7 +2060,7 @@ class WPConfModifBadgeDesign(WPBadgeBase):
         self.__baseTemplate = baseTemplateId
 
         if baseTemplateId != 'blank':
-            dconf = conference.CategoryManager().getDefaultConference()
+            dconf = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
             templMan = conf.getBadgeTemplateManager()
             newId = templateId
             default_template = dconf.getBadgeTemplateManager().getTemplateById(baseTemplateId)
@@ -2097,7 +2096,8 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
 
     def _getFullTemplateListOptions(self):
         templates = {}
-        templates['global'] = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        templates['global'] = (info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                               .getPosterTemplateManager().getTemplates())
         templates['local'] = self.__conf.getPosterTemplateManager().getTemplates()
         options = []
 
@@ -2119,7 +2119,8 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
         return options
 
     def _getBaseTemplateListOptions(self):
-        templates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        templates = (info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                     .getPosterTemplateManager().getTemplates())
         options = [{'value': 'blank', 'label': _('Blank Page')}]
 
         for id, template in templates.iteritems():

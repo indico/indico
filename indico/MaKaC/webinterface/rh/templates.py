@@ -19,10 +19,11 @@ from werkzeug.exceptions import Forbidden
 
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-import MaKaC.conference as conference
+
 
 class RHTemplatesBase(admins.RHAdminBase):
     pass
@@ -55,7 +56,8 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
 
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
-        self.__defaultConferencePDFOptions = conference.CategoryManager().getDefaultConference().getBadgeTemplateManager().getPDFOptions()
+        self.__defaultConferencePDFOptions = (HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                                              .getBadgeTemplateManager().getPDFOptions())
 
         try:
             self.__marginTop = float(params.get("marginTop",''))
