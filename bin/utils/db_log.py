@@ -139,7 +139,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             with output_lock:
                 print
                 print prettify_caption('Duration')
-                print '    {:.06f}s'.format(obj['sql_duration'])
+                print '    {}'.format(prettify_duration(obj['sql_duration']))
                 print_linesep()
 
 
@@ -180,6 +180,20 @@ def indent(msg, level=4):
 
 def prettify_caption(caption):
     return '\x1b[38;5;75;04m{}\x1b[0m'.format(caption)
+
+
+def prettify_duration(duration):
+    if duration >= 0.25:
+        color = 196
+    elif duration >= 0.1:
+        color = 202
+    elif duration >= 0.05:
+        color = 226
+    elif duration >= 0.005:
+        color = 46
+    else:
+        color = 123
+    return '\x1b[38;5;{}m{:.06f}s\x1b[0m'.format(color, duration)
 
 
 def prettify_source(source, traceback_frames):
