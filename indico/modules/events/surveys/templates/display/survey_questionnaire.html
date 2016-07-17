@@ -39,6 +39,13 @@
                 {%- trans %}Back{% endtrans -%}
             </a>
         {% endif %}
+        <div class="form-field-description">
+            {% if survey.anonymous %}
+                {% trans %}Your answers will be submitted anonymously.{% endtrans %}
+            {% else %}
+                {% trans %}Your answers will be associated with your account.{% endtrans %}
+            {% endif %}
+        </div>
     {% endcall %}
 
     <script>
