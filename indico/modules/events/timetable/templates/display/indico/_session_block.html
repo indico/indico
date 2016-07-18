@@ -5,7 +5,8 @@
 {% from 'events/timetable/display/indico/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/indico/_break.html' import render_break %}
 
-{% macro render_session_block(block, event, parent=none, timezone=none, show_notes=false, hide_contribs=false) %}
+{% macro render_session_block(block, event, parent=none, timezone=none, show_notes=false, hide_contribs=false,
+                              show_location=false, show_children_location=false) %}
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
 
@@ -26,7 +27,7 @@
                         {{- session_.title | safe -}}
                     {%- endif -%}
                 </span>
-                {% if not (block.inherit_location and block.session.inherit_location) and block.has_location_info -%}
+                {% if block.has_location_info and show_location -%}
                     {{ render_location(block, parent=event) }}
                 {%- endif %}
                 <div class="timetable-item-actions">
@@ -63,9 +64,11 @@
                     {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
                         {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
                             {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
-                                                   show_notes=show_notes, timezone=timezone, parent=block) }}
+                                                   show_notes=show_notes, timezone=timezone, parent=block,
+                                                   show_location=show_children_location) }}
                         {% elif entry.type.name == 'BREAK' %}
-                            {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone) }}
+                            {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone,
+                                            show_location=show_children_location) }}
                         {% endif %}
                     {% endfor %}
                 </ul>
