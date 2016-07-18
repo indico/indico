@@ -22,7 +22,7 @@ from indico.modules.categories.controllers.display import (RHCategoryStatistics,
                                                            RHCategoryInfo, RHCategorySearch, RHDisplayCategory,
                                                            RHEventList, RHExportCategoryAtom, RHExportCategoryICAL,
                                                            RHShowPastEventsInCategory, RHReachableCategoriesInfo,
-                                                           RHSubcatInfo)
+                                                           RHSubcatInfo, RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -70,6 +70,9 @@ _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
 _bp.add_url_rule('/events.ics', 'export_ical', RHExportCategoryICAL)
 _bp.add_url_rule('/events.atom', 'export_atom', RHExportCategoryAtom)
 _bp.add_url_rule('/events.rss', 'export_rss', make_compat_redirect_func(_bp, 'export_atom'))
+
+# TODO: remember to refactor it at some point
+_bp.add_url_rule('!/xmlGateway.py/getCategoryInfo', 'category_xml_info', RHXMLExportCategoryInfo)
 
 # Short URLs
 _bp.add_url_rule('!/categ/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)

@@ -23,12 +23,13 @@ from math import ceil
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
-from flask import jsonify, request, session
+from flask import jsonify, request, session, Response
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
+from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_category_atom, serialize_category_ical,
                                                  serialize_category_chain, serialize_category)
@@ -370,3 +371,16 @@ class RHExportCategoryAtom(RHDisplayCategoryBase):
                                       session.user,
                                       Event.end_dt >= now_utc())
         return send_file(filename, buf, 'application/atom+xml')
+
+
+class RHXMLExportCategoryInfo(RH):
+    def _checkParams(self):
+        try:
+            id_ = int(request.args['id'])
+        except ValueError:
+            raise BadRequest('Invalid Category ID')
+        self.category = Category.get_one(id_, is_deleted=False)
+
+    def _process(self):
+        category_xml_info = XMLCategorySerializer(self.category).serialize_category()
+        return Response(category_xml_info, mimetype='text/xml')
