@@ -51,7 +51,7 @@
                 {% for subcategory in subcategories|sort(attribute='title') %}
                     <a href="{{ url_for('categories.overview', subcategory, period=period,
                                         date=start_dt|format_date(format="YYYY-MM-dd"), detail=detail) }}">
-                        <img src="{{ url_for('categories.display_icon', subcategory, slug=subcategory.icon_metadata['hash']) }}">
+                        <img src="{{ subcategory.icon_url }}">
                         {{ subcategory.title }}
                     </a>
                     <br>
