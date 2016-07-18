@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from wtforms import validators, TextField, BooleanField
+from wtforms import StringField, BooleanField
 from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, Email
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -27,8 +28,8 @@ from indico.web.forms.widgets import SwitchWidget
 
 class CephalopodForm(IndicoForm):
     joined = BooleanField('Join the community', widget=SwitchWidget())
-    contact_name = TextField('Contact Name', [UsedIfChecked('enable_tracking'), validators.Required()],
-                             description=_('Name of the person responsible for your Indico server.'))
+    contact_name = StringField('Contact Name', [UsedIfChecked('enable_tracking'), DataRequired()],
+                               description=_('Name of the person responsible for your Indico server.'))
     contact_email = EmailField('Contact Email',
-                               [UsedIfChecked('enable_tracking'), validators.Required(), validators.Email()],
+                               [UsedIfChecked('enable_tracking'), DataRequired(), Email()],
                                description=_('Email address of the person responsible for your Indico server.'))
