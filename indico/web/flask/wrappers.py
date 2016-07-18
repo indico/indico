@@ -56,7 +56,7 @@ class IndicoRequest(Request):
     @cached_property
     def remote_addr(self):
         ip = super(IndicoRequest, self).remote_addr
-        if ip.startswith('::ffff:'):
+        if ip is not None and ip.startswith('::ffff:'):
             # convert ipv6-style ipv4 to the regular ipv4 notation
             ip = ip[7:]
         return ip
