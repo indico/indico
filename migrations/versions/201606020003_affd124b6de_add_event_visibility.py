@@ -1,7 +1,7 @@
 """Add event visibility
 
 Revision ID: affd124b6de
-Revises: 35eac9fee166
+Revises: 35a6ae289e03
 Create Date: 2016-07-14 14:05:24.007841
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'affd124b6de'
-down_revision = '35eac9fee166'
+down_revision = '35a6ae289e03'
 
 
 def upgrade():

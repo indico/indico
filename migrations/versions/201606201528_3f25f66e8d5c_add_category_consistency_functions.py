@@ -1,7 +1,7 @@
 """Add category consistency functions
 
 Revision ID: 3f25f66e8d5c
-Revises: 3bdd6bf0181a
+Revises: 535f817f2533
 Create Date: 2016-06-20 15:28:43.977274
 """
 
@@ -12,7 +12,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3f25f66e8d5c'
-down_revision = '3bdd6bf0181a'
+down_revision = '535f817f2533'
 
 
 def upgrade():

@@ -1,7 +1,7 @@
 """Add event type
 
 Revision ID: 35eac9fee166
-Revises: 179817f1fb97
+Revises: affd124b6de
 Create Date: 2016-07-04 17:15:20.292801
 """
 
@@ -13,7 +13,7 @@ from indico.modules.events.models.events import EventType
 
 # revision identifiers, used by Alembic.
 revision = '35eac9fee166'
-down_revision = '179817f1fb97'
+down_revision = 'affd124b6de'
 
 
 def upgrade():

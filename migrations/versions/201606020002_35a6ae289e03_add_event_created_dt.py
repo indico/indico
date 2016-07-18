@@ -1,7 +1,7 @@
 """Add event created_dt
 
 Revision ID: 35a6ae289e03
-Revises: 4243b0738b4f
+Revises: 3bdd6bf0181a
 Create Date: 2016-06-24 14:15:23.459355
 """
 
@@ -12,7 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '35a6ae289e03'
-down_revision = '4243b0738b4f'
+down_revision = '3bdd6bf0181a'
 
 
 def upgrade():
