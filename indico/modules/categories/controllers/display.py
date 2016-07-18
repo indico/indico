@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from functools import partial
 from io import BytesIO
-from itertools import chain, groupby
+from itertools import chain, groupby, imap
 from math import ceil
 from operator import attrgetter, itemgetter
 from time import mktime
@@ -51,6 +51,10 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
 from MaKaC.webinterface.rh.base import RH
+
+
+def _flat_map(func, list_):
+    return chain.from_iterable(imap(func, list_))
 
 
 class RHCategoryIcon(RHDisplayCategoryBase):
@@ -427,12 +431,8 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         # Only categories with icons are listed in the sidebar
         subcategories = {event.category for event in events if event.category.has_icon}
 
-        # Python doesn't have flat_map() and it improves the readability of the line bellow greatly
-        def flat_map(func, list_):
-            return chain.from_iterable(map(func, list_))
-
         # Events spanning multiple days must appear on all days
-        events = flat_map(partial(self._process_multiday_events, info), events)
+        events = _flat_map(partial(self._process_multiday_events, info), events)
 
         def _event_sort_key(event):
             # Ongoing events are shown after all other events on the same day and are sorted by start_date
