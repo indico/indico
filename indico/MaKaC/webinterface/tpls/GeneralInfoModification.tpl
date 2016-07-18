@@ -23,16 +23,6 @@
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
-      <td bgcolor="white" width="100%">&nbsp;
-         <select name="lang">
-           % for code, name in sorted(language_list.items(), key=lambda x: x[1]):
-           <option ${"selected" if code == language else ""} value="${ code }">${ name }</option>
-           % endfor
-         </select>
-      </td>
-    </tr>
-    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Address")}</span></td>
       <td bgcolor="white" width="100%">
         <table width="100%">

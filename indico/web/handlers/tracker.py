@@ -19,19 +19,17 @@ import sys
 
 from flask import jsonify
 
-from MaKaC.common import info
+from indico.core.config import Config
 from MaKaC.webinterface.rh.base import RH
 
 
 class RHSystemInfo(RH):
-
     def _process(self):
         try:
             indico_version = pkg_resources.get_distribution('indico').version
         except pkg_resources.DistributionNotFound:
             indico_version = 'dev'
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         stats = {'python_version': '.'.join(map(str, sys.version_info[:3])),
                  'indico_version': indico_version,
-                 'language': minfo.getLang()}
+                 'language': Config.getInstance().getDefaultLocale()}
         return jsonify(stats)

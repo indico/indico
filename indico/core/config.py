@@ -344,6 +344,7 @@ class Config:
         'ExternalRegistrationURL'   : '',
         'SecretKey'                 : None,
         'DefaultTimezone'           : 'UTC',
+        'DefaultLocale'             : 'en_GB',
         'CeleryBroker'              : None,
         'CeleryResultBackend'       : None,
         'CeleryConfig'              : {},

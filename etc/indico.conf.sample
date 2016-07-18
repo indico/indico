@@ -373,6 +373,9 @@ MaxUploadFileSize = 0
 # The timezone that is used by default. This also affects the timezone used by
 # periodic tasks.
 #DefaultTimezone = 'UTC'
+#
+# The locale that is used by default for i18n.
+#DefaultLocale = 'en_GB'
 
 
 #------------------------------------------------------------------------------

@@ -48,9 +48,10 @@ class RHCephalopod(RHCephalopodBase):
 
         affiliation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
         enabled = settings.get('joined')
-        instance_url = Config.getInstance().getBaseURL()
-        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-        tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
+        config = Config.getInstance()
+        instance_url = config.getBaseURL()
+        language = config.getDefaultLocale()
+        tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html',
                                             affiliation=affiliation,
                                             enabled=enabled,
@@ -106,8 +107,7 @@ class RHCephalopodSync(RHCephalopodBase):
 
 class RHSystemInfo(RH):
     def _process(self):
-        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
         stats = {'python_version': python_version(),
                  'indico_version': MaKaC.__version__,
-                 'language': language}
+                 'language': Config.getInstance().getDefaultLocale()}
         return jsonify(stats)

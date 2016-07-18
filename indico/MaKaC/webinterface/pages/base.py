@@ -199,7 +199,7 @@ class WPBase():
             "printCSS": map(self._fix_path, self.getPrintCSSFiles()),
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
-            "language": session.lang or info.getLang(),
+            "language": session.lang or Config.getInstance().getDefaultLocale(),
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
         })

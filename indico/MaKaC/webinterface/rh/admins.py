@@ -66,7 +66,6 @@ class RHGeneralInfoPerformModification(RHAdminBase):
             self._minfo.setOrganisation(params["organisation"])
             self._minfo.setCity(params["city"])
             self._minfo.setCountry(params["country"])
-            self._minfo.setLang(params["lang"])
         self._redirect(urlHandlers.UHAdminArea.getURL())
 
 

@@ -96,7 +96,7 @@ class WAdmins(wcomponents.WTemplated):
         wvars['supportEmail'] = Config.getInstance().getSupportEmail()
         wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
         wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
-        wvars['lang'] = minfo.getLang()
+        wvars['lang'] = Config.getInstance().getDefaultLocale()
         wvars['address'] = ''
         if minfo.getCity() != '':
             wvars['address'] = minfo.getCity()
@@ -161,7 +161,7 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["organisation"] = genInfo.getOrganisation()
         vars["city"] = genInfo.getCity()
         vars["country"] = genInfo.getCountry()
-        vars["language"] = genInfo.getLang()
+        vars["language"] = Config.getInstance().getDefaultLocale()
         vars["language_list"] = get_all_locales()
         return vars
 

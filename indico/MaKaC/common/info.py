@@ -35,7 +35,6 @@ class MaKaCInfo(Persistent):
         self._organisation = ""
         self._city = ""
         self._country = ""
-        self._lang = "en_GB"
 
         # Account-related features
         self._authorisedAccountCreation = True
@@ -184,17 +183,6 @@ class MaKaCInfo(Persistent):
     def setDefaultTemplateSet( self, defTemp ):
         self._defaultTemplateSet = defTemp
         return self._defaultTemplateSet
-
-    def getLang( self ):
-        try:
-            return self._lang
-        except:
-            self._lang = "en_GB"
-            #Logger.get('i18n').warning('No language set in MaKaCInfo... using %s by default' % self._lang)
-            return self._lang
-
-    def setLang( self, lang ):
-        self._lang = lang
 
     def setArchivingVolume(self, volume):
         if isinstance(volume, str):
