@@ -118,9 +118,11 @@ def apply_db_loggers(app):
                                                                      'sql_duration': total,
                                                                      'sql_verb': statement.split()[0]})
         g.sql_query_count = g.get('sql_query_count', 0) + 1
+        g.req_query_duration = g.get('req_query_duration', 0) + total
 
     @request_started.connect_via(app)
     def on_request_started(sender, **kwargs):
+        g.req_query_duration = 0.0
         g.req_start_ts = time.time()
         g.req_start_sent = False
 
@@ -135,4 +137,5 @@ def apply_db_loggers(app):
                                                 'req_verb': request.method if has_request_context() else None,
                                                 'req_url': request.url if has_request_context() else None,
                                                 'req_path': request.path if has_request_context() else None,
-                                                'req_duration': duration})
+                                                'req_duration': duration,
+                                                'req_query_duration': g.req_query_duration})
