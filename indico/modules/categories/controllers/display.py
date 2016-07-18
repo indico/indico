@@ -516,33 +516,6 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         # Function type: Event -> List[Event]
         tzinfo = self.category.display_tzinfo
 
-        class _EventProxy(object):
-            def __init__(self, event, date, timetable_objects):
-                start_dt = datetime.combine(date, event.start_dt.astimezone(tzinfo).timetz())
-                assert date >= event.start_dt
-                assert date <= event.end_dt
-                object.__setattr__(self, '_start_dt', start_dt)
-                object.__setattr__(self, '_real_event', event)
-                object.__setattr__(self, '_timetable_objects', timetable_objects)
-
-            def __getattribute__(self, name):
-                if name == 'start_dt':
-                    return object.__getattribute__(self, '_start_dt')
-                event = object.__getattribute__(self, '_real_event')
-                if name == 'timetable_objects':
-                    return object.__getattribute__(self, '_timetable_objects')
-                if name == 'ongoing':
-                    return event.start_dt.date() != self.start_dt.date()
-                if name == 'first_occurence_start_dt':
-                    return event.start_dt
-                return getattr(event, name)
-
-            def __setattr__(self, name, value):
-                raise AttributeError('This instance is read-only')
-
-            def __repr__(self):
-                return '<_EventProxy({}, {})>'.format(self.start_dt, object.__getattribute__(self, '_real_event'))
-
         # Breaks, contributions and sessions grouped by start_dt. Each EventProxy will return the relevant ones only
         timetable_objects = sorted(chain(*info[event.id].values()), key=attrgetter('timetable_entry.start_dt'))
         timetable_objects_by_date = {x[0]: list(x[1]) for x
@@ -553,4 +526,32 @@ class RHCategoryOverview(RHDisplayCategoryBase):
                                     min(self.end_dt, event.end_dt.astimezone(tzinfo)))
 
         # Generate a proxy object with adjusted start_dt and timetable_objects for each day
-        return [_EventProxy(event, day, timetable_objects_by_date.get(day.date(), [])) for day in event_days]
+        return [_EventProxy(event, day, tzinfo, timetable_objects_by_date.get(day.date(), [])) for day in event_days]
+
+
+class _EventProxy(object):
+    def __init__(self, event, date, tzinfo, timetable_objects):
+        start_dt = datetime.combine(date, event.start_dt.astimezone(tzinfo).timetz())
+        assert date >= event.start_dt
+        assert date <= event.end_dt
+        object.__setattr__(self, '_start_dt', start_dt)
+        object.__setattr__(self, '_real_event', event)
+        object.__setattr__(self, '_timetable_objects', timetable_objects)
+
+    def __getattribute__(self, name):
+        if name == 'start_dt':
+            return object.__getattribute__(self, '_start_dt')
+        event = object.__getattribute__(self, '_real_event')
+        if name == 'timetable_objects':
+            return object.__getattribute__(self, '_timetable_objects')
+        if name == 'ongoing':
+            return event.start_dt.date() != self.start_dt.date()
+        if name == 'first_occurence_start_dt':
+            return event.start_dt
+        return getattr(event, name)
+
+    def __setattr__(self, name, value):
+        raise AttributeError('This instance is read-only')
+
+    def __repr__(self):
+        return '<_EventProxy({}, {})>'.format(self.start_dt, object.__getattribute__(self, '_real_event'))
