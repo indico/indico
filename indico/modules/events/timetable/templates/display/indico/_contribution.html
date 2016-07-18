@@ -5,9 +5,8 @@
                                                               render_notes, render_description, render_time %}
 
 {% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
-                             show_notes=false) -%}
+                             show_notes=false, show_location=false) -%}
     {% set anchor = slugify(contrib.friendly_id, contrib.title, maxlen=30) %}
-
     <li class="timetable-item timetable-contrib" id="{{ anchor }}">
         <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
             {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
@@ -24,7 +23,7 @@
                         {{- contrib.duration | format_human_timedelta(narrow=true) -}}
                     </span>
                 {%- endif %}
-                {% if not contrib.inherit_location and contrib.has_location_info -%}
+                {% if contrib.has_location_info and show_location -%}
                     {{ render_location(contrib, parent=parent) }}
                 {%- endif %}
                 <div class="timetable-item-actions">

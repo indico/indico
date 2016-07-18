@@ -41,13 +41,16 @@
 
         {% if item.type.name == 'CONTRIBUTION' -%}
             {{ render_contribution(item.object, event, nested=false, timezone=timezone,
-                                   show_notes=theme_settings.show_notes, parent=event) }}
+                                   show_notes=theme_settings.show_notes, parent=event,
+                                   show_location=show_siblings_location) }}
         {%- elif item.type.name == 'SESSION_BLOCK' -%}
             {{ render_session_block(item.object, event, timezone=timezone, show_notes=theme_settings.show_notes,
-                                    parent=event, hide_contribs=hide_contribs) }}
+                                    parent=event, hide_contribs=hide_contribs,
+                                    show_location=show_siblings_location,
+                                    show_children_location=show_children_location[item.id]) }}
         {%- elif item.type.name == 'BREAK' -%}
             {{ render_break(item.object, event, nested=false, timezone=timezone, show_notes=theme_settings.show_notes,
-                            parent=event) }}
+                            parent=event, show_location=show_siblings_location) }}
         {%- endif %}
 
         {% set previous_date = date %}
