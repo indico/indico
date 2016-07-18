@@ -102,10 +102,11 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             return
         elif sql_log_type == 'end_request':
             with output_lock:
-                print '\x1b[38;5;202mEnd request\x1b[0m    {} {} [{} queries | {:.06f}s]'.format(obj['req_verb'],
-                                                                                                 obj['req_url'],
-                                                                                                 obj['sql_query_count'],
-                                                                                                 obj['req_duration'])
+                fmt = '\x1b[38;5;202mEnd request\x1b[0m    {} {} [{} queries ({}) | {}]'
+                print fmt.format(obj['req_verb'], obj['req_url'],
+                                 prettify_count(obj['sql_query_count']),
+                                 prettify_duration(obj['req_query_duration'], True),
+                                 prettify_duration(obj['req_duration'], True))
                 print_linesep(True, 196)
             return
         # XXX: `WITH` queries could be something different from SELECT but so far
@@ -182,18 +183,19 @@ def prettify_caption(caption):
     return '\x1b[38;5;75;04m{}\x1b[0m'.format(caption)
 
 
-def prettify_duration(duration):
-    if duration >= 0.25:
-        color = 196
-    elif duration >= 0.1:
-        color = 202
-    elif duration >= 0.05:
-        color = 226
-    elif duration >= 0.005:
-        color = 46
+def prettify_duration(duration, is_total=False):
+    if is_total:
+        thresholds = [(0.5, 196), (0.25, 202), (0.1, 226), (0.05, 46), (None, 123)]
     else:
-        color = 123
+        thresholds = [(0.25, 196), (0.1, 202), (0.05, 226), (0.005, 46), (None, 123)]
+    color = next(c for t, c in thresholds if t is None or duration >= t)
     return '\x1b[38;5;{}m{:.06f}s\x1b[0m'.format(color, duration)
+
+
+def prettify_count(count):
+    thresholds = [(50, 196), (30, 202), (20, 226), (10, 46), (None, 123)]
+    color = next(c for t, c in thresholds if t is None or count >= t)
+    return '\x1b[38;5;{}m{}\x1b[0m'.format(color, count)
 
 
 def prettify_source(source, traceback_frames):
