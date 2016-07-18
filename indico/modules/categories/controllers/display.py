@@ -39,7 +39,7 @@ from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
-from indico.util.date_time import format_date, now_utc
+from indico.util.date_time import format_date, now_utc, format_number
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -187,11 +187,33 @@ class RHCategorySearch(RH):
                             total_count=total_count, flash=False)
 
 
+class RHSubcatInfo(RHDisplayCategoryBase):
+    """Get basic information about subcategories.
+
+    This is intended to return information shown on a category display
+    page that is not needed immediately and is somewhat expensive to
+    retrieve.
+    """
+
+    @classproperty
+    @classmethod
+    def _category_query_options(cls):
+        children_strategy = joinedload('children')
+        children_strategy.load_only('id')
+        children_strategy.undefer('deep_events_count')
+        return children_strategy, load_only('id', 'parent_id', 'protection_mode')
+
+    def _process(self):
+        event_counts = {c.id: {'value': c.deep_events_count, 'pretty': format_number(c.deep_events_count)}
+                        for c in self.category.children}
+        return jsonify_data(flash=False, event_counts=event_counts)
+
+
 class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     """Base class for display pages displaying an event list"""
 
-    _category_query_options = (joinedload('children').undefer('deep_events_count'), undefer('attachment_count'),
-                               undefer('has_events'))
+    _category_query_options = (joinedload('children').load_only('id', 'title', 'protection_mode'),
+                               undefer('attachment_count'), undefer('has_events'))
 
     def _checkParams(self):
         RHDisplayCategoryBase._checkParams(self)

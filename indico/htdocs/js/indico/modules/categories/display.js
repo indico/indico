@@ -18,6 +18,26 @@
 (function(global) {
     'use strict';
 
+    global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
+        var url = $('.category-list').data('subcat-info-url');
+        if (url === undefined) {
+            // there's no .category-list if there are no subcategories
+            return;
+        }
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            error: handleAjaxError,
+            success: function(data) {
+                _.each(data.event_counts, function(count, id) {
+                    var text = !count.value ? $T.gettext('empty')
+                                            : $T.ngettext('{0} event', '{0} events', count.value).format(count.pretty);
+                    $('#category-event-count-' + id).text(text);
+                });
+            }
+        });
+    };
+
     global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(showPastEvents) {
         var $eventList = $('.event-list');
         var $futureEvents = $eventList.find('.future-events');
