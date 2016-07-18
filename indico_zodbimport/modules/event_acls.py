@@ -22,7 +22,6 @@ from operator import attrgetter
 import click
 from sqlalchemy.orm import joinedload
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events import Event
@@ -71,31 +70,7 @@ class EventACLImporter(Importer):
                 self.all_users_by_email[email] = user
 
         with patch_default_group_provider(self.default_group_provider):
-            if not self.parallel:
-                self._drop_timetable_trigger()
-            try:
-                self.migrate_event_acls()
-            except:
-                db.session.rollback()
-                raise
-            finally:
-                if not self.parallel:
-                    self._restore_trigger()
-
-    def _drop_timetable_trigger(self):
-        db.session.execute('DROP TRIGGER consistent_timetable ON events.events')
-        db.session.commit()
-
-    def _restore_trigger(self):
-        db.session.execute("""
-            CREATE CONSTRAINT TRIGGER consistent_timetable
-            AFTER UPDATE
-            ON events.events
-            DEFERRABLE INITIALLY DEFERRED
-            FOR EACH ROW
-            EXECUTE PROCEDURE events.check_timetable_consistency('event');
-        """)
-        db.session.commit()
+            self.migrate_event_acls()
 
     def migrate_event_acls(self):
         self.print_step('migrating event ACLs')
