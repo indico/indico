@@ -25,7 +25,8 @@
 {% macro move_category_button(category, classes="i-button") %}
     <a class="{{ classes }} icon-transmission js-move-category"
        title="{% trans %}Move to another category{% endtrans %}"
-       data-href="{{ url_for('categories.move', category) }}"></a>
+       data-href="{{ url_for('categories.move', category) }}"
+       data-category-id="{{ category.id }}"></a>
 {% endmacro %}
 
 {% block banner_title %}

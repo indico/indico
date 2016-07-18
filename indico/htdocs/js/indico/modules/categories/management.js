@@ -26,7 +26,8 @@
             _fetchSourceCategory(parentCategoryId);
         }
         $('.js-move-category').on('click', function(evt) {
-            _moveCategories(_categories[parentCategoryId], $(this).data('href'));
+            var $this = $(this);
+            _moveCategories([$this.data('categoryId')], _categories[parentCategoryId], $this.data('href'));
         });
     };
 
@@ -57,17 +58,17 @@
         });
 
         $bulkMoveButton.on('click', function(evt) {
+            var $this = $(this);
             evt.preventDefault();
-            if ($(this).hasClass('disabled')) {
+            if ($this.hasClass('disabled')) {
                 return;
             }
-            _moveCategories(_categories[categoryId], $(this).data('href'), {
-                category_id: getSelectedCategories()
-            });
+            _moveCategories(getSelectedCategories(), _categories[categoryId], $this.data('href'));
         });
 
         $table.find('.js-move-category').on('click', function(evt) {
-            _moveCategories(_categories[categoryId], $(this).data('href'));
+            var $this = $(this);
+            _moveCategories([$this.data('categoryId')], _categories[categoryId], $this.data('href'));
         });
 
         $table.find('.js-delete-category').on('indico:confirmed', function(evt) {
@@ -282,35 +283,45 @@
         }
     }
 
-    function _moveCategories(source, endpoint, data) {
+    function _moveCategories(ids, source, endpoint) {
         var sourceId = _.isObject(source) ? source.category.id : source;
-        var category_count = data ? data.category_id.length : 1;
+        var data = {category_id: ids};
 
         $('<div>').categorynavigator({
             category: source,
             confirmation: true,
             openInDialog: true,
             actionButtonText: $T.gettext("Move here"),
-            dialogTitle: $T.ngettext("Move category", "Move categories", category_count),
+            dialogTitle: $T.ngettext("Move category", "Move categories", ids.length),
             dialogSubtitle: $T.ngettext("Select new category parent for the category",
-                                        "Select new category parent for {0} selected categories".format(category_count),
-                                         category_count),
+                                        "Select new category parent for {0} selected categories",
+                                        ids.length).format(ids.length),
             actionOn: {
                 categoriesWithEvents: {disabled: true},
+                categoriesDescendingFrom: {
+                    disabled: true,
+                    ids: ids
+                },
                 categories: {
                     disabled: true,
-                    // TODO disable also selected categories
-                    ids: [sourceId],
-                    message: $T.ngettext("The category is already here",
-                                         "Selected categories are already here",
-                                         category_count)
+                    groups: [{
+                        ids: [sourceId],
+                        message: $T.ngettext("The category is already here",
+                                             "The selected categories are already here",
+                                             ids.length)
+                    }, {
+                        ids: ids,
+                        message: $T.ngettext("This is the category you are trying to move",
+                                             "This is one of the categories you are trying to move",
+                                             ids.length)
+                    }]
                 }
             },
             onAction: function(category) {
                 $.ajax({
                     url: endpoint,
                     type: 'POST',
-                    data: $.extend({'target_category_id': category.id}, data || {}),
+                    data: $.extend({'target_category_id': category.id}, data),
                     error: handleAjaxError,
                     success: function(data) {
                         if (data.success) {
