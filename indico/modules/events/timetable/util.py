@@ -22,7 +22,7 @@ from operator import attrgetter
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload, subqueryload, undefer
+from sqlalchemy.orm import joinedload, subqueryload, undefer, contains_eager
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -39,19 +39,6 @@ from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
-
-
-def is_visible_from(event, categ):
-    """Check whether ``event`` is visible from ``categ``
-    """
-    visibility = event.as_legacy.getFullVisibility()
-    for cat_id in event.category_chain[::-1]:
-        if visibility <= 0:
-            return False
-        if str(cat_id) == categ.id:
-            return True
-        visibility -= 1
-    return True
 
 
 def _query_events(categ_ids, day_start, day_end):
@@ -76,15 +63,16 @@ def _query_blocks(event_ids, dates_overlap, detail_level='session'):
     options = [subqueryload('session').joinedload('blocks').joinedload('person_links')]
 
     if detail_level == 'contribution':
-        options.append(joinedload(SessionBlock.timetable_entry).joinedload(TimetableEntry.children))
+        options.append(contains_eager(SessionBlock.timetable_entry).joinedload(TimetableEntry.children))
     else:
-        options.append(joinedload(SessionBlock.timetable_entry))
+        options.append(contains_eager(SessionBlock.timetable_entry))
 
     return (SessionBlock.find(~Session.is_deleted,
                               Session.event_id.in_(event_ids),
                               dates_overlap(TimetableEntry))
             .options(*options)
-            .join(TimetableEntry).join(Session))
+            .join(TimetableEntry)
+            .join(Session))
 
 
 def find_latest_entry_end_dt(obj, day=None):
@@ -176,7 +164,10 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 
     # first of all, query TimetableEntries/events that fall within
     # specified range of dates (and category set)
-    for eid, tt_start_dt in _query_events(categ_ids, day_start, day_end):
+    events = _query_events(categ_ids, day_start, day_end)
+    if from_categ:
+        events = events.filter(Event.is_visible_in(from_categ))
+    for eid, tt_start_dt in events:
         if tt_start_dt:
             items[eid][tt_start_dt.astimezone(tz).date()].append(tt_start_dt)
         else:
@@ -189,12 +180,9 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                       joinedload(Event.own_room).noload('owner'),
                       joinedload(Event.own_venue),
                       undefer('category_chain')))
-
     scheduled_events = defaultdict(list)
     ongoing_events = []
     for e in query:
-        if from_categ and not is_visible_from(e, from_categ):
-            continue
         local_start_dt = e.start_dt.astimezone(tz).date()
         local_end_dt = e.end_dt.astimezone(tz).date()
         if items[e.id] is None:
@@ -223,28 +211,26 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     if detail_level != 'event':
         query = _query_blocks(event_ids, dates_overlap, detail_level)
         for b in query:
-            if not from_categ or is_visible_from(b.session.event_new, from_categ):
-                start_date = b.timetable_entry.start_dt.astimezone(tz).date()
-                result[b.session.event_id]['blocks'][start_date].append((b.timetable_entry, b))
+            start_date = b.timetable_entry.start_dt.astimezone(tz).date()
+            result[b.session.event_id]['blocks'][start_date].append((b.timetable_entry, b))
 
     if detail_level == 'contribution':
         query = (Contribution.find(Contribution.event_id.in_(event_ids),
-                                   dates_overlap(TimetableEntry))
-                 .options(joinedload(Contribution.timetable_entry),
+                                   dates_overlap(TimetableEntry),
+                                   ~Contribution.is_deleted)
+                 .options(contains_eager(Contribution.timetable_entry),
                           joinedload(Contribution.person_links))
                  .join(TimetableEntry))
         for c in query:
-            if not from_categ or is_visible_from(c.event_new, from_categ):
-                start_date = c.timetable_entry.start_dt.astimezone(tz).date()
-                result[c.event_id]['contribs'][start_date].append((c.timetable_entry, c))
+            start_date = c.timetable_entry.start_dt.astimezone(tz).date()
+            result[c.event_id]['contribs'][start_date].append((c.timetable_entry, c))
 
         query = (Break.find(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
-                 .options(joinedload(Break.timetable_entry))
+                 .options(contains_eager(Break.timetable_entry))
                  .join(TimetableEntry))
         for b in query:
-            if not from_categ or is_visible_from(b.timetable_entry.event_new, from_categ):
-                start_date = b.timetable_entry.start_dt.astimezone(tz).date()
-                result[b.timetable_entry.event_id]['breaks'][start_date].append((b.timetable_entry, b))
+            start_date = b.timetable_entry.start_dt.astimezone(tz).date()
+            result[b.timetable_entry.event_id]['breaks'][start_date].append((b.timetable_entry, b))
     return result
 
 
