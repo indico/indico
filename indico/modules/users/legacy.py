@@ -24,7 +24,6 @@ from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii, encode_utf8
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 
@@ -274,13 +273,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         if not self.user:
             return False
         return self.user.is_admin
-
-    @encode_utf8
-    def getLang(self):
-        return self.user.settings.get('lang') if self.user else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-
-    def setLang(self, lang):
-        self.user.settings.set('lang', to_unicode(lang))
 
     @property
     def as_new(self):
