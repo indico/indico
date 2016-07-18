@@ -21,7 +21,7 @@
                 {% if show_chairpersons and event.person_links %}
                     ({{ event.person_links|map(attribute='full_name')|sort|join('; ') }})
                 {% endif %}
-                {% if event.is_protected %}
+                {% if event.effective_protection_mode == 'protected' %}
                     <span class="protection icon-shield" data-type="restricted"></span>
                 {% endif %}
                 {% if event.has_location_info %}
