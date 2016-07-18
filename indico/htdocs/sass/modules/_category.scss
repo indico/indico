@@ -522,6 +522,10 @@ ul.category-resource-qtip {
         &:not(:first-of-type) td {
             border-top: 1px dotted #aaa;
         }
+
+        .category-icon {
+            float: right;
+        }
     }
 
     td.time {
