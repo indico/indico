@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import pkg_resources
 from platform import python_version
 from urlparse import urljoin
 
@@ -107,7 +108,11 @@ class RHCephalopodSync(RHCephalopodBase):
 
 class RHSystemInfo(RH):
     def _process(self):
+        try:
+            indico_version = pkg_resources.get_distribution('indico').version
+        except pkg_resources.DistributionNotFound:
+            indico_version = 'dev'
         stats = {'python_version': python_version(),
-                 'indico_version': MaKaC.__version__,
+                 'indico_version': indico_version,
                  'language': Config.getInstance().getDefaultLocale()}
         return jsonify(stats)

@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.web.handlers import tracker
 from MaKaC.webinterface.rh import helpDisplay, lang, resetTimezone, contact, errors
 
 
@@ -27,4 +26,3 @@ misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ,
 misc.add_url_rule('/contact', 'contact', contact.RHContact)
 misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))
 misc.add_url_rule('/error-report/<report_id>/<filename>', 'error-report-download', errors.RHDownloadErrorReport)
-misc.add_url_rule('/system-info', 'system-info', tracker.RHSystemInfo)
