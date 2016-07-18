@@ -1,7 +1,7 @@
 """Add news table
 
 Revision ID: 179817f1fb97
-Revises: 35a6ae289e03
+Revises: 35eac9fee166
 Create Date: 2016-07-01 14:22:07.053308
 """
 
@@ -12,7 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '179817f1fb97'
-down_revision = '35a6ae289e03'
+down_revision = '35eac9fee166'
 
 
 def upgrade():

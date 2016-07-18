@@ -1,7 +1,7 @@
 """Add favorite category FK
 
 Revision ID: 2940c52467e4
-Revises: 438138fdf6ce
+Revises: 179817f1fb97
 Create Date: 2016-06-03 13:23:10.249330
 """
 
@@ -10,7 +10,7 @@ from alembic import op, context
 
 # revision identifiers, used by Alembic.
 revision = '2940c52467e4'
-down_revision = '438138fdf6ce'
+down_revision = '179817f1fb97'
 
 
 def upgrade():
