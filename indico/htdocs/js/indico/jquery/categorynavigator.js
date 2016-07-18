@@ -44,6 +44,12 @@
                     disabled: false,
                     message: $T.gettext("Not possible for categories containing events")
                 },
+                categoriesDescendingFrom: {
+                    disabled: false,
+                    ids: [],
+                    // The closest parent category title will be used if more than one parent is present in ids
+                    message: $T.gettext('Not possible for categories descending from category "{0}"')
+                },
                 categories: {
                     disabled: false,
                     message: $T.gettext("Not possible for this category"),
@@ -259,36 +265,17 @@
         _buildSidePanel: function(category, forSubcategory) {
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
-            var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
-            var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
-
             var $button = $('<span>', {
                 class: 'action-button js-action',
                 text: self.options.actionButtonText,
                 'data-category-id': category.id
             });
-
-            function disableActionButton(message) {
-                $button.addClass('disabled').attr('title', message);
-            }
-
-            if (categoriesWithSubcategories.disabled && !categoriesWithEvents.disabled && category.deep_category_count) {
-                disableActionButton(categoriesWithSubcategories.message);
-            }
-            if (categoriesWithEvents.disabled && !categoriesWithSubcategories.disabled && category.has_events && category.deep_category_count === 0) {
-                disableActionButton(categoriesWithEvents.message);
-            }
-            if (self.options.actionOn.categories.disabled && _.contains(self.options.actionOn.categories.ids, category.id)) {
-                disableActionButton(self.options.actionOn.categories.message);
-            }
-            if (self.options.actionOn.categories.disabled && self.options.actionOn.categories.groups.length) {
-                _.each(self.options.actionOn.categories.groups, function(group) {
-                    if (_.contains(group.ids, category.id)) {
-                        disableActionButton(group.message);
-                    }
-                });
-            }
             $buttonWrapper.append($('<div>').append($button));
+
+            var canActOn = self._canActOn(category, true);
+            if (!canActOn.allowed) {
+                $button.addClass('disabled').attr('title', canActOn.message);
+            }
 
             if (!forSubcategory && category.parent_path && category.parent_path.length) {
                 var parent = _.last(category.parent_path);
@@ -685,31 +672,95 @@
             }
         },
 
-        _canActOn: function(category) {
+        _canActOn: function(category, withMessage) {
             var self = this;
-            var ids = self.options.actionOn.categories.ids;
-            var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
-            var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
-            var hasOnlyEvents = (category.has_events && !category.deep_category_count);
-            var hasSubcategories = !!category.deep_category_count;
+            var result = {allowed: true, message: ""};
+            var canActOnCategories = self._canActOnCategories(category, true);
+            var canActOnCategoriesDescendingFrom = self._canActOnCategoriesDescendingFrom(category, true);
+            var canActOnCategoriesWithEvents = self._canActOnCategoriesWithEvents(category, true);
+            var canActOnCategoriesWithSubcategories = self._canActOnCategoriesWithSubcategories(category, true);
 
-            if ((categoriesWithSubcategories.disabled && hasSubcategories) ||
-                (categoriesWithEvents.disabled && hasOnlyEvents)) {
-                return false;
+            if (!canActOnCategories.allowed) {
+                result = canActOnCategories;
+            } else if (!canActOnCategoriesDescendingFrom.allowed) {
+                result = canActOnCategoriesDescendingFrom;
+            } else if (!canActOnCategoriesWithEvents.allowed) {
+                result = canActOnCategoriesWithEvents;
+            } else if (!canActOnCategoriesWithSubcategories.allowed) {
+                result = canActOnCategoriesWithSubcategories;
             }
 
-            if (self.options.actionOn.categories.disabled) {
-                if (_.contains(self.options.actionOn.categories.ids, category.id)) {
-                    return false;
-                }
-                for (var i in self.options.actionOn.categories.groups) {
-                    if (_.contains(self.options.actionOn.categories.groups[i].ids, category.id)) {
-                        return false;
+            return withMessage ? result : result.allowed;
+        },
+
+        _canActOnCategoriesWithSubcategories: function(category, withMessage) {
+            var self = this;
+            var result = {allowed: true, message: ""};
+            var hasSubcategories = !!category.deep_category_count;
+            var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
+            if (categoriesWithSubcategories.disabled && hasSubcategories) {
+                result.allowed = false;
+                result.message = categoriesWithSubcategories.message;
+            }
+            return withMessage ? result : result.allowed;
+        },
+
+        _canActOnCategoriesWithEvents: function(category, withMessage) {
+            var self = this;
+            var result = {allowed: true, message: ""};
+            var hasOnlyEvents = category.has_events && !category.deep_category_count;
+            var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
+            if (categoriesWithEvents.disabled && hasOnlyEvents) {
+                result.allowed = false;
+                result.message = categoriesWithEvents.message;
+            }
+            return withMessage ? result : result.allowed;
+        },
+
+        _canActOnCategoriesDescendingFrom: function(category, withMessage) {
+            var self = this;
+            var result = {allowed: true, message: ""};
+            var categoriesDescendingFrom = self.options.actionOn.categoriesDescendingFrom;
+
+            if (categoriesDescendingFrom.disabled) {
+                var id;
+                var path_ids = _.pluck(category.parent_path, 'id').reverse();
+                var ids = categoriesDescendingFrom.ids;
+                for (var i in path_ids) {
+                    id = path_ids[i];
+                    if (_.contains(ids, id)) {
+                        result.allowed = false;
+                        result.message = categoriesDescendingFrom.message.format(self._categories[id].title);
+                        break;
                     }
                 }
             }
 
-            return true;
+            return withMessage ? result : result.allowed;
+        },
+
+        _canActOnCategories: function(category, withMessage) {
+            var self = this;
+            var result = {allowed: true, message: ""};
+            var categories = self.options.actionOn.categories;
+
+            if (categories.disabled) {
+                if (_.contains(categories.ids, category.id)) {
+                    result.allowed = false;
+                    result.message = categories.message;
+                } else {
+                    for (var i in categories.groups) {
+                        var group = categories.groups[i];
+                        if (_.contains(group.ids, category.id)) {
+                            result.allowed = false;
+                            result.message = group.message;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return withMessage ? result : result.allowed;
         },
 
         _toggleLoading: function(state, disableInput) {
