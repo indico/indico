@@ -179,7 +179,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
              .options(subqueryload(Event.person_links).joinedload(EventPersonLink.person),
                       joinedload(Event.own_room).noload('owner'),
                       joinedload(Event.own_venue),
-                      undefer('category_chain')))
+                      joinedload(Event.category),
+                      undefer('effective_protection_mode')))
     scheduled_events = defaultdict(list)
     ongoing_events = []
     events = []
