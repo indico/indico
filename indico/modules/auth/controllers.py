@@ -291,7 +291,7 @@ class RHRegister(RH):
         identity_data = handler.get_identity_data(form)
         settings = {
             'timezone': Config.getInstance().getDefaultTimezone() if session.timezone == 'LOCAL' else session.timezone,
-            'lang': session.lang or HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+            'lang': session.lang or Config.getInstance().getDefaultLocale()
         }
         return {'email': email, 'extra_emails': extra_emails, 'user_data': user_data, 'identity_data': identity_data,
                 'settings': settings}
