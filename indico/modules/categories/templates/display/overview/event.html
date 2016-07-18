@@ -36,10 +36,12 @@
     </tr>
     <tr>
         <td class="content-info" colspan="2">
-            {% if detail == 'session' %}
-                {{ _render_timetable(event, timezone, show_session=true) }}
-            {% elif detail == 'contribution' %}
-                {{ _render_timetable(event, timezone, show_session=true, show_contribution=true, show_break=true) }}
+            {% if event.can_access(session.user) %}
+                {% if detail == 'session' %}
+                    {{ _render_timetable(event, timezone, show_session=true) }}
+                {% elif detail == 'contribution' %}
+                    {{ _render_timetable(event, timezone, show_session=true, show_contribution=true, show_break=true) }}
+                {% endif %}
             {% endif %}
         </td>
     </tr>
