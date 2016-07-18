@@ -154,7 +154,7 @@ class XMLEventSerializer(object):
         SubElement(xml, 'modificationDate').text = self._format_date(event.as_legacy.getModificationDate())
         xml.append(self._serialize_timezone(self._tz))
         if self._include_timetable:
-            for entry in event.timetable_entries.filter(TimetableEntry.parent == None):
+            for entry in event.timetable_entries.filter(TimetableEntry.parent.is_(None)):
                 xml.append(self._serialize_timetable_entry(entry))
         return xml
 
