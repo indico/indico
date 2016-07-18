@@ -21,7 +21,6 @@ import lxml.etree
 from lxml.etree import Element, SubElement
 from pytz import timezone
 
-from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
