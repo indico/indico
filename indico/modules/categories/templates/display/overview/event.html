@@ -28,9 +28,7 @@
                     {{ render_location(event) }}
                 {% endif %}
                 {% if category.has_icon %}
-                    <img src="{{ url_for('categories.display_icon', category, slug=category.icon_metadata['hash']) }}"
-                         class="category-icon"
-                         title="{{ category.title }}">
+                    <img src="{{ category.icon_url }}" class="category-icon" title="{{ category.title }}">
                 {% endif %}
             </span>
         </td>
