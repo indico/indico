@@ -23,6 +23,7 @@
         setupConfirmPopup();
         setupMathJax();
         setupSelectAllNone();
+        setupAnchorLinks();
     });
 
     function setupSelectAllNone() {
@@ -201,4 +202,17 @@
             $elems.mathJax();
         }
     }
+
+    function setupAnchorLinks() {
+        $('[data-anchor]').each(function() {
+            var $elem = $(this),
+                fragment = $elem.data('anchor');
+            $('<a>', {
+                class: 'anchor-link',
+                href: '#' + fragment,
+                title: $T.gettext('Direct link to this item')
+            }).html('&para;').appendTo($elem);
+        });
+    }
+
 })();

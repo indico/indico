@@ -183,6 +183,7 @@ def setup_jinja(app):
     app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
+    app.add_template_global(slugify)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))

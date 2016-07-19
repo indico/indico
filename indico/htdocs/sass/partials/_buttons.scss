@@ -198,14 +198,6 @@
         cursor: pointer !important;
     }
 
-    &.arrow {
-        @include icon-after('icon-arrow-down');
-
-        &:after {
-            vertical-align: -10%;
-        }
-    }
-
     &.inconspicuous {
         box-shadow: none !important;
         background: transparent !important;
@@ -366,6 +358,14 @@ a.i-button-icon {
     &.disabled {
         @extend %button-disabled;
         background: inherit;
+    }
+}
+
+a.arrow, .i-button.arrow {
+    @include icon-after('icon-arrow-down');
+
+    &:after {
+        vertical-align: -10%;
     }
 }
 

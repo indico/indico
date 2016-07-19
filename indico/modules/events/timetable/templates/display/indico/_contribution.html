@@ -6,14 +6,16 @@
 
 {% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
                              show_notes=false) -%}
-    <li class="timetable-item timetable-contrib">
+    {% set anchor = slugify(contrib.friendly_id, contrib.title, maxlen=30) %}
+
+    <li class="timetable-item timetable-contrib" id="{{ anchor }}">
         <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
             {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
 
         <div class="timetable-item-body">
             <div class="timetable-item-header">
-                <span class="timetable-title {{ 'nested' if nested }}">
+                <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ anchor }}">
                     {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
                     {{- contrib.title | safe -}}
                 </span>
