@@ -14,11 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session
+from flask import render_template, session
 
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.common import Config
 from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.core.db import DBMgr
+
+
+def render_error(message, description, standalone=False):
+    if standalone:
+        logo_url = Config.getInstance().getSystemIconURL("logoIndico")
+        return render_template('standalone_error.html', error_message=message, error_description=description,
+                               logo_url=logo_url)
+    else:
+        return WPErrorWSGI(message, description).getHTML()
 
 
 class WPErrorWSGI(WPDecorated, WPJinjaMixin):

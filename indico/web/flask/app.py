@@ -22,8 +22,7 @@ import traceback
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
-from flask import send_from_directory, request, _app_ctx_stack
-from flask import current_app
+from flask import _app_ctx_stack, current_app, request, send_from_directory
 from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
 from markupsafe import Markup
@@ -33,7 +32,7 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
-from MaKaC.webinterface.pages.error import WPErrorWSGI
+from MaKaC.webinterface.pages.error import render_error
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
@@ -317,14 +316,14 @@ def handle_404(exception):
             description = _("The page you are looking for doesn't exist.")
         else:
             description = exception.description
-        return WPErrorWSGI(_("Page not found"), description).getHTML(), 404
+        return render_error(_("Page not found"), description).getHTML(), 404
 
 
 def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
     if current_app.debug:
         raise
-    return WPErrorWSGI(str(exception), _("An unexpected error occurred.")).getHTML(), 500
+    return render_error(_("An unexpected error occurred."), str(exception), standalone=True), 500
 
 
 def make_app(set_path=False, db_setup=True, testing=False):
