@@ -162,21 +162,6 @@ class UHConferenceHelp(URLHandler):
     _endpoint = 'misc.help'
 
 
-class UHConferenceCreation(URLHandler):
-    _endpoint = 'event_creation.conferenceCreation'
-
-    @classmethod
-    def getURL(cls, target):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams(target.getLocator())
-        return url
-
-
-class UHConferencePerformCreation(URLHandler):
-    _endpoint = 'event_creation.conferenceCreation-createConference'
-
-
 class UHConferenceDisplay(URLHandler):
     _endpoint = 'event.conferenceDisplay'
 
