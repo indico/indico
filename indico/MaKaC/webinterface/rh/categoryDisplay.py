@@ -45,6 +45,7 @@ from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.util.string import to_unicode
 from indico.web.flask.util import endpoint_for_url
 
 
@@ -81,7 +82,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
         if self._confirm == True:
             if self._event_type != EventType.lecture:
                 c = self._createEvent( self._params )
-                self.alertCreation([c])
+                self.alertCreation([c], to_unicode(params['title']))
             # lectures
             else:
                 lectures = []
@@ -93,7 +94,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
                     self._params["sMinute"] = self._params.get("sMinute_%s"%i,"")
                     self._params["duration"] = int(self._params.get("dur_%s"%i,60))
                     lectures.append(self._createEvent(self._params))
-                self.alertCreation(lectures)
+                self.alertCreation(lectures, to_unicode(params['title']))
                 lectures.sort(sortByStartDate)
                 # create links
                 for i, source in enumerate(lectures, 1):
@@ -145,8 +146,9 @@ class RHConferencePerformCreation(RHCreateEventBase):
         allowedUsersDict = json.decode(self._params.get("allowedUsers") or "[]") or []
         return UserListModificationBase.retrieveUsers({"userList": allowedUsersDict})[0] if allowedUsersDict else []
 
-    def alertCreation(self, confs):
-        notify_event_creation(confs[0].as_event, [conf.as_event for conf in confs[1:]])
+    def alertCreation(self, confs, title):
+        occurrences = [conf.as_event for conf in confs] if len(confs) > 1 else None
+        notify_event_creation(confs[0].as_event, title, occurrences)
 
 
 class UtilsConference:
