@@ -391,7 +391,8 @@ module_js = {
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
                                        'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
-    'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js')
+    'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js'),
+    'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",
