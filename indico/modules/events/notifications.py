@@ -24,12 +24,17 @@ from indico.modules.categories.models.categories import Category
 from indico.web.flask.templating import get_template_module
 
 
-def notify_event_creation(event, following_events=None):
+def notify_event_creation(event, title, occurrences=None):
     """Send email notifications when a new Event is created
 
     :param event: The `Event` that has been created.
-    :param following_events: A list of later event occurrences in case
-                             of a lecture with more than one occurrence.
+    :param title: The title of the event.  Needed because currently
+                  a `(1/3)` suffix is appended when creating a series
+                  of events.
+    :param occurrences: A list of event occurrences in case of a
+                        series of events.  If specified, the links
+                        and dates/times are only taken from the
+                        events in this list.
     """
     emails = set()
 
@@ -42,7 +47,7 @@ def notify_event_creation(event, following_events=None):
                 emails.update(x.email for x in manager.get_members())
 
     if emails:
-        template = get_template_module('events/emails/event_creation.txt', event=event,
-                                       following_events=following_events)
+        template = get_template_module('events/emails/event_creation.txt', event=event, title=title,
+                                       occurrences=occurrences)
         send_email(make_email(bcc_list=emails, template=template, from_address=Config.getInstance().getSupportEmail()),
                    event.as_legacy, module='Events')

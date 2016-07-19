@@ -7,51 +7,72 @@
 {% block header -%}{%- endblock %}
 
 {% block body -%}
-_Title_
-    {{ event.title }}
+    {%- filter dedent -%}
+        {% filter underline %}Title{% endfilter %}
+        {{ title }}
 
-_Category_
-    {{ event.category.chain_titles|join(' » ') }}
+        {% filter underline %}Category{% endfilter %}
+        {{ event.category.chain_titles|join(' » ') }}
 
-{% if event.person_links -%}
-{{ '_Speakers_' if event.type == 'lecture' else '_Chairpersons_' }}
-    {{ event.person_links|sort(attribute='full_name')|join('; ', attribute='full_name') }}
-{%- endif %}
+        {% filter underline %}Creator{% endfilter %}
+        {{ event.creator.full_name }}
 
-{% if event.room_name -%}
-    _Room_
-    {{ event.room_name }}
-{%- endif %}
+        {%- if event.person_links %}
 
-{% if event.description -%}
-    _Description_
-    {{ event.description|strip_tags|indent }}
-{%- endif %}
+            {{ ('Speakers' if event.type == 'lecture' else 'Chairpersons' ) | underline }}
+            {{ event.person_links|sort(attribute='full_name')|join('; ', attribute='full_name') }}
+        {%- endif -%}
 
-_Creator_
-    {{ event.creator.full_name }}
+        {%- if event.venue_name and event.room_name %}
 
-_Date_
-    {{ event.start_dt|format_date(timezone=event.timezone) }}
+            {% filter underline %}Location{% endfilter %}
+            {{ event.room_name }} ({{ event.venue_name }})
+        {%- elif event.venue_name %}
 
-_Time_
-    {{ event.start_dt|format_time(timezone=event.timezone) }}
+            {% filter underline %}Venue{% endfilter %}
+            {{ event.venue_name }}
+        {%- elif event.room_name %}
 
-_Link_
-    {{ url_for('event.conferenceDisplay', event, _external=true) }}
+            {% filter underline %}Room{% endfilter %}
+            {{ event.room_name }}
+        {%- endif -%}
 
-{% if following_events %}
-_Other Occurrences_
-{% for following_event in following_events %}
-    {%- set start_dt = event.start_dt %}
-    {{ start_dt|format_date(timezone=event.timezone) }}, {{ start_dt|format_time(timezone=event.timezone) }} to {{ event.end_dt|format_time(timezone=event.timezone) }}: {{ url_for('event.conferenceDisplay', event, _external=true) -}}
-{% endfor %}
-{% endif %}
+        {%- if event.description %}
 
-{% endblock %}
+            {% filter underline %}Description{% endfilter %}
+            {{ event.description | strip_tags }}
+        {%- endif %}
+
+        {% if not occurrences -%}
+            {% filter underline %}Date{% endfilter %}
+            {{ event.start_dt|format_date(timezone=event.timezone) }}
+            {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
+                {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
+            {%- endif %}
+
+            {% filter underline %}Time{% endfilter %}
+            {{ event.start_dt|format_time(timezone=event.timezone) }} - {{ event.end_dt|format_time(timezone=event.timezone) }}
+            {#- #} ({{ event.timezone }})
+
+            {% filter underline %}URL{% endfilter %}
+            {{ url_for('event.conferenceDisplay', event, _external=true) }}
+        {%- else -%}
+            {% filter underline %}Timezone{% endfilter %}
+            {{ event.timezone }}
+
+            {% filter underline %}Occurrences{% endfilter -%}
+            {% for evt in occurrences %}
+                {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
+                {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
+                {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
+                {{ url_for('event.conferenceDisplay', evt, _external=true) -}}
+            {%- endfor -%}
+        {%- endif -%}
+    {%- endfilter -%}
+{%- endblock %}
 
 {% block footer_title -%}
-    Events
+    Event notifications
 {%- endblock %}
 
 {% block footer_url %}{% endblock %}
