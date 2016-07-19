@@ -129,20 +129,31 @@ def strict_unicode(value):
     return unicode(value)
 
 
-def slugify(value, lower=True):
-    """Converts a string to a simpler version useful for URL slugs.
+def slugify(*args, **kwargs):
+    """Joins a series of strings into a URL slug.
 
     - normalizes unicode to proper ascii repesentations
     - removes non-alphanumeric characters
     - replaces whitespace with dashes
 
     :param lower: Whether the slug should be all-lowercase
+    :param maxlen: Maximum slug length
     """
+
+    lower = kwargs.get('lower', True)
+    maxlen = kwargs.get('maxlen')
+
+    value = '-'.join(str(val) for val in args)
     value = to_unicode(value).encode('translit/long')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip())
+    value = unicode(re.sub(r'[^\w\s-]', '', value).strip())
+
     if lower:
         value = value.lower()
-    return re.sub('[-\s]+', '-', value)
+    value = re.sub(r'[-\s]+', '-', value)
+    if maxlen:
+        value = value[0:maxlen].rstrip('-')
+
+    return value
 
 
 def unicode_struct_to_utf8(obj):
