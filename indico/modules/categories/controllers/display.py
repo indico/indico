@@ -270,8 +270,22 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
     """Show the contents of a category (events/subcategories)"""
 
     def _process(self):
+        # Current events, which are always shown by default are events of this month and of the previous month.
+        # If there are no events in this range, it will include the last and next month containing events.
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
+        next_event_start_dt = (db.session.query(Event.start_dt)
+                               .filter(Event.start_dt >= self.now, Event.category_id == self.category.id)
+                               .order_by(Event.start_dt.asc())
+                               .first() or (None,))[0]
+        previous_event_start_dt = (db.session.query(Event.start_dt)
+                                   .filter(Event.start_dt < self.now, Event.category_id == self.category.id)
+                                   .order_by(Event.start_dt.desc())
+                                   .first() or (None,))[0]
+        if next_event_start_dt is not None and next_event_start_dt > future_threshold:
+            future_threshold = next_event_start_dt + relativedelta(months=1, day=1, hour=0, minute=0)
+        if previous_event_start_dt is not None and previous_event_start_dt < past_threshold:
+            past_threshold = previous_event_start_dt.replace(day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
                        .options(*self._event_query_options)
                        .order_by(Event.start_dt.desc()))
