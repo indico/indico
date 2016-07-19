@@ -38,8 +38,7 @@ _bp.add_url_rule('!/admin/users/settings', 'users_admin_settings', RHUsersAdminS
 _bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/', 'users_merge', RHUsersAdminMerge, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/check/', 'users_merge_check', RHUsersAdminMergeCheck)
-_bp.add_url_rule('!/admin/users/registration-requests/', 'registration_request_list', RHRegistrationRequestList,
-                 methods=('GET', ))
+_bp.add_url_rule('!/admin/users/registration-requests/', 'registration_request_list', RHRegistrationRequestList)
 _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/accept', 'accept_registration_request',
                  RHAcceptRegistrationRequest, methods=('POST',))
 _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/reject', 'reject_registration_request',
