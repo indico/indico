@@ -62,3 +62,6 @@ class WPUserDashboard(WPUser):
 class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
     sidemenu_option = 'users'
     template_prefix = 'users/'
+
+    def getJSFiles(self):
+        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_users_js'].urls()
