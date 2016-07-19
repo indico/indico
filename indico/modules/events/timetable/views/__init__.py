@@ -90,6 +90,7 @@ def inject_meeting_body(event, **kwargs):
     children_contrib_strategy.joinedload('subcontributions')
     children_contrib_strategy.joinedload('references')
     children_contrib_strategy.joinedload('own_room')
+    children_contrib_strategy.joinedload('note')
 
     children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
     children_subcontrib_strategy.joinedload('person_links')
@@ -97,10 +98,13 @@ def inject_meeting_body(event, **kwargs):
 
     contrib_strategy = joinedload('contribution')
     contrib_strategy.joinedload('person_links')
+    contrib_strategy.joinedload('references')
+    contrib_strategy.joinedload('note')
 
     subcontrib_strategy = contrib_strategy.joinedload('subcontributions')
     subcontrib_strategy.joinedload('person_links')
     subcontrib_strategy.joinedload('references')
+    subcontrib_strategy.joinedload('note')
 
     # try to minimize the number of DB queries
     options = [contrib_strategy,
