@@ -35,6 +35,7 @@ from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
@@ -349,24 +350,12 @@ class RHUsersAdminCreate(RHAdminBase):
 
     CSRF_ENABLED = True
 
-    def _create_user(self, form):
-        user = User()
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.email = form.email.data
-        user.affiliation = form.affiliation.data
-        identity = Identity(provider='indico', identifier=form.username.data, password=form.password.data)
-        user.identities.add(identity)
-        user.favorite_users.add(user)
-        db.session.add(user)
-        db.session.flush()
-        signals.users.registered.send(user, from_moderation=True, identity=identity)
-        return user
-
     def _process(self):
         form = AdminAccountRegistrationForm()
         if form.validate_on_submit():
-            user = self._create_user(form)
+            data = form.data
+            identity = Identity(provider='indico', identifier=data.pop('username'), password=data.pop('password'))
+            user = create_user(data.pop('email'), data, identity, from_moderation=True)
             msg = Markup('{} <a href="{}">{}</a>').format(
                 escape(_('The account has been created.')),
                 url_for('users.user_profile', user),

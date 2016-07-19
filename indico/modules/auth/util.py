@@ -24,6 +24,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
+from indico.modules.users.operations import create_user
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 
@@ -65,29 +66,9 @@ def register_user(email, extra_emails, user_data, identity_data, settings, from_
     only reason why this is here is that approving a registration request
     is handled by the `users` module.
     """
-    user = User.find_first(~User.is_deleted, User.is_pending,
-                           User.all_emails.contains(db.func.any(list({email} | set(extra_emails)))))
-    if user:
-        user.is_pending = False
-    else:
-        user = User()
-    user.populate_from_dict(user_data)
-    if email in user.secondary_emails:
-        # This can happen if there's a pending user who has a secondary email
-        # for some weird reason which should now become the primary email...
-        user.make_email_primary(email)
-    else:
-        user.email = email
     identity = Identity(**identity_data)
-    user.identities.add(identity)
-    user.secondary_emails |= extra_emails
-    user.favorite_users.add(user)
-    db.session.add(user)
-    user.settings.set('timezone', settings['timezone'])
-    user.settings.set('lang', settings['lang'])
-    db.session.flush()
-    signals.users.registered.send(user, from_moderation=from_moderation, identity=identity)
-    db.session.flush()
+    user = create_user(email, user_data, identity=identity, settings=settings, other_emails=extra_emails,
+                       from_moderation=from_moderation)
     return user, identity
 
 
