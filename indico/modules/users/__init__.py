@@ -86,7 +86,8 @@ def _registration_requested(req, **kwargs):
 @signals.users.registered.connect
 def _registered(user, identity, from_moderation, **kwargs):
     from indico.modules.users.util import get_admin_emails
-    if from_moderation or identity.provider != 'indico' or not user_management_settings.get('notify_account_creation'):
+    if (from_moderation or identity is None or identity.provider != 'indico' or
+            not user_management_settings.get('notify_account_creation')):
         return
     tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
     send_email(make_email(get_admin_emails(), template=tpl))
