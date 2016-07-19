@@ -4,23 +4,6 @@
 
 {% set day_list = days|list %}
 
-{% if day_list|length > 1 %}
-    <div class="toolbar right">
-        <div class="group right js-go-to-day">
-            <a href="" class="i-button icon-calendar arrow" data-toggle="dropdown"></a>
-            <ul class="dropdown">
-                {% for day, _ in day_list %}
-                    <li>
-                        <a href="#day-{{ day.isoformat() }}">
-                            {{ day | format_date(format='full', timezone=timezone) }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-{% endif %}
-
 <ul class="dayList">
     {% set previous_date = none %}
     {% for item in entries -%}
@@ -32,9 +15,26 @@
         {%- endif -%}
 
         {%- if not previous_date or date != previous_date -%}
-            <li id="day-{{ item.start_dt.date().isoformat() }}">
-                <div style="width: 100%;">
-                    <span class="day">{{ item.start_dt | format_date(format='full', timezone=timezone) }}</span>
+            {% set anchor -%}
+                day-{{ item.start_dt.date().isoformat() }}
+            {%- endset %}
+            <li id="{{ anchor }}">
+                <div class="day-header" style="width: 100%;">
+                    <div class="day-title" data-anchor="{{ anchor }}">
+                        {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
+                    </div>
+                    {% if day_list|length > 1 %}
+                        <a href="" class="js-go-to-day icon-calendar arrow js-dropdown" data-toggle="dropdown"></a>
+                        <ul class="dropdown days-dropdown">
+                            {% for day, _ in day_list %}
+                                <li>
+                                    <a href="#day-{{ day.isoformat() }}">
+                                        {{ day | format_date(format='EEE, d MMM', timezone=timezone) }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
                 <ul class="meeting-timetable">
         {%- endif %}

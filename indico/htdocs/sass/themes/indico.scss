@@ -17,14 +17,16 @@
 
  @import 'base';
 
- $header-bg-color: #1a63a0 !default;
+ $indico-theme-color: #1a63a0;
+ $header-bg-color: $indico-theme-color !default;
  $header-icon-color: $light-gray !default;
  $header-text-color: $light-gray !default;
- $tt-primary-color: #3875a8 !default;
+ $tt-primary-color: $indico-theme-color !default;
  $tt-secondary-color: #05b3b3 !default;
  $tt-secondary-pastel: #a8dede !default;
- $tt-nested-time-color: $gray !default;
+ $tt-nested-time-color: $light-black !default;
  $tt-additional-text-color: $light-black !default;
+ $selected-color: $indico-blue;
 
  @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
      div.event-header {
@@ -32,6 +34,29 @@
          background-position: $position;
          background-size: $scale;
          padding-left: $padding-left;
+     }
+ }
+
+ @mixin drop-shadow {
+     box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
+ }
+
+ @mixin ribbon($color) {
+     @include transition(.5s background-color linear);
+     @include border-radius(0 2px 2px 0);
+     $darkened-color: darken($color, 10%);
+
+     background-color: $color;
+     &:before {
+         content: ' ';
+         position: absolute;
+         width: 0;
+         height: 0;
+         left: 0px;
+         top: 100%;
+         border-width: 5px 5px;
+         border-style: solid;
+         border-color: $darkened-color $darkened-color transparent transparent;
      }
  }
 
@@ -78,8 +103,9 @@
 
 %highlighted-header-data {
     @extend %highlighted-data;
+    @include border-radius;
     color: $header-text-color !important;
-    background-color: darken($header-bg-color, 5%);
+    background-color: lighten($header-bg-color, 5%);
 }
 
 .event-time-data {
@@ -116,8 +142,11 @@
     margin-top: 0.5em;
 }
 
-.timetable-contrib-title {
-    margin-right: 0.2em;
+.timetable-contrib {
+    .timetable-title {
+        margin-right: 0.2em;
+        color: $tt-primary-color;
+    }
 }
 
 .speaker-list, .chairperson-list, .convener-list {
@@ -200,17 +229,36 @@ div.event-header {
 
 // Meeting Timetable-specific
 
-.day {
-    display: block;
-    font-size: 1.3em;
-    color: white;
-    padding: 1em 0 0.5em 0.5em;
-    border-bottom: 3px solid $gray;
+.day-header {
+    margin-top: 25px;
+    position: relative;
+    text-align: center;
+
+    .day-title {
+        display: inline-block;
+        font-variant: small-caps;
+        font-size: 1.7em;
+        color: $light-gray;
+        padding: 0.5em;
+    }
+
+    a.js-go-to-day {
+        display: inline-block;
+        color: $gray;
+        font-size: 1.4em;
+        position: absolute;
+        padding-bottom: 0.5em;
+        right: 0;
+        bottom: 0;
+    }
 }
 
 .meeting-timetable {
-    @extend %font-family-title-light;
-    padding: 0.5em 2em 0.5em 0;
+    @extend %font-family-modern-body;
+    @include border-radius;
+    @include drop-shadow;
+
+    padding: 1em 1em 0.5em 0;
     background-color: white;
 
     .toolbar, .toolbar .group {
@@ -250,9 +298,9 @@ div.event-header {
     /* Without the following IE11 doesn't correctly compute the width of the element. */
     width: 100%;
 
-    &:hover > .timetable-item-header .timetable-item-actions .manage-button .i-button,
-    &:hover > .timetable-item-header .timetable-item-actions .manage-button:not(.selected) .i-button {
-        opacity: 1;
+    &:not(:hover) > .timetable-item-header .timetable-item-actions .manage-button:not(.selected) .i-button {
+        background-color: #fff;
+        border-color: $gray !important;
     }
 
     &:not(:first-child) {
@@ -265,6 +313,7 @@ div.event-header {
         flex-direction: row;
 
         .timetable-title {
+            font-weight: bold;
             font-size: 1.1em;
             padding-top: 0.5rem;
             @extend %font-family-title;
@@ -272,7 +321,7 @@ div.event-header {
             line-height: 1rem;
 
             &.nested {
-                color: $tt-secondary-color;
+                color: $tt-primary-color;
             }
         }
 
@@ -283,14 +332,14 @@ div.event-header {
 
             .manage-button {
                 .i-button {
-                    @include transition(opacity .5s);
-                }
-
-                &:not(.selected) .i-button {
-                    opacity: 0.3;
+                    @include transition(.25s background-color linear);
                 }
             }
         }
+    }
+
+    .material-list {
+        padding-top: 0.4em;
     }
 }
 
@@ -301,6 +350,17 @@ div.event-header {
 .subcontrib-list {
     list-style-type: none;
     padding: 0;
+
+    font-size: 0.9em;
+
+    .timetable-item.timetable-subcontrib {
+        border-left: 2px dotted $gray;
+        padding-left: 1em;
+
+        .speaker-list {
+            padding-top: 0.5em;
+        }
+    }
 }
 
 .timetable-time {
@@ -311,28 +371,20 @@ div.event-header {
     &.top-level {
         .start-time {
             background-color: $tt-primary-color;
+            font-weight: bold;
+            box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
             margin-left: -10px;
-            padding-left: 10px;
+            padding: 0 10px 0 20px;
             position: relative;
-
-            &:before {
-                content: ' ';
-                position: absolute;
-                width: 0;
-                height: 0;
-                left: 0px;
-                top: 100%;
-                border-width: 5px 5px;
-                border-style: solid;
-                border-color: $light-black $light-black transparent transparent;
-            }
+            @include ribbon($tt-primary-color);
         }
     }
 
     &.nested {
+        @include transition(.5s border-color linear);
+
         margin-right: 0.5em;
         border-right: 3px solid $tt-nested-time-color;
-
         .start-time {
             background-color: $tt-nested-time-color;
         }
@@ -345,12 +397,14 @@ div.event-header {
             color: $tt-secondary-color !important;
         }
         .start-time {
-            background-color: $tt-secondary-color;
+            @include ribbon($tt-secondary-color);
         }
     }
 
     .start-time {
         @extend %highlighted-data;
+        @include border-radius(2px 0 0 2px);
+        @include transition(.5s background-color linear);
         color: $light-gray !important;
     }
 
@@ -363,7 +417,7 @@ div.event-header {
     .timetable-item-body {
         .timetable-title {
             text-align: center;
-            color: darken($tt-secondary-color, 10%) !important;
+            color: $tt-secondary-color !important;
         }
 
         .timetable-duration, .timetable-duration:before {
@@ -371,13 +425,7 @@ div.event-header {
         }
 
         .timetable-item-header {
-            background: repeating-linear-gradient(
-                -40deg,
-                $tt-secondary-pastel,
-                $tt-secondary-pastel 10px,
-                lighten($tt-secondary-pastel, 0.5*$light-color-variation) 10px,
-                lighten($tt-secondary-pastel, 0.5*$light-color-variation) 20px
-            );
+            background-color: $light-gray;
             padding-bottom: 0.5em;
         }
     }
@@ -388,13 +436,16 @@ div.event-header {
 }
 
 .event-sub-header {
+    @include border-radius(0 0 2px 2px);
+    @include drop-shadow;
+    @extend %font-family-title-light;
+
     background: $light-gray;
     font-size: 12px;
     color: black;
     margin: 0;
     padding: 3px 10px;
     border-bottom: 1px solid $gray;
-    @extend %font-family-title-light;
 }
 
 .note-area-wrapper .note-area{
@@ -425,4 +476,42 @@ a.lecture-series-link {
     background: $header-bg-color;
     color: $light-gray !important;
     margin-right: 0.1em;
+}
+
+[data-anchor]:hover {
+    .anchor-link {
+        opacity: 1;
+    }
+}
+
+.anchor-link {
+    @include transition(.25s opacity ease-out);
+    @extend %font-family-body;
+    opacity: 0;
+    margin-left: 0.5em;
+    color: $gray !important;
+}
+
+.timetable-item:target {
+    .timetable-time.nested {
+        border-color: $selected-color;
+
+        .start-time {
+            background-color: $selected-color;
+        }
+    }
+
+    &.timetable-block > .timetable-time .start-time {
+        @include ribbon($selected-color);
+    }
+
+    &.timetable-subcontrib, .timetable-subcontrib {
+        border-color: $selected-color;
+    }
+}
+
+.days-dropdown {
+    li {
+        white-space: nowrap;
+    }
 }

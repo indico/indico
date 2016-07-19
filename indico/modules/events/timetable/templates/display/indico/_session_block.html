@@ -9,13 +9,15 @@
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
 
-    <li class="timetable-item" id="session-{{ session_.id }}">
+    {% set anchor = slugify('b', block.id, session_.title, block.title, maxlen=30) %}
+
+    <li class="timetable-item timetable-block" id="{{ anchor }}">
         <span class="timetable-time top-level">
             {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
         <div class="timetable-item-body">
             <div class="timetable-item-header">
-                <span class="timetable-title {{ 'top-level' if not nested }}">
+                <span class="timetable-title {{ 'top-level' if not nested }}" data-anchor="{{ anchor }}">
                     {%- if block.title and block.title != session_.title -%}
                         {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
                         {{- session_.title | safe -}}: {{ block.title | safe -}}
