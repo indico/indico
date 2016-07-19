@@ -54,7 +54,7 @@ from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
-from indico.util.string import alpha_enum, crc32
+from indico.util.string import alpha_enum, crc32, slugify
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          subclassof, call_template_hook, groupby, strip_tags)
@@ -183,6 +183,7 @@ def setup_jinja(app):
     app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
+    app.add_template_global(slugify)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
