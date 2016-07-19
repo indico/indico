@@ -595,6 +595,25 @@ ul.category-resource-qtip {
     .ui-datepicker {
         width: 192px;
     }
+
+    #display-options {
+        .form-group {
+            margin-bottom: 1em;
+
+            & > div {
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        .form-label {
+            min-height: 2em;
+        }
+
+        select {
+            width: 100%;
+        }
+    }
 }
 
 .category-calendar-view {
