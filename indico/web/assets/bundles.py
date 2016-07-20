@@ -365,7 +365,8 @@ abstracts_js = rjs_bundle(
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
-    'categories': rjs_bundle('modules_categories', 'js/indico/modules/categories/display.js'),
+    'categories': rjs_bundle('modules_categories', *namespace('js/indico/modules/categories', 'display.js',
+                                                              'calendar.js')),
     'categories_management': rjs_bundle('modules_categories_management', 'js/indico/modules/categories/management.js'),
     'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/categories/statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),

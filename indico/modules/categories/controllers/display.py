@@ -32,6 +32,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
@@ -53,6 +54,15 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
 from MaKaC.webinterface.rh.base import RH
+
+
+CALENDAR_COLOR_PALETTE = [
+    ColorTuple('#1F1100', '#ECC495'),
+    ColorTuple('#0F0202', '#B9CBCA'),
+    ColorTuple('#0D1E1F', '#C2ECEF'),
+    ColorTuple('#000000', '#D0C296'),
+    ColorTuple('#202020', '#EFEBC2')
+]
 
 
 def _flat_map(func, list_):
@@ -578,18 +588,41 @@ class _EventProxy(object):
 class RHCategoryCalendarView(RHDisplayCategoryBase):
     def _process(self):
         if not request.is_xhr:
-            return WPCategory.render_template('display/calendar.html', self.category)
+            return WPCategory.render_template('display/calendar.html', self.category,
+                                              start_dt=request.args.get('start_dt'))
         tz = self.category.display_tzinfo
         start = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
         end = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
         query = (Event.query
-                 .filter(Event.happens_between(start, end),
+                 .filter(Event.starts_between(start, end),
                          Event.is_visible_in(self.category),
                          ~Event.is_deleted)
-                 .options(load_only('id', 'title', 'start_dt', 'end_dt')))
-        events = [{'title': event.title,
-                   'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
-                   'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
-                   'url': url_for('event.conferenceDisplay', event)}
-                  for event in query]
-        return jsonify_data(flash=False, events=events)
+                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id')))
+        events = self._get_event_data(query)
+        ongoing_events = (Event.query
+                          .filter(Event.is_visible_in(self.category),
+                                  Event.start_dt < start,
+                                  Event.end_dt > end)
+                          .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
+                          .order_by(Event.title)
+                          .all())
+        return jsonify_data(flash=False, events=events, ongoing_event_count=len(ongoing_events),
+                            ongoing_events_html=self._render_ongoing_events(ongoing_events))
+
+    def _get_event_data(self, event_query):
+        data = []
+        tz = self.category.display_tzinfo
+        for event in event_query:
+            category_id = event.category_id
+            event_data = {'title': event.title,
+                          'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
+                          'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
+                          'url': url_for('event.conferenceDisplay', event)}
+            colors = CALENDAR_COLOR_PALETTE[category_id % len(CALENDAR_COLOR_PALETTE)]
+            event_data.update({'textColor': '#' + colors.text, 'color': '#' + colors.background})
+            data.append(event_data)
+        return data
+
+    def _render_ongoing_events(self, ongoing_events):
+        template = get_template_module('categories/display/_calendar_ongoing_events.html')
+        return template.render_ongoing_events(ongoing_events)
