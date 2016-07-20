@@ -67,6 +67,15 @@ def test_slugify(input, output):
     assert slugify(input) == output
 
 
+def test_slugify_maxlen():
+    assert slugify('foo bar', maxlen=5) == 'foo-b'
+
+
+def test_slugify_args():
+    assert slugify('foo', 123, 'bar') == 'foo-123-bar'
+    assert slugify(u'm\xf6p'.encode('utf-8'), 123, u'b\xe4r') == 'moep-123-baer'
+
+
 @pytest.mark.parametrize(('input', 'lower', 'output'), (
     ('Test', True, 'test'),
     ('Test', False, 'Test'),
