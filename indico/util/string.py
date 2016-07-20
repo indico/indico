@@ -143,15 +143,15 @@ def slugify(*args, **kwargs):
     lower = kwargs.get('lower', True)
     maxlen = kwargs.get('maxlen')
 
-    value = '-'.join(str(val) for val in args)
-    value = to_unicode(value).encode('translit/long')
-    value = unicode(re.sub(r'[^\w\s-]', '', value).strip())
+    value = u'-'.join(to_unicode(val) for val in args)
+    value = value.encode('translit/long')
+    value = re.sub(ur'[^\w\s-]', u'', value).strip()
 
     if lower:
         value = value.lower()
-    value = re.sub(r'[-\s]+', '-', value)
+    value = re.sub(ur'[-\s]+', u'-', value)
     if maxlen:
-        value = value[0:maxlen].rstrip('-')
+        value = value[0:maxlen].rstrip(u'-')
 
     return value
 
