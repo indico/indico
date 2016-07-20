@@ -109,6 +109,12 @@ class LocalRegistrationForm(RegistrationForm):
     comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
                                                         "administrators who will review your registration."))
 
+    @property
+    def data(self):
+        data = super(LocalRegistrationForm, self).data
+        del data['confirm_password']
+        return data
+
 
 class ResetPasswordEmailForm(IndicoForm):
     email = EmailField(_('Email address'), [DataRequired()], filters=[_tolower])
