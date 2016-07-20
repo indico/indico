@@ -110,24 +110,23 @@ class ReviewingPacker:
         return str(name).translate(string.maketrans("",""),"\\/")
 
     def pack(self, fileHandler=None):
-        for contribution in self._conf.getContributionList():
+        for contribution in self._conf.as_event.contributions:
             reviewingStatus = self._conf.getReviewManager(contribution).getLastReview().getRefereeJudgement().getJudgement()
             if reviewingStatus == "Accept":
-                dirName = "%s" % self._normalisePathItem(contribution.getTitle().strip())
+                dirName = "%s" % self._normalisePathItem(contribution.title)
                 self._packContribution(contribution, dirName, fileHandler)
 
         fileHandler.close()
         return fileHandler.getPath()
 
     def _packContribution(self, contribution, dirName="", fileHandler=None):
-
-        for mat in self._conf.getReviewManager(contribution).getLastReview().getMaterials():
-            for res in mat.getResourceList():
-                self._items += 1
+        for mat in self._conf.getReviewManager(contribution).getLastReview().materials:
+            self._items += 1
+            with mat.get_local_path() as file_path:
                 fileHandler.add("%s" % (os.path.join(self._confDirName,
-                                                     self._normalisePathItem(contribution.getId()) + "-" + dirName,
-                                                     self._normalisePathItem(res.getFileName()))),
-                                        res.getFilePath())
+                                                     self._normalisePathItem(contribution.id) + "-" + dirName,
+                                                     self._normalisePathItem(mat.filename))),
+                                file_path)
 
 
 class RegistrantPacker:
