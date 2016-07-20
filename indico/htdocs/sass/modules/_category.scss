@@ -16,6 +16,7 @@
  */
 
 @import 'base';
+@import 'partials/buttons';
 
 .confirmation-dialog .body ul.categ-list {
     padding-left: 13px;
@@ -622,18 +623,40 @@ ul.category-resource-qtip {
     }
 }
 
-.category-calendar-view {
-    .category-content {
-        max-width: 70%;
+.category-calendar-side-menu {
+    .ui-datepicker {
+        width: 192px;
+    }
+}
 
-        .fc {
-            .fc-right {
-                .ui-datepicker-trigger {
-                    padding: 5px;
-                    margin-left: 0;
-                    right: 0;
-                }
+.category-calendar-page {
+    @extend %indico-page;
+
+    .category-calendar-view {
+        font-family: "Roboto", sans-serif;
+
+        .fc-right {
+            .fc-button {
+                @extend %button;
+                margin-left: 5px;
+            }
+
+            .ongoing-events-info {
+                font-style: italic;
+                line-height: 2.1em;
+                margin-right: 5px;
             }
         }
+    }
+}
+
+.ongoing-events-dialog, .all-events-dialog {
+    max-height: 600px !important;
+    overflow-y: scroll;
+
+    ul {
+        list-style-type: none;
+        padding: 0 10px;
+        margin-top: 0;
     }
 }

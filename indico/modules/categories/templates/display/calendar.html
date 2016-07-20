@@ -1,69 +1,45 @@
-{% from 'forms/_form.html' import simple_form %}
+{% extends 'layout/management_page.html' %}
 
-<div class="category-container">
-    <div class="category-header">
-        <div class="center">
-            <span class="right">
-                <a class="i-button icon-prev back-button" href="{{ category.url }}">
-                    {%- trans %}Category page{% endtrans -%}
-                </a>
-            </span>
-            <div class="category-title">
-                {{ category.title }}&nbsp;
-                <span class="subtitle">({% trans %}Calendar{% endtrans %})</span>
-            </div>
-        </div>
+{% block page_class %}category-calendar-page{% endblock %}
+
+{% block side_menu %}
+    <div class="category-calendar-side-menu">
+        <div class="js-calendar-datepicker"></div>
+        <input type="hidden" id="date" name="date">
     </div>
-    <div class="category-content-wrapper category-calendar-view">
-        <div class="category-content">
-            <div id="event-calendar"></div>
-            <script>
-                (function() {
-                    'use strict';
+    <script>
+        (function(){
+            'use strict';
 
-                    var cachedEvents = {};
+            $('.js-calendar-datepicker').datepicker({
+                beforeShowDay: function(date) {
+                    return [date.getDate() == 1, ''];
+                },
+                onSelect: function(date) {
+                    $('#event-calendar').fullCalendar('gotoDate', new moment(date, 'DD/MM/YYYY'));
+                }
+            });
+        })();
+    </script>
+{% endblock %}
 
-                    $('#event-calendar').fullCalendar({
-                        firstDay: 1,
-                        height: 800,
-                        eventOrder: 'start',
-                        eventTextColor: '#FFF',
-                        eventLimit: 15,
-                        timeFormat: 'H:mm',
-                        nextDayThreshold: '00:00',
-                        buttonText: {
-                            'today': $T.gettext('Today')
-                        },
-                        events: function(start, end, timezone, callback) {
-                            var events = cachedEvents[[{{ category.id }}, start, end]];
-                            if (events) {
-                                callback(events);
-                            } else {
-                                $.ajax({
-                                    url: {{ url_for('categories.calendar', category) | tojson }},
-                                    data: {start: start.format('YYYY-MM-DD'), end: end.format('YYYY-MM-DD')},
-                                    dataType: 'json',
-                                    contentType: 'application/json',
-                                    error: handleAjaxError,
-                                    complete: IndicoUI.Dialogs.Util.progress(),
-                                    success: function(data) {
-                                        cachedEvents[[{{ category.id }}, start, end]] = data.events;
-                                        callback(data.events);
-                                    }
-                                });
-                            }
-                        }
-                    });
-
-                    var datepickerTrigger = $('<input>', {'type': 'text', 'css': {'visibility': 'hidden'}});
-                    $('#event-calendar .fc-right').prepend(datepickerTrigger);
-                    datepickerTrigger.datepicker({
-                        onSelect: function(date) {
-                            $('#event-calendar').fullCalendar('gotoDate', new moment(date, 'DD/MM/YYYY'));
-                        }
-                    });
-                })();
-            </script>
-        </div>
+{% block display_view_button %}
+    <div class="group">
+        <a href="{{ url_for('categories.display', category) }}" class="icon-arrow-left highlight i-button">
+            {% trans %}Back to category page{% endtrans %}
+        </a>
     </div>
-</div>
+{% endblock %}
+
+{% block banner_title %}
+    {{ category.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="category-calendar-view">
+        <div id="event-calendar"></div>
+    </div>
+    <script>
+        setupCategoryCalendar('#event-calendar', {{ url_for('categories.calendar', category) | tojson }});
+    </script>
+{% endblock %}
