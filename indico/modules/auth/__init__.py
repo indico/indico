@@ -24,6 +24,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
+from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
 from indico.util.i18n import _
@@ -107,3 +108,11 @@ def login_user(user, identity=None):
 @signals.menu.items.connect_via('user-profile-sidemenu')
 def _extend_profile_sidemenu(sender, **kwargs):
     yield SideMenuItem('accounts', _('Accounts'), url_for('auth.accounts'), 50)
+
+
+@signals.users.registered.connect
+def _delete_requests(user, **kwargs):
+    for req in RegistrationRequest.find(RegistrationRequest.email.in_(user.all_emails)):
+        logger.info('Deleting registration request %r due to registration of %r', req, user)
+        db.session.delete(req)
+    db.session.flush()
