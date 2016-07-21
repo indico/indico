@@ -3,24 +3,26 @@
        {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
        data-toggle="dropdown">{{ text }}</a>
     <ul class="dropdown">
-        <li>
-            <a href="{{ _create_event_url(category, 'lecture') }}">
-                {% trans %}Lecture{% endtrans %}
-            </a>
-        </li>
-        <li>
-            <a href="{{ _create_event_url(category, 'meeting') }}">
-                {% trans %}Meeting{% endtrans %}
-            </a>
-        </li>
-        <li>
-            <a href="{{ _create_event_url(category, 'conference') }}">
-                {% trans %}Conference{% endtrans %}
-            </a>
-        </li>
+        <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
+        <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
+        <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
     </ul>
 {% endmacro %}
 
-{% macro _create_event_url(category, type) %}
-    {{ url_for('event_creation.conferenceCreation', category, event_type=type) }}
-{% endmacro %}
+{% macro create_event_link(category, type, text) -%}
+    {%- set title = {
+        'lecture': _('Create new lecture'),
+        'meeting': _('Create new meeting'),
+        'conference': _('Create new conference')
+    }[type] -%}
+    {%- set url = url_for('categories.display', category, _anchor='create-event:%s:%d'|format(type, category.id))
+                  if category and not category.is_root
+                  else url_for_index(_anchor='create-event:%s'|format(type)) -%}
+    <a href="{{ url }}"
+       data-href="{{ url_for('events.create', category, event_type=type) }}"
+       data-title="{{ title }}"
+       data-ajax-dialog
+       {{ kwargs | html_params }}>
+        {{ text }}
+    </a>
+{%- endmacro %}

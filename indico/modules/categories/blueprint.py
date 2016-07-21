@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import redirect
+
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
@@ -30,8 +32,13 @@ from indico.modules.categories.controllers.management import (RHCreateCategory, 
                                                               RHManageCategoryProtection, RHManageCategorySettings,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHSortSubcategories, RHSplitCategory)
-from indico.web.flask.util import make_compat_redirect_func, redirect_view
+from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
+
+
+def _redirect_event_creation(category_id, event_type):
+    anchor = 'create-event:{}:{}'.format(event_type, category_id)
+    return redirect(url_for('.display', category_id=category_id, _anchor=anchor))
 
 
 _bp = IndicoBlueprint('categories', __name__, template_folder='templates', virtual_template_folder='categories',
@@ -73,6 +80,9 @@ _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCate
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
 _bp.add_url_rule('/calendar', 'calendar', RHCategoryCalendarView)
+
+# Event creation - redirect to anchor page opening the dialog
+_bp.add_url_rule('/create/event/<any(lecture,meeting,conference):event_type>', view_func=_redirect_event_creation)
 
 # TODO: remember to refactor it at some point
 _bp.add_url_rule('!/xmlGateway.py/getCategoryInfo', 'category_xml_info', RHXMLExportCategoryInfo)
