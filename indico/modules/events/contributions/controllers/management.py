@@ -629,6 +629,7 @@ class RHManageDescriptionField(RHManageContributionsBase):
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
+
 class RHCreateReferenceMixin:
     """Common methods for RH class creating a ContibutionReference or SubContributionReference"""
 
