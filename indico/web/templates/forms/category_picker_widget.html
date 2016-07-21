@@ -57,7 +57,7 @@
                         var dfd = $.Deferred();
                         $categoryTitle.text(category.title);
                         hiddenData = {id: category.id, title: category.title};
-                        $field.val(JSON.stringify(hiddenData)).trigger(evt, [category, dfd]);
+                        $field.val(JSON.stringify(hiddenData)).trigger('change').trigger(evt, [category, dfd]);
                         if (evt.isDefaultPrevented()) {
                             return dfd;
                         }
