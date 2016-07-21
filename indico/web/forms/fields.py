@@ -271,11 +271,15 @@ class CategoryField(HiddenField):
     def process_formdata(self, valuelist):
         from indico.modules.categories import Category
         if valuelist:
-            category_id = int(json.loads(valuelist[0])['id'])
-            self.data = Category.get(category_id, is_deleted=False)
+            try:
+                category_id = int(json.loads(valuelist[0])['id'])
+            except KeyError:
+                self.data = None
+            else:
+                self.data = Category.get(category_id, is_deleted=False)
 
     def _value(self):
-        return {'id': self.data.id, 'title': self.data.title} if self.data else ''
+        return {'id': self.data.id, 'title': self.data.title} if self.data else {}
 
     def _get_data(self):
         return self.data
