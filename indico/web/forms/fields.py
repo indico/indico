@@ -21,7 +21,7 @@ from datetime import time, timedelta
 from operator import attrgetter, itemgetter
 
 import pytz
-from flask import render_template
+from flask import render_template, session
 from markupsafe import escape, Markup
 from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload
@@ -56,7 +56,6 @@ from indico.util.user import principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, LocationWidget
-from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 def _preprocessed_formdata(valuelist):
@@ -774,7 +773,13 @@ class TimeDeltaField(Field):
 
 
 class IndicoDateTimeField(DateTimeField):
-    """"Friendly datetime field that handles timezones and validations."""
+    """Friendly datetime field that handles timezones and validations.
+
+    Important: When the form has a `timezone` field it must be
+    declared before any `IndicoDateTimeField`.  Otherwise its
+    value is not available in this field resulting in an error
+    during form submission.
+    """
 
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True)
 
@@ -834,14 +839,21 @@ class IndicoDateTimeField(DateTimeField):
         return validator.linked_field if validator else None
 
     @property
+    def timezone_field(self):
+        field = getattr(self.get_form(), 'timezone', None)
+        return field if isinstance(field, SelectField) else None
+
+    @property
     def timezone(self):
         if self._timezone:
             return self._timezone
-        form = self.get_form()
-        if form and hasattr(self, 'timezone'):
-            return form.timezone
-        session_tz = DisplayTZ().getDisplayTZ()
-        return session_tz
+        elif self.timezone_field:
+            return self.timezone_field.data
+        else:
+            form = self.get_form()
+            if form and hasattr(form, 'timezone'):
+                return form.timezone
+            return session.tzinfo.zone
 
 
 class IndicoStaticTextField(Field):

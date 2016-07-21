@@ -13,7 +13,7 @@
                pattern="^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$"
                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
                {% if disabled %}disabled{% endif %}>{#--#}
-        <i class="timezone" title="{{ field.timezone }}"></i>{#--#}
+        <i class="timezone"></i>{#--#}
         {% if field.allow_clear -%}
             <span id="{{ field.id }}-reset"
                   class="icon-close clear-pickers" style="display: none;"
@@ -30,6 +30,8 @@
             var dateField = $('#{{ field.id }}-date');
             var timeField = $('#{{ field.id }}-time');
             var resetFieldAction = $('#{{ field.id }}-reset');
+            var timezoneElement = timeField.next('.timezone');
+            var timezone = {{ field.timezone | tojson }};
             var initialDate;
             var initialTime;
 
@@ -55,6 +57,20 @@
                 var isVisible = !!(dateField.val() || timeField.val());
                 resetFieldAction.toggle(isVisible);
             }
+
+            timezoneElement.qtip({
+                content: {
+                    text: function() {
+                        return timezone;
+                    }
+                }
+            });
+
+            {% if field.timezone_field %}
+                $('#{{ field.timezone_field.id }}').on('change', function() {
+                    timezone = $(this).val();
+                });
+            {% endif %}
 
             dateField.datepicker({
                 onSelect: function applyOnSelectHandlers() {
@@ -147,7 +163,7 @@
             {% endif %}
 
             {% if field.flags.linked_datetime %}
-                var linkedDateField = $('#{{ field.linked_field }}-date');
+                var linkedDateField = $('#{{ field.get_form()[field.linked_field].id }}-date');
                 function updateDateLimits(selectedDate) {
                     {% if field.linked_datetime_validator.not_before %}
                         dateField.datepicker('option', 'minDate', selectedDate);
