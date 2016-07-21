@@ -96,7 +96,7 @@ $(document).ready(function() {
         }
 
         /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
-        var container = $('<span>').qtip($.extend(true, {}, {
+        $('<span>').qtip($.extend(true, {}, {
             overwrite: false,
             position: $.extend({
                 target: $target
@@ -124,12 +124,12 @@ $(document).ready(function() {
                     }
                 },
 
-                hide: function(event) {
+                hide: function() {
                     $(this).qtip('destroy');
                 },
 
                 render: function(event, api) {
-                    $target.on('DOMNodeRemovedFromDocument remove', function(evt) {
+                    $target.on('DOMNodeRemovedFromDocument remove', function() {
                         api.destroy();
                     });
                 }
