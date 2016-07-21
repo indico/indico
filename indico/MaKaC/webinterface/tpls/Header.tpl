@@ -3,7 +3,8 @@
 % endif
 
 <%
-    category = getattr(currentCategory, 'as_new', currentCategory) if currentCategory else None
+    from indico.web.flask.templating import get_template_module
+    tpl = get_template_module('events/management/create_event.html')
 %>
 
 ${ template_hook('global-announcement') }
@@ -11,7 +12,7 @@ ${ template_hook('global-announcement') }
 <div class="page-header clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>
 
-        ${ template_hook('page-header', category=category) }
+        ${ template_hook('page-header', category=currentCategory) }
 
         <!--
             set fixed height on anchor to assure that the height is
@@ -25,25 +26,13 @@ ${ template_hook('global-announcement') }
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Create event") }</a>
         <ul class="dropdown">
             <li>
-                <a id="create-lecture" href="${ url_for('event_creation.conferenceCreation',
-                                                        (category if category and not category.is_root else None),
-                                                        event_type='lecture') }">
-                    ${ _("Create lecture") }
-                </a>
+                ${ tpl.create_event_link(currentCategory, 'lecture', _('Create lecture'), id='create-lecture') }
             </li>
             <li>
-                <a id="create-meeting" href="${ url_for('event_creation.conferenceCreation',
-                                                        (category if category and not category.is_root else None),
-                                                        event_type='meeting') }">
-                    ${ _("Create meeting") }
-                </a>
+                ${ tpl.create_event_link(currentCategory, 'meeting', _('Create meeting'), id='create-meeting') }
             </li>
             <li>
-                <a id="create-conference" href="${ url_for('event_creation.conferenceCreation',
-                                                           (category if category and not category.is_root else None),
-                                                           event_type='conference') }">
-                    ${ _("Create conference") }
-                </a>
+                ${ tpl.create_event_link(currentCategory, 'conference', _('Create conference'), id='create-conference') }
             </li>
         </ul>
 

@@ -13,31 +13,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import url_for
-from werkzeug.utils import redirect
 
 from MaKaC.webinterface.rh import categoryDisplay
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-def _redirect_simple_event(**kwargs):
-    # simple_event is confusing so we always use "lecture" in the URL
-    return redirect(url_for('.conferenceCreation', event_type='lecture', **kwargs))
-
-
-event_creation = IndicoBlueprint('event_creation', __name__, url_prefix='/event/create')
+event_creation = IndicoBlueprint('event_creation', __name__, url_prefix='/event/create-old')
 
 # Event creation
-event_creation.add_url_rule('/simple_event', view_func=_redirect_simple_event)
 event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>', 'conferenceCreation',
                             categoryDisplay.RHConferenceCreation)
 event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>/save', 'conferenceCreation-createConference',
                             categoryDisplay.RHConferencePerformCreation, methods=('POST',))
 
 # Event creation - category specified
-event_creation.add_url_rule('!/category/<int:category_id>/create/event/simple_event', view_func=_redirect_simple_event)
-event_creation.add_url_rule('!/category/<int:category_id>/create/event/<any(lecture,meeting,conference):event_type>',
-                            'conferenceCreation', categoryDisplay.RHConferenceCreation)
 event_creation.add_url_rule(
-    '!/category/<int:category_id>/create/event/<any(lecture,meeting,conference):event_type>/save',
+    '!/category/<int:category_id>/create-old/event/<any(lecture,meeting,conference):event_type>',
+    'conferenceCreation', categoryDisplay.RHConferenceCreation)
+event_creation.add_url_rule(
+    '!/category/<int:category_id>/create-old/event/<any(lecture,meeting,conference):event_type>/save',
     'conferenceCreation-createConference', categoryDisplay.RHConferencePerformCreation, methods=('POST',))

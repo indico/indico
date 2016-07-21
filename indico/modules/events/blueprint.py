@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.controllers.admin import (RHReferenceTypes, RHCreateReferenceType, RHEditReferenceType,
                                                      RHDeleteReferenceType)
+from indico.modules.events.controllers.creation import RHCreateEvent
 from indico.modules.events.controllers.display import RHExportEventICAL
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -36,3 +37,7 @@ _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_ref
                  methods=('DELETE',))
 
 _bp.add_url_rule('/event/<confId>/event.ics', 'export_event_ical', RHExportEventICAL)
+
+# Creation
+_bp.add_url_rule('/event/create/<any(lecture,meeting,conference):event_type>', 'create', RHCreateEvent,
+                 methods=('GET', 'POST'))

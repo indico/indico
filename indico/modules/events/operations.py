@@ -51,6 +51,16 @@ def create_event_references(event, data):
         logger.info('Reference "%s" created by %s', reference, session.user)
 
 
+def create_event(category, event_type, data):
+    from MaKaC.conference import Conference
+    conf = Conference.new(category, creator=session.user, title=data.pop('title'), start_dt=data.pop('start_dt'),
+                          end_dt=data.pop('end_dt'), timezone=data.pop('timezone'), event_type=event_type)
+    event = conf.as_event
+    event.populate_from_dict(data)
+    logger.info('Event %r created in %r by %r ', event, category, session.user)
+    return event
+
+
 def update_event(event, data):
     event.populate_from_dict(data)
     db.session.flush()

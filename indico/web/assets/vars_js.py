@@ -71,7 +71,7 @@ def generate_global_file(config):
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
             'FontSassBundle': core_env['fonts_sass'].urls(),
 
-            'EventCreation': url_rule_to_js('event_creation.conferenceCreation-createConference'),
+            'EventCreation': url_rule_to_js('events.create'),
 
             'RegistrationForm': {
                 'section': {

@@ -217,4 +217,23 @@ $(document).ready(function() {
     });
 
     showFormErrors();
+
+    // Show form creation dialog if hash is present in the URL
+    var match = location.hash.match(/^#create-event:(lecture|meeting|conference)(?::(\d+))?$/);
+    if (match) {
+        var eventType = match[1];
+        var categoryId = match[2];
+        var title = {
+            lecture: $T.gettext('Create new lecture'),
+            meeting: $T.gettext('Create new meeting'),
+            conference: $T.gettext('Create new conference')
+        }[eventType];
+        var url = match[2] !== undefined
+                    ? build_url(Indico.Urls.EventCreation, {event_type: eventType, category_id: categoryId})
+                    : build_url(Indico.Urls.EventCreation, {event_type: eventType});
+        ajaxDialog({
+            url: url,
+            title: title
+        });
+    }
 });

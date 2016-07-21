@@ -143,6 +143,6 @@ def get_request_info(hide_passwords=True):
     }
 
 
-def url_for_index(_external=False):
+def url_for_index(_external=False, _anchor=None):
     from indico.web.flask.util import url_for
-    return url_for('categories.display', _external=_external)
+    return url_for('categories.display', _external=_external, _anchor=_anchor)
