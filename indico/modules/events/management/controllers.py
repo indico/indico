@@ -21,6 +21,7 @@ from collections import defaultdict
 from flask import flash, redirect, session, request
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
@@ -135,6 +136,22 @@ class RHShowNonInheriting(RHConferenceModifBase):
     def _process(self):
         objects = self.obj.get_non_inheriting_objects()
         return jsonify_template('events/management/non_inheriting_objects.html', objects=objects)
+
+
+class RHEventACL(RHConferenceModifBase):
+    """Display the inherited ACL of the event"""
+
+    def _process(self):
+        return render_acl(self.event_new)
+
+
+class RHEventACLMessage(RHConferenceModifBase):
+    """Render the inheriting ACL message"""
+
+    def _process(self):
+        mode = ProtectionMode[request.args['mode']]
+        return jsonify_template('forms/protection_field_acl_message.html', object=self.event_new, mode=mode,
+                                endpoint='event_management.acl')
 
 
 class RHEventProtection(RHConferenceModifBase):
