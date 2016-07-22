@@ -81,17 +81,25 @@ class EventCategoryForm(IndicoForm):
     category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
 
 
-class EventCreationForm(IndicoForm):
-    _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
+class EventCreationFormBase(IndicoForm):
     category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
-    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt')], default_time=time(18),
-                                 allow_clear=False)
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
     protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
 
     def validate_category(self, field):
         if not field.data.can_create_events(session.user):
             raise ValidationError(_('You are not allowed to create events in this category.'))
+
+
+class EventCreationForm(EventCreationFormBase):
+    _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt')], default_time=time(18),
+                                 allow_clear=False)
+
+
+class LectureCreationForm(EventCreationForm):
+    _field_order = EventCreationForm._field_order + ('person_link_data',)
+    person_link_data = EventPersonLinkListField(_('Speakers'))
