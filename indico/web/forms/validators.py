@@ -174,11 +174,12 @@ class LinkedDateTime(object):
 
     field_flags = ('linked_datetime',)
 
-    def __init__(self, field, not_before=True, not_after=False):
+    def __init__(self, field, not_before=True, not_after=False, not_equal=False):
         if not not_before and not not_after:
             raise ValueError("Invalid validation")
         self.not_before = not_before
         self.not_after = not_after
+        self.not_equal = not_equal
         self.linked_field = field
 
     def __call__(self, form, field):
@@ -193,6 +194,8 @@ class LinkedDateTime(object):
             raise ValidationError(_("{} can't be before than {}").format(field.label, linked_field.label))
         if self.not_after and field_dt > linked_field_dt:
             raise ValidationError(_("{} can't be after than {}").format(field.label, linked_field.label))
+        if self.not_equal and field_dt == linked_field_dt:
+            raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
 
 
 def used_if_not_synced(form, field):
