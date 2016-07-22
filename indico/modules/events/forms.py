@@ -24,11 +24,13 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
-from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
 from indico.modules.events.models.references import ReferenceType, EventReference
-from indico.web.forms.fields import IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
+                                     IndicoEnumRadioField)
 from indico.web.forms.validators import LinkedDateTime
 
 
@@ -80,7 +82,7 @@ class EventCategoryForm(IndicoForm):
 
 
 class EventCreationForm(IndicoForm):
-    _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data')
+    _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
     category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
@@ -88,6 +90,7 @@ class EventCreationForm(IndicoForm):
     end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt')], default_time=time(18),
                                  allow_clear=False)
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
+    protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
 
     def validate_category(self, field):
         if not field.data.can_create_events(session.user):
