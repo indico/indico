@@ -73,7 +73,7 @@ def contribution_from_abstract(abstract, sess):
 
     event = abstract.as_new.event_new
     duration = sess.default_contribution_duration if sess else timedelta(minutes=15)
-    links = []
+    links = {}
 
     for auth in abstract.getAuthorList():
         author_type = AuthorType.primary if abstract.isPrimaryAuthor(auth) else AuthorType.secondary
@@ -86,17 +86,17 @@ def contribution_from_abstract(abstract, sess):
             'last_name': to_unicode(auth.getSurName()),
             'phone': to_unicode(auth.getTelephone())
         }
-
         person = person_from_data(person_data, event)
-        person_data.pop('email')
-        links.append(ContributionPersonLink(author_type=author_type, person=person,
-                                            is_speaker=abstract.isSpeaker(auth), **person_data))
+        if person.id not in links:
+            person_data.pop('email')
+            links[person.id] = ContributionPersonLink(author_type=author_type, person=person,
+                                                      is_speaker=abstract.isSpeaker(auth), **person_data)
 
     custom_fields_data = {'custom_{}'.format(field_val.contribution_field.id): field_val.data for
                           field_val in abstract.as_new.field_values}
     contrib = create_contribution(event, {'friendly_id': abstract.as_new.friendly_id,
                                           'title': to_unicode(abstract.getTitle()), 'duration': duration,
-                                          'person_link_data': {link: True for link in links}},
+                                          'person_link_data': {link: True for link in links.itervalues()}},
                                   custom_fields_data=custom_fields_data)
     contrib.abstract = abstract.as_new
     contrib.description = abstract.as_new.description
