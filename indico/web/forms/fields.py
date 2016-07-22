@@ -269,6 +269,13 @@ class CategoryField(HiddenField):
         self.allow_subcats = kwargs.pop('allow_subcats', True)
         super(CategoryField, self).__init__(*args, **kwargs)
 
+    def pre_validate(self, form):
+        if self.data:
+            if not self.allow_events and self.data.has_only_events:
+                raise ValueError(_("Categories containing only events are not allowed."))
+            if not self.allow_subcats and self.data.children:
+                raise ValueError(_("Categories containing subcategories are not allowed."))
+
     def process_formdata(self, valuelist):
         from indico.modules.categories import Category
         if valuelist:
