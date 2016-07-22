@@ -24,7 +24,7 @@ from pytz import timezone
 
 from indico.core.config import Config
 from indico.modules.categories import Category
-from indico.modules.events.forms import EventCreationForm
+from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import create_event
 from indico.util.date_time import now_utc
@@ -69,7 +69,8 @@ class RHCreateEvent(RHProtected):
     def _process(self):
         if not request.is_xhr:
             return redirect(url_for_index(_anchor='create-event:{}'.format(self.event_type.name)))
-        form = EventCreationForm(obj=self._get_form_defaults(), prefix='event-creation-')
+        form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
+        form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
         if form.validate_on_submit():
             data = form.data
             event = create_event(data.pop('category'), self.event_type, data)
