@@ -22,6 +22,7 @@ from wtforms import BooleanField, StringField
 
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
                                      IndicoPasswordField)
@@ -29,7 +30,10 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class EventProtectionForm(IndicoForm):
-    protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
+    protection_mode = IndicoProtectionField(_('Protection mode'),
+                                            protected_object=lambda form: form.protected_object,
+                                            acl_message_url=lambda form: url_for('event_management.acl_message',
+                                                                                 form.protected_object))
     acl = AccessControlListField(_('Access control list'), groups=True, allow_emails=True, allow_networks=True,
                                  allow_external=True)
     access_key = IndicoPasswordField(_('Access key'), toggle=True,
