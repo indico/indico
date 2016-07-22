@@ -96,8 +96,8 @@ class EventCreationFormBase(IndicoForm):
 class EventCreationForm(EventCreationFormBase):
     _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
     start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt')], default_time=time(18),
-                                 allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
+                                 default_time=time(18), allow_clear=False)
 
 
 class LectureCreationForm(EventCreationForm):
