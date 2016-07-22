@@ -57,6 +57,7 @@ def create_event(category, event_type, data):
                           end_dt=data.pop('end_dt'), timezone=data.pop('timezone'), event_type=event_type)
     event = conf.as_event
     event.populate_from_dict(data)
+    db.session.flush()
     logger.info('Event %r created in %r by %r ', event, category, session.user)
     return event
 

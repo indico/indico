@@ -1,0 +1,13 @@
+{% trans count = events|length - 1 -%}
+    One additional event has been created.
+{%- pluralize -%}
+    {{ count }} additional events have been created.
+{%- endtrans %}
+<ul>
+    {% for event in events[1:] %}
+        <li>
+            {{ event.start_dt | format_date }}:
+            <a href="{{ url_for('event_mgmt.conferenceModification', event) }}">{{ event.title }}</a>
+        </li>
+    {% endfor %}
+</ul>

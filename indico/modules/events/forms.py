@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from datetime import time
+from datetime import time, timedelta
 
 from flask import session
-from wtforms.fields import StringField
+from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -30,8 +30,9 @@ from indico.modules.events.models.references import ReferenceType, EventReferenc
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
-                                     IndicoEnumRadioField)
+                                     IndicoEnumRadioField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
+from indico.web.forms.widgets import CKEditorWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -95,11 +96,17 @@ class EventCreationFormBase(IndicoForm):
 
 class EventCreationForm(EventCreationFormBase):
     _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
+    _advanced_field_order = ()
     start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
     end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
                                  default_time=time(18), allow_clear=False)
 
 
-class LectureCreationForm(EventCreationForm):
-    _field_order = EventCreationForm._field_order + ('person_link_data',)
+class LectureCreationForm(EventCreationFormBase):
+    _field_order = ('category', 'title', 'occurrences', 'timezone', 'location_data', 'protection_mode',
+                    'person_link_data')
+    _advanced_field_order = ('description',)
+    occurrences = OccurrencesField(_("Dates"), [DataRequired()], default_time=time(8),
+                                   default_duration=timedelta(minutes=90))
     person_link_data = EventPersonLinkListField(_('Speakers'))
+    description = TextAreaField(_('Description'), widget=CKEditorWidget())
