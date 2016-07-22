@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapper
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -161,7 +163,7 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def for_user(cls, user, event):
         """Return EventPerson for a matching User in Event creating if needed"""
-        person = event.persons.filter_by(user=user).first()
+        person = event.persons.filter_by(user=user).first() if event else None
         return person or cls.create_from_user(user, event)
 
     @classmethod
@@ -401,3 +403,15 @@ class EventPersonLink(PersonLinkBase):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'event_id', _text=self.full_name)
+
+
+@listens_for(mapper, 'after_configured', once=True)
+def _mapper_configured():
+    @listens_for(EventPersonLink.event, 'set')
+    def _associate_event_person(target, value, *unused):
+        if value is None:
+            return
+        if target.person.event_new is None:
+            target.person.event_new = value
+        else:
+            assert target.person.event_new == value

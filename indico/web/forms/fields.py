@@ -363,7 +363,7 @@ class EventPersonListField(PrincipalListField):
 
     @property
     def event(self):
-        return self.get_form().event
+        return getattr(self.get_form(), 'event', None)
 
     def _convert_data(self, data):
         return map(self._get_event_person, data)
@@ -467,7 +467,7 @@ class PersonLinkListFieldBase(EventPersonListField):
 
     def __init__(self, *args, **kwargs):
         super(PersonLinkListFieldBase, self).__init__(*args, **kwargs)
-        self.object = getattr(kwargs['_form'], self.linked_object_attr)
+        self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @no_autoflush
     def _get_person_link(self, data, extra_data=None):
