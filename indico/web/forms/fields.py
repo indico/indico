@@ -20,6 +20,7 @@ from collections import OrderedDict
 from datetime import time, timedelta
 from operator import attrgetter, itemgetter
 
+import dateutil.parser
 import pytz
 from flask import render_template, session
 from markupsafe import escape, Markup
@@ -858,6 +859,58 @@ class IndicoDateTimeField(DateTimeField):
             if form and hasattr(form, 'timezone'):
                 return form.timezone
             return session.tzinfo.zone
+
+
+class OccurrencesField(JSONField):
+    """
+    A field that lets you select multiple occurrences consisting of a
+    start date/time and a duration.
+    """
+    widget = JinjaWidget('forms/occurrences_widget.html', single_line=True)
+    CAN_POPULATE = True
+
+    def __init__(self, *args, **kwargs):
+        self._timezone = kwargs.pop('timezone', None)
+        self.default_time = kwargs.pop('default_time', time(0, 0))
+        self.default_duration = kwargs.pop('default_duration', timedelta())
+        kwargs.setdefault('default', [])
+        super(OccurrencesField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        def _deserialize(occ):
+            try:
+                dt = dateutil.parser.parse(u'{} {}'.format(occ['date'], occ['time']))
+            except ValueError:
+                raise ValueError(u'Invalid date/time: {} {}'.format(escape(occ['date']), escape(occ['time'])))
+            return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
+
+        self.data = []
+        super(OccurrencesField, self).process_formdata(valuelist)
+        self.data = map(_deserialize, self.data)
+
+    def _value(self):
+        def _serialize(occ):
+            if isinstance(occ, dict):
+                # raw data from the client
+                return occ
+            dt = occ[0].astimezone(pytz.timezone(self.timezone))
+            return {'date': dt.date().isoformat(),
+                    'time': dt.time().isoformat()[:-3],  # hh:mm only
+                    'duration': int(occ[1].total_seconds() // 60)}
+
+        return json.dumps(map(_serialize, self.data))
+
+    @property
+    def timezone_field(self):
+        field = getattr(self.get_form(), 'timezone', None)
+        return field if isinstance(field, SelectField) else None
+
+    @property
+    def timezone(self):
+        if self.timezone_field:
+            return self.timezone_field.data
+        else:
+            return getattr(self.get_form(), 'timezone', session.tzinfo.zone)
 
 
 class IndicoStaticTextField(Field):
