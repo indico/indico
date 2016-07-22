@@ -19,15 +19,20 @@ from __future__ import unicode_literals
 from datetime import time, datetime
 
 from dateutil.relativedelta import relativedelta
-from flask import redirect, request
+from flask import flash, redirect, request, render_template
+from markupsafe import Markup
 from pytz import timezone
+from werkzeug.utils import cached_property
 
 from indico.core.config import Config
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.persons import EventPersonLink, EventPerson
 from indico.modules.events.operations import create_event
 from indico.util.date_time import now_utc
+from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import url_for_index, jsonify_data, jsonify_template
@@ -42,17 +47,20 @@ class RHCreateEvent(RHProtected):
     def _checkParams(self):
         self.event_type = EventType[request.view_args['event_type']]
 
-    def _get_form_defaults(self):
-        tzinfo = timezone(Config.getInstance().getDefaultTimezone())
-
+    @cached_property
+    def _default_category(self):
         try:
             category_id = int(request.args['category_id'])
         except (ValueError, KeyError):
-            category = None
+            return None
         else:
-            category = Category.get(category_id, is_deleted=False)
-            if category is not None:
-                tzinfo = timezone(category.timezone)
+            return Category.get(category_id, is_deleted=False)
+
+    def _get_form_defaults(self):
+        category = self._default_category
+        tzinfo = timezone(Config.getInstance().getDefaultTimezone())
+        if category is not None:
+            tzinfo = timezone(category.timezone)
 
         # try to find good dates/times
         now = now_utc(exact=False)
@@ -63,16 +71,53 @@ class RHCreateEvent(RHProtected):
 
         # XXX: Do not provide a default value for protection_mode. It is selected via JavaScript code
         # once a category has been selected.
-        return FormDefaults(category=category, timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
+        return FormDefaults(category=category if category and not category.children else None,
+                            timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
+                            occurrences=[(start_dt, end_dt - start_dt)],
                             location_data={'inheriting': False})
+
+    def _create_event(self, data):
+        data = data.copy()
+        return create_event(data.pop('category'), self.event_type, data)
+
+    @materialize_iterable()
+    def _create_series(self, data):
+        @materialize_iterable(dict)
+        def _copy_person_link_data(link_data):
+            # Copy person link data since we would otherwise end up
+            # adding the EventPersons of the first event in all other
+            # events of the series.
+            for link, submitter in link_data.iteritems():
+                link_copy = EventPersonLink(**{col: getattr(link, col)
+                                               for col in get_simple_column_attrs(EventPersonLink)})
+                link_copy.person = EventPerson(**{col: getattr(link.person, col)
+                                                  for col in get_simple_column_attrs(EventPerson)})
+                yield link_copy, submitter
+
+        # TODO: Link the events as a series
+        occurrences = data.pop('occurrences')
+        for occ in occurrences:
+            start_dt = occ[0]
+            end_dt = start_dt + occ[1]
+            yield self._create_event(dict(data,
+                                          person_link_data=_copy_person_link_data(data['person_link_data']),
+                                          start_dt=start_dt, end_dt=end_dt))
 
     def _process(self):
         if not request.is_xhr:
             return redirect(url_for_index(_anchor='create-event:{}'.format(self.event_type.name)))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
         form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
+        if self._default_category:
+            form.category.category_id = self._default_category.id
         if form.validate_on_submit():
-            data = form.data
-            event = create_event(data.pop('category'), self.event_type, data)
+            if self.event_type == EventType.lecture:
+                events = self._create_series(form.data)
+                event = events[0]
+                if len(events) > 1:
+                    flash(Markup(render_template('events/series_created_msg.html', events=events)), 'info')
+            else:
+                event = self._create_event(form.data)
             return jsonify_data(flash=False, redirect=url_for('event_mgmt.conferenceModification', event))
-        return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order)
+        return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
+                                event_type=self.event_type.name)
