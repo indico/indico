@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockEvent, RHUnlockEvent,
                                                           RHShowNonInheriting, RHEventProtection,
-                                                          RHMoveEvent, RHEventACL, RHEventACLMessage)
+                                                          RHMoveEvent, RHEventACL, RHEventACLMessage,
+                                                          RHManageReferences, RHManageEventLocation,
+                                                          RHManageEventPersonLinks)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -34,7 +36,9 @@ _bp.add_url_rule('/protection', 'protection', RHEventProtection, methods=('GET',
 _bp.add_url_rule('/protection/acl', 'acl', RHEventACL)
 _bp.add_url_rule('/protection/acl-message', 'acl_message', RHEventACLMessage)
 _bp.add_url_rule('/move', 'move', RHMoveEvent, methods=('POST',))
-
+_bp.add_url_rule('/external-ids', 'manage_event_references', RHManageReferences, methods=('GET', 'POST'))
+_bp.add_url_rule('/event-location', 'manage_event_location', RHManageEventLocation, methods=('GET', 'POST'))
+_bp.add_url_rule('/event-persons', 'manage_event_person_links', RHManageEventPersonLinks, methods=('GET', 'POST'))
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():
     if object_type == 'subcontribution':
