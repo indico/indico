@@ -30,7 +30,7 @@ from indico.modules.events.operations import create_event
 from indico.util.date_time import now_utc
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form, url_for_index, jsonify_data
+from indico.web.util import url_for_index, jsonify_data, jsonify_template
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -61,6 +61,8 @@ class RHCreateEvent(RHProtected):
             start_dt = tzinfo.localize(datetime.combine(now.date() + relativedelta(days=1), time(9)))
         end_dt = start_dt + relativedelta(hours=2)
 
+        # XXX: Do not provide a default value for protection_mode. It is selected via JavaScript code
+        # once a category has been selected.
         return FormDefaults(category=category, timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
                             location_data={'inheriting': False})
 
@@ -72,4 +74,4 @@ class RHCreateEvent(RHProtected):
             data = form.data
             event = create_event(data.pop('category'), self.event_type, data)
             return jsonify_data(flash=False, redirect=url_for('event_mgmt.conferenceModification', event))
-        return jsonify_form(form, fields=form._field_order)
+        return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order)
