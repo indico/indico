@@ -464,6 +464,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             signals.event.type_changed.send(self, old_type=old_type)
 
     @property
+    def url(self):
+        return url_for('event.conferenceDisplay', self)
+
+    @property
     def web_factory(self):
         return self.type_.web_factory
 
