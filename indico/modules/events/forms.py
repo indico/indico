@@ -26,11 +26,12 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
-                                     IndicoEnumRadioField, OccurrencesField)
+                                     IndicoEnumRadioField, OccurrencesField, IndicoThemeSelectField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -105,8 +106,9 @@ class EventCreationForm(EventCreationFormBase):
 class LectureCreationForm(EventCreationFormBase):
     _field_order = ('category', 'title', 'occurrences', 'timezone', 'location_data', 'protection_mode',
                     'person_link_data')
-    _advanced_field_order = ('description',)
+    _advanced_field_order = ('description', 'theme')
     occurrences = OccurrencesField(_("Dates"), [DataRequired()], default_time=time(8),
                                    default_duration=timedelta(minutes=90))
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
+    theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture)
