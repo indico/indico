@@ -24,27 +24,27 @@ from indico.modules.categories.models.categories import Category
 from indico.web.flask.templating import get_template_module
 
 
-def notify_event_creation(event, title, occurrences=None):
+def notify_event_creation(event, occurrences=None):
     """Send email notifications when a new Event is created
 
     :param event: The `Event` that has been created.
-    :param title: The title of the event.  Needed because currently
-                  a `(1/3)` suffix is appended when creating a series
-                  of events.
     :param occurrences: A list of event occurrences in case of a
                         series of events.  If specified, the links
                         and dates/times are only taken from the
                         events in this list.
     """
     emails = set()
-
-    for cat in event.category.chain_query.filter(Category.notify_managers).options(joinedload('acl_entries')):
+    query = (event.category.chain_query.
+             filter(Category.notify_managers | (Category.event_creation_notification_emails != []))
+             .options(joinedload('acl_entries')))
+    for cat in query:
         emails.update(cat.event_creation_notification_emails)
-        for manager in cat.get_manager_list():
-            if manager.is_single_person:
-                emails.add(manager.email)
-            elif manager.is_group:
-                emails.update(x.email for x in manager.get_members())
+        if cat.notify_managers:
+            for manager in cat.get_manager_list():
+                if manager.is_single_person:
+                    emails.add(manager.email)
+                elif manager.is_group:
+                    emails.update(x.email for x in manager.get_members())
 
     if emails:
         template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
