@@ -4,6 +4,9 @@
     <div class="category-header">
         <div id="category-toolbar" class="toolbar right">
             <div class="group">
+                {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
+            </div>
+            <div class="group">
                 {% if not category.is_root %}
                     <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
                         {% trans %}Parent category{% endtrans %}
@@ -38,7 +41,6 @@
                         <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
                     </li>
                 </ul>
-                {{ create_event_button(category, classes="icon-plus") }}
                 {% if category.can_manage(session.user) %}
                     <a href="{{ url_for('categories.manage_content', category) }}"
                        class="i-button icon-edit"
