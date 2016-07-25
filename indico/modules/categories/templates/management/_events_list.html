@@ -18,7 +18,7 @@
                 {{ event.title|strip_tags }}
             </a>
         </td>
-        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.timezone) }}</td>
+        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.category.display_tzinfo) }}</td>
         <td class="i-table actions">
             <a href="#"
                class="i-button-icon icon-remove"
