@@ -286,39 +286,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 }
 
-.occurrences-widget {
-    @extend .datetime-widget;
-
-    .occurrence + .occurrence {
-        margin-top: 5px;
-    }
-
-    .timepicker {
-        width: 26% !important;
-    }
-
-    .durationpicker {
-        width: 20% !important;
-    }
-
-    .duration-info {
-        @include icon-before('icon-time');
-        color: $light-black;
-        position: relative;
-        right: 24px;
-        top: 2px;
-    }
-
-    .remove-occurrence {
-        @extend .clear-pickers;
-    }
-
-    .add-occurrence {
-        display: inline-block;
-        margin-top: 0.25em;
-    }
-}
-
 .has-warning {
     color: $yellow;
 }
