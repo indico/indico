@@ -31,6 +31,7 @@ from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink, EventPerson
 from indico.modules.events.models.series import EventSeries
+from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import create_event
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import materialize_iterable
@@ -116,8 +117,10 @@ class RHCreateEvent(RHProtected):
                 event = events[0]
                 if len(events) > 1:
                     flash(Markup(render_template('events/series_created_msg.html', events=events)), 'info')
+                notify_event_creation(event, occurrences=events)
             else:
                 event = self._create_event(form.data)
+                notify_event_creation(event)
             return jsonify_data(flash=False, redirect=url_for('event_mgmt.conferenceModification', event))
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name)

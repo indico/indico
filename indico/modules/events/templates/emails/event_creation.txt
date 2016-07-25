@@ -9,7 +9,7 @@
 {% block body -%}
     {%- filter dedent -%}
         {% filter underline %}Title{% endfilter %}
-        {{ title }}
+        {{ event.title }}
 
         {% filter underline %}Category{% endfilter %}
         {{ event.category.chain_titles|join(' » ') }}
@@ -61,7 +61,7 @@
             {{ event.timezone }}
 
             {% filter underline %}Occurrences{% endfilter -%}
-            {% for evt in occurrences %}
+            {% for evt in occurrences|sort(attribute='start_dt') %}
                 {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
                 {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
                 {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
