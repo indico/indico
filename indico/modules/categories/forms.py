@@ -23,6 +23,7 @@ from wtforms.validators import DataRequired, Optional, InputRequired, NumberRang
 from indico.modules.categories.models.categories import EventMessageMode, Category
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
@@ -42,9 +43,9 @@ class CategorySettingsForm(IndicoForm):
     timezone = IndicoTimezoneSelectField(_("Timezone"), [DataRequired()],
                                          description=_("Default timezone event lists will show up in. It will also be "
                                                        "used as a default for new events."))
-    lecture_theme = IndicoThemeSelectField('simple_event', _("Theme for Lectures"), [DataRequired()],
+    lecture_theme = IndicoThemeSelectField(_("Theme for Lectures"), [DataRequired()], event_type=EventType.lecture,
                                            description=_("Default timetable theme used for lecture events"))
-    meeting_theme = IndicoThemeSelectField('meeting', _("Theme for Meetings"), [DataRequired()],
+    meeting_theme = IndicoThemeSelectField(_("Theme for Meetings"), [DataRequired()], event_type=EventType.meeting,
                                            description=_("Default timetable theme used for meeting events"))
     visibility = SelectField(_("Event visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
                              description=_("""From which point in the category tree contents will be visible from """
