@@ -21,7 +21,7 @@ from io import BytesIO
 
 from flask import flash, redirect, request, session
 from PIL import Image
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer_group, load_only
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
@@ -72,6 +72,9 @@ class RHManageCategoryContent(RHManageCategoryBase):
         direction = 'desc' if request.args.get('desc', '1') == '1' else 'asc'
         order_column = order_columns[request.args.get('order', 'start_dt')]
         query = (Event.query.with_parent(self.category)
+                 .options(joinedload('series'), undefer_group('series'),
+                          load_only('id', 'category_id', 'created_dt',  'end_dt', 'protection_mode',  'start_dt',
+                                    'title', 'type_', 'series_pos', 'series_count'))
                  .order_by(getattr(order_column, direction)())
                  .order_by(Event.id))
         if page == 'all':

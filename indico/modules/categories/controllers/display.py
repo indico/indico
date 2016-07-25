@@ -28,7 +28,7 @@ import dateutil
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, request, session, Response
 from pytz import utc
-from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
@@ -224,6 +224,9 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
 
     _category_query_options = (joinedload('children').load_only('id', 'title', 'protection_mode'),
                                undefer('attachment_count'), undefer('has_events'))
+    _event_query_options = (joinedload('person_links'), joinedload('series'), undefer_group('series'),
+                            load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
+                                      'title', 'type_', 'series_pos', 'series_count'))
 
     def _checkParams(self):
         RHDisplayCategoryBase._checkParams(self)
@@ -270,9 +273,8 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
-                       .order_by(Event.start_dt.desc())
-                       .options(joinedload('person_links'), load_only('id', 'category_id', 'created_dt', 'end_dt',
-                                                                      'protection_mode', 'start_dt', 'title', 'type_')))
+                       .options(*self._event_query_options)
+                       .order_by(Event.start_dt.desc()))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
@@ -331,8 +333,8 @@ class RHEventList(RHDisplayCategoryEventsBase):
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
         event_query = (Event.query.with_parent(self.category)
-                       .order_by(Event.start_dt.desc())
-                       .options(joinedload('person_links')))
+                       .options(*self._event_query_options)
+                       .order_by(Event.start_dt.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)
         if after:
