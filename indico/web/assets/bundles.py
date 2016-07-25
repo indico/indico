@@ -172,8 +172,7 @@ indico_jquery = rjs_bundle(
                'palettepicker.js',
                'itempicker.js',
                'sortablelist.js',
-               'categorynavigator.js',
-               '../modules/eventcreation.js'))
+               'categorynavigator.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
@@ -363,9 +362,6 @@ abstracts_js = rjs_bundle(
                'Markdown.Editor.js',
                'Markdown.Sanitizer.js'))
 
-base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js)
-
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
@@ -373,6 +369,7 @@ module_js = {
     'categories_management': rjs_bundle('modules_categories_management', 'js/indico/modules/categories/management.js'),
     'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/categories/statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
+    'event_creation': rjs_bundle('modules_event_creation', *namespace('js/indico/modules', 'eventcreation.js')),
     'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'eventdisplay.js',
                                                                     'reporter.js', 'static_filters.js')),
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
@@ -395,6 +392,10 @@ module_js = {
     'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js'),
     'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
 }
+
+base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
+                 module_js['event_creation'])
 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
