@@ -581,6 +581,23 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             rv['last'] = None
         return rv
 
+    def get_verbose_title(self, show_speakers=False, show_series_pos=False):
+        """Get the event title with some additional information
+
+        :param show_speakers: Whether to prefix the title with the
+                              speakers of the event.
+        :param show_series_pos: Whether to suffix the title with the
+                                position and total count in the event's
+                                series.
+        """
+        title = self.title
+        if show_speakers and self.person_links:
+            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=unicode.lower))
+            title = '{}, "{}"'.format(speakers, title)
+        if show_series_pos and self.series and self.series.show_sequence_in_title:
+            title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
+        return title
+
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
@@ -682,6 +699,7 @@ Event.register_protection_events()
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
     from indico.modules.categories import Category
+    event_alias = db.aliased(Event)
 
     # Event.category_chain -- the category ids of the event, starting
     # with the root category down to the event's immediate parent.
@@ -696,6 +714,21 @@ def _mappers_configured():
                              else_=Event.protection_mode, value=Event.protection_mode)])
              .where(Category.id == Event.category_id))
     Event.effective_protection_mode = column_property(query, deferred=True)
+
+    # Event.series_pos -- the position of the event in its series
+    subquery = (select([event_alias.id,
+                        db.func.row_number().over(order_by=(event_alias.start_dt, event_alias.id)).label('pos')])
+                .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
+                .correlate(Event)
+                .alias())
+    query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery)
+    Event.series_pos = column_property(query, group='series', deferred=True)
+
+    # Event.series_count -- the number of events in the event's series
+    query = (db.select([db.func.count(event_alias.id)])
+             .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
+             .correlate_except(event_alias))
+    Event.series_count = column_property(query, group='series', deferred=True)
 
 
 @listens_for(Event.start_dt, 'set')

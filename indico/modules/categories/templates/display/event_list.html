@@ -82,6 +82,7 @@
         </h4>
         <ul>
             {% for event in month.events %}
+                {% set is_lecture = (event.type == 'lecture') %}
                 <li itemscope itemtype="http://data-vocabulary.org/Event">
                     <span class="ical">
                         <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
@@ -93,15 +94,7 @@
                         </span>
                         <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
                             <span itemprop="summary">
-                                {% if event.type == 'lecture' %}
-                                    {% if event.person_links %}
-                                        {{ (event.person_links|map(attribute='full_name')|sort|join(', '), '"' + (event.title|strip_tags) + '"')|join(', ') }}
-                                    {% else %}
-                                        {{ event.title|strip_tags }}
-                                    {% endif %}
-                                {% else %}
-                                    {{ event.title|strip_tags }}
-                                {% endif %}
+                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | strip_tags }}
                             </span>
                         </a>
                         <span class="protected">
