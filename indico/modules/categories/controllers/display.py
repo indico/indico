@@ -352,7 +352,7 @@ class RHEventList(RHDisplayCategoryEventsBase):
         if before:
             event_query = event_query.filter(Event.start_dt < before)
         if after:
-            event_query = event_query.filter(Event.start_dt >= after + relativedelta(months=1))
+            event_query = event_query.filter(Event.start_dt >= after)
         self.events = event_query.all()
 
     def _process(self):
