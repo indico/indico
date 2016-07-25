@@ -184,6 +184,8 @@ def setup_jinja(app):
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
+    # Useful constants
+    app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
