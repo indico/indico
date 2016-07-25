@@ -146,6 +146,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         nullable=True,
         index=True
     )
+    #: The ID of the series this events belongs to
+    series_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.series.id'),
+        nullable=True,
+        index=True
+    )
     #: If this event was cloned, the id of the parent event
     cloned_from_id = db.Column(
         db.Integer,
@@ -305,6 +312,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         backref=db.backref(
             'event',
             lazy=True
+        )
+    )
+    #: The series this event is part of
+    series = db.relationship(
+        'EventSeries',
+        lazy=True,
+        backref=db.backref(
+            'events',
+            lazy=True,
+            order_by=(start_dt, id)
         )
     )
 
