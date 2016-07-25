@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events import logger
 
@@ -56,6 +57,9 @@ def create_event(category, event_type, data):
     conf = Conference.new(category, creator=session.user, title=data.pop('title'), start_dt=data.pop('start_dt'),
                           end_dt=data.pop('end_dt'), timezone=data.pop('timezone'), event_type=event_type)
     event = conf.as_event
+    theme = data.pop('theme', None)
+    if theme is not None:
+        layout_settings.set(event, 'timetable_theme', theme)
     event.populate_from_dict(data)
     db.session.flush()
     logger.info('Event %r created in %r by %r ', event, category, session.user)
