@@ -30,6 +30,7 @@ from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink, EventPerson
+from indico.modules.events.models.series import EventSeries
 from indico.modules.events.operations import create_event
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import materialize_iterable
@@ -94,8 +95,9 @@ class RHCreateEvent(RHProtected):
                                                   for col in get_simple_column_attrs(EventPerson)})
                 yield link_copy, submitter
 
-        # TODO: Link the events as a series
         occurrences = data.pop('occurrences')
+        if len(occurrences) > 1:
+            data['series'] = EventSeries()
         for occ in occurrences:
             start_dt = occ[0]
             end_dt = start_dt + occ[1]
