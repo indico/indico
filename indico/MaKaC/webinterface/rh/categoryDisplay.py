@@ -82,7 +82,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
         if self._confirm == True:
             if self._event_type != EventType.lecture:
                 c = self._createEvent( self._params )
-                self.alertCreation([c], to_unicode(params['title']))
+                self.alertCreation([c])
             # lectures
             else:
                 lectures = []
@@ -94,7 +94,7 @@ class RHConferencePerformCreation(RHCreateEventBase):
                     self._params["sMinute"] = self._params.get("sMinute_%s"%i,"")
                     self._params["duration"] = int(self._params.get("dur_%s"%i,60))
                     lectures.append(self._createEvent(self._params))
-                self.alertCreation(lectures, to_unicode(params['title']))
+                self.alertCreation(lectures)
                 lectures.sort(sortByStartDate)
                 # create links
                 for i, source in enumerate(lectures, 1):
@@ -146,9 +146,9 @@ class RHConferencePerformCreation(RHCreateEventBase):
         allowedUsersDict = json.decode(self._params.get("allowedUsers") or "[]") or []
         return UserListModificationBase.retrieveUsers({"userList": allowedUsersDict})[0] if allowedUsersDict else []
 
-    def alertCreation(self, confs, title):
+    def alertCreation(self, confs):
         occurrences = [conf.as_event for conf in confs] if len(confs) > 1 else None
-        notify_event_creation(confs[0].as_event, title, occurrences)
+        notify_event_creation(confs[0].as_event, occurrences)
 
 
 class UtilsConference:

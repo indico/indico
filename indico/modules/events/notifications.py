@@ -47,7 +47,6 @@ def notify_event_creation(event, title, occurrences=None):
                 emails.update(x.email for x in manager.get_members())
 
     if emails:
-        template = get_template_module('events/emails/event_creation.txt', event=event, title=title,
-                                       occurrences=occurrences)
+        template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
         send_email(make_email(bcc_list=emails, template=template, from_address=Config.getInstance().getSupportEmail()),
                    event.as_legacy, module='Events')
