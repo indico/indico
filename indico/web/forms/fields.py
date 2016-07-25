@@ -271,10 +271,19 @@ class CategoryField(HiddenField):
 
     def pre_validate(self, form):
         if self.data:
-            if not self.allow_events and self.data.has_only_events:
-                raise ValueError(_("Categories containing only events are not allowed."))
-            if not self.allow_subcats and self.data.children:
-                raise ValueError(_("Categories containing subcategories are not allowed."))
+            self._validate(self.data)
+
+    def process_data(self, value):
+        if not value:
+            self.data = None
+            return
+        try:
+            self._validate(value)
+        except ValueError:
+            self.data = None
+        else:
+            self.data = value
+            self.category_id = value.id
 
     def process_formdata(self, valuelist):
         from indico.modules.categories import Category
@@ -285,6 +294,12 @@ class CategoryField(HiddenField):
                 self.data = None
             else:
                 self.data = Category.get(category_id, is_deleted=False)
+
+    def _validate(self, category):
+        if not self.allow_events and category.has_only_events:
+            raise ValueError(_("Categories containing only events are not allowed."))
+        if not self.allow_subcats and category.children:
+            raise ValueError(_("Categories containing subcategories are not allowed."))
 
     def _value(self):
         return {'id': self.data.id, 'title': self.data.title} if self.data else {}

@@ -72,7 +72,7 @@ class RHCreateEvent(RHProtected):
 
         # XXX: Do not provide a default value for protection_mode. It is selected via JavaScript code
         # once a category has been selected.
-        return FormDefaults(category=category if category and not category.children else None,
+        return FormDefaults(category=category,
                             timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
                             occurrences=[(start_dt, end_dt - start_dt)],
                             location_data={'inheriting': False})
@@ -110,8 +110,6 @@ class RHCreateEvent(RHProtected):
             return redirect(url_for_index(_anchor='create-event:{}'.format(self.event_type.name)))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
         form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
-        if self._default_category:
-            form.category.category_id = self._default_category.id
         if form.validate_on_submit():
             if self.event_type == EventType.lecture:
                 events = self._create_series(form.data)
