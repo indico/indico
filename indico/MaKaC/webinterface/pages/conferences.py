@@ -19,10 +19,12 @@ import posixpath
 import re
 from collections import OrderedDict
 from datetime import datetime
+from operator import itemgetter
 from xml.sax.saxutils import quoteattr
 
 from flask import session, render_template, request
 from markupsafe import escape
+from sqlalchemy.orm import load_only
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -43,8 +45,9 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
+from indico.core.db import db
 from indico.modules.categories.util import get_visibility_options
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import EventType, Event
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
 from MaKaC.common.fossilize import fossilize
@@ -427,11 +430,12 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         self.theme = theme_settings.themes[theme_id]
 
     def _getVariables(self, conf):
+        event = conf.as_event
         wvars = {}
         wvars['INCLUDE'] = '../include'
 
         wvars['accessWrapper'] = accessWrapper = self._rh._aw
-        wvars['category'] = conf.as_event.category.title
+        wvars['category'] = event.category.title
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
@@ -442,16 +446,25 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         for folder in attached_items.get('folders', []):
             if LECTURE_SERIES_RE.match(folder.title):
-                lectures.append(folder)
+                lectures.append({'url': folder.attachments[0].link_url,
+                                 'pos': int(folder.title[4:])})
             elif folder.title != "Internal Page Files":
                 folders.append(folder)
 
-        cmp_title_number = lambda x, y: int(x.title[4:]) - int(y.title[4:])
+        if event.series is not None and event.series.show_links:
+            query = (Event.query
+                     .add_column(db.func.row_number().over(order_by=(Event.start_dt, Event.id)).label('n'))
+                     .options(load_only('id'))
+                     .filter_by(series_id=event.series_id, is_deleted=False)
+                     .order_by('n'))
+            lectures = [{'id': ev.id, 'url': ev.url, 'pos': n}
+                        for ev, n in query
+                        if ev != event]
 
         wvars.update({
             'files': attached_items.get('files', []),
             'folders': folders,
-            'lectures': sorted(lectures, cmp=cmp_title_number)
+            'lectures': sorted(lectures, key=itemgetter('pos'))
         })
 
         return wvars
