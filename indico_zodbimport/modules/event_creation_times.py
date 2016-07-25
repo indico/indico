@@ -30,9 +30,9 @@ class EventCreationTimeImporter(Importer):
         return bool(Event.query.filter(Event.created_dt != Event.start_dt).count())
 
     def migrate(self):
-        self.migrate_event_dates_titles()
+        self.migrate_event_creation_times()
 
-    def migrate_event_dates_titles(self):
+    def migrate_event_creation_times(self):
         self.print_step("Migrating event creation times")
         for old_event in committing_iterator(self._iter_events()):
             Event.query.filter_by(id=int(old_event.id)).update({Event.created_dt: old_event._creationDS},
