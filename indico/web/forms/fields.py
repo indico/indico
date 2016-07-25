@@ -264,7 +264,7 @@ class CategoryField(HiddenField):
     widget = JinjaWidget('forms/category_picker_widget.html')
 
     def __init__(self, *args, **kwargs):
-        self.category_id = kwargs.pop('category_id', 0)
+        self.navigator_category_id = kwargs.pop('navigator_category_id', 0)
         self.allow_events = kwargs.pop('allow_events', True)
         self.allow_subcats = kwargs.pop('allow_subcats', True)
         super(CategoryField, self).__init__(*args, **kwargs)
@@ -283,7 +283,7 @@ class CategoryField(HiddenField):
             self.data = None
         else:
             self.data = value
-            self.category_id = value.id
+            self.navigator_category_id = value.id
 
     def process_formdata(self, valuelist):
         from indico.modules.categories import Category
