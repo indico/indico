@@ -1039,7 +1039,8 @@ class IndicoTimezoneSelectField(SelectField):
 
 
 class IndicoThemeSelectField(SelectField):
-    def __init__(self, event_type, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        event_type = kwargs.pop('event_type').legacy_name
         super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
         self.choices = sorted([(tid, theme['title'])
                                for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
