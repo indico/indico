@@ -299,12 +299,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
     .durationpicker {
         width: 20% !important;
-
-        // the spinner looks awful in the field, let's just hide it
-        &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button {
-            display: none;
-        }
     }
 
     .duration-info {
