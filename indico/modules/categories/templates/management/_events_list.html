@@ -89,9 +89,12 @@
         </div>
         {% if events.total %}
             <div class="group right">
-                <a href="#" class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
+                <a href="#"
+                   class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
+                   title="{% trans %}Move selected events to a different category{% endtrans %}"
                    data-href="{{ url_for('.move_events', category) }}"></a>
                 <a href="#" class="i-button icon-remove js-enabled-if-checked"
+                   title="{% trans %}Delete selected events{% endtrans %}"
                    data-href="{{ url_for('.delete_events', category) }}"
                    data-method="POST"
                    data-params-selector="#event-management input[type=checkbox]:checked"
