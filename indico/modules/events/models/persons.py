@@ -156,12 +156,12 @@ class EventPerson(PersonMixin, db.Model):
         return None
 
     @classmethod
-    def create_from_user(cls, user, event):
+    def create_from_user(cls, user, event=None):
         return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,
                            email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone)
 
     @classmethod
-    def for_user(cls, user, event):
+    def for_user(cls, user, event=None):
         """Return EventPerson for a matching User in Event creating if needed"""
         person = event.persons.filter_by(user=user).first() if event else None
         return person or cls.create_from_user(user, event)
