@@ -51,10 +51,6 @@ body > * {
             float: left;
             padding: 0 1em 0 1em;
 
-            &.col-20 {
-                width: 20%;
-            }
-
             &.col-40 {
                 width: 40%;
             }
@@ -65,10 +61,6 @@ body > * {
 
             &.col-60 {
                 width: 60%;
-            }
-
-            &.col-80 {
-                width: 80%;
             }
 
             &.col-full {
@@ -94,14 +86,53 @@ body > * {
     }
 }
 
-.layout-sidemenu {
+.layout-side-menu {
     display: flex;
     min-height: 100%;
-}
+    margin-left: 30px;
+    margin-right: 30px;
 
-.layout-sidemenu > .body {
-    flex-grow: 1;
-    width: 0;
-    margin-top: 19px;
-    margin-right: 15px;
+    &:first-of-type {
+        margin-top: 20px;
+    }
+
+    .banner {
+        > .menu-column {
+            flex-grow: 0;
+            width: 200px;
+            margin-left: 30px;
+            margin-right: 30px;
+        }
+
+        > .page-column {
+            flex-grow: 1;
+        }
+
+        .action-menu {
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+    }
+
+
+    > .menu-column {
+        width: 200px;
+        margin-right: 30px;
+
+        .group:first-child {
+            margin-top: 5px;
+            margin-bottom: 23px;
+
+            a {
+                width: 100%;
+                padding: 5px 5px 5px 26px;
+                text-align: left;
+            }
+        }
+    }
+
+    > .content-column {
+        flex-grow: 1;
+        width: 0;
+    }
 }

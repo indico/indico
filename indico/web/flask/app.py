@@ -54,7 +54,7 @@ from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
-from indico.util.string import alpha_enum
+from indico.util.string import alpha_enum, crc32, slugify
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          subclassof, call_template_hook, groupby, strip_tags)
@@ -62,11 +62,12 @@ from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, List
                                    IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
+from indico.web.menu import render_sidemenu
+from indico.web.util import url_for_index
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
-AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt',
-                          'misc', 'rooms', 'rooms_admin'}
+AUTO_COMPAT_BLUEPRINTS = {'admin', 'event', 'event_creation', 'event_mgmt', 'misc', 'rooms', 'rooms_admin'}
 
 
 def fix_root_path(app):
@@ -135,7 +136,7 @@ def configure_multipass(app):
                                                   'address'}
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
-    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
     app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
 
 
@@ -176,16 +177,23 @@ def setup_jinja(app):
     app.add_template_global(iter_form_fields, '_iter_form_fields')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)
+    app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
     app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
+    app.add_template_global(render_sidemenu)
+    app.add_template_global(slugify)
+    # Useful constants
+    app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_datetime))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_datetime))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_number))
     # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
@@ -197,6 +205,7 @@ def setup_jinja(app):
     app.add_template_filter(any)
     app.add_template_filter(strip_tags)
     app.add_template_filter(alpha_enum)
+    app.add_template_filter(crc32)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
     app.add_template_test(subclassof)  # only use this test if you really have to!

@@ -1,0 +1,47 @@
+{% from '_statistics.html' import scatter_plot, stats_badges, stats_box %}
+{% from 'message_box.html' import message_box %}
+
+<div class="category-container">
+    <div class="category-header">
+        <div class="category-statistics center">
+            <span class="right">
+                <a class="i-button icon-prev" style="margin-top:0.4em;" href="{{ category.url }}">
+                    {%- trans %}Category page{% endtrans -%}
+                </a>
+            </span>
+            <div class="category-title" style="margin-left:0px; text-align:left;">
+                {{ category.title }}&nbsp;
+                <span style="font-style: italic; font-size: 0.8em;">({% trans %}statistics{% endtrans %})</span>
+            </div>
+        </div>
+    </div>
+    {% if has_stats %}
+        <div class="category-content-wrapper category-statistics center">
+            <div class="i-box-group horz vert">
+                {% for plot in plots %}
+                    {% set title, subtitle, data = plot %}
+                    {% call stats_box(title=title, subtitle=subtitle, label=data.total,
+                                      label_tooltip=_("Total"), classes='plot-container') %}
+                        {% if data['values'] %}
+                            {{ scatter_plot('plot-%s'|format(loop.index), data) }}
+                        {% else %}
+                           <span class="empty">{% trans %}No data available{% endtrans %}</span>
+                        {% endif %}
+                    {% endcall %}
+                {% endfor %}
+            </div>
+            {{ stats_badges(values, 'left') }}
+        </div>
+        <div class="category-content-wrapper category-statistics center">
+            <span class="footer right" style="margin-top: 2em;">
+                {% trans %}Last update:{% endtrans %} {{ updated|format_datetime }}
+            </span>
+        </div>
+    {% else %}
+        <div class="category-content-wrapper category-statistics center" style="text-align: left;">
+            {% call message_box('info', fixed_width=true) %}
+                {% trans %}There are no statistics available for this category.{% endtrans %}
+            {% endcall %}
+        </div>
+    {% endif %}
+</div>

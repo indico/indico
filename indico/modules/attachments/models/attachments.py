@@ -93,7 +93,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
         assert folder.object is not None
         if folder.link_type == LinkType.category:
             # category/<id>/...
-            path_segments = ['category', strict_unicode(folder.category_id)]
+            path_segments = ['category', strict_unicode(folder.category.id)]
         else:
             # event/<id>/event/...
             path_segments = ['event', strict_unicode(folder.event_new.id), folder.link_type.name]

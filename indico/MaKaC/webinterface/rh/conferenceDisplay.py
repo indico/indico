@@ -24,13 +24,11 @@ import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
-import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPError404
 from indico.core.config import Config
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.errors import MaKaCError
 from MaKaC.PDFinterface.conference import AbstractBook
 import zipfile
 from cStringIO import StringIO
@@ -58,9 +56,10 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         self._doNotSanitizeFields.append("accessKey")
 
     def _process(self):
-        access_keys = session.setdefault("accessKeys", {})
-        access_keys[self._conf.getUniqueId()] = self._accesskey
-        session.modified = True
+        # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message
+        # for that if there's an access key for the event in the session.
+        # this is pretty awful but eventually we'll do this properly :)
+        self.event_new.set_session_access_key(self._accesskey)
         url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         self._redirect(url)
 
@@ -133,19 +132,6 @@ class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
             p = self.render_meeting_page(self._conf, self._reqParams.get("view"), self._reqParams.get('fr') == 'no')
 
         return warningText + (p if isinstance(p, basestring) else p.display(**params))
-
-
-class RHRelativeEvent(RHConferenceBaseDisplay):
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._which = params['which']
-
-    def _process(self):
-        evt = self._conf.getOwner().getRelativeEvent(self._which, conf=self._conf)
-        if evt:
-            self._redirect(urlHandlers.UHConferenceDisplay.getURL(evt))
-        else:
-            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
 class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):

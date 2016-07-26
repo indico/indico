@@ -23,18 +23,26 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUserEmails, RHUserEmailsVerify, RHUserEmailsDelete,
                                               RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
                                               RHUserFavoritesUserRemove, RHUserFavoritesCategoryAPI,
-                                              RHUserSuggestionsRemove, RHUsersAdminSettings, RHUsersAdminCreate,
-                                              RHUsersAdminMerge, RHUsersAdminMergeCheck)
+                                              RHUserSuggestionsRemove, RHUsersAdmin, RHUsersAdminSettings,
+                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
+                                              RHRegistrationRequestList, RHRejectRegistrationRequest,
+                                              RHAcceptRegistrationRequest)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('users', __name__, template_folder='templates', virtual_template_folder='users',
                       url_prefix='/user')
 
 # Admin
-_bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdminSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdmin, methods=('GET', 'POST'))
+_bp.add_url_rule('!/admin/users/settings', 'users_admin_settings', RHUsersAdminSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/', 'users_merge', RHUsersAdminMerge, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/check/', 'users_merge_check', RHUsersAdminMergeCheck)
+_bp.add_url_rule('!/admin/users/registration-requests/', 'registration_request_list', RHRegistrationRequestList)
+_bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/accept', 'accept_registration_request',
+                 RHAcceptRegistrationRequest, methods=('POST',))
+_bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/reject', 'reject_registration_request',
+                 RHRejectRegistrationRequest, methods=('POST',))
 
 
 # User profile
@@ -48,7 +56,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
     _bp.add_url_rule('/favorites/users/<int:fav_user_id>', 'user_favorites_user_remove', RHUserFavoritesUserRemove,
                      methods=('DELETE',))
-    _bp.add_url_rule('/favorites/categories/<category_id>', 'user_favorites_category_api',
+    _bp.add_url_rule('/favorites/categories/<int:category_id>', 'user_favorites_category_api',
                      RHUserFavoritesCategoryAPI, methods=('PUT', 'DELETE'))
     _bp.add_url_rule('/emails/', 'user_emails', RHUserEmails, methods=('GET', 'POST'))
     _bp.add_url_rule('/emails/verify/<token>', 'user_emails_verify', RHUserEmailsVerify)

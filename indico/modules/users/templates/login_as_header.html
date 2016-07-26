@@ -1,0 +1,8 @@
+<div class="impersonation-header clearfix">
+    <span class="icon-eye text">
+            <small>{% trans %}Logged in as{% endtrans %}</small>
+            <span class="logged-user-name">{{ session.user.full_name }}</span>
+            <small>({{ login_as_data.user_name }})</small>
+        </span>
+    <span class="undo-login-as icon-close contextHelp" title="Switch back to {{ login_as_data.user_name }}"></span>
+</div>

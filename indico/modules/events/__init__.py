@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash, session, g, render_template
+from flask import request, redirect, flash, session, render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -214,31 +214,6 @@ def _sidemenu_items(sender, **kwargs):
                        section='customization')
 
 
-@signals.event.moved.connect
-def _event_moved(conf, old_parent, new_parent, **kwargs):
-    if new_parent.getCategoryPath()[0] != '0':
-        g.setdefault('detached_events_moved', set()).add(conf.as_event)
-        return
-    event = conf.as_event
-    event.category_id = int(new_parent.id)
-
-
-@signals.category.moved.connect
-def _category_moved(category, old_parent, new_parent, **kwargs):
-    events = Event.find(Event.category_chain.contains([int(category.id)])).all()
-    # update the category chain of all events from the moved category
-    for event in events:
-        event.category_chain = map(int, reversed(event.category.getCategoryPath()))
-    # update the category chain of all events from the target category
-    for event in g.get('detached_events_moved', set()):
-        # the event was in the target category of of the category move
-        assert event.category_id == int(new_parent.id)
-        # and it is now in the category that has just been moved
-        assert int(event.as_legacy.getOwner().id) == int(category.id)
-        # this will also update the chain (sqlalchemy hook)
-        event.category_id = int(category.id)
-
-
 @signals.app_created.connect
 def _check_cloners(app, **kwargs):
     # This will raise RuntimeError if the cloner names are not unique
@@ -251,6 +226,7 @@ def _get_cloners(sender, **kwargs):
     yield clone.EventLocationCloner
     yield clone.EventPersonCloner
     yield clone.EventPersonLinkCloner
+    yield clone.EventProtectionCloner
 
 
 @signals.event.cloned.connect
@@ -285,11 +261,11 @@ def _render_event_ical_export(event, **kwargs):
     from indico.modules.events.util import get_base_ical_parameters
     return render_template('events/display/event_ical_export.html', item=event,
                            ics_url=url_for('events.export_event_ical', event),
-                           **get_base_ical_parameters(session.user, event, 'events'))
+                           **get_base_ical_parameters(session.user, event, 'events',
+                                                      '/export/event/{0}.ics'.format(event.id)))
 
 
 @template_hook('contribution-fields')
 def _render_contribution_fields(event, **kwargs):
-    from indico.modules.events.contributions.models.fields import ContributionField
     return render_template('events/management/contribution_field_list.html', event=event,
                            fields=event.contribution_fields)

@@ -685,12 +685,6 @@ class Review(ReviewLegacyMixin, Persistent, Fossilizable):
         l["reviewId"] = self.getId()
         return l
 
-    def isProtected(self):
-        return self.getOwner().isProtected()
-
-    def canIPAccess( self, ip ):
-        return self.getOwner().canIPAccess(ip)
-
     def canUserModify( self, aw ):
         return self.getOwner().canUserModify(aw)
 

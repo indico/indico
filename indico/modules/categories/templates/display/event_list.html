@@ -1,0 +1,114 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro _hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
+                             before=none, after=none, message_first=true) %}
+    {% set message=caller() %}
+    {% macro render_message() %}
+        {% call message_box('info', icon=false) %}
+            <div class="content smaller">
+                <span class="js-show-message">
+                    {{ message }}
+                    <a class="js-toggle-list" href="#">{% trans %}Show{% endtrans %}</a>
+                    <span class="icon-spinner js-spinner"></span>
+                </span>
+                <span class="js-hide-message">
+                    {{ message }}
+                    <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
+                </span>
+            </div>
+        {% endcall %}
+    {% endmacro %}
+
+    {% macro render_list() %}
+        <div class="events"
+             data-event-list-url="{{ url_for('.event_list', category) }}"
+             {% if after %}data-event-list-after="{{ after }}"{% endif %}
+             {% if before %}data-event-list-before="{{ before }}"{% endif %}>
+            {%- if events_by_month -%}
+                {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
+            {%- endif -%}
+        </div>
+    {% endmacro %}
+
+    <div class="{{ class }}">
+        {% if message_first %}
+            {{ render_message() }}
+            {{ render_list() }}
+        {% else %}
+            {{ render_list() }}
+            {{ render_message() }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
+                    past_event_count, future_threshold, past_threshold, future_events_by_month=[],
+                    past_events_by_month=[], show_past_events=false) %}
+    <div class="event-list"
+         data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
+        {% if future_event_count %}
+            {% call _hidden_events_block('future-events', category, future_events_by_month, format_event_date,
+                                        is_recent, happening_now, after=future_threshold) %}
+                {% trans count=future_event_count -%}
+                    There is one event in the future.
+                {%- pluralize -%}
+                    There are {{ count }} events in the future.
+                {%- endtrans %}
+            {% endcall %}
+        {% endif %}
+        <div>
+            {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
+        </div>
+        {% if past_event_count %}
+            {% call _hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
+                                        happening_now, before=past_threshold, message_first=false) %}
+                {% trans count=past_event_count -%}
+                    There is one event in the past.
+                {%- pluralize -%}
+                    There are {{ count }} events in the past.
+                {%- endtrans %}
+            {% endcall %}
+        {% endif %}
+    </div>
+    <script>
+        setupCategoryDisplayEventList({{ (show_past_events and not past_events_by_month) | tojson }});
+    </script>
+{% endmacro %}
+
+{% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
+    {% for month in events_by_month %}
+        <h4 class="{% if month.is_current %}current-month{% endif %}">
+            <span>{{ month.name }}</span>
+        </h4>
+        <ul>
+            {% for event in month.events %}
+                {% set is_lecture = (event.type == 'lecture') %}
+                <li itemscope itemtype="http://data-vocabulary.org/Event">
+                    <span class="ical">
+                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
+                    </span>
+                    <span class="list-name">
+                        <span class="date {% if happening_now(event) %}today{% endif %}">
+                            {{ format_event_date(event) }}
+                            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
+                        </span>
+                        <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
+                            <span itemprop="summary">
+                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | strip_tags }}
+                            </span>
+                        </a>
+                        <span class="protected">
+                            {% if event.is_self_protected %}
+                                <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
+                            {% endif %}
+
+                            {% if is_recent(event.created_dt) %}
+                                <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                            {% endif %}
+                        </span>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endmacro %}

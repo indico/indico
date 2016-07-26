@@ -18,9 +18,11 @@ import json
 import uuid
 from collections import OrderedDict
 from datetime import time, timedelta
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
-from flask import render_template
+import dateutil.parser
+import pytz
+from flask import render_template, session
 from markupsafe import escape, Markup
 from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload
@@ -28,19 +30,23 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select, RadioInput
-from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
+from wtforms.fields.core import RadioField, SelectMultipleField, SelectField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.networks.models.networks import IPNetworkGroup
+from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.models.users import User, UserTitle
@@ -51,7 +57,6 @@ from indico.util.user import principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, LocationWidget
-from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 def _preprocessed_formdata(valuelist):
@@ -244,10 +249,71 @@ class IndicoPasswordField(PasswordField):
         super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 
+class CategoryField(HiddenField):
+    """WTForms field that lets you select a category.
+
+    :param category_id: The ID of the category to initialize the category
+                        navigator with. The root category is used in case the
+                        category_id is not provided.
+    :param allow_events: Whether to allow selecting a category that
+                         contains events.
+    :param allow_subcats: Whether to allow selecting a category that
+                          contains subcategories.
+    """
+
+    widget = JinjaWidget('forms/category_picker_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.navigator_category_id = kwargs.pop('navigator_category_id', 0)
+        self.allow_events = kwargs.pop('allow_events', True)
+        self.allow_subcats = kwargs.pop('allow_subcats', True)
+        super(CategoryField, self).__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        if self.data:
+            self._validate(self.data)
+
+    def process_data(self, value):
+        if not value:
+            self.data = None
+            return
+        try:
+            self._validate(value)
+        except ValueError:
+            self.data = None
+        else:
+            self.data = value
+            self.navigator_category_id = value.id
+
+    def process_formdata(self, valuelist):
+        from indico.modules.categories import Category
+        if valuelist:
+            try:
+                category_id = int(json.loads(valuelist[0])['id'])
+            except KeyError:
+                self.data = None
+            else:
+                self.data = Category.get(category_id, is_deleted=False)
+
+    def _validate(self, category):
+        if not self.allow_events and category.has_only_events:
+            raise ValueError(_("Categories containing only events are not allowed."))
+        if not self.allow_subcats and category.children:
+            raise ValueError(_("Categories containing subcategories are not allowed."))
+
+    def _value(self):
+        return {'id': self.data.id, 'title': self.data.title} if self.data else {}
+
+    def _get_data(self):
+        return self.data
+
+
 class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 
     :param groups: If groups should be selectable.
+    :param allow_networks: If ip networks should be selectable.
+    :param allow_emails: If emails should be allowed.
     :param allow_external: If "search users with no indico account"
                            should be available.  Selecting such a user
                            will automatically create a pending user once
@@ -260,13 +326,17 @@ class PrincipalListField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
+        self.allow_networks = kwargs.pop('allow_networks', False)
+        self.ip_networks = []
+        if self.allow_networks:
+            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
-                                     allow_emails=self.allow_emails)
+                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -279,13 +349,21 @@ class PrincipalListField(HiddenField):
     def _serialize_principal(self, principal):
         if principal.principal_type == PrincipalType.email:
             return principal.fossilize()
+        elif principal.principal_type == PrincipalType.network:
+            return serialize_ip_network_group(principal)
         elif principal.principal_type == PrincipalType.user:
             return serialize_user(principal)
-        else:
+        elif principal.is_group:
             return serialize_group(principal)
+        else:
+            raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
     def _value(self):
-        principals = sorted(self._get_data(), key=lambda x: x.name.lower())
+        def key(obj):
+            if isinstance(obj, PersonLinkBase):
+                return obj.name.lower()
+            return obj.principal_type, obj.name.lower()
+        principals = sorted(self._get_data(), key=key)
         return map(self._serialize_principal, principals)
 
     def _get_data(self):
@@ -308,7 +386,7 @@ class EventPersonListField(PrincipalListField):
 
     @property
     def event(self):
-        return self.get_form().event
+        return getattr(self.get_form(), 'event', None)
 
     def _convert_data(self, data):
         return map(self._get_event_person, data)
@@ -412,7 +490,7 @@ class PersonLinkListFieldBase(EventPersonListField):
 
     def __init__(self, *args, **kwargs):
         super(PersonLinkListFieldBase, self).__init__(*args, **kwargs)
-        self.object = getattr(kwargs['_form'], self.linked_object_attr)
+        self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @no_autoflush
     def _get_person_link(self, data, extra_data=None):
@@ -503,11 +581,15 @@ class MultipleItemsField(HiddenField):
     :param fields: A list of dicts with the following arguments:
                    'id': the unique ID of the field
                    'caption': the title of the column and the placeholder
-                   'type': 'text|select' the type of the field
+                   'type': 'text|number|select', the type of the field
+                   'coerce': callable to convert the value to a python type.
+                             the type must be comvertible back to a string,
+                             so usually you just want something like `int`
+                             or `float` here.
                    In case the type is 'select', the property 'choices' of the
-                   `MultipleItemsField` needs to be a dict where the key is the
-                   'id' of the select field and the value is another dict
-                   mapping the option's id to it's caption.
+                   `MultipleItemsField` or the 'choices' kwarg needs to be a dict
+                   where the key is the 'id' of the select field and the value is
+                   another dict mapping the option's id to it caption.
     :param uuid_field: If set, each item will have a UUID assigned and
                        stored in the field specified here.  The name
                        specified here may not be in `fields`.
@@ -527,7 +609,7 @@ class MultipleItemsField(HiddenField):
         self.uuid_field_opaque = kwargs.pop('uuid_field_opaque', False)
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
-        self.choices = getattr(self, 'choices', {})
+        self.choices = getattr(self, 'choices', kwargs.pop('choices', {}))
         self.serialized_data = {}
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
@@ -550,7 +632,8 @@ class MultipleItemsField(HiddenField):
     def pre_validate(self, form):
         unique_used = set()
         uuid_used = set()
-        for item in self.serialized_data:
+        coercions = {f['id']: f['coerce'] for f in self.fields if f.get('coerce') is not None}
+        for i, item in enumerate(self.serialized_data):
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             item_keys = set(item)
@@ -568,9 +651,21 @@ class MultipleItemsField(HiddenField):
                 # raises ValueError if uuid is invalid
                 uuid.UUID(item[self.uuid_field], version=4)
                 uuid_used.add(item[self.uuid_field])
+            for key, fn in coercions.viewitems():
+                try:
+                    self.data[i][key] = fn(self.data[i][key])
+                except ValueError:
+                    raise ValueError(u"Invalid value for field '{}': {}".format(self.field_names[key],
+                                                                                escape(item[key])))
 
     def _value(self):
         return self.data or []
+
+    @property
+    def _field_spec(self):
+        # Field data for the widget; skip non-json-serializable data
+        return [{k: v for k, v in field.iteritems() if k != 'coerce'}
+                for field in self.fields]
 
 
 class OverrideMultipleItemsField(HiddenField):
@@ -705,7 +800,13 @@ class TimeDeltaField(Field):
 
 
 class IndicoDateTimeField(DateTimeField):
-    """"Friendly datetime field that handles timezones and validations."""
+    """Friendly datetime field that handles timezones and validations.
+
+    Important: When the form has a `timezone` field it must be
+    declared before any `IndicoDateTimeField`.  Otherwise its
+    value is not available in this field resulting in an error
+    during form submission.
+    """
 
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True)
 
@@ -765,14 +866,73 @@ class IndicoDateTimeField(DateTimeField):
         return validator.linked_field if validator else None
 
     @property
+    def timezone_field(self):
+        field = getattr(self.get_form(), 'timezone', None)
+        return field if isinstance(field, SelectField) else None
+
+    @property
     def timezone(self):
         if self._timezone:
             return self._timezone
-        form = self.get_form()
-        if form and hasattr(self, 'timezone'):
-            return form.timezone
-        session_tz = DisplayTZ().getDisplayTZ()
-        return session_tz
+        elif self.timezone_field:
+            return self.timezone_field.data
+        else:
+            form = self.get_form()
+            if form and hasattr(form, 'timezone'):
+                return form.timezone
+            return session.tzinfo.zone
+
+
+class OccurrencesField(JSONField):
+    """
+    A field that lets you select multiple occurrences consisting of a
+    start date/time and a duration.
+    """
+    widget = JinjaWidget('forms/occurrences_widget.html', single_line=True)
+    CAN_POPULATE = True
+
+    def __init__(self, *args, **kwargs):
+        self._timezone = kwargs.pop('timezone', None)
+        self.default_time = kwargs.pop('default_time', time(0, 0))
+        self.default_duration = kwargs.pop('default_duration', timedelta())
+        kwargs.setdefault('default', [])
+        super(OccurrencesField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        def _deserialize(occ):
+            try:
+                dt = dateutil.parser.parse(u'{} {}'.format(occ['date'], occ['time']))
+            except ValueError:
+                raise ValueError(u'Invalid date/time: {} {}'.format(escape(occ['date']), escape(occ['time'])))
+            return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
+
+        self.data = []
+        super(OccurrencesField, self).process_formdata(valuelist)
+        self.data = map(_deserialize, self.data)
+
+    def _value(self):
+        def _serialize(occ):
+            if isinstance(occ, dict):
+                # raw data from the client
+                return occ
+            dt = occ[0].astimezone(pytz.timezone(self.timezone))
+            return {'date': dt.date().isoformat(),
+                    'time': dt.time().isoformat()[:-3],  # hh:mm only
+                    'duration': int(occ[1].total_seconds() // 60)}
+
+        return json.dumps(map(_serialize, self.data))
+
+    @property
+    def timezone_field(self):
+        field = getattr(self.get_form(), 'timezone', None)
+        return field if isinstance(field, SelectField) else None
+
+    @property
+    def timezone(self):
+        if self.timezone_field:
+            return self.timezone_field.data
+        else:
+            return getattr(self.get_form(), 'timezone', session.tzinfo.zone)
 
 
 class IndicoStaticTextField(Field):
@@ -830,12 +990,24 @@ class IndicoProtectionField(IndicoEnumRadioField):
         self.protected_object = kwargs.pop('protected_object')(kwargs['_form'])
         get_acl_message_url = kwargs.pop('acl_message_url', None)
         self.acl_message_url = get_acl_message_url(kwargs['_form']) if get_acl_message_url else None
+        self.can_inherit_protection = self.protected_object.protection_parent is not None
+        if not self.can_inherit_protection:
+            kwargs['skip'] = {ProtectionMode.inheriting}
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):
+        from indico.modules.categories.models.categories import Category
         protected_object = self.get_form().protected_object
-        non_inheriting_objects = protected_object.get_non_inheriting_objects()
-        parent_type = _('Event') if isinstance(protected_object.protection_parent, Event) else _('Session')
+        if hasattr(protected_object, 'get_non_inheriting_objects'):
+            non_inheriting_objects = protected_object.get_non_inheriting_objects()
+        else:
+            non_inheriting_objects = []
+        if isinstance(protected_object.protection_parent, Event):
+            parent_type = _('Event')
+        elif isinstance(protected_object.protection_parent, Category):
+            parent_type = _('Category')
+        else:
+            parent_type = _('Session')
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
                              parent_type=parent_type, non_inheriting_objects=non_inheriting_objects)
         return Markup(rv)
@@ -843,3 +1015,34 @@ class IndicoProtectionField(IndicoEnumRadioField):
 
 class IndicoTagListField(HiddenFieldList):
     widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
+
+
+class IndicoMarkdownField(TextAreaField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('description', _("You can use Markdown or basic HTML formatting tags."))
+        super(IndicoMarkdownField, self).__init__(*args, **kwargs)
+
+    widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
+
+
+class IndicoTimezoneSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
+        config = Config.getInstance()
+        self.choices = [(v, v) for v in pytz.common_timezones]
+        self.default = config.getDefaultTimezone()
+
+    def process_data(self, value):
+        super(IndicoTimezoneSelectField, self).process_data(value)
+        if self.data is not None and self.data not in pytz.common_timezones_set:
+            self.choices.append((self.data, self.data))
+
+
+class IndicoThemeSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        event_type = kwargs.pop('event_type').legacy_name
+        super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
+        self.choices = sorted([(tid, theme['title'])
+                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
+                              key=itemgetter(1))
+        self.default = theme_settings.defaults[event_type]

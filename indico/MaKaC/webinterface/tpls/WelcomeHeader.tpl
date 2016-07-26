@@ -1,18 +1,10 @@
-<%page args="tz=None"/>
-<%
-from indico.modules import ModuleHolder
-from MaKaC.common.timezoneUtils import DisplayTZ
-newsModule = ModuleHolder().getById("news")
-newsList = newsModule.getNewsItemsList()
-%>
+<%page args="news=None"/>
 
 <ul id="news-list" class="main-page-list">
-    % for newItem in newsList[:2]:
+    % for item in news:
         <li>
-            <a class="title" href="${ urlHandlers.UHIndicoNews.getURL()}">
-                ${ newItem.getTitle() }
-            </a>
-            <span class="timing">${ _('Posted on') }&nbsp;${ formatDate(newItem.getAdjustedCreationDate(tz)) }</span>
+            <a class="title" href="${ url_for('news.display', item.locator.anchor_only) }">${ item.title }</a>
+            <span class="timing">${ _('Posted on') }&nbsp;${ formatDate(item.created_dt) }</span>
         </li>
     % endfor
 </ul>

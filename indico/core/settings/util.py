@@ -44,14 +44,14 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
     """Helper function for SettingsProxy.get_all"""
     if no_defaults:
         rv = cls.get_all(proxy.module, **kwargs)
-        if acl_cls:
+        if acl_cls and proxy.acl_names:
             rv.update(acl_cls.get_all_acls(proxy.module, **kwargs))
         return rv
     settings = dict(proxy.defaults)
-    if acl_cls:
+    if acl_cls and proxy.acl_names:
         settings.update({name: set() for name in proxy.acl_names})
     settings.update(cls.get_all(proxy.module, **kwargs))
-    if acl_cls:
+    if acl_cls and proxy.acl_names:
         settings.update(acl_cls.get_all_acls(proxy.module, **kwargs))
     return settings
 
@@ -64,10 +64,7 @@ def get_setting(cls, proxy, name, default, cache, **kwargs):
         if value is not _not_in_db:
             return value
     except KeyError:
-        if proxy.preload:
-            setting = _preload_settings(cls, proxy, cache, **kwargs).get(name, _not_in_db)
-        else:
-            setting = cls.get(proxy.module, name, _not_in_db, **kwargs)
+        setting = _preload_settings(cls, proxy, cache, **kwargs).get(name, _not_in_db)
         cache[cache_key] = setting
         if setting is not _not_in_db:
             return setting

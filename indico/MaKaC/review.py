@@ -1644,11 +1644,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         #if the conference is protected, then only allowed AW can access
         return self.isAllowedToAccess(aw.getUser())
 
-    def canView(self, aw):
-        #in the future it would be possible to add an access control
-        #only those users allowed to access are allowed to view
-        return self.isAllowedToAccess(aw.getUser())
-
     def canModify(self, aw_or_user):
         if hasattr(aw_or_user, 'getUser'):
             aw_or_user = aw_or_user.getUser()
@@ -1663,18 +1658,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         #conference managers can modify
         conf = self.getConference()
         return conf.canUserModify(av)
-
-    def getModifKey(self):
-        return ""
-
-    def getAccessKey(self):
-        return ""
-
-    def getAccessController(self):
-        return self.getConference().getAccessController()
-
-    def isProtected(self):
-        return self.getConference().isProtected()
 
     def delete(self):
         if self._owner:
@@ -3235,10 +3218,6 @@ class NotificationTemplate(Persistent):
         # replace the %% by %
         result = result.replace("%%", "%")
         return result
-
-    def getModifKey( self ):
-        return self.getConference().getModifKey()
-
 
 
 class NotifTplToAddr(Persistent):

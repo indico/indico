@@ -21,7 +21,6 @@ import lxml.etree
 from lxml.etree import Element, SubElement
 from pytz import timezone
 
-from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
@@ -136,7 +135,7 @@ class XMLEventSerializer(object):
         xml = Element(self._event_tag_name)
         SubElement(xml, '_deprecated').text = 'True'
         SubElement(xml, 'ID').text = str(event.id)
-        SubElement(xml, 'category').text = event.category.name
+        SubElement(xml, 'category').text = event.category.title
         SubElement(xml, 'parentProtection').text = self._format_bool(event.is_protected)
         if event.can_manage(self._user):
             SubElement(xml, 'modifyLink').text = self._url_for('event_mgmt.conferenceModification', event)
@@ -155,7 +154,7 @@ class XMLEventSerializer(object):
         SubElement(xml, 'modificationDate').text = self._format_date(event.as_legacy.getModificationDate())
         xml.append(self._serialize_timezone(self._tz))
         if self._include_timetable:
-            for entry in event.timetable_entries.filter(TimetableEntry.parent == None):
+            for entry in event.timetable_entries.filter(TimetableEntry.parent.is_(None)):
                 xml.append(self._serialize_timetable_entry(entry))
         return xml
 

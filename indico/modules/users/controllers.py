@@ -21,20 +21,26 @@ from datetime import datetime
 from operator import attrgetter
 
 from flask import session, request, flash, jsonify, redirect
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from pytz import timezone
+from sqlalchemy.orm import undefer
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.notifications import make_email
-from indico.modules.users import User, logger
+from indico.core.notifications import make_email, send_email
+from indico.modules.auth import Identity
+from indico.modules.auth.models.registration_requests import RegistrationRequest
+from indico.modules.auth.util import register_user
+from indico.modules.categories import Category
+from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
-from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm
-from indico.modules.auth.forms import LocalRegistrationForm
+from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
+                                        AdminUserSettingsForm, AdminAccountRegistrationForm)
 from indico.util.date_time import timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
@@ -46,14 +52,14 @@ from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
+
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
@@ -97,7 +103,8 @@ class RHUserDashboard(RHUserBase):
 
         tz = timezone(DisplayTZ().getDisplayTZ())
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
-        return WPUserDashboard.render_template('dashboard.html', redis_enabled=bool(redis_client), timezone=unicode(tz),
+        return WPUserDashboard.render_template('dashboard.html', 'dashboard',
+                                               redis_enabled=bool(redis_client), timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                                categories=get_related_categories(self.user),
                                                suggested_categories=get_suggested_categories(self.user))
@@ -113,7 +120,7 @@ class RHPersonalData(RHUserBase):
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        return WPUser.render_template('personal_data.html', user=self.user, form=form)
+        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
 
 
 class RHUserPreferences(RHUserBase):
@@ -135,14 +142,17 @@ class RHUserPreferences(RHUserBase):
                                 else 'LOCAL')
             flash(_('Preferences saved'), 'success')
             return redirect(url_for('.user_preferences'))
-        return WPUser.render_template('preferences.html', user=self.user, form=form)
+        return WPUser.render_template('preferences.html', 'preferences', user=self.user, form=form)
 
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        categories = sorted([(cat, truncate_path(cat.getCategoryPathTitles()[:-1], chars=50))
-                             for cat in self.user.favorite_categories], key=lambda c: (c[0].name, c[1]))
-        return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
+        query = (Category.query
+                 .filter(Category.id.in_(c.id for c in self.user.favorite_categories))
+                 .options(undefer('chain_titles')))
+        categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
+                            key=lambda c: (c[0].title, c[1]))
+        return WPUser.render_template('favorites.html', 'favorites', user=self.user, favorite_categories=categories)
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):
@@ -169,23 +179,25 @@ class RHUserFavoritesUserRemove(RHUserBase):
 class RHUserFavoritesCategoryAPI(RHUserBase):
     CSRF_ENABLED = True
 
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.category = Category.get_one(request.view_args['category_id'])
+
     def _process_PUT(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category not in self.user.favorite_categories:
-            if not category.canAccess(AccessWrapper(self.user.as_avatar)):
+        if self.category not in self.user.favorite_categories:
+            if not self.category.can_access(self.user):
                 raise Forbidden()
-            self.user.favorite_categories.add(category)
+            self.user.favorite_categories.add(self.category)
             if redis_write_client:
-                suggestions.unignore(self.user, 'category', category.getId())
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unignore(self.user, 'category', str(self.category.id))
+                suggestions.unsuggest(self.user, 'category', str(self.category.id))
         return jsonify(success=True)
 
     def _process_DELETE(self):
-        category = CategoryManager().getById(request.view_args['category_id'])
-        if category in self.user.favorite_categories:
-            self.user.favorite_categories.remove(category)
+        if self.category in self.user.favorite_categories:
+            self.user.favorite_categories.remove(self.category)
             if redis_write_client:
-                suggestions.unsuggest(self.user, 'category', category.getId())
+                suggestions.unsuggest(self.user, 'category', self.category.id)
         return jsonify(success=True)
 
 
@@ -213,7 +225,7 @@ class RHUserEmails(RHUserBase):
             flash(_("We have sent an email to {email}. Please click the link in that email within 24 hours to "
                     "confirm your new email address.").format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
-        return WPUser.render_template('emails.html', user=self.user, form=form)
+        return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
 
 class RHUserEmailsVerify(RHUserBase):
@@ -283,7 +295,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
         return redirect(url_for('.user_emails'))
 
 
-class RHUsersAdminSettings(RHAdminBase):
+class RHUsersAdmin(RHAdminBase):
     """Admin users overview"""
 
     def _process(self):
@@ -292,6 +304,7 @@ class RHUsersAdminSettings(RHAdminBase):
         search_results = None
         num_of_users = User.query.count()
         num_deleted_users = User.find(is_deleted=True).count()
+
         if form.validate_on_submit():
             search_results = []
             exact = form_data.pop('exact')
@@ -299,28 +312,58 @@ class RHUsersAdminSettings(RHAdminBase):
             include_pending = form_data.pop('include_pending')
             external = form_data.pop('external')
             form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
-
-            for entry in search_users(exact=exact, include_deleted=include_deleted,
-                                      include_pending=include_pending, external=external, **form_data):
+            matches = search_users(exact=exact, include_deleted=include_deleted,
+                                   include_pending=include_pending, external=external, **form_data)
+            for entry in matches:
                 if isinstance(entry, User):
-                    search_results.append(UserEntry(profile_url=url_for('.user_profile', entry),
-                                                    **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}))
+                    search_results.append(UserEntry(
+                        profile_url=url_for('.user_profile', entry),
+                        **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}
+                    ))
                 else:
                     search_results.append(UserEntry(
-                        profile_url=None, full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
-                        **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}))
-
+                        profile_url=None,
+                        full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
+                        **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}
+                    ))
             search_results.sort(key=attrgetter('first_name', 'last_name'))
+
+        num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
-                                            num_of_users=num_of_users, num_deleted_users=num_deleted_users)
+                                            num_of_users=num_of_users, num_deleted_users=num_deleted_users,
+                                            num_reg_requests=num_reg_requests)
+
+
+class RHUsersAdminSettings(RHAdminBase):
+    """Manage global suer-related settings."""
+
+    def _process(self):
+        form = AdminUserSettingsForm(obj=FormDefaults(**user_management_settings.get_all()))
+        if form.validate_on_submit():
+            user_management_settings.set_multi(form.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
 
 
 class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
-        form = LocalRegistrationForm()
-        return WPUsersAdmin.render_template('users_create.html', form=form)
+        form = AdminAccountRegistrationForm()
+        if form.validate_on_submit():
+            data = form.data
+            identity = Identity(provider='indico', identifier=data.pop('username'), password=data.pop('password'))
+            user = create_user(data.pop('email'), data, identity, from_moderation=True)
+            msg = Markup('{} <a href="{}">{}</a>').format(
+                escape(_('The account has been created.')),
+                url_for('users.user_profile', user),
+                escape(_('Show details'))
+            )
+            flash(msg, 'success')
+            return jsonify_data()
+        return jsonify_template('users/users_admin_create.html', form=form)
 
 
 def _get_merge_problems(source, target):
@@ -377,3 +420,45 @@ class RHUsersAdminMergeCheck(RHAdminBase):
         target = User.get_one(request.args['target'])
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings)
+
+
+class RHRegistrationRequestList(RHAdminBase):
+    """List all registration requests"""
+
+    def _process(self):
+        requests = RegistrationRequest.query.order_by(RegistrationRequest.email).all()
+        return WPUsersAdmin.render_template('registration_requests.html', pending_requests=requests)
+
+
+class RHRegistrationRequestBase(RHAdminBase):
+    """Base class to process a registration request"""
+
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHAdminBase._checkParams(self, params)
+        self.request = RegistrationRequest.get_one(request.view_args['request_id'])
+
+
+class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
+    """Accept a registration request"""
+
+    def _process(self):
+        user, identity = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
+                                       self.request.identity_data, self.request.settings)
+        tpl = get_template_module('users/emails/registration_request_accepted.txt', user=user)
+        send_email(make_email(self.request.email, template=tpl))
+        db.session.delete(self.request)
+        flash(_('The request has been approved.'), 'success')
+        return jsonify_data()
+
+
+class RHRejectRegistrationRequest(RHRegistrationRequestBase):
+    """Reject a registration request"""
+
+    def _process(self):
+        db.session.delete(self.request)
+        tpl = get_template_module('users/emails/registration_request_rejected.txt', req=self.request)
+        send_email(make_email(self.request.email, template=tpl))
+        flash(_('The request has been rejected.'), 'success')
+        return jsonify_data()

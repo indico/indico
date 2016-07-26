@@ -61,31 +61,6 @@ $default-box-shadow-v-offset: 1px;
 // Custom mixins
 // -----------------------------------------------------------------------------
 
-@mixin border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-top: $width $style $color;
-}
-@mixin border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-right: $width $style $color;
-}
-@mixin border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-bottom: $width $style $color;
-}
-@mixin border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-left: $width $style $color;
-}
-@mixin border-vert($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @include border-top($color, $style, $width);
-    @include border-bottom($color, $style, $width);
-}
-@mixin border-horz($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @include border-right($color, $style, $width);
-    @include border-left($color, $style, $width);
-}
-@mixin border-all($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @include border-vert($color, $style, $width);
-    @include border-horz($color, $style, $width);
-}
-
 @mixin gradient($start-color, $end-color) {
     background: $start-color;
     @include background-image(linear-gradient(top, $start-color, $end-color));

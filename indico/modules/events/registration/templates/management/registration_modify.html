@@ -1,9 +1,9 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block subtitle %}
-    {% trans id=registration.friendly_id, name=registration.full_name, regform_title=registration.registration_form.title %}
+    {% trans id=registration.friendly_id, name=registration.full_name, regform_title=registration.registration_form.title -%}
         Modify #{{ id }}: {{ name }} in "{{ regform_title }}"
-    {% endtrans %}
+    {%- endtrans %}
 {% endblock %}
 
 {% block content %}

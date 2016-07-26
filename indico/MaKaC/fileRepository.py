@@ -119,27 +119,19 @@ class MaterialLocalRepository(Persistent):
         else:
             id = self._getNewFileId()
 
-        cat = newFile.getCategory()
-        #raise "%s"%cat
-        if cat:
-            interPath = os.path.join("categories", "%s"%cat.getId())
-        else:
+        conf = newFile.getConference()
+        abstract = None
+        if isinstance(newFile.getOwner(), Abstract):
+            abstract = newFile.getOwner()
 
-            conf = newFile.getConference()
-
-            abstract = None
-
-            if isinstance(newFile.getOwner(), Abstract):
-                abstract = newFile.getOwner()
-
-            try:
-                year = str(conf.getCreationDate().year)
-            except:
-                year= str(datetime.datetime.now().year)
-            interPath = os.path.join(year, "C%s"%conf.getId())
-            if abstract:
-                # the file is attach to an abstract. Then create a directory for the abstract
-                interPath = os.path.join(interPath, "abs%s" % abstract.getId())
+        try:
+            year = str(conf.getCreationDate().year)
+        except:
+            year = str(datetime.datetime.now().year)
+        interPath = os.path.join(year, "C%s" % conf.getId())
+        if abstract:
+            # the file is attach to an abstract. Then create a directory for the abstract
+            interPath = os.path.join(interPath, "abs%s" % abstract.getId())
         from MaKaC.common import info
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()
@@ -163,41 +155,6 @@ class MaterialLocalRepository(Persistent):
 
         Logger.get('storage').info("stored resource %s (%s) at %s" % (id, newFile.getFileName(), os.path.join(volume, interPath)))
 
-        return id
-
-    def recoverFile(self, recFile):
-        ##
-        ## TODO: This is NOT working because of the volume (see storeFile)
-        ##
-        id = recFile.getRepositoryId()
-        cat = recFile.getCategory()
-        if cat:
-            interPath = os.path.join("categories", "%s"%cat.getId())
-        else:
-            conf = recFile.getConference()
-            session = recFile.getSession()
-            cont = recFile.getContribution()
-            subcont = recFile.getSubContribution()
-            year = str(conf.getCreationDate().year)
-            interPath = os.path.join(year, "C%s"%conf.getId())
-            if cont:
-                # The file is in a contribution, then create a directory for the contribution.
-                interPath = os.path.join(interPath, "c%s"%cont.getId())
-                if subcont:
-                    #the file is in a subcontribution, then create a directory for the subcontribution
-                    interPath = os.path.join( interPath, "sc%s"%subcont.getId())
-            elif session:
-                # The file is attached to a session, but not to a contribution. Then create a directory for the session.
-                interPath = os.path.join(interPath, "s%s"%session.getId())
-            else:
-                # The file is attached directly to the conference, then don't add directory.
-                pass
-        relativePath = os.path.join(interPath, id, recFile.getFileName())
-        if not self.__files.has_key(id):
-            self.__files[id] = relativePath
-        else:
-            raise Exception("The id %s is already in use."%id)
-        recFile.setArchivedId(self, id)
         return id
 
     def getFileSize( self, id ):

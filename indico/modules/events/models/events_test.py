@@ -18,6 +18,9 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+import pytest
+
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -69,3 +72,17 @@ def test_modify_relationship_with_deleted(db, dummy_event_new):
     event.contributions = [c2]
     db.session.flush()
     assert set(Contribution.find_all()) == {cd, c2}
+
+
+@pytest.mark.parametrize(('category_pm', 'event_pm', 'effective_pm'), (
+    (ProtectionMode.inheriting, ProtectionMode.inheriting, ProtectionMode.public),
+    (ProtectionMode.protected, ProtectionMode.inheriting, ProtectionMode.protected),
+    (ProtectionMode.public, ProtectionMode.inheriting, ProtectionMode.public),
+    (ProtectionMode.protected, ProtectionMode.public, ProtectionMode.public),
+    (ProtectionMode.public, ProtectionMode.protected, ProtectionMode.protected)
+))
+def test_effective_protection_mode(db, dummy_category, dummy_event_new, category_pm, event_pm, effective_pm):
+    dummy_category.protection_mode = category_pm
+    dummy_event_new.protection_mode = event_pm
+    db.session.flush()
+    assert dummy_event_new.effective_protection_mode == effective_pm

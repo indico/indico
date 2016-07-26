@@ -16,16 +16,24 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField
+from datetime import time, timedelta
+
+from flask import session
+from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
+from indico.modules.events.models.events import EventType
+from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
-from indico.modules.events.models.references import ReferenceType, EventReference
-from indico.web.forms.fields import IndicoLocationField
+from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
+                                     IndicoEnumRadioField, OccurrencesField, IndicoThemeSelectField)
+from indico.web.forms.validators import LinkedDateTime
+from indico.web.forms.widgets import CKEditorWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -69,3 +77,34 @@ class EventPersonLinkForm(IndicoForm):
         super(EventPersonLinkForm, self).__init__(*args, **kwargs)
         if self.event_type == 'lecture':
             self.person_link_data.label.text = _('Speakers')
+
+
+class EventCreationFormBase(IndicoForm):
+    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
+    title = StringField(_('Event title'), [DataRequired()])
+    timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
+    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
+    protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
+
+    def validate_category(self, field):
+        if not field.data.can_create_events(session.user):
+            raise ValidationError(_('You are not allowed to create events in this category.'))
+
+
+class EventCreationForm(EventCreationFormBase):
+    _field_order = ('category', 'title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
+    _advanced_field_order = ()
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
+                                 default_time=time(18), allow_clear=False)
+
+
+class LectureCreationForm(EventCreationFormBase):
+    _field_order = ('category', 'title', 'occurrences', 'timezone', 'location_data', 'person_link_data',
+                    'protection_mode')
+    _advanced_field_order = ('description', 'theme')
+    occurrences = OccurrencesField(_("Dates"), [DataRequired()], default_time=time(8),
+                                   default_duration=timedelta(minutes=90))
+    person_link_data = EventPersonLinkListField(_('Speakers'))
+    description = TextAreaField(_('Description'), widget=CKEditorWidget())
+    theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture)

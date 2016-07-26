@@ -19,11 +19,12 @@ from __future__ import unicode_literals
 import itertools
 from collections import defaultdict
 
-from flask import request, flash
+from flask import request, flash, session, redirect
 from sqlalchemy.orm import joinedload, contains_eager
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
+from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -153,3 +154,61 @@ class RHEmailEventPersons(RHConferenceModifBase):
         return (self.event_new.persons
                 .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
                 .all())
+
+
+class RHGrantSubmissionRights(RHConferenceModifBase):
+    """Grants submission rights to all contribution speakers"""
+
+    def _process(self):
+        count = 0
+        for cont in self._target.as_event.contributions:
+            speakers = cont.speakers[:]
+            for subcontrib in cont.subcontributions:
+                speakers += subcontrib.speakers
+            for speaker in speakers:
+                principal = speaker.person.principal
+                if principal:
+                    cont.update_principal(principal, add_roles={'submit'})
+                    count += 1
+        self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+                           'Contribution speakers have been granted with submission rights', session.user)
+        flash(ngettext('Submission rights have been granted to one speaker',
+                       'Submission rights have been granted to {} speakers', count).format(count))
+        return redirect(url_for('.person_list', self.event_new))
+
+
+class RHGrantModificationRights(RHConferenceModifBase):
+    """Grants session modification rights to all session conveners"""
+
+    def _process(self):
+        count = 0
+        for sess in self.event_new.sessions:
+            for convener in sess.conveners:
+                principal = convener.person.principal
+                if principal:
+                    sess.update_principal(principal, full_access=True)
+                    count += 1
+        self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+                           'Modification rights have been granted to all session conveners', session.user)
+        flash(ngettext('Session modification rights have been granted to one session convener',
+                       'Session modification rights have been granted to {} session conveners', count).format(count))
+        return redirect(url_for('.person_list', self.event_new))
+
+
+class RHRevokeSubmissionRights(RHConferenceModifBase):
+    """Revokes submission rights"""
+
+    def _process(self):
+        count = 0
+        for cont in self.event_new.contributions:
+            for entry in set(cont.acl_entries):
+                cont.update_principal(entry.principal, del_roles={'submit'})
+                count += 1
+        for entry in set(self.event_new.acl_entries):
+            self.event_new.update_principal(entry.principal, del_roles={'submit'})
+            count += 1
+        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
+                           'Submission privileges have been revoked from event submitters', session.user)
+        flash(ngettext('Submission rights have been revoked from one principal',
+                       'Submission rights have been revoked from {} principals', count).format(count))
+        return redirect(url_for('.person_list', self.event_new))

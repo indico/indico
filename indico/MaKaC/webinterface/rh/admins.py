@@ -22,7 +22,6 @@ from indico.util.i18n import _
 
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.common.info as info
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -48,46 +47,12 @@ class RHAdminArea(RHAdminBase):
         return p.display()
 
 
-class RHUpdateNews( RHAdminBase ):
-    _uh = urlHandlers.UHUpdateNews
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        if self._params.has_key("news") and self._params.has_key("save"):
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            minfo.setNews(self._params["news"])
-        p = admins.WPUpdateNews( self )
-        return p.display()
-
-class RHConfigUpcoming( RHAdminBase ):
-    _uh = urlHandlers.UHConfigUpcomingEvents
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        p = admins.WPConfigUpcomingEvents( self )
-        return p.display()
-
-
 class RHGeneralInfoModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoModification
 
     def _process(self):
         p = admins.WPGenInfoModification(self)
         return p.display()
-
-
-class RHAdminSwitchNewsActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchNewsActive
-
-    def _process( self ):
-        self._minfo.setNewsActive( not self._minfo.isNewsActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 
 class RHGeneralInfoPerformModification(RHAdminBase):
@@ -101,7 +66,6 @@ class RHGeneralInfoPerformModification(RHAdminBase):
             self._minfo.setOrganisation(params["organisation"])
             self._minfo.setCity(params["city"])
             self._minfo.setCountry(params["country"])
-            self._minfo.setLang(params["lang"])
         self._redirect(urlHandlers.UHAdminArea.getURL())
 
 

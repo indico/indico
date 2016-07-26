@@ -41,14 +41,10 @@ class ModuleHolder( ObjectHolder ):
     def __init__(self):
         ObjectHolder.__init__(self)
         # These imports are done like this in order to avoid circular imports problems.
-        from indico.modules import news
         from indico.modules import cssTpls
-        from indico.modules import upcoming
 
         ModuleHolder._availableModules = {
-            news.NewsModule.id: news.NewsModule,
-            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id: upcoming.UpcomingEventsModule,
+            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule
         }
 
     def _newId( self ):

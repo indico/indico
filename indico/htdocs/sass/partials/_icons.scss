@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/palette";
+
 @font-face {
     font-family: "icomoon-ultimate";
     src: font-url("fonts/icomoon/icomoon.svg#icomoon-ultimate") format("svg"),
@@ -304,6 +306,9 @@ i[class^="icon-"]:before {
 .icon-lamp:before {
     content: "\e24e";
 }
+.icon-lan2:before {
+    content: "\ec68";
+}
 .icon-link:before {
     content: "\e2cd";
 }
@@ -405,6 +410,15 @@ i[class^="icon-"]:before {
 }
 .icon-sort:before {
     content: "\e00e";
+}
+.icon-sort-alpha-asc:before {
+    content: "\ee4c";
+}
+.icon-sort-alpha-desc:before {
+    content: "\ee4d";
+}
+.icon-split:before {
+    content: "\edb3";
 }
 .icon-stack:before {
     content: "\e097";
@@ -515,4 +529,14 @@ i[class^="icon-"]:before {
 }
 .icon-time-after:after {
     content: "\e004";
+}
+
+/* Customized icons for specific purposes */
+.icon-protection-public {
+    @extend .icon-unlocked;
+    color: $green;
+}
+.icon-protection-self {
+    @extend .icon-lock;
+    color: $red;
 }

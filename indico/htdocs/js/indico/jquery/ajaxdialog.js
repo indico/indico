@@ -54,7 +54,8 @@
             subtitle: null, // subtitle of the dialog
             closeButton: undefined, // include a close button at the bottom of the dialog. the inner text of the button
                                     // is configurable
-            url: null, // url to get the form/dialog from
+            url: null, // url to get the content from
+            content: null, // content of the dialog (used instead of the url option)
             method: 'GET', // http method to get the form/dialog
             data: null, // object or callable to add data when loading the form/dialog
             backSelector: '[data-button-back]', // elements in the form which will close the form
@@ -69,7 +70,8 @@
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
             confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
             dialogClasses: '',  // extra classes to add to the dialog canvas
-            hidePageHeader: false  // if the default page header (title/subtitle/description) should be hidden
+            hidePageHeader: false,  // if the default page header (title/subtitle/description) should be hidden
+            fullyModal: false  // Makes the dialog the only scrollable element
         }, options);
 
         var confirmCloseMessage = $T('You have unsaved changes. Do you really want to close the dialog without saving?');
@@ -81,6 +83,10 @@
         loadDialog();
 
         function loadDialog() {
+            if (options.content) {
+                showDialog({js: '', html: options.content});
+                return;
+            }
             $.ajax({
                 type: options.method,
                 url: options.url,
@@ -148,11 +154,12 @@
                         text: options.subtitle
                     }));
                 }
-                if (options.closeButton !== undefined) {
+                if (options.closeButton !== undefined && options.closeButton !== false) {
+                    var text = options.closeButton === true ? $T.gettext("Close") : options.closeButton;
                     this.contentContainer.append($('<button>', {
                         'class': 'i-button big right',
                         'type': 'button',
-                        'text': options.closeButton || $T("Close"),
+                        'text': text,
                         'data-button-back': ''
                     }));
                 }
@@ -169,13 +176,8 @@
                 popup.canvas.on('ajaxDialog:reload', function() {
                     loadDialog();
                 });
-
                 injectJS(dialogData.js);
-
-                if (options.onOpen) {
-                    options.onOpen(popup);
-                }
-
+                _onOpen(popup);
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
@@ -203,7 +205,7 @@
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
             confirmDeferred.then(function() {
                 ignoreOnBeforeUnload = true;
-                var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData, customData);
+                var onCloseResult = _onClose(callbackData);
                 if (onCloseResult === false) {
                     ignoreOnBeforeUnload = false;
                     return;
@@ -214,7 +216,7 @@
                 onCloseResult.then(function() {
                     _doCloseDialog();
                     if (options.trigger) {
-                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData])
+                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData]);
                     }
                 }, function() {
                     ignoreOnBeforeUnload = false;
@@ -228,6 +230,26 @@
                 window.onbeforeunload = oldOnBeforeUnload;
             }
             popup = null;
+        }
+
+        function _onOpen(popup) {
+            if (options.fullyModal) {
+                $('html, body').addClass('prevent-scrolling');
+            }
+            if (options.onOpen) {
+                options.onOpen(popup);
+            }
+        }
+
+        function _onClose(callbackData) {
+            if (options.fullyModal) {
+                $('html, body').removeClass('prevent-scrolling');
+            }
+            if (!options.onClose) {
+                return $.Deferred().resolve();
+            } else {
+                return options.onClose(callbackData, customData);
+            }
         }
 
         function ajaxifyForms() {
@@ -265,6 +287,10 @@
 
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);
+                        if (data.redirect) {
+                            IndicoUI.Dialogs.Util.progress();
+                            location.href = data.redirect;
+                        }
                     } else if (data.html) {
                         popup.contentContainer.html(data.html);
                         ajaxifyForms();
@@ -293,7 +319,7 @@
 
         function injectJS(js) {
             if (js) {
-                $('body').append(js)
+                $('body').append(js);
             }
         }
     };

@@ -405,7 +405,7 @@ def _mapper_configured():
 def _add_timetable_consistency_trigger(target, conn, **kw):
     sql = """
         CREATE CONSTRAINT TRIGGER consistent_timetable
-        AFTER INSERT OR UPDATE
+        AFTER INSERT OR UPDATE OF event_id, session_id, session_block_id, duration
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW

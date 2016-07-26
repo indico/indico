@@ -26,7 +26,7 @@ from indico.web.menu import SideMenuItem
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
-    if event.type == 'lecture' or not event.can_manage(session.user, allow_key=True):
+    if event.type == 'lecture' or not event.can_manage(session.user):
         return
 
     return SideMenuItem('lists', _('Roles'), url_for('persons.person_list', event), section='reports')

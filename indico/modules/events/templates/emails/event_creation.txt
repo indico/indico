@@ -1,0 +1,78 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    New {{ event.type }} in Indico
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {% filter underline %}Title{% endfilter %}
+        {{ event.title }}
+
+        {% filter underline %}Category{% endfilter %}
+        {{ event.category.chain_titles|join(' » ') }}
+
+        {% filter underline %}Creator{% endfilter %}
+        {{ event.creator.full_name }}
+
+        {%- if event.person_links %}
+
+            {{ ('Speakers' if event.type == 'lecture' else 'Chairpersons' ) | underline }}
+            {{ event.person_links|sort(attribute='full_name')|join('; ', attribute='full_name') }}
+        {%- endif -%}
+
+        {%- if event.venue_name and event.room_name %}
+
+            {% filter underline %}Location{% endfilter %}
+            {{ event.room_name }} ({{ event.venue_name }})
+        {%- elif event.venue_name %}
+
+            {% filter underline %}Venue{% endfilter %}
+            {{ event.venue_name }}
+        {%- elif event.room_name %}
+
+            {% filter underline %}Room{% endfilter %}
+            {{ event.room_name }}
+        {%- endif -%}
+
+        {%- if event.description %}
+
+            {% filter underline %}Description{% endfilter %}
+            {{ event.description | strip_tags }}
+        {%- endif %}
+
+        {% if not occurrences -%}
+            {% filter underline %}Date{% endfilter %}
+            {{ event.start_dt|format_date(timezone=event.timezone) }}
+            {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
+                {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
+            {%- endif %}
+
+            {% filter underline %}Time{% endfilter %}
+            {{ event.start_dt|format_time(timezone=event.timezone) }} - {{ event.end_dt|format_time(timezone=event.timezone) }}
+            {#- #} ({{ event.timezone }})
+
+            {% filter underline %}URL{% endfilter %}
+            {{ url_for('event.conferenceDisplay', event, _external=true) }}
+        {%- else -%}
+            {% filter underline %}Timezone{% endfilter %}
+            {{ event.timezone }}
+
+            {% filter underline %}Occurrences{% endfilter -%}
+            {% for evt in occurrences|sort(attribute='start_dt') %}
+                {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
+                {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
+                {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
+                {{ url_for('event.conferenceDisplay', evt, _external=true) -}}
+            {%- endfor -%}
+        {%- endif -%}
+    {%- endfilter -%}
+{%- endblock %}
+
+{% block footer_title -%}
+    Event notifications
+{%- endblock %}
+
+{% block footer_url %}{% endblock %}

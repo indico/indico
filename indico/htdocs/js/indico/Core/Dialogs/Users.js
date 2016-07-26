@@ -23,30 +23,6 @@ function singleUserNothing(user, func) {
     func(true);
 }
 
-function arrayToSet(array) {
-    var set = {};
-    each(array, function(item){
-        set[item] = true;
-    });
-    return set;
-}
-
-function userSort(user1, user2) {
-    if (user1.familyName > user2.familyName) {
-        return 1;
-    } else if (user1.familyName == user2.familyName) {
-        if (user1.firstName > user2.firstName) {
-            return 1;
-        } else if (user1.firstName == user2.firstName) {
-            return 0;
-        } else {
-            return -1;
-        }
-    } else {
-        return -1;
-    }
-}
-
 function create_favorite_button(user_id) {
     var integerRegex = /^[0-9]+$/;
     if (!integerRegex.test(user_id)) {  // external user
@@ -835,212 +811,6 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 );
 
 
-
-/**
- * Creates a form field whose value is a single user
- *
- * @param {Object} initialUser A user that will appear initially. Example: ${ AvatarHolder().getById(1).fossilize(IAvatarFossil) }
- *
- * @param {String} hiddenFieldName The name attribute for the hidden field that will be drawn along with the rest of the widget.
- *                                 This hidden field will have the currently selected user's id.
- *                                 If left to null, there will be no hidden field.
- *
- * @param {Boolean} allowChoose If true, a 'Choose User' dialog will be present when pressing on the "choose" button.
- *
- * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
- * @param {list} suggestedUsers A list of users that will be offered as options to be added. Example: ${ jsonEncode(fossilize([AvatarHolder().getById(3), AvatarHolder().getById(4)], IAvatarFossil)) }
- *                              If left to null, there will be suggested Users. For an empty list of users, use {}
- *
- * @param {Integer} conferenceId If different from null, authors from that conference will be included in the search results.
- * @param {Boolean} enableGroups If true, choosing groups will be enabled.
- *
- * @param {Boolean} allowNew If true, a 'New User' button will be present.
- *
- * @param {Boolean} allowDelete If true, the user will be able to be deleted from the field.
- *
- * @param {Function} assignProcess A function that will be called when a new user is chosen (from new data, or from the search dialog, or from the suggested list).
- *                                 The function will be passed a WatchObject representing the user, and a callback function.
- *                                 The callback function has to be called with "true" as argument to effectively display the new user.
- * @param {Function} removeProcess A function that will be called when a user is removed.
- *                                 The function will be passed a WatchObject representing the user, and a callback function.
- *                                 The callback function has to be called with "true" as argument to effectively display the new user.
- */
-type("SingleUserField", ["IWidget"], {
-
-    /**
-     * @return {String} The id of the currently selected user
-     */
-    get: function() {
-        return this.user.getAll();
-    },
-
-    set: function(user) {
-        this.user.replace(user);
-        this.__userChosenObserver();
-    },
-
-    /**
-     * @return {String} the name of the inner hidden field
-     */
-    getName: function() {
-        return this.hiddenFieldName;
-    },
-
-    /**
-     * @return {Boolean} Returns if a user has been chosen or not
-     */
-    isUserChosen: function() {
-        return this.userChosen.get();
-    },
-
-    __getNotChosenUser: function() {
-        return {id: null, name: "Choose a user"};
-    },
-
-    /**
-     * Updates the buttons to be shown next to the user name after the user changes
-     * @param {Object} user a dictionary with the user info.
-     */
-    __userChosenObserver: function() {
-        var self = this;
-        var user = this.user.getAll();
-
-        this.variableButtonsDiv.clear();
-        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
-            var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new Html(create_favorite_button(this.user.get('id')).get(0)));
-            this.variableButtonsDiv.append(favButtonDiv);
-        }
-
-        if (this.allowDelete && this.userChosen.get()) {
-
-            var removeButton = Widget.link(command(function(){
-                self.removeProcess(function(value) {
-                    if (value) {
-                        self.userChosen.set(false);
-                        var notChosenUser = self.__getNotChosenUser();
-                        self.user.replace(notChosenUser);
-                        self.__userChosenObserver();
-                    }
-                });
-            }, IndicoUI.Buttons.removeButton()));
-
-            var removeButtonDiv = Html.div({style:{display:"inline"}}, removeButton);
-            this.variableButtonsDiv.append(removeButtonDiv);
-        }
-    },
-
-    /**
-     * Returns the DOM of the widget
-     */
-    draw: function() {
-        var self = this;
-
-        var contentDiv = Html.div({style:{display:"inline"}});
-
-        // Draw the hidden field
-        if (exists(this.hiddenFieldName)) {
-            contentDiv.append($B(Html.input('hidden'), {name: this.hiddenFieldName}, self.user.accessor('id')));
-        }
-
-        // Draw the user if there is one
-        var userNameDiv = $B(Html.span({style:{verticalAlign:'middle'}}), self.user.accessor('name'));
-        contentDiv.append(userNameDiv);
-
-        this.variableButtonsDiv = Html.div({style: {display: 'inline'}});
-        this.__userChosenObserver();
-
-        var fixedButtonsDiv = Html.div({style: {display: 'inline'}});
-        // Draw the choose button
-        if (self.allowChoose) {
-            var chooseButton = Html.input("button", {
-                className: 'i-button',
-                style: {marginLeft: pixels(10), verticalAlign: 'middle'}
-            }, $T('Choose'));
-
-            var chooseUserHandler = function(userList) {
-                self.assignProcess(userList, function(value) {
-                    if (value) { // the assignProcess function returned true
-                        var returnedUser = userList[0];
-                        self.user.replace(returnedUser);
-                        self.userChosen.set(true);
-                        self.__userChosenObserver();
-                    }
-                });
-            };
-
-            chooseButton.observeClick(function(){
-                var userChoosePopup = new ChooseUsersPopup("Choose user",
-                                                           true, self.conferenceId, self.enableGroups,
-                                                           self.includeFavourites, self.suggestedUsers,
-                                                           true, true, false,
-                                                           chooseUserHandler, null, self.allowExternal);
-                userChoosePopup.execute();
-            });
-
-            fixedButtonsDiv.append(chooseButton);
-        }
-
-        return Html.div({style: {display: 'inline'}},
-                        contentDiv,
-                        this.variableButtonsDiv,
-                        fixedButtonsDiv);
-    }
-},
-    /**
-     * Constructor of SingleUserField
-     */
-    function(initialUser,
-             hiddenFieldName,
-             allowChoose,
-             includeFavourites, suggestedUsers,
-             conferenceId, enableGroups,
-             allowNew, allowDelete,
-             assignProcess, removeProcess, allowExternal) {
-
-        var self = this;
-
-        // we store the selected user
-        this.user = $O(exists(initialUser) ? initialUser : this.__getNotChosenUser());
-        this.userChosen = new WatchValue(exists(initialUser));
-
-        this.hiddenFieldName = hiddenFieldName;
-
-        this.allowChoose = any(allowChoose, true);
-
-        this.includeFavourites = any(includeFavourites, true);
-        if (exists(suggestedUsers)) {
-            if (suggestedUsers.WatchList) {
-                this.suggestedUsers = suggestedUsers;
-            } else {
-                this.suggestedUsers = new WatchList();
-                each(suggestedUsers, function(user){
-                    self.suggestedUsers.append(user);
-                });
-            }
-        } else {
-            this.suggestedUsers = null;
-        }
-
-        this.conferenceId = any(conferenceId, null);
-        this.enableGroups = any(enableGroups, false);
-
-        // new user dialog configuration
-        this.allowNew = any(allowNew, false);
-
-        // widget delete and favouritize buttons configuration
-        this.allowDelete = any(allowDelete, true);
-
-        // assign and remove user hook functions
-        this.assignProcess = any(assignProcess, singleUserNothing);
-        this.removeProcess = any(removeProcess, singleUserNothing);
-
-        // div that will have the remove and favouritize buttons
-        this.buttonsDiv = Html.div({style:{display:"inline"}});
-        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
-
-    }
-);
-
 /**
  * Creates a data creation / edit pop-up dialog.
  * @param {String} title The title of the popup.
@@ -1297,6 +1067,22 @@ $(function() {
  */
 type("UserListWidget", ["ListWidget"],
      {
+        _iteratingElement: function(attrs, item) {
+            var className;
+            var pairProperties = attrs.pair.get();
+            if (pairProperties.get('isGroup')) {
+                className = 'item-group';
+            } else if (pairProperties.get('_type') === 'IPNetworkGroup') {
+                className = 'icon-lan2';
+            } else if (pairProperties.get('_type') === 'Email') {
+                className = 'icon-mail';
+            } else {
+                className = 'icon-user';
+            }
+            attrs['className'] = className;
+            delete attrs['pair'];
+            return this.ListWidget.prototype._iteratingElement.call(this, attrs, item);
+        },
         _drawItem: function(user) {
             var self = this;
             var userData = user.get();
@@ -1322,11 +1108,26 @@ type("UserListWidget", ["ListWidget"],
             });
 
             var remove_button = $('<i class="remove-user icon-close">').click(function() {
-                self.removeProcess(userData, function(result) {
+                var currentUserId = $('body').data('user-id');
+                var userId = userData.get('id');
+                var confirmed;
+
+                function setResult(result) {
                     if (result) {
                         self.set(user.key, null);
                         self.userListField.inform();
                     }
+                }
+
+                if (currentUserId === userId) {
+                    confirmed = confirmPrompt($T.gettext('Are you sure you want to remove yourself from the list?'),
+                                              $T.gettext('Confirm action'));
+                } else {
+                    confirmed = $.Deferred().resolve();
+                }
+
+                confirmed.then(function() {
+                    self.removeProcess(userData, setResult);
                 });
             });
 
@@ -1352,6 +1153,11 @@ type("UserListWidget", ["ListWidget"],
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('email')));
                 } else {
                     userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
+                }
+
+                if (userData.get('_type') !== 'Email') {
+                    userName.append(Html.span('email', userData.get('email')));
+                    userName.append(Html.span('affiliation', userData.get('affiliation')));
                 }
                 return [userName, buttonDiv];
             }
@@ -1386,7 +1192,6 @@ type("UserListWidget", ["ListWidget"],
  *
  */
 type("UserListField", ["IWidget"], {
-
     getUsers: function() {
         return $L(this.userList);
     },
@@ -1481,18 +1286,54 @@ type("UserListField", ["IWidget"], {
 
     draw: function() {
         var self = this;
-        var select;
-        var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
+        var buttonDiv = Html.div({style: {marginTop: pixels(10)}});
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
+            var chooseUserButton = Html.input("button", {style: {marginRight: pixels(5)},
+                                                         className: 'i-button', type: 'button'},
+                                              this.enableGroups ? $T('Add User / Group'): $T('Add user'));
+            var chooseIpNetwork = Html.a({href: '#', style: {marginRight: pixels(5)},
+                                          className: 'i-button arrow js-dropdown',
+                                          'data-toggle': 'dropdown'}, $T('Add IP Network'));
+            var ipNetworksContainer = Html.span({className: 'group'});
+            var ipNetworksList = Html.ul({className: 'dropdown'});
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, this.enableGroups ? $T('Add Indico User / Group'): $T('Add Indico user'));
+            _.each(this.ipNetworks, function(network) {
+                var li = Html.li();
+                li.append(Html.a({href: '#'}, network.name));
+                li.observeClick(function() {
+                    self.newProcess([network], function(result) {
+                        if (result && !self.userList.get(network.identifier)) {
+                            var entries = self.userList.getAll();
+                            entries[network.identifier] = $O(network);
+                            updatePrincipalsList(entries);
+                        }
+                    });
+                });
+                ipNetworksList.append(li);
+            });
 
-            var title = "";
+            ipNetworksContainer.append(chooseIpNetwork);
+            ipNetworksContainer.append(ipNetworksList);
+            var title;
             if (this.includeFavourites || exists(this.suggestedUsers)) {
                 title = this.enableGroups ? $T("Add Users and Groups") : $T("Add Users");
             } else {
                 title = this.enableGroups ? $T("Search Users and Groups") : $T("Search Users");
+            }
+
+            function updatePrincipalsList(entries) {
+                var sortedKeys = _.sortBy(_.keys(entries), function(key) {
+                    var principal = entries[key].getAll();
+                    var weight = (principal._type == 'Avatar') ? 0 : (principal._type == 'Email' ? 1 : (principal.isGroup ? 2 : 3));
+                    var name = principal._type !== 'Email' ? principal.name : principal.email;
+                    return [weight, name.toLowerCase()];
+                });
+
+                self.userList.clearList();
+                _.each(sortedKeys, function(key) {
+                    self.userList.set(key, $O(entries[key].getAll()));
+                });
             }
 
             var peopleAddedHandler = function(peopleList){
@@ -1501,7 +1342,7 @@ type("UserListField", ["IWidget"], {
                     if (value) {
                         each(results, function(person){
                             var key;
-                            if (person.isGroup || person._fossil === 'group') {
+                            if (person.isGroup || person._fossil === 'group' || person._type == 'IPNetworkGroup') {
                                 key = person.identifier;
                             } else if (person._type === "Avatar") {
                                 key = "existingAv" + person.id;
@@ -1510,14 +1351,12 @@ type("UserListField", ["IWidget"], {
                             } else {
                                 key = person.id;
                             }
-                            if (person._type === "Avatar" && self.userList.get(key)) {
-                                // it is an existing avatar, unchanged, and already exists: we do nothing
-                            } else {
-                                if (self.userList.get(key)) {
-                                    self.userList.set(key, null);
-                                }
-                                self.userList.set(key, $O(person));
-                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
+                            if (!self.userList.get(key)) {
+                                var entries = self.userList.getAll();
+                                entries[key] = $O(person);
+                                updatePrincipalsList(entries);
+                                $('.icon-shield[data-id="author_' + person.email + '"]')
+                                    .trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
                             }
                         });
                     }
@@ -1532,6 +1371,9 @@ type("UserListField", ["IWidget"], {
             });
 
             buttonDiv.append(chooseUserButton);
+            if (this.enableIpNetworks) {
+                buttonDiv.append(ipNetworksContainer);
+            }
         }
 
 
@@ -1617,10 +1459,11 @@ type("UserListField", ["IWidget"], {
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
              allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
-             newProcess, editProcess, removeProcess, allowExternal) {
+             newProcess, editProcess, removeProcess, allowExternal, enableIpNetworks, ipNetworks) {
 
         var self = this;
-        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess,
+                                           showToggleFavouriteButtons, this);
         self.newUserCounter = 0;
         this.userDivStyle = any(userDivStyle, "user-list");
         this.setUpParameters();
@@ -1631,7 +1474,7 @@ type("UserListField", ["IWidget"], {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else if (user._type === 'EventPerson') {
                     self.userList.set('existingEventPerson' + user.id, $O(user));
-                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup'].indexOf(user._type)) {
+                } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup', 'IPNetworkGroup'].indexOf(user._type)) {
                     self.userList.set(user.identifier, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
@@ -1655,6 +1498,8 @@ type("UserListField", ["IWidget"], {
 
         this.allowSearch = any(allowSearch, true);
         this.enableGroups = any(enableGroups, false);
+        this.enableIpNetworks = any(enableIpNetworks, false);
+        this.ipNetworks = any(ipNetworks, []);
         this.conferenceId = any(conferenceId, null);
         this.privileges = any(privileges, {});
         this.selectedPrivileges = new WatchObject();
@@ -1666,4 +1511,3 @@ type("UserListField", ["IWidget"], {
         this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
      }
 );
-

@@ -47,7 +47,7 @@
 {% macro render_attachments(item) -%}
     <div class="js-attachment-container">
         {% if item.attached_items %}
-            <div class="material-list icon-attachment inline-attachments-icon">
+            <div class="material-list">
                 {{ render_attachments_folders(item=item) }}
             </div>
         {% endif %}

@@ -1,0 +1,14 @@
+{% macro render_ongoing_events(ongoing_events, tz) %}
+    <ul>
+        {% for ongoing_event in ongoing_events %}
+            <li>
+                <a href="{{ ongoing_event.url }}">{{ ongoing_event.title }}</a>
+                ({{ ongoing_event.start_dt|format_date(timezone=tz) }} - {{ ongoing_event.end_dt|format_date(timezone=tz) }})
+            </li>
+        {% else %}
+            <li>
+                <span>{% trans %}There are no ongoing events during selected month.{% endtrans %}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}

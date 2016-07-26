@@ -32,6 +32,11 @@ Called when an event is cloned. The *sender* is the `Event` object of
 the old event, the new event is passed in the `new_event` kwarg.
 """)
 
+type_changed = _signals.signal('type-changed', """
+Called when the type of an event is changed. The `sender` is the event,
+the old type is passed in the `old_type` kwarg.
+""")
+
 data_changed = _signals.signal('data-changed', """
 Called when the basic data of an event is changed. The `sender` is the event,
 and the following kwargs are available:
@@ -54,26 +59,11 @@ triggered.
 
 moved = _signals.signal('moved', """
 Called when an event is moved to a different category. The `sender` is the event,
-the old/new categories are passed using the `old_parent` and `new_parent` kwargs.
+the old category is in the `old_category` kwarg.
 """)
 
 created = _signals.signal('created', """
 Called when a new event is created. The `sender` is the new Event.
-""")
-
-protection_changed = _signals.signal('protection-changed', """
-Called when the protection mode of the event changed. The `sender` is the event,
-`old`/`new` contain the corresponding values.
-""")
-
-domain_access_granted = _signals.signal('domain-access-granted', """
-Called when an IP restriction is added to an event. The `sender` is the event class,
-the `domain` is that domain that has been added.
-""")
-
-domain_access_revoked = _signals.signal('domain-access-revoked', """
-Called when an IP restriction is removed from an event. The `sender` is the event class,
-the `domain` is that domain that has been removed.
 """)
 
 session_deleted = _signals.signal('session-deleted', """

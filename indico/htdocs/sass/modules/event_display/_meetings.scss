@@ -112,7 +112,7 @@ li > table + .note-area-wrapper {
             overflow: hidden;
 
             .gradient-layer {
-                @include gradient(rgba(0,0,0,0.0), #ECECEC);
+                @include gradient(rgba(0,0,0,0.0), $light-gray);
                 display: block;
                 position: absolute;
                 bottom: 0;
@@ -203,10 +203,6 @@ li > table + .note-area-wrapper {
         }
     }
 
-}
-
-.meetingTimetable .reference-list {
-    font-size: 0.9em;
 }
 
 .reference-list {

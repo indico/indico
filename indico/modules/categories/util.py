@@ -17,19 +17,19 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from io import BytesIO
+from datetime import timedelta
 
-from lxml import html
-from lxml.etree import ParserError
+from pytz import timezone
+from sqlalchemy.orm import load_only
+from sqlalchemy.orm.attributes import set_committed_value
 
-import icalendar as ical
-from pyatom import AtomFeed
-from sqlalchemy.orm import joinedload, load_only, subqueryload
-
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.categories import upcoming_events_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -37,98 +37,8 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
-from indico.util.string import to_unicode
-from indico.web.flask.util import url_for
-
-
-def serialize_category_ical(category, user, event_filter):
-    """Export the events in a category to iCal
-
-    :param category: The category to export
-    :param user: The user who needs to be able to access the events
-    :param event_filter: A SQLalchemy criterion to restrict which
-                         events will be returned.  Usually something
-                         involving the start/end date of the event.
-    """
-    own_room_strategy = joinedload('own_room')
-    own_room_strategy.load_only('building', 'floor', 'number', 'name')
-    own_room_strategy.lazyload('owner')
-    own_venue_strategy = joinedload('own_venue').load_only('name')
-    query = (Event.query
-             .filter(Event.category_chain.contains([int(category.getId())]),
-                     ~Event.is_deleted,
-                     event_filter)
-             .options(load_only('id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
-                                'own_room_name', 'protection_mode'),
-                      subqueryload('acl_entries'),
-                      joinedload('person_links'),
-                      own_room_strategy,
-                      own_venue_strategy)
-             .order_by(Event.start_dt))
-    events = [e for e in query if e.can_access(user)]
-    cal = ical.Calendar()
-    cal.add('version', '2.0')
-    cal.add('prodid', '-//CERN//INDICO//EN')
-
-    now = now_utc(False)
-    for event in events:
-        url = url_for('event.conferenceDisplay', confId=event.id, _external=True)
-        location = ('{} ({})'.format(event.room_name, event.venue_name)
-                    if event.venue_name and event.room_name
-                    else (event.venue_name or event.room_name))
-        cal_event = ical.Event()
-        cal_event.add('uid', u'indico-event-{}@cern.ch'.format(event.id))
-        cal_event.add('dtstamp', now)
-        cal_event.add('dtstart', event.start_dt)
-        cal_event.add('dtend', event.end_dt)
-        cal_event.add('url', url)
-        cal_event.add('summary', event.title)
-        cal_event.add('location', location)
-        description = []
-        if event.person_links:
-            speakers = [u'{} ({})'.format(x.full_name, x.affiliation) if x.affiliation else x.full_name
-                        for x in event.person_links]
-            description.append(u'Speakers: {}'.format(u', '.join(speakers)))
-
-        if event.description:
-            desc_text = unicode(event.description) or u'<p/>'  # get rid of RichMarkup
-            try:
-                description.append(unicode(html.fromstring(desc_text).text_content()))
-            except ParserError:
-                # this happens e.g. if desc_text contains only a html comment
-                pass
-        description.append(url)
-        cal_event.add('description', u'\n'.join(description))
-        cal.add_component(cal_event)
-    return BytesIO(cal.to_ical())
-
-
-def serialize_category_atom(category, url, user, event_filter):
-    """Export the events in a category to Atom
-
-    :param category: The category to export
-    :param url: The URL of the feed
-    :param user: The user who needs to be able to access the events
-    :param event_filter: A SQLalchemy criterion to restrict which
-                         events will be returned.  Usually something
-                         involving the start/end date of the event.
-    """
-    query = (Event.query
-             .filter(Event.category_chain.contains([int(category.getId())]),
-                     ~Event.is_deleted,
-                     event_filter)
-             .options(load_only('id', 'start_dt', 'title', 'description', 'protection_mode'),
-                      subqueryload('acl_entries'))
-             .order_by(Event.start_dt))
-    events = [e for e in query if e.can_access(user)]
-
-    feed = AtomFeed(feed_url=url, title='Indico Feed [{}]'.format(to_unicode(category.getTitle())))
-    for event in events:
-        feed.add(title=event.title,
-                 summary=unicode(event.description),  # get rid of RichMarkup
-                 url=url_for('event.conferenceDisplay', confId=event.id, _external=True),
-                 updated=event.start_dt)
-    return BytesIO(feed.to_string().encode('utf-8'))
+from indico.util.i18n import _, ngettext
+from indico.util.struct.iterables import materialize_iterable
 
 
 def get_events_by_year(category_id=None):
@@ -138,7 +48,7 @@ def get_events_by_year(category_id=None):
                         from subcategories are also included.
     :return: An `OrderedDict` mapping years to event counts.
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
              .query(db.cast(db.extract('year', Event.start_dt), db.Integer).label('year'),
                     db.func.count())
@@ -157,7 +67,7 @@ def get_contribs_by_year(category_id=None):
                         included.
     :return: An `OrderedDict` mapping years to contribution counts.
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
              .query(db.cast(db.extract('year', TimetableEntry.start_dt), db.Integer).label('year'),
                     db.func.count())
@@ -178,7 +88,7 @@ def get_attachment_count(category_id=None):
                         included.
     :return: The number of attachments
     """
-    category_filter = Event.category_chain.contains([category_id]) if category_id else True
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     subcontrib_contrib = db.aliased(Contribution)
     query = (db.session
              .query(db.func.count(Attachment.id))
@@ -214,3 +124,71 @@ def get_category_stats(category_id=None):
             'contribs_by_year': get_contribs_by_year(category_id),
             'attachments': get_attachment_count(category_id),
             'updated': now_utc()}
+
+
+@memoize_redis(3600)
+@materialize_iterable()
+def get_upcoming_events():
+    """Get the global list of upcoming events"""
+    from indico.modules.events import Event
+    data = upcoming_events_settings.get_all()
+    if not data['max_entries'] or not data['entries']:
+        return
+    tz = timezone(Config.getInstance().getDefaultTimezone())
+    now = now_utc(False).astimezone(tz)
+    base_query = (Event.query
+                  .filter(Event.effective_protection_mode == ProtectionMode.public,
+                          ~Event.is_deleted,
+                          Event.end_dt.astimezone(tz) > now)
+                  .options(load_only('id', 'title', 'start_dt', 'end_dt')))
+    queries = []
+    cols = {'category': Event.category_id,
+            'event': Event.id}
+    for entry in data['entries']:
+        delta = timedelta(days=entry['days'])
+        query = (base_query
+                 .filter(cols[entry['type']] == entry['id'])
+                 .filter(db.cast(Event.start_dt.astimezone(tz), db.Date) > (now - delta).date())
+                 .with_entities(Event, db.literal(entry['weight']).label('weight')))
+        queries.append(query)
+
+    query = (queries[0].union(*queries[1:])
+             .order_by(db.desc('weight'), Event.start_dt, Event.title)
+             .limit(data['max_entries']))
+    for row in query:
+        event = row[0]
+        # we cache the result of the function and is_deleted is used in the repr
+        # and having a broken repr on the cached objects would be ugly
+        set_committed_value(event, 'is_deleted', False)
+        yield event
+
+
+def get_visibility_options(category_or_event, allow_invisible=True):
+    """Return the visibility options available for the category or event."""
+    if isinstance(category_or_event, Event):
+        category = category_or_event.category
+        event = category_or_event
+    else:
+        category = category_or_event
+        event = None
+
+    def _category_above_message(number):
+        return ngettext('From the category above', 'From {} categories above', number).format(number)
+
+    options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
+               for n, title in enumerate(category.chain_titles[::-1])]
+    if event is None:
+        options[0] = (1, _("From this category only"))
+    else:
+        options[0] = (1, '{} \N{RIGHTWARDS ARROW} "{}"'.format(_("From the current category only"), category.title))
+    options[-1] = ('', _("From everywhere"))
+
+    if allow_invisible:
+        options.insert(0, (0, _("Invisible")))
+
+    # In case the current visibility is higher than the distance to the root category
+    if category_or_event.visibility is not None and not any(category_or_event.visibility == x[0] for x in options):
+        options.append((category_or_event.visibility,
+                        '({} \N{RIGHTWARDS ARROW} {})'.format(_category_above_message(category_or_event.visibility),
+                                                              _("Everywhere"))))
+    return options

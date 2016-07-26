@@ -1,0 +1,32 @@
+{% extends 'categories/display/overview/base.html' %}
+{% from 'categories/display/overview/event.html' import render_event %}
+
+{% block overview_title %}
+    {{ start_dt|format_date(format='long') }}
+{% endblock %}
+
+{% block overview_navigation_left %}
+    <a href="{{ previous_month_url }}" title="{% trans %}Previous month{% endtrans %}">
+        &lt;&lt;
+    </a>
+    <a href="{{ previous_day_url }}" title="{% trans %}Previous day{% endtrans %}">
+        &lt;
+    </a>
+{% endblock %}
+
+{% block overview_navigation_right %}
+    <a href="{{ next_day_url }}" title="{% trans %}Next day{% endtrans %}">
+        &gt;
+    </a>
+    <a href="{{ next_month_url }}" title="{% trans %}Next month{% endtrans %}">
+        &gt;&gt;
+    </a>
+{% endblock %}
+
+{% block overview %}
+    <table class="day">
+        {% for event in events %}
+            {{ render_event(event, timezone=category.display_tzinfo, detail=detail) }}
+        {% endfor %}
+    </table>
+{% endblock %}

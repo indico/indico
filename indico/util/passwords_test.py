@@ -48,6 +48,13 @@ def mock_bcrypt(mocker):
     return bcrypt
 
 
+def test_passwordproperty_get_class(mock_bcrypt):
+    assert isinstance(Foo.password, PasswordProperty)
+    assert Foo.password.backend.hash('test') == '098f6bcd4621d373cade4e832627b4f6'
+    assert mock_bcrypt.hashpw.called
+    mock_bcrypt.hashpw.assert_called_with(b'test', 'salt')
+
+
 @pytest.mark.parametrize('password', (u'm\xf6p', 'foo'))
 def test_passwordproperty_set(mock_bcrypt, password):
     test = Foo()

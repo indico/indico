@@ -113,7 +113,6 @@ indico_management = rjs_bundle(
     *namespace('js/indico/Management',
 
                'RoomBooking.js',
-               'eventCreation.js',
                'AbstractReviewing.js',
                'NotificationTPL.js',
                'CFA.js',
@@ -130,13 +129,6 @@ indico_room_booking = rjs_bundle(
                'RoomBookingCalendar.js',
                'roomselector.js',
                'validation.js'))
-
-indico_admin = rjs_bundle(
-    'indico_admin',
-    *namespace('js/indico/Admin',
-
-               'News.js',
-               'Upcoming.js'))
 
 indico_legacy = rjs_bundle(
     'indico_legacy',
@@ -179,7 +171,8 @@ indico_jquery = rjs_bundle(
                'colorpicker.js',
                'palettepicker.js',
                'itempicker.js',
-               'sortablelist.js'))
+               'sortablelist.js',
+               'categorynavigator.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
@@ -238,6 +231,9 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                        filters='cssmin', output='css/selectize_css_%(version)s.min.css')
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
+fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
+
+typewatch_js = rjs_bundle('dropzone_js', 'js/lib/jquery.typewatch.js')
 
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
@@ -261,7 +257,6 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'date.js',
               'jquery.colorpicker.js',
               'jquery-extra-selectors.js',
-              'jquery.typewatch.js',
               'jstorage.js')))
 
 utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
@@ -367,19 +362,20 @@ abstracts_js = rjs_bundle(
                'Markdown.Editor.js',
                'Markdown.Sanitizer.js'))
 
-base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js)
-
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
-    'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/category_statistics.js'),
+    'categories': rjs_bundle('modules_categories', *namespace('js/indico/modules/categories', 'display.js',
+                                                              'calendar.js')),
+    'categories_management': rjs_bundle('modules_categories_management', 'js/indico/modules/categories/management.js'),
+    'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/categories/statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
-    'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'eventdisplay.js',
+    'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
+    'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
                                                                     'reporter.js', 'static_filters.js')),
-    'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
+    'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/events/layout.js'),
     'event_management': rjs_bundle('modules_event_management',
-                                   *namespace('js/indico/modules', 'eventmanagement.js', 'reporter.js',
+                                   *namespace('js/indico/modules', 'events/management.js', 'reporter.js',
                                               'static_filters.js')),
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
     'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
@@ -394,8 +390,13 @@ module_js = {
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
                                        'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
-    'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js')
+    'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js'),
+    'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
 }
+
+base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+                 indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
+                 module_js['event_creation'])
 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
@@ -417,6 +418,7 @@ payment_sass = sass_module_bundle('payment')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
+category_management_sass = sass_module_bundle('category_management')
 admin_sass = sass_module_bundle('admin')
 bootstrap_sass = sass_module_bundle('bootstrap')
 
@@ -445,7 +447,6 @@ def register_all_js(env):
     env.register('indico_core', indico_core)
     env.register('indico_management', indico_management)
     env.register('indico_roombooking', indico_room_booking)
-    env.register('indico_admin', indico_admin)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
     env.register('indico_materialeditor', indico_materialeditor)
@@ -502,6 +503,7 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
                    'lib/jquery.typeahead.css',
+                   'lib/fullcalendar.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
                    'jquery.colorpicker.css'),
@@ -523,6 +525,7 @@ def register_all_css(env, main_css_file):
     env.register('contributions_sass', contributions_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
+    env.register('category_management_sass', category_management_sass)
     env.register('admin_sass', admin_sass)
     env.register('bootstrap_sass', bootstrap_sass)
     env.register('screen_sass', screen_sass)

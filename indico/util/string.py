@@ -129,20 +129,31 @@ def strict_unicode(value):
     return unicode(value)
 
 
-def slugify(value, lower=True):
-    """Converts a string to a simpler version useful for URL slugs.
+def slugify(*args, **kwargs):
+    """Joins a series of strings into a URL slug.
 
     - normalizes unicode to proper ascii repesentations
     - removes non-alphanumeric characters
     - replaces whitespace with dashes
 
     :param lower: Whether the slug should be all-lowercase
+    :param maxlen: Maximum slug length
     """
-    value = to_unicode(value).encode('translit/long')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip())
+
+    lower = kwargs.get('lower', True)
+    maxlen = kwargs.get('maxlen')
+
+    value = u'-'.join(to_unicode(val) for val in args)
+    value = value.encode('translit/long')
+    value = re.sub(ur'[^\w\s-]', u'', value).strip()
+
     if lower:
         value = value.lower()
-    return re.sub('[-\s]+', '-', value)
+    value = re.sub(ur'[-\s]+', u'-', value)
+    if maxlen:
+        value = value[0:maxlen].rstrip(u'-')
+
+    return value
 
 
 def unicode_struct_to_utf8(obj):
@@ -407,6 +418,7 @@ def format_repr(obj, *args, **kwargs):
                   for objects which have one longer title or text
                   that doesn't look well in the unquoted
                   comma-separated argument list.
+    :param _rawtext: Like `_text` but without surrounding quotes.
     :param _repr: Similar as `_text`, but uses the `repr()` of the
                   passed object instead of quoting it.  Cannot be
                   used together with `_text`.
@@ -418,6 +430,7 @@ def format_repr(obj, *args, **kwargs):
             return value
 
     text_arg = kwargs.pop('_text', None)
+    raw_text_arg = kwargs.pop('_rawtext', None)
     repr_arg = kwargs.pop('_repr', None)
     obj_name = type(obj).__name__
     formatted_args = [unicode(_format_value(getattr(obj, arg))) for arg in args]
@@ -427,6 +440,8 @@ def format_repr(obj, *args, **kwargs):
             formatted_args.append(u'{}={}'.format(name, _format_value(value)))
     if text_arg is not None:
         return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+    elif raw_text_arg is not None:
+        return u'<{}({}): {}>'.format(obj_name, u', '.join(formatted_args), raw_text_arg)
     elif repr_arg is not None:
         return u'<{}({}): {!r}>'.format(obj_name, u', '.join(formatted_args), repr_arg)
     else:

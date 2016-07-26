@@ -1,13 +1,3 @@
-
-    <!-- CONTEXT HELP DIVS -->
-    <div id="tooltipPool" style="display: none;">
-        <div id="features" class="tip">
-            ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu.""")}
-        </div>
-    </div>
-    <!-- END OF CONTEXT HELP DIVS -->
-
-
 <div class="groupTitle">${ _("General System Information") }</div>
 
 <table class="groupTable">
@@ -50,17 +40,6 @@
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Address")}</span></td>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${address}</td>
-    </tr>
-    <tr>
-      <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Features")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">
-        <table>
-          <tr>
-            <td>${features}</td>
-            <td valign="top">${contextHelp('features' )}</td>
-          </tr>
-        </table>
-      </td>
     </tr>
     % if _app.debug:
         <tr>

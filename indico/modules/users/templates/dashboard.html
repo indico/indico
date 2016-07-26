@@ -1,9 +1,12 @@
 {% extends 'users/base.html' %}
 {% from 'users/_category.html' import suggested_category, user_category %}
 
-{% block subtitle -%}
+{% block title -%}
     {% trans %}Dashboard{% endtrans %}
 {%- endblock %}
+
+{% block page_class %}user-dashboard{% endblock %}
+{% block banner_class %}user-dashboard{% endblock %}
 
 {% block user_content %}
     <div class="dashboard-tab">

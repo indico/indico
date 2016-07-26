@@ -16,7 +16,7 @@
          var url = "${Config.getInstance().getMobileURL()}";
          % if conf :
              url += "/event/"+${conf.getId()};
-             % if conf.hasAnyProtection():
+             % if conf.as_event.is_protected:
                    url += "?pr=yes";
              % endif
          % endif

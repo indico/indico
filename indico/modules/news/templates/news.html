@@ -1,0 +1,24 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}fixed-width-standalone-page{% endblock %}
+
+{% block title %}
+    {% trans %}Latest News{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% for item in news %}
+        <div class="news-item" id="{{ item.anchor }}">
+            <div class="right news-item-info">
+                <span class="date-time">{{ item.created_dt|format_date(timezone=session.tzinfo) }}</span>
+            </div>
+            <h2>
+                {{ item.title }}
+                {% if _is_new(item) %}<i class="icon-new new-label"></i>{% endif %}
+            </h2>
+            <div class="content">
+                {{ item.content | safe }}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

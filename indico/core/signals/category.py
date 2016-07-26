@@ -20,39 +20,19 @@ _signals = Namespace()
 
 
 moved = _signals.signal('moved', """
-Called when the parent of a category is changed. The `sender` is the category,
-the old/new parents are passed using the `old_parent` and `new_parent` kwargs.
+Called when a category is moved into another category. The `sender` is
+the category and the old parent category is passed in the `old_parent`
+kwarg.
 """)
 
 created = _signals.signal('created', """
-Called when a new category is created. The `sender` is the new category, its
-parent category is passed in the `parent` kwarg.
+Called when a new category is created. The `sender` is the new category.
+""")
+
+updated = _signals.signal('created', """
+Called when a category is modified. The `sender` is the updated category.
 """)
 
 deleted = _signals.signal('deleted', """
 Called when a category is deleted. The `sender` is the category.
-""")
-
-title_changed = _signals.signal('title-changed', """
-Called when the title of a category is changed. The `sender` is the category,
-the old/new titles are passed in the `old` and `new` kwargs.
-""")
-
-data_changed = _signals.signal('data-changed', """
-Called when some data of the category changed. The `sender` is the category.
-""")
-
-protection_changed = _signals.signal('protection-changed', """
-Called when the protection mode of the category changed. The `sender` is the category,
-`old`/`new` contain the corresponding values.
-""")
-
-domain_access_granted = _signals.signal('domain-access-granted', """
-Called when an IP restriction is added to a category. The `sender` is the category class,
-the `domain` is that domain that has been added.
-""")
-
-domain_access_revoked = _signals.signal('domain-access-revoked', """
-Called when an IP restriction is removed from a category. The `sender` is the category class,
-the `domain` is that domain that has been removed.
 """)

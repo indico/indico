@@ -26,7 +26,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem, SideMenuItem
+from indico.web.menu import SideMenuItem
 
 
 class IndicoOAuth2Provider(OAuth2Provider):
@@ -46,9 +46,9 @@ def _extend_admin_menu(sender, **kwargs):
     return SideMenuItem('applications', 'Applications', url_for('oauth.apps'), section='security')
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Applications'), 'oauth.user_profile')
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _extend_profile_sidemenu(sender, **kwargs):
+    yield SideMenuItem('applications', _('Applications'), url_for('oauth.user_profile'), 40)
 
 
 @signals.app_created.connect
