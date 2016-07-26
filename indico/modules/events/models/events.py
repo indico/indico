@@ -20,9 +20,9 @@ from contextlib import contextmanager
 
 import pytz
 from sqlalchemy import orm, DDL
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
@@ -38,6 +38,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, Protec
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
+from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
@@ -699,7 +700,6 @@ Event.register_protection_events()
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from indico.modules.categories import Category
     event_alias = db.aliased(Event)
 
     # Event.category_chain -- the category ids of the event, starting

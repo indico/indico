@@ -16,11 +16,9 @@
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
 from indico.modules.events.cloning import EventCloner
 
@@ -30,10 +28,6 @@ class WebFactory(WebFactory):
     iconURL = Config.getInstance().getSystemIconURL('lecture')
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
-
-    def getEventCreationPage( rh, targetCateg ):
-        return WPSimpleEventCreation( rh, targetCateg )
-    getEventCreationPage = staticmethod( getEventCreationPage )
 
     def getIconURL():
         return WebFactory.iconURL
@@ -87,24 +81,6 @@ class WPSEConfClone(conferences.WPConfClone):
         }
         return p.getHTML(pars)
 
-
-#################### Event Creation #####################################
-class WPSimpleEventCreation( WPConferenceCreationMainData):
-
-    def _getWComponent(self):
-        return WSimpleEventCreation(self.category, rh=self._rh)
-
-
-class WSimpleEventCreation(category.WConferenceCreation):
-    def __init__( self, targetCateg, type="simple_event", rh = None ):
-        self._categ = targetCateg
-        self._type = type
-        self._rh = rh
-
-    def getVars( self ):
-        vars = category.WConferenceCreation.getVars( self )
-        vars["event_type"] = 'lecture'
-        return vars
 
 ##################### Event Display ###################################
 

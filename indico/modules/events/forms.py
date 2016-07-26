@@ -79,10 +79,6 @@ class EventPersonLinkForm(IndicoForm):
             self.person_link_data.label.text = _('Speakers')
 
 
-class EventCategoryForm(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
-
-
 class EventCreationFormBase(IndicoForm):
     category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
     title = StringField(_('Event title'), [DataRequired()])
