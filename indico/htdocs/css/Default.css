@@ -1238,6 +1238,10 @@ div.timetableBlockTitle {
     padding: 4px;
 }
 
+a.entry-attachments + div.timetableBlockPresenters {
+    margin-right: 24px;
+}
+
 div.timetableBlockPresenters {
     float: right;
     margin: 4px;
