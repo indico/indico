@@ -321,7 +321,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         backref=db.backref(
             'events',
             lazy=True,
-            order_by=(start_dt, id)
+            order_by=(start_dt, id),
+            primaryjoin='(Event.series_id == EventSeries.id) & ~Event.is_deleted',
         )
     )
 
