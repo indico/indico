@@ -56,7 +56,7 @@
             events: function(start, end, timezone, callback) {
                 function updateCalendar(data) {
                     callback(data.events);
-                    var toolbarGroup = $('#event-calendar .fc-toolbar .fc-right');
+                    var toolbarGroup = $(elementId).find('.fc-toolbar .fc-right');
                     var ongoingEventsInfo = $('<a>', {
                         'href': '#',
                         'class': 'ongoing-events-info',

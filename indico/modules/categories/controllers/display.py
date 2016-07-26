@@ -625,4 +625,4 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
 
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')
-        return template.render_ongoing_events(ongoing_events)
+        return template.render_ongoing_events(ongoing_events, self.category.display_tzinfo)
