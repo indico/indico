@@ -1949,18 +1949,6 @@ ul.menuList li.active
     text-shadow: 1px 1px 1px #555555;
 }
 
-/* TODO: remove permanently? */
-#policyOfUse {
-    display: none;
-    float: right;
-    width: 40%;
-}
-#policyOfUse h1{
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
 /* General Titles */
 
 .selectedCategoryName{
