@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from sqlalchemy.orm import joinedload
 
-from indico.core.config import Config
 from indico.core.notifications import send_email, make_email
 from indico.modules.categories.models.categories import Category
 from indico.web.flask.templating import get_template_module
@@ -48,5 +47,4 @@ def notify_event_creation(event, occurrences=None):
 
     if emails:
         template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
-        send_email(make_email(bcc_list=emails, template=template, from_address=Config.getInstance().getSupportEmail()),
-                   event.as_legacy, module='Events')
+        send_email(make_email(bcc_list=emails, template=template))
