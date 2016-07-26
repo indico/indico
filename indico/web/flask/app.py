@@ -316,7 +316,7 @@ def handle_404(exception):
             description = _("The page you are looking for doesn't exist.")
         else:
             description = exception.description
-        return render_error(_("Page not found"), description).getHTML(), 404
+        return render_error(_("Page not found"), description), 404
 
 
 def handle_exception(exception):

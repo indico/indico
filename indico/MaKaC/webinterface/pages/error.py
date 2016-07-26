@@ -31,6 +31,10 @@ def render_error(message, description, standalone=False):
 
 
 class WPErrorWSGI(WPDecorated, WPJinjaMixin):
+    # social config is in MaKaCConfig - this can go away once it's
+    # moved to SettingsProxy
+    SOCIAL_ENABLED = False
+
     def __init__(self, message, description):
         WPDecorated.__init__(self, None)
         self._message = message

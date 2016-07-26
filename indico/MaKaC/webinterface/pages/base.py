@@ -97,9 +97,8 @@ class WPJinjaMixin:
         return self.render_template_func(template, **params)
 
 
-class WPBase():
-    """
-    """
+class WPBase:
+    SOCIAL_ENABLED = True
     _title = "Indico"
 
     # required user-specific "data packages"
@@ -184,8 +183,6 @@ class WPBase():
         elif isinstance(self._rh, RHAdminBase):
             area=i18nformat(""" - _("Administrator area")""")
 
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
-
         plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
                                         multi_value_types=list)
         plugin_js = values_from_signal(signals.plugin.inject_js.send(self.__class__), as_list=True,
@@ -200,7 +197,8 @@ class WPBase():
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "language": session.lang or Config.getInstance().getDefaultLocale(),
-            "social": info.getSocialAppConfig(),
+            # XXX: Remove SOCIAL_ENABLED once this is moved out of ZODB
+            "social": HelperMaKaCInfo().getMaKaCInfoInstance().getSocialAppConfig() if self.SOCIAL_ENABLED else {},
             "assets": self._asset_env
         })
 
