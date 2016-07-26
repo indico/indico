@@ -104,8 +104,8 @@ class EventCreationForm(EventCreationFormBase):
 
 
 class LectureCreationForm(EventCreationFormBase):
-    _field_order = ('category', 'title', 'occurrences', 'timezone', 'location_data', 'protection_mode',
-                    'person_link_data')
+    _field_order = ('category', 'title', 'occurrences', 'timezone', 'location_data', 'person_link_data',
+                    'protection_mode')
     _advanced_field_order = ('description', 'theme')
     occurrences = OccurrencesField(_("Dates"), [DataRequired()], default_time=time(8),
                                    default_duration=timedelta(minutes=90))
