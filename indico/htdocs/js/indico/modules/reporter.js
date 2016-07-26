@@ -12,7 +12,12 @@
     }
 
     global.setupReportFilter = function() {
-        $('.report-filter').dropdown({selector: '.report-column .title'});
+        $('.report-filter').each(function() {
+            $(this).find('.report-column').each(function() {
+                var $reportColumn = $(this);
+                $reportColumn.dropdown({selector: '.title', 'relative_to': $reportColumn});
+            });
+        });
 
         colorizeActiveFilters();
 
