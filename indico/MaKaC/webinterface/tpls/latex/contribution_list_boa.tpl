@@ -42,7 +42,7 @@
             \vspace{1em}
             \normalsize {
                 \rmfamily {
-                    ${md_convert(str(boa_text).decode('utf-8')).encode('utf-8')}
+                    ${md_convert(boa_text.decode('utf-8'))}
                 }
             }
             \fancyfoot[C]{\thepage}
@@ -57,14 +57,14 @@
     <%block name="book_body">
         % for contrib in contribs:
             % if contrib.can_access(aw):
-                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Report of Abstracts")}}
+                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Report of Abstracts") | latex_escape}}
                 \phantomsection
                 \addcontentsline{toc}{chapter}{${contrib.title | latex_escape}}
 
                 \vspace{3em}
                 <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>
 
-                \fancyfoot[C]{\small \rmfamily \color{gray} ${ _("Page {0}").format(r"\thepage") }}
+                \fancyfoot[C]{\small \rmfamily \color{gray} ${ latex_escape(_("Page {0}"), ignore_braces=True).format(r"\thepage") }}
             %endif
         % endfor
     </%block>

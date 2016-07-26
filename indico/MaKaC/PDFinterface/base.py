@@ -713,8 +713,11 @@ class PDFLaTeXBase(object):
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
+        def _escape_latex_math(string):
+            return mdx_latex.latex_escape(string, ignore_math=True)
+
         def _convert_markdown(text):
-            return render_markdown(text, md=md.convert).encode('utf-8')
+            return render_markdown(text, md=md.convert, escape_latex_math=_escape_latex_math).encode('utf-8')
 
         self._args = {
             'md_convert': _convert_markdown
@@ -752,6 +755,7 @@ class LatexRunner(object):
 
     def run_latex(self, source_file, log_file=None):
         pdflatex_cmd = [Config.getInstance().getPDFLatexProgram(),
+                        '-no-shell-escape',
                         '-interaction', 'nonstopmode',
                         '-output-directory', self._dir,
                         source_file]
