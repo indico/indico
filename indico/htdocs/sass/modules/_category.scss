@@ -438,6 +438,12 @@ ul.category-resource-qtip {
             background-color: #F6E8BD;
             border-radius: 5px;
         }
+
+        .protected {
+            font-weight: normal;
+            font-size: smaller;
+            color: $dark-gray;
+        }
     }
 }
 

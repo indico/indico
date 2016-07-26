@@ -43,9 +43,6 @@
 	background: transparent none repeat scroll 0 0;
 }
 
-.confLogo {
-}
-
 .confTitleBox {
 	color: white;
 	min-height: 90px;
@@ -362,10 +359,6 @@ pre {
 
 
 /* Elements not part of the conference itself */
-
-.pageHeader {
-    background: #424242;
-}
 
 ul.chair_list {
     padding: 0px;

@@ -15,55 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.smallLabel {
-    font-size: 10px;
-}
-
-.pageheader{
-    color: gray
-}
-
-.pagefooter {
-   color: #999;
-   background: #fff;
-   font-size: x-small;
-   margin-top: 20px;
-   padding-bottom: 5px;
-}
-.footerbox {
-   color: #999;
-   background: #fff;
-   margin-left: 0px;
-   padding-left: 5px;
-   padding-right: 5px;
-   border-top: 1px solid #999;
-}
-
-.pagebody {
-    color: #000;
-    background: transparent;
-    margin-left: 10px;
-    margin-top: 10px;
-    margin-right: 10px;
-}
-
-a.note:link {
-   color: #999;
-   background: transparent;
-}
-a.note:visited {
-   color: #999;
-   background: transparent;
-}
-a.note:active {
-   color: #999;
-   background: transparent;
-}
-a.note:hover {
-   color: #999;
-   background: transparent;
-}
-
 /* For the multi-tab control */
 .tabSelected {border-top: gray solid;
                 border-left: gray solid;
@@ -77,13 +28,7 @@ a.note:hover {
 .tabLink { color: white }
 
 
-/*For the big-conferences interface pages*/
-.confSupportEmailBox {  text-align: center}
-
-
-/*
-    Used for meeting and lectures
-*/
+/* Used for meeting and lectures */
 .eventWrapper {
     width: 1000px;
     margin: 30px auto;
@@ -176,13 +121,6 @@ a.img:active {
    font-weight: normal;
 }
 
-/* This will be overidden when a page is printed.
-   It's used for elements that should only be visible
-   when printing */
-.onlyPrint {
-    display: none;
-}
-
 @media print {
     .noprint {
         visibility:hidden;
@@ -190,29 +128,6 @@ a.img:active {
     .print {
         visibility: visible;
     }
-
-    .onlyPrint {
-        display: inherit;
-        visibility: visible;
-    }
-}
-
-.iconSeparator {
-    font-size:15px;
-    vertical-align: top;
-}
-
-.iconDropDownMenu {
-    background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
-    cursor: pointer;
-    padding-right: 12px;
-    padding-top: 6px;
-}
-
-.iconContribGoTo {
-  float: left;
-  padding: 0px 5px 0px 5px;
-  cursor: pointer;
 }
 
 .dropDownMenu, .dropDownMenuGrey, .dropUpMenu, .dropDownMenuWhite {
@@ -230,29 +145,6 @@ a.img:active {
 
 .dropUpMenu {
     background: transparent url(../images/menu_arrow_up_black.png) scroll no-repeat center right;
-}
-
-.centeredCheckBox {
-    vertical-align: middle;
-}
-
-.listtitle {
-   font-weight: bold;
-   font-size: 16px;
-   color: #234173;
-   background: #D9D9D9;
-   padding: 3px;
-}
-
-.listcell {
-   font-size: 16px;
-   font-weight: bold;
-   color: #000000;
-   color: #777777;
-   background: #FFFFFF;
-   padding-left: 2px;
-   padding-right: 2px;
-   border-bottom: 1px solid #777777;
 }
 
 
@@ -288,110 +180,12 @@ h2.menutitle {
    padding: 3px;
 }
 
-.menuselectedcell {
-
-   font-weight: bold;
-   font-size: 16px;
-   color: #E25300;
-   background: #FFFFFF;
-   border-bottom: 2px solid #234173;
-   border-top: 2px solid #234173;
-}
-
-.menumiddlecell {
-
-   font-weight: bold;
-   font-size: 16px;
-   color: #000000;
-   background: #D9D9D9;
-   border-bottom: 2px solid #FFFFFF;
-}
-
-.menutopcell {
-
-   font-weight: bold;
-   font-size: 16px;
-   color: #000000;
-   background: #D9D9D9;
-   border-top: 2px solid #234173;
-   border-bottom: 2px solid #FFFFFF;
-}
-
-.menubottomcell {
-
-   font-weight: bold;
-   font-size: 16px;
-   color: #000000;
-   background: #D9D9D9;
-   border-bottom: 2px solid #234173;
-}
-
-.menuadd {
-   background: #5294CC;
-   color: #FFFFFF;
-   font-weight: bold;
-}
-
-a.menuaddlink:link {
-   background: transparent;
-   color: #FFFFFF;
-   font-weight: bold;
-}
-a.menuaddlink:visited {
-   background: transparent;
-   color: #FFFFFF;
-   font-weight: bold;
-}
-a.menuaddlink:active {
-   background: transparent;
-   font-weight: bold;
-   color: #E25300;
-}
-a.menuaddlink:hover {
-   background: transparent;
-   font-weight: bold;
-   color: #E25300;
-}
-
-.outervtab {
-
-   font-size: 16px;
-   font-weight: bold;
-   color: #777777;
-   background: #FFFFFF;
-   padding: 0px;
-   border-right: 2px solid #777777;
-}
-
 .vtabmenu {
 
    font-weight: bold;
    font-size: 16px;
    color: #FFFFFF;
    background: #777777;
-}
-
-.lastvtabtitle {
-
-   font-size: 16px;
-   font-weight: bold;
-   color: #E25300;
-   background: #E5E5E5;
-   padding: 0px;
-   padding-left: 3px;
-   border-top: 2px solid #777777;
-}
-
-.lastvtab {
-
-   font-size: 16px;
-   font-weight: bold;
-   color: #777777;
-   background: #E5E5E5;
-   padding-left: 5px;
-   padding-top: 5px;
-   padding-right: 0px;
-   border-left: 2px solid #777777;
 }
 
 .vtab {
@@ -406,16 +200,6 @@ a.menuaddlink:hover {
    border-left: 2px solid #777777;
 }
 
-.vtabtitle_old {
-
-   font-size: 16px;
-   font-weight: bold;
-   color: #FFFFFF;
-   background: #0B63A2;
-   padding: 0px;
-   padding-left: 3px;
-}
-
 .vtabtitle {
 
    font-size: 16px;
@@ -426,41 +210,13 @@ a.menuaddlink:hover {
    border-top: 2px solid #777777;
 }
 
-.gestiontable {
-   margin-left: 10px;
-   padding: 0px;
-}
-
-.intermediatevtab {
-   color: #777777;
-   background: #E5E5E5;
-   border-left: 2px solid #777777;
-}
-
 .intermediateleftvtab {
-   display: none;/*
-   color: #777777;
-   background: #E5E5E5;
-   border-top: 2px solid #777777;*/
-}
-.frameBodyMngArea {
-
-   color: #777777;
-   background: #E5E5E5;
-   border-bottom: 2px solid #777777;
-   border-right: 2px solid #777777;
-   border-left: 2px solid #777777;
+   display: none;
 }
 
 .bottomvtab {
 
-   color: #777777;/*
-   background: #E5E5E5;
-   padding: 7px;
-   padding-top: 0px;
-   border-left: 2px solid #777777;
-   border-right: 2px solid #777777;
-   border-bottom: 2px solid #777777;*/
+   color: #777777;
 }
 
 .htab {
@@ -473,72 +229,11 @@ a.menuaddlink:hover {
    font-size: 4px;
 }
 
-.display_selectedhtab {
-   color: #E25300;
-   font-weight: bold;
-   background: #FFFFFF;
-   padding: 1px;
-   padding-left:3px;
-   padding-right:3px;
-   padding-top: 3px;
-   border-right: 2px solid #777777;
-   border-top: 2px solid #777777;
-
-}
-
-.display_unselectedhtab {
-   background: transparent;
-   font-weight: bold;
-   padding: 1px;
-   padding-left:3px;
-   padding-right:3px;
-   padding-top: 3px;
-   border-right: 2px solid #777777;
-   border-bottom: 2px solid #777777;
-}
-
-.display_neutralhtab {
-   background: transparent;
-   font-weight: bold;
-   padding: 1px;
-   border-bottom: 2px solid #777777;
-}
-
 .maincell {
    background: #FFFFFF;
-   /*border-bottom: 2px solid #777777;
-   border-right: 2px solid #777777;*/
    padding-top: 10px;
    padding-bottom: 5px;
    padding-right: 5px;
-}
-
-.managerheadertitle {
-   font-weight: bold;
-   font-size: 16px;
-   letter-spacing: 4px;
-   color: #FFFFFF;
-   text-align: center;
-   vertical-align: middle;
-   background: #E25300;
-   padding-top:4px;
-   padding-bottom:4px;
-   padding-left:8px;
-   padding-right:8px;
-}
-
-.adminheadertitle {
-   font-weight: bold;
-   font-size: 16px;
-   letter-spacing: 4px;
-   color: #FFFFFF;
-   text-align: center;
-   vertical-align: middle;
-   background: #234173;
-   padding-top:6px;
-   padding-bottom:4px;
-   padding-left:8px;
-   padding-right:8px;
 }
 
 .blacktext {
@@ -546,68 +241,13 @@ a.menuaddlink:hover {
    vertical-align: top;
 }
 
-.bluetext {
-   color: #234173;
-}
-
-.whitelink {
-   color: #FFFFFF;
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-}
-
 .conferencetitlelink {
    font-size: 33px;
    background: transparent;
 }
 
-.greylink {
-   color: #777777;
-   background: transparent;
-   text-decoration: none;
-}
-
 .imglink {
    border:0;
-}
-
-.bluerowheader {
-   background: #204080;
-   height: 4px;
-}
-
-.protected{
-   font-weight: normal;
-   color: gray;
-   font-size: smaller;
-}
-
-.parenthesisborder{
-   border-right: 2px solid #777777;
-   border-top: 2px solid #777777;
-   border-bottom: 2px solid #777777;
-}
-
-.topborder{
-   border-top: 1px solid #777777;
-}
-
-.bottomborder{
-   border-bottom: 1px solid #777777;
-   padding: 0px;
-   height: 2px;
-}
-
-.leftborder{
-   border-left: 1px solid #777777;
-}
-
-.rightborder{
-   border-right: 1px solid #777777;
-   padding: 0px;
-   width: 1%;
-   text-align: left;
 }
 
 .resvTable, .blockingTable {
@@ -654,175 +294,10 @@ a.menuaddlink:hover {
     border: 1px solid #aaa;
 }
 
-
-/*All used styles*/
-/* TODO: should probably be removed...
-.confTitle {
-   font-size: 33px;
-   vertical-align: bottom;
-   padding-left: 30px;
-   padding-bottom: 10px;
-   padding-top: 10px;
-}
-
-.confTitle h1 {
-    margin: 0;
-    display: inline;
-
-}
-
-
-.confDate {
-   font-size: 18px;
-   font-weight: bold;
-   background: #777777;
-   color: #FFFFFF;
-   vertical-align: middle;
-   text-align: left;
-   padding: 2px;
-   padding-left: 30px;
-   padding-right: 15px;
-}
-.confPlace {
-   font-size: 18px;
-   font-weight: bold;
-   background: #E5E5E5;
-   color: #777777;
-   vertical-align: middle;
-   text-align: left;
-   padding: 2px;
-   padding-left: 15px;
-}
-
-.conf {}
-
-.confTitleBox { text-align: center }
-
-.confBodyBox { background: white;
-                vertical-align: top;
-                padding-left: 3px;
-                padding-top: 8px;
-                padding-right: 3px }
-
-.confSectionsBox {  width: 180px;
-                    vertical-align: top;
-                    padding-left: 1px;
-                    padding-right: 1px}
-
-.confLogoBox { background: white;
-               vertical-align: middle;
-               text-align: center;
-               border: 0px;}
-
-.menuConf {
-   padding-left: 10px;
-}
-
-.menuConfTitle {
-   font-weight: bold;
-   font-size: 16px;
-   color: #0200C6;
-   background: #E5E5E5;
-   padding: 3px;
-   border-top: 1px solid #777777;
-}
-
-.menuConfTopCell {
-   border-bottom: 2px solid #1B3162;
-   color: #0200C6;
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-   font-size: 11px;
-}
-
-.menuConfBottomCell {
-   background: #FFFFFF;
-   border-top: 2px solid #1B3162;
-   padding-top: 0px;
-}
-
-.menuConfMiddleCell {
-   font-size: 11px;
-   font-weight: lighter;
-   color: #0200C6;
-   background: #FFFFFF;
-   padding: 3px;
-   padding-left: 10px;
-   border-top: 1px solid #777777;
-}
-
-.menuConfselected {
-   font-weight: bold;
-   font-size: 16px;
-   color: #FFFFFF;
-   background: #E25300;
-   border-bottom: 1px solid #777777;
-   padding: 3px;
-}
-
-a.confSection:link {
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-   font-size: 16px;
-}
-a.confSection:visited {
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-   font-size: 16px;
-}
-a.confSection:active {
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-   font-size: 16px;
-}
-a.confSection:hover {
-   background: transparent;
-   font-weight: bold;
-   text-decoration: none;
-   font-size: 16px;
-}
-
-a.confSubSection:link {
-   font-size: 11px;
-   font-weight: lighter;
-   background: transparent;
-}
-a.confSubSection:visited {
-   font-size: 11px;
-   font-weight: lighter;
-   background: transparent;
-}
-a.confSubSection:active {
-   font-size: 11px;
-   font-weight: lighter;
-   background: transparent;
-}
-a.confSubSection:hover {
-   font-size: 11px;
-   font-weight: lighter;
-   background: transparent;
-}
-
-*/
-
-.iconPDF { border-left: 1px solid #777777;
-           border-top: 1px solid #777777;
-           border-bottom: 1px solid #777777;
-           }
-
-.errorDetailsBox { color: gray;
-                    font-size: 16px;
-                    border: 1px solid
-                }
-
-
-.loginInfoHeader {
-   background: #FFFFFF;
-   vertical-align: top;
+.errorDetailsBox {
+    color: gray;
+    font-size: 16px;
+    border: 1px solid
 }
 
 .dataCaptionTD {
@@ -838,22 +313,6 @@ a.confSubSection:hover {
     color: #523D04;
 }
 
-.subDataCaptionFormat {
-    font-size: 13px;
-    font-family: Verdana, Arial;
-    color: #777777;
-}
-
-.tdNotSelected {
-    background: #ECECEC;
-}
-
-.tdSelected {
-    background: #CDEB8B;
-}
-
-
-
 .horizontalLine {
    border-top: 1px solid #AAA;
    padding-left: 20px;
@@ -861,19 +320,10 @@ a.confSubSection:hover {
 
 .buttonsSeparator {
     margin-top: 5px;
-    /* border-top: 1px solid #777777; */
 }
 
 
-.groupLink {
-   font-weight: normal;
-   font-size: 10px;
-   color: #FFFFFF;
-   background: #777777;
-   letter-spacing: 1px;
-}
-
-.titleCellTD, .titleCellNoBorderTD {
+.titleCellTD {
    vertical-align: top;
    text-align: right;
    padding-right: 15px;
@@ -889,7 +339,6 @@ a.confSubSection:hover {
 .contentCellTD {
     color: black;
 }
-
 
 .abstractLeftDataCell {
     padding-right:5px;
@@ -910,15 +359,6 @@ a.confSubSection:hover {
    padding: 1px;
 }
 
-.confDisplayTitle {
-   font-size: 24px;
-   color: #5294CC;
-   padding: 3px;
-   vertical-align: bottom;
-   border-bottom: 2px solid #777777;
-   text-align: center;
-}
-
 .trackDisplayTitle {
    font-size: 14px;
    font-weight: bold;
@@ -934,129 +374,8 @@ a.confSubSection:hover {
     padding: 3px 20px 3px 0;
 }
 
-.calendarList {
-    z-index: 1;
-    visibility: hidden;
-    position: absolute;
-    max-height: 220px;
-    overflow-y: auto;
-}
-
-.calendar thead .title {
-   border: none;
-   background: #ECECEC;
-   color:#444;
-   cursor:pointer;
-   font-weight: bold;
-}
-
-.calendar .button {
-   border: none;
-   background: #ECECEC;
-   color:#444;
-   cursor:pointer;
-   font-weight: bold;
-}
-
-.ACtab {
-   background-image: url(../images/keys.png);
-   background-repeat: no-repeat;
-}
-
-.toolsTab {
-   background-image: url(../images/tools.png);
-   background-repeat: no-repeat;
-}
-
-.timetableTab {
-   background-image: url(../images/pocketwatch.png);
-   background-repeat: no-repeat;
-}
-
-.listingsTab {
-   background-image: url(../images/listings.png);
-   background-repeat: no-repeat;
-}
-
 input, textarea, select {
    font-size: 100%;
-}
-
-input.smallbtn {
-   color:  #123062;
-   font-size: 80%;
-   text-decoration: none;
-   margin: 0px;
-   margin-top: 1px;
-   margin-right: 1px;
-   padding: 0px;
-   background-color: #D9D9D9;
-   border: 1px solid #fff;
-   border-top-color: #eee;
-   border-left-color: #eee;
-   border-right-color: #669;
-   border-bottom-color: #669;
-}
-
-.yellowButton {
-    background: white url(../images/sprites.png) repeat-x scroll 0 -90px;
-}
-
-.yellowButton input {
-    cursor: pointer;
-    font-weight: bold !important;
-    padding: 2px;
-    height: 21px;
-    font-size: 12px;
-    background-color: transparent;
-    border: 0;
-    color: black;
-}
-
-.loginButton {
-    border: 1px solid #AAA;
-    float: left;
-    text-align: center;
-}
-
-.loginButton input {
-    cursor: pointer;
-    padding: 0 10px;
-}
-
-.nav_border {
-   color: #eee;
-   background-color: #ddd;
-   border: 1px solid #eee;
-   border-right: 1px solid #aaa;
-   border-bottom: 1px solid #aaa;
-   padding-left: 2px;
-   padding-right: 2px;
-}
-
-a.nav_link:link {
-   color: #5294cc;
-   font-weight: normal;
-}
-a.nav_link:visited {
-   color: #5294cc;
-   font-weight: normal;
-}
-a.nav_link:active {
-   color: #5294cc;
-   font-weight: normal;
-}
-a.nav_link:hover {
-   color: #5294cc;
-   font-weight: normal;
-}
-.nav_alphabet{ height: 25px; }
-
-.nav_alphabet span.nav_border { line-height: 15px; }
-
-.nav_alphabet a{
-   width: 10px;
-   margin-top: 5px;
 }
 
 span.horizontalSeparator {
@@ -1076,127 +395,16 @@ img {
     max-width: 600px;
 }
 
-div.UISimpleDialogMainPanel {
-    background: #FFFFFF;
-    border: none;
-    padding-left: 2px;
-    padding-right: 2px;
-    font-size: 13px;
-}
-
 label, .label {
     font-weight: bold;
 }
 
-input.UIFieldText
-{
-    border: 1px solid #AAAAAA;
-}
-
-.UILabelSpan
-{
-    float: left;
-    width: 75px;
-    text-align: right;
-}
-
-.UIFieldSpan {
-  float: right;
-  width: 185px;
-  text-align: left;
-  }
-
-form.UIPrettyForm
-{
-    padding-top: 10px;
-    margin-left: 50px;
-
-    font-size: 11px;
-}
-
-label.UIPrettyForm, input.UIPrettyForm  {
-    display: block;
-    width: 150px;
-    float: left;
-    margin-bottom: 5px;
-}
-
-label.UIPrettyForm  {
-    text-align: right;
-    width: 100px;
-    padding-right: 20px;
-}
-
-br.UIPrettyForm  {
-    clear: left;
-}
-
-.UIExpandBottom {
-    font-size: xx-small;
-    width: 100%;
-    margin-bottom: 0px;
-}
-
-.UIExpandContainer {
-    text-align: center;
-}
 
 div.UIForm
 {
     padding-top: 5px;
     width: 100%;
 }
-
-div.UIFormRow {
-    clear: both;
-    display: block;
-}
-
-.categTitleChosen{
-    font-weight: bold;
-    font-size: 14px;
-}
-
-div.CategoryListDiv {
-    padding: 10px;
-    height: 300px;
-    width: 100%;
-    max-width: 600px;
-    min-width: 600px;
-    overflow: auto;
-}
-
-ul.CategoryList
-{
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-}
-
-ul.CategoryList li{
-    border-bottom: 1px solid #E2E2E2;
-    margin: 0;
-    display: block;
-    padding-left: 5px;
-    margin-bottom: 0px;
-    line-height: 25px;
-    vertical-align: middle;
-    cursor: pointer;
-    background-color: white;
-    color: #0B63A5;
-}
-
-ul.CategoryList li:hover{
-    background-color: #FFF6DF;
-}
-
-.CategoryListButtons{
-    float: right;
-    margin: 20px 0 0;
-}
-
 
 /* ListWidget, list of users styles */
 
@@ -1217,54 +425,6 @@ div.PluginOptionPeopleListDiv {
     border: 1px dashed #CCCCCC;
     min-height: 25px;
     min-width: 320px;
-}
-
-div.UISuggestedPeopleListDiv {
-    border-top: 1px dotted #DDDDDD;
-    height: 300px;
-}
-
-ul.UISuggestedPeopleList, ul.UIAuthorList {
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-}
-
-ul.UISuggestedPeopleList li, ul.UIAuthorList li {
-    margin: 0;
-    display: block;
-    margin-bottom: 0px;
-    line-height: 25px;
-    padding-left: 5px;
-    padding-right: 5px;
-    vertical-align: middle;
-}
-
-ul.UISuggestedPeopleList, ul.UIAuthorList li {
-    border-bottom: 1px dotted #DDDDDD;
-    cursor: pointer;
-}
-
-ul.UISuggestedPeopleList li:hover {
-    background-color: #FFF6DF !important;
-}
-
-ul.UIAuthorList li .nameLink {
-    padding: 0px 0px 4px 30px;
-}
-
-ul.UISuggestedPeopleList li .foundUserEmail {
-    font-style: italic;
-    font-size: 8pt;
-    padding-left: 5px;
-    line-height: 15px;
-    display:none;
-}
-
-ul.UISuggestedPeopleList li:hover > .foundUserEmail {
-    display:inline;
 }
 
 div.searchUsersButtonDiv {
@@ -1298,57 +458,6 @@ td.suggestedUsersPanel {
     border-left: 1px dotted #CCCCCC;
 }
 
-ul.UIListNestedMenu
-{
-    text-indent: 0;
-    padding-left: 0px;
-    margin-bottom: 0px;
-    margin-left: 0px;
-    list-style-type: none;
-}
-
-ul.UIListNestedMenu li
-{
-    background: #FFFF88;
-}
-
-div#UILoadDiv {
-    background: #FFFFFF;
-    z-index: 3;
-    text-align: center;
-}
-
-div.UITitleBar {
-    background: #4096EE;
-    height: 25px;
-}
-
-div.UITitleBar .UITitleText{
-    float: left;
-    width: 200px;
-    text-align: left;
-}
-
-div.UITitleBar .UITitleText h1{
-    margin: 0;
-    color: #FFFFFF;
-    font-size: 16px;
-    clear: both;
-}
-
-
-.UITitleBar .UITitleOptions{
-    float: right;
-    width: 100px;
-    padding-right: 5px;
-    text-align: right;
-}
-
-div#UILoadDiv h1{
-    color: black;
-    margin-top: 30px;
-}
-
 .arrowExpandIcon
 {
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center center;
@@ -1359,96 +468,6 @@ div#UILoadDiv h1{
     height: 17px;
     float: right;
     cursor: pointer;
-}
-
-.progressIcon
-{
-    background: transparent url(../images/loading.gif) scroll no-repeat center center;
-    font-weight: normal;
-    vertical-align: middle;
-    display:block;
-    width: 20px;
-    height: 17px;
-    float: right;
-    cursor: pointer;
-}
-
-
-a.meetingHeaderSearchBox
-{
-    padding-left: 5px;
-    font-size:xx-small;
-    color:#000000;
-    font-weight: normal;
-    vertical-align: middle;
-    float:left;
-}
-
-
-.bottomLine
-{
-    border-bottom: 1px solid #777777;
-}
-
-.leftFloat
-{
-    float: left;
-}
-
-.rightFloat
-{
-    float: right;
-}
-
-div.UITidyDialog
-{
-    margin-left: 10px;
-    margin-top: 50px;
-}
-
-div.UITidyDialog li
-{
-    font-size: x-small;
-    color: red;
-}
-
-ul.UIUserEvtList
-{
-    list-style-type: none;
-    padding-left: 0px;
-    padding-top: 0px;
-    margin-top: 0px;
-    margin-left: 0px;
-    margin-bottom: 0px;
-}
-
-li.UIUserEvtListPast
-{
-    background: #EFEFEF;
-    border-bottom: 1px solid #CFCFCF;
-}
-li.UIUserEvtListPresent
-{
-    background: #CDEB8B;
-    border-bottom: 1px solid #9AC65C;
-}
-
-li.UIUserEvtListFuture
-{
-    background: #FFFF88;
-    border-bottom: 1px solid #CCCC77;
-}
-li.UIUserEvtListNone
-{
-    border-bottom: 1px solid white;
-}
-
-ul.UIUserEvtList li
-{
-    position: relative;
-    height: 24px;
-    display: block;
-    vertical-align: middle;
 }
 
 .UIRowButton
@@ -1464,175 +483,9 @@ ul.UIUserEvtList li
     padding-top: 6px;
 }
 
-.favoriteItem
-{
-    font-style: italic;
-    color:blue;
-}
-
-.bookedItem
-{
-    font-style: italic;
-    color: #008C00;
-}
-
-.bookedItemHeader
-{
-    font-style: italic;
-    font-weight: bold;
-    text-align: center;
-    padding: 5px;
-}
-
-.bookedItemCollision
-{
-    font-style: italic;
-    color: #881122;
-}
-
-.bookedItemOutsideBooking
-{
-    font-style: italic;
-    color: #FF7400;
-}
-
-.bookedItemCollisionDiv {
-    position:relative;
-}
-
-.bookedItemCollisionDiv div{
-    display:none;
-}
-
-.bookedItemCollision:hover + div{
-    display: block;
-    position: absolute;
-    top: 25px;
-    left: 0px;
-    width: 100%;
-    color: #AAA;
-    background-color: #FFF6DF;
-    padding: 3px;
-    z-index: 2;
-}
-
-.bookedItemOutsideBooking:hover + div{
-    display: block;
-    position: absolute;
-    top: 25px;
-    left: 0px;
-    width: 100%;
-    color: #AAA;
-    background-color: #FFF6DF;
-    padding: 3px;
-    z-index: 2;
-}
-
-.UINavBar
-{
-    display: block;
-    height: 25px;
-    width: 100%;
-    background: #DDDDDD;
-    vertical-align: middle;
-}
-
-.UINavBar *
-{
-    vertical-align: middle;
-}
-
-.UILoading
-{
-    z-index: 2;
-    background: #FFFFFF;
-    text-align: center;
-}
-
-.UILoading *
-{
-    font-size: small;
-    font-weight: bold;
-    vertical-align: middle;
-}
-
-.UILoading img
-{
-    margin-top: 10px;
-}
-
-.UIListTitle {
-   font-weight: bold;
-   font-size: 16px;
-   color: #000000;
-   background: #DDDDDD;
-   letter-spacing: 6px;
-   padding: 3px;
-   margin-bottom: 0px;
-}
-
-span.evtDate
-{
-    float: left;
-    display: block;
-    width: 90px;
-    padding-right: 5px;
-}
-
-span.evtDateRow
-{
-    float: left;
-    display: block;
-    width: 300px;
-}
-
-span.evtDateSpan
-{
-    font-weight: bold;
-    font-size: 13px;
-}
-
-span.evtTimeSpan
-{
-    font-size: 10px;
-    font-weight: bold;
-}
-
-span.clickableText
-{
-    cursor:pointer;
-}
-span.clickableText:hover
-{
-    color: #E25300;
-    background: transparent;
-}
-
 span.mandatoryField
 {
     color: #FF0000;
-}
-
-
-a.evtTitle
-{
-    float: left;
-    display: block;
-    width: 350px;
-    padding-right: 5px;
-}
-
-img.evtIcon
-{
-    float: left;
-    display: block;
-    padding: 1px 5px 1px 0px;
-    vertical-align: middle;
-}
-
-img.clickableImage
-{
-    cursor:pointer;
 }
 
 
@@ -1653,7 +506,7 @@ div.pageOverHeader
 
 /* Mobile Header */
 
-div.mobile-device-header{
+div.mobile-device-header {
     display: none;
     width:100%;
     z-index: 10;
@@ -1669,7 +522,7 @@ div.mobile-device-header{
     -moz-box-sizing: border-box;
 }
 
-div.mobile-device-header > .text{
+div.mobile-device-header > .text {
     display: block;
     margin-bottom: 1em;
     font-size: 3em;
@@ -1694,55 +547,6 @@ div.mobile-device-header .i-button {
    font-size: 12px;
 }
 
-.pathWithoutLinks {
-    color: #AAAAAA;
-    font-size: 12px;
-}
-
-.pathWithoutLinks img {
-    padding-right: 5px;
-    padding-left: 7px;
-}
-
-ul.horizontalMenu
-{
-    margin: 0;
-    margin-top: 5px;
-    padding: 0;
-    display: inline;
-    list-style-type: none;
-    font-size: 13px;
-}
-
-ul.horizontalMenu li{
-    display: inline;
-    position: relative;
-    padding: 2px 6px;
-    border-right: 1px solid #DDDDDD;
-    line-height: 1.5;
-}
-
-img.headerLogo {
-    margin: 7px 10px;
-    border: none;
-    height: 52px;
-}
-
-div.headerAboutIndico
-{
-    position: absolute;
-    top: 25px;
-    left: 230px;
-    width: 300px;
-    color: #444444;
-    font-style: italic;
-    font-size: 12px;
-}
-
-img.centeredImg {
-    vertical-align: middle;
-    margin-right: 4px;
-}
 
 div.eventHeaderButtonBar {
     padding: 6px 0;
@@ -1814,65 +618,9 @@ div.filterDiv strong {
 }
 
 
-.body
-{
-}
-
-h1.active
-{
-    background: rgb(255,123,45);
-}
-
-li.active a{
-    font-weight: bold;
-}
-
 a.active {
     font-weight: bold;
 }
-
-/* Should no longer be needed... where used
-   for the server admin side menu section.
-h1.active_server_admin
-{
-    background: #4BB453;
-}
-
-li.active_server_admin a{
-    color: #4BB453;
-}
-
-li.active_server_admin a:hover {
-   color: #E25300;
-   background: transparent;
-   font-weight: bold;
-}
-*/
-
-ul.menuList
-{
-    font-size: 13px;
-    margin:0;
-    margin-bottom: 15px;
-    padding-left: 0px;
-    list-style-type: none;
-}
-
-ul.menuList li
-{
-    height: 20px;
-    display: block;
-    margin-bottom: 4px;
-    background: #ebebeb;
-    padding-left: 20px;
-    font-weight: bold;
-}
-
-ul.menuList li.active
-{
-    color: #e25300;
-}
-
 
 .clearfix:after {
     content: ".";
@@ -1949,61 +697,6 @@ ul.menuList li.active
     text-shadow: 1px 1px 1px #555555;
 }
 
-/* General Titles */
-
-.selectedCategoryName{
-    padding:20px;
-    font-size: 16px;
-}
-
-div.accessProtection {
-    padding: 10px;
-}
-
-span.eventProtectionRadioEntry {
-    display: block;
-    padding-left: 50px;
-    padding-bottom: 5px;
-}
-
-span.eventProtectionRadioEntry label, span.categProtectionRadioEntry label {
-    font-weight: normal;
-    padding-left: 5px;
-}
-
-span.eventProtectionRadioEntry label{
-    font-size: 16px;
-}
-
-span.protectionRadioInfo {
-    display: block;
-    padding: 20px;
-}
-
-input.eventProtectionRadioButton {
-    padding-right: 5px;
-}
-
-span.categProtectionRadioEntry {
-    display: block;
-    padding-bottom: 5px;
-}
-
-div.userListWrapper {
-    padding-left: 63px;
-}
-
-div.userListWrapper div {
-    padding: 6px;
-}
-
-div.userListDiv , div.allowedUserListDiv{
-    width: 320px;
-    height: 200px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
 div.managersPRUserListDiv {
     width: 320px;
     height: 100px;
@@ -2022,64 +715,7 @@ div.reviewersPRUserListDiv {
     overflow: auto;
 }
 
-span.userListInfo {
-    display: block;
-    padding-left: 70px;
-}
-
-span.allowedUserListInfo {
-    display: block;
-    padding-left: 27px;
-}
-
-div.ACModifDiv {
-    color: #333333;
-}
-
-div.ACStatusDiv {
-    font-size: 15px;
-    padding-bottom: 9px;
-    color: #444;
-}
-
-span.ACStatus {
-    font-weight: bold;
-}
-
-div.ACStatusDescDiv {
-    font-size: 0.9em;
-    color: #999;
-    margin-bottom: 10px;
-    max-width: 450px;
-}
-
-div.ACModifButtonsDiv {
-    padding-bottom: 20px;
-    font-size: 12px;
-}
-
-div.ACModifButtonEntry {
-    padding-bottom: 5px;
-}
-
-div.ACUserListDiv {
-    margin-bottom: 20px;
-}
-
 /* Forms */
-
-.oneline {
-    display: block;
-    margin-top: 5px;
-    width: 100%;
-
-}
-
-.blueLineBottom
-{
-    border-bottom: 1px solid #5294CC;
-}
-
 .formLine
 {
     margin-bottom: 5px;
@@ -2095,58 +731,6 @@ div.optionGroup
     font-weight: normal;
     font-size: 10px;
     color: gray;
-}
-
-/* Autocompletion */
-
-.autoCompleteMenu
-{
-    background: #eeeeee;
-}
-
-.autoCompleteMenu ul
-{
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-
-}
-
-.autoCompleteMenu ul li
-{
-    margin: 0;
-    display: block;
-    padding-left: 0px;
-    margin-bottom: 0px;
-    height: 20px;
-}
-
-.timeDurationEntry
-{
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-}
-
-.timeDurationEntry li
-{
-    background: #CDEB8B;
-    border: none;
-    margin: 0;
-    display: block;
-    padding-left: 0px;
-    margin-bottom: 0px;
-    height: 20px;
-}
-
-.timeDurationEntry_text
-{
-    font-weight: bold;
-    padding-right: 10px;
 }
 
 /* Tabs */
@@ -2173,40 +757,6 @@ ul.tabList li{
     padding-left: 10px;
     padding-right: 10px;
     font-weight: bold;
-}
-
-ul.subTabList
-{
-    background: #F2F2F2;
-    display: block;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    padding-top: 10px;
-    padding-bottom: 5px;
-    border-left: 1px solid #777777;
-    border-right: 1px solid #777777;
-}
-
-ul.subTabList li{
-    display: inline;
-    position: relative;
-}
-
-ul.subTabList a
-{
-    font-family: Verdana;
-    font-weight: normal;
-    font-size: 12px;
-    font-weight: bold;
-    padding-right: 15px;
-    padding-left: 15px;
-    border-right: 1px solid #AAAAAA;
-}
-
-ul.subTabList a:hover
-{
-    color: #dbb03a;
 }
 
 .tabSelected  {
@@ -2258,8 +808,7 @@ div.tabBorderGradient {
     display: inline;
 }
 
-
-.tabUnselected  {
+.tabUnselected {
     border-style: solid;
     border-width: 1px;
     border-color: #999999;
@@ -2270,18 +819,10 @@ div.tabBorderGradient {
     cursor: pointer;
 }
 
-.tabUnselected  a, .tabUnselected  span {
+.tabUnselected a, .tabUnselected  span {
     color: #4c6a83;
     font-weight: normal;
     font-size: 12px;
-}
-
-.subTabUnselected  a {
-    color: #4c6a83;
-}
-
-.subTabSelected  a {
-    color: #b38b1f;
 }
 
 .tabExtraButtons {
@@ -2324,29 +865,6 @@ div.tabBorderGradient {
     background: #555;
 }
 
-div.tabContents {
-}
-
-div.uniformButtonVBar  input
-{
-    width: 160px;
-}
-
-ul.horizontalSmallMenu
-{
-    padding-left: 0px;
-    margin: 0px;
-    list-style-type: none;
-    display: inline;
-}
-
-ul.horizontalSmallMenu li
-{
-    padding-left: 10px;
-    margin: 0px;
-    display: inline;
-}
-
 ul.materialList
 {
     padding: 0px;
@@ -2354,20 +872,8 @@ ul.materialList
 
 ul.materialList li
 {
-    /*border-top: 1px solid #AAAAAA;*/
     list-style-type: none;
     padding-bottom: 5px;
-}
-
-div.materialEntry {
-    padding: 5px;
-    -webkit-border-radius: 10px;
-
-}
-div.topMaterialBar {
-    background: #E0E0E0;
-    border: 1px solid #A0A0A0;
-    padding: 2px;
 }
 
 ul.materialList li span
@@ -2376,100 +882,9 @@ ul.materialList li span
     font-size: 14px;
 }
 
-
-ul.materialListResource
-{
-    padding: 0px 0px 0px 5px;
-}
-
-ul.materialListResource li
-{
-    background: #F2F2F2;
-    list-style-type: none;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 5px;
-    margin-top: 2px;
-    border: 1px solid #DDDDDD;
-}
-
-ul.materialListResource li span
-{
-    padding-left: 0px;
-    font-size: 13px;
-}
-
-ul.materialDescription {
-    background: none;
-    padding: 5px;
-    border: none;
-    margin-top: 5px;
-}
-
-ul.materialDescription li{
-    border: none;
-    background: none;
-    margin: 0px;
-    padding: 0px;
-}
-
-
-div.resourceContainer
-{
-    overflow: auto;
-}
-
-div.highlighted {
-    border: 1px solid red;
-}
-
-div.descriptionBox
-{
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 20px;
-}
-
-div.descriptionLine
-{
-    padding-left : 20px;
-    font-style: italic;
-    font-size: 12px;
-}
-
 ul.tabList li.hiddenTab
 {
     display: none;
-}
-
-.spaceLeft {
-    padding-left: 10px;
-    padding-bottom: 10px;
-}
-
-ul.slotHorizontalMenu
-{
-    margin: 0px;
-    margin-top: 0px;
-    padding: 0px;
-    display: inline;
-    list-style-type: none;
-}
-
-ul.slotHorizontalMenu li {
-    display: inline;
-    position: relative;
-    padding: 0 0 0 0;
-    padding: 5px 5px;
-    line-height: 1.5;
-}
-
-ul.slotHorizontalMenu li a {
-}
-
-h2.timetableSeparator {
-    margin-left: auto;
-    border-top: 1px solid #DDDDDD;
 }
 
 div.timetableHeader {
@@ -2497,7 +912,6 @@ ul.keywordList
     padding: 0px;
     display: block;
     list-style-type: none;
-    /*height: 25px;*/
 }
 
 
@@ -2538,12 +952,6 @@ ul.keywordList li.multipleLinesListItem_last {
 }
 
 
-.popupWindowTitle {
-    color: #1A64A0;
-    font-weight: bold;
-    font-style: normal;
-}
-
 .popUpLabel {
    text-align: right;
    font-size: 13px;
@@ -2564,27 +972,7 @@ ul.keywordList li.multipleLinesListItem_last {
    margin: 0px;
    margin-top: 1px;
    margin-right: 1px;
-   /*color:  #234173;
-   text-decoration: none;
-   background-color: #D9D9D9;
-   border: 1px solid #fff;
-   border-top-color: #eee;
-   border-left-color: #eee;
-   border-right-color: #669;
-   border-bottom-color: #669;*/
-
  }
-
-.fieldLabel {
-   text-align: right;
-   font-family: Verdana, Arial;
-   color: #523D04;
-   margin-right: 5px;
-   font-weight: normal;
-}
-
-.headerRoomLink {
-}
 
 .tooltip {
    background-color: #FFFFFF;
@@ -2603,10 +991,6 @@ ul.keywordList li.multipleLinesListItem_last {
 
 .warningText {
     color: #881122;
-}
-
-.successText {
-    color: #118822;
 }
 
 .tooltipError {
@@ -2630,22 +1014,7 @@ ul.errorList {
     width: 400px;
 }
 
-ul.warningList {
-    padding: 0;
-    margin: 0;
-    margin-left: 20px;
-}
-
 span.errorTitle {
-    font-size: medium;
-    font-weight: bold;
-}
-
-span.messageAfterErrors {
-    margin-top: 1em;
-}
-
-span.warningTitle {
     font-size: medium;
     font-weight: bold;
 }
@@ -2742,7 +1111,7 @@ div.CRLDiv {
 }
 
 
-.CRLIndexSelected  {
+.CRLIndexSelected {
     color: #B38B1F;
 }
 
@@ -2759,7 +1128,6 @@ ul.CRLIndexList {
     padding-bottom: 5px;
     padding-left: 15px;
     padding-right: 15px;
-
 }
 
 ul.CRLIndexList li {
@@ -2787,8 +1155,6 @@ ul.CRLIndexList a:hover
 
 .timetableInfoBox {
     margin: 17px 10px;
-    /*background: #F6E8BD url(../images/sprites.png) repeat-x scroll 0 -210px;
-    border: 1px solid #A2905A;*/
     color: #444444;
     font-family: Verdana;
     -moz-border-radius: 5px;
@@ -2820,7 +1186,6 @@ div.timetableContribution  {
 }
 
 /* Timetable drag n drop */
-
 #tt_hour_tip {
     cursor: pointer;
     overflow: auto;
@@ -2883,12 +1248,6 @@ div.ui-draggable-dragging.timetableBlock {
 
 /* Timetable drag n drop,
    droppable styles ends here. */
-
-div.timetableSession div.timetableBlock{
-}
-
-div.timetableBreak div.timetableBlock{
-}
 
 div.timetableBlockTitle {
     font-weight: bold;
@@ -2959,22 +1318,6 @@ div.timetableBlockContribs {
     border: 1px solid #CCC;
 }
 
-/*div.timetableBlockContrib {
-    border-top: 1px dotted #777;
-    background: white;
-    opacity: 0.65;
-    padding: 2px 5px;
-    font-size: 12px;
-    height: 14px;
-    overflow: hidden;
-}
-
-div.timetableBlockContrib:hover {
-    background: black;
-    opacity: 0.45;
-    color: white;
-}*/
-
 span.sessionRenameEntry, span.sessionRenameValue {
     color: #888888;
     font-weight: bold;
@@ -3025,37 +1368,6 @@ div.exclusivePopupCloseButton {
     height: 15px;
 }
 
-
-div.balloonPopup {
-    position: absolute;
-    padding-bottom: 15px;
-    color: #202020;
-    border: 1px solid black;
-    background-color: white;
-    -moz-border-radius: 6px;
-    -webkit-border-radius:6px;
-}
-
-div.balloonPopupArrow {
-    position: absolute;
-    background: transparent url('../images/balloon_popup_arrows.png') scroll no-repeat 0 -19px;
-    background-repeat: no-repeat;
-    background-position: 0 -19px;
-    /*opacity: 0.95;*/
-}
-
-div.yellowBalloon {
-    color: #000;
-    border: 1px solid black;
-    background-color: #ffed92;
-    opacity: 0.95;
-}
-
-div.yellowArrow {
-    background: transparent url('../images/balloon_popup_arrows_yellow.png') scroll no-repeat 0 -19px;
-}
-
-
 div.balloonPopupCloseButton {
     position: absolute;
     cursor: pointer;
@@ -3095,222 +1407,6 @@ div.timetableLoading {
     padding: 10px 0 6px 35px;
     background: transparent url('../images/loading.gif') scroll no-repeat 10px center;
     color: #444;
-}
-
-.timetablePopup {
-}
-
-.timetablePopup .title {
-    font-family: Verdana;
-    font-size: 16px;
-    padding: 10px 30px 10px 10px;
-}
-
-.timetablePopup .balloonSubtitle {
-    font-family: Verdana;
-    font-size: 11px;
-    color: #AAA;
-    padding: 0px 30px 10px 10px;
-}
-
-div.timetablePopupInfoWrapper {
-    width: 100%;
-    background-color:  #F8F8F8;
-    border-top: 1px solid #DDD;
-    border-bottom: 1px solid #CCC;
-}
-
-.timetablePopup .menuBar {
-    text-align: right;
-    color: #444444;
-    font-weight: normal;
-    padding: 5px 0;
-}
-
-.timetablePopup .managementMenuBar {
-    background-color: #f9f6e4;
-    border-top: 1px solid #e5e0d0;
-}
-
-.timetablePopup .managementMenuBar a {
-    color: #2F2506;
-}
-.timetablePopup .managementMenuBar a:hover {
-    color: #6F6429;
-}
-
-.timetablePopup .menuBar a {
-    margin: 0 10px;
-}
-
-div.timetablePopupInfoContent {
-    padding: 10px;
-    padding-left: 20px;
-    font-size: 12px;
-    line-height: 1.5em;
-    font-style: italic;
-}
-
-div.timetablePopupTimeDiv{
-    font-size: 16px;
-    font-style: normal;
-    margin-bottom: 10px;
-}
-
-div.timetablePopupDescription{
-    font-size: 12px;
-    font-style: italic;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-div.timetablePopupContributions{
-    font-family: Verdana;
-    padding: 10px 10px 0px 10px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-td.timetablePopupContributionTime{
-    vertical-align: top;
-    padding-top: 3px;
-    padding-right: 5px;
-    color: #444444;
-    font-size: 9px;
-    font-weight: bold;
-}
-
-td.timetablePopupContributionTitle{
-    vertical-align: top;
-    color: #444444;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.colorPicker {
-    padding: 3px;
-    background-color: white;
-    border: 1px solid #aaaaaa;
-    -moz-box-shadow: 2px 2px 2px #444;
-    box-shadow: 2px 2px 2px #444;
-    -webkit-box-shadow: 2px 2px 2px #444;
-}
-
-.colorField  {
-    margin-right: 5px;
-    width: 100px;
-    float: left;
-}
-
-.colorPicker .custom {
-    margin: 5px;
-    margin-bottom: 10px;
-    padding-top: 8px;
-    border-top: 1px dotted #555;
-}
-
-.colorPicker .inputWrapper, .colorField .inputWrapper {
-    position: relative;
-}
-
-.colorPicker .inputWrapper {
-    padding-right: 20px;
-}
-
-.colorPicker .inputContainer, .colorField .inputContainer {
-    border: 1px solid #777;
-    margin: 2px 0 2px 7px;
-    position: relative;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-}
-
-.colorPicker .numberSign, .colorField .numberSign {
-    font-size: 12px;
-    max-width: 12px;
-    overflow: hidden;
-    color: #777;
-    left: 10px;
-    top: 1px;
-    cursor: default;
-}
-.colorPicker .numberSign {
-    position: absolute;
-}
-
-.colorField .numberSign {
-    padding-left: 2px;
-    display: inline;
-}
-
-.colorPicker input, .colorField input {
-    width: 55px;
-    border: none;
-    font-size: 11px;
-    background: transparent;
-    outline: none;
-    height: 1em;
-}
-
-.colorPicker input {
-    margin-left: 15px;
-}
-.colorPicker button {
-    font-size: 11px;
-    margin-top: 5px;
-}
-
-.colorPicker .custom td {
-    text-align: right;
-    font-size: 11px;
-    font-family: Verdana;
-}
-
-.colorPicker .block, .colorPicker .previewBlock, .colorField .previewBlock {
-    border: 1px solid #AAA;
-    text-align: center;
-    overflow: hidden;
-    -moz-border-radius: 2px;
-    -webkit-border-radius:2px;
-    border-radius: 2px;
-}
-
-.colorPicker .previewBlock {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 16px;
-    height: 16px;
-}
-
-.colorField .previewBlock {
-    top: 0;
-    right: 0;
-    width: 16px;
-    height: 16px;
-    float: left;
-}
-
-.colorPicker .block {
-    margin: 2px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.colorPicker .block:hover {
-    opacity: 0.5;
-    border-color: black;
-}
-
-.colorPickerLink {
-    cursor: pointer;
-    padding: 3px 10px;
-    border: 1px solid #AAA;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
 }
 
 .timetableFilter {
@@ -3480,34 +1576,6 @@ ul.timetableSectionPopupList ul.subPopupList {
    overflow-y: auto;
 }
 
-ul.globalMenuPopupList {
-    background-color: #4e89b8;
-    border: 0;
-    display: block;
-}
-
-ul.globalMenuPopupList li {
-        display: block;
-}
-
-ul.globalMenuPopupList li a {
-    font-weight: bold;
-    font-family: Verdana;
-    font-size: 11px;
-    color: white;
-    letter-spacing: 0.04em;
-    padding: 8px;
-    display: block;
-}
-
-ul.globalMenuPopupList li a:hover {
-    padding: 8px;
-    display: block;
-    list-style-type:none;
-    color: white;
-    background: #5fa5d4;
-}
-
 ul.popupListCheckboxes {
     min-width: 200px;
 }
@@ -3550,15 +1618,6 @@ ul.darkPopupList li a {
     font-weight: normal;
 }
 
-ul.timetableManagementPopupList li a {
-    color: #2F2506;
-}
-
-ul.timetableManagementPopupList li a:hover {
-    color: #2F2506;
-    background: #F9F6E4;
-}
-
 div.timetableManagementInfoArea {
     width: 50%;
     background:#FFFFDD;
@@ -3595,13 +1654,13 @@ div.timetableManagementInfoArea ul li{
     margin-bottom:5px;
 }
 
-.printButton, .printButtonWhite, .buttonWhite, .buttonWhite, .dropDownMenuButtonWhite {
+.printButton, .printButtonWhite, .buttonWhite, .buttonWhite {
     padding: 4px 6px;
     margin-left: 6px;
     cursor: pointer;
 }
 
-.printButtonWhite, .buttonWhite, .buttonWhite, .dropDownMenuButtonWhite {
+.printButtonWhite, .buttonWhite, .buttonWhite {
     color: white;
 }
 
@@ -3620,27 +1679,6 @@ div.timetableManagementInfoArea ul li{
     background: transparent url('../images/link_white.png') scroll no-repeat center left;
 }
 
-.dropDownMenuButtonWhite {
-    padding-right: 20px;
-    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
-}
-
-.tt_tmp_button {
-    line-height: 30px;
-    height: 30px;
-    float: right;
-    background: #fefefe;
-    border: 1px solid #aaa;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    opacity: 0.9;
-    box-shadow: 0px 0px 2px rgba(220, 220, 200, 0.4);
-    margin-right: 10px;
-    vertical-align: middle;
-    padding: 0px 8px;
-}
-
 .ui-resizable-handle {
     z-index: 0 !important;
 }
@@ -3650,7 +1688,7 @@ div.timetableManagementInfoArea ul li{
     margin-right: 5px;
 }
 
-.ui-list-menu-level  {
+.ui-list-menu-level {
     position: absolute;
     background: #fff;
     padding: 0px;
@@ -3718,15 +1756,6 @@ div.timetableManagementInfoArea ul li{
     width: 100px;
 }
 
-/* MODIF DISPLAY*/
-
-.groupItem {
-    /*float:left;*/
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom:12px;
-}
-
 table.groupTable {
     border: none;
     width: 100%;
@@ -3747,10 +1776,6 @@ table.groupTable em.description {
     margin-top: 5px;
 }
 
-.groupItemContent {
-    padding-left:5px;
-}
-
 div.cssTplSelection {
     padding: 10px;
     padding-left: 75px;
@@ -3761,81 +1786,6 @@ div.cssTplSelection {
 
 div.cssPreview {
     float: right;
-}
-
-.disabledRadio {
-    display: none;
-}
-
-.roomWidget {
-}
-
-.roomWidgetTitle {
-    font-size: 12px;
-    color: #444444;
-    font-family: Verdana;
-    font-weight: normal;
-    width: 60px;
-    text-align: left;
-    padding-bottom: 5px;
-}
-
-.roomVerticalWidgetTitle {
-    font-size: 12px;
-    color: #444444;
-    font-family: Verdana;
-    font-weight: normal;
-    float: left;
-    width: 60px;
-    text-align: left;
-}
-
-.roomPopupTitle {
-    font-weight: bold;
-    width: 80px;
-    float: left;
-    font-style: normal;
-
-}
-
-.timeLocationDiv {
-    padding: 5px;
-    margin-left: -5px;
-}
-
-.timeLocationDiv img {
-    float: right;
-    opacity: 0.4;
-    filter: alpha(opacity=40);
-    background-color: #F8F8F8;
-}
-
-.timeLocationDiv:hover {
-    border: 1px solid #EAEAEA;
-    background: #FFF6DF;
-    padding: 4px;
-    cursor: pointer;
-}
-
-.timeLocationDiv:hover img {
-    opacity: 1;
-    filter: alpha(opacity=100);
-    background-color: #FFF6DF;
-}
-
-ul.nobulletsList
-{
-    position: relative;
-    margin:0px;
-    margin-top: 10px;
-    padding-left: 0px;
-}
-
-ul.nobulletsList li
-{
-    height: 25px;
-    overflow: visible;
-    list-style-type: none;
 }
 
 ul.nobulletsListInline
@@ -3854,22 +1804,6 @@ ul.nobulletsListInline li
     display: inline;
 }
 
-ul.nobulletsListWrapping
-{
-    position: relative;
-    margin:0px;
-    margin-top: 10px;
-    padding-left: 0px;
-    color: #777;
-}
-
-ul.nobulletsListWrapping li
-{
-    margin-top: 5px;
-    overflow: visible;
-    list-style-type: none;
-}
-
 div.AspectsListDiv {
     margin-bottom: 10px;
     height: 100px;
@@ -3882,46 +1816,6 @@ div.PeopleListDiv {
     margin-bottom: 10px;
     height: 100px;
     width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.FavoritePeopleListDiv {
-    margin-bottom: 10px;
-    height: 300px;
-    width: 400px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.ShortPeopleListDiv {
-    margin-bottom: 10px;
-    height: 150px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.VeryShortPeopleListDiv {
-    margin-bottom: 10px;
-    height:75px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.LongPeopleListDiv {
-    margin-bottom: 10px;
-    height: 130px;
-    width: 412px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.CategoryEventListDiv {
-    margin-bottom: 10px;
-    height: 150px;
-    width: 400px;
     border: 1px solid #CCCCCC;
     overflow: auto;
 }
@@ -3962,37 +1856,6 @@ ul.UnscheduledContribList li.selected {
     background-color: #CDEB8B;
 }
 
-div.popupWithButtonsMainContent {
-    background-color: #FFFFFF;
-    padding: 10px;
-}
-
-div.popupButtonBar {
-    border: 0;
-    border-top: 1px solid #CCCCCC;
-    padding: 10px;
-    text-align: center;
-    position:relative;
-    top:-10px;
-    background: #F8F8F8;
-    margin-bottom: -10px;
-
-    -moz-border-radius-bottomleft: 10px;
-    -webkit-border-bottom-left-radius:10px;
-    -moz-border-radius-bottomright: 10px;
-    -webkit-border-bottom-right-radius:10px;
-
-}
-
-div.dialogButtons {
-    background:#F8F8F8 none repeat scroll 0 0;
-    border-top:1px solid #CCCCCC;
-    margin-top:10px;
-    padding:10px;
-    text-align:center;
-}
-
-
 /* Reschedule dialog */
 
 div.rescheduleSection {
@@ -4003,7 +1866,6 @@ div.rescheduleTitle {
     font-size: 18px;
     padding-bottom: 5px;
 }
-
 
 tr.selectedAction {
     background-color: #CDEB8B;
@@ -4048,31 +1910,8 @@ div.fitInnerTimetableDialog {
 
 /* End of inner timetable dialog */
 
-
-
 .slotTitle {
     font-size:14px;
-}
-
-.slotSubTitle {
-    font-size: 13px;
-    font-weight:normal;
-    padding-bottom: 10px;
-    margin-top: 0px;
-    border-bottom:1px solid #E4E4E4;
-}
-
-.slotSubTitle span{
-    margin-right: 7px;
-}
-
-.calendarColorLegend {
-    padding: 10px 0 10px 20px;
-    font-size: 13px;
-}
-
-.calendarColorLegend a {
-    font-size: 13px;
 }
 
 .indicoHelp {
@@ -4103,7 +1942,6 @@ div.fitInnerTimetableDialog {
     padding-top: 20px;
 }
 
-
 .indicoHelp .icons {
     float: right;
     padding-right: 5px;
@@ -4119,67 +1957,11 @@ div.fitInnerTimetableDialog {
     border-bottom: 1px dotted #AAA;
 }
 
-.ttModifIcon {
-    float: right;
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
-    background: transparent url('../images/popupMenuHover.png') scroll repeat-x 0 0;
-}
-
-.ttModifIcon:hover {
-    background: transparent url('../images/popupMenuHover.png') scroll repeat-x 0 -15px;
-}
-
-.ttManagementBlock {
-    border: 1px solid #aaaaaa;
-    -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
-    overflow: hidden;
-}
-
-.ttSessionManagementBlock {
-    border: 1px solid #aaaaaa;
-    -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.ttMBlockExtraInfo {
-    color: #666666;
-}
-
-.loadingPast {
-    background: transparent url('../images/loading.gif') no-repeat;
-    padding-left: 25px;
-    margin-left: 10px;
-    display: none;
-}
-
-.fixPreOverflow pre{
-    overflow: hidden;
-}
-
 .successfulAction {
     background-color: #DDFFDD;
     padding: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
-}
-
-div.flexibleSelect, input.roomTextField {
-    border: 1px solid #AAAAAA;
-    position: relative;
-    width: 200px;
-}
-
-div.flexibleSelect input {
-    color: black;
-}
-
-div.flexibleSelect input[disabled]{
-    background: white;
 }
 
 div.disabled {
@@ -4195,49 +1977,6 @@ div.disabled input[disabled] {
     background: #DDDDDD;
 }
 
-.optionBox {
-    border: 1px solid #888888;
-    width: 200px;
-    overflow: hidden;
-    background-color: white;
-    z-index: 1;
-}
-
-.optionBoxList {
-    background-color: #FFFFFF;
-    padding: 3px;
-    margin: 0 0 0 0;
-    max-height: 200px;
-    overflow: auto;
-}
-
-.bottomLine {
-    border-bottom:1px dotted #DDDDDD;
-}
-
-.topLine {
-    border-top:1px dotted #DDDDDD;
-}
-
-.optionBoxList li {
-    list-style-type: none;
-    padding: 3px;
-    cursor: pointer;
-}
-
-.optionBoxAdd {
-    padding: 5px;
-    background: #F3F3F3;
-}
-
-.optionBoxList li:hover {
-    background-color: #FFF6DF;
-}
-
-.enhanced {
-    font-weight: bold;
-}
-
 div.posterEntry {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
@@ -4250,12 +1989,6 @@ div.posterEntry {
 
 div.posterEntry:hover {
     background-color: #ECECEC;
-}
-
-.posterBlockTime {
-    font-size: 11px;
-    float: right;
-    margin-top: 5px;
 }
 
 .startEndDate, .support {
@@ -4274,111 +2007,8 @@ td.startEndDateEntry, td.supportEntry, span.innerWidgetLabel {
     width: 300px;
 }
 
-.siteTitle {
-    font-size: 30px;
-    margin-top:0;
-    padding-left:10px;
-    padding-top:15px;
-}
-
-a.eventModifSpecial div.leftCorner {
-    background: transparent url(../images/button_bg_special.png) repeat-y scroll -198px 0px !important;
-}
-
-a.eventModifSpecial {
-    background: transparent url(../images/button_bg_special.png) repeat-y scroll 0 0 !important;
-}
-
-a.eventModifSpecial:hover {
-    background-position: 0 24px !important;
-}
-
-
-div.eventModifButtonBar {
-    padding: 6px 0;
-    min-height: 24px;
-    min-width: 200px;
-}
-
-div.eventModifButtonBar a {
-    position: relative;
-    display: block;
-    float: left;
-    height: 13px;
-    padding: 4px 10px 7px 10px;
-    min-width: 4px;
-    margin-left: 4px;
-    background: transparent url(../images/button_bg_light.png) repeat-y scroll 0 0;
-    font-size: 12px;
-    font-family: arial, helvetica, sans-serif;
-    color: #555;
-}
-
-div.eventModifButtonBar a div.leftCorner {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: transparent url(../images/button_bg_light.png) repeat-y scroll -198px 0px;
-    width: 2px;
-    height: 24px;
-}
-
-div.eventModifButtonBar a:hover {
-    background-position: 0 24px;
-    color: #808080;
-}
-
-div.eventModifButtonBar .separator {
-    float: left;
-    margin: 3px 6px 3px 10px;
-    width: 1px;
-    height: 18px;
-    border-right: 1px dotted #999;
-}
-
-label.normal {
-    font-weight: normal;
-}
-
-label.emphasis {
-    font-weight: normal;
-    font-style: italic;
-}
-
-.smallGrey {
-    margin-top: 2px;
-    font-size: 9px;
-    color: #777;
-}
-
-.smallRed {
-    font-size: 9px;
-    color: #881122;
-}
-
-
 tr.selectedItem td {
     color: #000;
-}
-
-.strongRed strong{
-    color: #881122;
-}
-
-.protPrivate {
-    color: #B02B2C;
-}
-
-.protPublic {
-    color: #128F33;
-}
-
-.strongProtPrivate strong {
-    color: #B02B2C;
-}
-
-.strongProtPublic strong {
-    color: #128F33;
 }
 
 div.cloneElements {
@@ -4399,34 +2029,9 @@ div.cloneElements {
     border-collapse: collapse;
 }
 
-.eventActionsToolBarLabel {
-    padding:3px 7px 5px;
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-topleft: 5px;
-    border: 1px solid #AAA;
-    border-bottom: 0px;
-    background-color: #fff;
-    font-size:8pt;
-}
-
-.eventActionsToolBarButtons {
-    padding:4px;
-    border: 1px solid #AAA;
-    border-top:0px;
-    -moz-border-radius-bottomright: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    background-color: #fff;
-    height: 24px;
-}
-
 div.invalid {
     background: white;
 }
-
-
-/*
-    Widget checkbox options
-*/
 
 .widgetCheckboxOption {
     margin-top: 5px;
@@ -4453,7 +2058,7 @@ div.invalid {
     border-left: 1px solid #E8E8E8;
 }
 
-.titleUpCellTD{
+.titleUpCellTD {
     width:20%;
 }
 
@@ -4477,24 +2082,6 @@ div.invalid {
 
 body.cke_show_borders {
     height: auto;
-}
-
-table.schedTaskList {
-    margin-top: 20px;
-    border-collapse:collapse;
-}
-
-table.schedTaskList td {
-    padding-top: 2px;
-    padding-left: 20px;
-    padding-right: 0px;
-}
-
-table.schedTaskList th {
-    padding-left: 20px;
-    padding-right: 0px;
-    color: #555;
-    border-bottom: 1px solid #EBEBEB;
 }
 
 .infoTD {
@@ -4553,15 +2140,6 @@ table.legend td.legendTd {
 }
 
 /* End notif templates */
-
-.userPrefOption {
-    float: left;
-}
-
-.userPrefOptionStatus {
-    float: left;
-    padding: 4px;
-}
 
 table.infoQuestionsTable td.dataHeader {
     font-size: 13px;
@@ -4814,11 +2392,6 @@ table.infoQuestionsTable td.dataBold {
    font-weight: bold;
 }
 
-.calendarContainer
-{
-    overflow: visible;
-}
-
 div#social {
     float: right;
     display: none;
@@ -4936,19 +2509,6 @@ div#social:hover {
     opacity: 1;
 }
 
-span.num_events {
-    font-size: 10px;
-    margin-left: 10px;
-    color: #aaa;
-}
-
-.subGroupTitleRegForm {
-   font-size: 13px;
-   font-family: Verdana, Arial;
-   color: #3B4145;
-   font-weight: bold;
-}
-
 .placesLeft {
     color:green;
     font-style:italic;
@@ -4959,54 +2519,6 @@ span.num_events {
     color: red;
 }
 
-.roleSmall {
-    font-weight: bold;
-    padding-left: 5px;
-    color: #888;
-}
-
-ul.UIAuthorList li .authorMove {
-    padding: 0px 0px 4px 20px;
-    z-index: 1;
-    cursor: move;
-}
-
-ul.UIAuthorList li .author {
-    padding: 0px 0px 4px 20px;
-    z-index: 1;
-    cursor: default;
-}
-
-ul.UIAuthorList li.UIAuthorMove {
-    background: white url("../images/drag.png") left top no-repeat;
-}
-
-
-ul.buttonMenuPopupList {
-    background-color: #ECECEC;
-    border: 0;
-    display: block;
-}
-
-ul.buttonMenuPopupList li {
-    display: block;
-}
-
-ul.buttonMenuPopupList li a {
-    color: #555555;
-    padding: 8px;
-    display: block;
-    font-weight:bold;
-}
-
-ul.buttonMenuPopupList li a:hover {
-    padding: 8px;
-    display: block;
-    list-style-type:none;
-    color: #FFFFFF;
-    background-color: #ACACAC;
-}
-
 .scrolling {
     background-color:#FFFFFF;
     box-shadow: 0 12px 6px -6px rgba(0, 0, 0, 0.2);
@@ -5015,7 +2527,7 @@ ul.buttonMenuPopupList li a:hover {
     z-index: 1;
 }
 
-.ui-list-menu-level  {
+.ui-list-menu-level {
     position: absolute;
     background: #fff;
     padding: 0px;
@@ -5274,79 +2786,13 @@ div#sdlw-actions {
     line-height: 17px;
 }
 
-div.domain_control .strong {
-    font-weight: bold;
-}
-
-div.domain_control p {
-    font-style: italic;
-}
-
-.contributionListFilteredText, .authorIndexFilteredText, .speakerIndexFilteredText {
-    color: #888;
-    padding-top: 5px;
-    font-size:12px
-}
-
-.contributionListContribItem, .abstractListAbstractItem {
+.abstractListAbstractItem {
     border-bottom: 1px solid #EBEBEB;
     padding-bottom: 5px;
     margin-top: 5px;
 }
 
-.contributionListContribDescription {
-    text-align:justify;
-    padding-top: 7px;
-    line-height: 1.3em;
-    color: #AAA;
-}
-
-.contributionListContribSpeakers {
-    text-align:right;
-    font-size:12px;
-    color:#888;
-}
-
-.contributionListFiltersContainer, .authorIndexFiltersContainer, .speakerIndexFiltersContainer {
-    border-bottom: 1px solid #EBEBEB;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-}
-
-.contribItem {
-    clear: both; padding-bottom: 7px; padding-left: 20px;
-}
-
-.authorIndexItem, .speakerIndexItem {
-    border-bottom: 1px solid #EBEBEB; padding-bottom: 8px; margin-top: 8px; overflow: hidden;
-}
-
-.authorIndexItemText, .speakerIndexItemText {
-    font-weight: bold; letter-spacing: 0.1em; line-height: 1.2em;
-}
-
-a.lightGreyLink {
-    color: #888;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-a.lightGreyLink:hover {
-    text-decoration: underline;
-}
-
-.contributionListContribHeader, .contributionHeader, .subContributionHeader, .sessionHeader, .abstractHeader {
-    line-height:17px;
-    color:#888;
-    font-size: 12px;
-}
-
-.contributionButtonBar, .subContributionButtonBar, .sessionButtonBar, .materialButtonBar, .abstractButtonBar {
-    text-align: right;
-    margin-bottom: 5px;
-}
-
-.contributionTitle, .subContributionTitle, .sessionTitle, .materialTitle {
+.sessionTitle {
     font-size: 18px;
     font-weight: bold;
     line-height: 24px;
@@ -5354,168 +2800,6 @@ a.lightGreyLink:hover {
     margin-bottom: 10px;
     padding-bottom: 3px;
     margin-top: 0;
-}
-
-.materialDescription {
-    color: #888;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.contributionMainContent, .subContributionMainContent, .materialMainContent {
-    float:left;
-    width:500px;
-}
-
-.sessionMainContent {
-    width: 720px;
-    padding-bottom: 10px;
-}
-
-.contributionRightPanel, .subContributionRightPanel, .materialRightPanel {
-    float:right;
-    width: 200px;
-    min-height: 500px;
-    padding-left:10px;
-    border-left: 1px solid #EAEAEA;
-}
-.sessionRightPanel {
-    min-height: 0px;
-}
-.contributionRightPanelSection, .subContributionRightPanelSection, .sessionRightPanelSection {
-    border-bottom: 1px solid #EAEAEA;
-    font-size: 11px;
-    color: #888;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-}
-
-.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .sessionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul, .subContributionListSection ul {
-    list-style: none inside none;
-    margin: 5px 0px 0px;
-    padding: 0px;
-}
-
-.contributionRightPanelSection li, .subContributionRightPanelSection li, .sessionRightPanelSection li, .materialSection li, .abstractRightPanelSection li {
-    margin-bottom: 3px;
-}
-
-ul.subList{
-    list-style: none inside none;
-    margin: 0px;
-    padding: 5px 15px;
-}
-
-.contributionRightPanelSection a, .subContributionRightPanelSection a, .sessionRightPanelSection a, .abstractRightPanelSection a {
-    font-size: 11px;
-    word-wrap: break-word;
-}
-
-a.titleWithLink{
-    font-size: 12px;
-    font-weight: bold;
-    color: #666;
-}
-
-a.titleWithLink:hover{
-    text-decoration: underline;
-}
-
-.contributionInformation, .subContributionInformation, .sessionInformation {
-    border-bottom: 1px solid #EAEAEA;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-}
-
-.contributionDetail, .subContributionDetail, .materialDetail, .abstractDetail {}
-
-.contributionSection, .subContributionSection, .sessionSection, .materialSection, .abstractSection {
-    margin-bottom: 10px;
-}
-
-.sessionLeftPanel {
-    float: left;
-    width: 500px;
-}
-
-.sessionContributionsSection {
-    clear: both;
-    border-top: 1px solid #EAEAEA;
-}
-
-.sessionContributionsSectionTitle {
-    padding: 15px 0px 15px 0px;
-}
-
-.sessionConvenersTable {
-    display: table;
-    padding-top: 15px;
-}
-
-ul.conveners {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-ul.conveners > li {
-    margin-bottom: 7px;
-}
-
-ul.conveners .time {
-    display: block;
-    float: left;
-    width: 160px;
-    color: #aaa;
-    white-space: nowrap;
-}
-
-ul.conveners .title {
-    float: left;
-    color: #888;
-    font-style: italic;
-    white-space: nowrap;
-    padding-left: 5px;
-}
-
-ul.conveners ul.names{
-    clear: both;
-    list-style-type: none;
-    padding-left: 10px;
-}
-
-ul.conveners ul.names .affiliation {
-    color: #888;
-}
-
-
-.contributionSectionTitle, .subContributionSectionTitle, .sessionSectionTitle {
-    color: #444;
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    margin-top: 0;
-    display: inline;
-}
-.contributionSectionContent, .subContributionSectionContent, .sessionSectionContent, .materialSectionContent {
-    font-size: 12px;
-    line-height: 1.5em;
-    text-align:justify;
-    color: #444;
-    margin-right: 5px;
-    white-space: pre-wrap;
-}
-
-.contributionSpeakerList, .subContributionSpeakerList, .sessionDateInformation {
-    margin-bottom:3px;
-    color:#666666;
-}
-
-.contributionReviewingSection, .abstractStatusSection {
-    margin-bottom: 5px;
-    border-radius: 5px;
-    color: #888;
-    border-bottom:1px solid #eaeaea;
-    padding-bottom:5px;
 }
 
 
@@ -5549,38 +2833,6 @@ ul.conveners ul.names .affiliation {
     background: none repeat scroll 0 0 #BCB8A3;
 }
 
-.contributionReviewingSection input {
-    background: none repeat scroll 0 0 #CDEB8B;
-    border: 1px solid #666;
-    border-radius: 5px 5px 5px 5px;
-}
-
-.contributionReviewingSection a {
-    color: white;
-    font-size : 11px;
-}
-
-.contributionReviewingSection a:hover {
-    text-decoration: underline;
-    color: white;
-}
-
-ul.resourceDetail {
-    list-style:none;
-    padding-left:25px;
-    margin:0px;
-    color:#888;
-    font-size: 11px;
-    line-height: 15px
-}
-
-.staticURLNote{
-    color: #999999;
-    float: right;
-    font-size: 11px;
-    font-style: italic;
-}
-
 .historyReviewHeader {
     border-bottom: 1px solid #DDDDDD;
     color: #444444;
@@ -5612,44 +2864,14 @@ ul.resourceDetail {
     border-radius: 5px;
 }
 
-div.domain_control ul {
-    list-style-type: none;
-    padding: 0 0 0 10px;
-}
-
 div.sdlw-complete {
     font-style: italic;
     color: #666666;
 }
 
-.redWarningMessage {
-    background-color: #F2DEDE;
-    border-color: #EED3D7;
-    color: #B94A48;
-    border-radius: 4px 4px 4px 4px;
-    margin-bottom: 18px;
-    padding: 8px 35px 8px 14px;
-    text-align: justify;
-}
-
 span#sdlw-progress {
     padding-left: 10px;
     display: inline-block;
-}
-
-table#currencies {
-    border-collapse: collapse;
-    border: 1px solid #ddd;
-}
-
-table#currencies tr {
-    border: 1px solid #ddd;
-    border-spacing: 5px;
-}
-
-table#currencies td, table#currencies th {
-    border: 1px solid #ddd;
-    padding: 5px;
 }
 
 .material_tip {
@@ -5703,132 +2925,9 @@ ul.material_list ul li {
     border: 0;
 }
 
-div.informationUserList {
-    background-color: #F2DEDE;
-    border-color: #EED3D7;
-    color: #B94A48;
-    border-radius: 4px 4px 4px 4px;
-    margin-bottom: 18px;
-    padding: 8px 35px 8px 14px;
-}
-
-.noninheriting_children_danger, .noninheriting_children_warning {
-    color: #777;
-    font-size: 0.9em;
-    margin: 5px 0 5px 0;
-    padding: 10px;
-    max-width: 440px;
-    background-color: #eee;
-    overflow: auto;
-}
-
-.noninheriting_children_danger {
-	background-color: #ECDAD1;
-}
-
-.noninheriting_children_danger .icon-shield {
-    vertical-align: middle;
-    font-size: 2em;
-    color: #991111;
-    float: left;
-    font-size: 1.7em;
-    margin-right: 0.3em;
-}
-
-.noninheriting_children_warning .icon-shield {
-    vertical-align: middle;
-    font-size: 2em;
-    color: #ccbc00;
-    float: left;
-    font-size: 1.7em;
-    margin-right: 0.3em;
-}
-
-.noninheriting_children_danger .text, .noninheriting_children_warning .text  {
-    padding-left: 3em;
-}
-
-#privacy_status {
-    border-bottom: 1px dotted #999;
-}
-
-#see_protected {
-    font-size: 0.9em;
-}
-
-.see_protected_tip {
-    padding: 5px !important;
-    min-width: 200px !important;
-}
-
-
-.see_protected_tip ul {
-    list-style: none inside none;
-    margin: 5px 0 0;
-    padding: 0px 10px;
-}
-
-
-.see_protected_tip ul li {
-    margin-bottom: 5px;
-}
-
 .user_list_icon_shield {
 	cursor: pointer;
 	margin-left: 5px;
 	vertical-align: -12%;
 	font-size: 15px;
-}
-
-
-/* Speakers List */
-
-ul.speaker_list {
-    list-style-type: none;
-    padding: 0.6em 0 0 0;
-}
-
-ul.speaker_list li {
-    margin: 1em 0 0 0;
-}
-
-ul.speaker_list a {
-    font-size: 1em;
-}
-
-ul.speaker_list > li .name {
-    padding: 0 0 1.5em 0;
-    font-size: 1.4em;
-}
-
-ul.speaker_list > li .contributions {
-    color: #777;
-    margin-top: 0.4em;
-    list-style-type: none;
-    padding: 0 0 0 2em;
-}
-
-ul.speaker_list > li .contributions li {
-    margin-top: 0.6em;
-}
-
-#list_options {
-    max-width: 600px;
-}
-
-#list_options #filterSpeakers {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 1.5em;
-    margin-right: 1em;
-    width: 20em;
-}
-
-.plugin-settings-form input[type=text], .plugin-settings-form input[type=url], .plugin-settings-form input[type=password] {
-    width: 400px;
-}
-
-.plugin-settings-form textarea {
-    width: 400px;
-    height: 200px;
 }

@@ -55,7 +55,7 @@ else:
     </div>
     <script>
         $(document).ready(function() {
-            $('h1, .subLevelTitle, .subEventLevelTitle, .topLevelTitle').mathJax();
+            $('h1').mathJax();
         });
     </script>
 </div>
