@@ -32,6 +32,7 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -93,8 +94,8 @@ class AddAttachmentFilesMixin:
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
                 filename = secure_filename(f.filename, 'attachment')
-                attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
-                                        protection_mode=form.protection_mode.data)
+                attachment = Attachment(folder=folder, user=session.user, title=to_unicode(f.filename),
+                                        type=AttachmentType.file, protection_mode=form.protection_mode.data)
                 if attachment.is_self_protected:
                     attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
