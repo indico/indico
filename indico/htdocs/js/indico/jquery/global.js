@@ -166,7 +166,10 @@ $(document).ready(function() {
     });
 
     $('.js-dropdown').each(function() {
-        $(this).parent().dropdown({selector: '.js-dropdown'});
+        $(this).parent().dropdown({
+            selector: '.js-dropdown',
+            always_listen: $(this).data('dropdown-always-listen') !== undefined
+        });
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {

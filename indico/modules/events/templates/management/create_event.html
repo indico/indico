@@ -1,7 +1,9 @@
 {% macro create_event_button(category, classes="", text="", with_tooltip=true) %}
     <a class="{{ classes }} i-button arrow js-dropdown"
        {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
-       data-toggle="dropdown">{{ text }}</a>
+       data-toggle="dropdown" data-dropdown-always-listen>
+        {{- text -}}
+    </a>
     <ul class="dropdown">
         <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
         <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
