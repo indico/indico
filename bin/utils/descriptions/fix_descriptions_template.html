@@ -14,18 +14,14 @@
     var objectDescriptions = {{ object_descriptions }};
     var $container = $('#description-container');
 
-    function message(html) {
-        $('#info').append($('<div>').html(html));
-    }
-
     function _processDescription(description, key, id) {
         // Try to reach a fixed point
         var previous;
         var i = 0;
         while (description != previous && i < 10) {
-            if (i > 0 ) {
-                console.log('>> This description has a small chance broken (but is still included in the generated SQL)', key, id);
-                console.log('>> iteration', i);
+            if (i > 1) {
+                console.log('>> This description has a small chance of being broken (but is still included in the generated SQL)', key, id);
+                console.log('>> iteration', i, description == previous);
                 console.log('>> previous');
                 console.log(previous);
                 console.log('>> description');
@@ -56,14 +52,14 @@
             }
             i++;
         });
-        message(key + ': ' + i + ' descriptions processed (' + modified + ' modified)');
+        console.log(key + ': ' + i + ' descriptions processed (' + modified + ' modified)');
     }
 
     function process() {
         $.each(objectDescriptions, function(key, descriptions) {
             processDescriptions(key, descriptions);
         });
-        message('Done.');
+        console.log('Done.');
         window.callPhantom('exit');
     }
 
