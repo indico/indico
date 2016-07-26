@@ -1,7 +1,7 @@
 """Add event series table
 
 Revision ID: 2803d4efb9
-Revises: 23ef6a49ae28
+Revises: 35eac9fee166
 Create Date: 2016-07-25 08:55:25.652408
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '2803d4efb9'
-down_revision = '23ef6a49ae28'
+down_revision = '35eac9fee166'
 
 
 def upgrade():
