@@ -1037,23 +1037,6 @@ ul.warningLevel1 {
     margin-bottom: 0px;
 }
 
-/* PLUGINS ADMIN */
-
-ul.optionList1 {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-}
-
-ul.optionList2 {
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
-
-span.optionKey1 {
-    font-weight: bold;
-}
-
 /* Conference, Registrants List */
 
 .CRLgroupTitleNoBorder {

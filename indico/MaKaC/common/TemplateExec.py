@@ -27,7 +27,6 @@ import MaKaC
 import xml.sax.saxutils
 
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import format_number, format_datetime, format_date, format_time, format_human_timedelta
 from indico.util.i18n import ngettext
 from indico.util.mdx_latex import latex_escape
@@ -240,26 +239,6 @@ def deepstr(obj):
 
     return str(obj)
 
-def beautify(obj, classNames={"UlClassName": "optionList",
-                              "KeyClassName": "optionKey"}, level=0):
-    """ Turns list or dicts into beautiful <ul> HTML lists, recursively.
-        -obj: an object that can be a list, a dict, with lists or dicts inside
-        -classNames: a dictionary specifying class names. Example:
-            {"UlClassName": "optionList", "KeyClassName": "optionKey"}
-        supported types are: UlClassName, LiClassName, DivClassName, KeyClassName
-        See BeautifulHTMLList.tpl and BeautifulHTMLDict.tpl to see how they are used.
-        In the CSS file, you should define classes like: ul.optionList1, ul.optionList2, ul.optionKey1 (the number is the level of recursivity)
-        -level: the level of recursivity.
-    """
-    from MaKaC.webinterface import wcomponents
-    if isinstance(obj, list):
-        return wcomponents.WBeautifulHTMLList(obj, classNames, level + 1).getHTML()
-    elif isinstance(obj, dict):
-        return wcomponents.WBeautifulHTMLDict(obj, classNames, level + 1).getHTML()
-    elif isinstance(obj, AvatarUserWrapper):
-        return obj.getStraightFullName()
-    else:
-        return str(obj)
 
 def systemIcon(s):
     return Config.getInstance().getSystemIconURL(s)
@@ -373,8 +352,6 @@ def registerHelpers(objDict):
         objDict['escapeHTMLForJS'] = escapeHTMLForJS
     if not 'deepstr' in objDict:
         objDict['deepstr'] = deepstr
-    if not 'beautify' in objDict:
-        objDict['beautify'] = beautify
     if not 'latex_escape' in objDict:
         objDict['latex_escape'] = latex_escape
     # allow fossilization
