@@ -39,9 +39,9 @@
             <tr id="lectureLinks">
                 <td class="leftCol">{% trans %}From the same series{% endtrans %}</td>
                 <td>
-                {% for lecture in lectures %}
-                    <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.pos }}</a>
-                {% endfor %}
+                    {% for lecture in lectures %}
+                        <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.series_pos }}</a>
+                    {% endfor %}
                 </td>
             </tr>
         {% endif %}

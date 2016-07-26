@@ -442,29 +442,20 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars['timezone'] = timezone(tz)
 
         attached_items = conf.attached_items
-        lectures, folders = [], []
+        folders = [folder for folder in attached_items.get('folders', []) if folder.title != "Internal Page Files"]
 
-        for folder in attached_items.get('folders', []):
-            if LECTURE_SERIES_RE.match(folder.title):
-                lectures.append({'url': folder.attachments[0].link_url,
-                                 'pos': int(folder.title[4:])})
-            elif folder.title != "Internal Page Files":
-                folders.append(folder)
-
+        lectures = []
         if event.series is not None and event.series.show_links:
-            query = (Event.query
-                     .add_column(db.func.row_number().over(order_by=(Event.start_dt, Event.id)).label('n'))
-                     .options(load_only('id'))
-                     .filter_by(series_id=event.series_id, is_deleted=False)
-                     .order_by('n'))
-            lectures = [{'id': ev.id, 'url': ev.url, 'pos': n}
-                        for ev, n in query
-                        if ev != event]
+            lectures = (Event.query.with_parent(event.series)
+                        .filter(Event.id != event.id)
+                        .options(load_only('series_pos', 'id'))
+                        .order_by(Event.series_pos)
+                        .all())
 
         wvars.update({
             'files': attached_items.get('files', []),
             'folders': folders,
-            'lectures': sorted(lectures, key=itemgetter('pos'))
+            'lectures': lectures
         })
 
         return wvars
