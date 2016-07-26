@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.modules.events import EventLogKind, EventLogRealm, logger
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events import logger
 
 
 def create_reference_type(data):
@@ -63,6 +63,7 @@ def create_event(category, event_type, data):
     event.populate_from_dict(data)
     db.session.flush()
     logger.info('Event %r created in %r by %r ', event, category, session.user)
+    event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event created', session.user)
     return event
 
 
