@@ -19,7 +19,6 @@ from flask import render_template, session
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import Config
 from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.core.db import DBMgr
 
 
 def render_error(message, description, standalone=False):
@@ -48,5 +47,4 @@ class WPErrorWSGI(WPDecorated, WPJinjaMixin):
         return AccessWrapper(session.avatar)
 
     def getHTML(self):
-        with DBMgr.getInstance().global_connection():
-            return self.display()
+        return self.display()
