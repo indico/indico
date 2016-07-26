@@ -65,12 +65,6 @@ class WSEConfModifMainData(meeting.WMConfModifMainData):
 
 
 #####Tools # Stays the same as conference for now
-class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
-
-    def __init__(self, rh, conf):
-        conferences.WPConfModifToolsBase.__init__(self, rh, conf)
-
-
 class WPSEConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
         p = conferences.WConferenceClone( self._conf )
