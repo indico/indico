@@ -16,11 +16,9 @@
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from indico.modules.events.cloning import EventCloner
 
@@ -36,10 +34,6 @@ class WebFactory(WebFactory):
 
 
 ######### Conference Creation/Display/Modifications ##########################
-
-    @staticmethod
-    def getEventCreationPage( rh, targetCateg ):
-        return WPMeetingEventCreation( rh, targetCateg )
 
     @staticmethod
     def getIconURL():
@@ -60,26 +54,6 @@ class WebFactory(WebFactory):
 
 
 MeetingWebFactory = WebFactory
-
-#################### Event Creation #####################################
-
-
-class WPMeetingEventCreation(WPConferenceCreationMainData):
-    def _getWComponent(self):
-        return WMeetingCreation(self.category, rh=self._rh)
-
-
-class WMeetingCreation(category.WConferenceCreation):
-    def __init__( self, targetCateg, type="meeting", rh = None ):
-        self._categ = targetCateg
-        self._type = type
-        self._rh = rh
-
-    def getVars( self ):
-        vars = category.WConferenceCreation.getVars( self )
-        vars["event_type"] = WebFactory.getId()
-        return vars
-
 
 #################Conference Modification#############################
 

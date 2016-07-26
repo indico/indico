@@ -18,137 +18,22 @@ import json
 import re
 from datetime import timedelta, datetime
 
-from flask import session
 from pytz import timezone
 
-from MaKaC.common.url import ShortURLMapper
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.category as category
-from MaKaC.errors import MaKaCError, FormValuesError
-import MaKaC.conference as conference
 from indico.core import signals
 from indico.core.config import Config
-from MaKaC.i18n import _
-from MaKaC.webinterface.user import UserListModificationBase
-from MaKaC.common.utils import validMail, setValidEmailSeparators
-
-from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.modules.attachments.models.attachments import Attachment, AttachmentType
-from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.categories.controllers.base import RHCreateEventBase
-from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
-from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
-from indico.util.string import to_unicode
+from indico.modules.rb.models.rooms import Room
+from indico.util.i18n import _
 from indico.web.flask.util import endpoint_for_url
-
-
-class RHConferenceCreation(RHCreateEventBase):
-    def _checkParams(self, params):
-        self._params = params
-        RHCreateEventBase._checkParams(self)
-
-    def _process(self):
-        if not self._event_type:
-            raise MaKaCError("No event type specified")
-        else:
-            p = category.WPConferenceCreationMainData(self, self.category)
-            if self._wf is not None:
-                p = self._wf.getEventCreationPage(self, self.category)
-            return p.display(**self._params)
-
-
-class RHConferencePerformCreation(RHCreateEventBase):
-    def _checkParams(self, params):
-        self._params = params
-        RHCreateEventBase._checkParams(self)
-        self._datecheck = False
-        self._confirm = False
-        self._performedAction = ""
-        if "ok" in params:
-            self._confirm = True
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if params["title"]=="":
-            params["title"]="No Title"
-        # change number of dates (lecture)
-        if self._confirm == True:
-            if self._event_type != EventType.lecture:
-                c = self._createEvent( self._params )
-                self.alertCreation([c])
-            # lectures
-            else:
-                lectures = []
-                for i in range (1, int(self._params["nbDates"])+1):
-                    self._params["sDay"] = self._params.get("sDay_%s"%i,"")
-                    self._params["sMonth"] = self._params.get("sMonth_%s"%i,"")
-                    self._params["sYear"] = self._params.get("sYear_%s"%i,"")
-                    self._params["sHour"] = self._params.get("sHour_%s"%i,"")
-                    self._params["sMinute"] = self._params.get("sMinute_%s"%i,"")
-                    self._params["duration"] = int(self._params.get("dur_%s"%i,60))
-                    lectures.append(self._createEvent(self._params))
-                self.alertCreation(lectures)
-                lectures.sort(sortByStartDate)
-                # create links
-                for i, source in enumerate(lectures, 1):
-                    if len(lectures) > 1:
-                        source.setTitle("{} ({}/{})".format(source.getTitle(), i, len(lectures)))
-
-                    for j, target in enumerate(lectures, 1):
-                        if j != i:
-                            folder = AttachmentFolder(object=source.as_event, title="part{}".format(j))
-                            link = Attachment(user=session.user, type=AttachmentType.link,
-                                              folder=folder, title="Part {}".format(j),
-                                              link_url=target.getURL())
-                            db.session.add(link)
-                c = lectures[0]
-            self._redirect(urlHandlers.UHConferenceModification.getURL( c ) )
-        else :
-            self._redirect(self.category.url)
-
-    def _createEvent(self, params):
-        kwargs = UtilsConference.get_new_conference_kwargs(self._params)
-        if kwargs['start_dt'] >= kwargs['end_dt']:
-            raise FormValuesError(_('The start date cannot be after the end date.'))
-        c = conference.Conference.new(self.category, creator=session.user, event_type=self._event_type, **kwargs)
-        UtilsConference.setValues(c, self._params)
-
-        eventAccessProtection = params.get("eventProtection", "inherit")
-        if eventAccessProtection == "private" :
-            c.as_event.protection_mode = ProtectionMode.protected
-        elif eventAccessProtection == "public" :
-            c.as_event.protection_mode = ProtectionMode.public
-
-        for legacy_principal in self._getPersons():
-            c.as_event.update_principal(legacy_principal.as_new, read_access=True)
-
-        # Add EventPersonLinks to the Event
-        person_links = self.get_event_person_links_data(c.as_event)
-        update_event(c.as_event, {'person_link_data': person_links})
-
-        return c
-
-    def get_event_person_links_data(self, event):
-        form = EventPersonLinkForm(event=event, event_type=event.type)
-        if not form.validate_on_submit():
-            raise FormValuesError(form.errors)
-        return form.person_link_data.data
-
-    def _getPersons(self):
-        from MaKaC.services.interface.rpc import json
-        allowedUsersDict = json.decode(self._params.get("allowedUsers") or "[]") or []
-        return UserListModificationBase.retrieveUsers({"userList": allowedUsersDict})[0] if allowedUsersDict else []
-
-    def alertCreation(self, confs):
-        occurrences = [conf.as_event for conf in confs] if len(confs) > 1 else None
-        notify_event_creation(confs[0].as_event, occurrences)
+import MaKaC.conference as conference
+from MaKaC.common.url import ShortURLMapper
+from MaKaC.common.utils import validMail, setValidEmailSeparators
+from MaKaC.errors import FormValuesError
 
 
 class UtilsConference:
@@ -183,15 +68,6 @@ class UtilsConference:
         if location_data.get('venue_id'):
             location_data['venue'] = Location.get_one(location_data['venue_id'])
         return location_data
-
-    @classmethod
-    def get_new_conference_kwargs(cls, params):
-        start_dt = cls.get_start_dt(params)
-        end_dt = cls.get_end_dt(params, start_dt)
-        return {'title': params['title'],
-                'timezone': unicode(params['Timezone']),
-                'start_dt': start_dt,
-                'end_dt': end_dt}
 
     @classmethod
     def setValues(cls, c, confData, notify=False):
@@ -280,7 +156,3 @@ class UtilsConference:
             # This shouldn't happen anymore with the /e/ namespace but we keep the check just to be safe
             raise ValueError(
                 _("Short URL tag conflicts with an URL used by Indico: '%s'. Please select another one.") % tag)
-
-
-def sortByStartDate(conf1,conf2):
-    return cmp(conf1.getStartDate(),conf2.getStartDate())
