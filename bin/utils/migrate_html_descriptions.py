@@ -249,9 +249,12 @@ def main(event, category, dry_run, html_log, verbose):
         else:
             migrate_description(contrib, verbose, log)
 
-    categories = db.m.Category.find(db.m.Category.description.op('~')('<[a-zA-Z]+>'))
-    for category in categories:
-        migrate_description(category, verbose, log)
+    if not event:
+        categories = db.m.Category.find(db.m.Category.description.op('~')('<[a-zA-Z]+>'))
+        if category:
+            categories = categories.filter(db.m.Category.id == category)
+        for category in categories:
+            migrate_description(category, verbose, log)
 
     if log:
         log.write('</table>')
