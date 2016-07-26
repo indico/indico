@@ -67,5 +67,10 @@
         $('#search-input').realtimefilter({
             callback: applySearchFilters
         });
+
+        // make sure that filters are applied when e.g. going back in
+        // browser history, this is needed since typewatch, which is used internally
+        // by realtimefilter, calls applySearchFilter only when user is typing
+        applySearchFilters();
     };
 })(window);
