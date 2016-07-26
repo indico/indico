@@ -23,7 +23,7 @@ ${ template_hook('global-announcement') }
 
     <div class="global-menu toolbar">
         <a href="${ url_for_index() }">${ _("Home") }</a>
-        <a class="arrow" href="#" data-toggle="dropdown">${ _("Create event") }</a>
+        <a class="arrow js-dropdown" href="#" data-toggle="dropdown" js-dropdown data-dropdown-always-listen>${ _("Create event") }</a>
         <ul class="dropdown">
             <li>
                 ${ tpl.create_event_link(currentCategory, 'lecture', _('Create lecture'), id='create-lecture') }
@@ -43,7 +43,7 @@ ${ template_hook('global-announcement') }
         % if len(adminItemList) == 1:
             <a href="${ adminItemList[0]['url'] }">${ adminItemList[0]['text'] }</a>
         % elif len(adminItemList) > 1:
-            <a class="arrow" href="#" data-toggle="dropdown">${ _("Administration") }</a>
+            <a class="arrow js-dropdown" href="#" data-toggle="dropdown">${ _("Administration") }</a>
             <ul class="dropdown">
                 % for item in adminItemList:
                     <li><a href="${ item['url'] }">${ item['text'] }</a></li>
@@ -57,7 +57,7 @@ ${ template_hook('global-announcement') }
                     <a href="${ item.url }">${ item.caption }</a>
                 % endfor
             % else:
-                <a class="arrow" href="#" data-toggle="dropdown">${ dropdown_title }</a>
+                <a class="arrow js-dropdown" href="#" data-toggle="dropdown">${ dropdown_title }</a>
                 <ul class="dropdown">
                     % for item in items:
                         <li><a href="${ item.url }">${ item.caption }</a></li>
@@ -70,7 +70,7 @@ ${ template_hook('global-announcement') }
             <a href="${ url_for('users.user_dashboard', user_id=None) }">${ _("My profile") }</a>
         % endif
 
-        <a class="arrow" href="#" data-toggle="dropdown">${ _("Help") }</a>
+        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">${ _("Help") }</a>
         <ul class="dropdown">
             <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
             % if show_contact:
@@ -99,7 +99,5 @@ ${ template_hook('global-announcement') }
         }
       })
     });
-
-    $('.global-menu').dropdown({selector: 'a[data-toggle=dropdown]'});
-  })
+  });
 </script>
