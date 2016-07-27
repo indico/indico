@@ -81,28 +81,6 @@ function objectInvoker(object, args) {
 }
 
 /**
- * Returns a template that invokes the method on an input value with the arguments.
- * @param {Function, String} method
- * @param {Array} [args]
- * @return {Function} template
- */
-function methodInvoker(method, args) {
-	args = any(args, []);
-	if (isFunction(method)) {
-		return function(object) {
-			return method.apply(object, args);
-		};
-	} else {
-		return function(object) {
-			var func = object[method];
-			if (exists(func)) {
-				return func.apply(object, args);
-			}
-		};
-	}
-}
-
-/**
  * Creates a sequential invoker from the functions.
  * @param {Function} ... functions
  * @return {Function} sequence
@@ -112,18 +90,6 @@ function sequence() {
 	return function Sequence() {
 		iterate(functions, invoker(this, $A(arguments)));
 	};
-}
-
-/**
- * Returns a function with attachable targets.
- * @param {Function} method
- * @return {Function}
- */
-function commander(method) {
-	var objects = new Bag();
-	return mixinInstance(function() {
-		return objects.each(methodInvoker(method, $A(arguments)));
-	}, objects, Attachable);
 }
 
 /**

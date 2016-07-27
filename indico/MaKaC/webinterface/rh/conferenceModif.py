@@ -29,7 +29,6 @@ from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
@@ -40,6 +39,7 @@ from indico.core.config import Config
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
+from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 import MaKaC.common.filters as filters
@@ -146,34 +146,12 @@ class RHConfScreenDatesEdit(RHConferenceModifBase):
         return p.display()
 
 
-class RHConferenceModifKey(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._modifkey = params.get("modifKey", "").strip()
-        self._doNotSanitizeFields.append("modifKey")
-        self._redirectURL = params.get("redirectURL", "")
-
-    def _checkProtection(self):
-        modif_keys = session.setdefault('modifKeys', {})
-        modif_keys[self._conf.getId()] = self._modifkey
-        session.modified = True
-
-        RHConferenceModifBase._checkProtection(self)
-
-    def _process( self ):
-        if self._redirectURL != "":
-            url = self._redirectURL
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        self._redirect( url )
-
-class RHConferenceModifManagementAccess( RHConferenceModifKey ):
+class RHConferenceModifManagementAccess( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfManagementAccess
     _tohttps = True
 
     def _checkParams(self, params):
-        RHConferenceModifKey._checkParams(self, params)
+        RHConferenceModifBase._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
@@ -183,14 +161,11 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
 
     def _checkProtection(self):
         if not (self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
-            RHConferenceModifKey._checkProtection(self)
+            RHConferenceModifBase._checkProtection(self)
 
     def _process(self):
         url = None
-        if self._redirectURL != "":
-            url = self._redirectURL
-
-        elif self._conf.canModify(self.getAW()):
+        if self._conf.canModify(self.getAW()):
             url = urlHandlers.UHConferenceModification.getURL( self._conf )
 
         elif self._isPRM:
@@ -204,25 +179,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         if not url:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
 
-        self._redirect(url)
-
-
-class RHConferenceCloseModifKey(RHConferenceBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._modifkey = params.get("modifKey", "").strip()
-        self._doNotSanitizeFields.append("modifKey")
-        self._redirectURL = params.get("redirectURL", "")
-
-    def _process(self):
-        modif_keys = session.get("modifKeys")
-        if modif_keys and modif_keys.pop(self._conf.getId(), None):
-            session.modified = True
-        if self._redirectURL != "":
-            url = self._redirectURL
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         self._redirect(url)
 
 
@@ -254,77 +210,6 @@ class RHConfPerformDataModif(RHConferenceModifBase):
         if not self._cancel:
             UtilsConference.setValues( self._conf, self._getRequestParams() )
         self._redirect( urlHandlers.UHConferenceModification.getURL( self._conf) )
-
-
-class RHConfModifAC( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifAC
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            p = conferences.WPConfModifAC( self, self._target)
-            wf=self.getWebFactory()
-            if wf is not None:
-                p = wf.getConfModifAC(self, self._conf)
-            return p.display()
-
-
-class RHConfSetVisibility( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfSetVisibility
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        if params.has_key("changeToPrivate"):
-            self._protectConference = 1
-        elif params.has_key("changeToInheriting"):
-            self._protectConference = 0
-        elif params.has_key("changeToPublic"):
-            self._protectConference = -1
-
-    def _process( self ):
-        self._conf.setProtection( self._protectConference )
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._conf ) )
-
-class RHConfGrantSubmissionToAllSpeakers( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfGrantSubmissionToAllSpeakers
-
-    def _process( self ):
-        for cont in self._target.as_event.contributions:
-            speakers = cont.speakers[:]
-            for sCont in cont.subcontributions:
-                speakers += sCont.speakers
-            for speaker in speakers:
-                if speaker.person.user:
-                    cont.update_principal(speaker.person.user, add_roles={'submit'})
-        self._redirect(urlHandlers.UHConfModifAC.getURL( self._target ))
-
-class RHConfRemoveAllSubmissionRights( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfRemoveAllSubmissionRights
-
-    def _process( self ):
-        for cont in self._target.as_event.contributions:
-            for entry in set(cont.acl_entries):
-                if entry.has_management_role('submit', explicit=True):
-                    cont.update_principal(entry.principal, del_roles={'submit'})
-        event = self._conf.as_event
-        for entry in set(event.acl_entries):
-            if entry.has_management_role('submit', explicit=True):
-                event.update_principal(entry.principal, del_roles={'submit'})
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
-
-class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfGrantModificationToAllConveners
-
-    def _process(self):
-        event = self._conf.as_event
-        for sess in event.sessions:
-            for convener in sess.conveners:
-                principal = convener.person.principal
-                if principal:
-                    sess.update_principal(principal, full_access=True)
-        self._redirect(urlHandlers.UHConfModifAC.getURL(self._target))
 
 
 #######################################################################################
@@ -463,7 +348,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
+            self._redirect(self._conf.as_event.category.url)
             return "done"
         else:
             return nbClones
@@ -608,7 +493,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     year = year + 1
                 date = datetime(year,month,int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
+            self._redirect(self._conf.as_event.category.url)
         else:
             return nbClones
 
@@ -1395,7 +1280,6 @@ class RHAbstractsToXML(RHConfModifCFABase):
         self._abstracts = []
         abMgr = self._conf.getAbstractMgr()
         for id in self._abstractIds:
-            #if abMgr.getAbstractById(id).canView( self._aw ):
             self._abstracts.append(abMgr.getAbstractById(id))
 
     def _process(self):
@@ -2080,7 +1964,7 @@ class RHConfPosterDesign(RHConferenceModifBase):
                 p = admins.WPPosterTemplateDesign(self, self._target, self.__templateId, self.__new)
             else:
                 if self.__new == True and self.__baseTemplate != 'blank':
-                    dconf = conference.CategoryManager().getDefaultConference()
+                    dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
                     templMan = self._target.getPosterTemplateManager()
                     newId = self.__templateId
                     dconf.getPosterTemplateManager().getTemplateById(self.__baseTemplate).clone(templMan, newId)
@@ -2102,7 +1986,8 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
             raise FormValuesError(_("Poster not selected"))
         if self.__templateId.find('global') != -1:
             self.__templateId = self.__templateId.replace('global','')
-            self.__template = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplateById(self.__templateId)
+            self.__template = (HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                               .getPosterTemplateManager().getTemplateById(self.__templateId))
         else:
             self.__template = self._conf.getPosterTemplateManager().getTemplateById(self.__templateId)
         try:

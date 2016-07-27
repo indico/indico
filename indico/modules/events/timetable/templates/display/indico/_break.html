@@ -2,7 +2,8 @@
 {% from 'events/display/indico/_common.html' import render_location %}
 {% from 'events/timetable/display/indico/_common.html' import render_description, render_time %}
 
-{% macro render_break(item, event, parent=none, timezone=none, show_notes=true, hide_end_time=false, nested=false) %}
+{% macro render_break(item, event, parent=none, timezone=none, show_notes=true, hide_end_time=false, nested=false,
+                      show_location=false) %}
     <li class="timetable-item timetable-break">
         <span class="timetable-time break {{ 'nested' if nested else 'top-level' }}">
             {{ render_time(item, timezone=timezone, hide_end_time=hide_end_time) }}
@@ -14,13 +15,13 @@
                     {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
                     {{- item.title | safe -}}
                 </span>
-                {% if hide_end_time and item.duration -%}
+                {% if item.duration -%}
                     <span class="icon-time timetable-duration">
                         {{ item.duration | format_human_timedelta(narrow=true) }}
                     </span>
                 {%- endif %}
 
-                {% if not item.inherit_location and item.has_location_info -%}
+                {% if item.has_location_info and show_location -%}
                     {{ render_location(item, parent=parent) }}
                 {%- endif %}
 
@@ -29,6 +30,5 @@
                 {{ render_description(item, class='break-description') }}
             {% endif %}
         </div>
-
     </li>
 {% endmacro %}

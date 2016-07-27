@@ -19,7 +19,12 @@ from __future__ import unicode_literals
 from flask import session, redirect, request
 from werkzeug.datastructures import MultiDict
 
+from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.auth import Identity
+from indico.modules.users import User
+from indico.modules.users.operations import create_user
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 
@@ -34,7 +39,8 @@ def save_identity_info(identity_info, user):
         'multipass_data': identity_info.multipass_data,
         'data': dict(identity_info.data.lists()),
         'indico_user_id': user.id if user else None,
-        'email_verified': bool(identity_info.data.get('email') and trusted_email)
+        'email_verified': bool(identity_info.data.get('email') and trusted_email),
+        'moderated': identity_info.provider.settings.get('moderated', False)
     }
 
 
@@ -49,6 +55,21 @@ def load_identity_info():
     info['data'] = MultiDict()
     info['data'].update(data)
     return info
+
+
+def register_user(email, extra_emails, user_data, identity_data, settings, from_moderation=False):
+    """
+    Create a user based on the registration data provided during te
+    user registration process (via `RHRegister` and `RegistrationHandler`).
+
+    This method is not meant to be used for generic user creation, the
+    only reason why this is here is that approving a registration request
+    is handled by the `users` module.
+    """
+    identity = Identity(**identity_data)
+    user = create_user(email, user_data, identity=identity, settings=settings, other_emails=extra_emails,
+                       from_moderation=from_moderation)
+    return user, identity
 
 
 def redirect_to_login(next_url=None, reason=None):

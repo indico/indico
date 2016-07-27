@@ -57,20 +57,17 @@
 
 .side-menu {
     @extend %font-family-title;
-    float: left;
-    width: 200px;
-    margin-right: 30px;
-    margin-left: 30px;
     font-size: 1.1em;
     @include user-select(none);
-    background: #ECECEC;
+    border-radius: 2px;
+    border: 1px solid lightgray;
+    @include single-box-shadow();
 
     ul.menu-items > li.section {
         padding: 0;
 
         .title-wrapper {
             @include icon-before('icon-arrow-down');
-            padding: 10px;
             cursor: pointer;
 
             &:before {
@@ -88,139 +85,92 @@
     }
 
     ul.menu-items {
-        min-height: 200px;
+        display: flex;
+        flex-direction: column;
         list-style-type: none;
         padding: 0;
         margin: 0;
 
         > li {
+            display: block;
             border-bottom: 1px solid darken($pastel-gray, 2%);
             margin: 0;
-
-            padding: 10px 10px 10px 27px;
-            display: block;
 
             &.disabled {
                 color: $dark-gray;
             }
 
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .title-wrapper {
+                display: block;
+                min-height: 2.3rem;
+                line-height: 2.3rem;
+                padding-left: 9px;
+
+                .title {
+                    display: inline;
+                    padding-left: 3px;
+                }
+            }
+
             .title {
+                display: block;
+                min-height: 2.3rem;
+                line-height: 2.3rem;
                 color: $black;
-                cursor: pointer;
+                padding-left: 26px;
 
                 &:before {
                     margin-right: 0.5rem;
+                }
+
+                span {
+                    display: inline-block;
+                    vertical-align: middle;
                 }
             }
 
             a.title {
                 color: $dark-blue;
-
-                &:hover {
-                    color: $darker-blue;
-                }
             }
 
             > ul {
+                list-style-type: none;
                 font-size: 0.95em;
                 padding: 0;
-            }
 
-            > ul > li {
-                padding: 5px 5px 5px 27px;
-                display: block;
-
-                &:last-child {
-                    margin-bottom: 5px;
+                > li .title {
+                    min-height: 1.7rem;
+                    line-height: 1.7rem;
+                    padding-left: 51px;
                 }
             }
 
             &:last-child > ul > li:last-child {
                 margin-bottom: 0;
             }
+
+            &:not(.active) a.title:hover {
+                color: $darker-blue;
+                background-color: $light-gray;
+            }
+
+            &.active a.title {
+                color: $darker-blue;
+            }
         }
     }
 }
 
 ul.menu-items li.active {
+    @include inner-border-left($link, $width: 2px);
     position: relative;
-    background-color: $pastel-gray;
+    background-color: $light-blue;
 
     > a {
         font-weight: normal;
-    }
-
-    &:before {
-        display: block;
-        content: ".";
-        color: transparent;
-        font-size: 0;
-        border-right: 2px solid $link;
-        height: 100%;
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-}
-
-.side-menu.old-style-menu {
-    @include border-radius();
-    margin: 0px 15px 0 0;
-
-    > ul.menu-items {
-        margin-top: 15px;
-        border-bottom: 1px solid $gray;
-    }
-
-    .corner {
-        width: 15px;
-        height: 15px;
-        margin-right: -15px;
-        float: right;
-        background: transparent image-url('../images/grey_corners.png') scroll no-repeat -30px 0;
-    }
-}
-
-.menu {
-
-    &.vertical {
-        padding: 0;
-
-        >.item {
-            display: block;
-            height: auto!important;
-            vertical-align: middle;
-            line-height: 1;
-            text-decoration: none;
-            padding: 1em;
-            border-bottom: 1px solid $separator-color;
-            position: relative;
-            @include transition-property(opacity, background-color);
-            @include transition-duration(.1s, .1s);
-            @include transition-timing-function(ease-out, ease-in);
-
-            &:hover {
-                cursor: pointer;
-                background-color: $light-gray;
-                color: $link;
-            }
-
-            &.active {
-                font-weight: bold;
-                background-color: $light-gray;
-
-                &:before {
-                    display:block;
-                    content:".";
-                    color:transparent;
-                    font-size:0;
-                    border-left:2px solid $link;
-                    height:100%;
-                    position:absolute;
-                    left:0;
-                    top:0;
-                }
-            }
-        }
     }
 }

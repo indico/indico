@@ -4,31 +4,14 @@
 # maybe all of this should be moved to the W* class?
 
 from MaKaC.fossils.conference import IConferenceFossil
-import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import escape
+from indico.modules.categories.util import get_visibility_options
+from indico.modules.events.models.events import EventType
 
-wr = webFactoryRegistry.WebFactoryRegistry()
-typeList = { "conference" : "conference" }
-for fact in wr.getFactoryList():
-    val = fact.getId()
-
-    if val == 'simple_event':
-        val = 'lecture'
-
-    typeList[fact.getId()] = val
-
-visibilityList = {}
-topcat = confObj.getOwnerList()[0]
-level = 0
-visibilityList[0] = 'Nowhere'
-while topcat:
-    level += 1
-    if topcat.getId() != "0":
-        from MaKaC.common.TemplateExec import truncateTitle
-        visibilityList[level] = truncateTitle(topcat.getName(), 50)
-    topcat = topcat.getOwner()
-visibilityList[999] = 'Everywhere'
+event_types = {t.name: str(t.title) for t in EventType}
+visibilityList = dict(get_visibility_options(confObj.as_event))
+visibilityList[999] = visibilityList.pop('')
 
 numRows = 11
 
@@ -126,7 +109,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Event type")}</span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditType">${eventType }</span>
+        <span id="inPlaceEditType">${ confObj.as_event.type_.title }</span>
     </td>
 </tr>
 <tr>
@@ -198,10 +181,10 @@ $E('inPlaceEditDefaultStyle').set(new SelectEditWidget('event.main.changeDefault
         {'conference':'${ conferenceId }'}, ${ styleOptions }, ${ jsonEncode(defaultStyle) }, null).draw());
 
 $E('inPlaceEditVisibility').set(new SelectEditWidget('event.main.changeVisibility',
-        {'conference':'${ conferenceId }'}, ${ visibilityList }, ${ jsonEncode(visibility) }, null).draw());
+        {'conference':'${ conferenceId }'}, ${ visibilityList|n,j }, ${ jsonEncode(visibility) }, null).draw());
 
 $E('inPlaceEditType').set(new SelectEditWidget('event.main.changeType',
-        {'conference':'${ conferenceId }'}, ${ typeList }, ${ jsonEncode(eventType) }, null).draw());
+        {'conference':'${ conferenceId }'}, ${ event_types }, ${ jsonEncode(confObj.as_event.type) }, null).draw());
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}, confFossile.type != 'simple_event').draw());
 

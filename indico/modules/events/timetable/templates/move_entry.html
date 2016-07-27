@@ -127,7 +127,7 @@
             var $item = $(this).parent();
             var data = {'parent_id': $item.data('entry-id'), 'day': $item.closest('ul').data('show-for')};
             $item.trigger('ajaxDialog:close', [data]);
-        })
+        });
 
         $('#move-timetable-entry-dialog .scroll-btn').on('click', function() {
             var $this = $(this);
@@ -143,7 +143,7 @@
             var scrollingEnd = $this.outerWidth() + $this.scrollLeft() == $this[0].scrollWidth;
             $this.parent().find('.fader-left').toggleClass('visible', $this.scrollLeft() > 0);
             $this.parent().find('.fader-right').toggleClass('visible', !scrollingEnd);
-        })
+        });
 
         _.defer(function(){
             $('#move-timetable-entry-dialog .days .day.highlight').trigger('click');

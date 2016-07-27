@@ -48,14 +48,19 @@ layout_settings = EventSettingsProxy('layout', {
     'use_custom_menu': False,
     'timetable_by_room': False,
     'timetable_detailed': False
-}, preload=True)
+})
 
 theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
 
 
+@signals.event.type_changed.connect
+def _event_type_changed(event, **kwargs):
+    layout_settings.delete(event, 'timetable_theme')
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu_layout(sender, event, **kwargs):
-    if not event.can_manage(session.user, allow_key=True):
+    if not event.can_manage(session.user):
         return
     if event.as_legacy.getType() == 'conference':
         yield SideMenuItem('layout', _('Layout'), url_for('event_layout.index', event), section='customization')

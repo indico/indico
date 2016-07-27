@@ -29,7 +29,6 @@ from indico.core.db import db
 from indico.modules.api import APIKey
 from indico.modules.auth import Identity
 from indico.modules.users import User, user_settings
-from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.links import UserLink
 from indico.modules.users.models.users import UserTitle
 from indico.util.caching import memoize
@@ -73,22 +72,10 @@ class UserImporter(Importer):
     def has_data(self):
         return bool(User.find().count())
 
-    @contextmanager
-    def _monkeypatch(self):
-        prop = FavoriteCategory.target
-        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'].get(str(fc.target_id)),
-                                           prop.fset,
-                                           prop.fdel)
-        try:
-            yield
-        finally:
-            FavoriteCategory.target = prop
-
     def migrate(self):
         self.users_by_primary_email = {}
         self.users_by_secondary_email = {}
-        with self._monkeypatch():
-            self.migrate_users()
+        self.migrate_users()
         self.fix_sequences('users', {'users'})
         self.migrate_favorite_users()
         self.migrate_admins()
@@ -125,6 +112,7 @@ class UserImporter(Importer):
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
             # favorite users cannot be migrated here since the target user might not have been migrated yet
+            # XXX: adapt to new categories for 2.0
             user.favorite_categories = set(filter(None, avatar.linkedTo['category']['favorite']))
             db.session.flush()
             print cformat('%{green}+++%{reset} '

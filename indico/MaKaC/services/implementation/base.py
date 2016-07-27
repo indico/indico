@@ -25,8 +25,6 @@ from flask import request, session
 from pytz import timezone
 
 
-from MaKaC.conference import Category
-from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
 from MaKaC.common.utils import parseDateTime
@@ -41,12 +39,9 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.i18n import _
 from MaKaC.common.contextManager import ContextManager
-import MaKaC.common.info as info
 
 from indico.core.config import Config
 from indico.util.string import unicode_struct_to_utf8
-
-# base module for asynchronous server requests
 
 
 class ExpectedParameterException(ServiceError):
@@ -258,45 +253,14 @@ class ServiceBase(RequestHandlerBase):
 
 
 class ProtectedService(ServiceBase):
-    """
-    ProtectedService is a parent class for ProtectedDisplayService and ProtectedModificationService
-    """
-
     def _checkSessionUser(self):
         """
         Checks that the current user exists (is authenticated)
         """
 
-        if self._getUser() == None:
+        if self._getUser() is None:
             self._doProcess = False
             raise ServiceAccessError("You are currently not authenticated. Please log in again.")
-
-
-class ProtectedDisplayService(ProtectedService):
-    """
-    A ProtectedDisplayService can only be accessed by users that
-    are authorized to "see" the target resource
-    """
-
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection, assuring that
-        the user is authorized to view the target resource
-        """
-        if not self._target.canAccess( self.getAW() ):
-            from MaKaC.conference import Resource
-            # in some cases, the target does not directly have an owner
-            if isinstance(self._target, Resource):
-                target = self._target.getOwner()
-            else:
-                target = self._target
-            if not isinstance(target, Category):
-                if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
-                    raise ServiceAccessError("You are currently not authenticated or cannot access this service. Please log in again if necessary.")
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise ServiceAccessError("You cannot access this service. Please log in again if necessary.")
 
 
 class LoggedOnlyService(ProtectedService):
@@ -321,9 +285,7 @@ class ProtectedModificationService(ProtectedService):
 
         target = self._target
         if not target.canModify( self.getAW() ):
-            if target.getModifKey() != "":
-                raise ServiceAccessError("You don't have the rights to modify this object")
-            if self._getUser() == None:
+            if self._getUser() is None:
                 self._checkSessionUser()
             else:
                 raise ServiceAccessError("You don't have the rights to modify this object")
@@ -436,17 +398,3 @@ class ListModificationBase:
             self._handleSet()
 
         return self._value
-
-
-class ExportToICalBase(object):
-
-    def _checkParams(self):
-        user = self._getUser()
-        if not user:
-            raise ServiceAccessError("User is not logged in!")
-        apiKey = user.api_key
-        if not apiKey:
-            raise ServiceAccessError("User has no API key!")
-        elif apiKey.is_blocked:
-            raise ServiceAccessError("This API key is blocked!")
-        self._apiKey = apiKey

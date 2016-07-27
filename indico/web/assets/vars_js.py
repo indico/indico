@@ -71,6 +71,8 @@ def generate_global_file(config):
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
             'FontSassBundle': core_env['fonts_sass'].urls(),
 
+            'EventCreation': url_rule_to_js('events.create'),
+
             'RegistrationForm': {
                 'section': {
                     'add': url_rule_to_angular('event_registration.add_section'),
@@ -134,6 +136,12 @@ def generate_global_file(config):
 
             'Sessions': {
                 'display_session': url_rule_to_js('sessions.display_session')
+            },
+
+            'Categories': {
+                'info': url_rule_to_js('categories.info'),
+                'infoFrom': url_rule_to_js('categories.info_from'),
+                'search': url_rule_to_js('categories.search')
             }
         },
 

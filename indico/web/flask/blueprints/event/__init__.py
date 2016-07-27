@@ -16,4 +16,3 @@
 
 from indico.web.flask.blueprints.event.display import event as event_display
 from indico.web.flask.blueprints.event.management import event_mgmt
-from indico.web.flask.blueprints.event.creation import event_creation

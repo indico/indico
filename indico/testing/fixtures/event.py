@@ -19,15 +19,15 @@ from datetime import timedelta
 import pytest
 
 from indico.modules.events import Event
+from indico.modules.events.models.events import EventType
 from indico.testing.mocks import MockConference, MockConferenceHolder
 from indico.util.date_time import now_utc
 from MaKaC.conference import ConferenceHolder
 
 
 @pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
+def create_event(monkeypatch, monkeypatch_methods, dummy_user, dummy_category, db):
     """Returns a callable which lets you create dummy events"""
-    mocker.patch('MaKaC.conference.CategoryManager')
     monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
     monkeypatch.setattr('MaKaC.conference.Conference', MockConference)  # for some isinstance checks
 
@@ -39,12 +39,13 @@ def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
+        kwargs.setdefault('type_', EventType.meeting)
         kwargs.setdefault('title', u'dummy#{}'.format(id_) if id_ is not None else u'dummy')
         kwargs.setdefault('start_dt', now)
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1, **kwargs)
-        conf.as_event.category_chain = [1, 0]  # set after __init__ (setting category_id modifies it)
+        kwargs.setdefault('category', dummy_category)
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), **kwargs)
         db.session.flush()
         conf.id = str(conf.as_event.id)
         ch.add(conf)

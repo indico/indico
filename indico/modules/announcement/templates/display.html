@@ -1,0 +1,22 @@
+<div class="pageOverHeader clearfix" id="announcement-bar">
+    <div class="left clear">
+        {{ message | safe }}
+    </div>
+    <div class="icon-close icon-announcement js-close"></div>
+</div>
+<script>
+    (function() {
+        'use strict';
+
+        var hash = {{ message | crc32 | string | tojson }};
+
+        $('#announcement-bar .js-close').on('click', function() {
+            $.jStorage.set('hideAnnouncement', hash);
+            $('#announcement-bar').slideUp('fast');
+        });
+
+        if ($.jStorage.get('hideAnnouncement') != hash){
+            $("#announcement-bar").show();
+        }
+    })();
+</script>

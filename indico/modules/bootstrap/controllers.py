@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from operator import itemgetter
+from __future__ import unicode_literals
+
 from platform import python_version
 
 import transaction
@@ -28,10 +29,11 @@ from indico.modules.auth import Identity, login_user
 from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.users import User
-from indico.util.i18n import _, get_all_locales, get_current_locale, parse_locale
+from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.util import url_for_index
 
 import MaKaC
 from MaKaC.webinterface.rh.base import RH
@@ -45,18 +47,16 @@ class RHBootstrap(RH):
 
     def _process_GET(self):
         if User.has_rows():
-            return redirect(url_for('misc.index'))
+            return redirect(url_for_index())
         return render_template('bootstrap/bootstrap.html',
-                               selected_lang_name=parse_locale(get_current_locale()).language_name,
-                               language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
-                               form=BootstrapForm(language=session.lang),
+                               form=BootstrapForm(),
                                timezone=Config.getInstance().getDefaultTimezone(),
                                indico_version=MaKaC.__version__,
                                python_version=python_version())
 
     def _process_POST(self):
         if User.has_rows():
-            return redirect(url_for('misc.index'))
+            return redirect(url_for_index())
         setup_form = BootstrapForm(request.form)
         if not setup_form.validate():
             flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
@@ -77,7 +77,7 @@ class RHBootstrap(RH):
         db.session.flush()
 
         user.settings.set('timezone', Config.getInstance().getDefaultTimezone())
-        user.settings.set('lang', to_unicode(setup_form.language.data))
+        user.settings.set('lang', session.lang or Config.getInstance().getDefaultLocale())
 
         login_user(user, identity)
         full_name = user.full_name  # needed after the session closes
@@ -87,7 +87,6 @@ class RHBootstrap(RH):
         # Configuring server's settings
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         minfo.setOrganisation(setup_form.affiliation.data)
-        minfo.setLang(setup_form.language.data)
 
         message = get_template_module('bootstrap/flash_messages.html').bootstrap_success(name=full_name)
         flash(Markup(message), 'success')
@@ -113,4 +112,4 @@ class RHBootstrap(RH):
                 category = 'success'
             flash(Markup(message), category)
 
-        return redirect(url_for('misc.index'))
+        return redirect(url_for_index())

@@ -32,6 +32,7 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -48,8 +49,8 @@ def _render_protection_message(linked_object):
 
 
 def _get_parent_info(parent):
-    from MaKaC.conference import Category
-    parent_data = {'is_protected': parent.is_protected}
+    parent_data = {'is_protected': parent.is_protected,
+                   'title': parent.title}
     if isinstance(parent, db.m.Event):
         parent_data['type'] = _('Event')
     elif isinstance(parent, db.m.Session):
@@ -58,9 +59,8 @@ def _get_parent_info(parent):
         parent_data['type'] = _('Contribution')
     elif isinstance(parent, db.m.SubContribution):
         parent_data['type'] = _('Sub contribution')
-    elif isinstance(parent, Category):
+    elif isinstance(parent, db.m.Category):
         parent_data['type'] = _('Category')
-    parent_data['title'] = parent.name if isinstance(parent, Category) else parent.title
     return parent_data
 
 
@@ -76,8 +76,10 @@ class ManageAttachmentsMixin:
     def _process(self):
         tpl_args = {'linked_object': self.object, 'linked_object_type': self.object_type,
                     'attachments': get_attached_items(self.object)}
-        if self.object_type in ('event', 'category'):
+        if self.object_type == 'event':
             return self.wp.render_template('attachments.html', self._target, **tpl_args)
+        elif self.object_type == 'category' and not request.is_xhr:
+            return self.wp.render_template('management/attachments.html', self.category, 'attachments', **tpl_args)
         else:
             return jsonify_template('attachments/attachments.html', **tpl_args)
 
@@ -92,8 +94,8 @@ class AddAttachmentFilesMixin:
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
                 filename = secure_filename(f.filename, 'attachment')
-                attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
-                                        protection_mode=form.protection_mode.data)
+                attachment = Attachment(folder=folder, user=session.user, title=to_unicode(f.filename),
+                                        type=AttachmentType.file, protection_mode=form.protection_mode.data)
                 if attachment.is_self_protected:
                     attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'

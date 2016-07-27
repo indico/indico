@@ -1,0 +1,7 @@
+<div class="error-box">
+    <h1>{{ error_message }}</h1>
+    <p>{{ error_description }}</p>
+    <div class="error-box-small">
+        <a href="{{ url_for_index() }}">{% trans %}Back to the main page{% endtrans %}</a>
+    </div>
+</div>

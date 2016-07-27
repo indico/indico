@@ -14,29 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from operator import itemgetter
+from __future__ import unicode_literals
 
-from wtforms import validators, TextField, SelectField, BooleanField
+from wtforms import StringField, BooleanField
 from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, Email
 
 from indico.modules.auth.forms import LocalRegistrationForm
-from indico.util.i18n import _, get_all_locales
+from indico.util.i18n import _
 from indico.web.forms.validators import UsedIfChecked
 from indico.web.forms.widgets import SwitchWidget
 
 
 class BootstrapForm(LocalRegistrationForm):
-    first_name = TextField('First Name', [validators.Required()])
-    last_name = TextField('Last Name', [validators.Required()])
-    email = EmailField(_('Email address'), [validators.Required()])
-    language = SelectField('Language', [validators.Required()])
-    affiliation = TextField('Affiliation', [validators.Required()])
+    first_name = StringField('First Name', [DataRequired()])
+    last_name = StringField('Last Name', [DataRequired()])
+    email = EmailField(_('Email address'), [DataRequired()])
+    affiliation = StringField('Affiliation', [DataRequired()])
     enable_tracking = BooleanField('Join the community', widget=SwitchWidget())
-    contact_name = TextField('Contact Name',
-                             [UsedIfChecked('enable_tracking'), validators.Required()])
-    contact_email = EmailField('Contact Email Address',
-                               [UsedIfChecked('enable_tracking'), validators.Required(), validators.Email()])
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapForm, self).__init__(*args, **kwargs)
-        self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))
+    contact_name = StringField('Contact Name', [UsedIfChecked('enable_tracking'), DataRequired()])
+    contact_email = EmailField('Contact Email Address',  [UsedIfChecked('enable_tracking'), DataRequired(), Email()])

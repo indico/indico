@@ -103,7 +103,7 @@ def _set_duration(target, value, oldvalue, *unused):
 def _add_timetable_consistency_trigger(target, conn, **kw):
     sql = """
         CREATE CONSTRAINT TRIGGER consistent_timetable
-        AFTER INSERT OR UPDATE
+        AFTER INSERT OR UPDATE OF duration
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW

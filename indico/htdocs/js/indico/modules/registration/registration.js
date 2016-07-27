@@ -60,7 +60,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     $('#payment-disabled-notice').remove();
-                    $('#event-sidemenu').html(data.event_menu);
+                    $('#event-side-menu').html(data.event_menu);
                 }
             });
         });

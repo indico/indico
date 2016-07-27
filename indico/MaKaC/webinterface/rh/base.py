@@ -57,7 +57,7 @@ from MaKaC.errors import (
     NotFoundError)
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.pages.errors as errors
-from MaKaC.webinterface.pages.error import WErrorWSGI
+from MaKaC.webinterface.pages.error import render_error
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
@@ -90,12 +90,6 @@ class RequestHandlerBase():
         a method named e.g. _checkProtection_POST which will be executed AFTER this one.
         """
         pass
-
-    def _getAuth(self):
-        """
-        Returns True if current user is a user or has either a modification key in their session.
-        """
-        return session.get('modifKeys') or self._getUser()
 
     def getAW(self):
         """
@@ -467,21 +461,21 @@ class RH(RequestHandlerBase):
 
     @jsonify_error(status=403)
     def _processForbidden(self, e):
-        if session.user is None and not request.is_xhr and not e.response:
+        if session.user is None and not request.is_xhr and not e.response and request.blueprint != 'auth':
             return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
         explanation = get_error_description(e)
-        return WErrorWSGI((message, explanation)).getHTML()
+        return render_error(message, explanation)
 
     @jsonify_error(status=400)
     def _processBadRequest(self, e):
         message = _("Bad Request")
-        return WErrorWSGI((message, e.description)).getHTML()
+        return render_error(message, e.description)
 
     @jsonify_error(status=400)
     def _processBadData(self, e):
         message = _("Invalid or expired token")
-        return WErrorWSGI((message, e.message)).getHTML()
+        return render_error(message, e.message)
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
@@ -548,7 +542,7 @@ class RH(RequestHandlerBase):
         else:
             message = e.getMessage()
             explanation = e.getExplanation()
-        return WErrorWSGI((message, explanation)).getHTML()
+        return render_error(message, explanation)
 
     @jsonify_error
     def _processFormValuesError(self, e):
@@ -586,10 +580,9 @@ class RH(RequestHandlerBase):
         # this is used for checking access/modification key existence
         # in the user session
         self._setSessionUser()
-        if self._getAuth():
-            if self._getUser():
-                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
-                    request, self._getUser().getFullName(), self._getUser().getId()))
+        if self._getUser():
+            Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
+                request, self._getUser().getFullName(), self._getUser().getId()))
             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                 self._tohttps = True
                 if self._checkHttpsRedirect():
@@ -848,25 +841,20 @@ class RHProtected(RH):
 
 
 class RHDisplayBaseProtected(RHProtected):
-
     def _checkProtection(self):
-        if not self._target.canAccess( self.getAW() ):
-            from MaKaC.conference import Resource, Category
-            if isinstance(self._target, Resource):
-                target = self._target.getOwner()
-            else:
-                target = self._target
-            if not isinstance(self._target, Category) and target.isProtected():
-                if target.getAccessKey() != "" or target.getConference() and \
-                        target.getConference().getAccessKey() != "":
-                    raise KeyAccessError()
-                elif target.getModifKey() != "" or target.getConference() and \
-                        target.getConference().getModifKey() != "":
-                    raise ModificationError()
-            if self._getUser() is None:
-                self._checkSessionUser()
-            else:
-                raise AccessError()
+        if isinstance(self._target, Conference):
+            event = self._target.as_event
+            can_access = event.can_access(session.user)
+            if not can_access and event.access_key:
+                raise KeyAccessError()
+        else:
+            can_access = self._target.canAccess(self.getAW())
+        if can_access:
+            return
+        elif self._getUser() is None:
+            self._checkSessionUser()
+        else:
+            raise AccessError()
 
 
 class RHModificationBaseProtected(RHProtected):
@@ -876,12 +864,10 @@ class RHModificationBaseProtected(RHProtected):
 
     def _checkProtection(self):
         if isinstance(self._target, Conference):
-            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE, allow_key=True)
+            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE)
         else:
             can_manage = self._target.canModify(session.avatar)
         if not can_manage:
-            if self._target.getModifKey() != "":
-                raise ModificationError()
             if self._getUser() is None:
                 self._checkSessionUser()
             else:

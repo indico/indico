@@ -68,7 +68,7 @@ class RHSwitchFeature(RHFeaturesBase):
     CSRF_ENABLED = True
 
     def render_event_menu(self):
-        return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option, old_style=True,
+        return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option,
                                event=self.event_new)
 
     def _format_feature_names(self, names):

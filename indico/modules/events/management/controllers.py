@@ -18,18 +18,27 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import flash, redirect, session
-from werkzeug.exceptions import Forbidden, NotFound
+from flask import flash, redirect, session, request
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.modules.categories.models.categories import Category
+from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm
+from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
-from indico.modules.events.util import get_object_from_args
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.operations import delete_event, create_event_references, update_event
+from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
+from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
-from indico.web.flask.util import url_for, jsonify_data
-from indico.web.util import jsonify_template
-
+from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_template, jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -46,15 +55,9 @@ class RHDeleteEvent(RHConferenceModifBase):
         return jsonify_template('events/management/delete_event.html', event=self._conf)
 
     def _process_POST(self):
-        category = self._conf.getOwner()
-        self._conf.delete(session.user)
+        delete_event(self.event_new)
         flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
-
-        if category:
-            redirect_url = url_for('category_mgmt.categoryModification', category)
-        else:
-            redirect_url = url_for('misc.index')
-
+        redirect_url = url_for('categories.manage_content', self.event_new.category)
         return jsonify_data(url=redirect_url, flash=False)
 
 
@@ -134,3 +137,122 @@ class RHShowNonInheriting(RHConferenceModifBase):
     def _process(self):
         objects = self.obj.get_non_inheriting_objects()
         return jsonify_template('events/management/non_inheriting_objects.html', objects=objects)
+
+
+class RHEventACL(RHConferenceModifBase):
+    """Display the inherited ACL of the event"""
+
+    def _process(self):
+        return render_acl(self.event_new)
+
+
+class RHEventACLMessage(RHConferenceModifBase):
+    """Render the inheriting ACL message"""
+
+    def _process(self):
+        mode = ProtectionMode[request.args['mode']]
+        return jsonify_template('forms/protection_field_acl_message.html', object=self.event_new, mode=mode,
+                                endpoint='event_management.acl')
+
+
+class RHEventProtection(RHConferenceModifBase):
+    """Show event protection"""
+
+    def _process(self):
+        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, {'protection_mode': form.protection_mode.data,
+                                          'own_no_access_contact': form.own_no_access_contact.data,
+                                          'access_key': form.access_key.data})
+            update_object_principals(self.event_new, form.acl.data, read_access=True)
+            update_object_principals(self.event_new, form.managers.data, full_access=True)
+            update_object_principals(self.event_new, form.submitters.data, role='submit')
+            self._update_session_coordinator_privs(form)
+            flash(_('Protection settings have been updated'), 'success')
+            return redirect(url_for('.protection', self.event_new))
+        return WPEventManagement.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
+
+    def _get_defaults(self):
+        acl = {p.principal for p in self.event_new.acl_entries if p.read_access}
+        submitters = {p.principal for p in self.event_new.acl_entries if p.has_management_role('submit', explicit=True)}
+        managers = {p.principal for p in self.event_new.acl_entries if p.full_access}
+        registration_managers = {p.principal for p in self.event_new.acl_entries
+                                 if p.has_management_role('registration', explicit=True)}
+        event_session_settings = session_settings.get_all(self.event_new)
+        coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
+                             if event_session_settings.get(val)}
+        return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
+                     'registration_managers': registration_managers, 'submitters': submitters,
+                     'access_key': self.event_new.access_key,
+                     'own_no_access_contact': self.event_new.own_no_access_contact}, **coordinator_privs)
+
+    def _update_session_coordinator_privs(self, form):
+        for priv_field in form.priv_fields:
+            try:
+                setting = COORDINATOR_PRIV_SETTINGS[priv_field]
+            except KeyError:
+                raise BadRequest('No such privilege')
+            session_settings.set(self.event_new, setting, form.data[priv_field])
+            log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
+                                                                               COORDINATOR_PRIV_TITLES[priv_field])
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
+
+
+class RHMoveEvent(RHConferenceModifBase):
+    """Move event to a different category"""
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
+        if not self.target_category.can_create_events(session.user):
+            raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
+
+    def _process(self):
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        old_path = sep.join(self.event_new.category.chain_titles)
+        new_path = sep.join(self.target_category.chain_titles)
+        self.event_new.move(self.target_category)
+        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
+                           data={'From': old_path, 'To': new_path})
+        flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
+              'success')
+        return jsonify_data(flash=False)
+
+
+class RHManageReferences(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventReferencesForm(obj=FormDefaults(references=self.event_new.references))
+        if form.validate_on_submit():
+            create_event_references(event=self.event_new, data=form.data)
+            flash(_('External IDs saved'), 'success')
+            tpl = get_template_module('events/management/_reference_list.html')
+            return jsonify_data(html=tpl.render_event_references_list(self.event_new.references))
+        return jsonify_form(form)
+
+
+class RHManageEventLocation(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventLocationForm(obj=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            flash(_('The location for the event has been updated'))
+            tpl = get_template_module('events/management/_event_location.html')
+            return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
+        return jsonify_form(form)
+
+
+class RHManageEventPersonLinks(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            tpl = get_template_module('events/management/_event_person_links.html')
+            return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
+        self.commit = False
+        return jsonify_form(form)

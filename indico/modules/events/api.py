@@ -23,30 +23,29 @@ from operator import attrgetter
 
 from flask import request
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload, subqueryload
+from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
+from indico.modules.categories import LegacyCategoryMapping, Category
 from indico.modules.events import Event
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
-from indico.web.http_api.fossils import IPeriodFossil, ICategoryMetadataFossil, ICategoryProtectedMetadataFossil
+from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
-
-from MaKaC.conference import CategoryManager
-from MaKaC.common.indexes import IndexesHolder
 
 
 utc = pytz.timezone('UTC')
@@ -131,20 +130,16 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         id_list = set(self._idList)
         if self._wantFavorites and aw.getUser():
-            id_list.update(c.getId() for c in aw.getUser().user.favorite_categories)
+            id_list.update(str(c.id) for c in aw.getUser().user.favorite_categories)
         legacy_id_map = {m.legacy_category_id: m.category_id
                          for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
         return expInt.category(id_list)
 
     def export_categ_extra(self, aw, resultList):
+        expInt = CategoryEventFetcher(aw, self)
         ids = set((event['categoryId'] for event in resultList))
-        return {
-            'eventCategories': CategoryEventFetcher.getCategoryPath(ids, aw),
-            "moreFutureEvents": False if not self._toDT else
-                                True in [IndexesHolder().getById('categoryDateAll')
-                                         .hasObjectsAfter(catId, self._toDT) for catId in self._idList]
-        }
+        return expInt.category_extra(ids)
 
     def export_event(self, aw):
         expInt = CategoryEventFetcher(aw, self)
@@ -424,38 +419,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         if self._detail_level not in ('events', 'contributions', 'subcontributions', 'sessions'):
             raise HTTPAPIError('Invalid detail level: {}'.format(self._detail_level), 400)
 
-    @classmethod
-    def getCategoryPath(cls, idList, aw):
-        res = []
-        for id in idList:
-            res.append({
-                '_type': 'CategoryPath',
-                'categoryId': id,
-                'path': cls._getCategoryPath(id, aw)
-            })
-        return res
-
-    @staticmethod
-    def _getCategoryPath(id, aw):
-        path = []
-        firstCat = cat = CategoryManager().getById(id)
-        visibility = cat.getVisibility()
-        while cat:
-            # the first category (containing the event) is always shown, others only with access
-            iface = ICategoryMetadataFossil if firstCat or cat.canAccess(aw) else ICategoryProtectedMetadataFossil
-            path.append(fossilize(cat, iface))
-            cat = cat.getOwner()
-        if visibility > len(path):
-            visibilityName = "Everywhere"
-        elif visibility == 0:
-            visibilityName = "Nowhere"
-        else:
-            categId = path[visibility-1]["id"]
-            visibilityName = CategoryManager().getById(categId).getName()
-        path.reverse()
-        path.append({"visibility": {"name": visibilityName}})
-        return path
-
     def _calculate_occurrences(self, event, from_dt, to_dt, tz):
         start_dt = max(from_dt, event.start_dt) if from_dt else event.start_dt
         end_dt = min(to_dt, event.end_dt) if to_dt else event.end_dt
@@ -481,16 +444,28 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             options.append(contributions_strategy)
         if detail_level == 'sessions':
             options.append(sessions_strategy)
+        options.append(undefer('effective_protection_mode'))
         return options
 
     def category(self, idlist):
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, idlist)),
+                         Event.category_chain_overlaps(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
+
+    def category_extra(self, ids):
+        if self._toDT is None:
+            has_future_events = False
+        else:
+            query = Event.find(Event.category_id.in_(ids), ~Event.is_deleted, Event.start_dt > self._toDT)
+            has_future_events = db.session.query(query.exists()).one()[0]
+        return {
+            'eventCategories': self._build_category_path_data(ids),
+            'moreFutureEvents': has_future_events
+        }
 
     def event(self, idlist):
         query = (Event.find(Event.id.in_(idlist),
@@ -538,26 +513,69 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     def serialize_events(self, events):
         return map(self._build_event_api_data, events)
 
+    def _serialize_category_path(self, category):
+        visibility = {'id': None, 'name': 'Everywhere'}
+        path = [self._serialize_path_entry(category_data) for category_data in category.chain]
+        if category.visibility is not None:
+            try:
+                path_segment = path[-category.visibility]
+            except IndexError:
+                pass
+            else:
+                visibility['id'] = path_segment['id']
+                visibility['name'] = path_segment['name']
+        path.append({'visibility': visibility})
+        return path
+
+    def _serialize_path_entry(self, category_data):
+        return {
+            '_fossil': 'categoryMetadata',
+            'type': 'Category',
+            'name': category_data['title'],
+            'id': category_data['id'],
+            'url': url_for('categories.display', category_id=category_data['id'], _external=True)
+        }
+
+    def _build_category_path_data(self, ids):
+        return [{'_type': 'CategoryPath', 'categoryId': category.id, 'path': self._serialize_category_path(category)}
+                for category in Category.query.filter(Category.id.in_(ids)).options(undefer('chain'))]
+
     def _build_event_api_data(self, event):
         can_manage = self.user is not None and event.can_manage(self.user)
         data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': unicode(event.category_id),
-            'category': event.category.getTitle(),
+            'category': event.category.title,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
             'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
             'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
-            'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
+            'creationDate': self._serialize_date(event.created_dt),
             'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
-            'hasAnyProtection': event.as_legacy.hasAnyProtection(),
+            'hasAnyProtection': event.effective_protection_mode != ProtectionMode.public,
             'roomMapURL': event.room.map_url if event.room else None,
-            'visibility': Conversion.visibility(event.as_legacy),
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
             'material': build_material_legacy_api_data(event) + [build_note_legacy_api_data(event.note)]
         })
+
+        event_category_path = event.category.chain
+        visibility = {'id': '', 'name': 'Everywhere'}
+        if event.visibility is None:
+            pass  # keep default
+        elif event.visibility == 0:
+            visibility['name'] = 'Nowhere'
+        elif event.visibility:
+            try:
+                path_segment = event_category_path[-event.visibility]
+            except IndexError:
+                pass
+            else:
+                visibility['id'] = path_segment['id']
+                visibility['name'] = path_segment['title']
+        data['visibility'] = visibility
+
         if can_manage:
             data['allowed'] = self._serialize_access_list(event)
         if self._detail_level in {'contributions', 'subcontributions'}:
@@ -677,7 +695,10 @@ class ContributionFetcher(SessionContribFetcher):
 class EventSearchFetcher(IteratedDataFetcher):
     def event(self, query):
         def _iterate_objs(query_string):
-            query = Event.find(Event.title_matches(to_unicode(query_string)), ~Event.is_deleted)
+            query = (Event.query
+                     .filter(Event.title_matches(to_unicode(query_string)),
+                             ~Event.is_deleted)
+                     .options(undefer('effective_protection_mode')))
             if self._orderBy == 'start':
                 query = query.order_by(Event.start_dt)
             elif self._orderBy == 'id':
@@ -704,5 +725,5 @@ class EventSearchFetcher(IteratedDataFetcher):
                 'id': event.id,
                 'title': event.title,
                 'startDate': event.start_dt,
-                'hasAnyProtection': event.as_legacy.hasAnyProtection()
+                'hasAnyProtection': event.effective_protection_mode == ProtectionMode.protected
             }

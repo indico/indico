@@ -1,0 +1,45 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.i-spinner {
+    position: relative;
+    height: 1em;
+    width: 1em;
+
+    &:before,
+    &:after {
+        @include border-radius(50%);
+        @include border-all($width: 0.1em);
+        box-sizing: border-box;
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    &:before {
+        border-color: $dark-gray;
+    }
+
+    &:after {
+        -webkit-animation: button-spin 0.5s linear;
+        animation: button-spin 0.5s linear;
+        -webkit-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+        border-color: $indico-blue transparent transparent;
+    }
+}

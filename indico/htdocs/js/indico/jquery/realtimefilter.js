@@ -19,12 +19,12 @@
     $.widget("indico.realtimefilter", {
 
         options: {
-            callback: function() {},
+            callback: function(value) {},
             validation: function(e) { return true; },
             clearable: true,
             disableenter: true,
             emptyvalue: "",
-            invalidclass: "invalid",
+            invalidclass: 'invalid',
             wait: 250
         },
 
@@ -45,17 +45,17 @@
             if (opt.clearable) {
                 element.clearableinput({
                     onClear: function() {
-                        self._delayedCallback();
+                        self._callback();
                     },
                     emptyvalue: opt.emptyvalue
                 });
             }
 
-            element.on("cut paste", function() {
+            element.on('cut paste', function() {
                 self._delayedCallback();
             });
 
-            element.on("focusout", function() {
+            element.on('focusout', function() {
                 if ($(this).val() === "") {
                     $(this).val(opt.emptyvalue);
                 }
@@ -70,10 +70,41 @@
             }
         },
 
-        setValue: function(value) {
+        _callback: function() {
+            var self = this;
+            var element = self.element;
+            var opt = self.options;
+
+            if (opt.validation(element)) {
+                element.removeClass(opt.invalidclass);
+                opt.callback(element.val().trim());
+            } else {
+                element.addClass(opt.invalidclass);
+            }
+        },
+
+        _delayedCallback: function() {
             var self = this;
 
-            self.element.clearableinput('setValue', value);
+            setTimeout(function() {
+                self._callback();
+            }, self.options.wait);
+        },
+
+        clear: function() {
+            var self = this;
+            self.setValue('');
+        },
+
+        setValue: function(value) {
+            var self = this;
+            if (self.options.clearable) {
+                self.element.clearableinput('setValue', value);
+            } else {
+                self.element.val(value);
+            }
+            // Needed for typeWatch to refresh its timer
+            self.element.trigger('input');
         },
 
         update: function(delayed) {
@@ -89,27 +120,6 @@
         validate: function() {
             var self = this;
             return self.options.validation(self.element);
-        },
-
-        _callback: function() {
-            var self = this;
-            var element = self.element;
-            var opt = self.options;
-
-            if (opt.validation(element)) {
-                element.removeClass(opt.invalidclass);
-                opt.callback();
-            } else {
-                element.addClass(opt.invalidclass);
-            }
-        },
-
-        _delayedCallback: function() {
-            var self = this;
-
-            setTimeout(function() {
-                self._callback();
-            }, self.options.wait);
         }
     });
 })(jQuery);

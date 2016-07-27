@@ -19,29 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-# legacy
-access_granted = _signals.signal('access-granted', """
-Called when a principal in an `AccessController` is granted access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-access_revoked = _signals.signal('access-revoked', """
-Called when a principal in an `AccessController` is revoked access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-modification_granted = _signals.signal('modification-granted', """
-Called when a principal in an `AccessController` is granted modification access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-modification_revoked = _signals.signal('modification-revoked', """
-Called when a principal in an `AccessController` is revoked modification access. The `sender`
-is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-
-# new
 can_access = _signals.signal('can-access', """
 Called when `ProtectionMixin.can_access` is used to determine if a
 user can access something or not.
@@ -50,10 +27,16 @@ The `sender` is the type of the object that's using the mixin.  The
 actual instance is passed as `obj`.  The `user` and `allow_admin`
 arguments of `can_access` are passed as kwargs with the same name.
 
+The `authorized` argument is ``None`` when this signal is called at
+the beginning of the access check and ``True`` or ``False`` at the end
+when regular access rights have already been checked.  For expensive
+checks (such as anything involving database queries) it is recommended
+to skip the check while `authorized` is ``None`` since the regular
+access check is likely to be cheaper (due to ACLs being preloaded etc).
+
 If the signal returns ``True`` or ``False``, the access check succeeds
-or fails without any further checks.  If multiple subscribers to the
-signal return contradictory results, ``False`` wins and access is
-denied.
+or fails immediately.  If multiple subscribers to the signal return
+contradictory results, ``False`` wins and access is denied.
 """)
 
 

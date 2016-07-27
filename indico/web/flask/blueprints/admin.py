@@ -15,14 +15,13 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
+from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
 # General settings
 admin.add_url_rule('/', 'adminList', admins.RHAdminArea)
-admin.add_url_rule('/settings/general/news', 'adminList-switchNewsActive', admins.RHAdminSwitchNewsActive)
 admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)
 admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admins.RHGeneralInfoPerformModification,
                    methods=('POST',))
@@ -30,16 +29,6 @@ admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admin
 # System settings
 admin.add_url_rule('/settings/system', 'adminSystem', admins.RHSystem)
 admin.add_url_rule('/settings/system/modify', 'adminSystem-modify', admins.RHSystemModify, methods=('GET', 'POST'))
-
-# Announcement
-admin.add_url_rule('/announcement', 'adminAnnouncement', announcement.RHAnnouncementModif)
-admin.add_url_rule('/announcement', 'adminAnnouncement-save', announcement.RHAnnouncementModifSave, methods=('POST',))
-
-# News
-admin.add_url_rule('/news', 'updateNews', admins.RHUpdateNews)
-
-# Upcoming events
-admin.add_url_rule('/upcoming-events', 'adminUpcomingEvents', admins.RHConfigUpcoming)
 
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)
@@ -51,15 +40,6 @@ admin.add_url_rule('/maintenance/clean-tmp', 'adminMaintenance-tmpCleanup', main
                    methods=('GET', 'POST'))
 admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTmpCleanup',
                    maintenance.RHMaintenancePerformTmpCleanup, methods=('POST',))
-
-# IP domains (let's call them "networks" in the URL - that's more fitting)
-admin.add_url_rule('/networks/create', 'domainCreation', domains.RHDomainCreation)
-admin.add_url_rule('/networks/create', 'domainCreation-create', domains.RHDomainPerformCreation, methods=('POST',))
-admin.add_url_rule('/networks/<domainId>/modify', 'domainDataModification', domains.RHDomainModification)
-admin.add_url_rule('/networks/<domainId>/modify', 'domainDataModification-modify', domains.RHDomainPerformModification,
-                   methods=('POST',))
-admin.add_url_rule('/networks/<domainId>/details', 'domainDetails', domains.RHDomainDetails)
-admin.add_url_rule('/networks/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))

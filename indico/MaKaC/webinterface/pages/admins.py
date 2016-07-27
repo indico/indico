@@ -16,23 +16,15 @@
 
 import os
 import re
-from cgi import escape
 from operator import methodcaller
 from urlparse import urljoin
 
-from pytz import timezone
-
 # MaKaC
 import MaKaC.common.info as info
-import MaKaC.conference as conference
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC import domain
-from MaKaC.common import timezoneUtils
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.modules import INewsItemFossil
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
@@ -41,9 +33,8 @@ from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
-from indico.util.i18n import _, i18nformat, get_all_locales
+from indico.util.i18n import _, get_all_locales
 from indico.web.menu import render_sidemenu
-
 
 
 class WPAdminsBase(WPMainBase):
@@ -57,14 +48,12 @@ class WPAdminsBase(WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + \
-               self._includeJSPackage('Admin') + \
-               self._includeJSPackage('Management')
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WHeader( self._getAW() )
+        wc = wcomponents.WHeader(self._getAW(), prot_obj=self._protected_object)
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
@@ -78,7 +67,7 @@ class WPAdminsBase(WPMainBase):
 
         return frame.getHTML({
             "body": self._getPageContent(params),
-            "sideMenu": render_sidemenu('admin-sidemenu', active_item=self.sidemenu_option, old_style=True)
+            "sideMenu": render_sidemenu('admin-sidemenu', active_item=self.sidemenu_option)
         })
 
     def _getNavigationDrawer(self):
@@ -107,7 +96,7 @@ class WAdmins(wcomponents.WTemplated):
         wvars['supportEmail'] = Config.getInstance().getSupportEmail()
         wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
         wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
-        wvars['lang'] = minfo.getLang()
+        wvars['lang'] = Config.getInstance().getDefaultLocale()
         wvars['address'] = ''
         if minfo.getCity() != '':
             wvars['address'] = minfo.getCity()
@@ -118,12 +107,6 @@ class WAdmins(wcomponents.WTemplated):
                 wvars['address'] = minfo.getCountry()
         wvars['timezone'] = Config.getInstance().getDefaultTimezone()
         wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
-        iconDisabled = str(Config.getInstance().getSystemIconURL('disabledSection'))
-        iconEnabled = str(Config.getInstance().getSystemIconURL('enabledSection'))
-        url = urlHandlers.UHAdminSwitchNewsActive.getURL()
-        icon = iconEnabled if minfo.isNewsActive() else iconDisabled
-        wvars['features'] = i18nformat('<a href="{}"><img src="{}" border="0"'
-                                       'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
         wvars['tracker_url'] = urljoin(Config.getInstance().getTrackerURL(),
@@ -178,7 +161,7 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["organisation"] = genInfo.getOrganisation()
         vars["city"] = genInfo.getCity()
         vars["country"] = genInfo.getCountry()
-        vars["language"] = genInfo.getLang()
+        vars["language"] = Config.getInstance().getDefaultLocale()
         vars["language_list"] = get_all_locales()
         return vars
 
@@ -189,92 +172,6 @@ class WPGenInfoModification(WPAdmins):
         wc = WGeneralInfoModification()
         pars = {"postURL": urlHandlers.UHGeneralInfoPerformModification.getURL()}
         return wc.getHTML(pars)
-
-
-class WPHomepageCommon( WPAdminsBase ):
-    sidemenu_option = 'homepage'
-
-    def _createTabCtrl( self ):
-        self._tabCtrl = wcomponents.TabControl()
-
-        self._subTabNews = self._tabCtrl.newTab( "news", _("News"), \
-                urlHandlers.UHUpdateNews.getURL() )
-        self._subTabAnnouncements = self._tabCtrl.newTab( "announcements", _("Announcements"), \
-                urlHandlers.UHAnnouncement.getURL() )
-        self._subTabUpcoming = self._tabCtrl.newTab( "upcoming", _("Upcoming Events"), \
-                urlHandlers.UHConfigUpcomingEvents.getURL() )
-
-    def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-class WPUpdateNews( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabNews.setActive()
-
-    def getCSSFiles(self):
-        return WPHomepageCommon.getCSSFiles(self) + self._asset_env['news_sass'].urls()
-
-    def _getTabContent( self, params ):
-        tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
-        wc = WUpdateNews()
-        newsModule = ModuleHolder().getById("news")
-
-        newslist = fossilize(newsModule.getNewsItemsList(), INewsItemFossil, tz=tz)
-        newsTypesList = newsModule.getNewsTypesAsDict()
-        recentDays = newsModule.getRecentDays()
-
-        pars = {"newslist": newslist,
-                "newsTypesList": newsTypesList,
-                "recentDays": recentDays }
-
-        return wc.getHTML( pars )
-
-class WUpdateNews(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["baseURL"] = Config.getInstance().getBaseURL()
-        vars["postURL"] = urlHandlers.UHUpdateNews.getURL()
-        return vars
-
-class WPConfigUpcomingEvents( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabUpcoming.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WConfigUpcomingEvents()
-        pars = {}
-        return wc.getHTML( pars )
-
-class WConfigUpcomingEvents(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        module = ModuleHolder().getById("upcoming_events")
-        vars["cacheTTL"] = module.getCacheTTL().seconds/60
-        vars["numberItems"] = module.getNumberItems()
-        return vars
-
-
-class WPAnnouncementModif( WPHomepageCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabAnnouncements.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WAnnouncementModif()
-        pars = {"saveURL": urlHandlers.UHAnnouncementSave.getURL() }
-        return wc.getHTML( pars )
-
-class WAnnouncementModif(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        an = getAnnoucementMgrInstance()
-        vars["announcement"] = escape(an.getText()).replace("\"", "&#34;")
-        return vars
 
 
 class WPServicesCommon(WPAdminsBase):
@@ -307,10 +204,6 @@ class WPTemplatesCommon( WPAdminsBase ):
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-        if self._showAdmin:
-            return WPAdminsBase._getBody( self, params )
-        else:
-            return self._getTabContent( params )
 
 
 class WPBadgeTemplatesBase(WPTemplatesCommon):
@@ -404,7 +297,7 @@ class WPBadgeTemplates(WPBadgeTemplatesBase):
         WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
-        wp = WBadgeTemplates(conference.CategoryManager().getDefaultConference())
+        wp = WBadgeTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
         return wp.getHTML(params)
 
     def _setActiveTab( self ):
@@ -418,7 +311,7 @@ class WPPosterTemplates(WPBadgeTemplatesBase):
         WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
-        wp = WPosterTemplates(conference.CategoryManager().getDefaultConference())
+        wp = WPosterTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
         return wp.getHTML(params)
 
     def _setActiveTab(self):
@@ -550,181 +443,6 @@ class WPosterTemplates(WBadgePosterTemplatingBase):
         }
 
         return data
-
-
-class WPDomainBase( WPAdminsBase ):
-    sidemenu_option = 'ip_domains'
-
-    def __init__( self, rh ):
-        WPAdminsBase.__init__( self, rh )
-
-
-class WBrowseDomains( wcomponents.WTemplated ):
-
-    def __init__( self, letter=None ):
-        self._letter = letter
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        dh = domain.DomainHolder()
-        letters = dh.getBrowseIndex()
-        vars["browseIndex"] = i18nformat("""
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.disable=1;document.browseForm.submit();return false;">_("clear")</a></span>""")
-        if self._letter == "all":
-            vars["browseIndex"] += """
-        [all] """
-        else:
-            vars["browseIndex"] += i18nformat("""
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='all';document.browseForm.submit();return false;">_("all")</a></span> """)
-        for letter in letters:
-            if self._letter == letter:
-                vars["browseIndex"] += """\n[%s] """ % letter
-            else:
-                vars["browseIndex"] += """\n<span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter,True),letter)
-        vars["browseResult"] = ""
-        if self._letter not in [ None, "" ]:
-            if self._letter != "all":
-                res = dh.matchFirstLetter(self._letter)
-            else:
-                res = dh.getValuesToList()
-            res.sort(key=lambda x: x.getName().lower())
-            vars["browseResult"] = WHTMLDomainList(vars,res).getHTML()
-        return vars
-
-class WDomainList(wcomponents.WTemplated):
-
-    def __init__( self, criteria, params ):
-        self._criteria = criteria
-        self._params = params
-
-    def _performSearch( self, criteria ):
-        dh = domain.DomainHolder()
-        res = dh.match(criteria)
-        return res
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["createDomainURL"] = urlHandlers.UHNewDomain.getURL()
-        vars["nbDomains"] = domain.DomainHolder().getLength()
-        vars["browseDomains"] = WBrowseDomains(self._params.get("letter",None)).getHTML(vars)
-        vars["browseDomainsURL"] = urlHandlers.UHDomains.getURL()
-        vars["searchDomainsURL"] = urlHandlers.UHDomains.getURL()
-        vars["domains"] = ""
-        if self._criteria:
-            domainList = self._performSearch(self._criteria)
-            vars["domains"] = WHTMLDomainList(vars,domainList).getHTML()
-        return vars
-
-class WHTMLDomainList:
-
-    def __init__(self, vars, list):
-        self._vars = vars
-        self._list = list
-
-    def getHTML(self):
-        text = """<tr>
-                              <td>
-                    <br>
-                <table width="100%%" align="left" style="border-top: 1px solid #777777; padding-top:10px">"""
-        color="white"
-        ul = []
-        for dom in self._list:
-            if color=="white":
-                color="#F6F6F6"
-            else:
-                color="white"
-            url = self._vars["domainDetailsURLGen"]( dom )
-            ul.append("""<tr>
-                            <td bgcolor="%s"><a href="%s">%s</a></td>
-                        </tr>"""%(color, url, dom.getName() or _("no name") ) )
-        if ul:
-            text += "".join( ul )
-        else:
-            text += """<tr>
-                        <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp;No domains for this search</span></td></tr>"""
-        text += """    </table>
-                      </td>
-                </tr>"""
-        return text
-
-class WPDomainList( WPDomainBase ):
-
-    def __init__( self, rh, params ):
-        WPDomainBase.__init__( self, rh )
-        self._params = params
-
-    def _getPageContent( self, params ):
-        criteria = {}
-        if self._params.get("sName","") != "":
-            criteria["name"] = self._params.get("sName","")
-        comp = WDomainList(criteria,self._params)
-        pars = {"domainDetailsURLGen": urlHandlers.UHDomainDetails.getURL }
-        return comp.getHTML(pars)
-
-
-class WDomainDetails(wcomponents.WTemplated):
-
-    def __init__( self, dom):
-        self._domain = dom
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._domain.getName()
-        vars["description"] = self._domain.getDescription()
-        vars["filters"] = "<br>".join(self._domain.getFilterList())
-        return vars
-
-
-class WPDomainDetails( WPDomainBase ):
-
-    def __init__(self, rh, domain):
-        WPDomainBase.__init__(self, rh)
-        self._domain = domain
-
-    def _getPageContent( self, params ):
-        comp = WDomainDetails( self._domain )
-        pars = {"modifyURL": urlHandlers.UHDomainModification.getURL( self._domain ) }
-        return comp.getHTML( pars )
-
-
-class WDomainDataModification(wcomponents.WTemplated):
-
-    def __init__( self, dom ):
-        self._domain = dom
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._domain.getName()
-        vars["description"] = self._domain.getDescription()
-        vars["filters"] = ";".join( self._domain.getFilterList() )
-        vars["locator"] = self._domain.getLocator().getWebForm()
-        return vars
-
-
-class WPDomainModification( WPDomainBase ):
-
-    def __init__(self, rh, domain):
-        WPDomainBase.__init__(self, rh)
-        self._domain = domain
-
-    def _getPageContent( self, params ):
-        comp = WDomainDataModification( self._domain )
-        pars = {
-            'postURL': urlHandlers.UHDomainPerformModification.getURL(self._domain)
-        }
-        return comp.getHTML( pars )
-
-
-class WDomainCreation(wcomponents.WTemplated):
-    pass
-
-
-class WPDomainCreation( WPDomainBase ):
-
-    def _getPageContent( self, params ):
-        comp = WDomainCreation()
-        pars = {"postURL": urlHandlers.UHDomainPerformCreation.getURL()}
-        return comp.getHTML( pars )
 
 
 class WPAdminsSystemBase(WPAdminsBase):

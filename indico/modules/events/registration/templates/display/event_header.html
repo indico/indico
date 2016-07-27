@@ -15,32 +15,34 @@
                                 {% endif %}
                             </span>
                         </div>
-                        <div class="event-service-toolbar toolbar right">
-                            <div class="group">
-                               {% set registration = session.user and regform.get_registration(user=session.user) %}
-                               {% if registration  %}
-                                    <a class="i-button i-button-small icon-edit highlight"
-                                        href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
-                                        <strong>{% trans %}Modify registration{% endtrans %}</strong>
-                                    </a>
-                               {% elif regform.limit_reached %}
-                                   <a class="i-button i-button-small highlight disabled"
-                                      title="{% trans %}There are no more places available.{% endtrans %}">
-                                       <strong>{% trans %}Register{% endtrans %}</strong>
-                                   </a>
-                               {% elif regform.moderation_enabled %}
-                                   <a class="i-button i-button-small highlight icon-question"
-                                      href="{{ url_for('event_registration.display_regform', regform) }}">
-                                       <strong>{% trans %}Apply for participation{% endtrans %}</strong>
-                                   </a>
-                                {% else %}
-                                    <a class="i-button i-button-small highlight icon-quill"
-                                        href="{{ url_for('event_registration.display_regform', regform) }}">
-                                        <strong>{% trans %}Register{% endtrans %}</strong>
-                                    </a>
-                                {% endif %}
+                        {% if not g.static_site %}
+                            <div class="event-service-toolbar toolbar right">
+                                <div class="group">
+                                   {% set registration = session.user and regform.get_registration(user=session.user) %}
+                                   {% if registration  %}
+                                        <a class="i-button i-button-small icon-edit highlight"
+                                            href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
+                                            <strong>{% trans %}Modify registration{% endtrans %}</strong>
+                                        </a>
+                                   {% elif regform.limit_reached %}
+                                       <a class="i-button i-button-small highlight disabled"
+                                          title="{% trans %}There are no more places available.{% endtrans %}">
+                                           <strong>{% trans %}Register{% endtrans %}</strong>
+                                       </a>
+                                   {% elif regform.moderation_enabled %}
+                                       <a class="i-button i-button-small highlight icon-question"
+                                          href="{{ url_for('event_registration.display_regform', regform) }}">
+                                           <strong>{% trans %}Apply for participation{% endtrans %}</strong>
+                                       </a>
+                                    {% else %}
+                                        <a class="i-button i-button-small highlight icon-quill"
+                                            href="{{ url_for('event_registration.display_regform', regform) }}">
+                                            <strong>{% trans %}Register{% endtrans %}</strong>
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

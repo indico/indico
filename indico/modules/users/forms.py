@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
+
 from pytz import all_timezones
 from wtforms.fields.core import SelectField, BooleanField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
+from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import UserTitle
@@ -92,3 +94,17 @@ class MergeForm(IndicoForm):
                                  description=_('The user that will be merged into the target one'))
     target_user = PrincipalField(_('Target user'), [DataRequired()],
                                  description=_('The user that will remain active in the end'))
+
+
+class AdminUserSettingsForm(IndicoForm):
+    notify_account_creation = BooleanField(_('Registration notifications'), widget=SwitchWidget(),
+                                           description=_('Send an email to all administrators whenever someone '
+                                                         'registers a new local account.'))
+
+
+class AdminAccountRegistrationForm(LocalRegistrationForm):
+    email = EmailField(_('Email address'), [DataRequired(), _check_existing_email])
+
+    def __init__(self, *args, **kwargs):
+        super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
+        del self.comment

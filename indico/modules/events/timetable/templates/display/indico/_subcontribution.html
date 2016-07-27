@@ -4,10 +4,12 @@
 
 
 {% macro render_subcontribution(subcontrib, event, show_notes=true) %}
-    <li class="timetable-subcontrib timetable-item">
+    {% set contrib = subcontrib.contribution %}
+    {% set anchor = slugify('sc', contrib.friendly_id, subcontrib.friendly_id, subcontrib.title, maxlen=30) %}
+    <li class="timetable-subcontrib timetable-item" id="{{ anchor }}">
         <div class="timetable-item-body">
             <div class="timetable-item-header">
-                <span class="timetable-title">
+                <span class="timetable-title" data-anchor="{{ anchor }}">
                     {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
                     {{- subcontrib.title | safe -}}
                 </span>

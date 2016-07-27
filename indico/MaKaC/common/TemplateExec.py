@@ -27,11 +27,11 @@ import MaKaC
 import xml.sax.saxutils
 
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import format_number, format_datetime, format_date, format_time, format_human_timedelta
 from indico.util.i18n import ngettext
 from indico.util.mdx_latex import latex_escape
 from indico.util.string import safe_upper
+from indico.web.util import url_for_index
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -239,26 +239,6 @@ def deepstr(obj):
 
     return str(obj)
 
-def beautify(obj, classNames={"UlClassName": "optionList",
-                              "KeyClassName": "optionKey"}, level=0):
-    """ Turns list or dicts into beautiful <ul> HTML lists, recursively.
-        -obj: an object that can be a list, a dict, with lists or dicts inside
-        -classNames: a dictionary specifying class names. Example:
-            {"UlClassName": "optionList", "KeyClassName": "optionKey"}
-        supported types are: UlClassName, LiClassName, DivClassName, KeyClassName
-        See BeautifulHTMLList.tpl and BeautifulHTMLDict.tpl to see how they are used.
-        In the CSS file, you should define classes like: ul.optionList1, ul.optionList2, ul.optionKey1 (the number is the level of recursivity)
-        -level: the level of recursivity.
-    """
-    from MaKaC.webinterface import wcomponents
-    if isinstance(obj, list):
-        return wcomponents.WBeautifulHTMLList(obj, classNames, level + 1).getHTML()
-    elif isinstance(obj, dict):
-        return wcomponents.WBeautifulHTMLDict(obj, classNames, level + 1).getHTML()
-    elif isinstance(obj, AvatarUserWrapper):
-        return obj.getStraightFullName()
-    else:
-        return str(obj)
 
 def systemIcon(s):
     return Config.getInstance().getSystemIconURL(s)
@@ -359,7 +339,7 @@ def registerHelpers(objDict):
         objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
-            objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."
+            objDict['user'] = None
         else:
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:
@@ -372,8 +352,6 @@ def registerHelpers(objDict):
         objDict['escapeHTMLForJS'] = escapeHTMLForJS
     if not 'deepstr' in objDict:
         objDict['deepstr'] = deepstr
-    if not 'beautify' in objDict:
-        objDict['beautify'] = beautify
     if not 'latex_escape' in objDict:
         objDict['latex_escape'] = latex_escape
     # allow fossilization
@@ -399,5 +377,6 @@ def registerHelpers(objDict):
     objDict['url_rule_to_js'] = url_rule_to_js
     objDict['render_template'] = render_template
     objDict['template_hook'] = mako_call_template_hook
+    objDict['url_for_index'] = url_for_index
     objDict['url_for_login'] = url_for_login
     objDict['url_for_logout'] = url_for_logout

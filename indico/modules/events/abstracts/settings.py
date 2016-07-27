@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.modules.events.settings import EventSettingsProxy
 
 
@@ -24,4 +26,4 @@ abstracts_settings = EventSettingsProxy('abstracts', {
         'max_length': None,
         'max_words': None
     }
-}, preload=True)
+})

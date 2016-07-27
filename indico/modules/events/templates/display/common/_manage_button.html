@@ -32,7 +32,7 @@
                 </li>
             {% endif %}
             {% if item.can_edit_note(session.user) %}
-                {% if item.as_legacy.getType() != 'simple_event' %}
+                {% if item.type != 'lecture' %}
                     {{ _render_note_editor(item) }}
                     {% if item.scheduled_notes %}
                         <li>

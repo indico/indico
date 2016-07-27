@@ -66,7 +66,7 @@ class PasswordProperty(object):
         self.backend = backend
 
     def __get__(self, instance, owner):
-        return self.backend(getattr(instance, self.attr, None))
+        return self.backend(getattr(instance, self.attr, None)) if instance is not None else self
 
     def __set__(self, instance, value):
         if not value:

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import pkg_resources
 from platform import python_version
 from urlparse import urljoin
 
@@ -48,9 +49,10 @@ class RHCephalopod(RHCephalopodBase):
 
         affiliation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
         enabled = settings.get('joined')
-        instance_url = Config.getInstance().getBaseURL()
-        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-        tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
+        config = Config.getInstance()
+        instance_url = config.getBaseURL()
+        language = config.getDefaultLocale()
+        tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html',
                                             affiliation=affiliation,
                                             enabled=enabled,
@@ -106,8 +108,11 @@ class RHCephalopodSync(RHCephalopodBase):
 
 class RHSystemInfo(RH):
     def _process(self):
-        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+        try:
+            indico_version = pkg_resources.get_distribution('indico').version
+        except pkg_resources.DistributionNotFound:
+            indico_version = 'dev'
         stats = {'python_version': python_version(),
-                 'indico_version': MaKaC.__version__,
-                 'language': language}
+                 'indico_version': indico_version,
+                 'language': Config.getInstance().getDefaultLocale()}
         return jsonify(stats)

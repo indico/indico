@@ -1,0 +1,18 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}Your Indico profile has been created{%- endblock %}
+
+{% block header_recipient -%}
+    {{ user.first_name }}
+{%- endblock %}
+
+{% block body -%}
+    {% filter dedent -%}
+        Your request to create an Indico profile has been approved.
+        You may now log in to your new account:
+        {{ url_for('auth.login', _external=true) }}
+
+        After logging in your can finish setting up your profile:
+        {{ url_for('users.user_profile', _external=true) }}
+    {%- endfilter %}
+{%- endblock %}

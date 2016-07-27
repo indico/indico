@@ -1,0 +1,30 @@
+{% macro create_event_button(category, classes="", text="", with_tooltip=true) %}
+    <a class="{{ classes }} i-button arrow js-dropdown"
+       {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
+       data-toggle="dropdown" data-dropdown-always-listen>
+        {{- text -}}
+    </a>
+    <ul class="dropdown">
+        <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
+        <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
+        <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
+    </ul>
+{% endmacro %}
+
+{% macro create_event_link(category, type, text) -%}
+    {%- set title = {
+        'lecture': _('Create new lecture'),
+        'meeting': _('Create new meeting'),
+        'conference': _('Create new conference')
+    }[type] -%}
+    {%- set url = url_for('categories.display', category, _anchor='create-event:%s:%d'|format(type, category.id))
+                  if category and not category.is_root
+                  else url_for_index(_anchor='create-event:%s'|format(type)) -%}
+    <a href="{{ url }}"
+       data-href="{{ url_for('events.create', category, event_type=type) }}"
+       data-title="{{ title }}"
+       data-ajax-dialog
+       {{ kwargs | html_params }}>
+        {{ text }}
+    </a>
+{%- endmacro %}

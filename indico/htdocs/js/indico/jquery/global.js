@@ -96,7 +96,7 @@ $(document).ready(function() {
         }
 
         /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
-        var container = $('<span>').qtip($.extend(true, {}, {
+        $('<span>').qtip($.extend(true, {}, {
             overwrite: false,
             position: $.extend({
                 target: $target
@@ -124,12 +124,12 @@ $(document).ready(function() {
                     }
                 },
 
-                hide: function(event) {
+                hide: function() {
                     $(this).qtip('destroy');
                 },
 
                 render: function(event, api) {
-                    $target.on('DOMNodeRemovedFromDocument remove', function(evt) {
+                    $target.on('DOMNodeRemovedFromDocument remove', function() {
                         api.destroy();
                     });
                 }
@@ -166,8 +166,10 @@ $(document).ready(function() {
     });
 
     $('.js-dropdown').each(function() {
-        this.id = this.id || uniqueId();
-        $(this).parent().dropdown({selector: '#' + this.id});
+        $(this).parent().dropdown({
+            selector: '.js-dropdown',
+            always_listen: $(this).data('dropdown-always-listen') !== undefined
+        });
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
@@ -218,4 +220,23 @@ $(document).ready(function() {
     });
 
     showFormErrors();
+
+    // Show form creation dialog if hash is present in the URL
+    var match = location.hash.match(/^#create-event:(lecture|meeting|conference)(?::(\d+))?$/);
+    if (match) {
+        var eventType = match[1];
+        var categoryId = match[2];
+        var title = {
+            lecture: $T.gettext('Create new lecture'),
+            meeting: $T.gettext('Create new meeting'),
+            conference: $T.gettext('Create new conference')
+        }[eventType];
+        var url = match[2] !== undefined
+                    ? build_url(Indico.Urls.EventCreation, {event_type: eventType, category_id: categoryId})
+                    : build_url(Indico.Urls.EventCreation, {event_type: eventType});
+        ajaxDialog({
+            url: url,
+            title: title
+        });
+    }
 });

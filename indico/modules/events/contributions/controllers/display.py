@@ -126,7 +126,8 @@ class RHContributionDisplay(RHContributionDisplayBase):
             reviewing_status = paper_upload_form = paper_file_data = None
             show_paper = False
 
-        ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions')
+        ical_params = get_base_ical_parameters(session.user, self.event_new, 'contributions',
+                                               '/export/event/{0}.ics'.format(self.event_new.id))
         contrib = (Contribution.query
                    .filter_by(id=self.contrib.id)
                    .options(joinedload('type'),
@@ -152,8 +153,8 @@ class RHAuthorList(RHDisplayProtectionBase):
 
     def _process(self):
         authors = _get_persons(self.event_new, ContributionPersonLink.author_type != AuthorType.none)
-        return self.view_class.render_template('display/author_list.html', self._conf,
-                                            authors=authors, event=self.event_new)
+        return self.view_class.render_template('display/author_list.html', self._conf, authors=authors,
+                                               event=self.event_new)
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
@@ -163,8 +164,8 @@ class RHSpeakerList(RHDisplayProtectionBase):
 
     def _process(self):
         speakers = _get_persons(self.event_new, ContributionPersonLink.is_speaker)
-        return self.view_class.render_template('display/speaker_list.html', self._conf,
-                                             speakers=speakers, event=self.event_new)
+        return self.view_class.render_template('display/speaker_list.html', self._conf, speakers=speakers,
+                                               event=self.event_new)
 
 
 class RHContributionAuthor(RHContributionDisplayBase):

@@ -25,6 +25,10 @@
             padding-right: 3.1em !important;
             word-break: break-all;
         }
+
+        &::-webkit-search-cancel-button {
+            display: none;
+        }
     }
 
     .button-box {

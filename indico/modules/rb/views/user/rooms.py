@@ -150,8 +150,10 @@ class WRoomBookingRoomDetails(WTemplated):
 class WPRoomBookingRoomStats(WPRoomBookingBase):
     def _getBody(self, params):
         params['period_options'] = [
-            ('pastmonth', _('Past month')),
+            ('pastmonth', _('Last 30 days')),
+            (params['last_month'], _('Previous month')),
             ('thisyear', _('This year')),
+            (params['last_year'], _('Previous year')),
             ('sinceever', _('Since ever'))
         ]
         return WTemplated('RoomBookingRoomStats').getHTML(params)

@@ -31,6 +31,7 @@ from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _, set_best_lang
 from MaKaC.common.cache import GenericCache
+from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -124,6 +125,15 @@ class IndicoSession(BaseSession):
     @timezone.setter
     def timezone(self, tz):
         self['_timezone'] = tz
+
+    @property
+    def tzinfo(self):
+        """The tzinfo of the user's current timezone.
+
+        This should only be used in places where no other timezone
+        such as from an event or category is available.
+        """
+        return DisplayTZ().getDisplayTZ(as_timezone=True)
 
 
 class IndicoSessionInterface(SessionInterface):

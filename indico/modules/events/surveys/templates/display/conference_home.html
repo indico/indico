@@ -1,26 +1,28 @@
-<div class="infoline announcement">
-    <span class="icon icon-file-check"></span>
-    <div class="text">
-    <div class="label">{% trans %}Surveys{% endtrans %}</div>
-    <div>
-        {% trans count=surveys|length -%}
-            There is an open survey.
-        {%- pluralize -%}
-            There are <strong>{{ count }}</strong> open surveys.
-        {%- endtrans %}
+{% if not g.static_site %}
+    <div class="infoline announcement">
+        <span class="icon icon-file-check"></span>
+        <div class="text">
+        <div class="label">{% trans %}Surveys{% endtrans %}</div>
+        <div>
+            {% trans count=surveys|length -%}
+                There is an open survey.
+            {%- pluralize -%}
+                There are <strong>{{ count }}</strong> open surveys.
+            {%- endtrans %}
+        </div>
+        <div class="toolbar right">
+            <a href="{{ url_for('surveys.display_survey_list', event) }}" class="i-button next highlight">
+                {% if surveys|length == 1 and was_survey_submitted(surveys[0]) %}
+                    {%- trans %}Show the surveys{% endtrans -%}
+                {% else %}
+                    {%- trans count=surveys|length -%}
+                        Fill out the survey
+                    {%- pluralize -%}
+                        Show the surveys
+                    {%- endtrans -%}
+                {% endif %}
+            </a>
+        </div>
+        </div>
     </div>
-    <div class="toolbar right">
-        <a href="{{ url_for('surveys.display_survey_list', event) }}" class="i-button next highlight">
-            {% if surveys|length == 1 and was_survey_submitted(surveys[0]) %}
-                {%- trans %}Show the surveys{% endtrans -%}
-            {% else %}
-                {%- trans count=surveys|length -%}
-                    Fill out the survey
-                {%- pluralize -%}
-                    Show the surveys
-                {%- endtrans -%}
-            {% endif %}
-        </a>
-    </div>
-    </div>
-</div>
+{% endif %}

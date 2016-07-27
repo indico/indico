@@ -20,7 +20,6 @@ import urlparse
 from flask import g, has_request_context, request
 
 from MaKaC.common.url import URL, EndpointURL
-from MaKaC.common.timezoneUtils import nowutc
 
 from indico.core.config import Config
 
@@ -159,60 +158,12 @@ def setSSLPort(url):
     return re.sub(regexp, sslPort, url)
 
 
-class UHWelcome(URLHandler):
-    _endpoint = 'misc.index'
-
-
-class UHIndicoNews(URLHandler):
-    _endpoint = 'misc.news'
-
-
 class UHConferenceHelp(URLHandler):
     _endpoint = 'misc.help'
 
 
-class UHCalendar(URLHandler):
-    _endpoint = 'category.wcalendar'
-
-    @classmethod
-    def getURL(cls, categList=None):
-        url = cls._getURL()
-        if not categList:
-            categList = []
-        lst = [categ.getId() for categ in categList]
-        url.addParam('selCateg', lst)
-        return url
-
-
-class UHCalendarSelectCategories(URLHandler):
-    _endpoint = 'category.wcalendar-select'
-
-
-class UHConferenceCreation(URLHandler):
-    _endpoint = 'event_creation.conferenceCreation'
-
-    @classmethod
-    def getURL(cls, target):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams(target.getLocator())
-        return url
-
-
-class UHConferencePerformCreation(URLHandler):
-    _endpoint = 'event_creation.conferenceCreation-createConference'
-
-
 class UHConferenceDisplay(URLHandler):
     _endpoint = 'event.conferenceDisplay'
-
-
-class UHNextEvent(URLHandler):
-    _endpoint = 'event.conferenceDisplay-next'
-
-
-class UHPreviousEvent(URLHandler):
-    _endpoint = 'event.conferenceDisplay-prev'
 
 
 class UHConferenceOverview(URLHandler):
@@ -227,10 +178,6 @@ class UHConferenceOverview(URLHandler):
 
 class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
-
-
-class UHCategoryIcon(URLHandler):
-    _endpoint = 'category.categoryDisplay-getIcon'
 
 
 class UHConferenceModification(URLHandler):
@@ -543,26 +490,6 @@ class UHTrackAbstractModIntComments(UHTrackAbstractBase):
     _endpoint = 'event_mgmt.trackAbstractModif-comments'
 
 
-class UHConfModifAC(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC'
-
-
-class UHConfSetVisibility(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-setVisibility'
-
-
-class UHConfGrantSubmissionToAllSpeakers(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-grantSubmissionToAllSpeakers'
-
-
-class UHConfRemoveAllSubmissionRights(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-removeAllSubmissionRights'
-
-
-class UHConfGrantModificationToAllConveners(URLHandler):
-    _endpoint = 'event_mgmt.confModifAC-grantModificationToAllConveners'
-
-
 class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 
@@ -595,44 +522,8 @@ class UHConfManagementAccess(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-managementAccess'
 
 
-class UHConfEnterModifKey(UHConfUser):
-    _endpoint = 'event_mgmt.conferenceModification-modifKey'
-
-
-class UHConfCloseModifKey(UHConfUser):
-    _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
-
-
-class UHDomains(URLHandler):
-    _endpoint = 'admin.domainList'
-
-
-class UHNewDomain(URLHandler):
-    _endpoint = 'admin.domainCreation'
-
-
-class UHDomainPerformCreation(URLHandler):
-    _endpoint = 'admin.domainCreation-create'
-
-
-class UHDomainDetails(URLHandler):
-    _endpoint = 'admin.domainDetails'
-
-
-class UHDomainModification(URLHandler):
-    _endpoint = 'admin.domainDataModification'
-
-
-class UHDomainPerformModification(URLHandler):
-    _endpoint = 'admin.domainDataModification-modify'
-
-
 class UHAdminArea(URLHandler):
     _endpoint = 'admin.adminList'
-
-
-class UHAdminSwitchNewsActive(URLHandler):
-    _endpoint = 'admin.adminList-switchNewsActive'
 
 
 class UHAdminsConferenceStyles(URLHandler):
@@ -645,111 +536,6 @@ class UHAdminsSystem(URLHandler):
 
 class UHAdminsSystemModif(URLHandler):
     _endpoint = 'admin.adminSystem-modify'
-
-
-class UHCategoryModification(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification'
-
-    @classmethod
-    def getActionURL(cls):
-        return ''
-
-
-class UHCategoryActionSubCategs(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification-actionSubCategs'
-
-
-class UHCategoryActionConferences(URLHandler):
-    _endpoint = 'category_mgmt.categoryModification-actionConferences'
-
-
-class UHCategModifAC(URLHandler):
-    _endpoint = 'category_mgmt.categoryAC'
-
-
-class UHCategorySetConfCreationControl(URLHandler):
-    _endpoint = 'category_mgmt.categoryConfCreationControl-setCreateConferenceControl'
-
-
-class UHCategorySetNotifyCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryConfCreationControl-setNotifyCreation'
-
-
-class UHCategModifTools(URLHandler):
-    _endpoint = 'category_mgmt.categoryTools'
-
-
-class UHCategoryDeletion(URLHandler):
-    _endpoint = 'category_mgmt.categoryTools-delete'
-
-
-class UHCategoryDataModif(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification'
-
-
-class UHCategoryPerformModification(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification-modify'
-
-
-class UHCategorySetVisibility(URLHandler):
-    _endpoint = 'category_mgmt.categoryAC-setVisibility'
-
-
-class UHCategoryCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryCreation'
-
-
-class UHCategoryPerformCreation(URLHandler):
-    _endpoint = 'category_mgmt.categoryCreation-create'
-
-
-class UHCategoryDisplay(URLHandler):
-    _endpoint = 'category.categoryDisplay'
-
-    @classmethod
-    def getURL(cls, target=None, **params):
-        url = cls._getURL(**params)
-        if target:
-            if target.isRoot():
-                return UHWelcome.getURL()
-            url.setParams(target.getLocator())
-        return url
-
-
-class UHCategoryMap(URLHandler):
-    _endpoint = 'category.categoryMap'
-
-
-class UHCategoryOverview(URLHandler):
-    _endpoint = 'category.categOverview'
-
-    @classmethod
-    def getURLFromOverview(cls, ow):
-        url = cls.getURL()
-        url.setParams(ow.getLocator())
-        return url
-
-    @classmethod
-    def getWeekOverviewUrl(cls, categ):
-        url = cls.getURL(categ)
-        p = {"day": nowutc().day,
-             "month": nowutc().month,
-             "year": nowutc().year,
-             "period": "week",
-             "detail": "conference"}
-        url.addParams(p)
-        return url
-
-    @classmethod
-    def getMonthOverviewUrl(cls, categ):
-        url = cls.getURL(categ)
-        p = {"day": nowutc().day,
-             "month": nowutc().month,
-             "year": nowutc().year,
-             "period": "month",
-             "detail": "conference"}
-        url.addParams(p)
-        return url
 
 
 class UHGeneralInfoModification(URLHandler):
@@ -973,10 +759,6 @@ class UHAbstractReviewingTeam(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-reviewingTeam'
 
 
-class UHUpdateNews(URLHandler):
-    _endpoint = 'admin.updateNews'
-
-
 class UHMaintenance(URLHandler):
     _endpoint = 'admin.adminMaintenance'
 
@@ -1031,22 +813,6 @@ class UHBadgeTemplates(URLHandler):
 
 class UHPosterTemplates(URLHandler):
     _endpoint = 'admin.posterTemplates'
-
-
-class UHAnnouncement(URLHandler):
-    _endpoint = 'admin.adminAnnouncement'
-
-
-class UHAnnouncementSave(URLHandler):
-    _endpoint = 'admin.adminAnnouncement-save'
-
-
-class UHConfigUpcomingEvents(URLHandler):
-    _endpoint = 'admin.adminUpcomingEvents'
-
-
-class UHCategoryCalendarOverview(URLHandler):
-    _endpoint = 'category.wcalendar'
 
 
 # URL Handlers for Printing and Design
@@ -1387,7 +1153,6 @@ class UHHelper(object):
     """
 
     modifUHs = {
-        "Category": UHCategoryModification,
         "Conference": UHConferenceModification,
         "DefaultConference": UHConferenceModification,
         "Track": UHTrackModification,
@@ -1395,10 +1160,6 @@ class UHHelper(object):
     }
 
     displayUHs = {
-        "Category": UHCategoryDisplay,
-        "CategoryMap": UHCategoryMap,
-        "CategoryOverview": UHCategoryOverview,
-        "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
         "Abstract": UHAbstractDisplay
     }
