@@ -257,6 +257,14 @@ def main(event, category, dry_run, html_log, verbose):
         for category in categories:
             migrate_description(category, verbose, log)
 
+    events = db.m.Event.find(db.m.Event.description.op('~')(html_tag_regex))
+    if event:
+        events = events.filter(db.m.Event.id == event)
+    if category:
+        events = events.filter(db.m.Event.category_chain_overlaps(category))
+    for event in events:
+        migrate_description(event, verbose, log)
+
     if log:
         log.write('</table>')
 
