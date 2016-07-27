@@ -1,7 +1,7 @@
 {% extends 'categories/management/base.html' %}
 
 {% from 'categories/management/_events_list.html' import render_events_list %}
-{% from 'events/management/create_event.html' import create_event_button %}
+{% from 'events/management/_create_event_button.html' import create_event_button %}
 
 {% macro _create_category_button(classes='') %}
     <button class="i-button js-new-category {{ classes }}"

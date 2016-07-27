@@ -4,7 +4,7 @@
 
 <%
     from indico.web.flask.templating import get_template_module
-    tpl = get_template_module('events/management/create_event.html')
+    tpl = get_template_module('events/management/_create_event_button.html')
 %>
 
 ${ template_hook('global-announcement') }
