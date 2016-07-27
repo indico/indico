@@ -75,7 +75,7 @@ class UtilsConference:
         c.setDescription( confData["description"] )
         c.setOrgText(confData.get("orgText",""))
         c.setComments(confData.get("comments",""))
-        c.setKeywords( confData["keywords"] )
+        c.as_event.keywords = confData["keywords"]
         c.setChairmanText( confData.get("chairText", "") )
         if "shortURLTag" in confData.keys():
             tag = confData["shortURLTag"].strip()

@@ -248,6 +248,14 @@ def _render_location_field(event, **kwargs):
     return tpl.form_row(form.location_data, skip_label=True)
 
 
+@template_hook('event-keywords-field')
+def _render_keywords_field(event, **kwargs):
+    from indico.modules.events.forms import EventKeywordsForm
+    form = EventKeywordsForm(obj=FormDefaults(keywords=event.keywords))
+    tpl = get_template_module('forms/_form.html')
+    return tpl.form_row(form.keywords, skip_label=True)
+
+
 @template_hook('event-ical-export')
 def _render_event_ical_export(event, **kwargs):
     from indico.modules.events.util import get_base_ical_parameters

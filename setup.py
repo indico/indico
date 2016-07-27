@@ -373,6 +373,7 @@ if __name__ == '__main__':
             event_visibility = indico_zodbimport.modules.event_visibility:EventVisibilityImporter
             user_management = indico_zodbimport.modules.user_management:UserManagementImporter
             event_series = indico_zodbimport.modules.event_series:EventSeriesImporter
+            event_keywords = indico_zodbimport.modules.event_keywords:EventKeywordsImporter
             """,
           zip_safe=False,
           packages=foundPackages,

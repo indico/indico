@@ -117,7 +117,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Keywords")}</span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditKeywords">${keywords }</span>
+        ${ render_template('events/management/event_keywords.html', event=confObj.as_event) }
     </td>
 </tr>
 
@@ -201,8 +201,6 @@ $E('inPlaceEditShortURL').set(new URLPathEditWidget('event.main.changeShortURL',
         {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, function(value) {
             return IndicoUtil.parseShortURL(value);
         }, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, /, _, - and .")).draw());
-
-$E('inPlaceEditKeywords').set(new TextAreaEditWidget('event.main.changeKeywords', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(keywords) }).draw());
 
 var timezoneList = $D(${dict((item,item) for item in timezoneList)| n,j});
 

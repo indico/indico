@@ -45,8 +45,8 @@ from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
 from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
                                                 TextModificationBase, HTMLModificationBase)
-from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning, ServiceError,
-                                                 TimingNoReportError, Warning)
+from MaKaC.services.interface.rpc.common import (NoReportError, ResultWithWarning, ServiceError, TimingNoReportError,
+                                                 Warning)
 
 
 def _serialize_contribution(contrib):
@@ -196,23 +196,6 @@ class ConferenceTimezoneModification(ConferenceTextModificationBase):
 
     def _handleGet(self):
         return self._target.getTimezone()
-
-
-class ConferenceKeywordsModification(ConferenceTextModificationBase):
-    """
-    Conference keywords modification
-    """
-    def _handleSet(self):
-        self._target.setKeywords(self._value)
-
-    def _handleGet(self):
-        return self._target.getKeywords()
-
-    def process(self):
-        try:
-            return ConferenceTextModificationBase.process(self)
-        except HTMLSecurityError as e:
-            raise NoReportError(e.message)
 
 
 class ConferenceSpeakerTextModification(ConferenceTextModificationBase):
@@ -479,7 +462,6 @@ methodMap = {
     "main.changeAdditionalInfo": ConferenceAdditionalInfoModification,
     "main.changeDates": ConferenceStartEndDateTimeModification,
     "main.changeShortURL": ConferenceShortURLModification,
-    "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
     "program.changeDescription": ConferenceProgramDescriptionModification,
     "contributions.list": ConferenceListContributionsReview

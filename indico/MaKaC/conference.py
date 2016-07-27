@@ -303,16 +303,6 @@ class Conference(CommonObjectBase):
     def setOrgText( self, org="" ):
         self._orgText = org
 
-    def getKeywords(self):
-        try:
-            return self._keywords
-        except:
-            self._keywords = ""
-            return ""
-
-    def setKeywords(self, keywords):
-        self._keywords = keywords
-
     def getType(self):
         return self.as_event.type_.legacy_name
 

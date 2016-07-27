@@ -31,7 +31,7 @@ from indico.modules.events.models.references import ReferenceType, EventReferenc
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
-                                     IndicoEnumRadioField, OccurrencesField, IndicoThemeSelectField)
+                                     IndicoEnumRadioField, OccurrencesField, IndicoThemeSelectField, IndicoTagListField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -66,6 +66,10 @@ class EventReferencesForm(IndicoForm):
 
 class EventLocationForm(IndicoForm):
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
+
+
+class EventKeywordsForm(IndicoForm):
+    keywords = IndicoTagListField(_('Keywords'))
 
 
 class EventPersonLinkForm(IndicoForm):

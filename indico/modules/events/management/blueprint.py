@@ -21,7 +21,7 @@ from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockE
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
                                                           RHManageReferences, RHManageEventLocation,
-                                                          RHManageEventPersonLinks)
+                                                          RHManageEventPersonLinks, RHManageEventKeywords)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -38,6 +38,7 @@ _bp.add_url_rule('/protection/acl-message', 'acl_message', RHEventACLMessage)
 _bp.add_url_rule('/move', 'move', RHMoveEvent, methods=('POST',))
 _bp.add_url_rule('/external-ids', 'manage_event_references', RHManageReferences, methods=('GET', 'POST'))
 _bp.add_url_rule('/event-location', 'manage_event_location', RHManageEventLocation, methods=('GET', 'POST'))
+_bp.add_url_rule('/event-keywords', 'manage_event_keywords', RHManageEventKeywords, methods=('GET', 'POST'))
 _bp.add_url_rule('/event-persons', 'manage_event_person_links', RHManageEventPersonLinks, methods=('GET', 'POST'))
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():

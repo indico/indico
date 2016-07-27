@@ -783,7 +783,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         if self._conf.getSupportInfo().hasEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
         #------------------------------------------------------
-        vars["keywords"] = self._conf.getKeywords()
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
         vars["shortURLTag"] = self._conf.getUrlTag()
         vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
@@ -934,7 +933,6 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars['types'] = OrderedDict((t.legacy_name, t.title) for t in EventType)
         vars["title"] = quoteattr( self._conf.getTitle() )
         vars["description"] = self._conf.getDescription()
-        vars["keywords"] = self._conf.getKeywords()
         tz = self._conf.getTimezone()
         vars["sDay"] = str( self._conf.getAdjustedStartDate(tz).day )
         vars["sMonth"] = str( self._conf.getAdjustedStartDate(tz).month )

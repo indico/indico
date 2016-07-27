@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import flash, redirect, session, request
+from markupsafe import Markup
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
@@ -27,7 +28,7 @@ from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm
+from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.util import can_lock
 from indico.modules.events.management.views import WPEventManagement
@@ -242,6 +243,18 @@ class RHManageEventLocation(RHConferenceModifBase):
             flash(_('The location for the event has been updated'))
             tpl = get_template_module('events/management/_event_location.html')
             return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
+        return jsonify_form(form)
+
+
+class RHManageEventKeywords(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventKeywordsForm(obj=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            flash(_('The keywords for the event have been updated'))
+            return jsonify_data(html=Markup('<br>').join(self.event_new.keywords))
         return jsonify_form(form)
 
 

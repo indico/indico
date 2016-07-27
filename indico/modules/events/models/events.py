@@ -20,7 +20,7 @@ from contextlib import contextmanager
 
 import pytz
 from sqlalchemy import orm, DDL
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
@@ -196,6 +196,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.Integer,
         nullable=True,
         default=None
+    )
+    #: A list of tags/keywords for the event
+    keywords = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[],
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(

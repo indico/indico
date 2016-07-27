@@ -19,7 +19,7 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Keywords<br><small>( ${ _("one per line")})</small></span></td>
             <td bgcolor="white" width="100%">
-                <textarea name="keywords" cols="70" rows="3">${ keywords }</textarea>
+                ${ template_hook('event-keywords-field', event=self_._rh._target.as_event) }
             </td>
         </tr>
 

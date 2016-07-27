@@ -297,10 +297,7 @@ class outputGenerator(object):
         self._generate_references(event, out)
 
         out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
-        # TODO: Fetch keywords from new models (once implemented)
-        keywords = event.as_legacy.getKeywords()
-        keywords = keywords.replace("\r\n", "\n")
-        for keyword in keywords.split("\n"):
+        for keyword in event.keywords:
             out.writeTag("subfield",keyword,[["code","a"]])
         out.closeTag("datafield")
 
