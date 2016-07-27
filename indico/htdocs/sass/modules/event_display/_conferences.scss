@@ -150,6 +150,9 @@
             overflow: hidden;
         }
 
+        &:hover {
+            border-color: $blue;
+        }
     }
 }
 
