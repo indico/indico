@@ -96,7 +96,7 @@ $(document).ready(function() {
         }
 
         /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
-        $('<span>').qtip($.extend(true, {}, {
+        var qtip = $('<span>').qtip($.extend(true, {}, {
             overwrite: false,
             position: $.extend({
                 target: $target
@@ -144,6 +144,10 @@ $(document).ready(function() {
                 classes: qtipClass ? 'qtip-' + qtipClass : null
             }
         }, extraOpts), event);
+
+        $target.on('indico:closeAutoTooltip', function() {
+            qtip.qtip('hide');
+        });
     });
 
     // Enable colorbox for links with .js-lightbox
