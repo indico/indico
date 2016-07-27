@@ -43,11 +43,12 @@
                 {%- endif %}
             </div>
             {% if contrib.description -%}
-                <div class="description js-mathjax">
-                    {{ contrib.description|truncate(400) }}
-                </div>
+                <a href="{{ url_for('contributions.display_contribution', contrib) }}">
+                    <div class="description js-mathjax">
+                        {{ contrib.description|truncate(400) }}
+                    </div>
+                </a>
             {%- endif %}
-
         </div>
     {%- endfor %}
 {% endmacro %}
