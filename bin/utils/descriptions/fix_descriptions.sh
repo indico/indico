@@ -9,8 +9,8 @@ cd "$(readlink -e "$(dirname "$0")")"
 # Read what gets written on stderr, and eventually perform manual adjustments then:
 #   psql < update_descriptions.sql
 
-# PhantomJS binary to use
-PHANTOMJS="/opt/phantomjs/bin/phantomjs"
+# PhantomJS binary to use. It can be overidden by setting the variable in your environment.
+[ -z "$PHANTOMJS" ] && PHANTOMJS="phantomjs"
 
 # http://localhost:9001/ with Chromium to get the console
 # When running in debugging mode phantomjs won't exit and you'll have to kill it.
