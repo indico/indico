@@ -100,37 +100,29 @@ type("TimetableBlockBase", [],
          createMaterialButton: function(attachments) {
              var self = this;
 
-             var button = Html.div('timetableBlockMaterial');
-             button.observeClick(function(e) {
-                 stopPropagation(e);
-                 // use this style as long as the menu is open
-                 button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
-                 $(".timetableBlockMaterialActive").qtip({
-                         content: {
-                             text: self.getMaterialMenu(attachments)
-                         },
-                         show: {
-                             event: 'click'
-                         },
-                         hide: {
-                             event: 'unfocus'
-                         },
-                         position: {
-                             my: 'top right',
-                             at: 'bottom left'
-                         },
-                         events: {
-                             hide: function(event, api) {
-                                 // Restores the button style when menu is closed
-                                 button.dom.className = "timetableBlockMaterial";
-                             }
-                         },
-                         style: {
-                             classes: 'material_tip'
-                         }
-                 });
-                 $(".timetableBlockMaterialActive").qtip().show();
-             });
+             var button = Html.a('entry-attachments i-button-icon');
+             $(button.dom).qtip({
+                 content: {
+                     text: self.getMaterialMenu(attachments)
+                 },
+                 show: {
+                     event: false
+                 },
+                 hide: {
+                     event: 'unfocus'
+                 },
+                 position: {
+                     my: 'top right',
+                     at: 'bottom left'
+                 },
+                 style: {
+                     classes: 'material_tip'
+                 },
+                 suppress: false
+             }).on('click', function(evt) {
+                 evt.stopPropagation();
+                 $(this).qtip('show');
+             }).attr('title', $T.gettext("Show materials")).data('qtip-position', 'left');
 
              return button;
          },
