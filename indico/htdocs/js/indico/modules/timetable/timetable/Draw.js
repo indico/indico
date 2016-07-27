@@ -101,7 +101,8 @@ type("TimetableBlockBase", [],
              var self = this;
 
              var button = Html.a('entry-attachments i-button-icon');
-             $(button.dom).qtip({
+             var $button = $(button.dom);
+             $button.qtip({
                  content: {
                      text: self.getMaterialMenu(attachments)
                  },
@@ -110,6 +111,14 @@ type("TimetableBlockBase", [],
                  },
                  hide: {
                      event: 'unfocus'
+                 },
+                 events: {
+                     show: function() {
+                         $button.addClass('open').trigger('indico:closeAutoTooltip');
+                     },
+                     hide: function() {
+                         $button.removeClass('open');
+                     }
                  },
                  position: {
                      my: 'top right',
@@ -122,7 +131,7 @@ type("TimetableBlockBase", [],
              }).on('click', function(evt) {
                  evt.stopPropagation();
                  $(this).qtip('show');
-             }).attr('title', $T.gettext("Show materials")).data('qtip-position', 'left');
+             }).attr('title', $T.gettext("Show materials")).data('qtip-position', 'right');
 
              return button;
          },
