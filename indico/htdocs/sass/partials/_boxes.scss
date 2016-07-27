@@ -350,7 +350,7 @@ $i-box-padding: 10px;
     color: $light-black;
     list-style: outside none none;
     padding: 0;
-    margin: 0;
+    margin: 0 -10px;
 
     /* Sortable <li> will use absolute positioning while being moved thus the
      * <ul> must use relative positioning for correct alignment. */
@@ -359,8 +359,6 @@ $i-box-padding: 10px;
     > li {
         border-top: 1px solid lighten($gray, $color-variation);
         display: block;
-        margin-left: -10px;
-        margin-right: -10px;
         padding: 10px 10px;
         position: relative;
         overflow: hidden;
@@ -440,5 +438,32 @@ $i-box-padding: 10px;
             @include border-vert(lighten($gray, $color-variation));
             border-top-width: 1px !important;
         }
+    }
+}
+
+.error-box {
+    font-size: 1.2em;
+    padding: 2em;
+    background-color: $light-gray;
+    width: 400px;
+    margin: 50px auto;
+    padding-top: 20px;
+    text-align: center;
+    border-radius: .5em;
+    border: 1px solid $gray;
+
+    h1 {
+        color: $dark-blue;
+        font-size: 2em;
+        padding-bottom: 10px;
+    }
+
+    p {
+        color: $light-black;
+    }
+
+    .error-box-small {
+        margin-top: 2em;
+        font-size: 0.8em;
     }
 }

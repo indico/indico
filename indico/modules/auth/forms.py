@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, SelectField, PasswordField
+from wtforms.fields import StringField, SelectField, PasswordField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
@@ -97,6 +97,8 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
     email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
     address = StringField(_('Address'), widget=SyncedInputWidget(textarea=True))
     phone = StringField(_('Phone number'), widget=SyncedInputWidget())
+    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
+                                                        "administrators who will review your registration."))
 
 
 class LocalRegistrationForm(RegistrationForm):
@@ -104,6 +106,14 @@ class LocalRegistrationForm(RegistrationForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
+                                                        "administrators who will review your registration."))
+
+    @property
+    def data(self):
+        data = super(LocalRegistrationForm, self).data
+        del data['confirm_password']
+        return data
 
 
 class ResetPasswordEmailForm(IndicoForm):

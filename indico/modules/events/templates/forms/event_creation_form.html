@@ -1,0 +1,100 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+{% set category = {'id': form.category.data.id,
+                   'is_protected': form.category.data.is_protected,
+                   'title': form.category.data.title} if form.category.data else none %}
+
+{{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
+{{ form_rows(form, fields=form._field_order) }}
+{% if form._advanced_field_order %}
+    {% call form_fieldset(_('Advanced'), collapsible=true) %}
+        {{ form_rows(form, fields=form._advanced_field_order) }}
+    {% endcall %}
+{% endif %}
+{% call form_footer(form) %}
+    <input class="i-button big highlight" type="submit" value="{% trans %}Create event{% endtrans %}"
+           data-disabled-until-change>
+    <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+{% endcall %}
+
+{#
+Those messages are similar to those in _protection_messages.html but can be used
+purely client-side and are worded for event creation instead of being generic.
+#}
+<script type="text/html" id="event-creation-protection-messages">
+    <div class="action-box for-form protection-message public-protection-message accept">
+        <div class="section">
+            <div class="icon icon-unlocked"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Public{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        The event will be publicly accessible since it is set as public.
+                    {%- endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box for-form protection-message protected-protection-message danger">
+        <div class="section">
+            <div class="icon icon-lock"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Protected{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        The event will <strong>only</strong> be accessible by the <strong>managers</strong> of
+                        <strong>parent categories</strong> and users you give access to.
+                    {%- endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box for-form protection-message inheriting-protected-protection-message warning">
+        <div class="section">
+            <div class="icon icon-lock"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Protected{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        This event will not be publicly accessible since the category <strong class="js-category-title"></strong> is protected.
+                    {%- endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box for-form protection-message inheriting-public-protection-message accept">
+        <div class="section">
+            <div class="icon icon-unlocked"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Public{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        This event will be publicly accessible since the category <strong class="js-category-title"></strong> is not protected.
+                    {%- endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    setupEventCreationDialog({
+        categoryField: $('#{{ form.category.id }}'),
+        protectionModeFields: $('input[name={{ form.protection_mode.name }}][id^={{ form.protection_mode.id }}]'),
+        initialCategory: {{ category | tojson }}
+    });
+
+    _.defer(function() {
+        $('#{{ form.title.id }}').focus();
+    });
+</script>

@@ -1,0 +1,10 @@
+{% extends 'categories/management/base.html' %}
+{% from 'attachments/_attachments.html' import attachments_page %}
+
+{% block title %}
+    {% trans %}Materials{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ attachments_page(linked_object, linked_object_type, attachments) }}
+{% endblock %}

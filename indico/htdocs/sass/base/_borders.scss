@@ -1,0 +1,95 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+%inner-border-base {
+    content: ".";
+    color: transparent;
+    font-size: 0;
+    position: absolute;
+}
+
+@mixin border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-top: $width $style $color;
+}
+
+@mixin border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-right: $width $style $color;
+}
+
+@mixin border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-bottom: $width $style $color;
+}
+
+@mixin border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-left: $width $style $color;
+}
+
+@mixin border-vert($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-top($color, $style, $width);
+    @include border-bottom($color, $style, $width);
+}
+
+@mixin border-horz($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-right($color, $style, $width);
+    @include border-left($color, $style, $width);
+}
+
+@mixin border-all($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-vert($color, $style, $width);
+    @include border-horz($color, $style, $width);
+}
+
+@mixin inner-border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    &:before {
+        @extend %inner-border-base;
+        @include border-top($color, $style, $width);
+        width: 100%;
+        left: 0;
+        top: 0;
+    }
+}
+
+@mixin inner-border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    &:before {
+        @extend %inner-border-base;
+        @include border-right($color, $style, $width);
+        height: 100%;
+        right: 0;
+        top: 0;
+    }
+}
+
+@mixin inner-border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    &:before {
+        @extend %inner-border-base;
+        @include border-bottom($color, $style, $width);
+        height: 100%;
+        left: 0;
+        bottom: 0;
+    }
+}
+
+@mixin inner-border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    &:before {
+        @extend %inner-border-base;
+        @include border-left($color, $style, $width);
+        height: 100%;
+        left: 0;
+        top: 0;
+    }
+}

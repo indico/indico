@@ -90,6 +90,7 @@ def inject_meeting_body(event, **kwargs):
     children_contrib_strategy.joinedload('subcontributions')
     children_contrib_strategy.joinedload('references')
     children_contrib_strategy.joinedload('own_room')
+    children_contrib_strategy.joinedload('note')
 
     children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
     children_subcontrib_strategy.joinedload('person_links')
@@ -97,10 +98,13 @@ def inject_meeting_body(event, **kwargs):
 
     contrib_strategy = joinedload('contribution')
     contrib_strategy.joinedload('person_links')
+    contrib_strategy.joinedload('references')
+    contrib_strategy.joinedload('note')
 
     subcontrib_strategy = contrib_strategy.joinedload('subcontributions')
     subcontrib_strategy.joinedload('person_links')
     subcontrib_strategy.joinedload('references')
+    subcontrib_strategy.joinedload('note')
 
     # try to minimize the number of DB queries
     options = [contrib_strategy,
@@ -110,6 +114,8 @@ def inject_meeting_body(event, **kwargs):
                joinedload('break_')]
 
     entries = []
+    show_siblings_location = False
+    show_children_location = {}
     for entry in event.timetable_entries.filter_by(parent=None).options(*options):
         if show_date != 'all' and entry.start_dt.astimezone(event_tz).date().isoformat() != show_date:
             continue
@@ -123,6 +129,9 @@ def inject_meeting_body(event, **kwargs):
             entries.append(entry)
         elif entry.object.can_access(session.user):
             entries.append(entry)
+        if not entry.object.inherit_location:
+            show_siblings_location = True
+        show_children_location[entry.id] = not all(child.object.inherit_location for child in entry.children)
 
     entries.sort(key=attrgetter('end_dt'), reverse=True)
     entries.sort(key=lambda entry: (entry.start_dt, entry.object.title if entry.object else entry.title))
@@ -134,4 +143,5 @@ def inject_meeting_body(event, **kwargs):
 
     return render_template(posixpath.join('events/timetable/display', tt_tpl), event=event, entries=entries, days=days,
                            timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
-                           theme_settings=theme.get('settings', {}), **kwargs)
+                           theme_settings=theme.get('settings', {}), show_siblings_location=show_siblings_location,
+                           show_children_location=show_children_location, **kwargs)

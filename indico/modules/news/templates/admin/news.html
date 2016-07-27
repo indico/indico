@@ -1,0 +1,69 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{%- block content %}
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}News{% endtrans %}
+            </div>
+            <div class="i-box-buttons toolbar right">
+                <div class="group">
+                    <a class="i-button icon-settings"
+                       data-href="{{ url_for('.settings') }}"
+                       data-qtip-position="right"
+                       data-ajax-dialog
+                       data-title="{% trans %}Settings{% endtrans %}">
+                        {% trans %}Settings{% endtrans %}
+                    </a>
+                    <a class="i-button icon-plus"
+                       data-ajax-dialog
+                       data-title="{% trans %}Post news{% endtrans %}"
+                       data-href="{{ url_for('.create_news') }}"
+                       data-confirm-close-unsaved
+                       data-reload-after>
+                        {% trans %}Post news{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="i-box-table-widget">
+            <table class="i-table-widget ip-network-group">
+                <thead>
+                    <tr>
+                        <th>{% trans %}Title{% endtrans %}</th>
+                        <th>{% trans %}Date{% endtrans %}</th>
+                        <th class="actions"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in news %}
+                        {{ _render_news_row(item) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{%- endblock %}
+
+{% macro _render_news_row(item) %}
+    <tr>
+        <td>{{ item.title }}</td>
+        <td>{{ item.created_dt|format_datetime }}</td>
+        <td class="actions">
+            <a class="icon-edit"
+               data-ajax-dialog
+               data-title="{% trans %}Edit news{% endtrans %}"
+               data-href="{{ url_for('.edit_news', item) }}"
+               data-confirm-close-unsaved
+               data-reload-after>
+            </a>
+            <a class="icon-remove"
+               data-href="{{ url_for('.delete_news', item) }}"
+               data-method="POST"
+               data-title="{% trans %}Delete news{% endtrans %}"
+               data-confirm="{% trans title=item.title %}Do you really want to delete the news '{{ title }}'?{% endtrans %}">
+            </a>
+        </td>
+    </tr>
+{% endmacro %}

@@ -70,7 +70,7 @@
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Attached files")}</span></td>
                     <td bgcolor="white" valign="top">
                         % for file in attachments:
-                            <div style="padding-bottom:3px;"><a href=${ url_for('event.abstractDisplay-getAttachedFile', file) }">${ file.getFileName() }</a></div>
+                            <div style="padding-bottom:3px;"><a href="${ url_for('event.abstractDisplay-getAttachedFile', file) }">${ file.getFileName() }</a></div>
                         % endfor
                     </td>
                     <form action=${ modDataURL } method="POST">

@@ -11,7 +11,11 @@
             'use strict';
 
             var inputs = $('input[name={{ field.name }}][id^={{ field.id }}]');
-            var parentProtected = {{ field.get_form().protected_object.protection_parent.is_protected | tojson }};
+            {% if field.can_inherit_protection %}
+                var parentProtected = {{ field.get_form().protected_object.protection_parent.is_protected | tojson }};
+            {% else %}
+                var parentProtected = false;
+            {% endif %}
 
             inputs.on('change', function() {
                 var $this = $(this);

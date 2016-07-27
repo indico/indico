@@ -1,0 +1,15 @@
+{% from 'confirmation_dialog.html' import confirmation_dialog %}
+
+{% call confirmation_dialog('danger', ok_text=ngettext("Delete category", "Delete categories", categories|length),
+                            extra_confirmation=false, id_field_name='category_id', ids=category_ids) %}
+    {% trans count=categories|length -%}
+        You are about to delete the following category:
+    {%- pluralize -%}
+        You are about to delete the following categories:
+    {%- endtrans %}
+    <ul>
+        {% for category in categories %}
+            <li>{{ category.title }}</li>
+        {% endfor %}
+    </ul>
+{% endcall %}

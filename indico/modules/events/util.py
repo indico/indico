@@ -27,7 +27,7 @@ from tempfile import NamedTemporaryFile
 
 from flask import session, request, g, current_app
 from sqlalchemy import inspect
-from sqlalchemy.orm import load_only, noload, joinedload
+from sqlalchemy.orm import load_only, noload, joinedload, subqueryload
 
 from indico.core import signals
 from indico.core.config import Config
@@ -49,27 +49,6 @@ from indico.util.i18n import _
 from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-
-
-def preload_events(ids, lightweight=True, persons=False):
-    """Preload events so they are in SA's identity cache
-
-    This is useful for legacy pages where we have to show large
-    numbers of events without being able to query them from the
-    db cleanly.
-
-    :param ids: An iterable of IDs or Conference objects
-    :param lightweight: Only load dates and title
-    :param persons: Also load the person links
-    """
-    cache = g.setdefault('_event_cache', {})
-    ids = {int(getattr(id_, 'id', id_)) for id_ in ids} - cache.viewkeys()
-    query = Event.find(Event.id.in_(ids))
-    if lightweight:
-        query = query.options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
-    if persons:
-        query = query.options(joinedload('person_links'))
-    cache.update((e.id, e) for e in query)
 
 
 def get_object_from_args(args=None):
@@ -336,7 +315,7 @@ class ReporterBase(object):
         session.modified = True
 
 
-def get_base_ical_parameters(user, event, detail, session_=None):
+def get_base_ical_parameters(user, object, detail, path):
     """Returns a dict of all parameters expected by iCal template"""
 
     from indico.web.http_api.util import generate_public_auth_request
@@ -347,10 +326,6 @@ def get_base_ical_parameters(user, event, detail, session_=None):
     persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
     tpl = get_template_module('api/_messages.html')
     persistent_agreement = tpl.get_ical_persistent_msg()
-    if session_:
-        path = '/export/event/{0}/session/{1}.ics'.format(event.id, session_.id)
-    else:
-        path = '/export/event/{0}.ics'.format(event.id)
     top_urls = generate_public_auth_request(api_key, path)
     urls = generate_public_auth_request(api_key, path, {'detail': detail})
     request_urls = {

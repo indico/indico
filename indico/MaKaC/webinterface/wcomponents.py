@@ -14,48 +14,39 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 import os
 import exceptions
 import urllib
 import pkg_resources
-import binascii
 from flask import session
 from lxml import etree
 from pytz import timezone
 from speaklater import _LazyString
-from datetime import timedelta, datetime
-from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
-from MaKaC import conference
 from MaKaC.common import info
-from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.url import URL
 from indico.core.config import Config
-from MaKaC.conference import Conference, Category
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
+from MaKaC.conference import Conference
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common import utils
 from MaKaC.errors import MaKaCError
 from MaKaC.common.ContextHelp import ContextHelp
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.util import preload_events
 from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
-from indico.util.date_time import utc_timestamp, is_same_month, format_date
+from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
-from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
@@ -228,13 +219,15 @@ class WHeader(WTemplated):
     """Templating web component for generating a common HTML header for
         the web interface.
     """
-    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, tpl_name=None):
+    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, tpl_name=None, prot_obj=None):
         WTemplated.__init__(self, tpl_name=tpl_name)
         self._currentuser = aw.getUser()
         self._locTZ = locTZ
         self._aw = aw
         self._isFrontPage = isFrontPage
         self.__currentCategory = currentCategory
+        # The object for which to show the protection indicator
+        self._prot_obj = prot_obj
 
     """
         Returns timezone string that is show to the user.
@@ -248,16 +241,27 @@ class WHeader(WTemplated):
         else:
             return timezone
 
-    """
-        Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
-    """
+    def _get_protection_new(self, obj):
+        if not obj.is_protected:
+            return ['Public', _('Public')]
+        else:
+            networks = [x.name for x in obj.get_access_list() if x.is_network]
+            if networks:
+                return ['DomainProtected', _('{} network only').format('/'.join(networks))]
+            else:
+                return ["Restricted", _("Restricted")]
+
     def _getProtection(self, target):
-        if target.isProtected():
-            return ["Restricted", _("Restricted")]
-        domain_list = target.getAccessController().getAnyDomainProtection()
-        if domain_list:
-            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
-        return ["Public", _("Public")]
+        """
+        Return a list with the status (Public, Protected, Restricted)
+        and extra info (domain list).
+        """
+        if isinstance(target, Conference):
+            return self._get_protection_new(target.as_event)
+        elif isinstance(target, db.m.Category):
+            return self._get_protection_new(target)
+        else:
+            raise TypeError('Unexpected object: {}'.format(target))
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
@@ -269,7 +273,8 @@ class WHeader(WTemplated):
 
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
-        vars["target"] = vars["currentCategory"] = self.__currentCategory
+        vars["currentCategory"] = self.__currentCategory
+        vars['prot_obj'] = self._prot_obj
 
         current_locale = get_current_locale()
         vars["ActiveTimezone"] = session.timezone
@@ -293,8 +298,6 @@ class WHeader(WTemplated):
             vars["title"] = "Indico"
             vars["organization"] = ""
 
-        vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
-
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
         vars['protectionDisclaimerProtected'] = legal_settings.get('network_protected_disclaimer')
         vars['protectionDisclaimerRestricted'] = legal_settings.get('restricted_disclaimer')
@@ -306,11 +309,8 @@ class WHeader(WTemplated):
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
-        vars["getProtection"] = lambda x: self._getProtection(x)
+        vars["getProtection"] = self._getProtection
 
-        announcement_header = getAnnoucementMgrInstance().getText()
-        vars["announcement_header"] = announcement_header
-        vars["announcement_header_hash"] = binascii.crc32(announcement_header)
         vars["show_contact"] = config.getPublicSupportEmail() is not None
 
         return vars
@@ -324,7 +324,7 @@ class WConferenceHeader(WHeader):
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
-        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -332,12 +332,12 @@ class WConferenceHeader(WHeader):
         from indico.web.http_api.util import generate_public_auth_request
 
         vars = WHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
 
-        vars["conf"] = vars["target"] = self._conf;
+        vars["conf"] = vars["target"] = self._conf
 
         vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
-        vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["MaKaCHomeURL"] = self._conf.as_event.category.url
 
         # Default values to avoid NameError while executing the template
         styles = theme_settings.get_themes_for("conference")
@@ -356,9 +356,6 @@ class WConferenceHeader(WHeader):
         vars["showDLMaterial"] = True
         vars["showLayout"] = True
 
-        vars["usingModifKey"]=False
-        if self._conf.canKeyModify():
-            vars["usingModifKey"]=True
         vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
 
         # This is basically the same WICalExportBase, but we need some extra
@@ -397,22 +394,14 @@ class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
         WConferenceHeader.__init__(self, self._aw, conf)
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
-        vars["categurl"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
-        url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-        vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
-        if self._conf.canKeyModify():
-            url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
-            url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-            vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
+        vars["categurl"] = self._conf.as_event.category.url
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -487,11 +476,10 @@ class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
-    def __init__(self, aw, conf, modifKey=False):
+    def __init__(self, aw, conf):
         self._conf = conf
-        self._modifKey=modifKey
         self._aw=aw
-        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -499,7 +487,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
 
-        vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
+        vars["categurl"] = self._conf.as_event.category.url
         view_options = [{'id': tid, 'name': data['title']} for tid, data in
                         sorted(theme_settings.get_themes_for(vars["type"]).viewitems(), key=lambda x: x[1]['title'])]
 
@@ -578,10 +566,6 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
 
     def getVars( self ):
         vars = WMenuMeetingHeader.getVars( self )
-        vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
-        if self._conf.canKeyModify():
-            vars["confModif"] = """<a href=%s>exit manage</a>"""%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
-
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
         vars["showExportToPDF"] = False
@@ -652,7 +636,7 @@ class WEventFooter(WFooter):
             'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
                                 self._gCalDateFormat(self._conf.getEndDate())),
             'details': description,
-            'location': location,
+            'location': location.encode('utf-8'),
             'trp': False,
             'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
                       'name:indico']
@@ -795,184 +779,6 @@ class WConferenceModifFrame(WTemplated):
 
         return vars
 
-class WCategoryModifFrame(WTemplated):
-
-    def __init__( self, conference):
-        self.__conf = conference
-
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["creator"] = ""
-        vars["context"] = ""
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
-        vars["categDisplayURL"] = vars["categDisplayURLGen"]( self.__conf )
-        vars["title"] = escape(self.__conf.getTitle())
-        vars["titleTabPixels"] = self.getTitleTabPixels()
-        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-        return vars
-
-
-    def getIntermediateVTabPixels( self ):
-        return 0
-
-    def getTitleTabPixels( self ):
-        return 260
-
-    def getCloseHeaderTags( self ):
-        return ""
-
-
-class WAccessControlFrameBase(WTemplated):
-
-    def _getAccessControlFrametParams( self ):
-        vars = {}
-        if self._target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "PUBLIC"
-            vars["statusColor"] = "#128F33"
-        elif self._target.isItselfProtected():
-            vars["privacy"] = "RESTRICTED"
-            vars["statusColor"] = "#B02B2C"
-        else :
-            vars["privacy"] = "INHERITING"
-            vars["statusColor"] = "#444444"
-
-        if isinstance(self._target, Category) and self._target.isRoot():
-            vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
-        else:
-            if isinstance(self._target, Conference):
-                vars["parentName"] = self._target.getOwner().getName()
-            else:
-                vars["parentName"] = self._target.getOwner().getTitle()
-            if self._target.hasProtectedOwner():
-                    vars["parentPrivacy"] = "RESTRICTED"
-                    vars["parentStatusColor"] = "#B02B2C"
-            else :
-                    vars["parentPrivacy"] = "PUBLIC"
-                    vars["parentStatusColor"] = "#128F33"
-
-        vars["locator"] = self._target.getLocator().getWebForm()
-        return vars
-
-class WAccessControlFrame(WAccessControlFrameBase):
-
-    def getHTML( self, target, setVisibilityURL, type ):
-        self._target = target
-
-        params = { "setPrivacyURL": setVisibilityURL,\
-                   "target": target,\
-                   "type": type }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars.update(self._getAccessControlFrametParams())
-        return vars
-
-
-class WConfAccessControlFrame(WAccessControlFrameBase):
-
-    def getHTML( self, target, setVisibilityURL):
-        self._target = target
-        params = { "target": target,\
-                   "setPrivacyURL": setVisibilityURL,\
-                   "type": "Event" }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["accessKey"] = self._target.getAccessKey()
-        vars.update(self._getAccessControlFrametParams())
-        return vars
-
-class WModificationControlFrame(WTemplated):
-
-    def getHTML( self, target ):
-        self.__target = target
-        return  WTemplated.getHTML( self )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        return vars
-
-
-class WConfModificationControlFrame(WTemplated):
-
-    def _getManagersList(self):
-        return fossilize(self.__target.getManagerList())
-
-    def getHTML(self, target):
-        self.__target = target
-        params = { "target": target }
-        return  WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["confId"] = self.__target.getId()
-        vars["modifKey"] = self.__target.getModifKey()
-        vars["managers"] = self._getManagersList()
-        return vars
-
-class WConfRegistrarsControlFrame(WTemplated):
-
-    def getHTML(self, target):
-        self.__target = target
-        params = {}
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["confId"] = self.__target.getId()
-        vars["registrars"] = fossilize(self.__target.getRegistrarList())
-        return vars
-
-
-class WConfProtectionToolsFrame(WTemplated):
-
-    def __init__( self, target ):
-        self._target = target
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["grantSubmissionToAllSpeakersURL"] = str(urlHandlers.UHConfGrantSubmissionToAllSpeakers.getURL(self._target))
-        vars["removeAllSubmissionRightsURL"] = str(urlHandlers.UHConfRemoveAllSubmissionRights.getURL(self._target))
-        vars["grantModificationToAllConvenersURL"] = str(urlHandlers.UHConfGrantModificationToAllConveners.getURL(self._target))
-        return vars
-
-class WDomainControlFrame(WTemplated):
-
-    def __init__(self, target):
-        self._target = target
-
-    def getVars(self):
-        tpl_vars = WTemplated.getVars(self)
-
-        if isinstance(self._target, conference.Conference):
-            tpl_vars['method'] = 'event.protection.toggleDomains'
-            event = self._target
-        else:
-            tpl_vars['method'] = 'category.protection.toggleDomains'
-            event = None
-
-        ac = self._target.getAccessController()
-        inheriting = (ac.getAccessProtectionLevel() == 0) and (self._target.getOwner() is not None)
-        domain_list = ac.getAnyDomainProtection() if inheriting else self._target.getDomainList()
-
-        tpl_vars["inheriting"] = inheriting
-        tpl_vars["domains"] = dict((dom, dom in domain_list)
-                                   for dom in domain.DomainHolder().getList())
-        tpl_vars["locator"] = self._target.getLocator().getWebForm()
-        tpl_vars["target"] = self._target
-        tpl_vars["event"] = event
-
-        return tpl_vars
-
 
 class WConfirmation(WTemplated):
 
@@ -992,122 +798,6 @@ class WConfirmation(WTemplated):
 
 class WClosed(WTemplated):
     pass
-
-
-class WConferenceListItem(WTemplated):
-    def __init__(self, event, aw):
-        self._event = event
-        self._aw = aw
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["lItem"] = self._event
-        vars["conferenceDisplayURLGen"] = urlHandlers.UHConferenceDisplay.getURL
-        vars["aw"] = self._aw
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
-
-
-class WEmptyCategory(WTemplated):
-    def getVars(self):
-        return {}
-
-
-class WConferenceList(WTemplated):
-
-    def __init__( self, category, wfRegm, showPastEvents ):
-        self._categ = category
-        self._showPastEvents = showPastEvents
-
-    def getHTML( self, aw, params ):
-        self._aw = aw
-        return WTemplated.getHTML( self, params )
-
-    def getEventTimeline(self, tz):
-        # Getting current and previous at the beggining
-        index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
-        today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
-        thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
-        nextMonthTS = utc_timestamp(thisMonth + relativedelta(months=1))
-        previousMonthTS = utc_timestamp(thisMonth - relativedelta(months=1))
-        twoMonthTS = utc_timestamp((today - timedelta(days=60)).replace(day=1))
-        future = []
-        present = []
-
-
-        # currentMonth will be used to ensure that when the OPTIMAL_PRESENT_EVENTS is reached
-        # the events of that month are still displayed in the present list
-        currentMonth = utctimestamp2date(previousMonthTS)
-        for ts, conf in index.iteritems(previousMonthTS):
-            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS or is_same_month(currentMonth, utctimestamp2date(ts)):
-                present.append(conf)
-                currentMonth = utctimestamp2date(ts)
-            else:
-                future.append(conf)
-
-        if len(present) < MIN_PRESENT_EVENTS:
-            present = index.values(twoMonthTS, previousMonthTS) + present
-
-        if not present:
-            maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
-            prevMonthTS = utc_timestamp(maxDT.replace(day=1))
-            present = index.values(prevMonthTS)
-        numPast = self._categ.getNumConferences() - len(present) - len(future)
-        preload_events(itertools.chain(present, future), persons=True)
-        return present, future, len(future), numPast
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        displayTZ = DisplayTZ(self._aw, self._categ, useServerTZ=1).getDisplayTZ()
-        vars["ActiveTimezone"] = displayTZ
-        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] =  self.getEventTimeline(displayTZ)
-        vars["categ"] = self._categ
-
-        vars["showPastEvents"] = self._showPastEvents
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
-
-
-class WCategoryList(WTemplated):
-
-    def __init__( self, categ ):
-        self._categ = categ
-        self._list = categ.getSubCategoryList()
-
-    def getHTML( self, aw, params ):
-        self._aw = aw
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-
-        vars = WTemplated.getVars( self )
-        vars["items"] = self._list
-        vars["categ"] = self._categ;
-        vars["getProtection"] = lambda x: utils.getProtectionText(x)
-
-        return vars
-
-
-class WConfCreationControlFrame(WTemplated):
-
-    def __init__( self, categ ):
-        self._categ = categ
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["locator"] = self._categ.getLocator().getWebForm()
-        vars["status"] =  _("OPENED")
-        vars["changeStatus"] =  i18nformat("""( <input type="submit" class="btn" name="RESTRICT" value="_("RESTRICT it")"> )""")
-        if self._categ.isConferenceCreationRestricted():
-            vars["status"] =  _("RESTRICTED")
-            vars["changeStatus"] = i18nformat("""( <input type="submit" class="btn" name="OPEN" value="_("OPEN it")"> )""")
-        vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
-        vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
-        vars["categoryId"] = self._categ.getId()
-        vars["confCreators"] = fossilize(self._categ.getConferenceCreatorList())
-        return vars
 
 
 class TabControl:
@@ -1486,158 +1176,6 @@ class WConfTickerTapeDrawer(WTemplated):
     def getSimpleText( self ):
         if layout_settings.get(self._conf, 'show_announcement'):
             return layout_settings.get(self._conf, 'announcement')
-
-
-class WUtils:
-    """A interface for creating easily some HTML elements..."""
-
-    def createImg(cls, imgId, imgInfo="", imgText="", **attributes):
-        """ returns an HTML image with optional text on the right.
-            Params:
-                imgId -- ID of the picture (see /code/MaKaC/common/MaCaKConfig.py ->SystemIcons).
-                ImgInfo -- optional information text about the link.
-                imgText -- optional text which will be displayed on the right of the pic.
-                attributes -- [dictionary] attributes for <img> (e.g. border="" name="" ...).
-        """
-        attr = utils.dictionaryToString(attributes)
-        return '<img src="{}" alt="{}" {} /> {}'.format(
-            Config.getInstance().getSystemIconURL(imgId), imgInfo, attr, imgText)
-    createImg = classmethod(createImg)
-
-    def createImgButton(cls, url, imgId, imgInfo="", imgText="", **attributes):
-        """ returns an HTML image link with optional text on the right.
-            Params:
-                url -- link of target.
-                imgId -- ID of the picture (see /code/MaKaC/common/MaCaKConfig.py ->SystemIcons).
-                ImgInfo -- optional information text about the link.
-                imgText -- optional text which will be displayed on the right of the pic.
-                attributes -- [dictionary] attributes for <a> (e.g. onclick="" onchange="" ...).
-        """
-        attr = utils.dictionaryToString(attributes)
-        return '<a href="{}" {}><img src="{}" alt="{}" /> {}</a>'.format(
-            url, attr, Config.getInstance().getSystemIconURL(imgId), imgInfo, imgText)
-    createImgButton = classmethod(createImgButton)
-
-    def createChangingImgButton(cls, url, imgID, imgOverId, imgInfo="", imgText="", **attributes):
-        """ returns a changing HTML image link
-            (i.e. the image changes depending on mouseOver/mouseOut)
-            with optional text on the right.
-
-            Params:
-                url -- link of target.
-                imgID -- ID of the basic picture (see /code/MaKaC/common/MaCaKConfig.py ->SystemIcons).
-                imgOverId -- ID of the picture appearing with onMouseOver.
-                ImgInfo -- optional information text about the link.
-                imgText -- optional text which will be displayed on the right of the pic.
-                attributes -- [dictionary] attributes for <a> (e.g. onclick="" onchange="" ...).
-        """
-        attr = utils.dictionaryToString(attributes)
-        iconUrl = Config.getInstance().getSystemIconURL(imgID)
-        iconOverUrl = Config.getInstance().getSystemIconURL(imgOverId)
-        return """<a href="%s" %s>
-              <img src="%s" alt="%s" onmouseover="javascript:this.src='%s'" onMouseOut="javascript:this.src='%s'"/> %s
-          </a>"""%(url, attr, iconUrl, imgInfo, iconOverUrl, iconUrl, imgText)
-    createChangingImgButton = classmethod(createChangingImgButton)
-
-    def createTextarea(cls, content="", **attributes):
-        """ returns an HTML textarea with optional text.
-            Params:
-                content -- optional text which will be displayed in the textarea.
-                attributes -- [dictionary] attributes for <input> (e.g. name="" type="" ...).
-        """
-        #check
-        if content==None: content=""
-        #attributes to string...
-        attr = utils.dictionaryToString(attributes)
-        #return HTML string
-        return """<textarea rows="5" cols="15" %s>%s</textarea>"""%(attr,content)
-    createTextarea = classmethod(createTextarea)
-
-    def createInput(cls, text="", **attributes):
-        """ returns an HTML input with optional text.
-            Params:
-                text -- optional text which will be displayed on the right of the input.
-                attributes -- [dictionary] attributes for <input> (e.g. name="" type="" ...).
-        """
-        #check
-        if text==None: text=""
-        #attributes to string...
-        attr = utils.dictionaryToString(attributes)
-        #return HTML string
-        return """<input %s/>%s"""%(attr,text)
-    createInput = classmethod(createInput)
-
-    def createSelect(cls, emptyOption, options, selected="", **attributes):
-        """ returns an HTML select field.
-            Params:
-                emptyOption -- [bool] if True, add a selectionable empty option in the select.
-                options -- list of the options.
-                selected -- (optional) the selected option.
-                attributes -- [dictionary] attributes for <select> (e.g. name="" onchange="" ...).
-        """
-        #attributes to string...
-        attr = utils.dictionaryToString(attributes)
-        #with empty option?
-        if emptyOption==True:
-            optionsHTML="<option></option>"
-        else:
-            optionsHTML=""
-        #treating options...
-        for option in options:
-            if option!=None and option!="":
-                if str(option)==str(selected):
-                    optionsHTML += """<option selected>%s</option>"""%(option)
-                else:
-                    optionsHTML += "<option>%s</option>"%(option)
-        return """<select %s>%s</select>"""%(attr,optionsHTML)
-    createSelect = classmethod(createSelect)
-
-    def appendNewLine(cls, htmlContent):
-        """ appends a new line <br/> to the given html element.
-            Params:
-                htmlContent -- [str] html element
-        """
-        return str(htmlContent) + "<br/>"
-    appendNewLine = classmethod(appendNewLine)
-
-class WBeautifulHTMLList(WTemplated):
-
-    def __init__(self, listObject, classNames, level):
-        """ classNames: a dictionary such as {'UlClassName' : 'optionList'}. See the getVars for more class names.
-        """
-        WTemplated.__init__(self)
-        self.__listObject = listObject
-        self.__classNames = classNames
-        self.__level = level
-
-    def getVars(self):
-        vars = WTemplated.getVars( self )
-        vars["ListObject"] = self.__listObject
-        vars["UlClassName"] = self.__classNames.get("UlClassName", "")
-        vars["LiClassName"] = self.__classNames.get("LiClassName", "")
-        vars["DivClassName"] = self.__classNames.get("DivClassName", "")
-        vars["Level"] = self.__level
-        return vars
-
-class WBeautifulHTMLDict(WTemplated):
-
-    def __init__(self, dictObject, classNames, level):
-        """ classNames: a dictionary such as {'UlClassName' : 'optionList'}. See the getVars for more class names.
-        """
-        WTemplated.__init__(self)
-        self.__dictObject = dictObject
-        self.__classNames = classNames
-        self.__level = level
-
-    def getVars(self):
-        vars = WTemplated.getVars( self )
-        vars["DictObject"] = self.__dictObject
-        vars["UlClassName"] = self.__classNames.get("UlClassName", "")
-        vars["LiClassName"] = self.__classNames.get("LiClassName", "")
-        vars["DivClassName"] = self.__classNames.get("DivClassName", "")
-        vars["KeyClassName"] = self.__classNames.get("KeyClassName", "")
-        vars["Level"] = self.__level
-        return vars
 
 
 class WFilterCriteria(WTemplated):

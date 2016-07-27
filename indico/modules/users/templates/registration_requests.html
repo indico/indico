@@ -1,0 +1,49 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Registration requests{% endtrans %}
+{% endblock %}
+
+{%- block content %}
+    <table class="i-table-widget fixed-width">
+        <thead>
+            <tr>
+                <th>{% trans %}Email Address{% endtrans %}</th>
+                <th>{% trans %}First name{% endtrans %}</th>
+                <th>{% trans %}Last name{% endtrans %}</th>
+                <th>{% trans %}Affiliation{% endtrans %}</th>
+                <th>{% trans %}Comment{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="registration-requests">
+            {%- for req in pending_requests %}
+                <tr>
+                    <td>{{ req.email }}</td>
+                    <td>{{ req.user_data.first_name }}</td>
+                    <td>{{ req.user_data.last_name }}</td>
+                    <td>{{ req.user_data.affiliation }}</td>
+                    <td>{{ req.comment }}</td>
+                    <td>
+                        <a href="#" class="i-button danger right js-process-request"
+                           data-href="{{ url_for('.reject_registration_request', req) }}"
+                           data-method="POST">
+                           {% trans %}Reject{% endtrans %}
+                        </a>
+                        <a href="#" class="i-button accept right js-process-request"
+                           data-href="{{ url_for('.accept_registration_request', req) }}"
+                           data-method="POST">
+                            {% trans %}Accept{% endtrans %}
+                        </a>
+                    </td>
+                </tr>
+            {%- endfor %}
+            <tr class="js-no-requests" {% if pending_requests %}style="display: none;"{% endif %}>
+                <td colspan="6">{% trans %}There are no pending requests{% endtrans %}</td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+        setupRegistrationRequestList();
+    </script>
+{%- endblock %}

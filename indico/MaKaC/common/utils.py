@@ -113,14 +113,6 @@ def setValidEmailSeparators(emailstr):
     # return the string obtained after replacing the separators
     return re.subn(r"[ ;,]+", ",", emails)[0]
 
-def validIP(ip):
-    """
-    Quick and dirty IP address validation
-    (not exact, but enough)
-    """
-    expr = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
-    return re.match(expr, ip) != None
-
 
 def isStringHTML(s):
     if not isinstance(s, basestring):
@@ -412,15 +404,3 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-
-def getProtectionText(target):
-    if target.hasAnyProtection():
-        if target.isItselfProtected():
-            return "protected_own", None
-        elif target.hasProtectedOwner():
-            return "protected_parent", None
-        elif target.getDomainList() != []:
-            return "domain", list(x.getName() for x in target.getDomainList())
-        else:
-            return getProtectionText(target.getOwner())
-    return "", None

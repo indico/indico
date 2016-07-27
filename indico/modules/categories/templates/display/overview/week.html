@@ -1,0 +1,45 @@
+{% extends 'categories/display/overview/base.html' %}
+{% from 'categories/display/overview/event.html' import render_event %}
+
+{% block overview_title %}
+    {{ start_dt|format_date }} – {{ end_dt|format_date }}
+{% endblock %}
+
+{% block overview_navigation_left %}
+    <a href="{{ previous_week_url }}"
+       title="{% trans %}Previous week{% endtrans %}">
+        &lt;
+    </a>
+{% endblock %}
+
+{% block overview_navigation_right %}
+    <a href="{{ next_week_url }}"
+       title="{% trans %}Next week{% endtrans %}">
+        &gt;
+    </a>
+{% endblock %}
+
+{% block overview %}
+    <table>
+        <tr>
+            {% for day, events in events_by_day %}
+                <th>
+                    {{ day|format_date(format='EEE d MMM') }}
+                </th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for day, events in events_by_day %}
+                <td class="day">
+                    {%- if events -%}
+                        <table>
+                            {% for event in events %}
+                                {{ render_event(event, timezone=category.display_tzinfo, detail=detail) }}
+                            {% endfor %}
+                        </table>
+                    {%- endif -%}
+                </td>
+            {% endfor %}
+        </tr>
+    </table>
+{% endblock %}

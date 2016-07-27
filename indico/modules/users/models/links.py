@@ -133,13 +133,9 @@ class UserLink(db.Model):
     def _link_map(cls):
         import MaKaC.conference
         import MaKaC.review
-        import MaKaC.user
         return {
-            'category': {'cls': MaKaC.conference.Category,
-                         'roles': {'access', 'creator', 'manager'}},
             'conference': {'cls': MaKaC.conference.Conference,
-                           'roles': {'abstractSubmitter', 'access', 'chair', 'editor', 'paperReviewManager', 'referee',
-                                     'reviewer'}},
+                           'roles': {'abstractSubmitter', 'editor', 'paperReviewManager', 'referee', 'reviewer'}},
             'track': {'cls': MaKaC.conference.Track,
                       'roles': {'coordinator'}},
             'abstract': {'cls': MaKaC.review.Abstract,

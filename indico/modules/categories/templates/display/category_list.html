@@ -1,0 +1,16 @@
+{% macro category_list(parent_category) %}
+    {% if parent_category.children %}
+        <ul class="category-list" data-subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
+            {% for category in parent_category.children %}
+                <li>
+                    <span class="protection {{ 'icon-shield' if category.is_self_protected }}"></span>
+                    <span class="number-events" id="category-event-count-{{ category.id }}"></span>
+                    <a href="{{ url_for('.display', category) }}" class="name">{{ category.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <script>
+            setupCategoryDisplaySubcatList();
+        </script>
+    {% endif %}
+{% endmacro %}

@@ -315,7 +315,7 @@ table.booking-stats {
 }
 
 .occupancy-stats {
-    width: 500px;
+    width: 680px;
 
     table {
         width: 100%;
@@ -330,16 +330,6 @@ table.booking-stats {
             font-weight: bold;
             padding-left: 25px;
             text-align: right;
-        }
-    }
-}
-
-.rb-menu-column .sideBar {
-    > .content {
-        padding-top: 0;
-
-        > ul {
-            margin-top: 0;
         }
     }
 }

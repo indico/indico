@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
-
 from flask import jsonify, session
+from sqlalchemy.orm import joinedload
 
 from indico.modules.events.util import get_events_with_linked_event_persons
 from indico.modules.events.contributions.util import get_events_with_linked_contributions
@@ -33,8 +32,6 @@ from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
-from MaKaC.common.indexes import IndexesHolder
-from MaKaC.conference import ConferenceHolder
 from MaKaC.user import AvatarHolder
 
 
@@ -123,7 +120,7 @@ class UserEventHook(HTTPAPIHook):
 
     def export_categ_events(self, aw):
         self._checkProtection(aw)
-        catIds = [item['categ'].getId() for item in get_related_categories(self._avatar.user).itervalues()]
+        catIds = [str(cat.id) for cat in get_related_categories(self._avatar.user, detailed=False)]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 
@@ -137,8 +134,9 @@ class UserCategoryEventFetcher(IteratedDataFetcher):
         from indico.modules.events import Event
         query = (Event.query
                  .filter(~Event.is_deleted,
-                         Event.category_chain.overlap(map(int, catIds)),
-                         Event.happens_between(self._fromDT, self._toDT)))
+                         Event.category_chain_overlaps(map(int, catIds)),
+                         Event.happens_between(self._fromDT, self._toDT))
+                 .options(joinedload('category').load_only('id', 'title')))
         return self._process(x.as_legacy for x in query)
 
 
@@ -157,12 +155,9 @@ class UserRelatedEventFetcher(IteratedDataFetcher):
         return fossil
 
     def events(self, eventIds):
-        ch = ConferenceHolder()
-
-        def _iterate_objs(objIds):
-            for objId in objIds:
-                obj = ch.getById(objId, True)
-                if obj is not None:
-                    yield obj
-
-        return self._process(_iterate_objs(eventIds))
+        from indico.modules.events import Event
+        query = (Event.query
+                 .filter(~Event.is_deleted,
+                         Event.id.in_(map(int, eventIds)))
+                 .options(joinedload('category').load_only('id', 'title')))
+        return self._process(x.as_legacy for x in query)

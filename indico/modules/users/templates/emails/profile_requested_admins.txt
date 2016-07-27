@@ -1,0 +1,26 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}Indico profile requested{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        Someone has requested to register a new indico profile.
+        Please review their registration request and approve/reject it accordingly.
+
+        First name: {{ req.user_data.first_name }}
+        Last name: {{ req.user_data.last_name }}
+        Email address: {{ req.email }}
+        {%- if req.user_data.affiliation %}
+            Affiliation: {{ req.user_data.affiliation }}
+        {%- endif %}
+        {%- if req.comment %}
+            Comment:
+            {{ req.comment }}
+        {%- endif %}
+
+        Manage pending requests:
+        {{ url_for('users.registration_request_list', _external=true) }}
+    {%- endfilter -%}
+{%- endblock %}

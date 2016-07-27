@@ -59,6 +59,8 @@
     }
 
     > .section > .text {
+        flex-grow: 1;
+
         > .label {
             font-weight: bold;
         }
@@ -129,5 +131,12 @@
     &.plain {
         border: none;
         background-color: transparent;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 1.5em;
+        max-height: 100px;
+        overflow: auto;
     }
 }

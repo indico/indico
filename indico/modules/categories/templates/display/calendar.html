@@ -1,0 +1,45 @@
+{% extends 'layout/management_page.html' %}
+
+{% block page_class %}category-calendar-page{% endblock %}
+
+{% block side_menu %}
+    <div class="category-calendar-side-menu">
+        <div class="js-calendar-datepicker"></div>
+        <input type="hidden" id="date" name="date">
+    </div>
+    <script>
+        (function(){
+            'use strict';
+
+            $('.js-calendar-datepicker').datepicker({
+                beforeShowDay: function(date) {
+                    return [date.getDate() == 1, ''];
+                },
+                onSelect: function(date) {
+                    $('#event-calendar').fullCalendar('gotoDate', new moment(date, 'DD/MM/YYYY'));
+                }
+            });
+        })();
+    </script>
+{% endblock %}
+
+{% block display_view_button %}
+    <div class="group">
+        <a href="{{ url_for('categories.display', category) }}" class="icon-arrow-left highlight i-button">
+            {% trans %}Back to category page{% endtrans %}
+        </a>
+    </div>
+{% endblock %}
+
+{% block banner_title %}
+    {{ category.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="category-calendar-view">
+        <div id="event-calendar"></div>
+    </div>
+    <script>
+        setupCategoryCalendar('#event-calendar', {{ url_for('categories.calendar', category) | tojson }});
+    </script>
+{% endblock %}

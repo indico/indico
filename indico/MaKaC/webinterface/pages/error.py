@@ -14,17 +14,41 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.wcomponents import WTemplated
+from flask import render_template, session
+
+from MaKaC.accessControl import AccessWrapper
+from MaKaC.common import Config
+from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
-class WErrorWSGI(WTemplated):
+def render_error(message, description, standalone=False):
+    if standalone:
+        logo_url = Config.getInstance().getSystemIconURL("logoIndico")
+        return render_template('standalone_error.html', error_message=message, error_description=description,
+                               logo_url=logo_url)
+    else:
+        return WPErrorWSGI(message, description).getHTML()
 
-    def __init__(self, ex):
-        WTemplated.__init__(self)
-        self._ex = ex
 
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["errorTitle"] = str(self._ex[0])
-        vars["errorText"] = str(self._ex[1])
-        return vars
+class WPErrorWSGI(WPDecorated, WPJinjaMixin):
+    # social config is in MaKaCConfig - this can go away once it's
+    # moved to SettingsProxy
+    SOCIAL_ENABLED = False
+
+    def __init__(self, message, description):
+        WPDecorated.__init__(self, None)
+        self._message = message
+        self._description = description
+
+    def _getBody(self, params):
+        return self._getPageContent({
+            '_jinja_template': 'error.html',
+            'error_message': self._message,
+            'error_description': self._description
+        })
+
+    def _getAW(self):
+        return AccessWrapper(session.avatar)
+
+    def getHTML(self):
+        return self.display()

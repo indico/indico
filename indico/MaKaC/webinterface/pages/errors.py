@@ -163,17 +163,13 @@ class WAccessError( WTemplated ):
         self._rh = rh
 
     def getVars( self ):
+        from MaKaC.conference import Conference
         vars = WTemplated.getVars( self )
         vars["area"]= i18nformat(""" _("Authorisation") - """)
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
-        if isinstance(self._rh._target, list):
-            #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
-            contactInfo = [item.getAccessController().getAnyContactInfo() for item in self._rh._target if hasattr(item, 'getAccessController') ]
-            vars["contactInfo"] = ";".join(contactInfo)
-        elif self._rh._target is not None and hasattr(self._rh._target, 'getAccessController'): #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
-            vars["contactInfo"] = self._rh._target.getAccessController().getAnyContactInfo()
-        else:
-            vars["contactInfo"] = ""
+        vars["contactInfo"] = ""
+        if isinstance(self._rh._target, Conference):
+            vars["contactInfo"] = self._rh._target.as_new.no_access_contact
         return vars
 
 class WAccessKeyError( WTemplated ):
@@ -210,14 +206,12 @@ class WPKeyAccessError( WPDecorated ):
     def __init__( self, rh ):
         WPDecorated.__init__( self, rh )
 
-    def _getBody( self, params ):
-        tgt = self._rh._target
+    def _getBody(self, params):
+        event = self._rh.event_new
         msg = ""
-        keys = session.get("accessKeys", {})
-        if tgt.getUniqueId() in keys:
+        has_key = session.get("access_keys", {}).get(event._access_key_session_key) is not None
+        if has_key:
             msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
-        else:
-            msg = ""
         wc = WAccessKeyError( self._rh, msg )
         return wc.getHTML()
 
@@ -273,40 +267,13 @@ class WModificationError( WTemplated ):
         return vars
 
 
-class WModificationKeyError( WTemplated ):
-
-    def __init__( self, rh, msg="" ):
-        self._rh = rh
-        self._msg = msg
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["msg"] = self._msg
-        redirectURL = ""
-        if hasattr(self._rh, "_redirectURL"):
-            redirectURL = self._rh._redirectURL
-        vars["redirectURL"] = quoteattr(redirectURL)
-        vars["url"] = quoteattr( str( urlHandlers.UHConfEnterModifKey.getURL(self._rh._target) ) )
-        return vars
-
-
 class WPModificationError( WPDecorated ):
 
     def __init__( self, rh ):
         WPDecorated.__init__( self, rh )
 
     def _getBody( self, params ):
-        if hasattr(self._rh._target, "getModifKey") and \
-            self._rh._target.getModifKey() != "":
-            keys = session.get("modifKeys", {})
-            if keys.get(self._rh._target.getId()):
-                msg = i18nformat("""<font color=red> _("Wrong modification key!")</font>""")
-            else:
-                msg = ""
-            wc = WModificationKeyError( self._rh, msg )
-        else:
-            wc = WModificationError( self._rh )
-        return wc.getHTML()
+        return WModificationError(self._rh).getHTML()
 
 
 class WReportError( WTemplated ):

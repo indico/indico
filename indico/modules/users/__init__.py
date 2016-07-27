@@ -16,13 +16,18 @@
 
 from __future__ import unicode_literals
 
+from flask import session, render_template
+
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.notifications import send_email, make_email
+from indico.core.settings.core import SettingsProxy
 from indico.modules.users.ext import ExtraUserPreferences
-from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -40,6 +45,10 @@ user_settings = UserSettingsProxy('users', {
     'synced_fields': None  # None to synchronise all fields, empty set to not synchronize
 })
 
+user_management_settings = SettingsProxy('user_management', {
+    'notify_account_creation': False
+})
+
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
@@ -48,4 +57,37 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.category.deleted.connect
 def _category_deleted(category, **kwargs):
-    FavoriteCategory.find(target_id=category.id).delete()
+    category.favorite_of.clear()
+
+
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100)
+    yield SideMenuItem('personal_data', _('Personal data'), url_for('users.user_profile'), 90)
+    yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80)
+    yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70)
+    yield SideMenuItem('favorites', _('Favourites'), url_for('users.user_favorites'), 60)
+
+
+@template_hook('global-announcement', priority=-1)
+def _inject_login_as_header(**kwargs):
+    login_as_data = session.get('login_as_orig_user')
+    if login_as_data:
+        return render_template('users/login_as_header.html', login_as_data=login_as_data)
+
+
+@signals.users.registration_requested.connect
+def _registration_requested(req, **kwargs):
+    from indico.modules.users.util import get_admin_emails
+    tpl = get_template_module('users/emails/profile_requested_admins.txt', req=req)
+    send_email(make_email(get_admin_emails(), template=tpl))
+
+
+@signals.users.registered.connect
+def _registered(user, identity, from_moderation, **kwargs):
+    from indico.modules.users.util import get_admin_emails
+    if (from_moderation or identity is None or identity.provider != 'indico' or
+            not user_management_settings.get('notify_account_creation')):
+        return
+    tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
+    send_email(make_email(get_admin_emails(), template=tpl))

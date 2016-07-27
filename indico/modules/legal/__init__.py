@@ -37,7 +37,7 @@ legal_settings = SettingsProxy('legal', {
     'network_protected_disclaimer': _DEFAULT_PROTECTED_DISCLAIMER,
     'restricted_disclaimer': _DEFAULT_RESTRICTED_DISCLAIMER,
     'tos': ''
-}, preload=True)
+})
 
 
 @signals.menu.items.connect_via('admin-sidemenu')

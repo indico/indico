@@ -48,7 +48,7 @@ registration_settings = RegistrationSettingsProxy('registrations', {
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     registration_section = 'organization' if event.type == 'conference' else 'advanced'
-    if not event.can_manage(session.user, 'registration', allow_key=True):
+    if not event.can_manage(session.user, 'registration'):
         return
     if event.type != 'conference':
         yield SideMenuItem('participants', _("Participants"), url_for('event_participation.manage', event),

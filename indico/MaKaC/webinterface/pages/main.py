@@ -20,7 +20,6 @@ import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.common import timezoneUtils
 from pytz import timezone
-from MaKaC.conference import Category, Conference
 
 
 class WPMainBase(base.WPDecorated):
@@ -28,14 +27,6 @@ class WPMainBase(base.WPDecorated):
 
     def _display(self, params):
         target = self._rh.getTarget()
-
-        # Check if user is administrator
-        self._isAdmin = session.user and session.user.is_admin
-        self._isCategoryManager = (
-            self._isAdmin or
-            (isinstance(target, Category) and target.canModify(self._getAW())) or
-            (isinstance(target, Conference) and target.getOwner() and target.getOwner().canModify(self._getAW())))
-        self._showAdmin = self._isAdmin or self._isCategoryManager
 
         self._timezone = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         params = dict(params, **self._kwargs)

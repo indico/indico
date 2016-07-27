@@ -16,17 +16,11 @@
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
-from MaKaC.i18n import _
 from indico.modules.events.cloning import EventCloner
-from indico.util.date_time import format_date
-import MaKaC.common.timezoneUtils as timezoneUtils
-from pytz import timezone
 
 
 class WebFactory(WebFactory):
@@ -34,10 +28,6 @@ class WebFactory(WebFactory):
     iconURL = Config.getInstance().getSystemIconURL('lecture')
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
-
-    def getEventCreationPage( rh, targetCateg ):
-        return WPSimpleEventCreation( rh, targetCateg )
-    getEventCreationPage = staticmethod( getEventCreationPage )
 
     def getIconURL():
         return WebFactory.iconURL
@@ -52,20 +42,9 @@ class WebFactory(WebFactory):
         return WPSEConfModif(rh, conf)
     getConfModif = staticmethod(getConfModif)
 
-    def getConfModifAC(rh, conf):
-        return WPSEConfModifAC(rh, conf)
-    getConfModifAC = staticmethod(getConfModifAC)
-
     def getConfClone(rh, conf):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
-
-
-#################### Participants #####################################
-
-    def getConfModifParticipantsNewPending(rh, conf):
-        return WPSEConfModifParticipantsNewPending(rh, conf)
-    getConfModifParticipantsNewPending = staticmethod(getConfModifParticipantsNewPending)
 
 
 SimpleEventWebFactory = WebFactory
@@ -85,46 +64,18 @@ class WSEConfModifMainData(meeting.WMConfModifMainData):
     pass
 
 
-#####Access Control # stays the same as conference for now
-class WPSEConfModifAC(conferences.WPConfModifAC):
-    pass
-
-
 #####Tools # Stays the same as conference for now
-class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
-
-    def __init__(self, rh, conf):
-        conferences.WPConfModifToolsBase.__init__(self, rh, conf)
-
-
 class WPSEConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
-        p = conferences.WConferenceClone( self._conf )
+        p = conferences.WConferenceClone(self._conf)
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "startTime": self._conf.getUnixStartDate(),
             "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         }
         return p.getHTML(pars)
 
-
-#################### Event Creation #####################################
-class WPSimpleEventCreation( WPConferenceCreationMainData):
-
-    def _getWComponent( self ):
-        return WSimpleEventCreation( self._target, rh = self._rh )
-
-
-class WSimpleEventCreation(category.WConferenceCreation):
-    def __init__( self, targetCateg, type="simple_event", rh = None ):
-        self._categ = targetCateg
-        self._type = type
-        self._rh = rh
-
-    def getVars( self ):
-        vars = category.WConferenceCreation.getVars( self )
-        vars["event_type"] = 'lecture'
-        return vars
 
 ##################### Event Display ###################################
 

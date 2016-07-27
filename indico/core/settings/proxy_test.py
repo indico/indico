@@ -69,10 +69,9 @@ def test_proxy_delete_all():
 
 
 @pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active
-@pytest.mark.parametrize('preload', (True, False))
-def test_proxy_preload(count_queries, preload):
+def test_proxy_preload(count_queries):
     defaults = {'hello': 'world', 'foo': None, 'bar': None}
-    proxy = SettingsProxy('test', defaults, preload=preload)
+    proxy = SettingsProxy('test', defaults)
     proxy.set('bar', 'test')
     with count_queries() as cnt:
         # this one preloads
@@ -82,10 +81,10 @@ def test_proxy_preload(count_queries, preload):
         # this one has no value in the db
         assert proxy.get('foo') is None
         assert proxy.get('foo', 'bar') == 'bar'
-    assert cnt() == (0 if preload else 1)
+    assert cnt() == 0
     with count_queries() as cnt:
         assert proxy.get('bar') is 'test'
-    assert cnt() == (0 if preload else 1)
+    assert cnt() == 0
 
 
 @pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active

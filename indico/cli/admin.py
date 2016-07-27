@@ -4,7 +4,10 @@ import transaction
 from flask_script import Manager, prompt, prompt_bool
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import update_session_options
+from indico.modules.auth import Identity
 from indico.modules.users import User
+from indico.modules.users.operations import create_user
 from indico.util.console import cformat, prompt_email, prompt_pass, success, error, warning
 from indico.util.string import to_unicode
 
@@ -25,34 +28,38 @@ def print_user_info(user):
                            help="Grants administration rights")
 def user_create(grant_admin):
     """Creates new user"""
-    user = User()
+    update_session_options(db)
     user_type = 'user' if not grant_admin else 'admin'
-
+    while True:
+        email = prompt_email()
+        if email is None:
+            return
+        email = email.lower()
+        if not User.find(User.all_emails.contains(email), ~User.is_deleted, ~User.is_pending).count():
+            break
+        error('Email already exists')
+    first_name = prompt("First name")
+    last_name = prompt("Last name")
+    affiliation = prompt("Affiliation", '')
     print()
-    name = prompt("First name")
-    surname = prompt("Last name")
-    affiliation = prompt("Affiliation")
-    print()
-    username = prompt("Enter username")
-    email = prompt_email()
-    if email is None:
-        return
+    while True:
+        username = prompt("Enter username").lower()
+        if not Identity.find(provider='indico', identifier=username).count():
+            break
+        error('Username already exists')
     password = prompt_pass()
     if password is None:
         return
 
-    user.first_name = to_unicode(name)
-    user.last_name = to_unicode(surname)
-    user.affiliation = to_unicode(affiliation)
-    user.email = email
+    identity = Identity(provider='indico', identifier=username, password=password)
+    user = create_user(email, {'first_name': to_unicode(first_name), 'last_name': to_unicode(last_name),
+                               'affiliation': to_unicode(affiliation)}, identity)
     user.is_admin = grant_admin
     print_user_info(user)
 
     if prompt_bool(cformat("%{yellow}Create the new {}?").format(user_type), default=True):
-        # TODO: adapt to new authentication system, create local identity with username/password
-        # user.identities.append(UserIdentity(..., identifier=username, password=password))
         db.session.add(user)
-        transaction.commit()
+        db.session.commit()
         success("New {} created successfully with ID: {}".format(user_type, user.id))
 
 

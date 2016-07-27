@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+(function() {
     'use strict';
 
     $(document).ready(function() {
@@ -23,6 +23,7 @@
         setupConfirmPopup();
         setupMathJax();
         setupSelectAllNone();
+        setupAnchorLinks();
     });
 
     function setupSelectAllNone() {
@@ -122,6 +123,7 @@
 
                 // Handle AJAX dialog
                 if (dialog) {
+                    var closeButton = $this.data('close-button');
                     ajaxDialog({
                         trigger: $this,
                         url: url,
@@ -129,18 +131,21 @@
                         data: params,
                         title: $this.data('title'),
                         subtitle: $this.data('subtitle'),
-                        closeButton: $this.data('close-button'),
+                        closeButton: closeButton === undefined ? false : (closeButton || true),
                         dialogClasses: $this.data('dialog-classes'),
                         hidePageHeader: $this.data('hide-page-header') !== undefined,
+                        confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
                         onClose: function(data, customData) {
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
                                     handleHtmlUpdate(data, update, $this);
                                 } else if (reload !== undefined && reload !== 'customData') {
+                                    IndicoUI.Dialogs.Util.progress();
                                     location.reload();
                                 }
                             } else if (reload === 'customData' && customData) {
+                                IndicoUI.Dialogs.Util.progress();
                                 location.reload();
                             }
                         }
@@ -197,4 +202,17 @@
             $elems.mathJax();
         }
     }
-})(window);
+
+    function setupAnchorLinks() {
+        $('[data-anchor]').each(function() {
+            var $elem = $(this),
+                fragment = $elem.data('anchor');
+            $('<a>', {
+                class: 'anchor-link',
+                href: '#' + fragment,
+                title: $T.gettext('Direct link to this item')
+            }).html('&para;').appendTo($elem);
+        });
+    }
+
+})();

@@ -1,7 +1,22 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, simple_form %}
 
 {% block title %}{% trans %}Users{% endtrans %}{% endblock %}
+
+{% block title_actions %}
+    <a class="i-button inconspicuous icon-settings arrow js-dropdown" data-toggle="dropdown"></a>
+    <ul class="dropdown">
+        <li>
+            <a href="#"
+               data-title="{% trans %}User settings{% endtrans %}"
+               data-href="{{ url_for('.users_admin_settings') }}"
+               data-qtip-position="right"
+               data-ajax-dialog>
+                {% trans %}User settings{% endtrans %}
+            </a>
+        </li>
+    </ul>
+{% endblock %}
 
 {%- block content %}
     <div class="i-box-group vert">
@@ -12,8 +27,25 @@
                 </div>
                 <div class="i-box-buttons toolbar right">
                     <div class="group">
-                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">Merge users</a>
+                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">{% trans %}Merge users{% endtrans %}</a>
                     </div>
+                    <div class="group">
+                        <a href="#"
+                           class="i-button icon-plus"
+                           data-href="{{ url_for('.users_create') }}"
+                           data-title="{% trans %}Create new account{% endtrans %}"
+                           data-ajax-dialog>
+                            {% trans %}Create new account{% endtrans %}
+                        </a>
+                    </div>
+                    {% if num_reg_requests or indico_config.LocalModeration %}
+                        <div class="group">
+                            <a class="i-button icon-info" href="{{ url_for('.registration_request_list') }}">
+                                {% trans %}Registration requests{% endtrans %}
+                                <span class="badge">{{ num_reg_requests }}</span>
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="i-box-content">
@@ -33,7 +65,7 @@
                         <h3>
                             {% trans count=search_results|count -%}
                                 There is one user matching your search criteria.
-                            {% pluralize %}
+                            {%- pluralize -%}
                                 There are {{ count }} users matching your search criteria.
                             {%- endtrans %}
                         </h3>

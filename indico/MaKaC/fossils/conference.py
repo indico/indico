@@ -20,15 +20,6 @@ from MaKaC.common.Conversion import Conversion
 from indico.core.fossils.event import ISupportInfoFossil
 
 
-class ICategoryFossil(IFossil):
-
-    def getId(self):
-        """ Category Id """
-
-    def getName(self):
-        """ Category Name """
-
-
 class IConferenceMinimalFossil(IFossil):
 
     def getId(self):

@@ -1,0 +1,21 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}New Indico profile registered{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        A new Indico profile has been registered.
+
+        First name: {{ user.first_name }}
+        Last name: {{ user.last_name }}
+        Email address: {{ user.email }}
+        {%- if user.affiliation %}
+            Affiliation: {{ user.affiliation }}
+        {%- endif %}
+
+        User details:
+        {{ url_for('users.user_profile', user, _external=true) }}
+    {%- endfilter -%}
+{%- endblock %}

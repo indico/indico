@@ -35,23 +35,9 @@ class MaKaCInfo(Persistent):
         self._organisation = ""
         self._city = ""
         self._country = ""
-        self._lang = "en_GB"
-
-        # Account-related features
-        self._authorisedAccountCreation = True
-        self._notifyAccountCreation = False
-        self._moderateAccountCreation = False
-        self._moderators = []
 
         # Global poster/badge templates
         self._defaultConference = None
-
-        # News management
-        self._news = ""
-
-        # special features
-        self._newsActive = False
-        self._debugActive = False
 
         # template set
         self._defaultTemplateSet = None
@@ -87,81 +73,8 @@ class MaKaCInfo(Persistent):
         warnings.warn(msg, DeprecationWarning, 2)
         return app.debug
 
-    def getNews( self ):
-        try:
-            return self._news
-        except:
-            self._news = ""
-            return ""
-
-    def setNews( self, news ):
-        self._news = news
-
-    def getModerators( self ):
-        try:
-            return self._moderators
-        except:
-            self._moderators = []
-            return self._moderators
-
-    def addModerator( self, av ):
-        if av not in self.getModerators():
-            self._moderators.append(av)
-            self._p_changed=1
-
-    def removeModerator( self, av ):
-        if av in self.getModerators():
-            self._moderators.remove( av )
-            self._p_changed=1
-
-    def isModerator( self, av ):
-        if av in self.getModerators():
-            return True
-        else:
-            return False
-
-    def getAuthorisedAccountCreation( self ):
-        try:
-            return self._authorisedAccountCreation
-        except:
-            self.setAuthorisedAccountCreation()
-            return self._authorisedAccountCreation
-
-    def setAuthorisedAccountCreation( self, flag=True ):
-        self._authorisedAccountCreation = flag
-
-    def getNotifyAccountCreation( self ):
-        try:
-            return self._notifyAccountCreation
-        except:
-            self.setNotifyAccountCreation()
-            return self._notifyAccountCreation
-
-    def setNotifyAccountCreation( self, flag=False ):
-        self._notifyAccountCreation = flag
-
-    def getModerateAccountCreation( self ):
-        try:
-            return self._moderateAccountCreation
-        except:
-            self.setModerateAccountCreation()
-            return self._moderateAccountCreation
-
-    def setModerateAccountCreation( self, flag=False ):
-        self._moderateAccountCreation = flag
-
     def getTitle( self ):
         return self._title
-
-    def isNewsActive( self ):
-        if hasattr( self, "_newsActive" ):
-            return self._newsActive
-        else:
-            self._newsActive = False
-            return False
-
-    def setNewsActive( self, bool=True ):
-        self._newsActive = bool
 
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
@@ -192,16 +105,13 @@ class MaKaCInfo(Persistent):
         warnings.warn(msg, DeprecationWarning, 2)
         return Config.getInstance().getDefaultTimezone()
 
-    def getDefaultConference( self ):
+    def getDefaultConference(self):
+        from MaKaC.conference import DefaultConference
         try:
             self._defaultConference
         except AttributeError:
-            self._defaultConference = None
+            self._defaultConference = DefaultConference()
 
-        return self._defaultConference
-
-    def setDefaultConference( self, dConf ):
-        self._defaultConference = dConf
         return self._defaultConference
 
     def getDefaultTemplateSet( self ):
@@ -214,17 +124,6 @@ class MaKaCInfo(Persistent):
     def setDefaultTemplateSet( self, defTemp ):
         self._defaultTemplateSet = defTemp
         return self._defaultTemplateSet
-
-    def getLang( self ):
-        try:
-            return self._lang
-        except:
-            self._lang = "en_GB"
-            #Logger.get('i18n').warning('No language set in MaKaCInfo... using %s by default' % self._lang)
-            return self._lang
-
-    def setLang( self, lang ):
-        self._lang = lang
 
     def setArchivingVolume(self, volume):
         if isinstance(volume, str):

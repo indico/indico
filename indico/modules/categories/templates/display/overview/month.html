@@ -1,0 +1,63 @@
+{% extends 'categories/display/overview/base.html' %}
+{% from 'categories/display/overview/event.html' import render_event %}
+
+{% block overview_title %}
+    {{ start_dt|format_date }} – {{ end_dt|format_date }}
+{% endblock %}
+
+{% block overview_navigation_left %}
+    <a href="{{ previous_year_url }}" title="{% trans %}Previous year{% endtrans %}">
+        &lt;&lt;
+    </a>
+    <a href="{{ previous_month_url }}" title="{% trans %}Previous month{% endtrans %}">
+        &lt;
+    </a>
+{% endblock %}
+
+{% block overview_navigation_right %}
+    <a href="{{ next_month_url }}" title="{% trans %}Next month{% endtrans %}">
+        &gt;
+    </a>
+    <a href="{{ next_year_url }}" title="{% trans %}Next year{% endtrans %}">
+        &gt;&gt;
+    </a>
+{% endblock %}
+
+{% block overview %}
+    <table>
+        <tr>
+            <th>{% trans %}Monday{% endtrans %}</th>
+            <th>{% trans %}Tuesday{% endtrans %}</th>
+            <th>{% trans %}Wednesday{% endtrans %}</th>
+            <th>{% trans %}Thursday{% endtrans %}</th>
+            <th>{% trans %}Friday{% endtrans %}</th>
+            {% if not hide_weekend %}
+                <th>{% trans %}Saturday{% endtrans %}</th>
+                <th>{% trans %}Sunday{% endtrans %}</th>
+            {% endif %}
+        </tr>
+        {% set batch_size = 5 if hide_weekend else 7 %}
+        {% for events_by_day_in_week in events_by_day|batch(batch_size) %}
+            <tr>
+                {% for day, events in events_by_day_in_week %}
+                    {% if day.month == start_dt.month %}
+                        <td class="day">
+                            <div class="calendar-date">
+                                <a href="{{ url_for('.overview', category, detail=detail, period='day', date=day|format_date('YYYY-MM-dd')) }}">
+                                    {{ day.day }}
+                                </a>
+                            </div>
+                            <table>
+                                {% for event in events %}
+                                    {{ render_event(event, timezone=category.display_tzinfo, detail=detail) }}
+                                {% endfor %}
+                            </table>
+                        </td>
+                    {% else %}
+                        <td class="other-month"></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

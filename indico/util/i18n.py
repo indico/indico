@@ -204,11 +204,10 @@ def set_best_lang(check_session=True):
     language, we will try to guess it from the browser settings and only
     after that fall back to the server's default.
     """
-    from indico.core.db import DBMgr
-    from MaKaC.common.info import HelperMaKaCInfo
+    from indico.core.config import Config
 
     if not has_request_context():
-        return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+        return 'en_GB' if current_app.config['TESTING'] else Config.getInstance().getDefaultLocale()
     elif 'lang' in g:
         return g.lang
     elif check_session and session.lang is not None:
@@ -222,10 +221,8 @@ def set_best_lang(check_session=True):
         if current_app.config['TESTING']:
             return 'en_GB'
 
-        with DBMgr.getInstance().global_connection():
-            # fall back to server default
-            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-            resolved_lang = minfo.getLang()
+        # fall back to server default
+        resolved_lang = Config.getInstance().getDefaultLocale()
 
     # As soon as we looked up a language, cache it during the request.
     # This will be returned when accessing `session.lang` since there's code

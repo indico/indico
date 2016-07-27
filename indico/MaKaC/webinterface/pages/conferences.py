@@ -14,17 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, render_template, request
 import os
 import posixpath
 import re
-
+from collections import OrderedDict
 from datetime import datetime
+from operator import itemgetter
 from xml.sax.saxutils import quoteattr
+
+from flask import session, render_template, request
+from markupsafe import escape
+from sqlalchemy.orm import load_only
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.conference as conference
 import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML
 import MaKaC.common.utils
@@ -42,6 +45,9 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
+from indico.core.db import db
+from indico.modules.categories.util import get_visibility_options
+from indico.modules.events.models.events import EventType, Event
 from indico.util.i18n import i18nformat, _
 from indico.util.date_time import format_date, format_datetime
 from MaKaC.common.fossilize import fossilize
@@ -49,14 +55,12 @@ from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
-from MaKaC.common.TemplateExec import render, mako_call_template_hook
+from MaKaC.common.TemplateExec import render
 
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
-from indico.modules.users.util import get_user_by_email
 from indico.util.string import encode_if_unicode, safe_upper, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
@@ -93,7 +97,8 @@ def stringToDate(str):
 class WPConferenceBase(base.WPDecorated):
 
     def __init__(self, rh, conference, **kwargs):
-        WPDecorated.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, _protected_object=conference, _current_category=conference.as_event.category,
+                             **kwargs)
         self._navigationTarget = self._conf = conference
         tz = self._tz = DisplayTZ(rh._aw, self._conf).getDisplayTZ()
         sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
@@ -148,7 +153,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WConferenceHeader( self._getAW(), self._conf )
+        wc = wcomponents.WConferenceHeader(self._getAW(), self._conf)
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(), \
@@ -218,7 +223,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
     def getVars(self):
         v = wcomponents.WTemplated.getVars( self )
-        minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
@@ -425,34 +430,32 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         self.theme = theme_settings.themes[theme_id]
 
     def _getVariables(self, conf):
+        event = conf.as_event
         wvars = {}
         wvars['INCLUDE'] = '../include'
 
         wvars['accessWrapper'] = accessWrapper = self._rh._aw
-        if conf.getOwnerList():
-            wvars['category'] = conf.getOwnerList()[0].getName()
-        else:
-            wvars['category'] = ''
+        wvars['category'] = event.category.title
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
         wvars['timezone'] = timezone(tz)
 
         attached_items = conf.attached_items
-        lectures, folders = [], []
+        folders = [folder for folder in attached_items.get('folders', []) if folder.title != "Internal Page Files"]
 
-        for folder in attached_items.get('folders', []):
-            if LECTURE_SERIES_RE.match(folder.title):
-                lectures.append(folder)
-            elif folder.title != "Internal Page Files":
-                folders.append(folder)
-
-        cmp_title_number = lambda x, y: int(x.title[4:]) - int(y.title[4:])
+        lectures = []
+        if event.series is not None and event.series.show_links:
+            lectures = (Event.query.with_parent(event.series)
+                        .filter(Event.id != event.id)
+                        .options(load_only('series_pos', 'id'))
+                        .order_by(Event.series_pos)
+                        .all())
 
         wvars.update({
             'files': attached_items.get('files', []),
             'folders': folders,
-            'lectures': sorted(lectures, cmp=cmp_title_number)
+            'lectures': lectures
         })
 
         return wvars
@@ -648,7 +651,7 @@ class WPConferenceModifBase(main.WPMainBase):
 
     def __init__(self, rh, conference, **kwargs):
         conference = getattr(conference, 'as_legacy', conference)
-        main.WPMainBase.__init__(self, rh, **kwargs)
+        main.WPMainBase.__init__(self, rh, _current_category=conference.as_event.category, **kwargs)
         self._navigationTarget = self._conf = conference
 
     def getJSFiles(self):
@@ -664,9 +667,7 @@ class WPConferenceModifBase(main.WPMainBase):
         return "ModificationArea"
 
     def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader( self._getAW() )
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category, prot_obj=self._protected_object)
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
@@ -679,10 +680,9 @@ class WPConferenceModifBase(main.WPMainBase):
         frame = wcomponents.WConferenceModifFrame(self._conf, self._getAW())
 
         params = {
-            "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL,
             "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL,
             "event": "Conference",
-            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option, old_style=True,
+            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option,
                                         event=self._conf.as_event)
         }
 
@@ -782,18 +782,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["supportEmail"] = i18nformat("""--_("not set")--""")
         if self._conf.getSupportInfo().hasEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
-        typeList = []
-        for ctype in self._conf.getContribTypeList():
-             # TODO: This will all go away soon
-            typeList.append("""<input type="checkbox" name="types" value="%s"><a href="%s">%s</a><br>
-<table><tr><td width="30"></td><td><font><pre>%s</pre></font></td></tr></table>"""%( \
-                ctype.id, \
-                '', \
-                ctype.name, \
-                ctype.description))
-        vars["typeList"] = "".join(typeList)
         #------------------------------------------------------
-        vars["eventType"] = self._conf.getType()
         vars["keywords"] = self._conf.getKeywords()
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
         vars["shortURLTag"] = self._conf.getUrlTag()
@@ -916,28 +905,12 @@ class WConferenceDataModification(wcomponents.WTemplated):
         self._rh = rh
 
     def _getVisibilityHTML(self):
-        visibility = self._conf.getVisibility()
-        topcat = self._conf.getOwnerList()[0]
-        level = 0
-        selected = ""
-        if visibility == 0:
-            selected = "selected"
-        vis = [ i18nformat("""<option value="0" %s> _("Nowhere")</option>""") % selected]
-        while topcat:
-            level += 1
-            selected = ""
-            if level == visibility:
-                selected = "selected"
-            if topcat.getId() != "0":
-                from MaKaC.common.TemplateExec import truncateTitle
-                vis.append("""<option value="%s" %s>%s</option>""" % (level, selected, truncateTitle(topcat.getName(), 120)))
-            topcat = topcat.getOwner()
-        selected = ""
-        if visibility > level:
-            selected = "selected"
-        vis.append( i18nformat("""<option value="999" %s> _("Everywhere")</option>""") % selected)
-        vis.reverse()
-        return "".join(vis)
+        options = [(val or 999,
+                    label,
+                    'selected' if self._conf.getVisibility() == (val or 999) else '')
+                   for val, label in get_visibility_options(self._conf.as_event)]
+        return '\n'.join('<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
+                         for val, label, selected in options)
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -958,20 +931,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["conference"] = self._conf
         vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         vars["styleOptions"] = styleoptions
-        import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        types = [ "conference" ]
-        for fact in wr.getFactoryList():
-            types.append(fact.getId())
-        vars["types"] = ""
-        for id in types:
-            typetext = id
-            if typetext == "simple_event":
-                typetext = "lecture"
-            if self._conf.getType() == id:
-                vars["types"] += "<option value=\"%s\" selected>%s" % (id,typetext)
-            else:
-                vars["types"] += "<option value=\"%s\">%s" % (id,typetext)
+        vars['types'] = OrderedDict((t.legacy_name, t.title) for t in EventType)
         vars["title"] = quoteattr( self._conf.getTitle() )
         vars["description"] = self._conf.getDescription()
         vars["keywords"] = self._conf.getKeywords()
@@ -1013,56 +973,6 @@ class WPConfDataModif( WPConferenceModification ):
             "type": params.get("type")
         }
         return p.getHTML( pars )
-
-
-class WConfModifAC:
-
-    def __init__(self, conference, eventType, user):
-        self.__conf = conference
-        self._eventType = eventType
-        self.__user = user
-
-    def getHTML( self, params ):
-        ac = wcomponents.WConfAccessControlFrame().getHTML( self.__conf,\
-                                            params["setVisibilityURL"])
-        dc = ""
-        if not self.__conf.isProtected():
-            dc = "<br>%s"%wcomponents.WDomainControlFrame( self.__conf ).getHTML()
-
-        mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf) + "<br>"
-
-        if self._eventType == "conference":
-            rc = wcomponents.WConfRegistrarsControlFrame().getHTML(self.__conf) + "<br>"
-        else:
-            rc = ""
-
-        tf = ""
-        if self._eventType in ["conference", "meeting"]:
-            tf = "<br>%s" % wcomponents.WConfProtectionToolsFrame(self.__conf).getHTML()
-        cr = ""
-        if self._eventType == "conference":
-            cr = "<br>" + mako_call_template_hook('conference-protection', event=self.__conf.as_event)
-
-        return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>""" % (mc, rc, ac, dc, tf, cr)
-
-
-class WPConfModifAC(WPConferenceModifBase):
-
-    sidemenu_option = 'protection'
-
-    def __init__(self, rh, conf):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._eventType = "conference"
-        if self._rh.getWebFactory() is not None:
-            self._eventType = self._rh.getWebFactory().getId()
-        self._user = self._rh._getUser()
-
-    def _getPageContent(self, params):
-        wc = WConfModifAC(self._conf, self._eventType, self._user)
-        p = {
-            'setVisibilityURL': urlHandlers.UHConfSetVisibility.getURL(self._conf)
-        }
-        return wc.getHTML(p)
 
 
 class WPConfModifToolsBase(WPConferenceModifBase):
@@ -1169,6 +1079,7 @@ class WPConfClone(WPConferenceModifBase):
         p = WConferenceClone(self._conf)
         pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
                 "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+                "startTime": self._conf.getUnixStartDate(),
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1">_("Tracks")</li>""")}
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
@@ -1963,7 +1874,7 @@ class WConfModifBadgePrinting(wcomponents.WTemplated):
         self._user = user
 
     def _getBaseTemplateOptions(self):
-        dconf = conference.CategoryManager().getDefaultConference()
+        dconf = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         templates = dconf.getBadgeTemplateManager().getTemplates()
 
         options = [{'value': 'blank', 'label': _('Blank Page')}]
@@ -2154,7 +2065,7 @@ class WPConfModifBadgeDesign(WPBadgeBase):
         self.__baseTemplate = baseTemplateId
 
         if baseTemplateId != 'blank':
-            dconf = conference.CategoryManager().getDefaultConference()
+            dconf = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
             templMan = conf.getBadgeTemplateManager()
             newId = templateId
             default_template = dconf.getBadgeTemplateManager().getTemplateById(baseTemplateId)
@@ -2190,7 +2101,8 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
 
     def _getFullTemplateListOptions(self):
         templates = {}
-        templates['global'] = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        templates['global'] = (info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                               .getPosterTemplateManager().getTemplates())
         templates['local'] = self.__conf.getPosterTemplateManager().getTemplates()
         options = []
 
@@ -2212,7 +2124,8 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
         return options
 
     def _getBaseTemplateListOptions(self):
-        templates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        templates = (info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
+                     .getPosterTemplateManager().getTemplates())
         options = [{'value': 'blank', 'label': _('Blank Page')}]
 
         for id, template in templates.iteritems():
