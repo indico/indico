@@ -233,7 +233,8 @@ def migrate_description(obj, verbose, html_log):
 @click.option('-l', '--html-log', help='HTML log file with original and converted data', type=click.File('w'))
 @click.option('-v', '--verbose', help='Be extra verbose', is_flag=True)
 def main(event, category, dry_run, html_log, verbose):
-    contribs = db.m.Contribution.find(db.m.Contribution.description.op('~')('</[a-zA-Z]+>'))
+    html_tag_regex = '<[a-zA-Z]+.*>'
+    contribs = db.m.Contribution.find(db.m.Contribution.description.op('~')(html_tag_regex))
     log = StringIO() if html_log else None
 
     if event:
@@ -250,7 +251,7 @@ def main(event, category, dry_run, html_log, verbose):
             migrate_description(contrib, verbose, log)
 
     if not event:
-        categories = db.m.Category.find(db.m.Category.description.op('~')('<[a-zA-Z]+>'))
+        categories = db.m.Category.find(db.m.Category.description.op('~')(html_tag_regex))
         if category:
             categories = categories.filter(db.m.Category.id == category)
         for category in categories:

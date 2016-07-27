@@ -21,20 +21,21 @@ from indico.modules.events.models.events import Event
 
 
 def main():
+    html_tag_regex = '<[a-zA-Z]+.*>'
     events = (Event.query
-              .filter(Event.description.op('~')('</[a-zA-Z]+>'))
+              .filter(Event.description.op('~')(html_tag_regex))
               .options(load_only('id', 'description'))
               .all())
     contributions = (Contribution.query
-                     .filter(Contribution.description.op('~')('</[a-zA-Z]+>'))
+                     .filter(Contribution.description.op('~')(html_tag_regex))
                      .options(load_only('id', 'description'))
                      .all())
     subcontributions = (SubContribution.query
-                        .filter(SubContribution.description.op('~')('</[a-zA-Z]+>'))
+                        .filter(SubContribution.description.op('~')(html_tag_regex))
                         .options(load_only('id', 'description'))
                         .all())
     categories = (Category.query
-                  .filter(Category.description.op('~')('</[a-zA-Z]+>'))
+                  .filter(Category.description.op('~')(html_tag_regex))
                   .options(load_only('id', 'description'))
                   .all())
 
