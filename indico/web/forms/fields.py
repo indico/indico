@@ -281,6 +281,7 @@ class CategoryField(HiddenField):
             self._validate(value)
         except ValueError:
             self.data = None
+            self.navigator_category_id = value.id
         else:
             self.data = value
             self.navigator_category_id = value.id
