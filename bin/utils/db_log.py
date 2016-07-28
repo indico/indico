@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import cPickle
 import fcntl
-import logging
 import logging.handlers
 import os
 import pprint
@@ -37,6 +38,7 @@ from pygments.lexers.agile import PythonLexer, PythonTracebackLexer
 from pygments.lexers.sql import SqlLexer
 
 
+click.disable_unicode_literals_warning = True
 ignored_line_re = re.compile(r'^(?:(?P<frame>\d+):)?(?P<file>.+?)(?::(?P<line>\d+))?$')
 output_lock = Lock()
 help_text = textwrap.dedent("""
