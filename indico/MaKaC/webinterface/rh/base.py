@@ -576,13 +576,9 @@ class RH(RequestHandlerBase):
             self._redisPipeline.reset()
 
     def _process_retry_auth_check(self, params):
-        # keep a link to the web session in the access wrapper
-        # this is used for checking access/modification key existence
-        # in the user session
         self._setSessionUser()
-        if self._getUser():
-            Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
-                request, self._getUser().getFullName(), self._getUser().getId()))
+        if session.user:
+            Logger.get('requestHandler').info('Request authenticated: %r', session.user)
             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                 self._tohttps = True
                 if self._checkHttpsRedirect():
@@ -644,7 +640,7 @@ class RH(RequestHandlerBase):
         return self._process_retry_do(profile)
 
     def _process_success(self):
-        Logger.get('requestHandler').info('Request {} successful'.format(request))
+        Logger.get('requestHandler').info('Request successful')
         # request is succesfull, now, doing tasks that must be done only once
         try:
             flush_after_commit_queue(True)
@@ -684,8 +680,8 @@ class RH(RequestHandlerBase):
 
         DBMgr.getInstance().startRequest()
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
-        Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
-            os.getpid(), request))
+        Logger.get('requestHandler').info(u'Request started: %s %s [IP=%s] [PID=%s]',
+                                          request.method, request.relative_url, request.remote_addr, os.getpid())
 
         is_error_response = False
         try:
@@ -695,7 +691,6 @@ class RH(RequestHandlerBase):
                         signals.before_retry.send()
 
                     try:
-                        Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                         profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
                         signals.after_process.send()
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
@@ -711,10 +706,10 @@ class RH(RequestHandlerBase):
                         import traceback
                         # only log conflict if it wasn't forced
                         if i >= forced_conflicts:
-                            Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
+                            Logger.get('requestHandler').warning('Database conflict')
                     except ClientDisconnected:
                         transaction.abort()
-                        Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))
+                        Logger.get('requestHandler').warning('Client disconnected')
                         time.sleep(i)
                     except DatabaseError:
                         handle_sqlalchemy_database_error()
