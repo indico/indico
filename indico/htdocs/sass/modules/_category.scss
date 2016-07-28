@@ -82,10 +82,11 @@
 }
 
 .category-info {
+    @extend %font-family-modern-body;
+
     display: flex;
     color: #888;
     font-size: 1.2em;
-    font-family: Georgia, Times, Serif;
     min-height: 0.3em;
     margin: 0 0 2em 0;
 
