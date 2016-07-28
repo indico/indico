@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import os
 from contextlib import contextmanager
+from uuid import uuid4
 
 from flask import Flask, Blueprint, request
 from flask.blueprints import BlueprintSetupState
@@ -29,9 +30,9 @@ from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
+from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
-from indico.util.json import IndicoJSONEncoder
 
 
 _notset = object()
@@ -42,7 +43,7 @@ class IndicoRequest(Request):
 
     @cached_property
     def id(self):
-        return '{0:012x}'.format(id(self))
+        return uuid4().hex[:16]
 
     @cached_property
     def relative_url(self):
