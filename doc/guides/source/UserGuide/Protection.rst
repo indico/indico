@@ -128,17 +128,11 @@ By default, all objects in Indico are INHERITING.
 Domain Control Policy
 ---------------------
 
-If an Indico object (category, event, session, contribution,
-material, file and link) is PUBLIC, we can restrict the access to
-users accessing Indico from some given IPs (these IPs could be like
-127.1 which means that every IP starting like this will be valid).
-
-If the Indico object is RESTRICTED, this checking will not be
-applied.
-
-If it is INHERITING, it will have the same access protection as its
-parent. Its access protection status will therefore change whenever
-the parent's access protection changes.
+Access to an Indico category or event can be restricted to a range of IP addresses.
+In order to do so, the Indico resource in question needs to be **Protected**,
+either directly or through **inheritance** from the parent object (e.g. event
+inheriting protection from protected category). Then, the desired IP network can
+be selected from the *Access control list (ACL)*.
 
 .. |image208| image:: UserGuidePics/tree.png
 .. |image209| image:: UserGuidePics/privByInh.png
