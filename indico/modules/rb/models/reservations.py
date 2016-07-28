@@ -587,7 +587,8 @@ class Reservation(Serializer, db.Model):
             else:
                 digest_start = date.today()
             digest_end = get_month_end(digest_start)
-            self.occurrences.filter(ReservationOccurrence.start_dt <= digest_end).update({'notification_sent': True})
+            self.occurrences.filter(ReservationOccurrence.start_dt <= digest_end).update({'notification_sent': True},
+                                                                                         synchronize_session='fetch')
 
     def find_excluded_days(self):
         return self.occurrences.filter(~ReservationOccurrence.is_valid)
