@@ -19,6 +19,14 @@
     'use strict';
 
     global.handleAjaxError = function handleAjaxError(data) {
+        if ('responseText' in data && data.readyState === 0 && data.status === 0 && !data.responseText) {
+            // if data is an XHR object and we don't have any readyState, status or response text
+            // the request most likely failed due to a page change so we just ignore the failure.
+            // this is not 100% reliable, an interrupted connection could yield the same result.
+            // since showing an error dialog in that case won't be very useful either this drawback
+            // is acceptable.
+            return true;
+        }
         if (data.responseText) {
             // $.ajax error callback, so data is the xhr object
             try {
