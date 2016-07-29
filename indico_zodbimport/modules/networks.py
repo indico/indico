@@ -17,9 +17,8 @@
 from __future__ import unicode_literals
 
 import re
-from operator import attrgetter
 
-from ipaddress import ip_address, ip_network
+from ipaddress import ip_network
 
 from indico.core.db import db
 from indico.modules.networks.models.networks import IPNetworkGroup

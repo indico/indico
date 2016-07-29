@@ -56,7 +56,7 @@ class MultiIPNetworkField(MultiStringField):
             # convert ipv6-style ipv4 to regular ipv4
             # the ipaddress library doesn't deal with such IPs properly!
             network = network[7:]
-        return network
+        return unicode(network)
 
     def process_formdata(self, valuelist):
         self._data_converted = False

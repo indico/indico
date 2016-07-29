@@ -18,7 +18,6 @@ from ipaddress import ip_address
 
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common import utils
 from MaKaC.common import info
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.errors import MaKaCError
@@ -52,7 +51,7 @@ class RHIPBasedACLFullAccessGrant( RHServicesBase ):
 
         if ipAddress:
             try:
-                ipAddress = unicode(ip_address(ipAddress))
+                ipAddress = unicode(ip_address(unicode(ipAddress)))
             except ValueError as exc:
                 raise MaKaCError("IP Address {} is not valid: {}".format(ipAddress, exc))
             else:

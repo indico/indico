@@ -83,7 +83,7 @@ class IPNetworkGroup(db.Model):
             return False
         if session.user != user:
             return False
-        return self.contains_ip(request.remote_addr)
+        return self.contains_ip(unicode(request.remote_addr))
 
     def contains_ip(self, ip):
         ip = ip_address(ip)

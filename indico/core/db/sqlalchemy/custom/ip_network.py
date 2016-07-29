@@ -40,6 +40,7 @@ class IPv6Network(_AlwaysSortableMixin, ipaddress.IPv6Network):
 def _ip_network(address, strict=True):
     # based on `ipaddress.ip_network` but returns always-sortable classes
     # since sqlalchemy needs to be able to sort all values of a type
+    address = unicode(address)
     try:
         return IPv4Network(address, strict)
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
