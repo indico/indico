@@ -27,9 +27,8 @@ from wtforms.widgets.html5 import NumberInput
 
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
-from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import find_next_start_dt
-from indico.util.date_time import format_human_timedelta
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (TimeDeltaField, IndicoPalettePickerField, IndicoLocationField,
@@ -57,7 +56,10 @@ class EntryFormMixin(object):
             kwargs.setdefault('time', self._get_default_time())
             defaults = kwargs.get('obj') or FormDefaults()
             if 'duration' not in defaults:
-                defaults.duration = self._default_duration
+                if self._entry_type == TimetableEntryType.CONTRIBUTION and self.session_block:
+                    defaults.duration = self.session_block.session.default_contribution_duration
+                else:
+                    defaults.duration = self._default_duration
                 kwargs['obj'] = defaults
         super(EntryFormMixin, self).__init__(*args, **kwargs)
 
