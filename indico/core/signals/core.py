@@ -95,6 +95,13 @@ context.  The additional kwargs passed to this signal depend on
 the context.
 """)
 
+get_rules = _signals.signal('get-rules', """
+Expected to return one or more `Rule` objects.
+The *sender* is a string (or some other object) identifying the
+context.  The additional kwargs passed to this signal depend on
+the context.
+""")
+
 get_fields = _signals.signal('get-fields', """
 Expected to return `BaseField` subclasses.  The *sender* is an object
 (or just a string) identifying for what to get fields.  This signal
