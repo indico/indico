@@ -593,3 +593,14 @@ class RHResetPassword(RH):
         form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity,
                                       widget_attrs={'username': {'disabled': True}})
+
+
+class RHSessionsInvalidate(RHUserBase):
+    """Invalidate all other sessions."""
+    CSRF_ENABLED = True
+
+    def _process(self):
+        self.user.valid_login_num += 1
+        session['_user_login_num'] += 1
+        flash(_('All other sessions have been invalidated.'), 'success')
+        return redirect(url_for('auth.accounts', self.user))

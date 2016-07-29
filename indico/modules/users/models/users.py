@@ -206,6 +206,13 @@ class User(PersonMixin, db.Model):
         nullable=False,
         default=False
     )
+    #: a number indicating which sessions are valid for the user.
+    #: incrementing this will log out the user everywhere
+    valid_login_num = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    )
 
     _affiliation = db.relationship(
         'UserAffiliation',

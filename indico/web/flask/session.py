@@ -74,14 +74,20 @@ class IndicoSession(BaseSession):
                     flash(Markup(msg).format(merged_into_user.full_name), 'warning')
                 else:
                     flash(_(u'Your profile has been deleted.'), 'error')
+        if user and user.valid_login_num != self.get('_user_login_num'):
+            flash(_(u'Your session has been terminated.'), 'message')
+            self.clear()
+            user = None
         return user
 
     @user.setter
     def user(self, user):
         if user is None:
             self.pop('_user_id', None)
+            self.pop('_user_login_num', None)
         else:
             self['_user_id'] = user.id
+            self['_user_login_num'] = user.valid_login_num
         self._refresh_sid = True
 
     @property

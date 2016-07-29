@@ -148,6 +148,22 @@
                 {% endif %}
             </div>
         </div>
+
+        <div class="i-box">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Sessions{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <p>
+                    {% trans %}Invalidate all other sessions.{% endtrans %}
+                </p>
+                <button type="button" class="i-button highlight" data-href="{{ url_for('auth.sessions_invalidate') }}" data-method="post">
+                    {%- trans %}Invalidate sessions{% endtrans -%}
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
