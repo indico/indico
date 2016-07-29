@@ -17,6 +17,7 @@ You will need some system libraries:
 * *libxslt-devel*
 * *libxml2-devel*
 * *libffi-devel*
+* *libz-devel*
 * *openldap-devel* (if you wish to use LDAP authentication)
 
 You will also need to ``easy_install python-ldap`` if you want LDAP to work.
