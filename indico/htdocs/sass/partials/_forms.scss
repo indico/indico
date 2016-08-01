@@ -107,6 +107,10 @@ $i-form-button-line-height: 1.8;
     .typeahead__field {
         font-size: 1em;
     }
+
+    &.no-max-width {
+        max-width: none;
+    }
 }
 
 .i-form .form-group {
