@@ -556,7 +556,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'visibility': Conversion.visibility(event.as_legacy),
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
-            'material': build_material_legacy_api_data(event) + [build_note_legacy_api_data(event.note)]
+            'material': build_material_legacy_api_data(event) + filter(None, [build_note_legacy_api_data(event.note)])
         })
         if can_manage:
             data['allowed'] = self._serialize_access_list(event)
