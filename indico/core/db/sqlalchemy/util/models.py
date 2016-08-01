@@ -419,3 +419,10 @@ def override_attr(attr_name, parent_name, fget=None):
         return getattr(cls, own_attr_name)
 
     return hybrid_property(_get, _set, expr=_expr)
+
+
+def get_model_by_table_name(table_name):
+    """Get the model class based on the name of the table"""
+    from indico.core.db import db
+    return next((x for x in db.Model._decl_class_registry.itervalues()
+                 if hasattr(x, '__table__') and x.__table__.fullname == 'events.events'), None)
