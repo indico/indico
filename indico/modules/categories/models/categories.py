@@ -323,16 +323,15 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                      .where(cat_alias.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
-    @classmethod
-    def get_protection_parent_cte(cls):
-        cat_alias = db.aliased(cls)
-        cte_query = (select([cat_alias.id, db.cast(literal(None), db.Integer).label('protection_parent')])
-                     .where(cat_alias.parent_id.is_(None))
+    def get_protection_parent_cte(self):
+        cte_query = (select([Category.id, db.cast(literal(None), db.Integer).label('protection_parent')])
+                     .where(Category.id == self.id)
                      .cte(recursive=True))
-        rec_query = (select([cat_alias.id,
-                             db.case({ProtectionMode.inheriting.value: func.coalesce(cte_query.c.protection_parent, 0)},
-                                     else_=cat_alias.id, value=cat_alias.protection_mode)])
-                     .where(cat_alias.parent_id == cte_query.c.id))
+        rec_query = (select([Category.id,
+                             db.case({ProtectionMode.inheriting.value: func.coalesce(cte_query.c.protection_parent,
+                                                                                     self.id)},
+                                     else_=Category.id, value=Category.protection_mode)])
+                     .where(Category.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
     @property
