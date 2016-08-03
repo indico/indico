@@ -2,6 +2,8 @@
                                                               render_description %}
 {% from 'attachments/_display.html' import render_attachments_folders %}
 
+{# Do not forget to update the conditions in the parent template when you add a new row in the details table. #}
+
 <table class="eventDetails" id="eventDetails">
     <tbody>
         {% if event.description %}
@@ -53,7 +55,7 @@
             </tr>
         {% endif %}
 
-        {{ template_hook('event-header', event=conf) }}
+        {{ hook_event_header }}
 
         {% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone() %}
             <tr>

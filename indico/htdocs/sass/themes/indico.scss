@@ -178,6 +178,9 @@
 }
 
 div.event-header {
+    @include border-top-left-radius();
+    @include border-top-right-radius();
+
     background: $header-bg-color;
     color: $header-text-color;
     font-size: 12pt;
@@ -186,8 +189,6 @@ div.event-header {
     min-height: 125px;
     margin: 0px;
     padding: 10px 30px 10px;
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
 
     h1 {
         font-size: 20pt;
@@ -195,6 +196,11 @@ div.event-header {
         font-weight: normal;
         margin-top: 10px;
         margin-bottom: 10px;
+    }
+
+    &.round-bottom-corners {
+        @include border-bottom-left-radius();
+        @include border-bottom-right-radius();
     }
 }
 

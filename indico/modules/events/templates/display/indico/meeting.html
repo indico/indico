@@ -5,9 +5,14 @@
 
 {{ render_event_header_msg(event) }}
 
+{% set hook_event_header = template_hook('event-header', event=conf) | trim %}
+{% set has_subheader = event.description or files or folders or lectures or conf.getOrgText()
+                       or conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone()
+                       or (event.references and conf.getType() == "meeting") or hook_event_header %}
+
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}
-        <div class="event-header">
+        <div class="event-header {%- if not has_subheader %} round-bottom-corners{% endif %}">
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
@@ -45,13 +50,17 @@
     {% endblock %}
 
     {% block body %}
-        <div class="event-sub-header">
-            <table class="eventDetails">
-                <tbody>
-                    {% include 'events/display/indico/_details.html' %}
-                </tbody>
-            </table>
-        </div>
+        {% if has_subheader %}
+            <div class="event-sub-header">
+                <table class="eventDetails">
+                    <tbody>
+                        {# https://github.com/pallets/jinja/issues/603 #}
+                        {% set hook_event_header = hook_event_header %}
+                        {% include 'events/display/indico/_details.html' %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
 
         {% if event.has_note or event.can_manage(session.user) %}
             {{ render_note(conf.note, hidden=not theme_settings.show_notes, can_edit=event.can_manage(session.user),
