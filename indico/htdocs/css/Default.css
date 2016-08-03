@@ -1155,8 +1155,12 @@ ul.CRLIndexList a:hover
 
 .timetableBlockPileEffect {
     border-bottom: none;
-    margin: 1px 0;
+    margin: 1px -1px;
+    box-shadow: none !important;
     height: 3px;
+    min-height: 0 !important;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 div.timetableContribution  {
