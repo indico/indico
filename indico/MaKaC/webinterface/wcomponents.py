@@ -557,6 +557,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("fr", "no")
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
+        vars["pdfURL"] = url_for('timetable.export_pdf', self._conf)
         return vars
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):
