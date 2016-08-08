@@ -228,9 +228,9 @@ def _column_ids_to_db(form, ids):
 
 def _get_reg_list_config(regform):
     session_key = 'reglist_config_{}'.format(regform.id)
-    report_config_uuid = request.args.get('config')
-    if report_config_uuid:
-        configuration = ReportLink.load(regform.event_new, REPORT_LINK_TYPE, report_config_uuid)
+    list_config_uuid = request.args.get('config')
+    if list_config_uuid:
+        configuration = ReportLink.load(regform.event_new, REPORT_LINK_TYPE, list_config_uuid)
         if configuration and configuration['regform_id'] == regform.id:
             session[session_key] = configuration['data']
     return session.get(session_key, DEFAULT_REPORT_CONFIG)

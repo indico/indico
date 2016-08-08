@@ -26,14 +26,14 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii, format_repr
 
 
-class ReportLink(db.Model):
-    """Display configuration data used in static links to report pages.
+class StaticListLink(db.Model):
+    """Display configuration data used in static links to listing pages.
 
-    This allows users to share links to report/listing pages in events
+    This allows users to share links to listing pages in events
     while preserving e.g. column/filter configurations.
     """
 
-    __tablename__ = 'report_links'
+    __tablename__ = 'static_list_links'
     __table_args__ = {'schema': 'events'}
 
     id = db.Column(
@@ -75,7 +75,7 @@ class ReportLink(db.Model):
         'Event',
         lazy=True,
         backref=db.backref(
-            'report_links',
+            'static_list_links',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -94,15 +94,15 @@ class ReportLink(db.Model):
             UUID(uuid)
         except ValueError:
             return None
-        report_link = event.report_links.filter_by(type=type_, uuid=uuid).first()
-        if report_link is None:
+        static_list_link = event.static_list_links.filter_by(type=type_, uuid=uuid).first()
+        if static_list_link is None:
             return None
-        report_link.last_used_dt = now_utc()
-        return report_link.data
+        static_list_link.last_used_dt = now_utc()
+        return static_list_link.data
 
     @classmethod
     def create(cls, event, type_, data):
-        """Create a new report link.
+        """Create a new static list link.
 
         If one exists with the same data, that link is used instead of
         creating a new one.
@@ -110,20 +110,20 @@ class ReportLink(db.Model):
         :param event: the `Event` for which to create the link
         :param type_: the type of the link
         :param data: the data to associate with the link
-        :return: the newly created `ReportLink`
+        :return: the newly created `StaticListLink`
         """
-        report_link = event.report_links.filter_by(type=type_, data=data).first()
-        if report_link is None:
-            report_link = cls(event_new=event, type=type_, data=data)
+        static_list_link = event.static_list_links.filter_by(type=type_, data=data).first()
+        if static_list_link is None:
+            static_list_link = cls(event_new=event, type=type_, data=data)
         else:
             # bump timestamp in case we start expiring old links
             # in the future
-            if report_link.last_used_dt is not None:
-                report_link.last_used_dt = now_utc()
+            if static_list_link.last_used_dt is not None:
+                static_list_link.last_used_dt = now_utc()
             else:
-                report_link.created_dt = now_utc()
+                static_list_link.created_dt = now_utc()
         db.session.flush()
-        return report_link
+        return static_list_link
 
     @return_ascii
     def __repr__(self):

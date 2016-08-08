@@ -71,16 +71,16 @@
             e.preventDefault();
             var $this = $(this);
             ajaxDialog({
-                dialogClasses: 'report-filter-dialog',
+                dialogClasses: 'list-filter-dialog',
                 trigger: this,
                 url: $this.data('href'),
                 title: $this.data('title'),
                 onClose: function(data) {
                     if (data) {
-                        $('.report-content').html(data.registration_list);
+                        $('.list-content').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
-                        $('.js-customize-report').toggleClass('highlight', data.filtering_enabled);
+                        $('.js-customize-list').toggleClass('highlight', data.filtering_enabled);
                     }
                 }
             });
@@ -166,7 +166,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     if (data) {
-                        $('.report-content').html(data.registration_list);
+                        $('.list-content').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
                     }
@@ -200,29 +200,29 @@
     }
 
     function colorizeActiveFilters() {
-        $('.report-filter .filter').each(function() {
+        $('.list-filter .filter').each(function() {
             colorizeFilter($(this));
         });
     }
 
     global.setupRegistrationListFilter = function setupRegistrationListFilter() {
-        $('.report-filter .filter').each(function() {
+        $('.list-filter .filter').each(function() {
             var filter = $(this).parent();
             filter.dropdown({selector: '.filter', relative_to: filter.parent()});
         });
         colorizeActiveFilters();
-        $('.report-filter-dialog .toolbar').dropdown();
+        $('.list-filter-dialog .toolbar').dropdown();
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
         var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
 
-        $('.report-column')
+        $('.list-column')
         .on('click', function(evt) {
             if ($(evt.target).hasClass('filter')) {
                 return;
             }
             var $this = $(this);
-            var field = $this.closest('.report-column');
+            var field = $this.closest('.list-column');
             var fieldId = field.data('id');
             var visibilityIcon = field.find('.visibility');
             var enabled = visibilityIcon.hasClass('enabled');
@@ -248,12 +248,12 @@
             }
         });
 
-        $('.report-column .dropdown').on('click', function(evt) {
+        $('.list-column .dropdown').on('click', function(evt) {
             evt.stopPropagation();
         });
 
         $('.js-reset-btn').on('click', function() {
-            $('.report-filter input:checkbox:checked').prop('checked', false).trigger('change');
+            $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
             $('.js-clear-filters-message').show({
                 done: function() {
                     var $this = $(this);
@@ -264,11 +264,11 @@
             });
         });
 
-        $('.report-filter input:checkbox').on('change', function() {
+        $('.list-filter input:checkbox').on('change', function() {
             colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
         });
 
-        $('.report-filter .title').on('mouseover', function() {
+        $('.list-filter .title').on('mouseover', function() {
             var title = $(this);
             // Show a qtip if the text is ellipsized
             if (this.offsetWidth < this.scrollWidth) {
@@ -276,12 +276,12 @@
             }
         });
 
-        $('#report-filter-select-all').on('click', function() {
-            $('.report-filter-dialog .visibility:not(.enabled)').trigger('click');
+        $('#list-filter-select-all').on('click', function() {
+            $('.list-filter-dialog .visibility:not(.enabled)').trigger('click');
         });
 
-        $('#report-filter-select-none').on('click', function() {
-            $('.report-filter-dialog .visibility.enabled').trigger('click');
+        $('#list-filter-select-none').on('click', function() {
+            $('.list-filter-dialog .visibility.enabled').trigger('click');
         });
     };
 })(window);

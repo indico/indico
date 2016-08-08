@@ -194,7 +194,7 @@
             placeholder: '#filter-placeholder'
         };
 
-        $('.report-section [data-toggle=dropdown]').closest('.group').dropdown();
+        $('.list-section [data-toggle=dropdown]').closest('.group').dropdown();
         setupTableSorter('#contribution-list .tablesorter');
         setupSearchBox(filterConfig);
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
@@ -211,7 +211,7 @@
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
-        setupReporter();
+        setupListGenerator();
         $('.js-submit-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -273,7 +273,7 @@
 
         setupSearchBox(filterConfig);
         applySearchFilters();
-        setupReporter();
+        setupListGenerator();
     };
 
     global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {

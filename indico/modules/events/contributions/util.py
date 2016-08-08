@@ -32,7 +32,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
-from indico.modules.events.util import serialize_person_link, ReporterBase
+from indico.modules.events.util import serialize_person_link, ListGeneratorBase
 from indico.modules.attachments.util import get_attached_items
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_human_timedelta, format_datetime
@@ -103,22 +103,22 @@ def serialize_contribution_person_link(person_link, is_submitter=None):
     return data
 
 
-class ContributionReporter(ReporterBase):
-    """Reporting and filtering actions in the contribution report."""
+class ContributionListGenerator(ListGeneratorBase):
+    """Listing and filtering actions in the contribution list."""
 
     endpoint = '.manage_contributions'
-    report_link_type = 'contribution'
+    list_link_type = 'contribution'
 
     def __init__(self, event):
-        super(ContributionReporter, self).__init__(event)
-        self.default_report_config = {'filters': {'items': {}}}
+        super(ContributionListGenerator, self).__init__(event)
+        self.default_list_config = {'filters': {'items': {}}}
 
         session_empty = {None: 'No session'}
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        session_choices = {unicode(s.id): s.title for s in self.report_event.sessions}
-        track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.report_event.as_legacy.getTrackList()}
-        type_choices = {unicode(t.id): t.name for t in self.report_event.contribution_types}
+        session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
+        track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
+        type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
         self.filterable_items = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
@@ -130,12 +130,12 @@ class ContributionReporter(ReporterBase):
                                                                  'unscheduled': _('Not scheduled')}})
         ])
 
-        self.report_config = self._get_config()
+        self.list_config = self._get_config()
 
     def build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
-        return (Contribution.query.with_parent(self.report_event)
+        return (Contribution.query.with_parent(self.list_event)
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
@@ -144,7 +144,7 @@ class ContributionReporter(ReporterBase):
                          db.undefer('attachment_count'),
                          db.undefer('is_scheduled')))
 
-    def filter_report_entries(self, query, filters):
+    def filter_list_entries(self, query, filters):
         if not filters.get('items'):
             return query
         criteria = []
@@ -173,35 +173,35 @@ class ContributionReporter(ReporterBase):
             criteria.append(db.or_(*column_criteria))
         return query.filter(*criteria)
 
-    def get_contrib_report_kwargs(self):
+    def get_contrib_list_kwargs(self):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
-        contributions = self.filter_report_entries(contributions_query, self.report_config['filters']).all()
-        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.report_event.sessions]
+        contributions = self.filter_list_entries(contributions_query, self.list_config['filters']).all()
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.list_event.sessions]
         tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
-                  for t in self.report_event.as_legacy.getTrackList()]
+                  for t in self.list_event.as_legacy.getTrackList()]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration}
 
-    def render_contrib_report(self, contrib=None):
-        """Render the contribution report template components.
+    def render_contrib_list(self, contrib=None):
+        """Render the contribution list template components.
 
         :param contrib: Used in RHs responsible for CRUD operations on a
                         contribution.
-        :return: dict containing the report's entries, the fragment of
+        :return: dict containing the list's entries, the fragment of
                  displayed entries and whether the contrib passed is displayed
                  in the results.
         """
-        contrib_report_kwargs = self.get_contrib_report_kwargs()
-        total_entries = contrib_report_kwargs.pop('total_entries')
-        tpl_contrib = get_template_module('events/contributions/management/_contribution_report.html')
-        tpl_reports = get_template_module('events/management/_reports.html')
-        contribs = contrib_report_kwargs['contribs']
-        filter_statistics = tpl_reports.render_filter_statistics(len(contribs), total_entries,
-                                                                 contrib_report_kwargs.pop('total_duration'))
-        return {'html': tpl_contrib.render_contrib_report(self.report_event, total_entries, **contrib_report_kwargs),
+        contrib_list_kwargs = self.get_contrib_list_kwargs()
+        total_entries = contrib_list_kwargs.pop('total_entries')
+        tpl_contrib = get_template_module('events/contributions/management/_contribution_list.html')
+        tpl_lists = get_template_module('events/management/_lists.html')
+        contribs = contrib_list_kwargs['contribs']
+        filter_statistics = tpl_lists.render_filter_statistics(len(contribs), total_entries,
+                                                               contrib_list_kwargs.pop('total_duration'))
+        return {'html': tpl_contrib.render_contrib_list(self.list_event, total_entries, **contrib_list_kwargs),
                 'hide_contrib': contrib not in contribs if contrib else None,
                 'filter_statistics': filter_statistics}
 
@@ -299,22 +299,22 @@ def get_contribution_ical_file(contrib):
     return BytesIO(serializer(data))
 
 
-class ContributionDisplayReporter(ContributionReporter):
+class ContributionDisplayListGenerator(ContributionListGenerator):
     endpoint = '.contribution_list'
-    report_link_type = 'contribution_display'
+    list_link_type = 'contribution_display'
 
     def render_contribution_list(self):
-        """Render the contribution report template components.
+        """Render the contribution list template components.
 
-        :return: dict containing the report's entries, the fragment of
+        :return: dict containing the list's entries, the fragment of
                  displayed entries and whether the contrib passed is displayed
                  in the results.
         """
-        contrib_report_kwargs = self.get_contrib_report_kwargs()
-        total_entries = contrib_report_kwargs.pop('total_entries')
-        contribs = contrib_report_kwargs['contribs']
+        contrib_list_kwargs = self.get_contrib_list_kwargs()
+        total_entries = contrib_list_kwargs.pop('total_entries')
+        contribs = contrib_list_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')
-        tpl_reports = get_template_module('events/management/_reports.html')
-        tz = timezone(DisplayTZ(session.user, self.report_event.as_legacy).getDisplayTZ())
-        return {'html': tpl.render_contribution_list(self.report_event, tz, contribs),
-                'counter': tpl_reports.render_displayed_entries_fragment(len(contribs), total_entries)}
+        tpl_lists = get_template_module('events/management/_lists.html')
+        tz = timezone(DisplayTZ(session.user, self.list_event.as_legacy).getDisplayTZ())
+        return {'html': tpl.render_contribution_list(self.list_event, tz, contribs),
+                'counter': tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)}

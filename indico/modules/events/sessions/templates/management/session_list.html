@@ -1,7 +1,7 @@
 {% extends 'layout/full_content_base.html' %}
 
 {% from 'events/sessions/management/_session_list.html' import render_session_list %}
-{% from 'events/management/_reports.html' import render_displayed_entries_fragment %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
 {% block title %}
     {%- trans %}Sessions{% endtrans -%}
@@ -89,7 +89,7 @@
                 </div>
             </div>
         </div>
-        <div class="report" id="sessions-wrapper">
+        <div class="list" id="sessions-wrapper">
             {{- render_session_list(event, sessions, default_colors) -}}
         </div>
         <div id="filter-placeholder"></div>

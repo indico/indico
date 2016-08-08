@@ -360,7 +360,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - registration_forms (RegistrationForm.event_new)
     # - registrations (Registration.event_new)
     # - reminders (EventReminder.event_new)
-    # - report_links (ReportLink.event_new)
+    # - static_list_links (StaticListLink.event_new)
     # - requests (Request.event_new)
     # - reservations (Reservation.event_new)
     # - sessions (Session.event_new)

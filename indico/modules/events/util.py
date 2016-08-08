@@ -27,7 +27,7 @@ from tempfile import NamedTemporaryFile
 
 from flask import session, request, g, current_app
 from sqlalchemy import inspect
-from sqlalchemy.orm import load_only, noload, joinedload, subqueryload
+from sqlalchemy.orm import load_only, noload
 
 from indico.core import signals
 from indico.core.config import Config
@@ -41,7 +41,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
-from indico.modules.events.models.report_links import ReportLink
+from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -226,23 +226,23 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
         obj.update_principal(principal, **revoke)
 
 
-class ReporterBase(object):
-    """Base class for classes performing actions on reports.
+class ListGeneratorBase(object):
+    """Base class for classes performing actions on Indico object lists.
 
     :param event: The associated `Event`
-    :param entry_parent: The parent of the entries of the report. If it's None,
+    :param entry_parent: The parent of the entries of the list. If it's None,
                          the parent is assumed to be the event itself.
     """
 
-    #: The endpoint of the report management page
+    #: The endpoint of the list management page
     endpoint = None
-    #: Unique report identifier
-    report_link_type = None
-    #: The default report configuration dictionary
-    default_report_config = None
+    #: Unique list identifier
+    list_link_type = None
+    #: The default list configuration dictionary
+    default_list_config = None
 
     def __init__(self, event, entry_parent=None):
-        self.report_event = event
+        self.list_event = event
         self.entry_parent = entry_parent or event
         self.filterable_items = None
         self.static_link_used = 'config' in request.args
@@ -250,38 +250,38 @@ class ReporterBase(object):
     def _get_config_session_key(self):
         """Compose the unique configuration ID.
 
-        This ID will be used as a key to set the report's configuration to the
+        This ID will be used as a key to set the list's configuration to the
         session.
         """
-        return '{}_config_{}'.format(self.report_link_type, self.entry_parent.id)
+        return '{}_config_{}'.format(self.list_link_type, self.entry_parent.id)
 
     def _get_config(self):
-        """Load the report's configuration from the DB and return it."""
+        """Load the list's configuration from the DB and return it."""
         session_key = self._get_config_session_key()
         if self.static_link_used:
             uuid = request.args['config']
-            configuration = ReportLink.load(self.report_event, self.report_link_type, uuid)
+            configuration = StaticListLink.load(self.list_event, self.list_link_type, uuid)
             if configuration and configuration['entry_parent_id'] == self.entry_parent.id:
                 session[session_key] = configuration['data']
-        return session.get(session_key, self.default_report_config)
+        return session.get(session_key, self.default_list_config)
 
     def build_query(self):
-        """Return the query of the report's entries.
+        """Return the query of the list's entries.
 
         The query should not take into account the user's filtering
         configuration, for example::
 
-            return Contribution.query.with_parent(self.report_event)
+            return Contribution.query.with_parent(self.list_event)
         """
         raise NotImplementedError
 
-    def filter_report_entries(self):
+    def filter_list_entries(self):
         """Apply user's filters to query and return it."""
         raise NotImplementedError
 
     def get_filters_from_request(self):
         """Get the new filters after the filter form is submitted."""
-        filters = deepcopy(self.default_report_config['filters'])
+        filters = deepcopy(self.default_list_config['filters'])
         for item_id, item in self.filterable_items.iteritems():
             if item.get('filter_choices'):
                 options = [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
@@ -289,29 +289,29 @@ class ReporterBase(object):
                     filters['items'][item_id] = options
         return filters
 
-    def get_report_url(self, uuid=None, external=False):
-        """Return the URL of the report management page."""
+    def get_list_url(self, uuid=None, external=False):
+        """Return the URL of the list management page."""
         return url_for(self.endpoint, self.entry_parent, config=uuid, _external=external)
 
     def generate_static_url(self):
-        """Return a URL with a uuid referring to the report's configuration."""
+        """Return a URL with a uuid referring to the list's configuration."""
         session_key = self._get_config_session_key()
         configuration = {
             'entry_parent_id': self.entry_parent.id,
             'data': session.get(session_key)
         }
         if configuration['data']:
-            link = ReportLink.create(self.report_event, self.report_link_type, configuration)
-            return self.get_report_url(uuid=link.uuid, external=True)
+            link = StaticListLink.create(self.list_event, self.list_link_type, configuration)
+            return self.get_list_url(uuid=link.uuid, external=True)
         else:
-            return self.get_report_url(external=True)
+            return self.get_list_url(external=True)
 
     def store_filters(self):
         """Load the filters from the request and store them in the session."""
         filters = self.get_filters_from_request()
         session_key = self._get_config_session_key()
-        self.report_config = session.setdefault(session_key, {})
-        self.report_config['filters'] = filters
+        self.list_config = session.setdefault(session_key, {})
+        self.list_config['filters'] = filters
         session.modified = True
 
 

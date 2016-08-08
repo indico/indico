@@ -25,7 +25,7 @@ from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.contributions.util import (ContributionDisplayReporter, get_contribution_ical_file,
+from indico.modules.events.contributions.util import (ContributionDisplayListGenerator, get_contribution_ical_file,
                                                       get_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
@@ -102,12 +102,12 @@ class RHContributionList(RHDisplayProtectionBase):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.contribs = self.event_new.contributions
-        self.reporter = ContributionDisplayReporter(event=self.event_new)
+        self.list_generator = ContributionDisplayListGenerator(event=self.event_new)
 
     def _process(self):
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event_new,
-                                               timezone=tz, **self.reporter.get_contrib_report_kwargs())
+                                               timezone=tz, **self.list_generator.get_contrib_list_kwargs())
 
 
 class RHContributionDisplay(RHContributionDisplayBase):
@@ -210,7 +210,7 @@ class RHContributionExportToPDF(RHContributionDisplayBase):
 
 class RHContributionsExportToPDF(RHContributionList):
     def _process(self):
-        contribs = self.reporter.get_contrib_report_kwargs()['contribs']
+        contribs = self.list_generator.get_contrib_list_kwargs()['contribs']
         pdf = ContribsToPDF(self._conf, contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
@@ -224,27 +224,27 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
         return send_file('contribution.ics', get_contribution_ical_file(self.contrib), 'text/calendar')
 
 
-class RHContributionReport(RHContributionList):
+class RHContributionListFilter(RHContributionList):
     """Display dialog with filters"""
 
     def _process(self):
         return RH._process(self)
 
     def _process_GET(self):
-        return WPContributions.render_template('contrib_report_filter.html', self._conf, event=self.event_new,
-                                               filters=self.reporter.report_config['filters'],
-                                               filterable_items=self.reporter.filterable_items)
+        return WPContributions.render_template('contrib_list_filter.html', self._conf, event=self.event_new,
+                                               filters=self.list_generator.list_config['filters'],
+                                               filterable_items=self.list_generator.filterable_items)
 
     def _process_POST(self):
-        self.reporter.store_filters()
-        return jsonify_data(**self.reporter.render_contribution_list())
+        self.list_generator.store_filters()
+        return jsonify_data(**self.list_generator.render_contribution_list())
 
 
-class RHContributionListStaticURL(RHContributionList):
+class RHContributionListDisplayStaticURL(RHContributionList):
     """Generate static URL for the current set of filters"""
 
     def _process(self):
-        return jsonify(url=self.reporter.generate_static_url())
+        return jsonify(url=self.list_generator.generate_static_url())
 
 
 class RHSubcontributionDisplay(RHConferenceBaseDisplay):
