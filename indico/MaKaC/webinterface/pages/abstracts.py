@@ -488,7 +488,7 @@ class WPAbstractRecovery( WPAbstractDisplayBase ):
 
 
 class WPAbstractManagementBase( WPConferenceModifBase ):
-    sidemenu_option = 'abstracts'
+    sidemenu_option = 'abstracts_old'
 
     def __init__( self, rh, abstract ):
         self._abstract = self._target = abstract
