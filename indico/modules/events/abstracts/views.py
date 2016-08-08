@@ -16,22 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-
-from indico.core import signals
-from indico.core.logger import Logger
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
-logger = Logger.get('events.abstracts')
+class WPManageAbstracts(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/abstracts/'
+    sidemenu_option = 'abstracts'
 
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_abstracts_js'].urls()
 
-@signals.menu.items.connect_via('event-management-sidemenu')
-def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
-        return
-    if event.type == 'conference':
-        return SideMenuItem('abstracts', _('Abstracts'), url_for('abstracts.manage_abstracts', event),
-                            section='organization')
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['abstracts_sass'].urls()
