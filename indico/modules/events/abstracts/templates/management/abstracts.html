@@ -1,1 +1,94 @@
-TODO
+{% extends 'events/abstracts/management/_abstracts_base.html' %}
+
+{% block content %}
+    <!-- TODO: Add missing templates for the rest of the states -->
+    {% include 'events/abstracts/management/abstracts_setup_actions/not_started.html' %}
+
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}General settings{% endtrans %}
+                </div>
+                {% trans %}Configure the submission dates, the abstract fields, etc.{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button icon-mail">
+                        {% trans %}Notification templates{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-settings">
+                        {% trans %}Settings{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="icon icon-file-check"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Abstract reviewing{% endtrans %}
+                </div>
+                {% trans %}Configure the reviewing questions and answers, the reviewing teams, etc.{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button icon-users">
+                        {% trans %}Teams{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-settings">
+                        {% trans %}Settings{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <!-- TODO: Choose a better icon -->
+            <div class="icon icon-file-pdf"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Book of abstracts{% endtrans %}
+                </div>
+                {% trans -%}Customize and download the book of abstracts{%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button icon-file-download">
+                        {% trans %}Download{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-settings">
+                        {% trans %}Settings{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-list"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}List of abstracts{% endtrans %}
+                </div>
+                {% trans -%}View and perform actions on abstracts{%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
