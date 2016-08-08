@@ -16,22 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from indico.modules.events.abstracts.controllers.management import RHAbstracts
+from indico.web.flask.wrappers import IndicoBlueprint
 
-from indico.core import signals
-from indico.core.logger import Logger
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
+_bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
+                      virtual_template_folder='events/abstracts')
 
-
-logger = Logger.get('events.abstracts')
-
-
-@signals.menu.items.connect_via('event-management-sidemenu')
-def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
-        return
-    if event.type == 'conference':
-        return SideMenuItem('abstracts', _('Abstracts'), url_for('abstracts.manage_abstracts', event),
-                            section='organization')
+# Management
+_bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', RHAbstracts)
