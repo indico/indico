@@ -1,0 +1,26 @@
+{% extends 'events/abstracts/management/abstracts_setup_actions/_base.html' %}
+
+{% block label %}
+    {% trans -%}
+        The call for abstracts is not open yet
+    {%- endtrans %}
+{% endblock %}
+
+{% block text %}
+    {% trans %}Start now or schedule opening.{% endtrans %}
+{% endblock %}
+
+{% block buttons %}
+    <div class="group">
+        <a href="#" class="i-button icon-time js-abstracts-schedule-dialog"
+           data-href="#"
+           data-title="{% trans %}Schedule call for abstracts{% endtrans %}">
+            {% trans %}Schedule{% endtrans %}
+        </a>
+    </div>
+    <div class="group">
+        <a href="#" data-href="#" data-method="POST" class="i-button highlight">
+            {% trans %}Start now{% endtrans %}
+        </a>
+    </div>
+{% endblock %}
