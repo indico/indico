@@ -16,22 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-
-from indico.core import signals
-from indico.core.logger import Logger
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
+from indico.modules.events.abstracts.views import WPManageAbstracts
+from MaKaC.webinterface.rh.base import RH
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-logger = Logger.get('events.abstracts')
+class RHManageAbstractsBase(RHConferenceModifBase):
+    """Base class for all abstracts management RHs"""
+    CSRF_ENABLED = True
+
+    def _process(self):
+        return RH._process(self)
 
 
-@signals.menu.items.connect_via('event-management-sidemenu')
-def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
-        return
-    if event.type == 'conference':
-        return SideMenuItem('abstracts', _('Abstracts'), url_for('abstracts.manage_abstracts', event),
-                            section='organization')
+class RHAbstracts(RHManageAbstractsBase):
+    """Display abstracts management page"""
+
+    def _process(self):
+        return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new)
