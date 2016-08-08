@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="report registrations">
+    <div class="list registrations">
         <div class="toolbar">
             <div class="group left">
                 <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
@@ -21,10 +21,10 @@
                 </ul>
             </div>
             <div class="group left">
-                <button class="i-button icon-settings js-dialog-action js-customize-report {% if filtering_enabled %} highlight{% endif %}"
+                <button class="i-button icon-settings js-dialog-action js-customize-list {% if filtering_enabled %} highlight{% endif %}"
                    data-href="{{ url_for('.customize_reglist', regform) }}"
                    data-title="{% trans %}Registration list configuration{% endtrans %}">
-                    {% trans %}Customize report{% endtrans %}
+                    {% trans %}Customize list{% endtrans %}
                 </button>
             </div>
             <div class="group left">
@@ -169,7 +169,7 @@
                 </span>
             </div>
         </div>
-        <div class="report-content">
+        <div class="list-content">
             {{ render_registration_list(registrations, visible_cols_regform_items, basic_columns, total_registrations) }}
         </div>
         <div class="toolbar right">

@@ -23,23 +23,23 @@
     }
 
     function colorizeActiveFilters() {
-        $('.report-filter .filter').each(function() {
+        $('.list-filter .filter').each(function() {
             colorizeFilter($(this));
         });
     }
 
-    global.setupReportFilter = function() {
-        $('.report-filter').each(function() {
-            $(this).find('.report-column').each(function() {
-                var $reportColumn = $(this);
-                $reportColumn.dropdown({selector: '.title', 'relative_to': $reportColumn});
+    global.setupListFilter = function() {
+        $('.list-filter').each(function() {
+            $(this).find('.list-column').each(function() {
+                var $listColumn = $(this);
+                $listColumn.dropdown({selector: '.title', 'relative_to': $listColumn});
             });
         });
 
         colorizeActiveFilters();
 
-        $('.report-filter-dialog .js-reset-btn').on('click', function() {
-            $('.report-filter input:checkbox:checked').prop('checked', false).trigger('change');
+        $('.list-filter-dialog .js-reset-btn').on('click', function() {
+            $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
             $('.js-clear-filters-message').slideDown({
                 done: function() {
                     $(this).delay(4000).slideUp();
@@ -47,7 +47,7 @@
             });
         });
 
-        $('.report-filter input:checkbox').on('change', function() {
+        $('.list-filter input:checkbox').on('change', function() {
             colorizeFilter($(this).closest('.filter'));
         });
     };
@@ -67,11 +67,11 @@
         });
     }
 
-    global.setupReporter = function() {
+    global.setupListGenerator = function() {
         setupStaticURLGeneration();
         handleRowSelection();
 
-        $('.report').on('indico:htmlUpdated', function() {
+        $('.list').on('indico:htmlUpdated', function() {
             handleRowSelection();
         });
     };

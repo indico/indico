@@ -39,8 +39,8 @@ from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
                                                             delete_contribution, create_subcontribution,
                                                             update_subcontribution, delete_subcontribution)
-from indico.modules.events.contributions.util import (ContributionReporter, generate_spreadsheet_from_contributions,
-                                                      make_contribution_form, contribution_type_row)
+from indico.modules.events.contributions.util import (ContributionListGenerator, contribution_type_row,
+                                                      make_contribution_form, generate_spreadsheet_from_contributions)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
@@ -81,7 +81,7 @@ class RHManageContributionsBase(RHConferenceModifBase):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        self.reporter = ContributionReporter(event=self.event_new)
+        self.list_generator = ContributionListGenerator(event=self.event_new)
 
     def _process(self):
         return RH._process(self)
@@ -144,34 +144,34 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        if self.reporter.static_link_used:
-            return redirect(self.reporter.get_report_url())
-        contrib_report_args = self.reporter.get_contrib_report_kwargs()
+        if self.list_generator.static_link_used:
+            return redirect(self.list_generator.get_list_url())
+        contrib_list_args = self.list_generator.get_contrib_list_kwargs()
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
-                                                     selected_entry=selected_entry, **contrib_report_args)
+                                                     selected_entry=selected_entry, **contrib_list_args)
 
 
-class RHContributionsReportCustomize(RHManageContributionsBase):
-    """Filter options for the contributions report of an event"""
+class RHContributionListCustomize(RHManageContributionsBase):
+    """Filter options for the contributions list of an event"""
 
     def _process_GET(self):
-        return WPManageContributions.render_template('contrib_report_filter.html', self._conf,
+        return WPManageContributions.render_template('contrib_list_filter.html', self._conf,
                                                      event=self.event_new,
-                                                     filters=self.reporter.report_config['filters'],
-                                                     filterable_items=self.reporter.filterable_items)
+                                                     filters=self.list_generator.list_config['filters'],
+                                                     filterable_items=self.list_generator.filterable_items)
 
     def _process_POST(self):
-        self.reporter.store_filters()
-        return jsonify_data(**self.reporter.render_contrib_report())
+        self.list_generator.store_filters()
+        return jsonify_data(**self.list_generator.render_contrib_list())
 
 
-class RHContributionsReportStaticURL(RHManageContributionsBase):
-    """Generate a static URL for the configuration of the contribution report"""
+class RHContributionListStaticURL(RHManageContributionsBase):
+    """Generate a static URL for the configuration of the contribution list"""
 
     def _process(self):
-        return jsonify(url=self.reporter.generate_static_url())
+        return jsonify(url=self.list_generator.generate_static_url())
 
 
 class RHCreateContribution(RHManageContributionsBase):
@@ -183,9 +183,9 @@ class RHCreateContribution(RHManageContributionsBase):
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, *_get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
-            tpl_components = self.reporter.render_contrib_report(contrib)
+            tpl_components = self.list_generator.render_contrib_list(contrib)
             if tpl_components['hide_contrib']:
-                self.reporter.flash_info_message(contrib)
+                self.list_generator.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
         return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
@@ -203,9 +203,9 @@ class RHEditContribution(RHManageContributionBase):
             with track_time_changes():
                 update_contribution(self.contrib, *_get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
-            tpl_components = self.reporter.render_contrib_report(self.contrib)
+            tpl_components = self.list_generator.render_contrib_list(self.contrib)
             if tpl_components['hide_contrib']:
-                self.reporter.flash_info_message(self.contrib)
+                self.list_generator.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
         self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form)
@@ -219,7 +219,7 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         flash(ngettext("The contribution has been deleted.",
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
-        return jsonify_data(**self.reporter.render_contrib_report())
+        return jsonify_data(**self.list_generator.render_contrib_list())
 
 
 class RHContributionACL(RHManageContributionBase):
@@ -242,7 +242,7 @@ class RHContributionREST(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
-        return jsonify_data(**self.reporter.render_contrib_report())
+        return jsonify_data(**self.list_generator.render_contrib_list())
 
     def _process_PATCH(self):
         data = request.json
@@ -304,7 +304,7 @@ class RHContributionProtection(RHManageContributionBase):
             if self.contrib.is_protected:
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
             update_object_principals(self.contrib, form.submitters.data, role='submit')
-            return jsonify_data(flash=False, **self.reporter.render_contrib_report(self.contrib))
+            return jsonify_data(flash=False, **self.list_generator.render_contrib_list(self.contrib))
         return jsonify_form(form)
 
     def _get_defaults(self):

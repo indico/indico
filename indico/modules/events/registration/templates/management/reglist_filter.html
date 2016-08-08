@@ -2,7 +2,7 @@
 
 {% macro _render_column_selector(item, filter_choices, special_item=false) %}
     {% set filters = filters['items'] if special_item else filters['fields'] %}
-    <div class="i-label report-column"
+    <div class="i-label list-column"
          data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
         {% if filter_choices %}
             <div class="actions">
@@ -55,8 +55,8 @@
                 <a class="i-button icon-checkbox-checked arrow left icon-only" aria-hidden="true" href="#"
                    data-toggle="dropdown"></a>
                 <ul class="dropdown">
-                    <li><a href="#" id="report-filter-select-all">{% trans %}All{% endtrans %}</a></li>
-                    <li><a href="#" id="report-filter-select-none">{% trans %}None{% endtrans %}</a></li>
+                    <li><a href="#" id="list-filter-select-all">{% trans %}All{% endtrans %}</a></li>
+                    <li><a href="#" id="list-filter-select-none">{% trans %}None{% endtrans %}</a></li>
                 </ul>
             </div>
             <div class="group">
@@ -74,7 +74,7 @@
         {%- endtrans -%}
     </div>
 </div>
-<form class="report-filter" method="POST">
+<form class="list-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>

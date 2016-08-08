@@ -16,7 +16,7 @@
  */
 
 
-.report {
+.list {
     .i-table {
         thead {
             font-weight: bold;
@@ -95,7 +95,7 @@
     }
 }
 
-.report-filter-dialog {
+.list-filter-dialog {
     max-width: 1200px;
 }
 
@@ -108,7 +108,7 @@
     color: $red !important;
 }
 
-.report-filter {
+.list-filter {
     padding-bottom: 14em;
     position: relative;
 
@@ -118,7 +118,7 @@
         font-weight: bold;
         min-height: 2em;
 
-        &.report-column {
+        &.list-column {
             width: 12em;
             display: inline-flex;
             align-items: center;
