@@ -703,7 +703,7 @@ class WPConferenceModifBase(main.WPMainBase):
 
 class WPConferenceModifAbstractBase( WPConferenceModifBase ):
 
-    sidemenu_option = 'abstracts'
+    sidemenu_option = 'abstracts_old'
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
