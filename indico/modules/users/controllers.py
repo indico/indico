@@ -23,16 +23,18 @@ from operator import attrgetter
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup, escape
 from pytz import timezone
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.notifications import make_email, send_email
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
+from indico.modules.events import Event
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
@@ -41,8 +43,9 @@ from indico.modules.users.util import (get_related_categories, get_suggested_cat
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
                                         AdminUserSettingsForm, AdminAccountRegistrationForm)
-from indico.util.date_time import timedelta_split
+from indico.util.date_time import timedelta_split, now_utc
 from indico.util.event import truncate_path
+from indico.util.fossilize.conversion import Conversion
 from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -103,10 +106,29 @@ class RHUserDashboard(RHUserBase):
 
         tz = timezone(DisplayTZ().getDisplayTZ())
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
+        categories = get_related_categories(self.user)
+        categories_events = []
+        if categories:
+            category_ids = {c['categ'].id for c in categories.itervalues()}
+            today = now_utc(False).astimezone(session.tzinfo).date()
+            query = (Event.query
+                     .filter(~Event.is_deleted,
+                             Event.category_chain_overlaps(category_ids),
+                             Event.start_dt.astimezone(session.tzinfo) >= today)
+                     .options(joinedload('category').load_only('id', 'title'),
+                              subqueryload('acl_entries'))
+                     .order_by(Event.start_dt, Event.id))
+            categories_events = [{'url': event.url,
+                                  'title': event.title,
+                                  'category': event.category.title,
+                                  'start_dt': Conversion.datetime(event.start_dt.astimezone(session.tzinfo)),
+                                  'end_dt': Conversion.datetime(event.end_dt.astimezone(session.tzinfo))}
+                                 for event in get_n_matching(query, 10, lambda x: x.can_access(self.user))]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                redis_enabled=bool(redis_client), timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
-                                               categories=get_related_categories(self.user),
+                                               categories=categories,
+                                               categories_events=categories_events,
                                                suggested_categories=get_suggested_categories(self.user))
 
 

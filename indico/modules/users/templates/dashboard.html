@@ -104,7 +104,15 @@
                     <ol>
                         {% if not categories %}
                             <li class="no-event">
-                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
+                                <span class="event-title italic text-superfluous">
+                                    {% trans %}You have no categories.{% endtrans %}
+                                </span>
+                            </li>
+                        {% elif not categories_events %}
+                            <li class="no-event">
+                                <span class="event-title italic text-superfluous">
+                                    {% trans %}Nothing happening in your categories.{% endtrans %}
+                                </span>
                             </li>
                         {% endif %}
                     </ol>
@@ -215,32 +223,23 @@
                 });
             {% endif %}
 
-            {% if categories %}
-                // Happening in your categories query
-                api_opts['from'] = 'today';
-                apiRequest('/user/categ_events', api_opts).done(function(resp) {
-                    var html = '';
-                    if (resp.count === 0) {
-                        html += '<li class="no-event"> \
-                             <span class="event-title italic text-superfluous">' + $T("Nothing happening in your categories.") + '</span> \
-                         </li>';
-                    } else {
-                        $.each(resp.results, function(i, item) {
-                            html += '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
-                                <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
-                                <span class="event-title truncate-target">' + item.title + '</span> \
-                                <span class="event-category">' + item.category + '</span> \
-                             </a></li>';
-                        });
-                    }
-                    $("#happeningCategories ol").append(html);
+            {% if categories_events %}
+                var categoriesEvents = {{ categories_events|tojson }};
+                var html = '';
+                categoriesEvents.forEach(function(event) {
+                    html += '<li class="truncate"><a href="' + event.url + '" class="truncate"> \
+                        <span class="event-date">' + getDate(event.start_dt, event.end_dt, true) + '</span> \
+                        <span class="event-title truncate-target">' + event.title + '</span> \
+                        <span class="event-category">' + event.category + '</span> \
+                     </a></li>';
                 });
+                $("#happeningCategories ol").append(html);
             {% endif %}
 
-            var momentDate = function(date) {
+            function momentDate(date) {
                 var timezone_offset = {{ offset | tojson }};
                 return moment(date.date + " " + date.time + timezone_offset);
-            };
+            }
 
             {% if suggested_categories %}
                 $('.suggestion-favorite').on('click', function(e) {
@@ -287,17 +286,17 @@
                 });
             {% endif %}
 
-            var getDate = function(startDate, endDate) {
+            function getDate(startDate, endDate) {
                 var now = moment();
 
-                if (momentDate(startDate) < now && now < momentDate(endDate)) {
+                if (momentDate(startDate) <= now && now < momentDate(endDate)) {
                     return $T("Now");
                 } else {
                     return moment(startDate.date).calendar();
                 }
-            };
+            }
 
-            var hasRights = function(rights, filter) {
+            function hasRights(rights, filter) {
                 for (var i=0; i < rights.length; i++) {
                     for (var j=0; j < filter.length; j++) {
                         if (rights[i] === filter[j]) {
@@ -306,7 +305,7 @@
                     }
                 }
                 return "";
-            };
+            }
         });
     </script>
 {% endblock %}
