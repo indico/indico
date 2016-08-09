@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, load_only
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -28,11 +28,13 @@ from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
+from indico.modules.events import Event
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
+from indico.util.redis import client as redis_client
 from indico.util.redis import suggestions, avatar_links
 
 
@@ -97,6 +99,41 @@ def get_suggested_categories(user):
             'path': truncate_path(categ.chain_titles[:-1], chars=50)
         })
     return res
+
+
+def get_linked_events(user, from_dt, to_dt, limit=None):
+    """Get the linked events and the user's roles in them"""
+    from indico.modules.events.contributions.util import get_events_with_linked_contributions
+    from indico.modules.events.registration.util import get_events_registered
+    from indico.modules.events.sessions.util import get_events_with_linked_sessions
+    from indico.modules.events.surveys.util import get_events_with_submitted_surveys
+    from indico.modules.events.util import (get_events_managed_by, get_events_created_by,
+                                            get_events_with_linked_event_persons)
+
+    links = avatar_links.get_links(user, from_dt, to_dt) if redis_client else OrderedDict()
+    for event_id in get_events_registered(user, from_dt, to_dt):
+        links.setdefault(str(event_id), set()).add('registration_registrant')
+    for event_id in get_events_with_submitted_surveys(user, from_dt, to_dt):
+        links.setdefault(str(event_id), set()).add('survey_submitter')
+    for event_id in get_events_managed_by(user, from_dt, to_dt):
+        links.setdefault(str(event_id), set()).add('conference_manager')
+    for event_id in get_events_created_by(user, from_dt, to_dt):
+        links.setdefault(str(event_id), set()).add('conference_creator')
+    for event_id, principal_roles in get_events_with_linked_sessions(user, from_dt, to_dt).iteritems():
+        links.setdefault(str(event_id), set()).update(principal_roles)
+    for event_id, principal_roles in get_events_with_linked_contributions(user, from_dt, to_dt).iteritems():
+        links.setdefault(str(event_id), set()).update(principal_roles)
+    for event_id in get_events_with_linked_event_persons(user, from_dt, to_dt):
+        links.setdefault(str(event_id), set()).add('conference_chair')
+
+    query = (Event.query
+             .filter(~Event.is_deleted,
+                     Event.id.in_(map(int, links)))
+             .options(load_only('id', 'category_id', 'title', 'start_dt', 'end_dt'))
+             .order_by(Event.start_dt, Event.id))
+    if limit is not None:
+        query = query.limit(limit)
+    return OrderedDict((event, links[str(event.id)]) for event in query)
 
 
 def serialize_user(user):

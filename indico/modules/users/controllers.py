@@ -20,6 +20,7 @@ from collections import namedtuple
 from datetime import datetime
 from operator import attrgetter
 
+from dateutil.relativedelta import relativedelta
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup, escape
 from pytz import timezone
@@ -39,7 +40,7 @@ from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
-                                       serialize_user, search_users, merge_users)
+                                       serialize_user, search_users, merge_users, get_linked_events)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
                                         AdminUserSettingsForm, AdminAccountRegistrationForm)
@@ -48,7 +49,6 @@ from indico.util.event import truncate_path
 from indico.util.fossilize.conversion import Conversion
 from indico.util.i18n import _
 from indico.util.redis import suggestions
-from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
@@ -124,12 +124,21 @@ class RHUserDashboard(RHUserBase):
                                   'start_dt': Conversion.datetime(event.start_dt.astimezone(session.tzinfo)),
                                   'end_dt': Conversion.datetime(event.end_dt.astimezone(session.tzinfo))}
                                  for event in get_n_matching(query, 10, lambda x: x.can_access(self.user))]
+        from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
+        linked_events = [{'id': event.id,
+                          'url': event.url,
+                          'title': event.title,
+                          'start_dt': Conversion.datetime(event.start_dt.astimezone(session.tzinfo)),
+                          'end_dt': Conversion.datetime(event.end_dt.astimezone(session.tzinfo)),
+                          'roles': list(roles)}
+                         for event, roles in get_linked_events(self.user, from_dt, None, 10).iteritems()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
-                                               redis_enabled=bool(redis_client), timezone=unicode(tz),
+                                               timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                                categories=categories,
                                                categories_events=categories_events,
-                                               suggested_categories=get_suggested_categories(self.user))
+                                               suggested_categories=get_suggested_categories(self.user),
+                                               linked_events=linked_events)
 
 
 class RHPersonalData(RHUserBase):
