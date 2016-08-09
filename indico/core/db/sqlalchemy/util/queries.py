@@ -130,3 +130,31 @@ def get_related_object(obj, relationship, criteria):
     # otherwise query that specific object
     cls = getattr(type(obj), relationship).prop.mapper.class_
     return cls.query.with_parent(obj, relationship).filter_by(**criteria).first()
+
+
+def get_n_matching(query, n, predicate):
+    """Get N objects from a query that satisfy a condition.
+
+    This queries for ``n * 5`` objects initially and then loads
+    more objects until no more results are available or ``n`` objects
+    have been found.
+
+    :param query: A sqlalchemy query object
+    :param n: The max number of objects to return
+    :param predicate: A callable used to filter the found objects
+    """
+    _offset = [0]
+
+    def _get():
+        limit = n * 5
+        rv = query.offset(_offset[0]).limit(limit).all()
+        _offset[0] += limit
+        return rv
+
+    results = filter(predicate, _get())
+    while len(results) < n:
+        objects = _get()
+        if not objects:
+            break
+        results.extend(x for x in objects if predicate(x))
+    return results[:n]
