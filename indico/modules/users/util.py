@@ -74,8 +74,8 @@ def get_suggested_categories(user):
     res = []
     categ_suggestions = suggestions.get_suggestions(user, 'category')
     query = (Category.query
-             .filter(Category.id.in_(categ_suggestions),
-                     ~Category.id.in_(related),
+             .filter(Category.id.in_(categ_suggestions) if categ_suggestions else False,
+                     ~Category.id.in_(related) if related else True,
                      ~Category.is_deleted,
                      ~Category.suggestions_disabled)
              .options(undefer('chain_titles')))
