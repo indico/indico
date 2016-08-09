@@ -49,7 +49,8 @@ def get_related_categories(user, detailed=True):
                     .all())
     managed = set(Category.query
                   .filter(Category.acl_entries.any(db.and_(CategoryPrincipal.type == PrincipalType.user,
-                                                           CategoryPrincipal.user == user)),
+                                                           CategoryPrincipal.user == user,
+                                                           CategoryPrincipal.has_management_role())),
                           ~Category.is_deleted)
                   .options(undefer('chain_titles')))
     if not detailed:
