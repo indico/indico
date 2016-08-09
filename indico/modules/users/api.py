@@ -15,23 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import jsonify, session
-from sqlalchemy.orm import joinedload
 
-from indico.modules.events.util import get_events_with_linked_event_persons
-from indico.modules.events.contributions.util import get_events_with_linked_contributions
-from indico.modules.events.registration.util import get_events_registered
-from indico.modules.events.sessions.util import get_events_with_linked_sessions
-from indico.modules.events.surveys.util import get_events_with_submitted_surveys
-from indico.modules.events.util import get_events_managed_by, get_events_created_by
 from indico.modules.oauth import oauth
-from indico.modules.users.util import get_related_categories
-from indico.util.redis import avatar_links
-from indico.util.redis import client as redis_client
-from indico.web.http_api.fossils import IBasicConferenceMetadataFossil
-from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
+from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.http_api.util import get_query_parameter
-
 from MaKaC.user import AvatarHolder
 
 
@@ -64,100 +51,3 @@ class UserInfoHook(HTTPAPIHook):
                 return [requested_user.fossilize()]
             raise HTTPAPIError('You do not have access to that info', 403)
         raise HTTPAPIError('You need to be logged in', 403)
-
-
-@HTTPAPIHook.register
-class UserEventHook(HTTPAPIHook):
-    TYPES = ('user',)
-    RE = r'(?P<what>linked_events|categ_events)'
-    DEFAULT_DETAIL = 'basic_events'
-    GUEST_ALLOWED = False
-    VALID_FORMATS = ('json', 'jsonp', 'xml')
-
-    def _getParams(self):
-        super(UserEventHook, self)._getParams()
-        self._avatar = None
-        # User-specified avatar
-        userId = get_query_parameter(self._queryParams, ['uid', 'userid'])
-        if userId is not None:
-            self._avatar = AvatarHolder().getById(userId)
-            if not self._avatar:
-                raise HTTPAPIError('Avatar does not exist')
-
-    def _getMethodName(self):
-        return self.PREFIX + '_' + self._pathParams['what']
-
-    def _checkProtection(self, aw):
-        if not self._avatar:
-            # No avatar specified => use self. No need to check any permissinos.
-            self._avatar = aw.getUser()
-            return
-        elif not self._avatar.canUserModify(aw.getUser()):
-            raise HTTPAPIError('Access denied', 403)
-
-    def export_linked_events(self, aw):
-        if not redis_client:
-            raise HTTPAPIError('This API is only available when using Redis')
-        self._checkProtection(aw)
-        links = avatar_links.get_links(self._avatar.user, self._fromDT, self._toDT)
-        for event_id in get_events_registered(self._avatar.user, self._fromDT, self._toDT):
-            links.setdefault(str(event_id), set()).add('registration_registrant')
-        for event_id in get_events_with_submitted_surveys(self._avatar.user, self._fromDT, self._toDT):
-            links.setdefault(str(event_id), set()).add('survey_submitter')
-        for event_id in get_events_managed_by(self._avatar.user, self._fromDT, self._toDT):
-            links.setdefault(str(event_id), set()).add('conference_manager')
-        for event_id in get_events_created_by(self._avatar.user, self._fromDT, self._toDT):
-            links.setdefault(str(event_id), set()).add('conference_creator')
-        for event_id, principal_roles in get_events_with_linked_sessions(self._avatar.user, self._fromDT,
-                                                                         self._toDT).iteritems():
-            links.setdefault(str(event_id), set()).update(principal_roles)
-        for event_id, principal_roles in get_events_with_linked_contributions(self._avatar.user, self._fromDT,
-                                                                              self._toDT).iteritems():
-            links.setdefault(str(event_id), set()).update(principal_roles)
-        for event_id in get_events_with_linked_event_persons(self._avatar.user, self._fromDT, self._toDT):
-            links.setdefault(str(event_id), set()).add('conference_chair')
-        return UserRelatedEventFetcher(aw, self, links).events(links.keys())
-
-    def export_categ_events(self, aw):
-        self._checkProtection(aw)
-        catIds = [str(cat.id) for cat in get_related_categories(self._avatar.user, detailed=False)]
-        return UserCategoryEventFetcher(aw, self).category_events(catIds)
-
-
-class UserCategoryEventFetcher(IteratedDataFetcher):
-
-    DETAIL_INTERFACES = {
-        'basic_events': IBasicConferenceMetadataFossil
-    }
-
-    def category_events(self, catIds):
-        from indico.modules.events import Event
-        query = (Event.query
-                 .filter(~Event.is_deleted,
-                         Event.category_chain_overlaps(map(int, catIds)),
-                         Event.happens_between(self._fromDT, self._toDT))
-                 .options(joinedload('category').load_only('id', 'title')))
-        return self._process(x.as_legacy for x in query)
-
-
-class UserRelatedEventFetcher(IteratedDataFetcher):
-
-    DETAIL_INTERFACES = {
-        'basic_events': IBasicConferenceMetadataFossil
-    }
-
-    def __init__(self, aw, hook, roles):
-        super(UserRelatedEventFetcher, self).__init__(aw, hook)
-        self._roles = roles
-
-    def _postprocess(self, obj, fossil, iface):
-        fossil['roles'] = list(self._roles[obj.getId()])
-        return fossil
-
-    def events(self, eventIds):
-        from indico.modules.events import Event
-        query = (Event.query
-                 .filter(~Event.is_deleted,
-                         Event.id.in_(map(int, eventIds)))
-                 .options(joinedload('category').load_only('id', 'title')))
-        return self._process(x.as_legacy for x in query)

@@ -18,13 +18,8 @@
 Basic fossils for data export
 """
 
-from hashlib import md5
-
-from indico.modules.attachments.api.util import build_material_legacy_api_data, build_folders_api_data
-from indico.modules.events.notes.util import build_note_api_data
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
-from MaKaC.webinterface import urlHandlers
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -65,37 +60,3 @@ class IPeriodFossil(IFossil):
     def endDT(self):
         pass
     endDT.convert = Conversion.datetime
-
-
-class IBasicConferenceMetadataFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getStartDate(self):
-        pass
-    getStartDate.convert = Conversion.datetime
-
-    def getEndDate(self):
-        pass
-    getEndDate.convert = Conversion.datetime
-
-    def getTitle(self):
-        pass
-
-    def getType(self):
-        pass
-
-    def getCategoryTitle(self):
-        pass
-    getCategoryTitle.produce = lambda x: x.as_event.category.title
-    getCategoryTitle.name = 'category'
-
-    def getCategoryId(self):
-        pass
-    getCategoryId.produce = lambda x: str(x.as_event.category_id)
-
-    def getLocator(self):
-        pass
-    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
-    getLocator.name = 'url'
