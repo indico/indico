@@ -306,3 +306,24 @@ class RegistrationManagersForm(IndicoForm):
 
     managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify registrations'))
+
+
+class CreateMultipleRegistrationsForm(IndicoForm):
+    """Form to create multiple registrations of Indico users at the same time."""
+
+    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
+    notify_users = BooleanField(_("Send e-mail notifications"),
+                                default=True,
+                                description=_("Notify the users about the registration."),
+                                widget=SwitchWidget())
+
+    def __init__(self, *args, **kwargs):
+        self._regform = kwargs.pop('regform')
+        open_add_user_dialog = kwargs.pop('open_add_user_dialog', False)
+        super(CreateMultipleRegistrationsForm, self).__init__(*args, **kwargs)
+        self.user_principals.open_immediately = open_add_user_dialog
+
+    def validate_user_principals(self, field):
+        for user in field.data:
+            if user.registrations.filter_by(registration_form=self._regform, is_deleted=False).one_or_none():
+                raise ValidationError(_("A registration for {} already exists.").format(user.full_name))

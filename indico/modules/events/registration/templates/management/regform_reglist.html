@@ -30,7 +30,7 @@
             <div class="group left">
                 <div id="indico-user-to-add" class="hidden"></div>
                 <a class="i-button arrow icon-plus" data-toggle="dropdown">
-                    {% trans %}Add new{% endtrans %}
+                    {% trans %}Register{% endtrans %}
                 </a>
                 <ul class="dropdown">
                     <li>
@@ -44,6 +44,13 @@
                            data-href="{{ url_for('.create_registration', regform) }}"
                            data-title="{% trans %}Register a Indico user{% endtrans %}">
                             {% trans %}Indico user{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="js-add-multiple-users"
+                           data-href="{{ url_for('.create_multiple_registrations', regform) }}"
+                           data-title="{% trans %}Register multiple Indico users{% endtrans %}">
+                            {% trans %}Multiple Indico users{% endtrans %}
                         </a>
                     </li>
                 </ul>

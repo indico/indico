@@ -1,0 +1,13 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'message_box.html' import message_box %}
+
+
+{{ form_header(form) }}
+{{ form_rows(form) }}
+
+{{ message_box('info', message=_('The registrations will be filled with personal data only. Additional fields will be left blank.')) }}
+
+<button class="i-button big highlight" type="submit">{% trans %}Add registrations{% endtrans %}</button>
+<button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+
+{{ form_footer(form) }}

@@ -39,7 +39,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.forms import EmailRegistrantsForm
+from indico.modules.events.registration.forms import EmailRegistrantsForm, CreateMultipleRegistrationsForm
 from indico.modules.events.registration.models.items import (RegistrationFormItemType, RegistrationFormItem,
                                                              PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
@@ -156,6 +156,14 @@ def _filter_registration(regform, query, filters):
                     .as_scalar())
         query = query.filter(subquery == len(field_filters))
     return query.filter(db.or_(*items_criteria))
+
+
+def _jsonify_registration_list(regform):
+    reg_list_config = _get_reg_list_config(regform=regform)
+    registrations_query = _query_registrations(regform)
+    registrations = _filter_registration(regform, registrations_query, reg_list_config['filters']).all()
+    return jsonify_data(registration_list=_render_registration_list(regform, registrations),
+                        flash=False)
 
 
 def _query_registrations(regform):
@@ -523,6 +531,28 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     user_data=self._get_user_data(), management=True)
 
 
+class RHRegistrationCreateMultiple(RHManageRegFormBase):
+    """Create multiple registrations for Indico users (management area)"""
+
+    def _register_user(self, user, notify):
+        # Fill only the personal data fields, custom fields are left empty.
+        data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType}
+        with db.session.no_autoflush:
+            create_registration(self.regform, data, management=True, notify_user=notify)
+
+    def _process(self):
+        form = CreateMultipleRegistrationsForm(regform=self.regform, open_add_user_dialog=(request.method == 'GET'),
+                                               notify_users=session.get('registration_notify_user_default', True))
+
+        if form.validate_on_submit():
+            session['registration_notify_user_default'] = form.notify_users.data
+            for user in form.user_principals.data:
+                self._register_user(user, form.notify_users.data)
+            return _jsonify_registration_list(self.regform)
+
+        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
+
+
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
     """Base class for all registration list export RHs"""
 
@@ -661,10 +691,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return _jsonify_registration_list(self.regform)
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
@@ -675,10 +702,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return _jsonify_registration_list(self.regform)
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):
