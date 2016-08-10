@@ -76,6 +76,7 @@
             var params = $this.data('params') || {};
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
+            var highlightUpdate = $this.data('highlight-update') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
             if (!$.isPlainObject(params)) {
@@ -96,6 +97,9 @@
             function updateHtml(selector, html, triggeredBy) {
                 var elem = $(selector);
                 elem.html(html).trigger('indico:htmlUpdated', [triggeredBy]);
+                if (highlightUpdate) {
+                    elem.effect('highlight', {color: '#5D95EA'});
+                }
             }
 
             function handleHtmlUpdate(data, update, triggeredBy) {
