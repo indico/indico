@@ -119,7 +119,7 @@ class ContributionListGenerator(ListGeneratorBase):
         session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
-        self.filterable_items = OrderedDict([
+        self.special_items_info = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
             ('track', {'title': _('Track'),
@@ -144,7 +144,7 @@ class ContributionListGenerator(ListGeneratorBase):
                          db.undefer('attachment_count'),
                          db.undefer('is_scheduled')))
 
-    def filter_list_entries(self, query, filters):
+    def _filter_list_entries(self, query, filters):
         if not filters.get('items'):
             return query
         criteria = []
@@ -176,7 +176,7 @@ class ContributionListGenerator(ListGeneratorBase):
     def get_contrib_list_kwargs(self):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
-        contributions = self.filter_list_entries(contributions_query, self.list_config['filters']).all()
+        contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.list_event.sessions]
         tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
                   for t in self.list_event.as_legacy.getTrackList()]

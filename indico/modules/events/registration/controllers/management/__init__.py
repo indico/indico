@@ -22,6 +22,7 @@ from sqlalchemy.orm import contains_eager, defaultload
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.util import RegistrationListGenerator
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -46,6 +47,7 @@ class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
     def _checkParams(self, params):
         RHManageRegFormsBase._checkParams(self, params)
         RegistrationFormMixin._checkParams(self)
+        self.list_generator = RegistrationListGenerator(regform=self.regform)
 
 
 class RHManageRegistrationBase(RHManageRegFormBase):

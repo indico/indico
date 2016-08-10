@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import json
 import random
 import warnings
 from collections import defaultdict
@@ -244,7 +245,9 @@ class ListGeneratorBase(object):
     def __init__(self, event, entry_parent=None):
         self.list_event = event
         self.entry_parent = entry_parent or event
-        self.filterable_items = None
+        self.basic_items = None
+        self.special_items = None
+        self.special_items_info = None
         self.static_link_used = 'config' in request.args
 
     def _get_config_session_key(self):
@@ -265,7 +268,24 @@ class ListGeneratorBase(object):
                 session[session_key] = configuration['data']
         return session.get(session_key, self.default_list_config)
 
-    def build_query(self):
+    def _split_item_ids(self, item_ids):
+        """Separate the custom item ids from the rest"""
+        other_item_ids = [item_id for item_id in item_ids if isinstance(item_id, basestring)]
+        return [item_id for item_id in item_ids if item_id not in other_item_ids], list(other_item_ids)
+
+    def _split_special_ids(self, item_ids):
+        """Separate the special item ids from the rest"""
+        special_item_ids = []
+        other_item_ids = []
+
+        for item_id in item_ids:
+            if item_id in self.special_items:
+                special_item_ids.append(item_id)
+            else:
+                other_item_ids.append(item_id)
+        return other_item_ids, special_item_ids
+
+    def _build_query(self):
         """Return the query of the list's entries.
 
         The query should not take into account the user's filtering
@@ -275,14 +295,14 @@ class ListGeneratorBase(object):
         """
         raise NotImplementedError
 
-    def filter_list_entries(self):
+    def _filter_list_entries(self):
         """Apply user's filters to query and return it."""
         raise NotImplementedError
 
-    def get_filters_from_request(self):
+    def _get_filters_from_request(self):
         """Get the new filters after the filter form is submitted."""
         filters = deepcopy(self.default_list_config['filters'])
-        for item_id, item in self.filterable_items.iteritems():
+        for item_id, item in self.special_items_info.iteritems():
             if item.get('filter_choices'):
                 options = [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
                 if options:
@@ -306,12 +326,15 @@ class ListGeneratorBase(object):
         else:
             return self.get_list_url(external=True)
 
-    def store_filters(self):
+    def store_configuration(self):
         """Load the filters from the request and store them in the session."""
-        filters = self.get_filters_from_request()
+        filters = self._get_filters_from_request()
         session_key = self._get_config_session_key()
         self.list_config = session.setdefault(session_key, {})
         self.list_config['filters'] = filters
+        if request.values.get('visible_items'):
+            visible_items = json.loads(request.values['visible_items'])
+            self.list_config['items'] = sorted(visible_items)
         session.modified = True
 
 

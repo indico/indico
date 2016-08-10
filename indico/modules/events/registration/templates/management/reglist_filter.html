@@ -12,7 +12,7 @@
                         <li>
                             <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
                                    id="field_{{ item.id }}_option_{{ value }}"
-                                   {% if value in filters[item.id] %}
+                                   {% if value in filters[item.id|string] %}
                                        checked
                                    {% endif %}>
                             <label for="field_{{ item.id }}_option_{{ value }}">
@@ -75,7 +75,7 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
+    <input id="visible-columns-reg-items" type="hidden" name="visible_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
 
