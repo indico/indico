@@ -50,7 +50,7 @@
                         {{ news.title }}
                     </a>
                     <span class="timing">
-                        {% trans date=news.created_dt.astimezone(tzinfo).date()|format_human_date() -%}
+                        {% trans date=news.created_dt|format_pretty_date(tzinfo=tzinfo) -%}
                             Posted {{ date }}
                         {%- endtrans %}
                     </span>
@@ -74,11 +74,11 @@
                     </a>
                     <span class="timing">
                         {% if happening_now(event) %}
-                            {% trans time=event.end_dt|format_human_datetime(timezone=tzinfo) -%}
+                            {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
                                 ongoing until {{ time }}
                             {%- endtrans %}
                         {% else %}
-                            {% trans time=event.start_dt|format_human_datetime(timezone=tzinfo) -%}
+                            {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo) -%}
                                 starts {{ time }}
                             {%- endtrans %}
                         {% endif %}
