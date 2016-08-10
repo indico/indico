@@ -74,7 +74,8 @@ class AddAdministrator(AdminService):
             user = User.get(int(fossil['id']))
             if user is not None:
                 user.is_admin = True
-        return fossilize([u.as_avatar for u in User.find(is_admin=True)])
+        admins = User.find(is_admin=True, is_deleted=False).order_by(User.first_name, User.last_name).all()
+        return fossilize([u.as_avatar for u in admins])
 
 
 class RemoveAdministrator(AdminService):
@@ -88,7 +89,8 @@ class RemoveAdministrator(AdminService):
         user = User.get(self._userId)
         if user is not None:
             user.is_admin = False
-        return fossilize([u.as_avatar for u in User.find(is_admin=True)])
+        admins = User.find(is_admin=True, is_deleted=False).order_by(User.first_name, User.last_name).all()
+        return fossilize([u.as_avatar for u in admins])
 
 
 methodMap = {
