@@ -100,6 +100,13 @@ class RHUserBase(RHProtected):
 
 
 class RHUserDashboard(RHUserBase):
+    management_roles = {'conference_creator', 'conference_chair', 'conference_manager', 'session_manager',
+                        'session_coordinator', 'contribution_manager'}
+    reviewer_roles = {'conference_paperReviewManager', 'conference_referee', 'conference_editor', 'conference_reviewer',
+                      'contribution_referee', 'contribution_editor', 'contribution_reviewer', 'track_coordinator'}
+    attendance_roles = {'contributor', 'contribution_submission', 'abstract_submitter', 'registration_registrant',
+                        'survey_submitter'}
+
     def _process(self):
         if redis_write_client:
             suggestions.schedule_check(self.user)
@@ -118,19 +125,11 @@ class RHUserDashboard(RHUserBase):
                      .options(joinedload('category').load_only('id', 'title'),
                               subqueryload('acl_entries'))
                      .order_by(Event.start_dt, Event.id))
-            categories_events = [{'url': event.url,
-                                  'title': event.title,
-                                  'category': event.category.title,
-                                  'start_dt': Conversion.datetime(event.start_dt.astimezone(session.tzinfo)),
-                                  'end_dt': Conversion.datetime(event.end_dt.astimezone(session.tzinfo))}
-                                 for event in get_n_matching(query, 10, lambda x: x.can_access(self.user))]
+            categories_events = get_n_matching(query, 10, lambda x: x.can_access(self.user))
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
-        linked_events = [{'id': event.id,
-                          'url': event.url,
-                          'title': event.title,
-                          'start_dt': Conversion.datetime(event.start_dt.astimezone(session.tzinfo)),
-                          'end_dt': Conversion.datetime(event.end_dt.astimezone(session.tzinfo)),
-                          'roles': list(roles)}
+        linked_events = [(event, {'management': bool(roles & self.management_roles),
+                                  'reviewing': bool(roles & self.reviewer_roles),
+                                  'attendance': bool(roles & self.attendance_roles)})
                          for event, roles in get_linked_events(self.user, from_dt, None, 10).iteritems()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                timezone=unicode(tz),
