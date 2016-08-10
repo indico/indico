@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import calendar
-import time
 from collections import OrderedDict
 from datetime import timedelta, datetime
 from datetime import time as dt_time
@@ -48,10 +46,6 @@ def now_utc(exact=True):
     return pytz.utc.localize(now)
 
 
-def utc_timestamp(datetimeVal):
-    return int(calendar.timegm(datetimeVal.utctimetuple()))
-
-
 def as_utc(dt):
     """Returns the given naive datetime with tzinfo=UTC."""
     if dt.tzinfo and dt.tzinfo != pytz.utc:
@@ -67,16 +61,6 @@ def localize_as_utc(dt, timezone='UTC'):
     """
     timezone = pytz.timezone(timezone)
     return timezone.localize(dt).astimezone(pytz.utc)
-
-
-def event_to_utc(dt, event):
-    """Converts a datetime of an event to UTC.
-
-    :param dt: A naive :class:`datetime.datetime` object in UTC
-    :param event: An :class:`.Conference` object from which to take the timezone
-    """
-    timezone = DisplayTZ(conf=event).getDisplayTZ()
-    return get_timezone(timezone).localize(dt).astimezone(pytz.utc)
 
 
 def server_to_utc(dt):
@@ -295,13 +279,6 @@ def format_number(number, locale=None):
     return _format_number(number, locale=locale).encode('utf-8')
 
 
-def is_same_month(date_1, date_2):
-    """
-    This method ensures that is the same month of the same year
-    """
-    return date_1.month == date_2.month and date_1.year == date_2.year
-
-
 def timedelta_split(delta):
     """
     Decomposes a timedelta into hours, minutes and seconds
@@ -311,18 +288,6 @@ def timedelta_split(delta):
     hours, remainder = divmod(sec, 3600)
     minutes, seconds = divmod(remainder, 60)
     return hours, minutes, seconds
-
-
-## ATTENTION: Do not use this one for new developments ##
-# It is flawed, as even though the returned value is DST-safe,
-# it is in the _local timezone_, meaning that the number of seconds
-# returned is the one for the hour with the same "value" for the
-# local timezone.
-def int_timestamp(datetimeVal, tz=pytz.timezone('UTC')):
-    """
-    Returns the number of seconds from the local epoch to the UTC time
-    """
-    return int(time.mktime(datetimeVal.astimezone(tz).timetuple()))
 
 
 def overlaps(range1, range2, inclusive=False):
