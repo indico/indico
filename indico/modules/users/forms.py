@@ -38,7 +38,7 @@ from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
 
 class UserDetailsForm(SyncedInputsMixin, IndicoForm):
     title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
-    first_name = StringField(_('First Name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
+    first_name = StringField(_('First name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
     last_name = StringField(_('Family name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
     affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
     address = TextAreaField(_('Address'), widget=SyncedInputWidget(textarea=True))

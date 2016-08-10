@@ -1,5 +1,6 @@
 {% extends 'events/persons/management/_person_list_base.html' %}
 
+{% from 'events/persons/management/_person_list_row.html' import render_person_row %}
 {% from 'message_box.html' import message_box %}
 
 {% block title %}
@@ -45,63 +46,13 @@
                 <th class="i-table"></th>
                 <th class="i-table"></th>
                 <th class="i-table"></th>
+                <th class="i-table"></th>
             </tr>
         </thead>
         <tbody>
             {% for person_data in persons -%}
-                {% set person = person_data.person %}
-                <tr class="i-table" data-person-roles="{{ person_data.roles | tojson | forceescape }}">
-                    <td class="i-table checkbox-column">
-                        <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id"
-                               {{ 'disabled' if not person.email }}>
-                    </td>
-                    <td class="i-table name-column">{{ person.get_full_name(last_name_first=true, last_name_upper=false,
-                                                                abbrev_first_name=false) }}</td>
-                    <td class="i-contributiontable email-column">{{ person.email }}</td>
-                    <td class="i-table affiliation-column">{{ person.affiliation }}</td>
-                    <td class="i-table">
-                        <span class="i-label{{ ' no-role' if not person_data.roles.chairperson }}">
-                            {% trans %}Chairperson{% endtrans %}
-                        </span>
-                    </td>
-                    <td class="i-table">
-                        <span class="i-label js-count-label{{ ' no-role' if not person_data.contributions }}"
-                              data-items="{{ person_data.contributions | tojson | forceescape }}">
-                            {% trans %}Speaker{% endtrans %}
-                            <span class="badge">
-                                {{ person_data.contributions | length }}
-                            </span>
-                        </span>
-                    </td>
-                    <td class="i-table">
-                        <span class="i-label js-count-label{{ ' no-role' if not person_data.subcontributions }}"
-                              data-items="{{ person_data.subcontributions | tojson | forceescape }}">
-                            {% trans %}Sub-contrib. Speaker{% endtrans %}
-                            <span class="badge">
-                                {{ person_data.subcontributions | length }}
-                            </span>
-                        </span>
-                    </td>
-                    <td class="i-table">
-                        <span class="i-label js-count-label{{ ' no-role' if not person_data.session_blocks }}"
-                              data-items="{{ person_data.session_blocks | tojson | forceescape }}">
-                            {% trans %}Convener{% endtrans %}
-                            <span class="badge">
-                                {{ person_data.session_blocks | length }}
-                            </span>
-                        </span>
-                    </td>
-                    <td class="i-table">
-                        {% if person_data.roles.no_account %}
-                            <span class="i-label warning icon-warning"
-                                   title="{% trans email=person.email %}This user seems to have no Indico
-                                   account. If they do have an account, they should add {{ email }} to their profile
-                                   {%- endtrans %}">
-                                {% trans %}No Indico account{% endtrans %}
-                            </span>
-                        {% endif %}
-                    </td>
-
+                <tr id="person-{{ person_data.person.id }}" class="i-table" data-person-roles="{{ person_data.roles | tojson | forceescape }}">
+                    {{ render_person_row(person_data) }}
                 </tr>
             {%- else -%}
                 <tr class="i-table">

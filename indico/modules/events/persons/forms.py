@@ -20,9 +20,10 @@ from flask import session, request
 from wtforms.fields import StringField, TextAreaField, SelectField, HiddenField
 from wtforms.validators import DataRequired
 
+from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoStaticTextField, HiddenFieldList
+from indico.web.forms.fields import IndicoStaticTextField, HiddenFieldList, IndicoEnumSelectField
 from indico.web.forms.widgets import CKEditorWidget
 
 
@@ -42,3 +43,12 @@ class EmailEventPersonsForm(IndicoForm):
 
     def is_submitted(self):
         return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form
+
+
+class EventPersonForm(IndicoForm):
+    title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
+    first_name = StringField(_('First name'), [DataRequired()])
+    last_name = StringField(_('Family name'), [DataRequired()])
+    affiliation = StringField(_('Affiliation'))
+    address = TextAreaField(_('Address'))
+    phone = StringField(_('Phone number'))

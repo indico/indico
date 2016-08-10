@@ -29,18 +29,21 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
+from indico.modules.events.persons.operations import update_person
+from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.persons.forms import EmailEventPersonsForm
-from indico.modules.events.persons.views import WPManagePersons
 from indico.util.i18n import ngettext, _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHPersonsList(RHConferenceModifBase):
-    def _process(self):
+class RHPersonsBase(RHConferenceModifBase):
+    def get_persons(self):
         contribution_strategy = joinedload('contribution_links')
         contribution_strategy.joinedload('contribution')
         contribution_strategy.joinedload('person').joinedload('user')
@@ -53,28 +56,12 @@ class RHPersonsList(RHConferenceModifBase):
         event_strategy = joinedload('event_links')
         event_strategy.joinedload('person').joinedload('user')
 
-        event_persons_query = (self.event_new.persons.options(event_strategy, contribution_strategy,
-                                                              subcontribution_strategy, session_block_strategy)
-                               .all())
+        chairpersons = {link.person for link in self.event_new.person_links}
         persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
                                        'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
 
-        event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
-                                 .filter(EventPrincipal.type == PrincipalType.email,
-                                         EventPrincipal.has_management_role('submit')))
-
-        contrib_principal_query = (ContributionPrincipal.find(Contribution.event_new == self.event_new,
-                                                              ContributionPrincipal.type == PrincipalType.email,
-                                                              ContributionPrincipal.has_management_role('submit'))
-                                   .join(Contribution)
-                                   .options(contains_eager('contribution')))
-
-        session_principal_query = (SessionPrincipal.find(Session.event_new == self.event_new,
-                                                         SessionPrincipal.type == PrincipalType.email,
-                                                         SessionPrincipal.has_management_role())
-                                   .join(Session).options(joinedload('session').joinedload('acl_entries')))
-
-        chairpersons = {link.person for link in self.event_new.person_links}
+        event_persons_query = (self.event_new.persons.options(event_strategy, contribution_strategy,
+                                                              subcontribution_strategy, session_block_strategy).all())
 
         for event_person in event_persons_query:
             data = persons[event_person.email or event_person.id]
@@ -112,8 +99,36 @@ class RHPersonsList(RHConferenceModifBase):
                 data['roles']['speaker'] = True
 
         # Some EventPersons will have no roles since they were connected to deleted things
-        persons = {email: data for email, data in persons.viewitems() if
-                   any(data['roles'].viewvalues())}
+        persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
+        return persons
+
+
+class RHPersonsList(RHPersonsBase):
+    @classmethod
+    def get_person_list(cls):
+        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
+                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
+        return sorted(persons.viewvalues(), key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
+
+    def _process(self):
+        event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
+                                 .filter(EventPrincipal.type == PrincipalType.email,
+                                         EventPrincipal.has_management_role('submit')))
+
+        contrib_principal_query = (ContributionPrincipal.find(Contribution.event_new == self.event_new,
+                                                              ContributionPrincipal.type == PrincipalType.email,
+                                                              ContributionPrincipal.has_management_role('submit'))
+                                   .join(Contribution)
+                                   .options(contains_eager('contribution')))
+
+        session_principal_query = (SessionPrincipal.find(Session.event_new == self.event_new,
+                                                         SessionPrincipal.type == PrincipalType.email,
+                                                         SessionPrincipal.has_management_role())
+                                   .join(Session).options(joinedload('session').joinedload('acl_entries')))
+
+        persons = self.get_persons()
+        person_list = sorted(persons.viewvalues(),
+                             key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
@@ -122,8 +137,6 @@ class RHPersonsList(RHConferenceModifBase):
             if not persons[principal.email].get('no_account'):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
-
-        person_list = sorted(persons.viewvalues(), key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
 
         return WPManagePersons.render_template('management/person_list.html', self._conf, event=self.event_new,
                                                persons=person_list, num_no_account=num_no_account)
@@ -212,3 +225,18 @@ class RHRevokeSubmissionRights(RHConferenceModifBase):
         flash(ngettext('Submission rights have been revoked from one principal',
                        'Submission rights have been revoked from {} principals', count).format(count))
         return redirect(url_for('.person_list', self.event_new))
+
+
+class RHEditEventPerson(RHPersonsBase):
+    def _checkParams(self, params):
+        RHPersonsBase._checkParams(self, params)
+        self.person = EventPerson.query.with_parent(self.event_new).filter_by(id=request.view_args['person_id']).one()
+
+    def _process(self):
+        form = EventPersonForm(obj=FormDefaults(self.person, skip_attrs={'title'}, title=self.person._title))
+        if form.validate_on_submit():
+            update_person(self.person, form.data)
+            person_data = self.get_persons()[self.person.email]
+            tpl = get_template_module('events/persons/management/_person_list_row.html')
+            return jsonify_data(html=tpl.render_person_row(person_data))
+        return jsonify_form(form)
