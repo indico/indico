@@ -16,10 +16,7 @@
 
 from __future__ import unicode_literals
 
-import json
 import os
-from collections import OrderedDict
-from copy import deepcopy
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
@@ -34,18 +31,13 @@ from indico.core import signals
 from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.attachments.controllers.event_package import adjust_path_length
-from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import EmailRegistrantsForm
-from indico.modules.events.registration.models.items import (RegistrationFormItemType, RegistrationFormItem,
-                                                             PersonalDataType)
+from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
-from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
-                                                                   RegistrationFormPersonalDataField)
-from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
@@ -65,201 +57,6 @@ from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
-
-REPORT_LINK_TYPE = 'registration_list'
-
-PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address', 'phone',
-                    'country')
-SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
-
-SPECIAL_COLUMN_LABELS = OrderedDict([
-    ('reg_date', {
-        'title': _('Registation Date'),
-        'id': 'reg_date'
-    }),
-    ('price', {
-        'title': _('Price'),
-        'id': 'price'
-    }),
-    ('state', {
-        'title': _('State'),
-        'id': 'state',
-        'filter_choices': {str(state.value): state.title for state in RegistrationState}
-    }),
-    ('checked_in', {
-        'title': _('Checked in'),
-        'id': 'checked_in',
-        'filter_choices': {
-            '0': _('No'),
-            '1': _('Yes')
-        }
-    }),
-    ('checked_in_date', {
-        'title': _('Check-in date'),
-        'id': 'checked_in_date'
-    })
-])
-
-DEFAULT_REPORT_CONFIG = {
-    'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
-    'filters': {'fields': {}, 'items': {}}
-}
-
-
-def _get_filters_from_request(regform):
-    filters = deepcopy(DEFAULT_REPORT_CONFIG['filters'])
-    for field in regform.form_items:
-        if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
-            options = request.form.getlist('field_{}'.format(field.id))
-            if options:
-                filters['fields'][field.id] = options
-    for item in SPECIAL_COLUMN_LABELS.itervalues():
-        if item.get('filter_choices'):
-            options = request.form.getlist('field_{}'.format(item['id']))
-            if options:
-                filters['items'][item['id']] = options
-    return filters
-
-
-def _filter_registration(regform, query, filters):
-    if not filters['fields'] and not filters['items']:
-        return query
-    field_types = {f.id: f.field_impl for f in regform.form_items
-                   if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
-    field_filters = {field_id: data_list
-                     for field_id, data_list in filters['fields'].iteritems()
-                     if field_id in field_types}
-    if not field_filters and not filters['items']:
-        return query
-    criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
-                        field_types[field_id].create_sql_filter(data_list))
-                for field_id, data_list in field_filters.iteritems()]
-
-    items_criteria = []
-    if 'checked_in' in filters['items']:
-        checked_in_values = filters['items']['checked_in']
-        # If both values 'true' and 'false' are selected, there's no point in filtering
-        if len(checked_in_values) == 1:
-            items_criteria.append(Registration.checked_in == bool(int(checked_in_values[0])))
-
-    if 'state' in filters['items']:
-        states = [RegistrationState(int(state)) for state in filters['items']['state']]
-        items_criteria.append(Registration.state.in_(states))
-
-    if field_filters:
-        subquery = (RegistrationData.query
-                    .with_entities(db.func.count(RegistrationData.registration_id))
-                    .join(RegistrationData.field_data)
-                    .filter(RegistrationData.registration_id == Registration.id)
-                    .filter(db.or_(*criteria))
-                    .correlate(Registration)
-                    .as_scalar())
-        query = query.filter(subquery == len(field_filters))
-    return query.filter(db.or_(*items_criteria))
-
-
-def _query_registrations(regform):
-    return (Registration.query
-            .with_parent(regform)
-            .filter(~Registration.is_deleted)
-            .options(joinedload('data').joinedload('field_data').joinedload('field'))
-            .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
-
-
-def _split_column_ids(items):
-    """Split column ids between custom and 'basic' (personal + special)."""
-    special_cols = [item for item in items if isinstance(item, basestring)]
-    return [item for item in items if item not in special_cols], list(special_cols)
-
-
-def _split_special_ids(items):
-    """Split column ids between 'DB-stored' (custom + personal) and special."""
-    special = []
-    normal = []
-
-    for item in items:
-        if item in SPECIAL_COLUMNS:
-            special.append(item)
-        else:
-            normal.append(item)
-    return normal, special
-
-
-def _get_basic_columns(form, ids):
-    """
-    Retrieve information needed for the header of "basic" columns (personal + special).
-
-    Returns a list of ``{'id': ..., 'caption': ...}`` dictionaries.
-    """
-    result = []
-    for item_id in PERSONAL_COLUMNS:
-        if item_id in ids:
-            field = RegistrationFormItem.find_one(registration_form=form,
-                                                  personal_data_type=PersonalDataType[item_id])
-            result.append({
-                'id': field.id,
-                'caption': field.title
-            })
-
-    for item_id in SPECIAL_COLUMNS:
-        if item_id in ids:
-            result.append({
-                'id': item_id,
-                'caption': SPECIAL_COLUMN_LABELS[item_id]['title']
-            })
-    return result
-
-
-def _column_ids_to_db(form, ids):
-    """Translate string-based ids to DB-based RegistrationFormItem ids."""
-    result = []
-    for item_id in ids:
-        if isinstance(item_id, basestring):
-            personal_data = PersonalDataType.get(item_id)
-            if personal_data:
-                result.append(RegistrationFormPersonalDataField.find_one(registration_form=form,
-                                                                         personal_data_type=personal_data).id)
-            else:
-                result.append(item_id)
-        else:
-            result.append(item_id)
-    return result
-
-
-def _get_reg_list_config(regform):
-    session_key = 'reglist_config_{}'.format(regform.id)
-    list_config_uuid = request.args.get('config')
-    if list_config_uuid:
-        configuration = ReportLink.load(regform.event_new, REPORT_LINK_TYPE, list_config_uuid)
-        if configuration and configuration['regform_id'] == regform.id:
-            session[session_key] = configuration['data']
-    return session.get(session_key, DEFAULT_REPORT_CONFIG)
-
-
-def _get_sorted_regform_items(regform, item_ids):
-    """Return the form items ordered by their position in the registration form."""
-
-    return (RegistrationFormItem
-            .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
-            .with_parent(regform)
-            .join(RegistrationFormItem.parent, aliased=True)
-            .filter(~RegistrationFormItem.is_deleted)  # parent deleted
-            .order_by(RegistrationFormItem.position)  # parent position
-            .reset_joinpoint()
-            .order_by(RegistrationFormItem.position)  # item position
-            .all())
-
-
-def _render_registration_list(regform, registrations):
-    reg_list_config = _get_reg_list_config(regform=regform)
-    item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
-    basic_columns = _get_basic_columns(regform, basic_item_ids)
-    regform_items = _get_sorted_regform_items(regform, item_ids)
-    total_regs = _query_registrations(regform).count()
-    tpl = get_template_module('events/registration/management/_reglist.html')
-    reglist = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
-                                           basic_columns=basic_columns, total_registrations=total_regs)
-    return reglist
 
 
 def _render_registration_details(registration):
@@ -300,68 +97,34 @@ class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
     def _process(self):
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        if 'config' in request.args:
-            return redirect(url_for('.manage_reglist', self.regform))
-
-        item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
-        basic_columns = _get_basic_columns(self.regform, basic_item_ids)
-        regform_items = _get_sorted_regform_items(self.regform, item_ids)
-        registrations_query = _query_registrations(self.regform)
-        total_regs = registrations_query.count()
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
+        if self.list_generator.static_link_used:
+            return redirect(self.list_generator.get_list_url())
+        reg_list_kwargs = self.list_generator.get_reg_list_kwargs()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
-                                                    event=self.event, visible_cols_regform_items=regform_items,
-                                                    registrations=registrations, basic_columns=basic_columns,
-                                                    total_registrations=total_regs,
-                                                    filtering_enabled=total_regs != len(registrations))
+                                                    event=self.event, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event"""
 
     def _process_GET(self):
-        reg_list_config = _get_reg_list_config(self.regform)
-        visible_columns = reg_list_config['items']
-
+        reg_list_config = self.list_generator._get_config()
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
-                                                    visible_cols_regform_items=visible_columns,
+                                                    visible_cols_regform_items=reg_list_config['items'],
                                                     filters=reg_list_config['filters'],
-                                                    special_items=SPECIAL_COLUMN_LABELS)
+                                                    special_items=self.list_generator.special_items_info)
 
     def _process_POST(self):
-        filters = _get_filters_from_request(self.regform)
-        session_key = 'reglist_config_{}'.format(self.regform.id)
-        visible_regform_items = json.loads(request.values['visible_cols_regform_items'])
-
-        reglist_config = session.setdefault(session_key, {})
-        reglist_config['filters'] = filters
-        reglist_config['items'] = sorted(visible_regform_items)
-
-        session.modified = True
-        registrations_query = _query_registrations(self.regform)
-        total_regs = registrations_query.count()
-        registrations = _filter_registration(self.regform, registrations_query, filters).all()
-
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations),
-                            filtering_enabled=total_regs != len(registrations))
+        self.list_generator.store_configuration()
+        return jsonify_data(**self.list_generator.render_registration_list())
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list"""
 
     def _process(self):
-        session_key = 'reglist_config_{}'.format(self.regform.id)
-        configuration = {
-            'regform_id': self.regform.id,
-            'data': session.get(session_key)
-        }
-        url = url_for('.manage_reglist', self.regform, _external=True)
-        if configuration['data']:
-            link = ReportLink.create(self.event_new, REPORT_LINK_TYPE, configuration)
-            url = url_for('.manage_reglist', self.regform, config=link.uuid, _external=True)
-        return jsonify(url=url)
+        return jsonify(url=self.list_generator.generate_static_url())
 
 
 class RHRegistrationDetails(RHManageRegistrationBase):
@@ -528,18 +291,15 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
     def _checkParams(self, params):
         RHRegistrationsActionBase._checkParams(self, params)
-        reg_list_config = _get_reg_list_config(self.regform)
-        item_ids, self.special_item_ids = _split_special_ids(reg_list_config['items'])
-        self.item_ids = _column_ids_to_db(self.regform, item_ids)
-        self.regform_items = _get_sorted_regform_items(self.regform, self.item_ids)
+        self.export_config = self.list_generator.get_reg_list_export_config()
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style"""
 
     def _process(self):
-        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.regform_items,
-                                   special_items=self.special_item_ids)
+        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
+                                   special_items=self.export_config['special_item_ids'])
         try:
             data = pdf.getPDFBin()
         except Exception:
@@ -554,8 +314,9 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
     def _process(self):
-        pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations, display=self.regform_items,
-                                       special_items=self.special_item_ids)
+        pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations,
+                                       display=self.export_config['regform_items'],
+                                       special_items=self.export_config['special_item_ids'])
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
 
 
@@ -563,8 +324,8 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     """Export registration list to a CSV file"""
 
     def _process(self):
-        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.regform_items,
-                                                                self.special_item_ids)
+        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
+                                                                self.export_config['special_item_ids'])
         return send_csv('registrations.csv', headers, rows)
 
 
@@ -572,8 +333,8 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
     """Export registration list to an XLSX file"""
 
     def _process(self):
-        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.regform_items,
-                                                                self.special_item_ids)
+        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
+                                                                self.export_config['special_item_ids'])
         return send_xlsx('registrations.xlsx', headers, rows)
 
 
@@ -661,10 +422,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return jsonify_data(**self.list_generator.render_registration_list())
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
@@ -675,10 +433,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')
-        reg_list_config = _get_reg_list_config(regform=self.regform)
-        registrations_query = _query_registrations(self.regform)
-        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
+        return jsonify_data(**self.list_generator.render_registration_list())
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):

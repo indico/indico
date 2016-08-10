@@ -160,10 +160,10 @@ class RHContributionListCustomize(RHManageContributionsBase):
         return WPManageContributions.render_template('contrib_list_filter.html', self._conf,
                                                      event=self.event_new,
                                                      filters=self.list_generator.list_config['filters'],
-                                                     filterable_items=self.list_generator.filterable_items)
+                                                     special_items_info=self.list_generator.special_items_info)
 
     def _process_POST(self):
-        self.list_generator.store_filters()
+        self.list_generator.store_configuration()
         return jsonify_data(**self.list_generator.render_contrib_list())
 
 

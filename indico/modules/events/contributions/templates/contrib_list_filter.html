@@ -51,7 +51,7 @@
 <form class="list-filter" method="POST">
     <h3>{% trans %}Available filtering options{% endtrans %}</h3>
 
-    {% for item_id, item in filterable_items.iteritems() %}
+    {% for item_id, item in special_items_info.iteritems() %}
         {{ _render_column_selector(item_id, item) }}
     {% endfor %}
 

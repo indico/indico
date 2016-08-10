@@ -77,7 +77,7 @@
                 title: $this.data('title'),
                 onClose: function(data) {
                     if (data) {
-                        $('.list-content').html(data.registration_list);
+                        $('.list-content').html(data.html);
                         handleRowSelection();
                         setupTableSorter();
                         $('.js-customize-list').toggleClass('highlight', data.filtering_enabled);
@@ -166,7 +166,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     if (data) {
-                        $('.list-content').html(data.registration_list);
+                        $('.list-content').html(data.html);
                         handleRowSelection();
                         setupTableSorter();
                     }

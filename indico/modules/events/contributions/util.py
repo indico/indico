@@ -119,7 +119,7 @@ class ContributionListGenerator(ListGeneratorBase):
         session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
-        self.filterable_items = OrderedDict([
+        self.special_items_info = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
             ('track', {'title': _('Track'),
