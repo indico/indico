@@ -24,7 +24,7 @@ from dateutil.relativedelta import relativedelta
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup, escape
 from pytz import timezone
-from sqlalchemy.orm import undefer, joinedload, subqueryload
+from sqlalchemy.orm import undefer, joinedload, subqueryload, load_only
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
@@ -123,7 +123,10 @@ class RHUserDashboard(RHUserBase):
                              Event.category_chain_overlaps(category_ids),
                              Event.start_dt.astimezone(session.tzinfo) >= today)
                      .options(joinedload('category').load_only('id', 'title'),
-                              subqueryload('acl_entries'))
+                              joinedload('series'),
+                              subqueryload('acl_entries'),
+                              load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
+                                        'protection_mode', 'series_id', 'series_pos', 'series_count'))
                      .order_by(Event.start_dt, Event.id))
             categories_events = get_n_matching(query, 10, lambda x: x.can_access(self.user))
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)

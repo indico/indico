@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
-from sqlalchemy.orm import undefer, load_only
+from sqlalchemy.orm import undefer, load_only, joinedload
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -129,7 +129,9 @@ def get_linked_events(user, from_dt, to_dt, limit=None):
     query = (Event.query
              .filter(~Event.is_deleted,
                      Event.id.in_(map(int, links)))
-             .options(load_only('id', 'category_id', 'title', 'start_dt', 'end_dt'))
+             .options(joinedload('series'),
+                      load_only('id', 'category_id', 'title', 'start_dt', 'end_dt',
+                                'series_id', 'series_pos', 'series_count'))
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)

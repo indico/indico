@@ -114,7 +114,7 @@ def get_events_created_by(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    query = user.created_events.filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt))
+    query = user.created_events.filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt)).options(load_only('id'))
     return {event.id for event in query}
 
 
