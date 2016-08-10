@@ -27,6 +27,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.users.models.users import UserTitle, PersonMixin
 from indico.util.decorators import strict_classproperty
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
 
 
@@ -142,6 +143,10 @@ class EventPerson(PersonMixin, db.Model):
     # - event_links (EventPersonLink.person)
     # - session_block_links (SessionBlockPersonLink.person)
     # - subcontribution_links (SubContributionPersonLink.person)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, person_id=self.id)
 
     @return_ascii
     def __repr__(self):
