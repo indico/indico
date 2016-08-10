@@ -183,6 +183,7 @@ def setup_jinja(app):
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
+    app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
@@ -195,6 +196,8 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_number))
     # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
+    app.add_template_filter(date_time_util.format_pretty_date)
+    app.add_template_filter(date_time_util.format_pretty_datetime)
     app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
     app.add_template_filter(underline)
     app.add_template_filter(markdown)

@@ -32,7 +32,7 @@ from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta
 
 from indico.core.config import Config
-from indico.util.i18n import get_current_locale, _, ngettext
+from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -227,6 +227,66 @@ def format_human_date(dt, format='medium', locale=None):
         return _("tomorrow")
     else:
         return format_date(dt, format, locale=locale)
+
+
+def _format_pretty_datetime(dt, locale, tzinfo, formats):
+    locale = get_current_locale() if not locale else parse_locale(locale)
+
+    if tzinfo:
+        if dt.tzinfo:
+            dt = dt.astimezone(tzinfo)
+        else:
+            dt = tzinfo.localize(dt).astimezone(tzinfo)
+
+    today = (now_utc(False).astimezone(tzinfo) if tzinfo else now_utc(False)).replace(hour=0, minute=0)
+    diff = (dt - today).total_seconds() / 86400.0
+    mapping = [(-6, 'other'), (-1, 'last_week'), (0, 'last_day'),
+               (1, 'same_day'), (2, 'next_day'), (7, 'next_week'),
+               (None, 'other')]
+
+    fmt = next(formats[key] for delta, key in mapping if delta is None or diff < delta)
+    fmt = fmt.format(date_fmt=locale.date_formats['medium'], time_fmt=locale.time_formats['short'])
+    return _format_datetime(dt, fmt, tzinfo, locale)
+
+
+def format_pretty_date(dt, locale=None, tzinfo=None):
+    """Format a date in a pretty way using relative units if possible.
+
+    :param dt: a date or datetime object. if a date is provided, its
+               time is assumed to be midnight
+    :param locale: the locale to use for formatting
+    :param tzinfo: the timezone to use
+    """
+    if not isinstance(dt, datetime):
+        dt = datetime.combine(dt, dt_time())
+    return _format_pretty_datetime(dt, locale, tzinfo, {
+        'last_day': _(u"'Yesterday'"),
+        'same_day': _(u"'Today'"),
+        'next_day': _(u"'Tomorrow'"),
+        'last_week': _(u"'Last' EEEE"),
+        'next_week': _(u"EEEE"),
+        'other': _(u"{date_fmt}")
+    })
+
+
+def format_pretty_datetime(dt, locale=None, tzinfo=None):
+    """
+    Format a datetime in a pretty way using relative units for the
+    date if possible.
+
+    :param dt: a datetime object
+    :param locale: the locale to use for formatting
+    :param tzinfo: the timezone to use
+    """
+
+    return _format_pretty_datetime(dt, locale, tzinfo, {
+        'last_day': _(u"'Yesterday' 'at' {time_fmt}"),
+        'same_day': _(u"'Today' 'at' {time_fmt}"),
+        'next_day': _(u"'Tomorrow' 'at' {time_fmt}"),
+        'last_week': _(u"'Last' EEEE 'at' {time_fmt}"),
+        'next_week': _(u"EEEE 'at' {time_fmt}"),
+        'other': _(u"{date_fmt} 'at' {time_fmt}")
+    })
 
 
 def format_human_datetime(dt, locale=None, timezone=None):
