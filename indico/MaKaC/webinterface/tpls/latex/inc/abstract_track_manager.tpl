@@ -4,7 +4,7 @@
 
 <%block name="management_data" args="track_view">
     \vspace{1em}
-    \textbf{${_("Track Status:")} |latex_escape} ${track_view[0]}
+    \textbf{${_("Track Status:") | latex_escape}} ${track_view[0]}
     % if track_view[1] is not None:
         % if not isinstance(track_view[1], list):
             (${track_view[1].getId() | latex_escape}: ``${track_view[1].getTitle() | latex_escape}'')
