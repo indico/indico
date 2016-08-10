@@ -196,7 +196,7 @@
             dialogClasses: 'add-multiple-users-dialog',
             onClose: function(data) {
                 if (data) {
-                    $('.report-content').html(data.registration_list);
+                    $('.list-content').html(data.html);
                     handleRowSelection();
                     setupTableSorter();
                 }
