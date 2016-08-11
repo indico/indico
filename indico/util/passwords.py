@@ -29,7 +29,7 @@ class BCryptPassword(object):
             return False
         if isinstance(value, unicode):
             value = value.encode('utf-8')
-        return self.hash == bcrypt.hashpw(value, self.hash)
+        return bcrypt.checkpw(value, self.hash)
 
     def __ne__(self, other):
         return not (self == other)

@@ -45,6 +45,7 @@ def mock_bcrypt(mocker):
     bcrypt = mocker.patch('indico.util.passwords.bcrypt')
     bcrypt.gensalt.return_value = 'salt'
     bcrypt.hashpw.side_effect = _hashpw
+    bcrypt.checkpw = lambda pwd, pwdhash: md5(pwd) == pwdhash
     return bcrypt
 
 
