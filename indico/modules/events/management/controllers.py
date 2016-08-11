@@ -193,6 +193,8 @@ class RHEventProtection(RHConferenceModifBase):
                 setting = COORDINATOR_PRIV_SETTINGS[priv_field]
             except KeyError:
                 raise BadRequest('No such privilege')
+            if session_settings.get(self.event_new, setting) == form.data[priv_field]:
+                continue
             session_settings.set(self.event_new, setting, form.data[priv_field])
             log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
                                                                                COORDINATOR_PRIV_TITLES[priv_field])
