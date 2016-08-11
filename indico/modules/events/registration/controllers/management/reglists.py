@@ -292,6 +292,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
     def _register_user(self, user, notify):
         # Fill only the personal data fields, custom fields are left empty.
         data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType}
+        data['title'] = get_title_uuid(self.regform, data['title'])
         with db.session.no_autoflush:
             create_registration(self.regform, data, management=True, notify_user=notify)
 
