@@ -20,10 +20,10 @@ import csv
 import re
 from io import BytesIO
 
+from markupsafe import Markup
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
-from indico.util.string import RichMarkup
 from indico.web.flask.util import send_file
 
 
@@ -83,7 +83,7 @@ def _prepare_excel_data(data):
         data = ', '.join(data)
     elif isinstance(data, set):
         data = ', '.join(sorted(data, key=unicode.lower))
-    elif is_lazy_string(data) or isinstance(data, RichMarkup):
+    elif is_lazy_string(data) or isinstance(data, Markup):
         data = unicode(data)
     return data
 
