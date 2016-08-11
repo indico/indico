@@ -1,7 +1,7 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
-{% macro render_contrib_report(event, total_entries, contribs, sessions, tracks) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks) %}
     {% if contribs %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

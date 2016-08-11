@@ -1,6 +1,6 @@
 {% extends 'layout/full_content_base.html' %}
-{% from 'events/contributions/management/_contribution_report.html' import render_contrib_report %}
-{% from 'events/management/_reports.html' import render_filter_statistics %}
+{% from 'events/contributions/management/_contribution_list.html' import render_contrib_list %}
+{% from 'events/management/_lists.html' import render_filter_statistics %}
 
 {% block title %}
     {% trans %}Contributions{% endtrans %}
@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="report-section">
+    <div class="list-section">
         <div class="toolbar">
             <div class="group">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
@@ -138,9 +138,9 @@
                 </div>
                 <div class="group">
                     <button class="i-button icon-filter js-dialog-action"
-                            data-href="{{ url_for('.customize_contrib_report', event) }}"
+                            data-href="{{ url_for('.customize_contrib_list', event) }}"
                             data-title="{% trans %}Contribution list configuration{% endtrans %}"
-                            data-dialog-classes="report-filter-dialog"
+                            data-dialog-classes="list-filter-dialog"
                             data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                             data-ajax-dialog>
                         {% trans %}Filters{% endtrans %}
@@ -153,8 +153,8 @@
                 </div>
             </div>
         </div>
-        <div class="report" id="contribution-list">
-            {{ render_contrib_report(event, total_entries, contribs, sessions, tracks) }}
+        <div class="list" id="contribution-list">
+            {{ render_contrib_list(event, total_entries, contribs, sessions, tracks) }}
         </div>
         <div id="filter-placeholder"></div>
     </div>

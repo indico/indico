@@ -1,16 +1,3 @@
-<div class="action-box">
-    <div class="section">
-        <div class="icon icon-quill {% block regform_icon_classes %}{% endblock %}"></div>
-        <div class="text">
-            <div class="label">
-                {% block label %}{% endblock %}
-            </div>
-            <div>
-                {% block text %}{% endblock %}
-            </div>
-        </div>
-        <div class="toolbar">
-            {% block buttons %}{% endblock %}
-        </div>
-    </div>
-</div>
+{% extends '_module_actions_base.html' %}
+
+{% block icon_classes %}icon-quill{% endblock %}

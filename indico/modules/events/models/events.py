@@ -335,6 +335,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     # relationship backrefs:
     # - abstracts (Abstract.event_new)
+    # - abstract_notification_templates (AbstractNotificationTemplate.event_new)
     # - agreements (Agreement.event_new)
     # - all_attachment_folders (AttachmentFolder.event_new)
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)

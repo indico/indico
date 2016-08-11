@@ -22,16 +22,17 @@ from indico.modules.events.contributions.controllers.compat import compat_contri
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHMyContributions,
                                                                      RHContributionAuthor, RHContributionDisplay,
                                                                      RHContributionList, RHContributionExportToPDF,
-                                                                     RHContributionReport, RHContributionExportToICAL,
+                                                                     RHContributionListFilter,
+                                                                     RHContributionExportToICAL,
                                                                      RHContributionsExportToPDF,
-                                                                     RHContributionListStaticURL, RHSpeakerList,
+                                                                     RHContributionListDisplayStaticURL, RHSpeakerList,
                                                                      RHSubcontributionDisplay)
 from indico.modules.events.contributions.controllers.management import (RHContributions, RHCreateContribution,
                                                                         RHEditContribution, RHContributionREST,
                                                                         RHDeleteContributions, RHContributionPersonList,
                                                                         RHContributionProtection,
-                                                                        RHContributionsReportCustomize,
-                                                                        RHContributionsReportStaticURL,
+                                                                        RHContributionListCustomize,
+                                                                        RHContributionListStaticURL,
                                                                         RHContributionSubContributions,
                                                                         RHCreateSubContribution,
                                                                         RHEditSubContribution, RHSubContributionREST,
@@ -67,9 +68,9 @@ _bp = IndicoBlueprint('contributions', __name__, template_folder='templates',
                       virtual_template_folder='events/contributions', url_prefix='/event/<confId>')
 
 _bp.add_url_rule('/manage/contributions/', 'manage_contributions', RHContributions)
-_bp.add_url_rule('/manage/contributions/customize', 'customize_contrib_report',
-                 RHContributionsReportCustomize, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/contributions/static-url', 'generate_static_url', RHContributionsReportStaticURL,
+_bp.add_url_rule('/manage/contributions/customize', 'customize_contrib_list',
+                 RHContributionListCustomize, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/static-url', 'generate_static_url', RHContributionListStaticURL,
                  methods=('POST',))
 _bp.add_url_rule('/manage/contributions/create', 'manage_create_contrib', RHCreateContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/delete', 'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
@@ -152,9 +153,9 @@ _bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', RH
 _bp.add_url_rule('/contributions/mine', 'my_contributions', RHMyContributions)
 _bp.add_url_rule('/contributions/authors', 'author_list', RHAuthorList)
 _bp.add_url_rule('/contributions/speakers', 'speaker_list', RHSpeakerList)
-_bp.add_url_rule('/contributions/customize', 'customize_contribution_list', RHContributionReport,
+_bp.add_url_rule('/contributions/customize', 'customize_contribution_list', RHContributionListFilter,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url', RHContributionListStaticURL,
+_bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url', RHContributionListDisplayStaticURL,
                  methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/', 'display_contribution', RHContributionDisplay)
 _bp.add_url_rule('/contributions/<int:contrib_id>/author/<int:person_id>', 'display_author',

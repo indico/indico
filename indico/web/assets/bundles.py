@@ -372,10 +372,10 @@ module_js = {
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
     'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
     'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
-                                                                    'reporter.js', 'static_filters.js')),
+                                                                    'list_generator.js', 'static_filters.js')),
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/events/layout.js'),
     'event_management': rjs_bundle('modules_event_management',
-                                   *namespace('js/indico/modules', 'events/management.js', 'reporter.js',
+                                   *namespace('js/indico/modules', 'events/management.js', 'list_generator.js',
                                               'static_filters.js')),
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
     'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
@@ -387,6 +387,7 @@ module_js = {
                                           'sectiontoolbar.js', 'table.js')),
     'contributions': rjs_bundle('modules_contributions',
                                 *namespace('js/indico/modules/contributions', 'common.js')),
+    'abstracts': rjs_bundle('modules_abstracts', 'js/indico/modules/abstracts.js'),
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
                                        'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
@@ -413,6 +414,7 @@ def sass_module_bundle(module_name, depends=[]):
 agreements_sass = sass_module_bundle('agreements')
 attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
+abstracts_sass = sass_module_bundle('abstracts')
 registration_sass = sass_module_bundle('registrationform')
 payment_sass = sass_module_bundle('payment')
 roombooking_sass = sass_module_bundle('roombooking')
@@ -523,6 +525,7 @@ def register_all_css(env, main_css_file):
     env.register('registration_sass', registration_sass)
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)
+    env.register('abstracts_sass', abstracts_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('category_management_sass', category_management_sass)
