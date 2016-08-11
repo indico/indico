@@ -7,3 +7,4 @@ sphinx
 repoze.sphinx.autointerface
 pygments
 sqlparse
+requests
