@@ -331,17 +331,26 @@ class VCRoomEventAssociation(db.Model):
         """Get a dict mapping link objects to event vc rooms"""
         return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
-    def delete(self, user):
+    def delete(self, user, delete_all=False):
         """Deletes a VC room from an event
 
         If the room is not used anywhere else, the room itself is also deleted.
 
         :param user: the user performing the deletion
+        :param delete_all: if True, the room is detached from all
+                           events and deleted.
         """
-        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-            self.vc_room, self.event_new, self.link_object)
-        )
-        db.session.delete(self)
+        if delete_all:
+            for e in self.vc_room.events[:]:
+                Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+                    self.vc_room, e.event_new, e.link_object)
+                )
+                db.session.delete(e)
+        else:
+            Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+                self.vc_room, self.event_new, self.link_object)
+            )
+            db.session.delete(self)
         db.session.flush()
         if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
