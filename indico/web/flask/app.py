@@ -23,8 +23,8 @@ import uuid
 
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, current_app, request, send_from_directory
-from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
+from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
@@ -32,25 +32,21 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
-from MaKaC.webinterface.pages.error import render_error
-
-import indico.util.date_time as date_time_util
-from indico.core.config import Config
 from indico.core import signals
-from indico.util.i18n import gettext_context, ngettext_context, babel, _
-from indico.core.logger import Logger
-
 from indico.core.auth import multipass
 from indico.core.celery import celery
+from indico.core.config import Config
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.logger import Logger
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
-from indico.modules.auth.providers import IndicoAuthProvider
-from indico.modules.auth.providers import IndicoIdentityProvider
+from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
+from indico.util import date_time as date_time_util
+from indico.util.i18n import gettext_context, ngettext_context, babel, _
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
@@ -63,6 +59,7 @@ from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
+from MaKaC.webinterface.pages.error import render_error
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
