@@ -133,7 +133,7 @@
         background-color: transparent;
     }
 
-    ul {
+    ul:not(.dropdown) {
         margin: 0;
         padding-left: 1.5em;
         max-height: 100px;
