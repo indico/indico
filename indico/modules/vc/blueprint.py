@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelectService, RHVCManageEventCreate,
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
-                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList)
+                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList,
+                                           RHVCManageEventRemoveAll)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -38,6 +39,8 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc
                  'manage_vc_rooms_modify', RHVCManageEventModify, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/remove',
                  'manage_vc_rooms_remove', RHVCManageEventRemove, methods=('POST',))
+_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/remove_all',
+                 'manage_vc_rooms_remove_all', RHVCManageEventRemoveAll, methods=('POST',))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/refresh',
                  'manage_vc_rooms_refresh', RHVCManageEventRefresh, methods=('POST',))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/attach/',

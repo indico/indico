@@ -351,6 +351,21 @@ class VCRoomEventAssociation(db.Model):
             db.session.delete(self.vc_room)
 
 
+    def delete_all(self, user):
+        """Deletes a VC room from an event
+
+        If the room is not used anywhere else, the room itself is also deleted.
+
+        :param user: the user performing the deletion
+        """
+        # Logging all events to be deleted
+        if self.vc_room.events:
+            for e in self.vc_room.events:
+                Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+                    self.vc_room, e.event_new, e.link_object)
+                )
+        db.session.delete(self.vc_room)
+
 VCRoomEventAssociation.register_link_events()
 
 
