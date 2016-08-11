@@ -20,6 +20,8 @@ You will need some system libraries:
 * *libz-devel*
 * *openldap-devel* (if you wish to use LDAP authentication)
 
+Since some of the python libraries used by Indico require compiled modules you need a compiler such as gcc.
+
 You will also need to ``easy_install python-ldap`` if you want LDAP to work.
 
 =============
