@@ -16,8 +16,11 @@
 
 import os
 import sys
+import warnings
 
+from flask.exthook import ExtDeprecationWarning
 from flask_script import Manager
+warnings.simplefilter('ignore', ExtDeprecationWarning)  # some of our dependencies still use flask.ext :(
 
 from indico.cli.admin import IndicoAdminManager
 from indico.cli.database import DatabaseManager, PluginDatabaseManager
