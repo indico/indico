@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import flash, session, request
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.settings import EventSettingsProxy
+from indico.util.i18n import ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -48,5 +49,13 @@ def _check_feature_definitions(app, **kwargs):
 def _event_type_changed(event, **kwargs):
     from indico.modules.events.features.util import (get_enabled_features, get_disallowed_features, set_feature_enabled,
                                                      format_feature_names)
-    for feature in get_enabled_features(event, only_explicit=True) & get_disallowed_features(event):
-        set_feature_enabled(event, feature, False)
+    conflicting = get_enabled_features(event, only_explicit=True) & get_disallowed_features(event)
+    if conflicting:
+        for feature in conflicting:
+            set_feature_enabled(event, feature, False)
+        if request.endpoint != 'api.jsonrpc':
+            # XXX: we cannot flash a message in the legacy js ajax editor for the event type.
+            # remove this check once we don't use it anymore (on the general settings page)
+            flash(ngettext('Feature disabled: {features} (not available for this event type)',
+                           'Features disabled: {features} (not available for this event type)', len(conflicting))
+                  .format(features=format_feature_names(conflicting)), 'warning')
