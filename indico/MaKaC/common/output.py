@@ -517,7 +517,7 @@ class outputGenerator(object):
         if auth:
             user = auth
             out.openTag('datafield', [['tag', '100'], ['ind1', ' '], ['ind2', ' ']])
-            out.writeTag('subfield', '{} {}'.format(auth.last_name, auth.first_name), [['code', 'a']])
+            out.writeTag('subfield', u'{} {}'.format(auth.last_name, auth.first_name), [['code', 'a']])
             for val in list_[user]:
                 out.writeTag('subfield', val, [['code', 'e']])
             out.writeTag('subfield', auth.affiliation, [['code', 'u']])
@@ -526,7 +526,7 @@ class outputGenerator(object):
 
         for user in list_.keys():
             out.openTag('datafield', [['tag', '700'], ['ind1', ' '], ['ind2', ' ']])
-            out.writeTag('subfield', '{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
+            out.writeTag('subfield', u'{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
             for val in list_[user]:
                 out.writeTag('subfield', val, [['code', 'e']])
             out.writeTag('subfield', user.affiliation, [['code', 'u']])

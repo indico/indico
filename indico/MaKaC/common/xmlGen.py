@@ -17,6 +17,9 @@
 from xml.sax import saxutils
 from MaKaC.common.utils import encodeUnicode
 
+from indico.util.string import encode_if_unicode
+
+
 class XMLGen:
 
     def __init__(self, init=True):
@@ -89,4 +92,4 @@ class XMLGen:
                 cm.append(" ")
             else:
                 cm.append(chr(c))
-        return str(text).translate("".join(cm))
+        return str(encode_if_unicode(text)).translate("".join(cm))
