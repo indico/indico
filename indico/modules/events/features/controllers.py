@@ -37,7 +37,6 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 class RHFeaturesBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf
 
     def _process(self):
         # ConferenceModifBase overrides this with functionality that
@@ -54,12 +53,12 @@ class RHFeatures(RHFeaturesBase):
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(on_label=_('On'), off_label=_('Off')),
                                  description=feature.description)
             setattr(form_class, name, field)
-        defaults = {name: True for name in get_enabled_features(self.event)}
+        defaults = {name: True for name in get_enabled_features(self.event_new)}
         return form_class(csrf_enabled=False, obj=FormDefaults(defaults))
 
     def _process(self):
         form = self._make_form()
-        return WPFeatures.render_template('features.html', self.event, event=self.event, form=form)
+        return WPFeatures.render_template('features.html', self._conf, event=self.event_new, form=form)
 
 
 class RHSwitchFeature(RHFeaturesBase):
@@ -77,29 +76,29 @@ class RHSwitchFeature(RHFeaturesBase):
                                 if f.name in names))
 
     def _process_PUT(self):
-        prev = get_enabled_features(self.event)
+        prev = get_enabled_features(self.event_new)
         feature = get_feature_definition(request.view_args['feature'])
         changed = set()
-        if set_feature_enabled(self.event, feature.name, True):
-            current = get_enabled_features(self.event)
+        if set_feature_enabled(self.event_new, feature.name, True):
+            current = get_enabled_features(self.event_new)
             changed = current - prev
             flash(ngettext('Feature enabled: {features}', 'Features enabled: {features}', len(changed))
                   .format(features=self._format_feature_names(changed)), 'success')
-            logger.info("Feature '%s' for event %s enabled by %s", feature, self.event, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
-                           'Enabled {}'.format(feature.friendly_name), session.user)
+            logger.info("Feature '%s' for event %s enabled by %s", feature.name, self.event_new, session.user)
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Features',
+                               'Enabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
 
     def _process_DELETE(self):
-        prev = get_enabled_features(self.event)
+        prev = get_enabled_features(self.event_new)
         feature = get_feature_definition(request.view_args['feature'])
         changed = set()
-        if set_feature_enabled(self.event, feature.name, False):
-            current = get_enabled_features(self.event)
+        if set_feature_enabled(self.event_new, feature.name, False):
+            current = get_enabled_features(self.event_new)
             changed = prev - current
             flash(ngettext('Feature disabled: {features}', 'Features disabled: {features}', len(changed))
                   .format(features=self._format_feature_names(changed)), 'warning')
-            logger.info("Feature '%s' for event %s disabled by %s", feature, self.event, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
-                           'Disabled {}'.format(feature.friendly_name), session.user)
+            logger.info("Feature '%s' for event %s disabled by %s", feature.name, self.event_new, session.user)
+            self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Features',
+                               'Disabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))
