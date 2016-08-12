@@ -25,6 +25,7 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
+from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
@@ -203,7 +204,7 @@ class RegistrationFeature(EventFeature):
 
     @classmethod
     def is_default_for_event(cls, event):
-        return event.getType() == 'conference'
+        return event.type_ == EventType.conference
 
 
 class RegistrationRole(ManagementRole):
