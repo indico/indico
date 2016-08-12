@@ -42,3 +42,11 @@ def _check_feature_definitions(app, **kwargs):
     # This will raise RuntimeError if the feature names are not unique
     from indico.modules.events.features.util import get_feature_definitions
     get_feature_definitions()
+
+
+@signals.event.type_changed.connect
+def _event_type_changed(event, **kwargs):
+    from indico.modules.events.features.util import (get_enabled_features, get_disallowed_features, set_feature_enabled,
+                                                     format_feature_names)
+    for feature in get_enabled_features(event, only_explicit=True) & get_disallowed_features(event):
+        set_feature_enabled(event, feature, False)
