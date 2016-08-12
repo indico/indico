@@ -26,6 +26,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -124,4 +125,4 @@ class ImagesFeature(EventFeature):
 
     @classmethod
     def is_default_for_event(cls, event):
-        return event.getType() == 'conference'
+        return event.type_ == EventType.conference
