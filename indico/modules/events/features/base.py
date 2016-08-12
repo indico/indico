@@ -66,6 +66,11 @@ class EventFeature(object):
         return False
 
     @classmethod
+    def is_allowed_for_event(cls, event):  # pragma: no cover
+        """Check if the feature can be enabled in an event"""
+        return True
+
+    @classmethod
     def enabled(cls, event):  # pragma: no cover
         """Called when the feature is enabled for an event"""
         pass
