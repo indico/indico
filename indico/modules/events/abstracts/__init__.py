@@ -20,6 +20,8 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.features.base import EventFeature
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -32,6 +34,26 @@ logger = Logger.get('events.abstracts')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user):
         return
-    if event.type == 'conference':
+    if event.has_feature('abstracts'):
         return SideMenuItem('abstracts', _('Abstracts'), url_for('abstracts.manage_abstracts', event),
                             section='organization')
+
+
+@signals.event.get_feature_definitions.connect
+def _get_feature_definitions(sender, **kwargs):
+    return AbstractsFeature
+
+
+class AbstractsFeature(EventFeature):
+    name = 'abstracts'
+    friendly_name = _('Abstracts')
+    description = _('Gives event managers the opportunity to do a "Call for Abstracts" and use the abstract '
+                    'reviewing workflow.')
+
+    @classmethod
+    def is_allowed_for_event(cls, event):
+        return event.type_ == EventType.conference
+
+    @classmethod
+    def is_default_for_event(cls, event):
+        return event.type_ == EventType.conference
