@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from itertools import chain
+
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
@@ -78,6 +80,18 @@ def set_feature_enabled(event, name, state):
     for func in funcs:
         func(event)
     return True
+
+
+def get_disallowed_features(event):
+    """
+    Get a set containing the names of features which are not available
+    for an event.
+    """
+    disallowed = {feature
+                  for feature in get_feature_definitions().itervalues()
+                  if not feature.is_allowed_for_event(event)}
+    indirectly_disallowed = set(chain.from_iterable(feature.required_by_deep for feature in disallowed))
+    return indirectly_disallowed | {f.name for f in disallowed}
 
 
 def is_feature_enabled(event, name):
