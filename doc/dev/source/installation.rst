@@ -194,6 +194,19 @@ Here's the explanation of the above lines:
 * ``WSGIProcessGroup``: Configure the execution with the settings of ``WSGIDAEMON``
 * ``WSGIApplicationGroup``: Set the execution to run under the same Python interpreter (the first created)
 
+Note that if you use Apache 2.4 rather than 2.2, you should replace
+
+.. code-block:: apacheconf
+    
+    Order deny,allow
+    Allow from all
+
+with
+
+.. code-block:: apacheconf
+    
+    Require all granted
+
 Accessing ``http://localhost/indico/`` should give you the main Indico page.
 
 ----------------------------------
