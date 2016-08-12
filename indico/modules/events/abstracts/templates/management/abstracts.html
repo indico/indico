@@ -6,17 +6,22 @@
 
     <div class="action-box">
         <div class="section">
-            <div class="icon icon-settings"></div>
+            <div class="icon icon-upload"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}General settings{% endtrans %}
+                    {% trans %}Submission{% endtrans %}
                 </div>
                 {% trans %}Configure the submission dates, the abstract fields, etc.{% endtrans %}
             </div>
             <div class="toolbar">
                 <div class="group">
                     <a href="#" class="i-button icon-mail">
-                        {% trans %}Notification templates{% endtrans %}
+                        {% trans %}Notifications{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-list">
+                        {% trans %}Abstract fields{% endtrans %}
                     </a>
                 </div>
                 <div class="group">
@@ -31,7 +36,7 @@
             <div class="icon icon-file-check"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Abstract reviewing{% endtrans %}
+                    {% trans %}Reviewing{% endtrans %}
                 </div>
                 {% trans %}Configure the reviewing questions and answers, the reviewing teams, etc.{% endtrans %}
             </div>
@@ -56,14 +61,9 @@
                 <div class="label">
                     {% trans %}Book of abstracts{% endtrans %}
                 </div>
-                {% trans -%}Customize and download the book of abstracts{%- endtrans %}
+                {% trans url='#' -%}Customize and <a href={{ url }}>download</a> the book of abstracts{%- endtrans %}
             </div>
             <div class="toolbar">
-                <div class="group">
-                    <a href="#" class="i-button icon-file-download">
-                        {% trans %}Download{% endtrans %}
-                    </a>
-                </div>
                 <div class="group">
                     <a href="#" class="i-button icon-settings">
                         {% trans %}Settings{% endtrans %}
