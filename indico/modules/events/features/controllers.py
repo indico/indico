@@ -17,11 +17,12 @@
 from __future__ import unicode_literals
 
 from flask import request, session, flash
+from werkzeug.exceptions import Forbidden
 from wtforms.fields import BooleanField
 
 from indico.modules.events.features import logger
 from indico.modules.events.features.util import (get_feature_definitions, get_enabled_features, set_feature_enabled,
-                                                 get_feature_definition)
+                                                 get_feature_definition, get_disallowed_features)
 from indico.modules.events.features.views import WPFeatures
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.i18n import _, ngettext
@@ -49,7 +50,10 @@ class RHFeatures(RHFeaturesBase):
 
     def _make_form(self):
         form_class = type(b'FeaturesForm', (IndicoForm,), {})
+        disallowed = get_disallowed_features(self.event_new)
         for name, feature in sorted(get_feature_definitions().iteritems(), key=lambda x: x[1].friendly_name):
+            if name in disallowed:
+                continue
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(on_label=_('On'), off_label=_('Off')),
                                  description=feature.description)
             setattr(form_class, name, field)
@@ -78,6 +82,8 @@ class RHSwitchFeature(RHFeaturesBase):
     def _process_PUT(self):
         prev = get_enabled_features(self.event_new)
         feature = get_feature_definition(request.view_args['feature'])
+        if feature.name in get_disallowed_features(self.event_new):
+            raise Forbidden('Feature not available')
         changed = set()
         if set_feature_enabled(self.event_new, feature.name, True):
             current = get_enabled_features(self.event_new)
