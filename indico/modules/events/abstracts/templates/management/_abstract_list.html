@@ -1,0 +1,56 @@
+{% from 'message_box.html' import message_box %}
+{% from 'attachments/_management_info_column.html' import render_attachment_info %}
+
+{% macro render_abstract_list(abstracts, visible_items, basic_columns, total_abstracts) %}
+    {% if abstracts %}
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            {% set num_filtered_abstracts = abstracts | length %}
+            {% if num_filtered_abstracts != total_abstracts %}
+                <div class="info-message-box">
+                    <div class="message-text">
+                        {%- trans -%}
+                            Filtering is enabled. Displaying {{ num_filtered_abstracts }} out of {{ total_abstracts }} abstracts.
+                        {%- endtrans -%}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="abstracts-table-wrapper">
+                <table class="i-table tablesorter">
+                    <thead>
+                        <tr class="i-table">
+                            <th class="i-table checkbox-column" data-sorter="false"></th>
+                            <th class="i-table id-column">
+                                {% trans %}ID{% endtrans %}
+                            </th>
+                            <th class="i-table title-column">
+                                {% trans %}Title{% endtrans %}
+                            </th>
+                            {% for item in basic_columns %}
+                                <th class="i-table" data-sorter="text">{{ item.caption }}</th>
+                            {% endfor %}
+                            {% for item in visible_items %}
+                                <th class="i-table">{{ item.title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for abstract in abstracts %}
+                            {# TODO #}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    {%- else %}
+        {%- call message_box('info') %}
+            {%- if total_entries %}
+                {%- trans -%}
+                    The filtering criteria do not match with any of the existing abstracts. Try to clear the filters.
+                {%- endtrans %}
+            {%- else %}
+                {%- trans %}There are no abstracts yet.{% endtrans %}
+            {%- endif %}
+        {%- endcall %}
+    {%- endif %}
+{% endmacro %}
