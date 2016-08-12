@@ -1,0 +1,121 @@
+{% extends 'layout/full_content_base.html' %}
+{% from 'events/abstracts/management/_abstract_list.html' import render_abstract_list %}
+
+{% block title %}
+    {%- trans %}Abstract{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans %}List of abstracts{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="list abstracts">
+        <div class="toolbar">
+            <div class="group left">
+                <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
+                   data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
+                    <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="group left">
+                <button class="i-button icon-settings js-dialog-action js-customize-list {% if filtering_enabled %} highlight{% endif %}"
+                   {# TODO: data-href="{{ url_for('.customize_list', event) }}" #}
+                   data-title="{% trans %}Abstract list configuration{% endtrans %}">
+                    {% trans %}Customize list{% endtrans %}
+                </button>
+            </div>
+            <div class="group left">
+                <a class="i-button icon-plus js-dialog-action">
+                    {% trans %}New abstract{% endtrans %}
+                </a>
+                <a class="i-button icon-remove js-requires-selected-row disabled js-delete-abstracts"
+                   {# TODO: data-href="{{ url_for('.delete_abstracts', event) }}" #}
+                   data-method="POST"
+                   data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}">
+                    {%- trans %}Remove{% endtrans -%}
+                </a>
+                <a class="i-button icon-checkmark js-requires-selected-row js-dialog-action accept">
+                    {% trans %}Accept{% endtrans %}
+                </a>
+                <a class="i-button icon-disable js-requires-selected-row js-dialog-action danger">
+                    {% trans %}Reject{% endtrans %}
+                </a>
+                {# TODO: Add icon for merge #}
+                <a class="i-button js-requires-selected-row js-dialog-action"
+                   {# TODO: data-href="{{ url_for('.merge_abstracts', event) }}" #}>
+                    {% trans %}Merge{% endtrans %}
+                </a>
+            </div>
+            <div class="group left">
+                <button class="i-button icon-users js-enable-if-checked disabled"
+                        data-title="{% trans %}Author list{% endtrans %}"
+                        {# TODO: data-href="{{ url_for('.person_list', event) }}" #}
+                        data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                        data-method="POST"
+                        data-dialog-classes="event-persons-dialog"
+                        data-ajax-dialog>
+                    {%- trans %}Author list{% endtrans -%}
+                </button>
+            </div>
+            <div class="group left">
+                <a href="#" class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
+                   {# TODO: data-href="{{ url_for('.download_attachments', event) }}" #}>
+                    {%- trans %}Download attachments{%- endtrans %}
+                </a>
+            </div>
+            <div class="group left">
+                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#"
+                           class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                           {# TODO: data-href="{{ url_for('.abstracts_pdf_export', event) }}" #}>
+                            {%- trans %}PDF{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                           {# data-href="{{ url_for('.abstracts_csv_export', event) }}" #}>CSV</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                           {# TODO: data-href="{{ url_for('.abstracts_excel_export', event) }}" #}>XLSX (Excel)</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           class="icon-file-xml js-requires-selected-row disabled js-submit-list-form"
+                           {# TODO: data-href="{{ url_for('.abstracts_json_export', event) }}" #}>JSON</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group left">
+                <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
+            </div>
+            <div class="group right">
+                <a class="i-button icon-link js-static-url"
+                   {# TODO: data-href="{{ url_for('.generate_static_url', event) }}" #}
+                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
+            </div>
+            <div class="right">
+                <div class="group" id="filter-statistics">
+                    {# TODO: render_filter_statistics(abstracts|length, total_entries) #}
+                </div>
+            </div>
+            <div id="filter-placeholder"></div>
+        </div>
+        <div class="list-content">
+            {{ render_abstract_list(abstracts, visible_items, basic_columns, total_abstracts) }}
+        </div>
+    </div>
+
+    <script>
+        // TODO: setupAbstractList();
+    </script>
+{% endblock %}
