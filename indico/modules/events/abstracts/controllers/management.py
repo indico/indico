@@ -23,7 +23,9 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 class RHManageAbstractsBase(RHConferenceModifBase):
     """Base class for all abstracts management RHs"""
+
     CSRF_ENABLED = True
+    EVENT_FEATURE = 'abstracts'
 
     def _process(self):
         return RH._process(self)
