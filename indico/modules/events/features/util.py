@@ -119,3 +119,9 @@ def require_feature(event, name):
     if not is_feature_enabled(event, name):
         feature = get_feature_definition(name)
         raise NotFound("The '{}' feature is not enabled for this event.".format(feature.friendly_name))
+
+
+def format_feature_names(names):
+    return ', '.join(sorted(unicode(f.friendly_name)
+                            for f in get_feature_definitions().itervalues()
+                            if f.name in names))
