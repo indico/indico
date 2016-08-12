@@ -55,3 +55,10 @@ class RHManageBOA(RHManageAbstractsBase):
             flash(_('Book of Abstract settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
+
+
+class RHAbstractList(RHManageAbstractsBase):
+    """Display the list of abstracts"""
+
+    def _process(self):
+        return WPManageAbstracts.render_template('management/abstract_list.html', self._conf, event=self.event_new)
