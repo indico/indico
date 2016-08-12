@@ -208,7 +208,8 @@ class RHConfPerformDataModif(RHConferenceModifBase):
 
     def _process( self ):
         if not self._cancel:
-            UtilsConference.setValues( self._conf, self._getRequestParams() )
+            params = dict(self._getRequestParams(), keywords=request.form.getlist('keywords'))
+            UtilsConference.setValues(self._conf, params)
         self._redirect( urlHandlers.UHConferenceModification.getURL( self._conf) )
 
 
