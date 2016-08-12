@@ -22,7 +22,7 @@ from wtforms.fields import BooleanField
 
 from indico.modules.events.features import logger
 from indico.modules.events.features.util import (get_feature_definitions, get_enabled_features, set_feature_enabled,
-                                                 get_feature_definition, get_disallowed_features)
+                                                 get_feature_definition, get_disallowed_features, format_feature_names)
 from indico.modules.events.features.views import WPFeatures
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.i18n import _, ngettext
@@ -74,11 +74,6 @@ class RHSwitchFeature(RHFeaturesBase):
         return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option,
                                event=self.event_new)
 
-    def _format_feature_names(self, names):
-        return ', '.join(sorted(unicode(f.friendly_name)
-                                for f in get_feature_definitions().itervalues()
-                                if f.name in names))
-
     def _process_PUT(self):
         prev = get_enabled_features(self.event_new)
         feature = get_feature_definition(request.view_args['feature'])
@@ -89,7 +84,7 @@ class RHSwitchFeature(RHFeaturesBase):
             current = get_enabled_features(self.event_new)
             changed = current - prev
             flash(ngettext('Feature enabled: {features}', 'Features enabled: {features}', len(changed))
-                  .format(features=self._format_feature_names(changed)), 'success')
+                  .format(features=format_feature_names(changed)), 'success')
             logger.info("Feature '%s' for event %s enabled by %s", feature.name, self.event_new, session.user)
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Features',
                                'Enabled {}'.format(feature.friendly_name), session.user)
@@ -103,7 +98,7 @@ class RHSwitchFeature(RHFeaturesBase):
             current = get_enabled_features(self.event_new)
             changed = prev - current
             flash(ngettext('Feature disabled: {features}', 'Features disabled: {features}', len(changed))
-                  .format(features=self._format_feature_names(changed)), 'warning')
+                  .format(features=format_feature_names(changed)), 'warning')
             logger.info("Feature '%s' for event %s disabled by %s", feature.name, self.event_new, session.user)
             self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Features',
                                'Disabled {}'.format(feature.friendly_name), session.user)
