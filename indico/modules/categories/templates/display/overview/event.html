@@ -25,7 +25,7 @@
                     <span class="protection icon-shield" data-type="restricted"></span>
                 {% endif %}
                 {% if event.has_location_info %}
-                    {{ render_location(event) }}
+                    {{ render_location(event, class='right') }}
                 {% endif %}
                 {% if category.has_icon %}
                     <img src="{{ category.icon_url }}" class="category-icon" title="{{ category.title }}">
