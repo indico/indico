@@ -47,7 +47,7 @@ def _get_feature_definitions(sender, **kwargs):
 class AbstractsFeature(EventFeature):
     name = 'abstracts'
     friendly_name = _('Abstracts')
-    description = _('Gives event managers the opportunity to do a "Call for Abstracts" and use the abstract '
+    description = _('Gives event managers the opportunity to open a "Call for Abstracts" and use the abstract '
                     'reviewing workflow.')
 
     @classmethod
