@@ -1,7 +1,7 @@
 {% macro create_event_button(category, classes="", text="", with_tooltip=true) %}
     <a class="{{ classes }} i-button arrow js-dropdown"
        {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
-       data-toggle="dropdown" data-dropdown-always-listen>
+       data-toggle="dropdown" {% if session.user %}data-dropdown-always-listen{% endif %}>
         {{- text -}}
     </a>
     <ul class="dropdown">
@@ -20,10 +20,12 @@
     {%- set url = url_for('categories.display', category, _anchor='create-event:%s:%d'|format(type, category.id))
                   if category and not category.is_root
                   else url_for_index(_anchor='create-event:%s'|format(type)) -%}
-    <a href="{{ url }}"
-       data-href="{{ url_for('events.create', category, event_type=type) }}"
-       data-title="{{ title }}"
-       data-ajax-dialog
+    <a href="{{ url if session.user else url_for_login(url) }}"
+       {% if session.user %}
+           data-href="{{ url_for('events.create', category, event_type=type) }}"
+           data-title="{{ title }}"
+           data-ajax-dialog
+       {% endif %}
        {{ kwargs | html_params }}>
         {{ text }}
     </a>
