@@ -691,7 +691,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         old_category = self.category
         self.category = category
         db.session.flush()
-        signals.event.moved.send(self, old_category=old_category)
+        signals.event.moved.send(self, old_parent=old_category)
 
     @return_ascii
     def __repr__(self):

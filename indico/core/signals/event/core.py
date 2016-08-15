@@ -59,7 +59,7 @@ triggered.
 
 moved = _signals.signal('moved', """
 Called when an event is moved to a different category. The `sender` is the event,
-the old category is in the `old_category` kwarg.
+the old category is in the `old_parent` kwarg.
 """)
 
 created = _signals.signal('created', """
