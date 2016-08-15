@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, IntegerField
-from wtforms.validators import NumberRange, Optional
+from wtforms.fields import BooleanField, IntegerField, SelectField
+from wtforms.validators import NumberRange, Optional, DataRequired
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -33,3 +34,23 @@ class AbstractContentSettingsForm(IndicoForm):
                                description=_("Whether the user has to fill the content field."))
     max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
     max_words = IntegerField(_('Max words'), [Optional(), NumberRange(min=1)])
+
+
+class BOASettingsForm(IndicoForm):
+    """Settings form for the 'Book of Abstracts'"""
+
+    extra_text = IndicoMarkdownField(_('Additional text'))
+    sort_by = SelectField(_('Sort by'), [DataRequired()], choices=[
+        ('id', _('ID')),
+        ('title', _('Title')),
+        ('session_title', _('Session title')),
+        ('speaker', _('Presenter')),
+        ('schedule', _('Schedule'))
+    ])
+    corresponding_author = SelectField(_('Corresponding author'), [DataRequired()], choices=[
+        ('none', _('Nobody')),
+        ('submitter', _('Submitter')),
+        ('speakers', _('Speakers'))
+    ])
+    show_abstract_ids = BooleanField(_('Show abstract IDs'), widget=SwitchWidget(),
+                                     description=_("Show abstract IDs in the table of contents."))
