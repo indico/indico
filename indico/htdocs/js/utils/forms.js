@@ -224,10 +224,14 @@
             var numUnchecked = container.find(options.checkboxSelector + ':not(:checked)').length;
             var numRows = numChecked + numUnchecked;
 
-            if (numRows === options.totalRows || numChecked < numRows) {
-                // only one page or not everything selected
+            if (numChecked < numRows) {
+                // not everything selected
                 messageContainer.hide();
                 _setAllSelected(false);
+            } else if (numChecked === options.totalRows) {
+                // everything selected and only one page
+                messageContainer.hide();
+                _setAllSelected(true);
             } else if (numChecked === numRows) {
                 // all rows selected
                 if (_getAllSelected()) {
