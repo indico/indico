@@ -36,9 +36,6 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHFeaturesBase(RHConferenceModifBase):
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-
     def _process(self):
         # ConferenceModifBase overrides this with functionality that
         # doesn't even belong in there...
