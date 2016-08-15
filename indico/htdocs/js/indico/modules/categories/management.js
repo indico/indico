@@ -240,7 +240,7 @@
 
             var data = {};
             if (isEverythingSelected()) {
-                data.all_selected = true;
+                data.all_selected = 1;  // do NOT change this to true - the code on the server expects '1'
             } else {
                 data.event_id = _.map($('#event-management input[name=event_id]:checkbox:checked'), function(obj) {
                     return obj.value;
@@ -335,7 +335,7 @@
 
     function _moveEvents(source, endpoint, data) {
         var sourceId = _.isObject(source) ? source.category.id : source;
-        var eventCount = data ? data.event_id.length : 1;
+        var eventCount = data ? (data.all_selected ? $('#event-management').data('total') : data.event_id.length) : 1;
 
         $('<div>').categorynavigator({
             category: source,
