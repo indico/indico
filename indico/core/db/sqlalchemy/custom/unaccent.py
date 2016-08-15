@@ -16,20 +16,18 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app
 from sqlalchemy import DDL, text, Index
 from sqlalchemy.event import listens_for
 from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import conv
 
-from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.util.string import to_unicode
 
 
 # if you wonder why search_path is set and the two-argument `unaccent` function is used,
 # see this post on stackoverflow: http://stackoverflow.com/a/11007216/298479
 SQL_FUNCTION_UNACCENT = '''
-    CREATE FUNCTION indico_unaccent(value TEXT)
+    CREATE FUNCTION indico.indico_unaccent(value TEXT)
         RETURNS TEXT
     AS $$
     BEGIN
@@ -37,17 +35,6 @@ SQL_FUNCTION_UNACCENT = '''
     END;
     $$
     LANGUAGE plpgsql IMMUTABLE SET search_path = public, pg_temp;
-'''
-
-SQL_FUNCTION_NOOP = '''
-    CREATE FUNCTION indico_unaccent(value TEXT)
-        RETURNS TEXT
-    AS $$
-    BEGIN
-        RETURN value;
-    END;
-    $$
-    LANGUAGE plpgsql IMMUTABLE;
 '''
 
 
@@ -63,12 +50,7 @@ def create_unaccent_function(conn):
     In TESTING mode it always uses the no-op version to have a
     consistent database setup.
     """
-    if not current_app.config['TESTING'] and has_extension(conn, 'unaccent'):
-        DDL(SQL_FUNCTION_UNACCENT).execute_if(callable_=_should_create_function).execute(conn)
-    else:
-        if not current_app.config['TESTING']:
-            print 'Warning: unaccent extension is not available'
-        DDL(SQL_FUNCTION_NOOP).execute_if(callable_=_should_create_function).execute(conn)
+    DDL(SQL_FUNCTION_UNACCENT).execute_if(callable_=_should_create_function).execute(conn)
 
 
 def define_unaccented_lowercase_index(column):
@@ -78,11 +60,10 @@ def define_unaccented_lowercase_index(column):
     also converted to lowercase before being unaccented. To make proper
     use of this index, use this criterion when querying the table::
 
-        db.func.indico_unaccent(db.func.lower(column)).ilike(...)
+        db.func.indico.indico_unaccent(db.func.lower(column)).ilike(...)
 
-    If the ``pg_trgm`` extension is available, the index will use the
-    trgm operators which allow very efficient LIKE even when searching
-    e.g. ``LIKE '%something%'``.
+    The index will use the trgm operators which allow very efficient LIKE
+    even when searching e.g. ``LIKE '%something%'``.
 
     :param column: The column the index should be created on, e.g.
                    ``User.first_name``
@@ -90,13 +71,9 @@ def define_unaccented_lowercase_index(column):
     @listens_for(column.table, 'after_create')
     def _after_create(target, conn, **kw):
         assert target is column.table
-        col_func = func.indico_unaccent(func.lower(column))
-        index_kwargs = {}
-        if not current_app.config['TESTING'] and has_extension(conn, 'pg_trgm'):
-            index_kwargs = {'postgresql_using': 'gin',
-                            'postgresql_ops': {col_func.key: 'gin_trgm_ops'}}
-        elif not current_app.config['TESTING']:
-            print 'Warning: pg_trgm extension is not available'
+        col_func = func.indico.indico_unaccent(func.lower(column))
+        index_kwargs = {'postgresql_using': 'gin',
+                        'postgresql_ops': {col_func.key: 'gin_trgm_ops'}}
         Index(conv('ix_{}_{}_unaccent'.format(column.table.name, column.name)), col_func, **index_kwargs).create(conn)
 
 
@@ -107,4 +84,4 @@ def unaccent_match(column, value, exact):
         value = '%{}%'.format(value)
     # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
     # actually faster than `=`
-    return db.func.indico_unaccent(db.func.lower(column)).ilike(db.func.indico_unaccent(value))
+    return db.func.indico.indico_unaccent(db.func.lower(column)).ilike(db.func.indico.indico_unaccent(value))

@@ -28,8 +28,20 @@ from flask_script import Command
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.management import get_all_tables
+from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
 from indico.util.console import colored, cformat
+
+
+def _require_extensions(*names):
+    missing = sorted(name for name in names if not has_extension(db.engine, name))
+    if not missing:
+        return True
+    print colored('Required Postgres extensions missing: {}'.format(', '.join(missing)), 'red')
+    print colored('Create them using these SQL commands (as a Postgres superuser):', 'yellow')
+    for name in missing:
+        print colored('  CREATE EXTENSION {};'.format(name), 'white', attrs={'bold': True})
+    return False
 
 
 @DatabaseManager.command
@@ -61,6 +73,8 @@ def prepare():
         for schema, schema_tables in sorted(tables.items()):
             for t in schema_tables:
                 print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
+        return
+    if not _require_extensions('unaccent', 'pg_trgm'):
         return
     print colored('Creating tables', 'green')
     db.create_all()

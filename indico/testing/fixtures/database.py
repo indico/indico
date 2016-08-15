@@ -64,6 +64,8 @@ def postgresql():
         silent_check_call(['initdb', '--encoding', 'UTF8', temp_dir])
         silent_check_call(['pg_ctl', '-D', temp_dir, '-w', '-o', postgres_args, 'start'])
         silent_check_call(['createdb', '-h', temp_dir, db_name])
+        silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION unaccent;'])
+        silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION pg_trgm;'])
     except Exception as e:
         shutil.rmtree(temp_dir)
         pytest.skip('Could not init/start PostgreSQL: {}'.format(e))
