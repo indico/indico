@@ -16,7 +16,14 @@
 
 from __future__ import unicode_literals
 
+from flask import flash
+
+from indico.modules.events.abstracts.forms import BOASettingsForm
+from indico.modules.events.abstracts.settings import boa_settings
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.util.i18n import _
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -36,3 +43,15 @@ class RHAbstracts(RHManageAbstractsBase):
 
     def _process(self):
         return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new)
+
+
+class RHManageBOA(RHManageAbstractsBase):
+    """Configure book of abstracts"""
+
+    def _process(self):
+        form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event_new)))
+        if form.validate_on_submit():
+            boa_settings.set_multi(self.event_new, form.data)
+            flash(_('Book of Abstract settings have been saved'), 'success')
+            return jsonify_data()
+        return jsonify_form(form)

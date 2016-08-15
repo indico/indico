@@ -27,3 +27,11 @@ abstracts_settings = EventSettingsProxy('abstracts', {
         'max_words': None
     }
 })
+
+
+boa_settings = EventSettingsProxy('abstracts_book', {
+    'extra_text': '',
+    'sort_by': 'id',
+    'corresponding_author': 'submitter',
+    'show_abstract_ids': False
+})
