@@ -104,9 +104,6 @@ def i18n_locale(locale_name):
                                    'lang': locale_name}}}
             i18n_data.update(data)
 
-        if not i18n_data:
-            raise NotFound("Translation for language '{}' not found".format(locale_name))
-
         with open(cache_file, 'wb') as f:
             f.write("window.TRANSLATIONS = {};".format(json.dumps(i18n_data)))
 
