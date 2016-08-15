@@ -107,11 +107,8 @@ class MaKaCInfo(Persistent):
 
     def getDefaultConference(self):
         from MaKaC.conference import DefaultConference
-        try:
-            self._defaultConference
-        except AttributeError:
+        if self._defaultConference is None:
             self._defaultConference = DefaultConference()
-
         return self._defaultConference
 
     def getDefaultTemplateSet( self ):

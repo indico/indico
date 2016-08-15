@@ -26,6 +26,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.sql import select, literal, exists, func
 
 from indico.core import signals
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -45,6 +46,14 @@ def _get_next_position(context):
     parent_id = context.current_parameters['parent_id']
     res = db.session.query(db.func.max(Category.position)).filter_by(parent_id=parent_id).one()
     return (res[0] or 0) + 1
+
+
+def _get_default_event_themes():
+    from indico.modules.events.layout import theme_settings
+    return {
+        'meeting': theme_settings.defaults['meeting'],
+        'lecture': theme_settings.defaults['lecture']
+    }
 
 
 class EventMessageMode(TitledIntEnum):
@@ -127,12 +136,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     timezone = db.Column(
         db.String,
         nullable=False,
-        default=''
+        default=lambda: Config.getInstance().getDefaultTimezone()
     )
     default_event_themes = db.Column(
         JSON,
         nullable=False,
-        default={}
+        default=_get_default_event_themes
     )
     event_creation_restricted = db.Column(
         db.Boolean,

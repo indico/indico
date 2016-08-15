@@ -36,9 +36,15 @@ class RHCategoryBase(RH):
             query = query.options(*self._category_query_options)
         return query
 
+    def _get_category(self, category_id):
+        category = self._category_query.filter_by(id=category_id, is_deleted=False).one_or_none()
+        if category is None and category_id == 0:
+            category = Category.get_root()
+        return category
+
     def _checkParams(self):
         category_id = request.view_args['category_id']
-        self.category = self._category_query.filter_by(id=category_id, is_deleted=False).one_or_none()
+        self.category = self._get_category(category_id)
         if self.category is None:
             raise NotFound(_("This category does not exist or has been deleted."))
 
