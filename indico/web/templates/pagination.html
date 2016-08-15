@@ -30,3 +30,17 @@
         </div>
     {% endif %}
 {% endmacro %}
+
+{% macro render_pagination_entries_fragment(pagination) -%}
+    {% if pagination.pages > 1 %}
+        <span class="i-button label icon-list"
+              title="{% trans num=pagination.items|count, total=pagination.total -%}{{ num }} out of {{ total }} displayed{%- endtrans %}">
+            <strong>{{ pagination.items|count }}</strong> / {{ pagination.total }}
+        </span>
+    {% else %}
+        <span class="i-button label icon-list"
+              title="{% trans count=pagination.total %}{{ count }} displayed{% endtrans %}">
+            <strong>{{ pagination.total }}</strong>
+        </span>
+    {% endif %}
+{%- endmacro %}

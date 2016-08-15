@@ -51,10 +51,18 @@
             <button class="i-button icon-sort-alpha-asc js-sort-categories"
                     title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
         </div>
-        <div class="group right">
-            <button class="i-button icon-transmission js-bulk-move-category"
-                    data-href="{{ url_for('categories.move_subcategories', category) }}"></button>
-            <button class="i-button icon-remove js-bulk-delete-category"></button>
+        <div class="right">
+            <div class="group">
+                <span class="i-button label icon-list"
+                      title="{% trans count=subcategories|count %}{{ count }} displayed{% endtrans %}">
+                    <strong>{{ subcategories|count }}</strong>
+                </span>
+            </div>
+            <div class="group">
+                <button class="i-button icon-transmission js-bulk-move-category"
+                        data-href="{{ url_for('categories.move_subcategories', category) }}"></button>
+                <button class="i-button icon-remove js-bulk-delete-category"></button>
+            </div>
         </div>
     </div>
     <table class="i-table category-management"
