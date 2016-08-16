@@ -20,7 +20,7 @@
 	ignore = dirty
 [submodule "ext_modules/pagedown"]
 	path = ext_modules/pagedown
-	url = git://github.com/ujifgc/pagedown.git
+	url = git://github.com/balpha/pagedown.git
 	ignore = dirty
 [submodule "ext_modules/jquery-ui-multiselect"]
 	path = ext_modules/jquery-ui-multiselect
