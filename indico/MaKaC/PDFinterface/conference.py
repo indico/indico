@@ -996,15 +996,10 @@ class TimeTablePlain(PDFWithTOC):
                         if self._useColors():
                             ts.add('BACKGROUND', (0, 1), (0, -1), self._getSessionColor(sess_block))
                         t = Table(l, colWidths=widths, style=ts)
-
                 if l:
                     res.append(t)
-                    if self._ttPDFFormat.showNewPagePerSession():
-                        res.append(PageBreak())
-                elif entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
-                    res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
-                    if self._ttPDFFormat.showNewPagePerSession():
-                        res.append(PageBreak())
+                if self._ttPDFFormat.showNewPagePerSession():
+                    res.append(PageBreak())
             # contribution
             elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
                 contrib = entry.object
