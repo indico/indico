@@ -23,7 +23,7 @@
                 {%- endfor %}
                 <span class="page-number">
                     <a href="{{ caller('all')|trim }}" class="i-button">
-                        {% trans %}Show all{% endtrans %}
+                        {% trans count=pagination.total %}Show all ({{ count }}){% endtrans %}
                     </a>
                 </span>
             {% endif %}
