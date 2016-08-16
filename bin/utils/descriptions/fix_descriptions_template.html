@@ -16,16 +16,11 @@
 
     function _processDescription(description, key, id) {
         // Try to reach a fixed point
-        var previous;
-        var i = 0;
+        var previous,
+            i = 0;
         while (description != previous && i < 10) {
             if (i > 1) {
-                console.log('>> This description has a small chance of being broken (but is still included in the generated SQL)', key, id);
-                console.log('>> iteration', i, description == previous);
-                console.log('>> previous');
-                console.log(previous);
-                console.log('>> description');
-                console.log(description);
+                console.log('[?] Check after conversion:', key, id)
             }
             previous = description;
             i++;
@@ -37,22 +32,22 @@
     }
 
     function processDescriptions(key, descriptions) {
-        var i = 0;
-        var modified = 0;
+        var i = 0,
+            modified = 0;
         $.each(descriptions, function(id, description) {
             new_description = _processDescription(description, key, id);
             descriptions[id] = new_description;
             if (new_description != description) {
                 modified++;
                 if (new_description == '') {
-                    console.log('This description needs to be manualy edited: ', key, id, '"', description, '"');
+                    console.log('[!] Needs manual intervention:', key, id);
                 } else {
                     window.callPhantom('sql', 'UPDATE ' + key + ' SET description=' + escapeLiteral(new_description) + ' WHERE id = ' + id + ';');
                 }
             }
             i++;
         });
-        console.log(key + ': ' + i + ' descriptions processed (' + modified + ' modified)');
+        console.log('--- ' + key + ': ' + i + ' descriptions processed (' + modified + ' modified)');
     }
 
     function process() {
@@ -66,8 +61,8 @@
     // The following function was take from node-postgres: https://github.com/brianc/node-postgres
     // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
     function escapeLiteral(str) {
-        var hasBackslash = false;
-        var escaped = '\'';
+        var hasBackslash = false,
+            escaped = '\'';
 
         for(var i = 0; i < str.length; i++) {
             var c = str[i];

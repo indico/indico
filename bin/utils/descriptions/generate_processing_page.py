@@ -17,15 +17,10 @@ from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.models.events import Event
 
 
 def main():
     html_tag_regex = '<[a-zA-Z]+.*>'
-    events = (Event.query
-              .filter(Event.description.op('~')(html_tag_regex))
-              .options(load_only('id', 'description'))
-              .all())
     contributions = (Contribution.query
                      .filter(Contribution.description.op('~')(html_tag_regex))
                      .options(load_only('id', 'description'))
@@ -46,7 +41,6 @@ def main():
         return model.__table__.fullname
 
     object_descriptions = {
-        format_table(Event): as_dict(events),
         format_table(Contribution): as_dict(contributions),
         format_table(SubContribution): as_dict(subcontributions),
         format_table(Category): as_dict(categories)
