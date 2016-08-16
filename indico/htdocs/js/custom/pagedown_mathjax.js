@@ -181,8 +181,8 @@
         // When the preview changes, cancel MathJax and restart,
         // if we haven't done that already.
         //
-        function updateMJ(cb) {
-            if (!pending && ready) {
+        function updateMJ(elem, cb) {
+            if (!pending && ready && $(elem).data('no-mathjax') === undefined) {
                 pending = true;
                 HUB.cancelTypeset = false;
                 HUB.Queue(restartMJ, cb);
@@ -190,16 +190,18 @@
         }
 
         function typeset(elem) {
-            HUB.Queue(["Typeset", HUB, elem]);
+            if ($(elem).data('no-mathjax') === undefined) {
+                HUB.Queue(["Typeset", HUB, elem]);
+            }
         }
 
-        function createPreview(editorObject) {
+        function createPreview(elem, editorObject) {
             var converterObject = editorObject.getConverter();
             converterObject.hooks.chain("preConversion", removeMath);
             converterObject.hooks.chain("postConversion", replaceMath);
 
             var preview = function() {
-                updateMJ(function() {
+                updateMJ(elem, function() {
                     var new_height =  $preview.outerHeight(),
                         $wrapper = $preview.closest('.md-preview-wrapper'),
                         is_empty = $preview.is(':empty');
@@ -244,7 +246,7 @@
                 }
             });
 
-            createPreview(editor);
+            createPreview(elem, editor);
             editor.run();
         }
 
@@ -257,12 +259,8 @@
         }
 
         return {
-            createPreview: createPreview,
             mathJax: mathJax,
-            restartMJ: restartMJ,
-            updateMJ: updateMJ,
-            createEditor: createEditor,
-            addListener: addListener
+            createEditor: createEditor
         };
     });
 
