@@ -362,6 +362,13 @@ abstracts_js = rjs_bundle(
                'Markdown.Editor.js',
                'Markdown.Sanitizer.js'))
 
+markdown_js = rjs_bundle(
+    'markdown',
+    *namespace('js/lib/pagedown',
+               'Markdown.Converter.js',
+               'Markdown.Editor.js',
+               'Markdown.Sanitizer.js'))
+
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
@@ -435,6 +442,7 @@ auth_sass = sass_module_bundle('auth')
 surveys_sass = sass_module_bundle('surveys')
 timetable_sass = sass_module_bundle('timetable')
 sessions_sass = sass_module_bundle('sessions')
+markdown_sass = sass_module_bundle('markdown')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -462,6 +470,7 @@ def register_all_js(env):
     env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
+    env.register('markdown_js', markdown_js)
     env.register('jqplot_js', jqplot_js)
     env.register('clipboard_js', clipboard_js)
     env.register('dropzone_js', dropzone_js)
@@ -545,6 +554,7 @@ def register_all_css(env, main_css_file):
     env.register('surveys_sass', surveys_sass)
     env.register('timetable_sass', timetable_sass)
     env.register('sessions_sass', sessions_sass)
+    env.register('markdown_sass', markdown_sass)
     register_theme_sass(env)
 
 
