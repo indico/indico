@@ -10,6 +10,7 @@
                           rows="{{ rows }}"
                           class="wmd-input"
                           style="width: 100%;"
+                          {% if not field.use_mathjax %}data-no-mathjax{% endif %}
                           {{ input_args|html_params }}>
                     {{- field._value() -}}
                 </textarea>
@@ -17,10 +18,16 @@
             <div class="md-preview-wrapper edit">
                 <div id="wmd-preview-f_{{ field.orig_id }}" class="wmd-preview"></div>
                 <div class="icon-arrow-up instructions">
-                    {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe,
-                             latex='<a href="#" class="latex-info">LaTeX</a>'|safe -%}
-                        You can use {{ markdown }} and {{ latex }} formulae.
-                    {%- endtrans %}
+                    {% if field.use_mathjax %}
+                        {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe,
+                                 latex='<a href="#" class="latex-info">LaTeX</a>'|safe -%}
+                            You can use {{ markdown }} and {{ latex }} formulae.
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe -%}
+                            You can use {{ markdown }}.
+                        {%- endtrans %}
+                    {% endif %}
                 </div>
             </div>
 
@@ -54,10 +61,16 @@
 
             <script type="text/html" class="wmd-help-button-text">
                 <p>
-                    {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe,
-                             latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
-                        You can use {{ markdown }} and {{ latex }}.
-                    {%- endtrans %}
+                    {% if field.use_mathjax %}
+                        {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe,
+                                 latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
+                            You can use {{ markdown }} and {{ latex }}.
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe -%}
+                            You can use {{ markdown }}.
+                        {%- endtrans %}
+                    {% endif %}
                 </p>
                 <p>{% trans %}Here are some nice examples:{% endtrans %}</p>
                 <ul>
