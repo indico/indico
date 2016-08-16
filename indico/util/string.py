@@ -32,7 +32,7 @@ import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from enum import Enum
 from lxml import html, etree
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from speaklater import _LazyString
 
 
@@ -574,3 +574,10 @@ class MarkdownText(Markup):
 
     def __html__(self):
         return render_markdown(unicode(self), extensions=('nl2br', 'tables'))
+
+
+class PlainText(Markup):
+    """unicode/Markup class that renders plain text."""
+
+    def __html__(self):
+        return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))

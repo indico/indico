@@ -23,11 +23,11 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, MarkdownText
+from indico.util.string import format_repr, return_ascii
 
 
 class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
@@ -35,7 +35,8 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'breaks'
     default_colors = ColorTuple('#202020', '#90c0f0')
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     @declared_attr
     def __table_args__(cls):

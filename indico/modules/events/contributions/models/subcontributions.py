@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, MarkdownText
+from indico.util.string import format_repr, return_ascii
 
 
 def _get_next_friendly_id(context):
@@ -48,7 +48,8 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'subcontribution_id'
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.html, RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     id = db.Column(
         db.Integer,

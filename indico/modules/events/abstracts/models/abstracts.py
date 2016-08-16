@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, MarkdownText
+from indico.util.string import format_repr, return_ascii
 
 
 class Abstract(DescriptionMixin, db.Model):
@@ -33,7 +33,8 @@ class Abstract(DescriptionMixin, db.Model):
     __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
                          {'schema': 'event_abstracts'})
 
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     @declared_attr
     def __table_args__(cls):
