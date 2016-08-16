@@ -17,6 +17,8 @@ from indico.web.flask.app import make_app
 
 from StringIO import StringIO
 
+EMPTY_OR_TRALING_WS_ONLY_REGEX = re.compile(r'()(\s*(?!.))', re.MULTILINE | re.DOTALL)
+TRAILING_WS_REGEX = re.compile(r'(.*?)((?<=[^\s])\s*(?!.))', re.MULTILINE | re.DOTALL)
 HTML_TPL = b"""
 <!doctype html>
 <html lang="en">
@@ -41,6 +43,7 @@ ROW_TPL = b"""<tr style="background-color: #ddd;">
     <td style="max-width: 45%;">{}</td>
 </tr>
 """
+
 
 def _deleted(text):
     red_mark = click.style('- ', fg='red')
@@ -109,8 +112,8 @@ def _split_leading_whitespace(text, _leading_whitespace_regex=re.compile(r'(\s*)
     return _leading_whitespace_regex.match(text).groups(0)
 
 
-def _split_trailing_whitespace(text, _empty_or_trailing_ws_only=re.compile(r'()(\s*(?!.))', re.MULTILINE | re.DOTALL),
-                               _trailing_ws_regex=re.compile(r'(.*?)((?<=[^\s])\s*(?!.))', re.MULTILINE | re.DOTALL)):
+def _split_trailing_whitespace(text, _empty_or_trailing_ws_only_regex=EMPTY_OR_TRALING_WS_ONLY_REGEX,
+                               _trailing_ws_regex=TRAILING_WS_REGEX):
     match = _empty_or_trailing_ws_only_regex.match(text)
     if match:
         return match.groups(0)
@@ -120,7 +123,7 @@ def _split_trailing_whitespace(text, _empty_or_trailing_ws_only=re.compile(r'()(
 
 def _contains_problematic_space_near_delimiter(
         text,
-        _space_after_starting_delimiter=re.compile(r'.*^[\*_]\s', re.MULTILINE | re.DOTALL)
+        _space_after_starting_delimiter=re.compile(r'.*^[\*_]\s', re.MULTILINE | re.DOTALL),
         _space_around_delimiter_regex=re.compile(r'.*\s[\*_]\s', re.MULTILINE | re.DOTALL)):
     return (_space_around_delimiter_regex.match(text) is not None or
             _space_after_starting_delimiter.match(text) is not None)
@@ -211,7 +214,8 @@ def migrate_description(obj, verbose, html_log):
 
     if convert_to_markdown and re.search(r'</\w+>', result):
         click.echo(click.style('[FAIL] ', fg='yellow', bold=True) + click.style(repr(obj), fg='cyan'))
-        click.echo(click.style(obj.description, fg='yellow', dim=True))
+        click.echo(click.style(obj.description, fg='red', dim=True))
+        click.echo(click.style(result, fg='green', dim=True))
         choice = click.prompt("What do you want to do? [s = skip / c = change anyway / q = quit]")
 
         if choice == 's':
@@ -255,15 +259,7 @@ def main(event, category, dry_run, html_log, verbose):
         if category:
             categories = categories.filter(db.m.Category.id == category)
         for category in categories:
-            migrate_description(category, verbose, log)
-
-    events = db.m.Event.find(db.m.Event.description.op('~')(html_tag_regex))
-    if event:
-        events = events.filter(db.m.Event.id == event)
-    if category:
-        events = events.filter(db.m.Event.category_chain_overlaps(category))
-    for event in events:
-        migrate_description(event, verbose, log)
+            migrate_description(category, verbose, log, use_pandoc=use_pandoc)
 
     if log:
         log.write('</table>')
