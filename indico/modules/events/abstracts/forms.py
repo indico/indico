@@ -39,7 +39,7 @@ class AbstractContentSettingsForm(IndicoForm):
 class BOASettingsForm(IndicoForm):
     """Settings form for the 'Book of Abstracts'"""
 
-    extra_text = IndicoMarkdownField(_('Additional text'))
+    extra_text = IndicoMarkdownField(_('Additional text'), wmd=True)
     sort_by = SelectField(_('Sort by'), [DataRequired()], choices=[
         ('id', _('ID')),
         ('title', _('Title')),
