@@ -565,7 +565,8 @@ class TimetablePDFFormat:
 
 class TimeTablePlain(PDFWithTOC):
     def __init__(self, event, aw, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
-                 pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False, tz=None):
+                 pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False,
+                 showSessionDescription=False, tz=None):
         self._conf = event.as_legacy
         self._event = event
         self._aw = aw
@@ -583,6 +584,7 @@ class TimeTablePlain(PDFWithTOC):
         self._sortingCrit = sortingCrit
         self._firstPageNumber = firstPageNumber
         self._showSpeakerAffiliation = showSpeakerAffiliation
+        self._showSessionDescription = showSessionDescription
 
     def _processTOCPage(self):
         if self._ttPDFFormat.showTableContents():
@@ -920,7 +922,7 @@ class TimeTablePlain(PDFWithTOC):
                     self._indexedFlowable[p1] = {'text': escape(sess_block.session.title.encode('utf-8')), 'level': 2}
 
                 # add session description
-                if sess_block.session.description:
+                if self._showSessionDescription and sess_block.session.description:
                     text = u'<i>{}</i>'.format(escape(unicode(sess_block.session.description)))
                     res.append(Paragraph(text, self._styles["session_description"]))
 
