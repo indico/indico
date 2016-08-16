@@ -1,4 +1,5 @@
 import re
+import subprocess
 import sys
 from itertools import chain, ifilter
 
@@ -129,16 +130,53 @@ def _contains_problematic_space_near_delimiter(
             _space_after_starting_delimiter.match(text) is not None)
 
 
-def migrate_description(obj, verbose, html_log):
+def convert_using_html2text(text):
     h = HTML2Text()
     h.unicode_snob = True
-    input_html = re.sub(r'^\r?\n$', '<br>', unicode(obj.description))
+    return h.handle(text)
 
+
+def convert_using_pandoc(text):
+    sp = subprocess.Popen(['pandoc', '--from', 'html', '--to', 'markdown_strict-raw_html'],
+                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    result, __ = sp.communicate(text.encode('utf-8'))
+    return result.decode('utf-8')
+
+
+def purify_html(input_html, obj):
     parser = html5lib.HTMLParser(tree=html5lib.getTreeBuilder("dom"))
     document = parser.parse(input_html)
 
     convert_to_markdown = True
     dom_modified = False
+
+    # Group consecutive orphaned <li>s inside a <ul>
+    for li in document.getElementsByTagName('li'):
+        node = li
+        has_proper_parent = False
+        while node.tagName != 'body' and node.parentNode:
+            node = node.parentNode
+            if node.tagName in {'ul', 'ol'}:
+                has_proper_parent = True
+
+        if not has_proper_parent:
+            sibling_items = []
+            sibling = li
+            while sibling and sibling.nodeType == minidom.Node.ELEMENT_NODE and sibling.tagName == 'li':
+                sibling_items.append(sibling)
+                sibling = sibling.nextSibling
+                # jump over empty nodes
+                while sibling and sibling.nodeType == minidom.Node.TEXT_NODE and sibling.data.isspace():
+                    sibling = sibling.nextSibling
+
+            container = document.createElement('ul')
+            li.parentNode.replaceChild(container, li)
+            print "!! Adding missing ul", obj
+            container.appendChild(li)
+            for child in sibling_items:
+                if child != li:
+                    container.appendChild(child)
+            dom_modified = True
 
     # Handle missing <li>
     for ul in document.getElementsByTagName('ul'):
@@ -203,8 +241,19 @@ def migrate_description(obj, verbose, html_log):
     else:
         result = input_html
 
+    return result, convert_to_markdown
+
+
+def migrate_description(obj, verbose, html_log, use_pandoc=False):
+    input_html = re.sub(r'^\r?\n$', '<br>', unicode(obj.description))
+
+    result, convert_to_markdown = purify_html(input_html, obj)
+
     if convert_to_markdown:
-        result = h.handle(result)
+        if use_pandoc:
+            result = convert_using_pandoc(result)
+        else:
+            result = convert_using_html2text(result)
 
     if verbose:
         click.echo(click.style('\n' + ' ' * 80, bg='cyan', fg='black'))
@@ -236,7 +285,8 @@ def migrate_description(obj, verbose, html_log):
 @click.option('-c', '--category', help='Process only contributions in the given category', type=int)
 @click.option('-l', '--html-log', help='HTML log file with original and converted data', type=click.File('w'))
 @click.option('-v', '--verbose', help='Be extra verbose', is_flag=True)
-def main(event, category, dry_run, html_log, verbose):
+@click.option('-p', '--use-pandoc', help="Use pandoc instead of html2text", is_flag=True)
+def main(event, category, dry_run, html_log, verbose, use_pandoc):
     html_tag_regex = '<[a-zA-Z]+.*>'
     contribs = db.m.Contribution.find(db.m.Contribution.description.op('~')(html_tag_regex))
     log = StringIO() if html_log else None
@@ -252,7 +302,7 @@ def main(event, category, dry_run, html_log, verbose):
         if '<html>' in unicode(contrib.description):
             click.echo(click.style('[HTML DOCUMENT] ', fg='red', bold=True) + repr(contrib))
         else:
-            migrate_description(contrib, verbose, log)
+            migrate_description(contrib, verbose, log, use_pandoc=use_pandoc)
 
     if not event:
         categories = db.m.Category.find(db.m.Category.description.op('~')(html_tag_regex))
