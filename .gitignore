@@ -13,6 +13,7 @@ __pycache__/
 
 # python packaging
 /dist
+setuptools-*.zip
 *.egg-info
 *.egg
 
