@@ -177,7 +177,7 @@
             </div>
         </div>
         <div class="list-content">
-            {{ render_registration_list(registrations, visible_cols_regform_items, basic_columns, total_registrations) }}
+            {{ render_registration_list(registrations, dynamic_columns, static_columns, total_registrations) }}
         </div>
         <div class="toolbar right">
             <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">

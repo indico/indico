@@ -147,7 +147,7 @@ class RHContributions(RHManageContributionsBase):
     def _process(self):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
-        contrib_list_args = self.list_generator.get_contrib_list_kwargs()
+        contrib_list_args = self.list_generator.get_list_kwargs()
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
@@ -161,11 +161,11 @@ class RHContributionListCustomize(RHManageContributionsBase):
         return WPManageContributions.render_template('contrib_list_filter.html', self._conf,
                                                      event=self.event_new,
                                                      filters=self.list_generator.list_config['filters'],
-                                                     special_items_info=self.list_generator.special_items_info)
+                                                     static_items=self.list_generator.static_items)
 
     def _process_POST(self):
         self.list_generator.store_configuration()
-        return jsonify_data(**self.list_generator.render_contrib_list())
+        return jsonify_data(**self.list_generator.render_list())
 
 
 class RHContributionListStaticURL(RHManageContributionsBase):
@@ -184,7 +184,7 @@ class RHCreateContribution(RHManageContributionsBase):
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, *_get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
-            tpl_components = self.list_generator.render_contrib_list(contrib)
+            tpl_components = self.list_generator.render_list(contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
@@ -204,7 +204,7 @@ class RHEditContribution(RHManageContributionBase):
             with track_time_changes():
                 update_contribution(self.contrib, *_get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
-            tpl_components = self.list_generator.render_contrib_list(self.contrib)
+            tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
@@ -222,7 +222,7 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         flash(ngettext("The contribution has been deleted.",
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
-        return jsonify_data(**self.list_generator.render_contrib_list())
+        return jsonify_data(**self.list_generator.render_list())
 
 
 class RHContributionACL(RHManageContributionBase):
@@ -245,7 +245,7 @@ class RHContributionREST(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
-        return jsonify_data(**self.list_generator.render_contrib_list())
+        return jsonify_data(**self.list_generator.render_list())
 
     def _process_PATCH(self):
         data = request.json
@@ -307,7 +307,7 @@ class RHContributionProtection(RHManageContributionBase):
             if self.contrib.is_protected:
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
             update_object_principals(self.contrib, form.submitters.data, role='submit')
-            return jsonify_data(flash=False, **self.list_generator.render_contrib_list(self.contrib))
+            return jsonify_data(flash=False, **self.list_generator.render_list(self.contrib))
         return jsonify_form(form)
 
     def _get_defaults(self):

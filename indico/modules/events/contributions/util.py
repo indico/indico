@@ -119,7 +119,7 @@ class ContributionListGenerator(ListGeneratorBase):
         session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
-        self.special_items_info = OrderedDict([
+        self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
             ('track', {'title': _('Track'),
@@ -173,7 +173,7 @@ class ContributionListGenerator(ListGeneratorBase):
             criteria.append(db.or_(*column_criteria))
         return query.filter(*criteria)
 
-    def get_contrib_list_kwargs(self):
+    def get_list_kwargs(self):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
         contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
@@ -185,7 +185,7 @@ class ContributionListGenerator(ListGeneratorBase):
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration}
 
-    def render_contrib_list(self, contrib=None):
+    def render_list(self, contrib=None):
         """Render the contribution list template components.
 
         :param contrib: Used in RHs responsible for CRUD operations on a
@@ -194,7 +194,7 @@ class ContributionListGenerator(ListGeneratorBase):
                  displayed entries and whether the contrib passed is displayed
                  in the results.
         """
-        contrib_list_kwargs = self.get_contrib_list_kwargs()
+        contrib_list_kwargs = self.get_list_kwargs()
         total_entries = contrib_list_kwargs.pop('total_entries')
         tpl_contrib = get_template_module('events/contributions/management/_contribution_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
@@ -310,7 +310,7 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
                  displayed entries and whether the contrib passed is displayed
                  in the results.
         """
-        contrib_list_kwargs = self.get_contrib_list_kwargs()
+        contrib_list_kwargs = self.get_list_kwargs()
         total_entries = contrib_list_kwargs.pop('total_entries')
         contribs = contrib_list_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')

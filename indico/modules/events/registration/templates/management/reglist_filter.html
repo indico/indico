@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item, filter_choices, special_item=false) %}
-    {% set filters = filters['items'] if special_item else filters['fields'] %}
+{% macro _render_column_selector(item, filter_choices, is_static_item=false) %}
+    {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="i-label list-column"
          data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
         {% if filter_choices %}
@@ -76,12 +76,12 @@
 </div>
 <form class="list-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_items"
-           value="{{ visible_cols_regform_items | tojson | forceescape }}">
+           value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
 
-    {% for item in special_items.itervalues() %}
+    {% for item in static_items.itervalues() %}
         {% set filter_choices = item.get('filter_choices') %}
-        {{ _render_column_selector(item, filter_choices, special_item=true) }}
+        {{ _render_column_selector(item, filter_choices, is_static_item=true) }}
     {% endfor %}
 
     {% for section in regform.sections if not section.is_deleted %}

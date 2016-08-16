@@ -243,11 +243,14 @@ class ListGeneratorBase(object):
     default_list_config = None
 
     def __init__(self, event, entry_parent=None):
+        #: The event the list is associated with
         self.list_event = event
+        #: The parent object of the list items
         self.entry_parent = entry_parent or event
-        self.basic_items = None
-        self.special_items = None
-        self.special_items_info = None
+        #: Columns that originate from the list item's properties,
+        #: relationships etc, but not from user defined fields (e.g.
+        #: registration/contribution fields)
+        self.static_items = None
         self.static_link_used = 'config' in request.args
 
     def _get_config_session_key(self):
@@ -268,22 +271,27 @@ class ListGeneratorBase(object):
                 session[session_key] = configuration['data']
         return session.get(session_key, self.default_list_config)
 
-    def _split_item_ids(self, item_ids):
-        """Separate the custom item ids from the rest"""
-        other_item_ids = [item_id for item_id in item_ids if isinstance(item_id, basestring)]
-        return [item_id for item_id in item_ids if item_id not in other_item_ids], list(other_item_ids)
+    def _split_item_ids(self, item_ids, separator_type=None):
+        """Separate the dynamic item ids from the static
 
-    def _split_special_ids(self, item_ids):
-        """Separate the special item ids from the rest"""
-        special_item_ids = []
-        other_item_ids = []
-
-        for item_id in item_ids:
-            if item_id in self.special_items:
-                special_item_ids.append(item_id)
-            else:
-                other_item_ids.append(item_id)
-        return other_item_ids, special_item_ids
+        :param item_ids: The list of ids to be splitted.
+        :param separator_type: The type of the item to base the partitioning on.
+                               If the value is 'dynamic', the function will
+                               return a tuple where the first element is a list
+                               of the dynamic item IDs and the second element a
+                               list of the rest item IDs. If the value is
+                               'static', the first element of the returned
+                               tuple will be a list of the static item IDs.
+        :return: A tuple of 2 lists as a result of the item_ids list
+                 partitioning.
+        """
+        if separator_type == 'dynamic':
+            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, basestring)]
+            return dynamic_item_ids, [item_id for item_id in item_ids if item_id not in dynamic_item_ids]
+        elif separator_type == 'static':
+            static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]
+            return static_item_ids, [item_id for item_id in item_ids if item_id not in static_item_ids]
+        return item_ids,
 
     def _build_query(self):
         """Return the query of the list's entries.
@@ -302,7 +310,7 @@ class ListGeneratorBase(object):
     def _get_filters_from_request(self):
         """Get the new filters after the filter form is submitted."""
         filters = deepcopy(self.default_list_config['filters'])
-        for item_id, item in self.special_items_info.iteritems():
+        for item_id, item in self.static_items.iteritems():
             if item.get('filter_choices'):
                 options = [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
                 if options:

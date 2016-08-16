@@ -1260,11 +1260,11 @@ class SimplifiedTimeTablePlain(PDFBase):
 
 class RegistrantToPDF(PDFBase):
 
-    def __init__(self, conf, reg, display, doc=None, story=None, special_items=None):
+    def __init__(self, conf, reg, display, doc=None, story=None, static_items=None):
         self._reg = reg
         self._conf = conf
         self._display = display
-        self.special_items = special_items
+        self.static_items = static_items
         if not story:
             story = [Spacer(inch, 5*cm)]
         PDFBase.__init__(self, doc, story)
@@ -1336,16 +1336,16 @@ class RegistrantToPDF(PDFBase):
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(caption=item.title, value=value)
 
-        if 'reg_date' in self.special_items:
+        if 'reg_date' in self.static_items:
             _print_row(caption=_('Registration date'), value=format_datetime(registration.submitted_dt))
-        if 'state' in self.special_items:
+        if 'state' in self.static_items:
             _print_row(caption=_('Registration state'), value=registration.state.title)
-        if 'price' in self.special_items:
+        if 'price' in self.static_items:
             _print_row(caption=_('Price'), value=registration.render_price())
-        if 'checked_in' in self.special_items:
+        if 'checked_in' in self.static_items:
             checked_in = 'Yes' if registration.checked_in else 'No'
             _print_row(caption=_('Checked in'), value=checked_in)
-        if 'checked_in_date' in self.special_items:
+        if 'checked_in_date' in self.static_items:
             check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
             _print_row(caption=_('Check-in date'), value=check_in_date)
 
@@ -1353,12 +1353,12 @@ class RegistrantToPDF(PDFBase):
 
 
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
+    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], static_items=None):
         self._conf = conf
         self._regList = reglist
         self._display = display
         self._title = _("Registrants Book")
-        self.special_items = special_items
+        self.static_items = static_items
         PDFWithTOC.__init__(self)
 
     def firstPage(self, c, doc):
@@ -1396,14 +1396,14 @@ class RegistrantsListToBookPDF(PDFWithTOC):
 
     def getBody(self):
         for reg in self._regList:
-            temp = RegistrantToPDF(self._conf, reg, self._display, special_items=self.special_items)
+            temp = RegistrantToPDF(self._conf, reg, self._display, static_items=self.static_items)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
 
 class RegistrantsListToPDF(PDFBase):
 
-    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
+    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], static_items=None):
         self._conf = conf
         self._regList = reglist
         self._display = display
@@ -1411,7 +1411,7 @@ class RegistrantsListToPDF(PDFBase):
         self._title = _("Registrants List")
         self._PAGE_HEIGHT = landscape(A4)[1]
         self._PAGE_WIDTH = landscape(A4)[0]
-        self.special_items = special_items
+        self.static_items = static_items
 
     def firstPage(self, c, doc):
         c.saveState()
@@ -1466,15 +1466,15 @@ class RegistrantsListToPDF(PDFBase):
                 lp.append(Paragraph("<b>{}</b>".format(_('Departure date')), text_format))
             else:
                 lp.append(Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format))
-        if 'reg_date' in self.special_items:
+        if 'reg_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Registration date')), text_format))
-        if 'state' in self.special_items:
+        if 'state' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Registration state')), text_format))
-        if 'price' in self.special_items:
+        if 'price' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Price')), text_format))
-        if 'checked_in' in self.special_items:
+        if 'checked_in' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Checked in')), text_format))
-        if 'checked_in_date' in self.special_items:
+        if 'checked_in_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Check-in date')), text_format))
         l.append(lp)
 
@@ -1507,20 +1507,20 @@ class RegistrantsListToPDF(PDFBase):
                     if isinstance(friendly_data, unicode):
                         friendly_data = friendly_data.encode('utf-8')
                     lp.append(Paragraph(str(friendly_data), text_format))
-            if 'reg_date' in self.special_items:
+            if 'reg_date' in self.static_items:
                 lp.append(Paragraph(format_datetime(registration.submitted_dt), text_format))
-            if 'state' in self.special_items:
+            if 'state' in self.static_items:
                 lp.append(Paragraph(registration.state.title.encode('utf-8'), text_format))
-            if 'price' in self.special_items:
+            if 'price' in self.static_items:
                 lp.append(Paragraph(registration.render_price(), text_format))
-            if 'checked_in' in self.special_items:
+            if 'checked_in' in self.static_items:
                 checked_in = 'Yes' if registration.checked_in else 'No'
                 lp.append(Paragraph(checked_in, text_format))
-            if 'checked_in_date' in self.special_items:
+            if 'checked_in_date' in self.static_items:
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 lp.append(Paragraph(check_in_date, text_format))
             l.append(lp)
-        noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 2)
+        noneList = (None,) * (len(self._display) + len(self.static_items) + (accommodation_col_counter * 2) + 2)
         t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story

@@ -107,7 +107,7 @@ class RHContributionList(RHDisplayProtectionBase):
     def _process(self):
         tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event_new,
-                                               timezone=tz, **self.list_generator.get_contrib_list_kwargs())
+                                               timezone=tz, **self.list_generator.get_list_kwargs())
 
 
 class RHContributionDisplay(RHContributionDisplayBase):
@@ -210,7 +210,7 @@ class RHContributionExportToPDF(RHContributionDisplayBase):
 
 class RHContributionsExportToPDF(RHContributionList):
     def _process(self):
-        contribs = self.list_generator.get_contrib_list_kwargs()['contribs']
+        contribs = self.list_generator.get_list_kwargs()['contribs']
         pdf = ContribsToPDF(self._conf, contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
@@ -233,7 +233,7 @@ class RHContributionListFilter(RHContributionList):
     def _process_GET(self):
         return WPContributions.render_template('contrib_list_filter.html', self._conf, event=self.event_new,
                                                filters=self.list_generator.list_config['filters'],
-                                               special_items_info=self.list_generator.special_items_info)
+                                               static_items=self.list_generator.static_items)
 
     def _process_POST(self):
         self.list_generator.store_configuration()

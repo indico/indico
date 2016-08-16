@@ -99,7 +99,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
     def _process(self):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
-        reg_list_kwargs = self.list_generator.get_reg_list_kwargs()
+        reg_list_kwargs = self.list_generator.get_list_kwargs()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, **reg_list_kwargs)
 
@@ -111,13 +111,13 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         reg_list_config = self.list_generator._get_config()
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
-                                                    visible_cols_regform_items=reg_list_config['items'],
-                                                    filters=reg_list_config['filters'],
-                                                    special_items=self.list_generator.special_items_info)
+                                                    visible_items=reg_list_config['items'],
+                                                    static_items=self.list_generator.static_items,
+                                                    filters=reg_list_config['filters'])
 
     def _process_POST(self):
         self.list_generator.store_configuration()
-        return jsonify_data(**self.list_generator.render_registration_list())
+        return jsonify_data(**self.list_generator.render_list())
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
@@ -304,7 +304,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
             session['registration_notify_user_default'] = form.notify_users.data
             for user in form.user_principals.data:
                 self._register_user(user, form.notify_users.data)
-            return jsonify_data(**self.list_generator.render_registration_list())
+            return jsonify_data(**self.list_generator.render_list())
 
         return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
 
@@ -314,7 +314,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
     def _checkParams(self, params):
         RHRegistrationsActionBase._checkParams(self, params)
-        self.export_config = self.list_generator.get_reg_list_export_config()
+        self.export_config = self.list_generator.get_list_export_config()
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
@@ -322,7 +322,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
-                                   special_items=self.export_config['special_item_ids'])
+                                   static_items=self.export_config['static_item_ids'])
         try:
             data = pdf.getPDFBin()
         except Exception:
@@ -339,7 +339,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     def _process(self):
         pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations,
                                        display=self.export_config['regform_items'],
-                                       special_items=self.export_config['special_item_ids'])
+                                       static_items=self.export_config['static_item_ids'])
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
 
 
@@ -348,7 +348,7 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
-                                                                self.export_config['special_item_ids'])
+                                                                self.export_config['static_item_ids'])
         return send_csv('registrations.csv', headers, rows)
 
 
@@ -357,7 +357,7 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
-                                                                self.export_config['special_item_ids'])
+                                                                self.export_config['static_item_ids'])
         return send_xlsx('registrations.xlsx', headers, rows)
 
 
@@ -445,7 +445,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
-        return jsonify_data(**self.list_generator.render_registration_list())
+        return jsonify_data(**self.list_generator.render_list())
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
@@ -456,7 +456,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')
-        return jsonify_data(**self.list_generator.render_registration_list())
+        return jsonify_data(**self.list_generator.render_list())
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):

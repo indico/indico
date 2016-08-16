@@ -286,12 +286,12 @@ def modify_registration(registration, data, management=False, notify_user=True):
     logger.info('Registration %s modified by %s', registration, session.user)
 
 
-def generate_spreadsheet_from_registrations(registrations, regform_items, special_items):
+def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
     """Generates a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
     :param regform_items: The registration form items to be used as columns
-    :param special_items: Registration form information as extra columns
+    :param static_items: Registration form information as extra columns
     """
     field_names = ['ID', 'Name']
     special_item_mapping = OrderedDict([
@@ -307,7 +307,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
         if item.input_type == 'accommodation':
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
-    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in special_items)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in static_items)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -328,7 +328,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
         for name, (title, fn) in special_item_mapping.iteritems():
-            if name not in special_items:
+            if name not in static_items:
                 continue
             value = fn(registration)
             registration_dict[title] = value
@@ -440,7 +440,7 @@ class RegistrationListGenerator(ListGeneratorBase):
             'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
             'filters': {'fields': {}, 'items': {}}
         }
-        self.special_items_info = OrderedDict([
+        self.static_items = OrderedDict([
             ('reg_date', {
                 'title': _('Registation Date'),
                 'id': 'reg_date'
@@ -467,32 +467,30 @@ class RegistrationListGenerator(ListGeneratorBase):
                 'id': 'checked_in_date'
             })
         ])
-        self.basic_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address', 'phone',
-                            'country')
-        self.special_items = tuple(self.special_items_info)
+        self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
+                               'phone', 'country')
         self.list_config = self._get_config()
 
     def _get_static_columns(self, ids):
         """
         Retrieve information needed for the header of the static
-        columns (basic and special).
+        columns (including static and personal items).
 
         :return: a list of {'id': ..., 'caption': ...} dicts
         """
         result = []
-        for item_id in self.basic_items:
-            if item_id in ids:
+        for item_id in ids:
+            if item_id in self.personal_items:
                 field = RegistrationFormItem.find_one(registration_form=self.regform,
                                                       personal_data_type=PersonalDataType[item_id])
                 result.append({
                     'id': field.id,
                     'caption': field.title
                 })
-        for item_id in self.special_items:
-            if item_id in ids:
+            elif item_id in self.static_items:
                 result.append({
                     'id': item_id,
-                    'caption': self.special_items_info[item_id]['title']
+                    'caption': self.static_items[item_id]['title']
                 })
         return result
 
@@ -575,33 +573,33 @@ class RegistrationListGenerator(ListGeneratorBase):
                 query = query.filter(subquery == len(field_filters))
         return query.filter(db.or_(*items_criteria))
 
-    def get_reg_list_kwargs(self):
+    def get_list_kwargs(self):
         reg_list_config = self._get_config()
         registrations_query = self._build_query()
         total_entries = registrations_query.count()
         registrations = self._filter_list_entries(registrations_query, reg_list_config['filters']).all()
-        custom_item_ids, other_item_ids = self._split_item_ids(reg_list_config['items'])
-        other_columns = self._get_static_columns(other_item_ids)
-        regform_items = self._get_sorted_regform_items(custom_item_ids)
+        dynamic_item_ids, static_item_ids = self._split_item_ids(reg_list_config['items'], 'dynamic')
+        static_columns = self._get_static_columns(static_item_ids)
+        regform_items = self._get_sorted_regform_items(dynamic_item_ids)
         return {
             'registrations': registrations,
             'total_registrations': total_entries,
-            'basic_columns': other_columns,
-            'visible_cols_regform_items': regform_items,
+            'static_columns': static_columns,
+            'dynamic_columns': regform_items,
             'filtering_enabled': total_entries != len(registrations)
         }
 
-    def get_reg_list_export_config(self):
+    def get_list_export_config(self):
         reg_list_config = self._get_config()
-        item_ids, special_item_ids = self._split_special_ids(reg_list_config['items'])
+        static_item_ids, item_ids = self._split_item_ids(reg_list_config['items'], 'static')
         item_ids = self._column_ids_to_db(item_ids)
         return {
-            'special_item_ids': special_item_ids,
+            'static_item_ids': static_item_ids,
             'regform_items': self._get_sorted_regform_items(item_ids)
         }
 
-    def render_registration_list(self):
-        reg_list_kwargs = self.get_reg_list_kwargs()
+    def render_list(self):
+        reg_list_kwargs = self.get_list_kwargs()
         tpl = get_template_module('events/registration/management/_reglist.html')
         filtering_enabled = reg_list_kwargs.pop('filtering_enabled')
         return {
