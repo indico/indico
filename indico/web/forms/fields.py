@@ -1025,11 +1025,18 @@ class IndicoTagListField(HiddenFieldList):
 
 
 class IndicoMarkdownField(TextAreaField):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('description', _("You can use Markdown or basic HTML formatting tags."))
-        super(IndicoMarkdownField, self).__init__(*args, **kwargs)
-
     widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
+
+    def __init__(self, *args, **kwargs):
+        self.use_wmd = kwargs.pop('wmd', False)
+        orig_id = kwargs['_prefix'] + kwargs['_name']
+        if self.use_wmd:
+            # WMD relies on this awful ID :/
+            kwargs['id'] = 'wmd-input-f_' + orig_id
+        else:
+            kwargs.setdefault('description', _(u"You can use Markdown or basic HTML formatting tags."))
+        super(IndicoMarkdownField, self).__init__(*args, **kwargs)
+        self.orig_id = orig_id
 
 
 class IndicoTimezoneSelectField(SelectField):
