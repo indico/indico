@@ -1027,21 +1027,21 @@ class IndicoTagListField(HiddenFieldList):
 class IndicoMarkdownField(TextAreaField):
     """A Markdown-enhanced textarea.
 
-    When using WMD you need to include the markdown JS/CSS bundles
-    and also the MathJax JS bundle (even when using only WMD without
-    Mathjax).
+    When using the editor you need to include the markdown JS/CSS
+    bundles and also the MathJax JS bundle (even when using only
+    the editor without Mathjax).
 
-    :param wmd: Whether to use the WMD widget with its live preview
+    :param editor: Whether to use the WMD widget with its live preview
     :param mathjax: Whether to use MathJax in the WMD live preview
     """
 
     widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
 
     def __init__(self, *args, **kwargs):
-        self.use_wmd = kwargs.pop('wmd', False)
+        self.use_editor = kwargs.pop('editor', False)
         self.use_mathjax = kwargs.pop('mathjax', False)
         orig_id = kwargs['_prefix'] + kwargs['_name']
-        if self.use_wmd:
+        if self.use_editor:
             # WMD relies on this awful ID :/
             kwargs['id'] = 'wmd-input-f_' + orig_id
         else:
