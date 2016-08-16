@@ -278,6 +278,12 @@ class TimetableEntry(db.Model):
                 return True
             return any(x.can_access(user) for x in self.object.contributions if not x.is_inheriting)
 
+    def extend_start_dt(self, start_dt):
+        assert start_dt < self.start_dt
+        extension = self.start_dt - start_dt
+        self.start_dt = start_dt
+        self.duration = self.duration + extension
+
     def extend_end_dt(self, end_dt):
         diff = end_dt - self.end_dt
         if diff < timedelta(0):
@@ -304,7 +310,7 @@ class TimetableEntry(db.Model):
         else:
             extended = False
             if by_start and self.start_dt < self.parent.start_dt:
-                self.parent.start_dt = self.start_dt
+                self.parent.extend_start_dt(self.start_dt)
                 extended = True
             if by_end and self.end_dt > self.parent.end_dt:
                 self.parent.extend_end_dt(self.end_dt)
