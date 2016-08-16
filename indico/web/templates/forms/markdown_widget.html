@@ -1,7 +1,107 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <textarea id="{{ field.id }}" name="{{ field.name }}" rows="{{ rows }}" {{ input_args|html_params }}>
-        {{- field._value() -}}
-    </textarea>
+    {% if field.use_wmd %}
+        <div data-field-id="{{ field.orig_id }}">
+            <div class="wmd-panel">
+                <div id="wmd-button-bar-f_{{ field.orig_id }}" class="wmd-button-bar"></div>
+                <textarea id="{{ field.id }}"
+                          name="{{ field.name }}"
+                          rows="{{ rows }}"
+                          class="wmd-input"
+                          style="width: 100%;"
+                          {{ input_args|html_params }}>
+                    {{- field._value() -}}
+                </textarea>
+            </div>
+            <div class="md-preview-wrapper edit">
+                <div id="wmd-preview-f_{{ field.orig_id }}" class="wmd-preview"></div>
+                <div class="icon-arrow-up instructions">
+                    {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe,
+                             latex='<a href="#" class="latex-info">LaTeX</a>'|safe -%}
+                        You can use {{ markdown }} and {{ latex }} formulae.
+                    {%- endtrans %}
+                </div>
+            </div>
+
+            <script type="text/html" class="markdown-info-text">
+                <p>
+                    {% trans -%}
+                        Markdown is a lightweight markup language that makes it easier to write rich text content.
+                        Here are some examples:
+                    {%- endtrans %}
+                </p>
+                <ul>
+                    <li><span class="mono">*apples*</span> - <em>apples</em></li>
+                    <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
+                    <li><span class="mono">[Google][https://www.google.com]</span> - <a href="http://www.google.com">Google</a></li>
+                </ul>
+                <p>
+                    {% trans link='<a href="https://daringfireball.net/projects/markdown/syntax">'|safe, link_end='</a>'|safe -%}
+                        Check the icon bar for more options, or consult the {{ link }}language reference{{ link_end }}.
+                    {%- endtrans %}
+                </p>
+            </script>
+
+            <script type="text/html" class="latex-info-text">
+                <p>
+                    {% trans link='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">'|safe,
+                             link_end='</a>'|safe -%}
+                        Several {{ link }}LaTeX commands{{ link_end }} are supported.
+                    {%- endtrans %}
+                </p>
+            </script>
+
+            <script type="text/html" class="wmd-help-button-text">
+                <p>
+                    {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe,
+                             latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
+                        You can use {{ markdown }} and {{ latex }}.
+                    {%- endtrans %}
+                </p>
+                <p>{% trans %}Here are some nice examples:{% endtrans %}</p>
+                <ul>
+                    <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
+                    <li><span class="mono">![A logo](https://is.gd/VBDpT0)</span> - <img src="https://indico.cern.ch/images/indico.ico" title="A logo"></li>
+                </ul>
+            </script>
+        </div>
+    {% else %}
+        <textarea id="{{ field.id }}" name="{{ field.name }}" rows="{{ rows }}" {{ input_args|html_params }}>
+            {{- field._value() -}}
+        </textarea>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {% if field.use_wmd %}
+        <script>
+            (function() {
+                'use strict';
+                $(document).ready(function() {
+                    var field = $('#{{ field.id }}');
+                    var container = field.closest('[data-field-id]');
+                    field.pagedown();
+
+                    ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(function(name) {
+                        var content = container.find('.{0}-text'.format(name));
+                        container.find('.' + name).qtip({
+                            content: content.html(),
+                            hide: {
+                                event: 'unfocus'
+                            },
+                            show: {
+                                solo: true
+                            },
+                            style: {
+                                classes: 'informational markdown-help-qtip'
+                            }
+                        }).on('click', function(evt) {
+                            evt.preventDefault();
+                        });
+                    });
+                });
+            })();
+        </script>
+    {% endif %}
 {% endblock %}

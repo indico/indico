@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+// XXX: Use _markdown.scss for anything new. This file is legacy and
+// should be removed together with the legacy abstract code!
+
 $editor-preview-bg-color: $light-gray;
 
 .wmd-input {

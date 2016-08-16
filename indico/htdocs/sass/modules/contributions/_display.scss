@@ -15,7 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- @import 'compass';
+// XXX: Use _markdown.scss for anything new. This file is legacy and
+// should be removed together with the legacy abstract code!
+
+@import 'compass';
 
 $display-preview-bg-color: white;
 

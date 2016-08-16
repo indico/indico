@@ -202,7 +202,7 @@
                 updateMJ(function() {
                     var new_height =  $preview.outerHeight(),
                         $wrapper = $preview.closest('.md-preview-wrapper'),
-                        is_empty = ($preview.text() == '');
+                        is_empty = $preview.is(':empty');
 
                     $wrapper.toggleClass('empty', is_empty);
                     if (is_empty) {
@@ -221,14 +221,17 @@
         }
 
         function createEditor(elem) {
-            var $td = $(elem).closest('td');
+            var $container = $(elem).closest('[data-field-id]');
+            $preview = $container.find('.wmd-preview');
 
-            $preview = $td.find('.wmd-preview');
-
-            var fieldId = $td.data('fieldId'),
+            var fieldId = $container.data('fieldId'),
                 converter = Markdown.getSanitizingConverter();
 
-            converter.hooks.chain("preBlockGamut", block_handler);
+            converter.hooks.chain("preBlockGamut", function block_handler(text, rbg) {
+                return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+                    return "<blockquote>" + rbg(inner) + "</blockquote>\n";
+                });
+            });
 
             var editor = new Markdown.Editor(converter, "-f_" + fieldId, {
                 helpButton: {

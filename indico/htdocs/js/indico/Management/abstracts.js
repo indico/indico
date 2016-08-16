@@ -15,13 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// Pagedown editor stuff
-function block_handler(text, rbg) {
-    return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
-        return "<blockquote>" + rbg(inner) + "</blockquote>\n";
-    });
-}
-
 $(function() {
 
     $('textarea.wmd-input:visible').each(function(i, elem) {
