@@ -21,7 +21,7 @@
                     {% if field.use_mathjax %}
                         {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe,
                                  latex='<a href="#" class="latex-info">LaTeX</a>'|safe -%}
-                            You can use {{ markdown }} and {{ latex }} formulae.
+                            You can use {{ markdown }} and {{ latex }} math formulae.
                         {%- endtrans %}
                     {% else %}
                         {% trans markdown='<a href="#" class="markdown-info">Markdown</a>'|safe -%}
@@ -54,7 +54,8 @@
                 <p>
                     {% trans link='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">'|safe,
                              link_end='</a>'|safe -%}
-                        Several {{ link }}LaTeX commands{{ link_end }} are supported.
+                        You may write formulae using {{ link }}LaTeX{{ link_end }} (math mode only) by surrounding
+                        them in <code>$...$</code>.
                     {%- endtrans %}
                 </p>
             </script>
