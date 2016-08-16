@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from MaKaC.common.TemplateExec import render
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
@@ -25,7 +26,16 @@ class WPManageAbstracts(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'abstracts'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_abstracts_js'].urls()
+        return (WPConferenceModifBase.getJSFiles(self) +
+                self._asset_env['markdown_js'].urls() +
+                self._asset_env['modules_abstracts_js'].urls())
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['abstracts_sass'].urls()
+        return (WPConferenceModifBase.getCSSFiles(self) +
+                self._asset_env['markdown_sass'].urls() +
+                self._asset_env['abstracts_sass'].urls())
+
+    def _getHeadContent(self):
+        return (WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') +
+                '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()))
