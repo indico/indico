@@ -344,8 +344,11 @@
     right: 18px;
     visibility: hidden;
 
-    a:first-child {
-        margin-right: 2px;
+    a {
+        background: transparent !important;
+        &:first-child {
+            margin-right: 2px;
+        }
     }
 }
 
