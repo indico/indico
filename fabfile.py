@@ -344,7 +344,6 @@ def install_mathjax():
     with lcd(os.path.join(env.ext_dir, 'mathjax')):
         local('rm -rf {0}'.format(os.path.join(dest_dir)))
         _cp_tree('unpacked/', dest_dir, exclude=["AM*", "MML*", "Accessible*", "Safe*"])
-        _cp_tree('images/', os.path.join(dest_dir, 'images'))
         _cp_tree('fonts/', os.path.join(dest_dir, 'fonts'), exclude=["png"])
 
     with open(mathjax_js, 'r') as f:
