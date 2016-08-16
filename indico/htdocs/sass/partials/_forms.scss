@@ -27,9 +27,9 @@ $i-form-button-line-height: 1.8;
 
 %form-field-input {
     line-height: $i-form-line-height;
-    height: $i-form-height;
     padding: 0.5em 1em;
     vertical-align: top;
+    height: $i-form-height;
 }
 
 %form-field-button {
