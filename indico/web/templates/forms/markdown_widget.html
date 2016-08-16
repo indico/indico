@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    {% if field.use_wmd %}
+    {% if field.use_editor %}
         <div data-field-id="{{ field.orig_id }}">
             <div class="wmd-panel">
                 <div id="wmd-button-bar-f_{{ field.orig_id }}" class="wmd-button-bar"></div>
@@ -87,7 +87,7 @@
 {% endblock %}
 
 {% block javascript %}
-    {% if field.use_wmd %}
+    {% if field.use_editor %}
         <script>
             (function() {
                 'use strict';
