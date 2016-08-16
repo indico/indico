@@ -25,7 +25,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
@@ -37,7 +37,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, MarkdownText
+from indico.util.string import format_repr, return_ascii
 
 
 def _get_next_friendly_id(context):
@@ -76,7 +76,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     location_backref_name = 'contributions'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.html, RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
     allow_relationship_preloading = True
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True

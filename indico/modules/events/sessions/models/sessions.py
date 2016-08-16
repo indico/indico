@@ -24,7 +24,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
@@ -34,7 +34,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, MarkdownText
+from indico.util.string import format_repr, return_ascii
 
 
 def _get_next_friendly_id(context):
@@ -58,7 +58,8 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'session_id'
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     @declared_attr
     def __table_args__(cls):
