@@ -275,26 +275,12 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
                   'error')
             return redirect(url_for('.manage_vc_rooms', self.event_new))
 
-        self.event_vc_room.delete(session.user)
+        delete_all = request.args.get("delete_all") ==  '1'
+        self.event_vc_room.delete(session.user, delete_all)
         flash(_("{plugin_name} room '{room.name}' removed").format(
             plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event_new))
 
-class RHVCManageEventRemoveAll(RHVCSystemEventBase):
-    """Removes an existin VC room from all Indico events"""
-
-    CSRF_ENABLED = True
-
-    def _process(self):
-        if not self.plugin.can_manage_vc_rooms(session.user, self.event_new):
-            flash(_('You are not allowed to remove {} rooms from these events.').format(self.plugin.friendly_name),
-                  'error')
-            return redirect(url_for('.manage_vc_rooms', self.event_new))
-
-        self.event_vc_room.delete_all(session.user)
-        flash(_("{plugin_name} room '{room.name}' removed").format(
-            plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
-        return redirect(url_for('.manage_vc_rooms', self.event_new))
 
 class RHVCEventPage(RHConferenceBaseDisplay):
     """Lists the VC rooms in an event page"""
