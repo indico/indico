@@ -222,16 +222,16 @@ class LocationWidget(JinjaWidget):
     def __call__(self, field, **kwargs):
         rooms = {'data': []}
         venues = {'data': []}
-        venueMap = {}
+        venue_map = {}
         if Config.getInstance().getIsRoomBookingActive():
             rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
             venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
-            venueMap = {loc['id']: loc['name'] for loc in venues['data']}
+            venue_map = {loc['id']: loc['name'] for loc in venues['data']}
         parent = (self._get_parent_info(field.object_data['source'], field.object_data['inheriting'])
                   if field.object_data and field.object_data.get('source') and field.allow_location_inheritance
                   else ('', ''))
         return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent,
-                                                    source=field.object_data.get('source'), venueMap=venueMap,
+                                                    source=field.object_data.get('source'), venue_map=venue_map,
                                                     init_inheritance=field.object_data.get('inheriting'))
 
     def _get_parent_info(self, obj, inheriting):
