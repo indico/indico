@@ -24,12 +24,10 @@ from pkg_resources import iter_entry_points
 
 import click
 import pytz
-from flask_migrate import stamp
 from sqlalchemy.sql import func, select
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
-from indico.core.db.sqlalchemy.util.management import delete_all_tables
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
@@ -45,7 +43,6 @@ click.disable_unicode_literals_warning = True
 @click.group()
 @click.argument('sqlalchemy-uri')
 @click.argument('zodb-uri')
-@click.option('--destructive', '-d', is_flag=True, help="delete all existing tables first")
 @click.pass_context
 def cli(ctx, **kwargs):
     """
@@ -61,10 +58,9 @@ class Importer(object):
     #: Specify plugins that need to be loaded for the import (e.g. to access its .settings property)
     plugins = frozenset()
 
-    def __init__(self, sqlalchemy_uri, zodb_uri, destructive, quiet):
+    def __init__(self, sqlalchemy_uri, zodb_uri, quiet):
         self.sqlalchemy_uri = sqlalchemy_uri
         self.zodb_uri = zodb_uri
-        self.destructive = destructive
         self.quiet = quiet
         self.zodb_root = None
         self.app = None
@@ -123,17 +119,6 @@ class Importer(object):
             if not self.pre_check():
                 sys.exit(1)
 
-            if self.destructive:
-                print(cformat('%{yellow!}*** DANGER'))
-                print(cformat('%{yellow!}***%{reset} '
-                              '%{red!}ALL DATA%{reset} in your database %{yellow!}{!r}%{reset} will be '
-                              '%{red!}PERMANENTLY ERASED%{reset}!').format(db.engine.url))
-                if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
-                    print('Aborting')
-                    sys.exit(1)
-                delete_all_tables(db)
-                stamp()
-                db.create_all()
             if self.has_data():
                 # Usually there's no good reason to migrate with data in the DB. However, during development one might
                 # comment out some migration tasks and run the migration anyway.
