@@ -337,6 +337,7 @@ class VCRoomEventAssociation(db.Model):
         If the room is not used anywhere else, the room itself is also deleted.
 
         :param user: the user performing the deletion
+        :param delete_all: if set to 1 all events linked to a videoconference room will be deleted together with the room. Default set to false.
         """
         if not delete_all:
             Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(

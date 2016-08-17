@@ -35,7 +35,7 @@
                  });
             } else {
                 new SpecialRemovePopup($T("Videoconference room removal"),
-                                       $T('Do you want to remove this videoconference from <strong>All</strong> events ({0}) or just this <strong>One</strong>?').format($this.data('numEvents')),
+                                       $T('This video conference room is used in {0} Indico events.<br> Do you want to remove this videoconference from <strong>All</strong> {0} events  or just this <strong>One</strong>?').format($this.data('numEvents')),
                     function(action) {
                         var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
                         if (action === 1) {
