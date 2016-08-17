@@ -10,42 +10,11 @@
 
 {% block javascript %}
     <script>
-        $(function() {
-            'use strict';
-
-            var button = $('#choose-{{ field.id }}');
-            var display = $('#display-{{ field.id }}');
-            var field = $('#{{ field.id }}');
-
-            {% if not field.flags.required %}
-                display.clearableinput({
-                    clearOnEscape: false,
-                    focusOnClear: false,
-                    onClear: function() {
-                        field.principalfield('remove');
-                    }
-                });
-            {% endif %}
-
-            field.principalfield({
-                {% if field.event %}
-                    eventId: {{ field.event.id|tojson }},
-                {% endif %}
-                allowExternalUsers: {{ field.allow_external|tojson }},
-                enableGroupsTab: {{ field.groups|tojson }},
-                render: function(users) {
-                    var name = users[0] ? users[0].name : '';
-                    {% if not field.flags.required %}
-                        display.clearableinput('setValue', name);
-                    {% else %}
-                        display.val(name);
-                    {% endif %}
-                }
-            });
-
-            display.add(button).on('click', function() {
-                field.principalfield('choose');
-            });
+        setupPrincipalWidget({
+            fieldId: {{ field.id | tojson }},
+            eventId: {{ (field.event.id if field.event else none) | tojson }},
+            required: {{ field.flags.required | tojson }},
+            allowExternal: {{ field.allow_external | tojson }}
         });
     </script>
 {% endblock %}
