@@ -7,8 +7,12 @@
             <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text" maxlength="7">
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
     <script>
-        $('.i-color-field').colorpicker();
-        $('.i-color-field input').clearableinput();
+        setupColorPickerWidget({
+            fieldId: {{ field.id | tojson }}
+        });
     </script>
 {% endblock %}

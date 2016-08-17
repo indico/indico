@@ -260,7 +260,7 @@ class ColorPickerWidget(JinjaWidget):
     """Renders a colorpicker input field"""
 
     def __init__(self):
-        super(ColorPickerWidget, self).__init__('forms/colorpicker_widget.html', single_line=True)
+        super(ColorPickerWidget, self).__init__('forms/color_picker_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
         return super(ColorPickerWidget, self).__call__(field, input_args=kwargs)
