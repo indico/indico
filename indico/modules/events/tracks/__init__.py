@@ -16,8 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events import Event
+from indico.core.logger import Logger
 from indico.core import signals
+from indico.modules.events import Event
+
+
+logger = Logger.get('tracks')
 
 
 @signals.acl.can_access.connect_via(Event)
