@@ -16,13 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import RHManageTracks, RHCreateTrack, RHCreateTrackOld
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
-_bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_template_folder='events/tracks',
-                      url_prefix='/event/<confId>')
 
-_bp.add_url_rule('/manage/tracks/', 'manage', RHManageTracks)
-_bp.add_url_rule('/manage/tracks/create', 'create', RHCreateTrack, methods=('GET', 'POST'))
-
-_bp.add_url_rule('/manage/tracks/create-old', 'create_track_old', RHCreateTrackOld, methods=('GET', 'POST'))
+class WPManageTracks(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/tracks/'
+    sidemenu_option = 'program'

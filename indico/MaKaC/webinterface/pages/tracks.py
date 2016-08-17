@@ -35,7 +35,7 @@ from indico.web.flask.util import url_for
 
 
 class WPTrackModifBase(WPConferenceModifBase):
-    sidemenu_option = 'program'
+    sidemenu_option = 'program_old'
 
     def __init__(self, rh, track):
         WPConferenceModifBase.__init__(self, rh, track.getConference())
@@ -651,7 +651,7 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
 
 
 class WPTrackAbstractModifBase(WPConferenceModifBase):
-    sidemenu_option = 'program'
+    sidemenu_option = 'program_old'
 
     def __init__(self, rh, track, abstract):
         self._abstract = abstract
