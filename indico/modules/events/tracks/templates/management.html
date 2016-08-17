@@ -1,0 +1,20 @@
+{% extends 'layout/full_content_base.html' %}
+
+{% block title %}
+    {%- trans %}Programme{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {% for track in tracks %}
+        <div>
+            {{ track.title }}
+        </div>
+    {% endfor %}
+
+    <a class="i-button highlight icon-plus"
+        data-href="{{ url_for('.create', event) }}"
+        data-ajax-dialog
+        data-reload-after>
+        {% trans %}Add track{% endtrans %}
+    </a>
+{% endblock %}
