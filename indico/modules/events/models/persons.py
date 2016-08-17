@@ -356,9 +356,21 @@ class PersonLinkBase(PersonMixin, db.Model):
             )
         )
 
+    @declared_attr
+    def display_order(cls):
+        return db.Column(
+            db.Integer,
+            nullable=False,
+            default=0
+        )
+
     @property
     def email(self):
         return self.person.email
+
+    @property
+    def display_order_key(self):
+        return self.display_order, self.first_name, self.last_name
 
     @hybrid_property
     def object(self):
