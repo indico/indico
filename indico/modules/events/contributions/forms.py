@@ -23,13 +23,14 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.contributions.fields import (ContributionPersonLinkListField,
                                                         SubContributionPersonLinkListField)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
 from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
                                      IndicoDateTimeField, IndicoTagListField, AccessControlListField)
 from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
@@ -55,6 +56,10 @@ class ContributionForm(IndicoForm):
     references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
                                  description=_("Manage external resources for this contribution"))
     board_number = StringField(_("Board Number"))
+
+    @generated_data
+    def render_mode(self):
+        return RenderMode.markdown
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -118,6 +123,10 @@ class SubContributionForm(IndicoForm):
                                                   description=_('The speakers of the subcontribution'))
     references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
                                  description=_("Manage external resources for this sub-contribution"))
+
+    @generated_data
+    def render_mode(self):
+        return RenderMode.markdown
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
