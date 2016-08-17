@@ -7,41 +7,14 @@
 
 {% block javascript -%}
     <script>
-        (function() {
-            'use strict';
-
-            var inputs = $('input[name={{ field.name }}][id^={{ field.id }}]');
-            {% if field.can_inherit_protection %}
-                var parentProtected = {{ field.get_form().protected_object.protection_parent.is_protected | tojson }};
-            {% else %}
-                var parentProtected = false;
-            {% endif %}
-
-            inputs.on('change', function() {
-                var $this = $(this);
-                var isProtected = $this.val() === 'protected' || ($this.val() === 'inheriting' && parentProtected);
-
-                if (this.checked) {
-                    $('#form-group-protected-{{ field.id }} .protection-message').hide();
-                    $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
-
-                    toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
-                    {% if field.acl_message_url and (field.protected_object.get_inherited_acl() | length) %}
-                        $.ajax({
-                            url: {{ field.acl_message_url | tojson }},
-                            data: {mode: $this.val()},
-                            error: handleAjaxError,
-                            success: function(data) {
-                                $this.closest('form').find('.inheriting-acl-message').html(data.html);
-                            }
-                        });
-                    {% endif %}
-                }
-            });
-
-            _.defer(function() {
-                inputs.trigger('change');
-            });
-        })();
+        setupProtectionWidget({
+            fieldId: {{ field.id | tojson }},
+            fieldName: {{ field.name | tojson }},
+            parentProtected: {{ (field.get_form().protected_object.protection_parent.is_protected
+                                 if field.can_inherit_protection else false) | tojson }},
+            aclFieldId: {{ field.get_form().acl.id | tojson }},
+            aclMessageUrl: {{ field.acl_message_url | tojson }},
+            hasInheritedAcl: {{ (field.acl_message_url and field.protected_object.get_inherited_acl()) | bool | tojson }}
+        });
     </script>
 {%- endblock %}
