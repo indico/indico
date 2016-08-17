@@ -23,7 +23,10 @@
             <div class="group left">
                 <button class="i-button icon-settings js-dialog-action js-customize-list {% if filtering_enabled %} highlight{% endif %}"
                    data-href="{{ url_for('.customize_reglist', regform) }}"
-                   data-title="{% trans %}Registration list configuration{% endtrans %}">
+                   data-title="{% trans %}Registration list configuration{% endtrans %}"
+                   data-dialog-classes="list-filter-dialog"
+                   data-update='#registration-list'
+                   data-ajax-dialog>
                     {% trans %}Customize list{% endtrans %}
                 </button>
             </div>
@@ -67,23 +70,23 @@
                 </a>
                 <ul class="dropdown">
                     <li>
-                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-reglist-form"
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
                             {%- trans %}PDF (table style){% endtrans -%}
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-reglist-form"
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
                             {%- trans %}PDF (book style){% endtrans -%}
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-reglist-form"
+                        <a href="#" class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
                     </li>
                     <li>
-                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-reglist-form"
+                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
                     </li>
                 </ul>
@@ -99,14 +102,14 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="icon-tag js-requires-selected-row disabled js-submit-reglist-form"
+                        <a href="#" class="icon-tag js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.registrations_print_badges', regform) }}">
                             {%- trans %}Print Badges{% endtrans -%}
                         </a>
                     </li>
                     <li>
                         <a href="#"
-                           class="icon-attachment js-requires-selected-row disabled js-submit-reglist-form regform-download-attachments"
+                           class="icon-attachment js-requires-selected-row disabled js-submit-list-form regform-download-attachments"
                            data-href="{{ url_for('.registrations_attachments_export', regform) }}">
                             {%- trans %}Download attachments{% endtrans -%}
                         </a>
@@ -176,7 +179,7 @@
                 </span>
             </div>
         </div>
-        <div class="list-content">
+        <div class="list-content" id="registration-list">
             {{ render_registration_list(registrations, dynamic_columns, static_columns, total_registrations) }}
         </div>
         <div class="toolbar right">

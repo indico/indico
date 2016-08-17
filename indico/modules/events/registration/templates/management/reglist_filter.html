@@ -75,7 +75,7 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <input id="visible-columns-reg-items" type="hidden" name="visible_items"
+    <input id="visible-items" type="hidden" name="visible_items"
            value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
 
@@ -95,5 +95,5 @@
     </div>
 </form>
 <script>
-    setupRegistrationListFilter();
+    setupListFilter();
 </script>

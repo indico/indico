@@ -18,86 +18,14 @@
 (function(global) {
     'use strict';
 
-    function getSelectedRows() {
-        return $('.registrations input:checkbox:checked').map(function() {
-            return $(this).val();
-        }).get();
-    }
-
-    function handleRowSelection() {
-        $('table.i-table input.select-row').on('change', function() {
-            $(this).closest('tr').toggleClass('selected', this.checked);
-            $('.js-requires-selected-row').toggleClass('disabled', !$('.registrations input:checkbox:checked').length);
-            $('.regform-download-attachments').toggleClass('disabled', !$('.registrations input:checkbox:checked[data-has-files=true]').length);
-        }).trigger('change');
-    }
-
-    function setupStaticURLGeneration() {
-        $('.js-static-url').on('click', function() {
-            var $this = $(this);
-            $.ajax({
-                method: 'POST',
-                url: $this.data('href'),
-                error: handleAjaxError,
-                complete: IndicoUI.Dialogs.Util.progress(),
-                success: function(data) {
-                    $this.copyURLTooltip(data.url);
-                }
-            });
-        });
-    }
-
-    function setupTableSorter() {
-        $('.registrations .tablesorter').tablesorter({
-            cssAsc: 'header-sort-asc',
-            cssDesc: 'header-sort-desc',
-            headerTemplate: '',
-            headers: {
-                0: {
-                    sorter: false
-                }
-            }
-        });
-    }
-
     global.setupRegistrationList = function setupRegistrationList() {
-        handleRowSelection();
-        setupStaticURLGeneration();
-        setupTableSorter();
+        setupListGenerator();
 
-        $('.registrations .toolbar')
-        .dropdown()
-        .on('click', '.js-dialog-action', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            ajaxDialog({
-                dialogClasses: 'list-filter-dialog',
-                trigger: this,
-                url: $this.data('href'),
-                title: $this.data('title'),
-                onClose: function(data) {
-                    if (data) {
-                        $('.list-content').html(data.html);
-                        handleRowSelection();
-                        setupTableSorter();
-                        $('.js-customize-list').toggleClass('highlight', data.filtering_enabled);
-                    }
-                }
-            });
-        });
-
-        $('#select-all').on('click', function() {
-            $('table.i-table input.select-row').prop('checked', true).trigger('change');
-        });
-
-        $('#select-none').on('click', function() {
-            $('table.i-table input.select-row').prop('checked', false).trigger('change');
-        });
-
-        $('.change-columns-width').on('click', function() {
-            $('.registrations-table-wrapper').toggleClass('scrollable');
-            $('.change-columns-width').toggleClass('active');
-        });
+        function handleRegListRowSelection() {
+            $('table.i-table input.select-row').on('change', function() {
+                $('.regform-download-attachments').toggleClass('disabled', !$('.list input:checkbox:checked[data-has-files=true]').length);
+            }).trigger('change');
+        }
 
         $('.js-dialog-send-email').ajaxDialog({
             getExtraData: function() {
@@ -119,14 +47,6 @@
                     };
                 }
             });
-        });
-
-        $('.js-submit-reglist-form').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            if (!$this.hasClass('disabled')) {
-                $('.registrations form').attr('action', $this.data('href')).submit();
-            }
         });
 
         $('.registrations').on('indico:confirmed', '.js-delete-registrations', function(evt) {
@@ -168,15 +88,11 @@
                     if (data) {
                         $('.list-content').html(data.html);
                         handleRowSelection();
+                        handleRegListRowSelection();
                         setupTableSorter();
                     }
                 }
             });
-        });
-
-        $('.registrations .toolbar').on('click', '.disabled', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
         });
 
         var principal = $('#indico-user-to-add').principalfield({
@@ -198,101 +114,10 @@
                 if (data) {
                     $('.list-content').html(data.html);
                     handleRowSelection();
+                    handleRegListRowSelection();
                     setupTableSorter();
                 }
             }
-        });
-    };
-
-
-    function colorizeFilter(filter) {
-        var dropdown = filter.next('.dropdown');
-        filter.toggleClass('active', dropdown.find(':checked').length > 0);
-    }
-
-    function colorizeActiveFilters() {
-        $('.list-filter .filter').each(function() {
-            colorizeFilter($(this));
-        });
-    }
-
-    global.setupRegistrationListFilter = function setupRegistrationListFilter() {
-        $('.list-filter .filter').each(function() {
-            var filter = $(this).parent();
-            filter.dropdown({selector: '.filter', relative_to: filter.parent()});
-        });
-        colorizeActiveFilters();
-        $('.list-filter-dialog .toolbar').dropdown();
-
-        var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
-        var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
-
-        $('.list-column')
-        .on('click', function(evt) {
-            if ($(evt.target).hasClass('filter')) {
-                return;
-            }
-            var $this = $(this);
-            var field = $this.closest('.list-column');
-            var fieldId = field.data('id');
-            var visibilityIcon = field.find('.visibility');
-            var enabled = visibilityIcon.hasClass('enabled');
-
-            if (enabled) {
-                regItemsData.splice(regItemsData.indexOf(fieldId), 1);
-            } else {
-                regItemsData.push(fieldId);
-            }
-
-            visibilityIcon.toggleClass('enabled', !enabled);
-            field.toggleClass('striped', enabled);
-            visibleColumnsRegItemsField.val(JSON.stringify(regItemsData)).trigger('change');
-        })
-        .each(function() {
-            var field = $(this);
-            var fieldId = field.data('id');
-
-            if (regItemsData.indexOf(fieldId) != -1) {
-                field.find('.visibility').addClass('enabled');
-            } else {
-                field.addClass('striped');
-            }
-        });
-
-        $('.list-column .dropdown').on('click', function(evt) {
-            evt.stopPropagation();
-        });
-
-        $('.js-reset-btn').on('click', function() {
-            $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
-            $('.js-clear-filters-message').show({
-                done: function() {
-                    var $this = $(this);
-                    setTimeout(function() {
-                        $this.slideUp();
-                    }, 4000);
-                }
-            });
-        });
-
-        $('.list-filter input:checkbox').on('change', function() {
-            colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
-        });
-
-        $('.list-filter .title').on('mouseover', function() {
-            var title = $(this);
-            // Show a qtip if the text is ellipsized
-            if (this.offsetWidth < this.scrollWidth) {
-                title.qtip({hide: 'mouseout', content: title.text(), overwrite: false}).qtip('show');
-            }
-        });
-
-        $('#list-filter-select-all').on('click', function() {
-            $('.list-filter-dialog .visibility:not(.enabled)').trigger('click');
-        });
-
-        $('#list-filter-select-none').on('click', function() {
-            $('.list-filter-dialog .visibility.enabled').trigger('click');
         });
     };
 })(window);
