@@ -1,5 +1,6 @@
 {% extends 'layout/full_content_base.html' %}
 {% from 'events/abstracts/management/_abstract_list.html' import render_abstract_list %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
 {% block title %}
     {%- trans %}Abstract{% endtrans -%}
@@ -22,8 +23,11 @@
             </div>
             <div class="group left">
                 <button class="i-button icon-settings js-dialog-action js-customize-list {% if filtering_enabled %} highlight{% endif %}"
-                   {# TODO: data-href="{{ url_for('.customize_list', event) }}" #}
-                   data-title="{% trans %}Abstract list configuration{% endtrans %}">
+                   data-href="{{ url_for('.customize_abstract_list', event) }}"
+                   data-title="{% trans %}Abstract list configuration{% endtrans %}"
+                   data-dialog-classes="list-filter-dialog"
+                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                   data-ajax-dialog>
                     {% trans %}Customize list{% endtrans %}
                 </button>
             </div>
@@ -105,17 +109,17 @@
             </div>
             <div class="right">
                 <div class="group" id="filter-statistics">
-                    {# TODO: render_filter_statistics(abstracts|length, total_entries) #}
+                    {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
                 </div>
             </div>
             <div id="filter-placeholder"></div>
         </div>
-        <div class="list-content">
-            {{ render_abstract_list(abstracts, visible_items, basic_columns, total_abstracts) }}
+        <div class="list-content" id="abstract-list">
+            {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) }}
         </div>
     </div>
 
     <script>
-        // TODO: setupAbstractList();
+        setupAbstractList();
     </script>
 {% endblock %}
