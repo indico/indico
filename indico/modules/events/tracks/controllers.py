@@ -17,6 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.tracks.forms import TrackForm
+from indico.modules.events.tracks.operations import create_track
+from indico.modules.events.tracks.views import WPManageTracks
 from indico.web.util import jsonify_form, jsonify_data
 from indico.util.string import to_unicode
 from MaKaC.webinterface.rh.base import RH
@@ -32,7 +34,22 @@ class RHManageTracksBase(RHConferenceModifBase):
         return RH._process(self)
 
 
+class RHManageTracks(RHManageTracksBase):
+    def _process(self):
+        tracks = self.event_new.tracks
+        return WPManageTracks.render_template('management.html', self._conf, event=self.event_new, tracks=tracks)
+
+
 class RHCreateTrack(RHManageTracksBase):
+    def _process(self):
+        form = TrackForm()
+        if form.validate_on_submit():
+            create_track(self.event_new, form.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHCreateTrackOld(RHManageTracksBase):
     """Create a track"""
 
     def _process(self):
