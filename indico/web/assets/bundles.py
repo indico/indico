@@ -394,9 +394,11 @@ module_js = {
     'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
 }
 
+widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets', 'person_link_widget.js'))
+
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
-                 module_js['event_creation'])
+                 widgets_js, module_js['event_creation'])
 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
@@ -466,6 +468,7 @@ def register_all_js(env):
     env.register('selectize_js', selectize_js)
     env.register('chartist_js', chartist_js)
     env.register('taggle_js', taggle_js)
+    env.register('widgets_js', widgets_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
