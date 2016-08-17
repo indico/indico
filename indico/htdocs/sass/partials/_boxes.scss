@@ -187,7 +187,7 @@ $i-box-padding: 10px;
     }
 
     > .titled-rule:first-child,
-    > *:first-child > .titled-rule:first-child, {
+    > *:first-child > .titled-rule:first-child {
         @extend %i-box-titled-rule-header;
     }
 
