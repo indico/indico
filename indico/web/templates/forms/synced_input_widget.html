@@ -21,21 +21,8 @@
 
 {% block javascript %}
     <script>
-        (function() {
-            'use strict';
-
-            $('#{{ field.id }}-action-button').on('click', function() {
-                var field = $('#{{ field.id }}');
-                var syncedValue;
-
-                field.prop('readonly', this.checked);
-                if (this.checked) {
-                    syncedValue = JSON.parse(field.attr('data-synced-value'))
-                    if (syncedValue !== null) {
-                        field.val(syncedValue);
-                    }
-                }
-            });
-        })();
+        setupSyncedInputWidget({
+            fieldId: {{ field.id | tojson }}
+        });
     </script>
 {% endblock %}
