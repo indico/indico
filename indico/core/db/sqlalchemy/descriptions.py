@@ -20,14 +20,32 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.string import MarkdownText, PlainText, RichMarkup
+from indico.util.struct.enum import TitledIntEnum
+
+
+class RenderMode(TitledIntEnum):
+    """Rendering formats that a description can be written in."""
+
+    __titles__ = [None, 'HTML', 'Markdown', 'Plain Text']
+    html = 1
+    markdown = 2
+    plain_text = 3
+
+
+RENDER_MODE_WRAPPER_MAP = {
+    RenderMode.html: RichMarkup,
+    RenderMode.markdown: MarkdownText,
+    RenderMode.plain_text: PlainText
+}
 
 
 class DescriptionMixin(object):
     """Mixin to add an html-enabled description column."""
 
-    #: This class attribute will define whether the string
-    #: should be post-processed (e.g. RichMarkup)
-    description_wrapper = None
+    possible_render_modes = {RenderMode.plain_text}
+    default_render_mode = RenderMode.plain_text
 
     @declared_attr
     def _description(cls):
@@ -38,12 +56,24 @@ class DescriptionMixin(object):
             default=''
         )
 
+    @declared_attr
+    def render_mode(cls):
+        # Only add the column if there's a choice
+        # between several alternatives
+        if len(cls.possible_render_modes) > 1:
+            return db.Column(
+                PyIntEnum(RenderMode),
+                default=cls.default_render_mode,
+                nullable=False
+            )
+        else:
+            return cls.default_render_mode
+
     @hybrid_property
     def description(self):
-        if self.description_wrapper:
-            return self.description_wrapper(self._description)
-        else:
-            return self._description
+        selected_mode = self.default_render_mode if len(self.possible_render_modes) == 1 else self.render_mode
+        description_wrapper = RENDER_MODE_WRAPPER_MAP[selected_mode]
+        return description_wrapper(self._description)
 
     @description.setter
     def description(self, value):

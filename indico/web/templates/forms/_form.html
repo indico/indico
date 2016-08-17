@@ -48,7 +48,7 @@
             <div class="form-field-description">{{ field.description | safe }}</div>
         {% endif %}
         {% if field.warning %}
-            {%- call message_box('warning', fixed_width=true, classes='i-form-field-fixed-width') -%}
+            {%- call message_box('warning', fixed_width=true, classes='i-form-field-fixed-width form-field-warning') -%}
                 {{ field.warning }}
             {%- endcall -%}
         {% endif %}

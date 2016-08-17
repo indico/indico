@@ -25,18 +25,12 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, render_markdown, text_to_repr
-from indico.util.struct.enum import TitledIntEnum
-
-
-class RenderMode(TitledIntEnum):
-    __titles__ = [None, 'HTML', 'Markdown']
-    html = 1
-    markdown = 2
 
 
 class EventNote(LinkMixin, db.Model):

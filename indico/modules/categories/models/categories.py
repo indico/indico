@@ -30,7 +30,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -70,7 +70,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     __tablename__ = 'categories'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
-    description_wrapper = MarkdownText
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
     allow_no_access_contact = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'category_id'
 

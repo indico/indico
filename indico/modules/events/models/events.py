@@ -31,7 +31,7 @@ from sqlalchemy.sql import select
 from indico.core import signals
 from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
@@ -47,7 +47,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps, now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
-from indico.util.string import return_ascii, format_repr, text_to_repr, RichMarkup
+from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
@@ -96,7 +96,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     allow_no_access_contact = True
     location_backref_name = 'events'
     allow_location_inheritance = False
-    description_wrapper = RichMarkup
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
     __logging_disabled = False
 
     ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'

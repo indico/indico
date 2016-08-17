@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<title>Indico</title>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+<h1>Fix descriptions</h1>
+
+<p>
+    The browser is very unlikely to refresh its UI before the computation is finished. Please be patient.
+</p>
+
+<div id="info" style="margin-bottom:2em; border: 1px solid black;"></div>
+
+<script>
+    var objectDescriptions = {{ object_descriptions }};
+    var $container = $('#description-container');
+
+    function _processDescription(description, key, id) {
+        // Try to reach a fixed point
+        var previous,
+            i = 0;
+        while (description != previous && i < 10) {
+            if (i > 1) {
+                console.log('[?] Check after conversion:', key, id)
+            }
+            previous = description;
+            i++;
+            $container = $('<div>');
+            $container.html(description);
+            description = $container.html();
+        }
+        return description;
+    }
+
+    function processDescriptions(key, descriptions) {
+        var i = 0,
+            modified = 0;
+        $.each(descriptions, function(id, description) {
+            new_description = _processDescription(description, key, id);
+            descriptions[id] = new_description;
+            if (new_description != description) {
+                modified++;
+                if (new_description == '') {
+                    console.log('[!] Needs manual intervention:', key, id);
+                } else {
+                    window.callPhantom('sql', 'UPDATE ' + key + ' SET description=' + escapeLiteral(new_description) + ' WHERE id = ' + id + ';');
+                }
+            }
+            i++;
+        });
+        console.log('--- ' + key + ': ' + i + ' descriptions processed (' + modified + ' modified)');
+    }
+
+    function process() {
+        $.each(objectDescriptions, function(key, descriptions) {
+            processDescriptions(key, descriptions);
+        });
+        console.log('Done.');
+        window.callPhantom('exit');
+    }
+
+    // The following function was take from node-postgres: https://github.com/brianc/node-postgres
+    // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
+    function escapeLiteral(str) {
+        var hasBackslash = false,
+            escaped = '\'';
+
+        for(var i = 0; i < str.length; i++) {
+            var c = str[i];
+            if(c === '\'') {
+                escaped += c + c;
+            } else if (c === '\\') {
+                escaped += c + c;
+                hasBackslash = true;
+            } else {
+                escaped += c;
+            }
+        }
+
+        escaped += '\'';
+
+        if(hasBackslash === true) {
+            escaped = ' E' + escaped;
+        }
+
+        return escaped;
+    }
+
+    window.setTimeout(process, 1000);
+</script>
