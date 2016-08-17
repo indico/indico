@@ -19,4 +19,7 @@
     'use strict';
 
 
+    global.setupAbstractList = function setupAbstractList() {
+        setupListGenerator();
+    };
 })(window);
