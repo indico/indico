@@ -396,6 +396,7 @@ module_js = {
 
 widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
                                               'category_picker_widget.js',
+                                              'ckeditor_widget.js',
                                               'color_picker_widget.js',
                                               'datetime_widget.js',
                                               'linking_widget.js',
