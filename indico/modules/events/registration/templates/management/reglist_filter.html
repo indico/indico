@@ -1,21 +1,21 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item, filter_choices, is_static_item=false) %}
+{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="i-label list-column"
-         data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
+         data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
         {% if filter_choices %}
             <div class="actions">
                 <a class="filter icon-filter" data-toggle="dropdown"></a>
                 <ul class="dropdown" style="display: none">
                     {% for value, caption in filter_choices.iteritems() %}
                         <li>
-                            <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
-                                   id="field_{{ item.id }}_option_{{ value }}"
-                                   {% if value in filters[item.id|string] %}
+                            <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
+                                   id="field_{{ item_id }}_option_{{ value }}"
+                                   {% if value in filters[item_id|string] %}
                                        checked
                                    {% endif %}>
-                            <label for="field_{{ item.id }}_option_{{ value }}">
+                            <label for="field_{{ item_id }}_option_{{ value }}">
                                 {{ caption }}
                             </label>
                         </li>
@@ -34,7 +34,7 @@
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
         {% set filter_choices = child_item.field_impl.filter_choices %}
-        {{ _render_column_selector(child_item, filter_choices) }}
+        {{ _render_column_selector(child_item.id, child_item, filter_choices) }}
     {% endfor %}
 {% endmacro %}
 
@@ -79,9 +79,9 @@
            value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
 
-    {% for item in static_items.itervalues() %}
+    {% for item_id, item in static_items.iteritems() %}
         {% set filter_choices = item.get('filter_choices') %}
-        {{ _render_column_selector(item, filter_choices, is_static_item=true) }}
+        {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
     {% endfor %}
 
     {% for section in regform.sections if not section.is_deleted %}

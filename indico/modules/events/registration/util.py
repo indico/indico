@@ -443,20 +443,16 @@ class RegistrationListGenerator(ListGeneratorBase):
         self.static_items = OrderedDict([
             ('reg_date', {
                 'title': _('Registation Date'),
-                'id': 'reg_date'
             }),
             ('price', {
                 'title': _('Price'),
-                'id': 'price'
             }),
             ('state', {
                 'title': _('State'),
-                'id': 'state',
                 'filter_choices': {str(state.value): state.title for state in RegistrationState}
             }),
             ('checked_in', {
                 'title': _('Checked in'),
-                'id': 'checked_in',
                 'filter_choices': {
                     '0': _('No'),
                     '1': _('Yes')
@@ -464,7 +460,6 @@ class RegistrationListGenerator(ListGeneratorBase):
             }),
             ('checked_in_date', {
                 'title': _('Check-in date'),
-                'id': 'checked_in_date'
             })
         ])
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
