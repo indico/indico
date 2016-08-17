@@ -399,6 +399,7 @@ widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
                                               'datetime_widget.js',
                                               'location_widget.js',
                                               'multiple_items_widget.js',
+                                              'occurrences_widget.js',
                                               'override_multiple_items_widget.js',
                                               'person_link_widget.js'))
 
