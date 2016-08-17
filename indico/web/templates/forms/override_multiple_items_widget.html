@@ -38,31 +38,8 @@
 
 {% block javascript %}
     <script>
-        (function() {
-            'use strict';
-
-            var widget = $('#{{ field.id }}-widget');
-            var field = $('#{{ field.id }}');
-            var data = JSON.parse(field.val());
-
-            widget.on('input change', 'input', function() {
-                var $this = $(this);
-                if (data[$this.data('key')] === undefined) {
-                    data[$this.data('key')] = {};
-                }
-                data[$this.data('key')][$this.data('field')] = $this.val();
-                updateField();
-            });
-
-            widget.find('input').each(function() {
-                var $this = $(this);
-                var rowData = data[$this.data('key')] || {};
-                $this.val(rowData[$this.data('field')] || '');
-            });
-
-            function updateField() {
-                field.val(JSON.stringify(data));
-            }
-        })();
+        setupOverrideMultipleItemsWidget({
+            fieldId: {{ field.id | tojson }}
+        });
     </script>
 {% endblock %}
