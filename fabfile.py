@@ -474,7 +474,9 @@ def init_submodules(src_dir='.'):
     print green("Initializing submodules")
     with lcd(src_dir):
         local('pwd')
-        local('git submodule update --init --recursive')
+        local('git submodule init')
+        local('git submodule sync --recursive')
+        local('git submodule update --recursive')
 
 
 def _install_deps():
