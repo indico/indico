@@ -1,6 +1,7 @@
 import re
 import subprocess
 import sys
+from contextlib import contextmanager
 from itertools import chain, ifilter
 
 import click
@@ -20,6 +21,8 @@ from StringIO import StringIO
 
 EMPTY_OR_TRALING_WS_ONLY_REGEX = re.compile(r'()(\s*(?!.))', re.MULTILINE | re.DOTALL)
 TRAILING_WS_REGEX = re.compile(r'(.*?)((?<=[^\s])\s*(?!.))', re.MULTILINE | re.DOTALL)
+HTML_TAG_REGEX = '<[a-zA-Z]+.*>'
+
 HTML_TPL = b"""
 <!doctype html>
 <html lang="en">
@@ -131,7 +134,7 @@ def _contains_problematic_space_near_delimiter(
 
 
 def convert_using_html2text(text):
-    h = HTML2Text()
+    h = HTML2Text(bodywidth=0)
     h.unicode_snob = True
     return h.handle(text)
 
@@ -279,51 +282,76 @@ def migrate_description(obj, verbose, html_log, use_pandoc=False):
     obj.description = result
 
 
-@click.command()
+@contextmanager
+def html_log_writer(f):
+    log = StringIO()
+    log.write('<table style="width: 100%;">')
+    yield log
+    log.write('</table>')
+    log.seek(0)
+    if f:
+        f.write(HTML_TPL.format(log.read()))
+
+
+@click.group()
 @click.option('--dry-run', help='Do not actually save to the DB', is_flag=True)
-@click.option('-e', '--event', help='Process only contributions in the given event', type=int)
-@click.option('-c', '--category', help='Process only contributions in the given category', type=int)
 @click.option('-l', '--html-log', help='HTML log file with original and converted data', type=click.File('w'))
 @click.option('-v', '--verbose', help='Be extra verbose', is_flag=True)
 @click.option('-p', '--use-pandoc', help="Use pandoc instead of html2text", is_flag=True)
-def main(event, category, dry_run, html_log, verbose, use_pandoc):
-    html_tag_regex = '<[a-zA-Z]+.*>'
-    contribs = db.m.Contribution.find(db.m.Contribution.description.op('~')(html_tag_regex))
-    log = StringIO() if html_log else None
+@click.pass_context
+def cli(ctx, dry_run, html_log, verbose, use_pandoc):
+    ctx.obj.update({
+        'dry_run': dry_run,
+        'html_log': html_log,
+        'verbose': verbose,
+        'use_pandoc': use_pandoc
+    })
 
-    if event:
-        contribs = contribs.filter(db.m.Contribution.event_id == event)
-    elif category:
-        contribs = contribs.join(db.m.Event).filter(db.m.Event.category_chain_overlaps(category))
 
-    if log:
-        log.write('<table style="width: 100%;">')
-    for contrib in contribs:
-        if '<html>' in unicode(contrib.description):
-            click.echo(click.style('[HTML DOCUMENT] ', fg='red', bold=True) + repr(contrib))
-        else:
-            migrate_description(contrib, verbose, log, use_pandoc=use_pandoc)
+@click.command()
+@click.option('-e', '--event', help='Process only descriptions in the given event', type=int)
+@click.option('-c', '--category', help='Process only descriptions for the given category', type=int)
+@click.pass_context
+def contribution_descriptions(ctx, event, category):
+    contribs = db.m.Contribution.find(db.m.Contribution.description.op('~')(HTML_TAG_REGEX))
 
-    if not event:
-        categories = db.m.Category.find(db.m.Category.description.op('~')(html_tag_regex))
+    with html_log_writer(ctx.obj['html_log']) as log:
+        if event:
+            contribs = contribs.filter(db.m.Contribution.event_id == event)
+        elif category:
+            contribs = contribs.join(db.m.Event).filter(db.m.Event.category_chain_overlaps(category))
+
+        for contrib in contribs:
+            if '<html>' in unicode(contrib.description):
+                click.echo(click.style('[HTML DOCUMENT] ', fg='red', bold=True) + repr(contrib))
+            else:
+                migrate_description(contrib, ctx.obj['verbose'], log, use_pandoc=ctx.obj['use_pandoc'])
+
+    if not ctx.obj['dry_run']:
+        db.session.commit()
+
+
+@click.command()
+@click.option('-c', '--category', help='Process only descriptions for the given category', type=int)
+@click.pass_context
+def category_descriptions(ctx, category):
+    with html_log_writer(ctx.obj['html_log']) as log:
+        categories = db.m.Category.find(db.m.Category.description.op('~')(HTML_TAG_REGEX))
         if category:
             categories = categories.filter(db.m.Category.id == category)
         for category in categories:
-            migrate_description(category, verbose, log, use_pandoc=use_pandoc)
+            migrate_description(category, ctx.obj['verbose'], log, use_pandoc=ctx.obj['use_pandoc'])
 
-    if log:
-        log.write('</table>')
-
-    if html_log:
-        log.seek(0)
-        html_log.write(HTML_TPL.format(log.read()))
-
-    if not dry_run:
+    if not ctx.obj['dry_run']:
         db.session.commit()
+
+
+cli.add_command(category_descriptions)
+cli.add_command(contribution_descriptions)
 
 
 if __name__ == '__main__':
     update_session_options(db)
     with make_app().app_context():
         with DBMgr.getInstance().global_connection():
-            main()
+            cli(obj={})
