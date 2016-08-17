@@ -405,6 +405,7 @@ widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
                                               'principal_list_widget.js',
                                               'principal_widget.js',
                                               'protection_widget.js',
+                                              'selectize_widget.js',
                                               'synced_input_widget.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
