@@ -16,13 +16,19 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import RHManageTracks, RHCreateTrack, RHCreateTrackOld
-from indico.web.flask.wrappers import IndicoBlueprint
+from flask import session
 
-_bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_template_folder='events/tracks',
-                      url_prefix='/event/<confId>')
+from indico.core.db import db
+from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.events.tracks import logger
+from indico.modules.events.tracks.models.tracks import Track
 
-_bp.add_url_rule('/manage/tracks/', 'manage', RHManageTracks)
-_bp.add_url_rule('/manage/tracks/create', 'create', RHCreateTrack, methods=('GET', 'POST'))
 
-_bp.add_url_rule('/manage/tracks/create-old', 'create_track_old', RHCreateTrackOld, methods=('GET', 'POST'))
+def create_track(event, data):
+    track = Track(event_new=event)
+    track.populate_from_dict(data)
+    db.session.flush()
+    logger.info('Track %r created by %s', track, session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Tracks',
+              'Track "{}" has been created.'.format(track.title), session.user)
+    return track

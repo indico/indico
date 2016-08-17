@@ -19,66 +19,66 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Tracks
-event_mgmt.add_url_rule('/program/', 'confModifProgram', conferenceModif.RHConfModifProgram)
-event_mgmt.add_url_rule('/program/tracks/add', 'confModifProgram-addTrack', conferenceModif.RHConfAddTrack,
+event_mgmt.add_url_rule('/program-old/', 'confModifProgram', conferenceModif.RHConfModifProgram)
+event_mgmt.add_url_rule('/program-old/tracks/add', 'confModifProgram-addTrack', conferenceModif.RHConfAddTrack,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/add/save', 'confModifProgram-performAddTrack',
+event_mgmt.add_url_rule('/program-old/tracks/add/save', 'confModifProgram-performAddTrack',
                         conferenceModif.RHConfPerformAddTrack, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/delete', 'confModifProgram-deleteTracks', conferenceModif.RHConfDelTracks,
+event_mgmt.add_url_rule('/program-old/tracks/delete', 'confModifProgram-deleteTracks', conferenceModif.RHConfDelTracks,
                         methods=('POST',))
 
 # View/edit track
-event_mgmt.add_url_rule('/program/tracks/<trackId>/', 'trackModification', trackModif.RHTrackModification)
-event_mgmt.add_url_rule('/program/tracks/<trackId>/down', 'confModifProgram-moveTrackDown',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/', 'trackModification', trackModif.RHTrackModification)
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/down', 'confModifProgram-moveTrackDown',
                         conferenceModif.RHProgramTrackDown)
-event_mgmt.add_url_rule('/program/tracks/<trackId>/up', 'confModifProgram-moveTrackUp',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/up', 'confModifProgram-moveTrackUp',
                         conferenceModif.RHProgramTrackUp)
-event_mgmt.add_url_rule('/program/tracks/<trackId>/modify', 'trackModification-modify',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/modify', 'trackModification-modify',
                         trackModif.RHTrackDataModification, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/modify/save', 'trackModification-performModify',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/modify/save', 'trackModification-performModify',
                         trackModif.RHTrackPerformDataModification, methods=('POST',))
 
 # Track: coordinators
-event_mgmt.add_url_rule('/program/tracks/<trackId>/coordinators', 'trackModifCoordination',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/coordinators', 'trackModifCoordination',
                         trackModif.RHTrackCoordination)
 
 # Track: abstracts
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/', 'trackModifAbstracts', trackModif.RHTrackAbstractList,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/direct-access', 'trackAbstractModif-directAccess',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/', 'trackModifAbstracts',
+                        trackModif.RHTrackAbstractList, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/direct-access', 'trackAbstractModif-directAccess',
                         trackModif.RHTrackAbstractDirectAccess, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/perform-action', 'trackAbstractModif-abstractAction',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/perform-action', 'trackAbstractModif-abstractAction',
                         trackModif.RHAbstractsActions, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/abstracts.pdf', 'trackAbstractModif-abstractToPDF',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/abstracts.pdf', 'trackAbstractModif-abstractToPDF',
                         trackModif.RHAbstractToPDF, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/', 'trackAbstractModif',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/', 'trackAbstractModif',
                         trackModif.RHTrackAbstract, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/abstract.pdf',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/abstract.pdf',
                         'trackAbstractModif-abstractToPDF', trackModif.RHAbstractToPDF)
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/accept', 'trackAbstractModif-accept',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/accept', 'trackAbstractModif-accept',
                         trackModif.RHTrackAbstractAccept, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/propose/accept',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/propose/accept',
                         'trackAbstractModif-proposeToBeAcc', trackModif.RHTrackAbstractPropToAccept, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/propose/reject',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/propose/reject',
                         'trackAbstractModif-proposeToBeRej', trackModif.RHTrackAbstractPropToReject, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/reject', 'trackAbstractModif-reject',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/reject', 'trackAbstractModif-reject',
                         trackModif.RHTrackAbstractReject, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/dupe', 'trackAbstractModif-markAsDup',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/dupe', 'trackAbstractModif-markAsDup',
                         trackModif.RHModAbstractMarkAsDup, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/dupe/undo', 'trackAbstractModif-unMarkAsDup',
-                        trackModif.RHModAbstractUnMarkAsDup, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/propose-track',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/dupe/undo',
+                        'trackAbstractModif-unMarkAsDup', trackModif.RHModAbstractUnMarkAsDup, methods=('POST',))
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/propose-track',
                         'trackAbstractModif-proposeForOtherTracks', trackModif.RHTrackAbstractPropForOtherTracks,
                         methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/comments/', 'trackAbstractModif-comments',
-                        trackModif.RHAbstractIntComments)
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/comments/add',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/comments/',
+                        'trackAbstractModif-comments', trackModif.RHAbstractIntComments)
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/comments/add',
                         'trackAbstractModif-commentNew', trackModif.RHAbstractIntCommentNew, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/comments/<intCommentId>/edit',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/comments/<intCommentId>/edit',
                         'trackAbstractModif-commentEdit', trackModif.RHAbstractIntCommentEdit, methods=('POST',))
-event_mgmt.add_url_rule('/program/tracks/<trackId>/abstracts/<abstractId>/comments/<intCommentId>/delete',
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/abstracts/<abstractId>/comments/<intCommentId>/delete',
                         'trackAbstractModif-commentRem', trackModif.RHAbstractIntCommentRem, methods=('POST',))
 
 # Track: contributions
-event_mgmt.add_url_rule('/program/tracks/<trackId>/contributions/', 'trackModContribList', trackModif.RHContribList,
-                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/program-old/tracks/<trackId>/contributions/', 'trackModContribList',
+                        trackModif.RHContribList, methods=('GET', 'POST'))
