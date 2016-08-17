@@ -1253,7 +1253,7 @@ class WConfModifProgram(wcomponents.WTemplated):
 
 class WPConfModifProgram( WPConferenceModifBase ):
 
-    sidemenu_option = 'program'
+    sidemenu_option = 'program_old'
 
     def _getPageContent( self, params ):
         wc = WConfModifProgram( self._conf )
