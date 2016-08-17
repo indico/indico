@@ -372,6 +372,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - static_sites (StaticSite.event_new)
     # - surveys (Survey.event_new)
     # - timetable_entries (TimetableEntry.event_new)
+    # - tracks (Track.event_new)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
     @classmethod
