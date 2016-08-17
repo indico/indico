@@ -394,7 +394,9 @@ module_js = {
     'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
 }
 
-widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets', 'person_link_widget.js'))
+widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
+                                              'category_picker_widget.js',
+                                              'person_link_widget.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
