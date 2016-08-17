@@ -1,7 +1,7 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
-{% macro render_abstract_list(abstracts, visible_items, basic_columns, total_abstracts) %}
+{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) %}
     {% if abstracts %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -20,23 +20,83 @@
                     <thead>
                         <tr class="i-table">
                             <th class="i-table checkbox-column" data-sorter="false"></th>
-                            <th class="i-table id-column">
-                                {% trans %}ID{% endtrans %}
-                            </th>
-                            <th class="i-table title-column">
-                                {% trans %}Title{% endtrans %}
-                            </th>
-                            {% for item in basic_columns %}
+                            <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
+                            <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                            {% for item in static_columns %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
-                            {% for item in visible_items %}
+                            {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for abstract in abstracts %}
-                            {# TODO #}
+                            <tr class="i-table abstract-row"
+                                data-friendly-id="{{ abstract.friendly_id }}"
+                                data-title="{{ abstract.as_legacy.getTitle() }}">
+                                <td class="i-table id-column">
+                                    <span class="vertical-aligner">
+                                        <input type="checkbox" class="select-row" name="abstract_id"
+                                               value="{{ abstract.id }}">
+                                    </span>
+                                </td>
+                                <td class="i-table id-column">
+                                    <span class="vertical-aligner">{{ abstract.friendly_id }}</span>
+                                </td>
+                                <td class="i-table">
+                                    <span class="vertical-aligner">{{ abstract.as_legacy.getTitle() }}</span>
+                                </td>
+                                {% for item in static_columns %}
+                                    {% if item.id == 'proposed_type' %}
+                                        <td class="i-table type-column" data-text="{{ abstract.type.name if abstract.type else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.type -%}
+                                                    {{ abstract.type.name }}
+                                                {%- else %}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'accepted_type' %}
+                                        <td class="i-table type-column" data-text="{{ abstract.accepted_type.name if abstract.accepted_type else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.accepted_type -%}
+                                                    {{ abstract.accepted_type.name }}
+                                                {%- else %}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'proposed_track' %}
+                                        <td class="i-table"
+                                            data-text="{{ abstract.track.getTitle().decode('utf-8') if abstract.track else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.track %}
+                                                    {%- trans title=abstract.track.getTitle().decode('utf-8') %}
+                                                        {{ title }}
+                                                    {% endtrans -%}
+                                                {% else %}
+                                                    {% trans %}No track{% endtrans %}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'accepted_track' %}
+                                        <td class="i-table"
+                                            data-text="{{ abstract.accepted_track.getTitle().decode('utf-8') if abstract.accepted_track else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.accepted_track %}
+                                                    {%- trans title=abstract.accepted_track.getTitle().decode('utf-8') %}
+                                                        {{ title }}
+                                                    {% endtrans -%}
+                                                {% else %}
+                                                    {% trans %}No track{% endtrans %}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>

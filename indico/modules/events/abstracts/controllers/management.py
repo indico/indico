@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import flash
+from flask import redirect, flash
 
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
+from indico.modules.events.abstracts.util import AbstractListGenerator
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
@@ -36,6 +37,14 @@ class RHManageAbstractsBase(RHConferenceModifBase):
 
     def _process(self):
         return RH._process(self)
+
+
+class RHAbstractListBase(RHManageAbstractsBase):
+    """Base class for all abstract list operations"""
+
+    def _checkParams(self, params):
+        RHManageAbstractsBase._checkParams(self, params)
+        self.list_generator = AbstractListGenerator(event=self.event_new)
 
 
 class RHAbstracts(RHManageAbstractsBase):
@@ -57,8 +66,27 @@ class RHManageBOA(RHManageAbstractsBase):
         return jsonify_form(form)
 
 
-class RHAbstractList(RHManageAbstractsBase):
+class RHAbstractList(RHAbstractListBase):
     """Display the list of abstracts"""
 
     def _process(self):
-        return WPManageAbstracts.render_template('management/abstract_list.html', self._conf, event=self.event_new)
+        if self.list_generator.static_link_used:
+            return redirect(self.list_generator.get_list_url())
+        list_kwargs = self.list_generator.get_list_kwargs()
+        return WPManageAbstracts.render_template('management/abstract_list.html', self._conf, event=self.event_new,
+                                                 **list_kwargs)
+
+
+class RHAbstractListCustomize(RHAbstractListBase):
+    """Filter options and columns to display for the abstract list of an event"""
+
+    def _process_GET(self):
+        list_config = self.list_generator._get_config()
+        return WPManageAbstracts.render_template('management/abstract_list_filter.html', self._conf,
+                                                 event=self.event_new, visible_items=list_config['items'],
+                                                 static_items=self.list_generator.static_items,
+                                                 filters=list_config['filters'])
+
+    def _process_POST(self):
+        self.list_generator.store_configuration()
+        return jsonify_data(flash=False, **self.list_generator.render_list())
