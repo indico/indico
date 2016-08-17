@@ -165,7 +165,7 @@
 
         setupContributionList({
             createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},
-            createTrackURL: {{ url_for('tracks.create_track', event) | tojson }},
+            createTrackURL: {{ url_for('tracks.create_track_old', event) | tojson }},
             timetableRESTURL: {{ url_for('timetable.timetable_rest', event, _method='POST') | tojson }}
         });
     </script>

@@ -72,7 +72,7 @@ def _sidemenu_items(sender, event, **kwargs):
                                icon='location')
     if is_conference:
         if can_modify:
-            yield SideMenuItem('program', _('Programme'),
+            yield SideMenuItem('program_old', _('Programme (Old)'),
                                url_for('event_mgmt.confModifProgram', event),
                                section='organization')
         if can_modify and cfa_enabled:
