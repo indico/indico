@@ -17,31 +17,33 @@ down_revision = '8763fe20f41'
 
 
 def upgrade():
-    html_mode = str(RenderMode.html.value)
+    markdown_mode = str(RenderMode.markdown.value)
     print 'Adding render_mode column to (sub-)contributions - this may take some time!'
-    op.add_column('contributions', sa.Column('render_mode', PyIntEnum(RenderMode), server_default=html_mode,
+    op.add_column('contributions', sa.Column('render_mode', PyIntEnum(RenderMode), server_default=markdown_mode,
                                              nullable=False), schema='events')
-    op.add_column('subcontributions', sa.Column('render_mode', PyIntEnum(RenderMode), server_default=html_mode,
+    op.add_column('subcontributions', sa.Column('render_mode', PyIntEnum(RenderMode), server_default=markdown_mode,
                                                 nullable=False), schema='events')
     op.alter_column('contributions', 'render_mode', server_default=None, schema='events')
     op.alter_column('subcontributions', 'render_mode', server_default=None, schema='events')
 
-    # set 'non-legacy' (sub-)contributions to 'markdown'
-    print 'Updating non-legacy (sub-)contributions - this may take some time!'
+    # set legacy (sub-)contributions with a description to 'html'
+    print 'Updating legacy (sub-)contributions - this may take some time!'
     op.execute("""
-        CREATE TEMP TABLE markdown_contribs ON COMMIT DROP AS (
+        CREATE TEMP TABLE html_contribs ON COMMIT DROP AS (
             SELECT id FROM events.contributions c
-            WHERE NOT EXISTS (SELECT 1 FROM events.legacy_contribution_id_map WHERE contribution_id = c.id)
+            WHERE description != '' AND
+                  EXISTS (SELECT 1 FROM events.legacy_contribution_id_map WHERE contribution_id = c.id)
         );
-        CREATE TEMP TABLE markdown_subcontribs ON COMMIT DROP AS (
+        CREATE TEMP TABLE html_subcontribs ON COMMIT DROP AS (
             SELECT id FROM events.subcontributions sc
-            WHERE NOT EXISTS (SELECT 1 FROM events.legacy_subcontribution_id_map WHERE subcontribution_id = sc.id)
+            WHERE description != '' AND
+                  EXISTS (SELECT 1 FROM events.legacy_subcontribution_id_map WHERE subcontribution_id = sc.id)
         );
     """)
     op.execute("""
-        UPDATE events.contributions c SET render_mode = {0:d} FROM markdown_contribs mc WHERE mc.id = c.id;
-        UPDATE events.subcontributions s SET render_mode = {0:d} FROM markdown_subcontribs m WHERE m.id = s.id;
-    """.format(RenderMode.markdown.value))
+        UPDATE events.contributions c SET render_mode = {0:d} FROM html_contribs hc WHERE hc.id = c.id;
+        UPDATE events.subcontributions sc SET render_mode = {0:d} FROM html_subcontribs hs WHERE hs.id = sc.id;
+    """.format(RenderMode.html.value))
 
     # support all render modes for notes
     op.drop_constraint('ck_note_revisions_valid_enum_render_mode', 'note_revisions', schema='events')
