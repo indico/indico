@@ -81,3 +81,4 @@ certifi
 Jinja2==2.8
 xlsxwriter==0.9.3
 jsonschema==2.5.1
+html2text==2016.5.29
