@@ -54,6 +54,7 @@ class ContributionForm(IndicoForm):
     keywords = IndicoTagListField(_('Keywords'))
     references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
                                  description=_("Manage external resources for this contribution"))
+    board_number = StringField(_("Board Number"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
