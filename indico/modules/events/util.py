@@ -191,7 +191,8 @@ def serialize_person_link(person_link):
             'title': person_link.title,
             'affiliation': person_link.affiliation,
             'phone': person_link.phone,
-            'address': person_link.address}
+            'address': person_link.address,
+            'displayOrder': person_link.display_order}
 
 
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
