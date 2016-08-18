@@ -40,6 +40,12 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.categories.tasks
 
 
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    from indico.modules.categories.models.principals import CategoryPrincipal
+    CategoryPrincipal.merge_users(target, source, 'category')
+
+
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
