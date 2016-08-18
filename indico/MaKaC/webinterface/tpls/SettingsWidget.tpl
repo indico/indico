@@ -1,8 +1,8 @@
 <%page args="Languages=None"/>
 <div id="settingsWidget" style="display:none" class="settingsWidget">
     <div style="line-height:17px">
-        <span class="settingsWidgetHeader">${currentUser.getStraightFullName()}</span><br/>
-        <span style="font-size:12px">${currentUser.getEmail()}</span>
+        <span class="settingsWidgetHeader">${_session.user.full_name}</span><br/>
+        <span style="font-size:12px">${_session.user.email}</span>
     </div>
     <div class="settingsSeparator"></div>
     <div class="settingsWidgetSection">
@@ -16,9 +16,9 @@
             </select>
         </form>
     </div>
-    % if currentUser:
-        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard', user_id=currentUser.getId()) }">${ _("My profile") }</a></div>
-        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences', user_id=currentUser.getId()) }">${ _("My preferences") }</a></div>
+    % if _session.user:
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard', user_id=_session.user.id) }">${ _("My profile") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences', user_id=_session.user.id) }">${ _("My preferences") }</a></div>
         % if _session.user.is_admin:
             <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
         % endif
@@ -34,7 +34,7 @@
     % endif
 </div>
 
-<a class="i-button icon icon-user arrow user-settings">${currentUser.getStraightAbrName()}</a>
+<a class="i-button icon icon-user arrow user-settings">${_session.user.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=True)}</a>
 
 <script type="text/javascript">
 

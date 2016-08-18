@@ -66,7 +66,7 @@ ${ template_hook('global-announcement') }
             % endif
         % endfor
 
-        % if currentUser:
+        % if _session.user:
             <a href="${ url_for('users.user_dashboard', user_id=None) }">${ _("My profile") }</a>
         % endif
 
