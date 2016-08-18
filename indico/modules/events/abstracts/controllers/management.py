@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash
+from flask import redirect, flash, jsonify
 
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
@@ -90,3 +90,10 @@ class RHAbstractListCustomize(RHAbstractListBase):
     def _process_POST(self):
         self.list_generator.store_configuration()
         return jsonify_data(flash=False, **self.list_generator.render_list())
+
+
+class RHAbstractListStaticURL(RHAbstractListBase):
+    """Generate a static URL for the configuration of the abstract list"""
+
+    def _process(self):
+        return jsonify(url=self.list_generator.generate_static_url())
