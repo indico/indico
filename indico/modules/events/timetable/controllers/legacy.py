@@ -54,6 +54,7 @@ from indico.modules.events.timetable.util import (find_next_start_dt, get_sessio
 from indico.modules.events.util import get_random_color, track_time_changes
 from indico.util.date_time import iterdays, as_utc
 from indico.util.i18n import _
+from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -199,6 +200,8 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
                 return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                     notifications=notifications, flash=False)
+            elif not form.is_submitted():
+                handle_legacy_description(form.description, contrib)
             return jsonify_template('events/contributions/forms/contribution.html', form=form,
                                     fields=form._display_fields)
         elif self.entry.break_:

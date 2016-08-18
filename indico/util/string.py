@@ -31,6 +31,7 @@ import bleach
 import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from enum import Enum
+from html2text import HTML2Text
 from lxml import html, etree
 from markupsafe import Markup, escape
 from speaklater import _LazyString
@@ -581,3 +582,24 @@ class PlainText(Markup):
 
     def __html__(self):
         return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))
+
+
+def handle_legacy_description(field, obj):
+    """Check if the object in question is using an HTML description and convert it.
+
+       The description will be automatically converted to Markdown and a warning will
+       be shown next to the field.
+
+       :param field: the WTForms field to be checked
+       :param obj: the object whose render mode/description will be checked
+    """
+    from indico.core.db.sqlalchemy.descriptions import RenderMode
+    from indico.util.i18n import _
+    if obj.render_mode == RenderMode.html:
+        field.warning = _(u"This description has been automatically converted from HTML to Markdown. "
+                          u"Please double-check that it's properly displayed.")
+        ht = HTML2Text(bodywidth=0)
+        desc = obj._description
+        if RichMarkup(desc)._preformatted:
+            desc = desc.replace(u'\n', u'<br>\n')
+        field.data = ht.handle(desc)

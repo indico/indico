@@ -19,12 +19,10 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from flask import flash, request, jsonify, redirect, session
-from html2text import HTML2Text
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
@@ -53,6 +51,7 @@ from indico.modules.events.util import update_object_principals, track_time_chan
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
+from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
@@ -60,22 +59,6 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.PDFinterface.conference import ContribsToPDF, ContributionBook
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-
-def _handle_legacy_description(field, obj):
-    """Check if the object in question is using an HTML description and convert it.
-
-       The description will be automatically converted to Markdown and a warning will
-       be shown next to the field.
-
-       :param field: the WTForms field to be checked
-       :param obj: the object whose render mode/description will be checked
-    """
-    if obj.render_mode == RenderMode.html:
-        field.warning = _("This description has been automatically converted from HTML to Markdown. "
-                          "Please double-check that it's properly displayed.")
-        ht = HTML2Text(bodywidth=0)
-        field.data = ht.handle(unicode(obj.description))
 
 
 def _render_subcontribution_list(contrib):
@@ -225,8 +208,8 @@ class RHEditContribution(RHManageContributionBase):
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
-        else:
-            _handle_legacy_description(form.description, self.contrib)
+        elif not form.is_submitted():
+            handle_legacy_description(form.description, self.contrib)
         self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
@@ -363,8 +346,8 @@ class RHEditSubContribution(RHManageSubContributionBase):
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
-        else:
-            _handle_legacy_description(form.description, self.subcontrib)
+        elif not form.is_submitted():
+            handle_legacy_description(form.description, self.subcontrib)
         self.commit = False
         return jsonify_template('events/contributions/forms/subcontribution.html', form=form)
 
