@@ -15,19 +15,24 @@
 {% endmacro %}
 
 {% block html %}
+    {% set custom_display_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
     <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
         {% block sections %}{% endblock %}
-        <div class="i-box-footer" style="text-align: right;">
-            <i class="info-helper"
-               title="{% trans %}Added people can be modified by moving the cursor over them.{% endtrans %}"></i>
-            <span id="add-existing-{{ field.id }}" class="i-button highlight">
-                {% trans %}Choose{% endtrans %}
+        <div class="i-box-footer">
+            <span class="alpha-order-switch i-button label icon-only icon-sort-alpha-asc {% if not custom_display_order %}active{% endif %}">
             </span>
-            <span id="add-new-{{ field.id }}" class="i-button"
-                  title="{% trans %}Enter a person manually{% endtrans %}">
-                {% trans %}Enter{% endtrans %}
-            </span>
+            <div class="right">
+                <i class="info-helper"
+                   title="{% trans %}Added people can be modified by moving the cursor over them.{% endtrans %}"></i>
+                <span id="add-existing-{{ field.id }}" class="i-button highlight">
+                    {% trans %}Choose{% endtrans %}
+                </span>
+                <span id="add-new-{{ field.id }}" class="i-button"
+                      title="{% trans %}Enter a person manually{% endtrans %}">
+                    {% trans %}Enter{% endtrans %}
+                </span>
+            </div>
         </div>
     </div>
 {% endblock %}
