@@ -506,7 +506,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         person_data = {'title': next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none),
                        'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
                        'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
-                       'phone': data.get('phone', '')}
+                       'phone': data.get('phone', ''), 'display_order': data['displayOrder']}
         person_data.update(extra_data)
         person_link = None
         if self.object and inspect(person).persistent:
