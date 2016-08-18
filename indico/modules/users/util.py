@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
-from sqlalchemy.orm import undefer, load_only, joinedload
+from sqlalchemy.orm import undefer, load_only, joinedload, contains_eager
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -32,10 +32,11 @@ from indico.modules.events import Event
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import client as redis_client
-from indico.util.redis import suggestions, avatar_links
+from indico.util.redis import avatar_links
 
 
 def get_admin_emails():
@@ -45,10 +46,12 @@ def get_admin_emails():
 
 def get_related_categories(user, detailed=True):
     """Gets the related categories of a user for the dashboard"""
-    favorites = set(Category.query
-                    .filter(Category.id.in_(c.id for c in user.favorite_categories))
-                    .options(undefer('chain_titles'))
-                    .all())
+    favorites = set()
+    if user.favorite_categories:
+        favorites = set(Category.query
+                        .filter(Category.id.in_(c.id for c in user.favorite_categories))
+                        .options(undefer('chain_titles'))
+                        .all())
     managed = set(Category.query
                   .filter(Category.acl_entries.any(db.and_(CategoryPrincipal.type == PrincipalType.user,
                                                            CategoryPrincipal.user == user,
@@ -72,31 +75,27 @@ def get_suggested_categories(user):
     """Gets the suggested categories of a user for the dashboard"""
     if not redis_write_client:
         return []
-    related = {cat.id for cat in get_related_categories(user, detailed=False)}
+    related = set(get_related_categories(user, detailed=False))
     res = []
-    categ_suggestions = suggestions.get_suggestions(user, 'category')
-    query = (Category.query
-             .filter(Category.id.in_(categ_suggestions) if categ_suggestions else False,
-                     ~Category.id.in_(related) if related else True,
-                     ~Category.is_deleted,
-                     ~Category.suggestions_disabled)
-             .options(undefer('chain_titles')))
-    categories = {c.id: c for c in query}
-    for id_, score in categ_suggestions.iteritems():
-        try:
-            categ = categories[int(id_)]
-        except KeyError:
-            suggestions.unsuggest(user, 'category', id_)
+    category_strategy = contains_eager('category')
+    category_strategy.subqueryload('acl_entries')
+    category_strategy.undefer('chain_titles')
+    query = (user.suggested_categories
+             .filter_by(is_ignored=False)
+             .join(SuggestedCategory.category)
+             .options(category_strategy))
+    for suggestion in query:
+        category = suggestion.category
+        if (category.is_deleted or category in related or category.suggestions_disabled or
+                any(p.suggestions_disabled for p in category.parent_chain_query)):
+            user.suggested_categories.remove(suggestion)
             continue
-        if any(p.suggestions_disabled for p in categ.parent_chain_query):
-            suggestions.unsuggest(user, 'category', id_)
-            continue
-        if not categ.can_access(user):
+        if not category.can_access(user):
             continue
         res.append({
-            'score': score,
-            'categ': categ,
-            'path': truncate_path(categ.chain_titles[:-1], chars=50)
+            'score': suggestion.score,
+            'categ': category,
+            'path': truncate_path(category.chain_titles[:-1], chars=50)
         })
     return res
 
@@ -303,6 +302,9 @@ def merge_users(source, target, force=False):
     target.favorite_of |= source.favorite_of
     target.favorite_categories |= source.favorite_categories
 
+    # Update category suggestions
+    SuggestedCategory.merge_users(target, source)
+
     # Merge identities
     for identity in set(source.identities):
         identity.user = target
@@ -310,7 +312,6 @@ def merge_users(source, target, force=False):
     # Merge avatars in redis
     if redis_write_client:
         avatar_links.merge_avatars(target, source)
-        suggestions.merge_avatars(target, source)
 
     # Notify signal listeners about the merge
     signals.users.merged.send(target, source=source)

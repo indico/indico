@@ -272,6 +272,14 @@ class User(PersonMixin, db.Model):
         collection_class=set,
         backref=db.backref('favorite_of', lazy=True, collection_class=set),
     )
+    #: the user's category suggestions
+    suggested_categories = db.relationship(
+        'SuggestedCategory',
+        lazy='dynamic',
+        order_by='SuggestedCategory.score.desc()',
+        cascade='all, delete-orphan',
+        backref=db.backref('user', lazy=True)
+    )
     #: the legacy objects the user is connected to
     linked_objects = db.relationship(
         'UserLink',

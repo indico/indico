@@ -46,10 +46,7 @@ from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, Us
                                         AdminUserSettingsForm, AdminAccountRegistrationForm)
 from indico.util.date_time import timedelta_split, now_utc
 from indico.util.event import truncate_path
-from indico.util.fossilize.conversion import Conversion
 from indico.util.i18n import _
-from indico.util.redis import suggestions
-from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
@@ -108,9 +105,7 @@ class RHUserDashboard(RHUserBase):
                         'survey_submitter'}
 
     def _process(self):
-        if redis_write_client:
-            suggestions.schedule_check(self.user)
-
+        self.user.settings.set('suggest_categories', True)
         tz = timezone(DisplayTZ().getDisplayTZ())
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
         categories = get_related_categories(self.user)
@@ -215,22 +210,23 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
     def _checkParams(self):
         RHUserBase._checkParams(self)
         self.category = Category.get_one(request.view_args['category_id'])
+        self.suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
 
     def _process_PUT(self):
         if self.category not in self.user.favorite_categories:
             if not self.category.can_access(self.user):
                 raise Forbidden()
             self.user.favorite_categories.add(self.category)
-            if redis_write_client:
-                suggestions.unignore(self.user, 'category', str(self.category.id))
-                suggestions.unsuggest(self.user, 'category', str(self.category.id))
+            if self.suggestion:
+                self.user.suggested_categories.remove(self.suggestion)
         return jsonify(success=True)
 
     def _process_DELETE(self):
         if self.category in self.user.favorite_categories:
             self.user.favorite_categories.remove(self.category)
-            if redis_write_client:
-                suggestions.unsuggest(self.user, 'category', self.category.id)
+            suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
+            if suggestion:
+                self.user.suggested_categories.remove(suggestion)
         return jsonify(success=True)
 
 
@@ -238,7 +234,9 @@ class RHUserSuggestionsRemove(RHUserBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        suggestions.unsuggest(self.user, 'category', request.view_args['category_id'], True)
+        suggestion = self.user.suggested_categories.filter_by(category_id=request.view_args['category_id']).first()
+        if suggestion:
+            suggestion.is_ignored = True
         return jsonify(success=True)
 
 

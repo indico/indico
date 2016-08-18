@@ -24,10 +24,10 @@ from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.modules.categories import logger, Category
-from indico.modules.users import User
+from indico.modules.users import User, UserSetting
+from indico.modules.users.models.suggestions import SuggestedCategory
+from indico.modules.users.util import get_related_categories
 from indico.util.date_time import now_utc
-from indico.util.redis import write_client as redis_write_client
-from indico.util.redis.suggestions import next_scheduled_check, suggest, unschedule_check
 from indico.util.suggestions import get_category_scores
 
 
@@ -37,20 +37,25 @@ SUGGESTION_MIN_SCORE = 0.25
 
 @celery.periodic_task(name='category_suggestions', run_every=crontab(minute='0', hour='7'))
 def category_suggestions():
-    if not redis_write_client:
-        return
-    while True:
-        user_id = next_scheduled_check()
-        if user_id is None:
-            break
-        user = User.get(int(user_id))
-        if user:
-            for category, score in get_category_scores(user).iteritems():
-                if score < SUGGESTION_MIN_SCORE:
-                    continue
-                logger.debug('Suggesting %s with score %.03f for %s', category, score, user)
-                suggest(user, 'category', category.id, score)
-        unschedule_check(user_id)
+    users = (User.query
+             .filter(~User.is_deleted,
+                     User._all_settings.any(db.and_(UserSetting.module == 'users',
+                                                    UserSetting.name == 'suggest_categories',
+                                                    db.cast(UserSetting.value, db.String) == 'true'))))
+    for user in users:
+        existing = {x.category: x for x in user.suggested_categories}
+        related = set(get_related_categories(user, detailed=False))
+        for category, score in get_category_scores(user).iteritems():
+            if score < SUGGESTION_MIN_SCORE:
+                continue
+            if (category in related or category.is_deleted or category.suggestions_disabled or
+                    any(p.suggestions_disabled for p in category.parent_chain_query)):
+                continue
+            logger.debug('Suggesting %s with score %.03f for %s', category, score, user)
+            suggestion = existing.get(category) or SuggestedCategory(category=category, user=user)
+            suggestion.score = score
+        user.settings.set('suggest_categories', False)
+        db.session.commit()
 
 
 @celery.periodic_task(name='category_cleanup', run_every=crontab(minute='0', hour='5'))
