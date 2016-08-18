@@ -27,3 +27,9 @@ directions!
 When adding a new column that is not nullable, you need to add it in two steps: First create it with a `server_default`
 value set to whatever default value you want. Afterwars, use the `alter_column` operation to remove the default value.
 While keeping it would not hurt, it's better to stay in sync with the SQLAlchemy model!
+
+
+## Writing models
+When writing/changing models or alembic revisions, run `python bin/maintenance/update_backrefs.py` to keep comments
+about relationship backrefs in sync and `python bin/utils/db_diff.py` to compare the models against your current
+database both to ensure your alembic revision is correct and that your own database is up to date.
