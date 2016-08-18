@@ -191,6 +191,12 @@
         &.heavy {
             background: $light-gray;
         }
+
+        &.active {
+            background-color: $light-yellow;
+            color: $dark-yellow !important;
+            border-color: $dark-yellow !important;
+        }
     }
 
     &.clickable-label {
