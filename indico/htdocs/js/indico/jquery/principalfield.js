@@ -120,6 +120,10 @@
             var person = _.findWhere(self.people, {id: personId});
             $.extend(person, data);
             self._update();
+        },
+
+        refresh: function refresh() {
+            this._update();
         }
     });
 })(jQuery);
