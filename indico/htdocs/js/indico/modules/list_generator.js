@@ -19,8 +19,8 @@
     'use strict';
 
     function colorizeFilter(filter) {
-        var dropdown = filter.next('.dropdown');
-        filter.toggleClass('active', dropdown.find(':checked').length > 0);
+        var dropdown = filter.find('.dropdown');
+        filter.toggleClass('active highlight', dropdown.find(':checked').length > 0);
     }
 
     function colorizeActiveFilters() {
@@ -70,22 +70,24 @@
 
         $('.list-filter .filter').each(function() {
             var $filter = hasColumnSelector ? $(this).parent() : $(this);
-            if (hasColumnSelector) {
-                $filter.dropdown({selector: '.filter', relative_to: $filter.parent()});
-            } else {
-                $filter.dropdown({selector: '.title', relative_to: $filter});
+            $filter.dropdown({selector: "a[data-toggle='dropdown']", relative_to: $filter});
+            if (!hasColumnSelector) {
+                $filter.next('.title-wrapper').on('click', function(evt) {
+                    $filter.find("a[data-toggle='dropdown']").trigger('click');
+                    evt.stopPropagation();
+                });
             }
         });
 
         colorizeActiveFilters();
         $('.list-filter-dialog .toolbar').dropdown();
 
-        $('.list-column').on('click', function(evt) {
+        $('.title-wrapper').on('click', function(evt) {
             if ($(evt.target).hasClass('filter')) {
                 return;
             }
             var $this = $(this);
-            var field = $this.closest('.list-column');
+            var field = $this.closest('.title-wrapper');
             var fieldId = field.data('id');
             var visibilityIcon = field.find('.visibility');
             var enabled = visibilityIcon.hasClass('enabled');
@@ -105,7 +107,7 @@
         });
 
         if (hasColumnSelector) {
-            $('.list-column').each(function() {
+            $('.title-wrapper').each(function() {
                 var field = $(this);
                 var fieldId = field.data('id');
                 var itemsData = JSON.parse(visibleItems.val());
@@ -117,10 +119,6 @@
                 }
             });
         }
-
-        $('.list-column .dropdown').on('click', function(evt) {
-            evt.stopPropagation();
-        });
 
         $('.js-reset-btn').on('click', function() {
             $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
@@ -135,7 +133,7 @@
         });
 
         $('.list-filter input:checkbox').on('change', function() {
-            colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
+            colorizeFilter($(this).closest('.filter'));
         });
 
         $('.list-filter .title').on('mouseover', function() {

@@ -112,24 +112,65 @@
     padding-bottom: 14em;
     position: relative;
 
-    > .i-label {
+    .list-column {
         margin: 5px;
+        width: 14.2em;
+        display: flex;
+        float: left;
+
+        > .filter {
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+
+            > a {
+                color: $light-black;
+                padding: $i-label-vertical-padding $i-label-horizontal-padding;
+                float: left;
+            }
+
+            &:hover {
+                > a:before {
+                    color: $yellow !important;
+                }
+            }
+        }
+    }
+
+    .i-label {
         text-align: left;
         font-weight: bold;
         min-height: 2em;
 
-        &.list-column {
-            width: 12em;
+        &.title-wrapper {
             display: inline-flex;
             align-items: center;
             cursor: pointer;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            flex-grow: 1;
+
+            &:not(.striped) {
+                border-color: $dark-blue;
+                color: $dark-blue !important;
+
+                + .filter {
+                    border-color: $dark-blue;
+                }
+
+                > .title {
+                    color: $dark-blue;
+                }
+            }
 
             > .title {
                 flex-grow: 1;
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
-                color: $light-black;
+                color: $dark-gray;
                 margin-left: 4px;
 
                 &:before {
@@ -144,30 +185,11 @@
                     &.enabled {
                         @extend %enabled-action;
                         display: none;
-                        &:hover {
-                            @extend %not-enabled-action;
-                        }
                     }
                     &:not(.enabled) {
                         @extend %not-enabled-action;
-                        &:hover {
-                            @extend %enabled-action;
-                        }
                     }
 
-                }
-
-                > .filter {
-                    cursor: pointer;
-                    color: $light-black;
-
-                    &.active:before {
-                        color: $indico-blue;
-                    }
-
-                    &:hover:before {
-                        color: $yellow !important;
-                    }
                 }
             }
 

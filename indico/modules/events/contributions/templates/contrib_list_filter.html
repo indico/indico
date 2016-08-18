@@ -2,24 +2,27 @@
 
 {% macro _render_column_selector(item_id, item) %}
     {% set filters = filters['items'] %}
-    <div class="i-label list-column {%- if item.filter_choices %} filter{% endif %}"
-         data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
-        <a class="title {% if item.filter_choices %}icon-filter{% endif %}" data-toggle="dropdown">
-            {{- item.title -}}
-        </a>
+    <div class="label-group list-column">
+        <div class="i-label title-wrapper"
+             data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
+            <div class="title">{{ item.title }}</div>
+        </div>
         {% if item.filter_choices %}
-            <ul class="dropdown" style="display: none">
-                {% for value, caption in item.filter_choices.iteritems() %}
-                    <li>
-                        <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
-                               id="field-{{ item_id }}-option-{{ value }}"
-                               {% if value in filters[item_id] %} checked {% endif %}>
-                        <label for="field-{{ item_id }}-option-{{ value }}">
-                            {{ caption }}
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
+            <div class="i-label filter">
+                <a class="icon-filter" data-toggle="dropdown"></a>
+                <ul class="dropdown" style="display: none">
+                    {% for value, caption in item.filter_choices.iteritems() %}
+                        <li>
+                            <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
+                                   id="field-{{ item_id }}-option-{{ value }}"
+                                   {% if value in filters[item_id] %} checked {% endif %}>
+                            <label for="field-{{ item_id }}-option-{{ value }}">
+                                {{ caption }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endif %}
     </div>
 {% endmacro %}
