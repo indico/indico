@@ -24,6 +24,7 @@
             eventId: null,
             authorTypes: null,
             showEmptyCoauthors: true,
+            sort: true,
             allow: {
                 authors: false,
                 submitters: false,
@@ -49,12 +50,84 @@
         var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-' + options.fieldId);
         var $buttonAddExisting = $('#add-existing-' + options.fieldId);
         var $buttonAddNew = $('#add-new-' + options.fieldId);
+        var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
+        var customOrder = !$buttonAlphaOrder.hasClass('active');
+
+        function updatePersonOrder() {
+            var people = _.map($fieldDisplay.find('.person-row'), function(e) {
+                return $(e).data('person');
+            });
+            people.forEach(function(person, i) {
+                person.displayOrder = customOrder ? (i + 1) : 0;
+                $field.principalfield('set', person.id, {displayOrder: person.displayOrder});
+            });
+        }
+
+        function setupList(entryType, $list, sortedPeople) {
+            var isSortable = options.sort === true;
+
+            $list.empty();
+
+            if (isSortable) {
+                $list.sortable({
+                    axis: 'y',
+                    containment: 'parent',
+                    cursor: 'move',
+                    distance: 10,
+                    handle: '.sort-handle',
+                    items: '> .person-row',
+                    tolerance: 'pointer',
+                    forceHelperSize: true,
+                    forcePlaceholderSize: true,
+                    helper: function(e, item) {
+                        var originals = item.children();
+                        var helper = item.clone();
+                        helper.children().each(function(i) {
+                            $(this).width(originals.eq(i).width());
+                        });
+                        return helper;
+                    },
+                    update: updatePersonOrder
+                });
+            }
+
+            sortedPeople.forEach(function(person) {
+                renderPerson(person, $list, entryType, isSortable && customOrder);
+            });
+        }
 
         function renderPeople(people) {
-            $authorList.html('');
-            $coauthorList.html('');
-            $otherList.html('');
-            _.each(people, renderPerson);
+            $coauthorList.empty();
+            $otherList.empty();
+
+            var sortedPeople = _.sortBy(people, function(person) {
+                return [person.displayOrder, person.name];
+            });
+
+            // Set default values
+            people.forEach(function(person) {
+                setPersonDefaults(person);
+            });
+
+            if (options.authorTypes) {
+                var sortedAuthors = _.filter(sortedPeople, function(person) {
+                    return person.authorType === options.authorTypes.primary;
+                });
+                var sortedCoAuthors = _.filter(sortedPeople, function(person) {
+                    return person.authorType === options.authorTypes.secondary;
+                });
+                var sortedOthers = _.filter(sortedPeople, function(person) {
+                    return (!options.authorTypes || person.authorType === options.authorTypes.none ||
+                            (!options.allow.authors && person.isSpeaker));
+                });
+                setupList(options.authorTypes.primary, $authorList, sortedAuthors);
+                setupList(options.authorTypes.secondary, $coauthorList, sortedCoAuthors);
+                setupList(options.authorTypes.none, $otherList, sortedOthers);
+            } else {
+                setupList(null, $otherList, sortedPeople);
+            }
+
+
             $noAuthorPlaceholder.toggle($authorList.is(':empty'));
             if (!options.showEmptyCoauthors) {
                 $coauthorListTitle.toggle($coauthorList.is(':not(:empty)'));
@@ -65,43 +138,47 @@
             $noOtherPlaceholder.toggle($otherList.is(':empty'));
         }
 
-        function renderPerson(person) {
-            var $personRow = $('<div>').addClass('person-row');
+        function renderPerson(person, $list, entryType, isSortable) {
+            var $speakerLabel = $('<span>').addClass('i-label small speaker').text($T.gettext("Speaker"));
+            var $personRow = $('<div>').addClass('person-row').data('person', person);
             var $personName = $('<div>').addClass('name').text(person.name);
             var $personRoles = $('<span>').addClass('person-roles');
             var $personButtons = $('<span>').addClass('person-buttons');
-            var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close').attr('title', $T.gettext("Remove person"));
-            var $buttonEdit = $('<a>').addClass('i-button-icon icon-edit').attr('title', $T.gettext("Edit information"));
-            var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings').attr('title', $T.gettext("Configure roles"));
+            var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close')
+                                        .attr('title', $T.gettext("Remove person"));
+            var $buttonEdit = $('<a>').addClass('i-button-icon icon-edit')
+                                      .attr('title', $T.gettext("Edit information"));
+            var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings')
+                                        .attr('title', $T.gettext("Configure roles"));
 
-            setPersonDefaults(person);
             $personRow.append($personName).append($personRoles).append($personButtons);
             $personButtons.append($buttonRemove).append($buttonEdit);
 
+            if (isSortable) {
+                $personRow.prepend('<span class="sort-handle">');
+            }
+
             if (options.allow.submitters) {
-                var $submitterLabel = $('<span>').addClass('i-label small submitter').text($T.gettext("Submitter"));
+                var $submitterLabel = $('<span>').addClass('i-label small submitter')
+                                                 .text($T.gettext("Submitter"));
                 $personRoles.append($submitterLabel.toggleClass('selected', person.isSubmitter));
             }
 
             if (options.allow.authors) {
-                var $speakerLabel = $('<span>').addClass('i-label small speaker').text($T.gettext("Speaker"));
                 $personRoles.prepend($speakerLabel.toggleClass('selected', person.isSpeaker));
             }
 
-            if (!options.authorTypes || person.authorType == options.authorTypes.none || (!options.allow.authors && person.isSpeaker)) {
-                $otherList.append($personRow);
+            if (entryType !== null && entryType === options.authorTypes.none) {
                 if (options.allow.authors) {
                     $speakerLabel.addClass('other');
                 }
-            } else if (person.authorType == options.authorTypes.primary) {
-                $authorList.append($personRow);
-            } else if (person.authorType == options.authorTypes.secondary) {
-                $coauthorList.append($personRow);
             }
+
+            $list.append($personRow);
 
             if (options.allow.submitters || options.allow.authors) {
                 $personButtons.append($buttonConfig);
-                setupPersonConfig(person, $buttonConfig, $personRoles);
+                setupPersonConfig(person, $buttonConfig, $personRow, $personRoles);
             }
             $buttonEdit.on('click', function() {
                 $field.principalfield('edit', person.id);
@@ -123,44 +200,43 @@
             }
         }
 
-        function setupPersonConfig(person, $element, $personRoles) {
+        function setupPersonConfig(person, $element, $personRow, $personRoles) {
             var $buttons = $('<div>');
             var $buttonsSeparator = $('<div>').addClass('titled-rule').text($T.gettext("or"));
             var $submitterLabel = $personRoles.find('.submitter');
             var $speakerLabel = $personRoles.find('.speaker');
 
+            function actionButton(moveText, $targetList, targetData) {
+                var $button = $('<div>').addClass('action-row').text(moveText);
+                return $button.on('click', function() {
+                    $element.qbubble('hide');
+                    if ($targetList) {
+                        $personRow.appendTo($targetList);
+                        updatePersonOrder();
+                    }
+                    $field.principalfield('set', person.id, targetData);
+                });
+            }
+
             if (options.allow.authors) {
-                if (person.authorType != options.authorTypes.primary) {
-                    var $authorButton = $('<div>').addClass('action-row').text($T.gettext("Move to authors"));
-                    $authorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 1});
-                    });
-                    $buttons.append($authorButton);
+                if (person.authorType !== options.authorTypes.primary) {
+                    $buttons.append(actionButton($T.gettext("Move to authors"), $authorList, {authorType: 1}));
                 }
 
-                if (person.authorType != options.authorTypes.secondary) {
-                    var $coAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to co-authors"));
-                    $coAuthorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 2});
-                    });
-                    $buttons.append($coAuthorButton);
+                if (person.authorType !== options.authorTypes.secondary) {
+                    $buttons.append(actionButton($T.gettext("Move to co-authors"), $coauthorList, {authorType: 2}));
                 }
 
-                if (person.authorType != options.authorTypes.none) {
-                    var $nonAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to others"));
-                    $nonAuthorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 0, isSpeaker: true});
-                    });
-                    var $speakerButton = $('<div>').addClass('action-row');
-                    $speakerButton.text(person.isSpeaker ? $T.gettext("Not a speaker anymore") : $T.gettext("Make a speaker"));
-                    $speakerButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
-                    });
-                    $buttons.append($nonAuthorButton).append($buttonsSeparator).append($speakerButton);
+                if (person.authorType !== options.authorTypes.none) {
+                    $buttons.append(actionButton($T.gettext("Move to others"), $otherList,
+                                                 {authorType: 0, isSpeaker: true}));
+
+                    var text = person.isSpeaker ? $T.gettext("Not a speaker anymore")
+                                                : $T.gettext("Make a speaker");
+
+                    $buttons.append($buttonsSeparator);
+                    $buttons.append(actionButton(text, null, {isSpeaker: !person.isSpeaker}));
+
                     $speakerLabel.on('click', function() {
                         $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
                     });
@@ -183,7 +259,8 @@
 
             if (options.allow.submitters) {
                 var $submitterButton = $('<div>').addClass('action-row');
-                $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") : $T.gettext("Grant submission rights"));
+                $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") :
+                                                           $T.gettext("Grant submission rights"));
                 $submitterButton.on('click', function() {
                     $element.qbubble('hide');
                     $field.principalfield('set', person.id, {isSubmitter: !person.isSubmitter});
@@ -227,6 +304,15 @@
             overwriteChoice: false,
             render: function(people) {
                 renderPeople(people);
+            },
+            onAdd: function(people) {
+                people.forEach(function(person) {
+                    if (person.authorType === undefined) {
+                        var maxOrder = _.max(people, _.iteratee('displayOrder')).displayOrder;
+                        person.authorType = options.defaults.authorType;
+                        person.displayOrder = customOrder ? (maxOrder + 1) : 0;
+                    }
+                });
             }
         });
 
@@ -236,6 +322,29 @@
 
         $buttonAddNew.on('click', function() {
             $field.principalfield('enter');
+        });
+
+        function getSortingMessage()  {
+            if (customOrder) {
+                return $T.gettext('Custom sorting has been applied. Click to restore alphabetical order.');
+            } else {
+                return $T.gettext('Alphabetical sorting is ON. Click to turn it off.');
+            }
+        }
+
+        $buttonAlphaOrder.qtip({content: getSortingMessage});
+        $buttonAlphaOrder.on('click', function() {
+            var $list = $fieldDisplay.find('.person-list');
+            customOrder = !customOrder;
+            $buttonAlphaOrder.toggleClass('active', !customOrder);
+            if (customOrder) {
+                updatePersonOrder();
+            } else {
+                $list.find('.person-row').each(function() {
+                    $(this).data('person').displayOrder = 0;
+                });
+            }
+            $field.principalfield('refresh');
         });
     };
 })(window);
