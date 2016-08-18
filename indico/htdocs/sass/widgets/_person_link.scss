@@ -99,6 +99,13 @@
             }
         }
 
+        .sort-handle {
+            @include icon-before('icon-handle');
+            color: $dark-gray;
+            margin-right: 0.5em;
+            cursor: move;
+        }
+
         &:hover,
         &.active {
             background: $light-gray;
@@ -129,7 +136,10 @@
     .i-box-footer {
         .info-helper {
             vertical-align: sub;
-            margin-right: 0.5em;
+        }
+
+        .alpha-order-switch, .alpha-order-switch:hover {
+            cursor: pointer !important;
         }
     }
 }
