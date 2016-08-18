@@ -71,7 +71,7 @@ def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None)
     else:
         if return_output:
             return rv
-        if verbose and rv:
+        if verbose > 1 and rv:
             click.echo(click.style(rv, fg='green'), err=True)
 
 
@@ -121,7 +121,7 @@ def _get_apgdiff_cmd(apgdiff):
 
 @click.command()
 @click.argument('dbname', required=False, default='indico')
-@click.option('-v', '--verbose', help='Verbose - show called commands', is_flag=True)
+@click.option('-v', '--verbose', help='Verbose - show called commands; use -vv to also show all output', count=True)
 @click.option('--apgdiff', help='Path to apgdiff (or its .jar file)', envvar='APGDIFF',
               type=click.Path(exists=True, dir_okay=False, resolve_path=True))
 def main(dbname, verbose, apgdiff):
