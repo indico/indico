@@ -139,6 +139,7 @@ class EventPerson(PersonMixin, db.Model):
     )
 
     # relationship backrefs:
+    # - abstract_links (AbstractPersonLink.person)
     # - contribution_links (ContributionPersonLink.person)
     # - event_links (EventPersonLink.person)
     # - session_block_links (SessionBlockPersonLink.person)
