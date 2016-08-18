@@ -15,7 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 from collections import OrderedDict
 
-from indico.util.redis import scripts
+from indico.core.logger import Logger
+from indico.util.redis import scripts, RedisError
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 
@@ -23,7 +24,10 @@ from indico.util.redis import write_client as redis_write_client
 def schedule_check(user, client=None):
     if client is None:
         client = redis_write_client
-    client.sadd('suggestions/scheduled_checks', user.id)
+    try:
+        client.sadd('suggestions/scheduled_checks', user.id)
+    except RedisError:
+        Logger.get('redis').exception('Could not schedule check')
 
 
 def unschedule_check(avatar_id, client=None):
@@ -63,7 +67,11 @@ def get_suggestions(user, what, client=None):
     if client is None:
         client = redis_client
     key = 'suggestions/suggested:%s:%s' % (user.id, what)
-    return OrderedDict(client.zrevrangebyscore(key, '+inf', '-inf', withscores=True))
+    try:
+        return OrderedDict(client.zrevrangebyscore(key, '+inf', '-inf', withscores=True))
+    except RedisError:
+        Logger.get('redis').exception('Could not get suggestions')
+        return OrderedDict()
 
 
 def merge_avatars(destination, source, client=None):
