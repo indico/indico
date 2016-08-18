@@ -1,22 +1,31 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 import os
 
 from flask.json import htmlsafe_dumps
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import load_only
 
-# Used only by imports in the next block
-from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.contributions.models.references import SubContributionReference
-from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
-from indico.modules.rb.models.holidays import Holiday
-
-from indico.web.flask.app import make_app
-
 from indico.core.db import DBMgr, db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.web.flask.app import make_app
 
 
 def main():
