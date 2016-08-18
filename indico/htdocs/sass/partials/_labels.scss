@@ -110,3 +110,39 @@ $i-label-color: $light-black;
         margin-right: $i-label-horizontal-padding/2;
     }
 }
+
+
+.label-group {
+    display: inline-block;
+
+    .i-label {
+        @include border-radius(0);
+        margin: 0;
+        float: left;
+        border-right-width: 0px;
+
+        &:first-child {
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
+        }
+
+        &:last-child {
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+            border-right-width: 1px;
+        }
+
+        &.highlight {
+            border-right-width: 1px;
+
+            + .i-label {
+                border-left: 0;
+            }
+
+            > a:before {
+                color: white;
+            }
+        }
+    }
+
+}
