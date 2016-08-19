@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from collections import OrderedDict
 from datetime import datetime
 from operator import itemgetter
 
@@ -210,7 +211,7 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def wtf_field_kwargs(self):
-        return {'choices': CountryHolder.getCountries().items()}
+        return {'choices': sorted(CountryHolder.getCountries().items(), key=itemgetter(1))}
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -220,7 +221,7 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def filter_choices(self):
-        return dict(self.wtf_field_kwargs['choices'])
+        return OrderedDict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False):
         return CountryHolder.getCountryById(registration_data.data) if registration_data.data else ''
