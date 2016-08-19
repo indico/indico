@@ -1,0 +1,116 @@
+env:
+  browser: true
+  jquery: true
+
+extends: 'eslint:recommended'
+
+rules:
+  indent:
+    - error
+    - 4
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - off
+  semi:
+    - error
+    - always
+  max-len:
+    - warn
+    - code: 120
+  one-var:
+    - warn
+    - initialized: never
+      uninitialized: always
+  eqeqeq:
+    - error
+    - smart
+  dot-location:
+    - error
+    - property
+  wrap-iife:
+    - error
+    - inside
+  block-spacing:
+    - error
+    - always
+  camelcase:
+    - error
+    - properties: never
+  func-style:
+    - warn
+    - declaration
+  padded-blocks:
+    - error
+    - never
+  quote-props:
+    - warn
+    - consistent-as-needed
+  space-before-function-paren:
+    - warn
+    - never
+  array-callback-return: error
+  comma-spacing: error
+  comma-style: error
+  computed-property-spacing: error
+  curly: error
+  func-call-spacing: error
+  key-spacing: error
+  keyword-spacing: error
+  max-statements-per-line: error
+  radix: error
+  semi-spacing: error
+  space-in-parens: error
+  space-infix-ops: error
+  strict: error
+  yoda: error
+  no-unmodified-loop-condition: error
+  no-unsafe-negation: error
+  no-alert: error
+  no-eval: error
+  no-implied-eval: error
+  no-floating-decimal: warn
+  no-global-assign: error
+  no-implicit-globals: error
+  no-lone-blocks: error
+  no-lonely-if: error
+  no-loop-func: error
+  no-mixed-operators: error
+  no-new-func: error
+  no-new-object: error
+  no-return-assign: error
+  no-octal-escape: warn
+  no-new-wrappers: error
+  no-script-url: error
+  no-self-compare: error
+  no-sequences: error
+  no-tabs: error
+  no-throw-literal: error
+  no-trailing-spaces: error
+  no-unneeded-ternary: error
+  no-void: error
+  no-whitespace-before-property: error
+  no-with: error
+  no-shadow:
+    - warn
+    - allow: [data]
+  no-use-before-define:
+    - error
+    - functions: false
+      classes: false
+
+globals:
+  _: false
+  $T: false
+  K: false
+  moment: false
+  Indico: false
+  IndicoUI: false
+  build_url: false
+  alertPopup: false
+  confirmPrompt: false
+  handleFlashes: false
+  handleAjaxError: false
+  ajaxDialog: false
+  cornerMessage: false
