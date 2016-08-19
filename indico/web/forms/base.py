@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import weakref
 
 from flask import request, session, flash, g
@@ -28,7 +30,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.string import strip_whitespace
+from indico.util.string import strip_whitespace, return_ascii
 
 
 class _DataWrapper(object):
@@ -36,6 +38,7 @@ class _DataWrapper(object):
     def __init__(self, data):
         self.data = data
 
+    @return_ascii
     def __repr__(self):
         return '<DataWrapper({!r})>'.format(self.data)
 
@@ -69,7 +72,7 @@ class IndicoFormMeta(FormMeta):
         for name, field in extra_fields:
             name = 'ext__' + name
             if hasattr(ext_cls, name):
-                raise RuntimeError(u'Preference collision in {}: {}'.format(cls.__name__, name))
+                raise RuntimeError('Preference collision in {}: {}'.format(cls.__name__, name))
             setattr(ext_cls, name, field)
         return ext_cls(*args, **kwargs)
 
@@ -99,10 +102,10 @@ class IndicoForm(Form):
             if not g.get('flashed_csrf_message'):
                 # Only flash the message once per request. We may end up in here
                 # multiple times if `validate()` is called more than once
-                flash(_(u'It looks like there was a problem with your current session. Please submit the form again.'),
+                flash(_('It looks like there was a problem with your current session. Please submit the form again.'),
                       'error')
                 g.flashed_csrf_message = True
-            raise ValidationError(_(u'CSRF token missing'))
+            raise ValidationError(_('CSRF token missing'))
 
     def validate(self):
         valid = super(IndicoForm, self).validate()

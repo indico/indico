@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import json
 import uuid
 from collections import OrderedDict
@@ -191,7 +193,7 @@ class TextListField(TextAreaField):
             self._validate_item(line)
 
     def _value(self):
-        return u'\n'.join(self.data) if self.data else u''
+        return '\n'.join(self.data) if self.data else ''
 
 
 class EmailListField(TextListField):
@@ -201,7 +203,7 @@ class EmailListField(TextListField):
 
     def _validate_item(self, line):
         if not is_valid_mail(line, False):
-            raise ValueError(_(u'Invalid email address: {}').format(escape(line)))
+            raise ValueError(_('Invalid email address: {}').format(escape(line)))
 
 
 class IndicoEnumSelectField(SelectFieldBase):
@@ -344,7 +346,7 @@ class PrincipalListField(HiddenField):
 
     def pre_validate(self, form):
         if not self.groups and any(isinstance(p, GroupProxy) for p in self._get_data()):
-            raise ValueError(u'You cannot select groups')
+            raise ValueError('You cannot select groups')
 
     def _serialize_principal(self, principal):
         if principal.principal_type == PrincipalType.email:
@@ -559,17 +561,17 @@ class MultiStringField(HiddenField):
 
     def pre_validate(self, form):
         if not all(isinstance(item, dict) for item in self.data):
-            raise ValueError(u'Invalid data. Expected list of dicts.')
+            raise ValueError('Invalid data. Expected list of dicts.')
         if self.unique:
             unique_values = {item[self.field_name] for item in self.data}
             if len(unique_values) != len(self.data):
-                raise ValueError(u'Items must be unique')
+                raise ValueError('Items must be unique')
         if self.uuid_field:
             unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
             if len(unique_uuids) != len(self.data):
-                raise ValueError(u'UUIDs must be unique')
+                raise ValueError('UUIDs must be unique')
         if not all(item[self.field_name].strip() for item in self.data):
-            raise ValueError(u'Empty items are not allowed')
+            raise ValueError('Empty items are not allowed')
 
     def _value(self):
         return self.data or []
@@ -635,19 +637,19 @@ class MultipleItemsField(HiddenField):
         coercions = {f['id']: f['coerce'] for f in self.fields if f.get('coerce') is not None}
         for i, item in enumerate(self.serialized_data):
             if not isinstance(item, dict):
-                raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
+                raise ValueError('Invalid item type: {}'.format(type(item).__name__))
             item_keys = set(item)
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
             if item_keys != {x['id'] for x in self.fields}:
-                raise ValueError(u'Invalid item (bad keys): {}'.format(escape(u', '.join(item.viewkeys()))))
+                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(item.viewkeys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
-                    raise ValueError(u'{} must be unique'.format(self.field_names[self.unique_field]))
+                    raise ValueError('{} must be unique'.format(self.field_names[self.unique_field]))
                 unique_used.add(item[self.unique_field])
             if self.uuid_field and not self.uuid_field_opaque:
                 if item[self.uuid_field] in uuid_used:
-                    raise ValueError(u'UUID must be unique')
+                    raise ValueError('UUID must be unique')
                 # raises ValueError if uuid is invalid
                 uuid.UUID(item[self.uuid_field], version=4)
                 uuid_used.add(item[self.uuid_field])
@@ -740,10 +742,10 @@ class TimeDeltaField(Field):
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
     # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': u'Seconds',
-        'minutes': u'Minutes',
-        'hours': u'Hours',
-        'days': u'Days'
+        'seconds': 'Seconds',
+        'minutes': 'Minutes',
+        'hours': 'Hours',
+        'days': 'Days'
     }
     magnitudes = OrderedDict([
         ('days', 86400),
@@ -773,7 +775,7 @@ class TimeDeltaField(Field):
         choices = [(unit, self.unit_names[unit]) for unit in self.units]
         # Add whatever unit is necessary to represent the currenet value if we have one
         if best_unit and best_unit not in self.units:
-            choices.append((best_unit, u'({})'.format(self.unit_names[best_unit])))
+            choices.append((best_unit, '({})'.format(self.unit_names[best_unit])))
         return choices
 
     def process_formdata(self, valuelist):
@@ -781,20 +783,20 @@ class TimeDeltaField(Field):
             value = int(valuelist[0])
             unit = valuelist[1]
             if unit not in self.magnitudes:
-                raise ValueError(u'Invalid unit')
+                raise ValueError('Invalid unit')
             self.data = timedelta(seconds=self.magnitudes[unit] * value)
 
     def pre_validate(self, form):
         if self.best_unit in self.units:
             return
         if self.object_data is None:
-            raise ValueError(_(u'Please choose a valid unit.'))
+            raise ValueError(_('Please choose a valid unit.'))
         if self.object_data != self.data:
-            raise ValueError(_(u'Please choose a different unit or keep the previous value.'))
+            raise ValueError(_('Please choose a different unit or keep the previous value.'))
 
     def _value(self):
         if self.data is None:
-            return u'', u''
+            return '', ''
         else:
             return int(self.data.total_seconds()) // self.magnitudes[self.best_unit], self.best_unit
 
@@ -901,9 +903,9 @@ class OccurrencesField(JSONField):
     def process_formdata(self, valuelist):
         def _deserialize(occ):
             try:
-                dt = dateutil.parser.parse(u'{} {}'.format(occ['date'], occ['time']))
+                dt = dateutil.parser.parse('{} {}'.format(occ['date'], occ['time']))
             except ValueError:
-                raise ValueError(u'Invalid date/time: {} {}'.format(escape(occ['date']), escape(occ['time'])))
+                raise ValueError('Invalid date/time: {} {}'.format(escape(occ['date']), escape(occ['time'])))
             return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
 
         self.data = []

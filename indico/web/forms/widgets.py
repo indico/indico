@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import re
 
 from wtforms.widgets import TextInput, TextArea, HiddenInput, CheckboxInput
@@ -40,7 +42,7 @@ class ConcatWidget(object):
         field_args = field_args or {}
         html = []
         for subfield in field:
-            fmt = u'{0} {1}' if self.prefix_label else u'{1} {0}'
+            fmt = '{0} {1}' if self.prefix_label else '{1} {0}'
             html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
         return HTMLString(self.separator.join(html))
 
