@@ -40,7 +40,7 @@ class Judgment(db.Model):
     )
     abstract_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_abstracts.abstracts.id'),
+        db.ForeignKey('event_abstracts.legacy_abstracts.id'),
         index=True,
         nullable=False
     )
@@ -61,7 +61,7 @@ class Judgment(db.Model):
         index=True
     )
     abstract = db.relationship(
-        'Abstract',
+        'LegacyAbstract',
         lazy=False,
         backref=db.backref(
             'judgments',
