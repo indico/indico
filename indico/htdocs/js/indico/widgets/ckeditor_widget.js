@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupCKEditorWidget = function setupCKEditorWidget(options) {
@@ -40,4 +40,4 @@
             dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
         }
     };
-})();
+})(window);

@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupLinkingWidget = function setupLinkingWidget(options) {
@@ -37,4 +37,4 @@
             .off('change').on('change', updateDropdownState)
             .each(updateDropdownState);
     };
-})();
+})(window);

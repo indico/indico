@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupProtectionWidget = function setupProtectionWidget(options) {
@@ -56,4 +56,4 @@
             inputs.trigger('change');
         });
     };
-})();
+})(window);

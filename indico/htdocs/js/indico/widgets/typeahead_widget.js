@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupTypeaheadWidget = function setupTypeaheadWidget(options) {
@@ -54,4 +54,4 @@
 
         field.typeahead($.extend(true, params, options.typeaheadOptions));
     };
-})();
+})(window);

@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupSyncedInputWidget = function setupSyncedInputWidget(options) {
@@ -36,4 +36,4 @@
             }
         });
     };
-})();
+})(window);

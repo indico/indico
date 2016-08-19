@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupColorPickerWidget = function setupColorPickerWidget(options) {
@@ -27,4 +27,4 @@
         field.closest('.i-color-field').colorpicker();
         field.clearableinput();
     };
-})();
+})(window);
