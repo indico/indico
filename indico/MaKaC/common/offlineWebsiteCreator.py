@@ -55,7 +55,6 @@ from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.util.string import remove_tags
-from indico.web.assets import ie_compatibility
 from indico.web.flask.util import url_for
 
 
@@ -133,10 +132,6 @@ class OfflineEventCreator(object):
         for icon in Config.getInstance().getSystemIcons().itervalues():
             self._addFileFromSrc(os.path.join(self._staticPath, 'images', icon),
                                  os.path.join(config.getHtdocsDir(), 'images', icon))
-        # IE compat files (in conditional comments so BS doesn't see them)
-        for path in ie_compatibility.urls():
-            self._addFileFromSrc(os.path.join(self._staticPath, path.lstrip('/')),
-                                 os.path.join(config.getHtdocsDir(), path.lstrip('/')))
         # Mathjax plugins can't be discovered by parsing the HTML
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'lib', 'mathjax'),
                                os.path.join(config.getHtdocsDir(), 'js', 'lib', 'mathjax'))

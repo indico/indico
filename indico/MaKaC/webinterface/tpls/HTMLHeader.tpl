@@ -32,12 +32,6 @@
             <script type="text/javascript" src="${ js_file }"></script>
         % endfor
 
-        <!--[if (gte IE 6)&(lte IE 8)]>
-        % for JSFile in assets["ie_compatibility"].urls():
-            ${'<script src="'+ baseurl + JSFile +'" type="text/javascript"></script>\n'}
-        % endfor
-        <![endif]-->
-
         <!-- global JS variables -->
         <script>
         % if user:

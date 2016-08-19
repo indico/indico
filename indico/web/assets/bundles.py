@@ -306,8 +306,6 @@ presentation = rjs_bundle(
 
 statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
 
-ie_compatibility = rjs_bundle('ie_compatibility', 'js/selectivizr.js')
-
 jed = rjs_bundle('jed', 'js/lib/jed.js')
 moment = rjs_bundle('moment', *namespace('js/lib/moment.js', 'moment.js', 'locale/en-gb.js', 'locale/es.js',
                     'locale/fr.js'))
@@ -474,7 +472,6 @@ def register_all_js(env):
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
-    env.register('ie_compatibility', ie_compatibility)
     env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)

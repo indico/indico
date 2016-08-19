@@ -64,8 +64,6 @@ jQuery TypeWatch <github.com/dennyferra/TypeWatch>: Dual licensed under the MIT 
 
 jQuery Extra Selectors <https://github.com/keithclark/JQuery-Extended-Selectors>: Released under MIT license.
 
-selectivizr (http://selectivizr.com/) is freely distributed under MIT license.
-
 Werkzeug (http://werkzeug.pocoo.org) is a BSD-licensed WSGI utility library providing nice things like LocalProxy.
 
 jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MIT-licensed plugin for jQuery that provides a placeholder for objects.
