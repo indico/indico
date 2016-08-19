@@ -20,8 +20,9 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.roles import ManagementRole
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import EventType, Event
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -57,3 +58,14 @@ class AbstractsFeature(EventFeature):
     @classmethod
     def is_default_for_event(cls, event):
         return event.type_ == EventType.conference
+
+
+@signals.acl.get_management_roles.connect_via(Event)
+def _get_management_roles(sender, **kwargs):
+    return AbstractReviewerRole
+
+
+class AbstractReviewerRole(ManagementRole):
+    name = 'abstract_reviewer'
+    friendly_name = _('Reviewer')
+    description = _('Grants abstract reviewing rights on an event.')

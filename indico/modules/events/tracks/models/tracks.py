@@ -61,6 +61,17 @@ class Track(DescriptionMixin, db.Model):
             order_by=position
         )
     )
+    abstract_reviewers = db.relationship(
+        'User',
+        secondary='events.track_abstract_reviewers',
+        collection_class=set,
+        lazy=True,
+        backref=db.backref(
+            'reviewer_for_tracks',
+            collection_class=set,
+            lazy=True
+        )
+    )
 
     @return_ascii
     def __repr__(self):
