@@ -34,7 +34,8 @@ favorite_user_table = db.Table(
         db.Integer,
         db.ForeignKey('users.users.id'),
         primary_key=True,
-        nullable=False
+        nullable=False,
+        index=True
     ),
     schema='users'
 )
@@ -55,7 +56,8 @@ favorite_category_table = db.Table(
         db.Integer,
         db.ForeignKey('categories.categories.id'),
         primary_key=True,
-        nullable=False
+        nullable=False,
+        index=True
     ),
     schema='users'
 )
