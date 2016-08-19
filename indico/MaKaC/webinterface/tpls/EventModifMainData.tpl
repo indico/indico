@@ -9,7 +9,7 @@ from xml.sax.saxutils import escape
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType
 
-event_types = {t.name: str(t.title) for t in EventType}
+event_types = {t.name: unicode(t.title).encode('utf-8') for t in EventType}
 visibilityList = dict(get_visibility_options(confObj.as_event))
 visibilityList[999] = visibilityList.pop('')
 
