@@ -26,6 +26,107 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
+class AbstracNew(DescriptionMixin, db.Model):
+    """Represents an abstract that can be associated to a Contribution."""
+
+    __tablename__ = 'abstracts_new'
+    __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
+                         {'schema': 'event_abstracts'})
+
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls)
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    #: The friendly ID for the abstract (same as the legacy id in ZODB)
+    friendly_id = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_friendly_id
+    )
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
+    track_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.tracks.id'),
+        nullable=True,
+        index=True
+    )
+    type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contribution_types.id'),
+        nullable=True,
+        index=True
+    )
+    final_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contribution_types.id'),
+        nullable=True,
+        index=True
+    )
+    final_track_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.tracks.id'),
+        nullable=True,
+        index=True
+    )
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'abstracts',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+    track = db.relationship(
+        'Track',
+        lazy=True,
+        foreign_keys=[track_id],
+        backref=db.backref(
+            'abstracts',
+            lazy='dynamic'
+        )
+    )
+    type = db.relationship(
+        'ContributionType',
+        lazy=True,
+        foreign_keys=[type_id],
+        backref=db.backref(
+            'proposed_abstracts',
+            lazy=True
+        )
+    )
+    final_type = db.relationship(
+        'ContributionType',
+        lazy=True,
+        foreign_keys=[final_type_id],
+        backref=db.backref(
+            'completed_abstracts',
+            lazy=True
+        )
+    )
+    final_track = db.relationship(
+        'Track',
+        lazy=True,
+        foreign_keys=[final_track_id],
+        backref=db.backref(
+            'completed_abstracts',
+            lazy=True
+        )
+    )
+
+
 class Abstract(DescriptionMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
