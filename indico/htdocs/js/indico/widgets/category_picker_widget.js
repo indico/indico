@@ -63,13 +63,13 @@
                 openInDialog: true,
                 actionOn: actionOn,
                 onAction: function(category) {
-                    var evt = $.Event('indico:categorySelected');
+                    var event = $.Event('indico:categorySelected');
                     var dfd = $.Deferred();
                     $categoryTitle.text(category.title);
                     hiddenData = {id: category.id, title: category.title};
                     navigatorCategory = category.id;
-                    $field.val(JSON.stringify(hiddenData)).trigger('change').trigger(evt, [category, dfd]);
-                    if (evt.isDefaultPrevented()) {
+                    $field.val(JSON.stringify(hiddenData)).trigger('change').trigger(event, [category, dfd]);
+                    if (event.isDefaultPrevented()) {
                         return dfd;
                     }
                 }

@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
 // -----------------------------------------------------------------------------
 // Indico-specific settings
 // -----------------------------------------------------------------------------
@@ -33,12 +32,15 @@ $.datepicker.setDefaults({
 
 $.extend(true, $.indico.daterange.prototype.options, {
     pickerOptions: {
-        dateFormat: 'dd/mm/yy'},
+        dateFormat: 'dd/mm/yy'
+    },
     labelAttrs: {
-        'class': 'label titleCellFormat'},
+        class: 'label titleCellFormat'
+    },
     labels: [
         $T('Choose the start date'),
-        $T('Choose the end date')]
+        $T('Choose the end date')
+    ]
 });
 
 
@@ -60,6 +62,7 @@ $.extend($.colorbox.settings, {
 $.ajaxSetup({
     traditional: true,
     beforeSend: function(xhr, settings) {
+        'use strict';
         xhr._requestURL = settings.url;  // save the url in case we need it
         if (!/^https?:.*/.test(settings.url)) {
             // Add CSRF token to local requests
@@ -70,5 +73,5 @@ $.ajaxSetup({
 
 // Disabling autoDiscover, otherwise Dropzone will try to attach twice.
 if (window.Dropzone) {
-    Dropzone.autoDiscover = false;
+    window.Dropzone.autoDiscover = false;
 }

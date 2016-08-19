@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global showFormErrors:false, initForms:false */
+
 (function($) {
     'use strict';
 
@@ -25,7 +27,7 @@
                     effect: false
                 },
                 content: {
-                    text: $('<span>', {'text': $T.gettext('Loading...')})
+                    text: $('<span>', {text: $T.gettext('Loading...')})
                 }
             },
             url: null,
@@ -60,7 +62,10 @@
                                     // form. otherwise url normalization might fail during the POST requests.
                                     // we also remove the _=\d+ cache buster since it's only relevant for the GET
                                     // request and added there automatically
-                                    loadedURL = loadedURL.replace(/&_=\d+/, '').replace(/\?_=\d+$/, '').replace(/\?_=\d+&/, '?');
+                                    loadedURL = loadedURL
+                                        .replace(/&_=\d+/, '')
+                                        .replace(/\?_=\d+$/, '')
+                                        .replace(/\?_=\d+&/, '?');
                                 }
 
                                 function updateContent(data) {

@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global Clipboard:false */
+
 $(document).ready(function() {
     'use strict';
 
@@ -36,7 +38,7 @@ $(document).ready(function() {
                 event: 'unfocus click'
             },
             events: {
-                hide: function(evt, api) {
+                hide: function() {
                     $(this).qtip('destroy');
                 }
             }
@@ -45,7 +47,7 @@ $(document).ready(function() {
 
         if (hideAfterDelay) {
             setTimeout(function() {
-                container.qtip('hide')
+                container.qtip('hide');
             }, 3000);
         }
     }

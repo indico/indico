@@ -242,13 +242,13 @@
                 validVenue = true;
                 venueInput.val(latestVenueValue);
                 if (hiddenData.venue_id) {
-                    highlightOption(venueInput, latestVenueValue)
+                    highlightOption(venueInput, latestVenueValue);
                 }
             } else if (latestUsedField[0].id == roomInput[0].id) {
                 validRoom = true;
                 roomInput.val(latestRoomValue);
                 if (hiddenData.room_id) {
-                    highlightOption(roomInput, latestRoomValue)
+                    highlightOption(roomInput, latestRoomValue);
                 }
             }
         }

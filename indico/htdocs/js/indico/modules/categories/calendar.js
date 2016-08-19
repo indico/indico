@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     global.setupCategoryCalendar = function setupCategoryCalendar(elementId, categoryURL) {
@@ -99,4 +99,4 @@
             }
         });
     };
-})();
+})(window);

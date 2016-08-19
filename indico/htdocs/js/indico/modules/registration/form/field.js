@@ -658,8 +658,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                      editable: true,
                      edittype: "text",
                      editoptions: {
-                        size: "30",
-                        maxlength: "50"}},
+                         size: "30",
+                         maxlength: "50"}},
 
                     {name: 'isBillable',
                      index: 'isBillable',
@@ -677,8 +677,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                      edittype: 'text',
                      pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
                      editoptions: {
-                        size: "7",
-                        maxlength: "20"}},
+                         size: "7",
+                         maxlength: "20"}},
 
                     {name: 'placesLimit',
                      index: 'placesLimit',
@@ -688,8 +688,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                      edittype: "text",
                      pattern: '/^\\d*$/',
                      editoptions: {
-                        size: "7",
-                        maxlength: "20"}},
+                         size: "7",
+                         maxlength: "20"}},
 
                     {name: 'maxExtraSlots',
                      index: 'maxExtraSlots',
@@ -700,8 +700,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                      pattern: '/^\\d*$/',
                      className: 'extra-slots',
                      editoptions: {
-                        size: "7",
-                        maxlength: "2"}},
+                         size: "7",
+                         maxlength: "2"}},
 
                     {name: 'extraSlotsPay',
                      index: 'extraSlotsPay',

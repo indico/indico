@@ -41,6 +41,6 @@
     };
 
     global.repositionTooltips = function repositionTooltips() {
-       $('.qtip').qtip('reposition');
+        $('.qtip').qtip('reposition');
     };
 })(jQuery, window);

@@ -28,8 +28,8 @@
 
             $("body").on("mousewheel wheel", function (e) {
                 var blocker = $(e.target).parentsUntil(element.parent()).filter(function(){
-                        return $(this).hasCSS("overflow-y", options.overflowType);
-                    });
+                    return $(this).hasCSS("overflow-y", options.overflowType);
+                });
 
                 if (blocker.length > 0) {
                     var wheelup = (e.originalEvent.wheelDelta || -e.originalEvent.deltaY) / 120 > 0;

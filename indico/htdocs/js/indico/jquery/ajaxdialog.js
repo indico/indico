@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global ExclusivePopup:false, showFormErrors:false, initForms:false */
+/* eslint-disable max-len */
+
 (function(global, $) {
     'use strict';
 
@@ -32,9 +35,9 @@
                 return;
             }
             var href = $(this).attr('href');
-            if (href === undefined || href == '#') {
-                var data_href = $(this).data('href');
-                href = data_href ? data_href : href;
+            if (href === undefined || href === '#') {
+                var dataHref = $(this).data('href');
+                href = dataHref ? dataHref : href;
             }
             ajaxDialog($.extend({
                 title: $(this).data('title')
@@ -177,7 +180,7 @@
                     loadDialog();
                 });
                 injectJS(dialogData.js);
-                _onOpen(popup);
+                _onOpen();
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
@@ -232,7 +235,7 @@
             popup = null;
         }
 
-        function _onOpen(popup) {
+        function _onOpen() {
             if (options.fullyModal) {
                 $('html, body').addClass('prevent-scrolling');
             }

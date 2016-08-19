@@ -16,8 +16,12 @@
  */
 
 // Global scripts that should be executed on all pages
+/* global showFormErrors:false */
+/* eslint-disable max-len */
 
 $(document).ready(function() {
+    'use strict';
+
     // Create static tabs. They just load the target URL and use no ajax whatsoever
     $('.static-tabs').each(function() {
         var tabCtrl = $(this);
@@ -59,15 +63,13 @@ $(document).ready(function() {
      *
      * It is also possible to have HTML inside the qTip by using the
      * data-qtip-html attribute instead of the title attribute. */
-    $(document).on("mouseenter",
-                   '[title]:not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
-                   function(event) {
-        var $target = $(this),
-            title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim(),
-            extraOpts = $(this).data('qtip-opts') || {},
-            qtipClass = $(this).data('qtip-style'),
-            qtipHTMLContainer = $(this).data('qtip-html'),
-            qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
+    $(document).on("mouseenter", '[title]:not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)', function(evt) {
+        var $target = $(this);
+        var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
+        var extraOpts = $(this).data('qtip-opts') || {};
+        var qtipClass = $(this).data('qtip-style');
+        var qtipHTMLContainer = $(this).data('qtip-html');
+        var qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
 
         if (!qtipHTML && !title) {
             return;
@@ -78,17 +80,17 @@ $(document).ready(function() {
 
         var position = $(this).data('qtip-position');
         var positionOptions;
-        if (position == "left") {
+        if (position === "left") {
             positionOptions = {
                 my: 'right center',
                 at: 'left center'
             };
-        } else if (position == "right") {
+        } else if (position === "right") {
             positionOptions = {
                 my: 'left center',
                 at: 'right center'
             };
-        } else if (position == "top") {
+        } else if (position === "top") {
             positionOptions = {
                 my: 'bottom center',
                 at: 'top center'
@@ -103,7 +105,7 @@ $(document).ready(function() {
             }, positionOptions),
 
             show: {
-                event: event.type,
+                event: evt.type,
                 ready: true
             },
 
@@ -143,7 +145,7 @@ $(document).ready(function() {
             style: {
                 classes: qtipClass ? 'qtip-' + qtipClass : null
             }
-        }, extraOpts), event);
+        }, extraOpts), evt);
 
         $target.on('indico:closeAutoTooltip', function() {
             qtip.qtip('hide');
@@ -203,18 +205,18 @@ $(document).ready(function() {
     }
 
     $('body').on('focusin', function(e) {
-        if(!$.ui.dialog.overlayInstances) {
+        if (!$.ui.dialog.overlayInstances) {
             return;
         }
 
-        if(getMaxZ($(e.target)) > getMaxZ($('.ui-dialog:visible:last'))) {
+        if (getMaxZ($(e.target)) > getMaxZ($('.ui-dialog:visible:last'))) {
             e.stopPropagation();
         }
     });
 
     // Prevent BACK in browser with backspace when focused on a readonly field
     $('input, textarea').on('keydown', function(e) {
-        if (this.readOnly && e.which == K.BACKSPACE) {
+        if (this.readOnly && e.which === K.BACKSPACE) {
             e.preventDefault();
         }
     });

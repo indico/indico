@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget("indico.colorpicker", {
 
         options: {
@@ -54,16 +56,16 @@
                     updateColorPreview('#' + hex);
                     $(el).ColorPickerHide();
                 },
-                onChange: function (hsb, hex, rgb) {
+                onChange: function(hsb, hex) {
                     colorInput.val('#' + hex);
                     updateColorPreview('#' + hex);
                     colorInput.trigger('input');
                 },
-                onShow: function (colorpicker) {
+                onShow: function(colorpicker) {
                     $(colorpicker).fadeIn(500);
                     return false;
                 },
-                onHide: function (colorpicker) {
+                onHide: function(colorpicker) {
                     $(colorpicker).fadeOut(500);
                     return false;
                 }

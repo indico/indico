@@ -29,7 +29,7 @@
 
             field.prop('readonly', this.checked);
             if (this.checked) {
-                syncedValue = JSON.parse(field.attr('data-synced-value'))
+                syncedValue = JSON.parse(field.attr('data-synced-value'));
                 if (syncedValue !== null) {
                     field.val(syncedValue);
                 }

@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global RichTextEditor:false, $E:false */
+
 (function(global) {
     'use strict';
 

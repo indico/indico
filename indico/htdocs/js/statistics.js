@@ -30,7 +30,7 @@ function processJqPlotOptions(options) {
         cursor: {
             show: true,
             showTooltip: false,
-            zoom: false,
+            zoom: false
         },
         grid: {
             background: 'rgba(0, 0, 0, 0)',
@@ -51,12 +51,12 @@ function processJqPlotOptions(options) {
                 color: 'white',
                 location: 'w',
                 xpadding: 4,
-                edgeTolerance: -2,
+                edgeTolerance: -2
             },
             rendererOptions: {
                 animation: { speed: 1000 },
                 highlightColors: '#0085B9',
-                smooth: true,
+                smooth: true
             },
             shadow: false,
             size: 11
@@ -81,7 +81,7 @@ $(document).ready(function initStats() {
             duration: 1000,
             easing: 'swing',
             step: function () {
-              $this.text(Math.ceil(this.Counter));
+                $this.text(Math.ceil(this.Counter));
             }
         });
     });

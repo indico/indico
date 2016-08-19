@@ -45,8 +45,7 @@
         var resetFieldAction = $('#' + options.fieldId + '-reset');
         var timezoneElement = timeField.next('.timezone');
         var timezone = options.timezone;
-        var initialDate;
-        var initialTime;
+        var initialDate, initialTime;
 
         function clearDate() {
             dateField.datepicker('setDate', null).trigger('change');
@@ -75,7 +74,7 @@
             var selectedTime = timeField.val();
             if (selectedDate !== limitDate || (selectedDate === initialDate && selectedTime === initialTime)) {
                 timeField.removeAttr(attr);
-            } else if (timeField.attr(attr) != limitTime) {
+            } else if (timeField.attr(attr) !== limitTime) {
                 // Fix for Chrome ignoring next number keydown after min/max attr change.
                 // Delay gives some margin to type double digits.
                 setTimeout(function() {
@@ -136,7 +135,7 @@
             updateResetFieldAction();
         }).on('keydown', function(e) {
             e.preventDefault();
-            if (e.which == K.BACKSPACE) {
+            if (e.which === K.BACKSPACE) {
                 clearDate();
             }
         });

@@ -31,7 +31,7 @@
             // $.ajax error callback, so data is the xhr object
             try {
                 data = JSON.parse(data.responseText);
-            } catch(e) {
+            } catch (e) {
                 IndicoUI.Dialogs.Util.error({
                     code: data.status,
                     type: 'unknown',

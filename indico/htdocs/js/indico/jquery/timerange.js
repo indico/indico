@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget('indico.timerange', {
         options: {
             label: $T('Time'),
@@ -59,7 +61,6 @@
 
         _createInputs: function() {
             var self = this;
-            var element = self.element;
             var opt = self.options;
 
             var typeWatchOptions = {
@@ -88,13 +89,13 @@
                 .typeWatch(typeWatchOptions);
 
             self.element.on('keydown', 'input', function(e) {
-                if ($(e.target).prop('name') == opt.startTimeName) {
-                    if (e.which == K.TAB) {
+                if ($(e.target).prop('name') === opt.startTimeName) {
+                    if (e.which === K.TAB) {
                         e.preventDefault();
                         self.endTime.focus().select();
                     }
-                } else if ($(e.target).prop('name') == opt.endTimeName) {
-                    if (e.which == K.TAB && e.shiftKey) {
+                } else if ($(e.target).prop('name') === opt.endTimeName) {
+                    if (e.which === K.TAB && e.shiftKey) {
                         e.preventDefault();
                         self.startTime.focus().select();
                     }
@@ -104,7 +105,6 @@
 
         _createSlider: function() {
             var self = this;
-            var element = self.element;
             var opt = self.options;
 
             self.slider = $('<span>').slider({
@@ -162,11 +162,11 @@
         },
 
         __getTimeString: function(time) {
-            var minutes = parseInt(time % 60);
-            var hours = parseInt((time / 60) % 24);
+            var minutes = parseInt(time % 60, 10);
+            var hours = parseInt((time / 60) % 24, 10);
 
             minutes = minutes + '';
-            if (minutes.length == 1) {
+            if (minutes.length === 1) {
                 minutes = '0' + minutes;
             }
 
@@ -175,13 +175,13 @@
 
         __getTime: function(timeString) {
             var time = timeString.split(':');
-            return (Math.min(parseInt(time[0]), 23) * 60) + Math.min(parseInt(time[1]), 59);
+            return (Math.min(parseInt(time[0], 10), 23) * 60) + Math.min(parseInt(time[1], 10), 59);
         },
 
         __validateTime: function(timeString) {
             var time = timeString.split(':');
-            var hours = parseInt(time[0]);
-            var minutes = parseInt(time[1]);
+            var hours = parseInt(time[0], 10);
+            var minutes = parseInt(time[1], 10);
 
             if (isNaN(hours) || isNaN(minutes)) {
                 return false;
@@ -269,6 +269,6 @@
             }
 
             return valid;
-        },
-    })
+        }
+    });
 })(jQuery);

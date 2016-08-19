@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget("indico.nullableselector", {
 
         options: {
@@ -27,9 +29,9 @@
             var element = self.element;
             var opt = self.options;
 
-            element.toggleClass('no-value', element.val() === opt.nullvalue)
+            element.toggleClass('no-value', element.val() === opt.nullvalue);
             element.on('change', function() {
-                $(this).toggleClass('no-value', $(this).val() === opt.nullvalue)
+                $(this).toggleClass('no-value', $(this).val() === opt.nullvalue);
             });
         }
     });

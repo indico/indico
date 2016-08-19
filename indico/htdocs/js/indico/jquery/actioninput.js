@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget('indico.actioninput', $.indico.clearableinput, {
         options: {
             actionCallback: function() {},
@@ -37,7 +39,7 @@
                 });
 
             input.on("keydown keypress", function(e) {
-                if (e.which == K.ENTER && self.options.enterKeyEnabled) {
+                if (e.which === K.ENTER && self.options.enterKeyEnabled) {
                     self._action();
                 }
             });

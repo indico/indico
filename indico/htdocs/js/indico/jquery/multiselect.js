@@ -56,35 +56,35 @@ $.extend($.ech.multiselectfilter.prototype, {
     },
 
     updateCache: function(){
-            // each list item
-            this.rows = this.instance.menu.find(".ui-multiselect-checkboxes li:not(.ui-multiselect-optgroup-label)");
+        // each list item
+        this.rows = this.instance.menu.find(".ui-multiselect-checkboxes li:not(.ui-multiselect-optgroup-label)");
 
-            // cache
-            this.cache = this.element.children().map(function(){
-                var self = $(this);
+        // cache
+        this.cache = this.element.children().map(function(){
+            var self = $(this);
 
-                // account for optgroups
-                if( this.tagName.toLowerCase() === "optgroup" ){
-                    self = self.children();
-                }
+            // account for optgroups
+            if( this.tagName.toLowerCase() === "optgroup" ){
+                self = self.children();
+            }
 
-                return self.map(function(){
-                    return this.innerHTML.toLowerCase();
-                }).get();
+            return self.map(function(){
+                return this.innerHTML.toLowerCase();
             }).get();
+        }).get();
 
-            this.cache2 = this.element.children().map(function(){
-                var self = $(this);
+        this.cache2 = this.element.children().map(function(){
+            var self = $(this);
 
-                // account for optgroups
-                if( this.tagName.toLowerCase() === "optgroup" ){
-                    self = self.children();
-                }
+            // account for optgroups
+            if( this.tagName.toLowerCase() === "optgroup" ){
+                self = self.children();
+            }
 
-                return self.map(function(){
-                    return $(this).attr('label');
-                }).get();
+            return self.map(function(){
+                return $(this).attr('label');
             }).get();
+        }).get();
     },
 
     _handler: function( e ){
@@ -116,8 +116,8 @@ $.extend($.ech.multiselectfilter.prototype, {
         // show/hide optgroups
         this.instance.menu.find(".ui-multiselect-optgroup-label").each(function(){
             var $this = $(this);
-            var isVisible = $this.nextUntil('.ui-multiselect-optgroup-label').filter(function(){
-              return $.css(this, "display") !== 'none';
+            var isVisible = $this.nextUntil('.ui-multiselect-optgroup-label').filter(function() {
+                return $.css(this, "display") !== 'none';
             }).length;
 
             $this[ isVisible ? 'show' : 'hide' ]();

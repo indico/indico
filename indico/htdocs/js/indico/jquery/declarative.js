@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable max-len */
+
 (function() {
     'use strict';
 
@@ -102,13 +104,13 @@
                 }
             }
 
-            function handleHtmlUpdate(data, update, triggeredBy) {
+            function handleHtmlUpdate(data, triggeredBy) {
                 if (typeof update === 'string') {
                     updateHtml(update, data.html, triggeredBy);
                 } else {
                     for (var key in update) {
                         if (!(key in data)) {
-                            console.error('Invalid key: ' + key);
+                            console.error('Invalid key: ' + key);  // eslint-disable-line no-console
                         } else {
                             updateHtml(update[key], data[key], triggeredBy);
                         }
@@ -143,7 +145,7 @@
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
-                                    handleHtmlUpdate(data, update, $this);
+                                    handleHtmlUpdate(data, $this);
                                 } else if (reload !== undefined && reload !== 'customData') {
                                     IndicoUI.Dialogs.Util.progress();
                                     location.reload();
@@ -167,7 +169,7 @@
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
                             handleFlashes(data, true, $this);
-                            handleHtmlUpdate(data, update, $this);
+                            handleHtmlUpdate(data, $this);
                         }
                     });
                     return;
@@ -209,8 +211,8 @@
 
     function setupAnchorLinks() {
         $('[data-anchor]').each(function() {
-            var $elem = $(this),
-                fragment = $elem.data('anchor');
+            var $elem = $(this);
+            var fragment = $elem.data('anchor');
             $('<a>', {
                 class: 'anchor-link',
                 href: '#' + fragment,
@@ -218,5 +220,4 @@
             }).html('&para;').appendTo($elem);
         });
     }
-
 })();

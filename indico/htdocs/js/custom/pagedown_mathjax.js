@@ -1,7 +1,9 @@
-
+/* eslint-disable camelcase, one-var, no-lonely-if */
+/* global Markdown:false, MathJax:false, PageDownMathJax:false */
 
 // General MathJax configuration
 (function() {
+    'use strict';
     if (!window.indicoOfflineSite) {
         MathJax.Ajax.config.root = Indico.Urls.Base + "/js/lib/mathjax";
     }
@@ -10,18 +12,16 @@
 (function() {
     "use strict";
 
-    var DELIMITERS = [["$", "$"], ["$$","$$"]];
+    var DELIMITERS = [["$", "$"], ["$$", "$$"]];
 
     window.PageDownMathJax = (function() {
-        var ready = false, // true after initial typeset is complete
-            pending = false, // true when MathJax has been requested
-            $preview = null, // the preview container
-            inline = "$",
-            ready_listeners = []; // the inline math delimiter
+        var ready = false; // true after initial typeset is complete
+        var pending = false; // true when MathJax has been requested
+        var $preview = null; // the preview container
+        var ready_listeners = []; // the inline math delimiter
 
         var blocks, start, end, last, braces; // used in searching for math
         var math; // stores math until markdone is done
-
         var HUB = MathJax.Hub;
 
         //
@@ -31,11 +31,11 @@
             ready = true;
             HUB.processUpdateTime = 50; // reduce update time so that we can cancel easier
             HUB.Config({
-                "HTML-CSS": {
+                'HTML-CSS': {
                     EqnChunk: 10,
                     EqnChunkFactor: 1
                 }, // reduce chunk for more frequent updates
-                SVG: {
+                'SVG': {
                     EqnChunk: 10,
                     EqnChunkFactor: 1
                 }
@@ -216,9 +216,7 @@
             };
 
             editorObject.hooks.chain("onPreviewRefresh", preview);
-
             typeset($preview.get(0));
-
             addListener(preview);
         }
 
@@ -245,7 +243,6 @@
 
             createPreview(editor);
             editor.run();
-
         }
 
         function mathJax(elem) {
@@ -253,7 +250,7 @@
         }
 
         function addListener(listener) {
-           ready_listeners.push(listener);
+            ready_listeners.push(listener);
         }
 
         return {
@@ -269,7 +266,7 @@
     var pd = PageDownMathJax();
 
     $.fn.mathJax = function() {
-        $(this).each(function(i, elem) {
+        $(this).each(function() {
             pd.mathJax(this);
         });
         return this;
@@ -307,7 +304,7 @@
             }
 
             if (pd_context) {
-                if (arg1 == 'auto-save' && $save_button.length) {
+                if (arg1 === 'auto-save' && $save_button.length) {
                     /*
                      * This is the 'auto-save' feature
                      * options:

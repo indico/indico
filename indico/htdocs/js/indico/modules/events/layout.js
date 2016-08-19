@@ -101,7 +101,7 @@
                         var isRoot = ui.item.closest('.menu-entry')[0] === undefined;
                         // disallow adding child elements
                         if (!isRoot) {
-                             ui.item.removeClass('allow-nested');
+                            ui.item.removeClass('allow-nested');
                         }
                         // allow adding children to root entries which have a list of children
                         if (isRoot && ui.item.find('> .menu-entry > .menu-entries')) {

@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget("indico.clearableinput", {
         options: {
             alwaysClearable: false,
@@ -47,7 +49,7 @@
                 })
                 .on('keyup', function(e) {
                     if (self.options.clearOnEscape) {
-                        if (e.which == K.ESCAPE) {
+                        if (e.which === K.ESCAPE) {
                             self.element.val('value');
                             self._clear();
                         }

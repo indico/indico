@@ -16,6 +16,8 @@
  */
 
 $(function() {
+    'use strict';
+
     var resultCache = [];
     var allItems = $(".index .item");
 
@@ -33,7 +35,7 @@ $(function() {
         items.removeClass('visibility_hidden');
 
         $("#numberFiltered").text(items.length);
-        $("#numberFilteredText").text(items.length == 1 ? $T("author") : $T("authors"));
+        $("#numberFilteredText").text(items.length === 1 ? $T("author") : $T("authors"));
     });
 
     $(".material_icon").each(function() {

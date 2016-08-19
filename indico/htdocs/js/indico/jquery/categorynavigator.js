@@ -183,17 +183,16 @@
         },
 
         _buildBreadcrumbs: function(path, clickable) {
-            var self = this;
             var $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
             var tag = clickable ? '<a>' : '<span>';
 
             _.each(path, function(category, idx) {
                 var $item = $('<li>');
                 var $segment = $(tag, {
-                    text: category.title,
+                    'text': category.title,
                     'data-category-id': category.id
                 }).toggleClass('js-go-to', clickable);
-                if (idx == 0) {
+                if (idx === 0) {
                     $item.text($T.gettext("in") + " ");
                 }
                 if (clickable) {
@@ -266,8 +265,8 @@
             var self = this;
             var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
             var $button = $('<span>', {
-                class: 'action-button js-action',
-                text: self.options.actionButtonText,
+                'class': 'action-button js-action',
+                'text': self.options.actionButtonText,
                 'data-category-id': category.id
             });
             $buttonWrapper.append($('<div>').append($button));
@@ -280,8 +279,8 @@
             if (!forSubcategory && category.parent_path && category.parent_path.length) {
                 var parent = _.last(category.parent_path);
                 var $arrowUp = $('<a>', {
-                    class: 'icon-arrow-up navigate-up js-navigate-up',
-                    title: $T.gettext("Go to parent: {0}".format(parent.title)),
+                    'class': 'icon-arrow-up navigate-up js-navigate-up',
+                    'title': $T.gettext("Go to parent: {0}".format(parent.title)),
                     'data-parent-id': parent.id
                 });
                 $buttonWrapper.append($arrowUp);
@@ -342,16 +341,19 @@
         },
 
         _buildNoResultsPlaceholder: function() {
-            var self = this;
             var $placeholder = $('<div>')
-                .append($('<div>', {class: 'placeholder-text', text: $T.gettext("Your search doesn't match any category")}))
-                .append($('<div>', {html: $T.gettext('You can <a class="js-search">modify</a> ' +
-                                                     'or <a class="js-clear-search">clear</a> your search.')}));
+                .append($('<div>', {
+                    class: 'placeholder-text',
+                    text: $T.gettext("Your search doesn't match any category")
+                }))
+                .append($('<div>', {
+                    html: $T.gettext('You can <a class="js-search">modify</a> or ' +
+                                     '<a class="js-clear-search">clear</a> your search.')
+                }));
             return $placeholder;
         },
 
         _ellipsizeBreadcrumbs: function($category) {
-            var self = this;
             var $breadcrumbs = $category.find('.breadcrumbs');
             var availableSpace = $category.find('.title-wrapper').width();
             var $ellipsis = $('<li>', {class: 'ellipsis'});
@@ -374,7 +376,6 @@
         },
 
         _highlightQuery: function(query, $result) {
-            var self = this;
             var $title = $result.find('.title');
             var title = $title.text();
             var indexStart = title.toLowerCase().search(query.toLowerCase());
@@ -382,12 +383,6 @@
 
             $title.html(title.substring(0, indexStart) + '<strong>' + title.substring(indexStart, indexEnd) +
                         '</strong>' + title.substring(indexEnd));
-        },
-
-        _renderInitialCategory: function(data) {
-            var self = this;
-            self._renderCurrentCategory(data.category);
-            self._renderCategoryTree(data.subcategories, data.category);
         },
 
         _renderCurrentCategory: function(category) {
@@ -446,7 +441,7 @@
                 text: totalCount ? $T.gettext("Displaying {0} out of {1} results.").format(count, totalCount)
                                  : $T.gettext("There are no results.")
             });
-            if (totalCount != count || !totalCount) {
+            if (totalCount !== count || !totalCount) {
                 $stats.text($stats.text() + ' ' + $T("Make the search more specific for more accurate results"));
             }
             var $clear = $('<a>', {
@@ -503,8 +498,8 @@
 
             function resolve() {
                 var subcategories = [];
-                _.each(self._subcategories[id], function(id) {
-                    subcategories.push(self._categories[id]);
+                _.each(self._subcategories[id], function(scId) {
+                    subcategories.push(self._categories[scId]);
                 });
                 dfd.resolve(subcategories, self._categories[id]);
             }
@@ -539,7 +534,7 @@
             var self = this;
 
             // Don't send another request if one for the same ID is ongoing
-            if (self._currentCategoryRequest && self._currentCategoryRequest.categoryId == id) {
+            if (self._currentCategoryRequest && self._currentCategoryRequest.categoryId === id) {
                 self._currentCategoryRequest.then(callback);
                 return;
             }
@@ -724,10 +719,10 @@
 
             if (categoriesDescendingFrom.disabled) {
                 var id;
-                var path_ids = _.pluck(category.parent_path, 'id').reverse();
+                var pathIds = _.pluck(category.parent_path, 'id').reverse();
                 var ids = categoriesDescendingFrom.ids;
-                for (var i in path_ids) {
-                    id = path_ids[i];
+                for (var i in pathIds) {
+                    id = pathIds[i];
                     if (_.contains(ids, id)) {
                         result.allowed = false;
                         result.message = categoriesDescendingFrom.message.format(self._categories[id].title);
@@ -817,7 +812,7 @@
 
             self._toggleTreeView(false);
             self._toggleSearchResultsView(false);
-            self._getSearchResults(query).then(function(data, query) {
+            self._getSearchResults(query).then(function(data, query) {  // eslint-disable-line no-shadow
                 self._renderSearchResultInfo(data.categories.length, data.total_count);
                 self._renderSearchResults(data.categories, query);
             });

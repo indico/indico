@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global processJqPlotOptions:false */
+
 $(function initCategoryStats() {
     'use strict';
 
@@ -48,28 +50,31 @@ $(function initCategoryStats() {
             highlighter: {
                 location: 'n',
                 tooltipAxes: 'yx',
-                tooltipSeparator: $this.data('tooltip'),
+                tooltipSeparator: $this.data('tooltip')
             },
             series: [
                 {
                     fillAlpha: 0.9,
                     fill: true,
                     fillAndStroke: true
-                },{
+                }, {
                     markerOptions: {
-                    color: '#005272',
-                    style: 'circle',
-                }},
+                        color: '#005272',
+                        style: 'circle'
+                    }
+                }
             ],
             width: 400
         };
         data = [
-            _.pairs(data).map(function(datum) { return [parseInt(datum[0]), datum[1]]; }),
+            _.pairs(data).map(function(datum) {
+                return [parseInt(datum[0], 10), datum[1]];
+            }),
             current
         ];
         var plot = $.jqplot(this.id, data, processJqPlotOptions(options));
         $(window).resize(function() {
-              plot.replot( { resetAxes: true } );
+            plot.replot({ resetAxes: true });
         });
     });
 });

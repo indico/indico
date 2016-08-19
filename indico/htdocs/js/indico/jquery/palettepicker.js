@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget('indico.palettepicker', {
 
         options: {
@@ -29,7 +31,7 @@
         _create: function() {
             var self = this;
             var element = this.element;
-            var paletteTable = $('<table>', {'class': 'palette-picker'});
+            var paletteTable = $('<table>', {class: 'palette-picker'});
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
@@ -37,24 +39,24 @@
 
             $.each(availableColors, function(index, color) {
                 var td = $('<td>', {
-                    'class': 'palette-color',
-                    'data': {color: color}
+                    class: 'palette-color',
+                    data: {color: color}
                 });
 
                 var colorBox = $('<div>', {
-                    'css': {'background': '#' + color.background},
-                    'class': 'background-box'
+                    css: {background: '#' + color.background},
+                    class: 'background-box'
                 });
 
                 colorBox.append($('<div>', {
-                    'css': {'background': '#' + color.text},
-                    'class': 'text-box'
+                    css: {background: '#' + color.text},
+                    class: 'text-box'
                 }));
 
                 td.append(colorBox);
                 tr.append(td);
 
-                if ((index + 1) % self.options.numColumns == 0) {
+                if ((index + 1) % self.options.numColumns === 0) {
                     paletteTable.append(tr);
                     tr = self._createTableRow();
                 }
@@ -65,11 +67,11 @@
             }
 
             paletteTable.on('click', '.palette-color', function() {
-                var $this = $(this),
-                    color = $this.data('color'),
-                    backgroundColor = '#' + color.background,
-                    textColor = '#' + color.text,
-                    styleObject = element[0].style;
+                var $this = $(this);
+                var color = $this.data('color');
+                var backgroundColor = '#' + color.background;
+                var textColor = '#' + color.text;
+                var styleObject = element[0].style;
 
                 self.options.selectedColor = color;
                 self._updateSelection();
@@ -113,7 +115,7 @@
                 events: {
                     show: self._updateSelection.bind(self)
                 }
-            }
+            };
             if (self.options.qtipConstructor) {
                 self.options.qtipConstructor(element, qtipOptions);
             } else {
@@ -122,7 +124,7 @@
         },
 
         _createTableRow: function() {
-            return $('<tr>', {'height': 13});
+            return $('<tr>', {height: 13});
         },
 
         _updateSelection: function() {
@@ -130,9 +132,9 @@
             this._paletteTable.find('.palette-color').each(function() {
                 var $this = $(this);
                 var color = $this.data('color');
-                if (selectedColor != null
-                        && color.background == selectedColor.background
-                        && color.text == selectedColor.text) {
+                if (selectedColor !== null
+                        && color.background === selectedColor.background
+                        && color.text === selectedColor.text) {
                     $this.addClass('selected');
                 } else {
                     $this.removeClass('selected');

@@ -3,14 +3,13 @@
     // rule-based url building is based on werkzeug.contrib.jsrouting
 
     function BuildError(message) {
-        var args = [];
-        var arg_str;
+        var argString;
         if (arguments.length > 1) {
-            arg_str = JSON.stringify(Array.prototype.slice.call(arguments, 1));
-            arg_str = arg_str.substring(1, arg_str.length - 1);
+            argString = JSON.stringify(Array.prototype.slice.call(arguments, 1));
+            argString = argString.substring(1, argString.length - 1);
         }
         this.name = 'BuildError';
-        this.message = message + (arg_str ? ': ' + arg_str : '');
+        this.message = message + (argString ? ': ' + argString : '');
         // remove the following when http://code.google.com/p/chromium/issues/detail?id=228909 is fixed
         var err = new Error(this.message);
         err.name = this.name;
@@ -19,7 +18,7 @@
     BuildError.prototype = new Error();
     BuildError.prototype.constructor = BuildError;
 
-    var converter_functions = {
+    var converterFuncs = {
         // Put any converter functions for custom URL converters here. The key is the converter's python class name.
         // If there is no function, encodeURIComponent is used - so there's no need to put default converters here!
         ListConverter: function(value) {
@@ -30,7 +29,7 @@
         }
     };
 
-    function split_obj(obj) {
+    function splitObj(obj) {
         // Splits an object into keys and values (and the object itself for convenience)
         var names = [];
         var values = [];
@@ -43,26 +42,26 @@
 
     function suitable(rule, args) {
         // Checks if a rule is suitable for the given arguments
-        var default_args = split_obj(rule.defaults || {});
-        var diff_arg_names = _.difference(rule.args, default_args.names);
+        var defaultArgs = splitObj(rule.defaults || {});
+        var diffArgNames = _.difference(rule.args, defaultArgs.names);
         var i;
 
         // If a rule arg that has no default value is missing, the rule is not suitable
-        for (i = 0; i < diff_arg_names.length; i++) {
-            if (!~_.indexOf(args.names, diff_arg_names[i])) {
+        for (i = 0; i < diffArgNames.length; i++) {
+            if (!~_.indexOf(args.names, diffArgNames[i])) {
                 return false;
             }
         }
 
-        if (_.difference(rule.args, args.names).length == 0) {
+        if (_.difference(rule.args, args.names).length === 0) {
             if (!rule.defaults) {
                 return true;
             }
             // If a default argument is provided with a different value, the rule is not suitable
-            for (i = 0; i < default_args.names.length; i++) {
-                var key = default_args.names[i];
-                var value = default_args.values[i];
-                if (value != args.original[key]) {
+            for (i = 0; i < defaultArgs.names.length; i++) {
+                var key = defaultArgs.names[i];
+                var value = defaultArgs.values[i];
+                if (value !== args.original[key]) {
                     return false;
                 }
             }
@@ -77,7 +76,7 @@
         for (var i = 0; i < rule.trace.length; i++) {
             var part = rule.trace[i];
             if (part.is_dynamic) {
-                var converter = converter_functions[rule.converters[part.data]] || encodeURIComponent;
+                var converter = converterFuncs[rule.converters[part.data]] || encodeURIComponent;
                 var value = converter(args.original[part.data]);
                 if (value === null) {
                     return null;
@@ -97,8 +96,8 @@
         return { url: url, unprocessed: unprocessed };
     }
 
-    function fix_params(params) {
-        var clean_params = {};
+    function fixParams(params) {
+        var cleanParams = {};
         for (var key in params) {
             var value = params[key];
             if (value === '') {
@@ -106,26 +105,26 @@
             }
             if (value === undefined || value === null) {
                 // convert them to a string
-                value = '' + value
+                value = '' + value;
             }
             if (!_.isObject(value) || _.isArray(value)) {
-                clean_params[key] = value;
+                cleanParams[key] = value;
             }
         }
-        return clean_params;
+        return cleanParams;
     }
 
-    function build_url(template, params, fragment) {
+    function build_url(template, params, fragment) {  // eslint-disable-line camelcase
         var qsParams, url;
 
-        params = fix_params(params);
+        params = fixParams(params);
 
-        if (typeof template == 'string') {
+        if (typeof template === 'string') {
             url = template;
             qsParams = params || {};
         }
-        else if (template.type == 'flask_rules') {
-            var args = split_obj(params || {});
+        else if (template.type === 'flask_rules') {
+            var args = splitObj(params || {});
             for (var i = 0; i < template.rules.length; i++) {
                 var rule = template.rules[i];
                 if (suitable(rule, args)) {
@@ -146,7 +145,7 @@
             if (window.indicoOfflineSite) {
                 // See url_to_static_filename() in modules/events/static/util.py
                 url = url.replace(/^\/event\/\d+/, '');
-                if (url.indexOf('static/') == 0) {
+                if (url.indexOf('static/') === 0) {
                     url = url.substring(7);
                 }
                 url = url.replace(/^\/+/, '').replace(/\/$/, '').replace(/\//g, '--');
@@ -174,5 +173,5 @@
     }
 
     global.BuildError = BuildError;
-    global.build_url = build_url;
+    global.build_url = build_url;  // eslint-disable-line camelcase
 })(window);
