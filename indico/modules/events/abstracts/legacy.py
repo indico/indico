@@ -21,7 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.legacy import LegacyAbstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -413,7 +413,7 @@ class AbstractLegacyMixin(object):
     @classmethod
     @memoize_request
     def all_for_event(cls, event):
-        return {a.friendly_id: a for a in Abstract.find(event_new=event)}
+        return {a.friendly_id: a for a in LegacyAbstract.find(event_new=event)}
 
     @property
     @memoize_request
@@ -422,7 +422,7 @@ class AbstractLegacyMixin(object):
             return self.all_for_event(self.event)[int(self._id)]
         except KeyError:
             # then the abstract is new and has to be fetched from the DB
-            return Abstract.find_one(event_new=self.event, friendly_id=self._id)
+            return LegacyAbstract.find_one(event_new=self.event, friendly_id=self._id)
 
     @no_autoflush
     def _add_judgment(self, legacy_judgment):
@@ -499,7 +499,7 @@ class AbstractManagerLegacyMixin(object):
     """Adds methods necessary to the creation of abstracts, from the legacy code."""
 
     def _new_abstract(self, event):
-        abstract = Abstract(event_new=event)
+        abstract = LegacyAbstract(event_new=event)
         db.session.flush()
         return abstract
 
