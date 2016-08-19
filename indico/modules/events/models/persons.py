@@ -139,6 +139,7 @@ class EventPerson(PersonMixin, db.Model):
     )
 
     # relationship backrefs:
+    # - abstract_links (AbstractPersonLink.person)
     # - contribution_links (ContributionPersonLink.person)
     # - event_links (EventPersonLink.person)
     # - session_block_links (SessionBlockPersonLink.person)
@@ -263,6 +264,7 @@ class PersonLinkBase(PersonMixin, db.Model):
     """Base class for EventPerson associations."""
 
     __abstract__ = True
+    __auto_table_args = {'schema': 'events'}
     #: The name of the backref on the `EventPerson`
     person_link_backref_name = None
     #: The columns which should be included in the unique constraint.
@@ -277,7 +279,7 @@ class PersonLinkBase(PersonMixin, db.Model):
 
     @declared_attr
     def __table_args__(cls):
-        return auto_table_args(cls, schema='events')
+        return auto_table_args(cls)
 
     @declared_attr
     def id(cls):

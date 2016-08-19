@@ -17,27 +17,23 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.util.string import format_repr, return_ascii
 
 
 def _get_next_position(context):
     event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).one()
+    res = db.session.query(db.func.max(AbstractReviewQuestion.position)).filter_by(event_id=event_id,
+                                                                                   is_deleted=False).one()
     return (res[0] or 0) + 1
 
 
-class Track(DescriptionMixin, db.Model):
-    __tablename__ = 'tracks'
-    __table_args__ = {'schema': 'events'}
+class AbstractReviewQuestion(db.Model):
+    __tablename__ = 'abstract_review_questions'
+    __table_args__ = {'schema': 'event_abstracts'}
 
     id = db.Column(
         db.Integer,
         primary_key=True
-    )
-    title = db.Column(
-        db.String,
-        nullable=False
     )
     event_id = db.Column(
         db.Integer,
@@ -45,33 +41,30 @@ class Track(DescriptionMixin, db.Model):
         index=True,
         nullable=False
     )
+    text = db.Column(
+        db.Text,
+        nullable=False
+    )
     position = db.Column(
         db.Integer,
         nullable=False,
         default=_get_next_position
     )
-
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     event_new = db.relationship(
         'Event',
-        lazy=True,
+        lazy=False,
         backref=db.backref(
-            'tracks',
+            'abstract_review_questions',
             cascade='all, delete-orphan',
-            lazy=True,
-            order_by=position
-        )
-    )
-    abstract_reviewers = db.relationship(
-        'User',
-        secondary='events.track_abstract_reviewers',
-        lazy=True,
-        collection_class=set,
-        backref=db.backref(
-            'reviewer_for_tracks',
             lazy='dynamic'
         )
     )
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', 'event_id')
