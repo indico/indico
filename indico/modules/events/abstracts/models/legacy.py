@@ -21,15 +21,15 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
+from indico.modules.events.contributions.models.contributions import _get_next_friendly_id
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
-class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
+class LegacyAbstract(DescriptionMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
-    __tablename__ = 'abstracts'
+    __tablename__ = 'legacy_abstracts'
     __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
                          {'schema': 'event_abstracts'})
 
@@ -56,49 +56,41 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         index=True,
         nullable=False
     )
-    track_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.tracks.id'),
-        nullable=True,
-        index=True
-    )
     type_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contribution_types.id'),
         nullable=True,
         index=True
     )
-    final_type_id = db.Column(
+    accepted_track_id = db.Column(
+        db.Integer,
+        nullable=True,
+        index=True
+    )
+    accepted_type_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contribution_types.id'),
         nullable=True,
         index=True
     )
-    final_track_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.tracks.id'),
-        nullable=True,
-        index=True
-    )
-    title = db.Column(
-        db.String,
-        nullable=False
-    )
     event_new = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
-            'abstracts',
+            'legacy_abstracts',
             cascade='all, delete-orphan',
             lazy=True
         )
     )
-    track = db.relationship(
-        'Track',
+    #: Data stored in abstract/contribution fields
+    field_values = db.relationship(
+        'AbstractFieldValue',
         lazy=True,
-        foreign_keys=[track_id],
+        primaryjoin='AbstractFieldValue.abstract_id == LegacyAbstract.id',
+        foreign_keys='AbstractFieldValue.abstract_id',
+        cascade='all, delete-orphan',
         backref=db.backref(
-            'abstracts',
+            'legacy_abstract',
             lazy=True
         )
     )
@@ -107,51 +99,40 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         lazy=True,
         foreign_keys=[type_id],
         backref=db.backref(
-            'proposed_abstracts',
+            'legacy_abstracts',
             lazy=True
         )
     )
-    final_type = db.relationship(
+    accepted_type = db.relationship(
         'ContributionType',
         lazy=True,
-        foreign_keys=[final_type_id],
+        foreign_keys=[accepted_type_id],
         backref=db.backref(
-            'completed_abstracts',
-            lazy=True
-        )
-    )
-    final_track = db.relationship(
-        'Track',
-        lazy=True,
-        foreign_keys=[final_track_id],
-        backref=db.backref(
-            'completed_abstracts',
-            lazy=True
-        )
-    )
-    #: Data stored in abstract/contribution fields
-    field_values = db.relationship(
-        'AbstractFieldValue',
-        lazy=True,
-        cascade='all, delete-orphan',
-        backref=db.backref(
-            'abstract',
+            'legacy_accepted_as_abstracts',
             lazy=True
         )
     )
 
     # relationship backrefs:
     # - contribution (Contribution.abstract)
-    # - email_logs (AbstractEmailLogEntry.abstract)
-    # - reviews (AbstractReview.abstract)
+    # - judgments (Judgment.abstract)
 
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
 
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'id', friendly_id=self.friendly_id)
+
     def get_field_value(self, field_id):
         return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
 
-    @return_ascii
-    def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+    @property
+    def as_legacy(self):
+        amgr = self.event_new.as_legacy.getAbstractMgr()
+        return amgr.getAbstractById(str(self.friendly_id))
+
+    @property
+    def accepted_track(self):
+        return self.event_new.as_legacy.getTrackById(str(self.accepted_track_id))

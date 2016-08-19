@@ -33,7 +33,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import update_session_options
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.legacy import LegacyAbstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -591,7 +591,7 @@ class TimetableMigration(object):
                 accepted_track = old_abstract._currentStatus._track
                 accepted_track_id = int(accepted_track.id) if accepted_track else None
 
-        abstract = Abstract(event_new=self.event, friendly_id=old_abstract._id,
+        abstract = LegacyAbstract(event_new=self.event, friendly_id=old_abstract._id,
                             description=description, type_id=type_id, accepted_track_id=accepted_track_id,
                             accepted_type_id=accepted_type_id)
 
@@ -992,7 +992,7 @@ class EventTimetableImporter(Importer):
     def has_data(self):
         if self.parallel and self.parallel[1] == 0 and ReferenceType.has_rows():
             return True
-        models = (TimetableEntry, Break, Session, SessionBlock, Contribution, Abstract, Judgment)
+        models = (TimetableEntry, Break, Session, SessionBlock, Contribution, LegacyAbstract, Judgment)
         return any(x.has_rows() for x in models)
 
     def _load_data(self):
