@@ -484,20 +484,6 @@ a.lecture-series-link {
     margin-right: 0.1em;
 }
 
-[data-anchor]:hover {
-    .anchor-link {
-        opacity: 1;
-    }
-}
-
-.anchor-link {
-    @include transition(.25s opacity ease-out);
-    @extend %font-family-body;
-    opacity: 0;
-    margin-left: 0.5em;
-    color: $gray !important;
-}
-
 .timetable-item:target {
     .timetable-time.nested {
         border-color: $selected-color;

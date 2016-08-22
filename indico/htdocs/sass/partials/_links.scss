@@ -22,3 +22,17 @@ a.discreet-link {
         text-decoration: underline;
     }
 }
+
+[data-anchor]:hover {
+    .anchor-link {
+        opacity: 1;
+    }
+}
+
+.anchor-link {
+    @include transition(.25s opacity ease-out);
+    @extend %font-family-body;
+    opacity: 0;
+    margin-left: 0.5em;
+    color: $gray !important;
+}
