@@ -73,6 +73,12 @@ class Track(DescriptionMixin, db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - abstract_reviews (AbstractReview.track)
+    # - abstracts (Abstract.track)
+    # - completed_abstracts (Abstract.final_track)
+    # - proposed_abstract_reviews (AbstractReview.proposed_track)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
