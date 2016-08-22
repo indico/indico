@@ -52,7 +52,7 @@
                     {%- endtrans -%}
                 </h3>
                 <div class="speaker-list">
-                    {{ render_users(subcontrib.speakers|sort(attribute='full_name'),
+                    {{ render_users(subcontrib.speakers|sort(attribute='display_order_key'),
                                     span_class='speaker-item icon-user', separator='') }}
                 </div>
             {% endif %}

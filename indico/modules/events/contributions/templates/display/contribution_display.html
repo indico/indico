@@ -22,7 +22,7 @@
 
 {% macro render_author_list(authors) %}
     <div class="speaker-list">
-        {% call(user_data) render_users(authors, separator='') %}
+        {% call(user_data) render_users(authors|sort(attribute='display_order_key'), separator='') %}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="speaker-item icon-user">
                 {% if user_data.title -%}
                     <span class="speaker-title">
@@ -135,7 +135,7 @@
                 {%- endtrans -%}
             </h3>
             <div class="speaker-list">
-                {{ render_users(contribution.speakers|sort(attribute='full_name'),
+                {{ render_users(contribution.speakers|sort(attribute='display_order_key'),
                                 span_class='speaker-item icon-user', separator='') }}
             </div>
         {% endif %}
