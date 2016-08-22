@@ -40,7 +40,7 @@
   <div class="infoline chairs clear">
       <span  title="${_("Chairpersons")}" class="icon icon-user-chairperson" aria-hidden="true"></span>
       <ul class="chair_list text">
-        % for link in event.person_links:
+        % for link in sorted(event.person_links, key=lambda l: l.display_order_key):
         <li>
           % if link.email:
             % if _session.user:
