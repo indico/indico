@@ -13,7 +13,7 @@
             </div>
             {% if contrib.speakers -%}
                 <div class="speaker-list icon-user">
-                    {{ render_users(contrib.speakers|sort(attribute='full_name'),
+                    {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
                                     span_class='speaker-item-inline') }}
                 </div>
             {%- endif %}

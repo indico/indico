@@ -48,7 +48,7 @@
             {% if contrib.speaker_names %}
                 <dt>{% trans count=contrib.speaker_names|count %}Presenter{% pluralize %}Presenters{% endtrans %}</dt>
                 <dd>
-                    {% for speaker in contrib.speakers | sort(attribute='full_name') -%}
+                    {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
                         <div>{{ speaker.full_name }}</div>
                     {%- endfor %}
                 </dd>
