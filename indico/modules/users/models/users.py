@@ -316,8 +316,9 @@ class User(PersonMixin, db.Model):
 
     # relationship backrefs:
     # - _all_settings (UserSetting.user)
-    # - absctract_comments (AbstractComment.user)
+    # - abstract_comments (AbstractComment.user)
     # - abstract_judgments (Judgment.judge)
+    # - abstract_reviews (AbstractReview.user)
     # - agreements (Agreement.user)
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
@@ -339,6 +340,7 @@ class User(PersonMixin, db.Model):
     # - in_settings_acls (SettingPrincipal.user)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
+    # - modified_abstract_comments (AbstractComment.modified_by)
     # - oauth_tokens (OAuthToken.user)
     # - owned_rooms (Room.owner)
     # - paper_reviewing_roles (PaperReviewingRole.user)
@@ -347,6 +349,7 @@ class User(PersonMixin, db.Model):
     # - requests_processed (Request.processed_by_user)
     # - reservations (Reservation.created_by_user)
     # - reservations_booked_for (Reservation.booked_for_user)
+    # - reviewer_for_tracks (Track.abstract_reviewers)
     # - static_sites (StaticSite.creator)
     # - survey_submissions (SurveySubmission.user)
     # - vc_rooms (VCRoom.created_by_user)

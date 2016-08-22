@@ -337,6 +337,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     # relationship backrefs:
     # - abstract_email_templates (AbstractEmailTemplate.event_new)
+    # - abstract_review_questions (AbstractReviewQuestion.event_new)
     # - abstracts (Abstract.event_new)
     # - agreements (Agreement.event_new)
     # - all_attachment_folders (AttachmentFolder.event_new)
