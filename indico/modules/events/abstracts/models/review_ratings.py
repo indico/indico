@@ -17,67 +17,53 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.util.string import format_repr, return_ascii
 
 
-def _get_next_position(context):
-    event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).one()
-    return (res[0] or 0) + 1
-
-
-class Track(DescriptionMixin, db.Model):
-    __tablename__ = 'tracks'
-    __table_args__ = {'schema': 'events'}
+class AbstractReviewRating(db.Model):
+    __tablename__ = 'abstract_review_ratings'
+    __table_args__ = (db.UniqueConstraint('review_id'),
+                      {'schema': 'event_abstracts'})
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    title = db.Column(
-        db.String,
-        nullable=False
-    )
-    event_id = db.Column(
+    question_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.events.id'),
+        db.ForeignKey('event_abstracts.abstract_review_questions.id'),
         index=True,
         nullable=False
     )
-    position = db.Column(
+    review_id = db.Column(
         db.Integer,
-        nullable=False,
-        default=_get_next_position
+        db.ForeignKey('event_abstracts.abstract_reviews.id'),
+        index=True,
+        nullable=False
     )
-
-    event_new = db.relationship(
-        'Event',
-        lazy=True,
+    value = db.Column(
+        db.Integer,
+        nullable=False
+    )
+    question = db.relationship(
+        'AbstractReviewQuestion',
+        lazy=False,
         backref=db.backref(
-            'tracks',
+            'ratings',
             cascade='all, delete-orphan',
-            lazy=True,
-            order_by=position
+            lazy='dynamic'
         )
     )
-    abstract_reviewers = db.relationship(
-        'User',
-        secondary='events.track_abstract_reviewers',
-        lazy=True,
-        collection_class=set,
+    review = db.relationship(
+        'AbstractReview',
+        lazy=False,
         backref=db.backref(
-            'reviewer_for_tracks',
+            'ratings',
+            cascade='all, delete-orphan',
             lazy='dynamic'
         )
     )
 
-    # relationship backrefs:
-    # - abstract_reviews (AbstractReview.track)
-    # - abstracts (Abstract.track)
-    # - completed_abstracts (Abstract.final_track)
-    # - proposed_abstract_reviews (AbstractReview.proposed_track)
-
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', 'review_id')

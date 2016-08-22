@@ -16,21 +16,20 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.ext.declarative import declared_attr
-
-from indico.core.db import db
+from indico.core.db.sqlalchemy import db
 from indico.util.string import format_repr, return_ascii
-from indico.util.locators import locator_property
 
 
-class ContributionType(db.Model):
-    __tablename__ = 'contribution_types'
+def _get_next_position(context):
+    event_id = context.current_parameters['event_id']
+    res = db.session.query(db.func.max(AbstractReviewQuestion.position)).filter_by(event_id=event_id,
+                                                                                   is_deleted=False).one()
+    return (res[0] or 0) + 1
 
-    @declared_attr
-    def __table_args__(cls):
-        return (db.Index('ix_uq_contribution_types_event_id_name_lower', cls.event_id, db.func.lower(cls.name),
-                         unique=True),
-                {'schema': 'events'})
+
+class AbstractReviewQuestion(db.Model):
+    __tablename__ = 'abstract_review_questions'
+    __table_args__ = {'schema': 'event_abstracts'}
 
     id = db.Column(
         db.Integer,
@@ -42,39 +41,33 @@ class ContributionType(db.Model):
         index=True,
         nullable=False
     )
-    name = db.Column(
-        db.String,
+    text = db.Column(
+        db.Text,
         nullable=False
     )
-    description = db.Column(
-        db.Text,
+    position = db.Column(
+        db.Integer,
         nullable=False,
-        default=''
+        default=_get_next_position
     )
-
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     event_new = db.relationship(
         'Event',
-        lazy=True,
+        lazy=False,
         backref=db.backref(
-            'contribution_types',
+            'abstract_review_questions',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
     )
 
     # relationship backrefs:
-    # - abstract_judgments (Judgment.accepted_type)
-    # - abstract_reviews (AbstractReview.proposed_type)
-    # - completed_abstracts (Abstract.final_type)
-    # - contributions (Contribution.type)
-    # - legacy_abstracts (LegacyAbstract.type)
-    # - legacy_accepted_as_abstracts (LegacyAbstract.accepted_type)
-    # - proposed_abstracts (Abstract.type)
+    # - ratings (AbstractReviewRating.question)
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.name)
-
-    @locator_property
-    def locator(self):
-        return dict(self.event_new.locator, contrib_type_id=self.id)
+        return format_repr(self, 'id', 'event_id')

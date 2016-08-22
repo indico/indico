@@ -335,8 +335,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     )
 
     # relationship backrefs:
+    # - abstract_email_templates (AbstractEmailTemplate.event_new)
+    # - abstract_review_questions (AbstractReviewQuestion.event_new)
     # - abstracts (Abstract.event_new)
-    # - abstract_notification_templates (AbstractEmailTemplate.event_new)
     # - agreements (Agreement.event_new)
     # - all_attachment_folders (AttachmentFolder.event_new)
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)
@@ -350,6 +351,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - contributions (Contribution.event_new)
     # - custom_pages (EventPage.event_new)
     # - layout_images (ImageFile.event_new)
+    # - legacy_abstracts (LegacyAbstract.event_new)
     # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
     # - legacy_mapping (LegacyEventMapping.event_new)
     # - legacy_session_block_mappings (LegacySessionBlockMapping.event_new)
