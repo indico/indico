@@ -59,6 +59,7 @@ def get_translation_domain(plugin_name=_use_context):
 
 
 def gettext_unicode(*args, **kwargs):
+    from indico.core.config import Config
     func_name = kwargs.pop('func_name', 'ugettext')
     plugin_name = kwargs.pop('plugin_name', None)
     force_unicode = kwargs.pop('force_unicode', False)
@@ -71,6 +72,8 @@ def gettext_unicode(*args, **kwargs):
 
     translations = get_translation_domain(plugin_name).get_translations()
     res = getattr(translations, func_name)(*args, **kwargs)
+    if Config.getInstance().getDebugUnicode():
+        res = u'\N{ZERO WIDTH SPACE}' + res + u'\N{ZERO WIDTH SPACE}'
     if not using_unicode:
         res = res.encode('utf-8')
     return res

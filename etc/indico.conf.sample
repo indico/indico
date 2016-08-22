@@ -88,6 +88,14 @@ SecretKey = ''
 # tracking down errors but should not be enabled for production systems.
 #Debug = False
 #
+# Enabling unicode debugging injects an invisible zero-width space at the
+# beginning and end of every translated string.  This will cause errors in case
+# of implicit conversions from bytes to unicode or vide versa instead of
+# silently succeeding for english (ascii) strings and then failing in languages
+# where the same string is not plain ascii.  This setting should be enabled only
+# during development and never in production.
+#DebugUnicode = False
+#
 # You can force a certain number of (simulated) database conflicts on every
 # by setting ForceConflicts to the number of conflict errors you want:
 #ForceConflicts = 0

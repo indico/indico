@@ -319,6 +319,7 @@ class Config:
         'ForceConflicts'            : 0,
         'PropagateAllExceptions'    : False,
         'Debug'                     : False,
+        'DebugUnicode'              : False,
         'EmbeddedWebserver'         : False,
         'OAuthGrantTokenTTL'        : 120,
         'MobileURL'                 : '',
