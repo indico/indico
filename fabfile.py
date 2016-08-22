@@ -475,7 +475,7 @@ def init_submodules(src_dir='.'):
     with lcd(src_dir):
         local('pwd')
         local('git submodule init')
-        local('git submodule sync --recursive')
+        local('git submodule sync')
         local('git submodule update --recursive')
 
 
