@@ -96,9 +96,9 @@ class NewBookingCriteriaForm(NewBookingFormBase):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
     flexible_dates_range = RadioField('Flexible days', coerce=int, default=0,
                                       choices=[(0, _(u'Exact')),
-                                               (1, '&plusmn;{}'.format(_(u'1 day'))),
-                                               (2, '&plusmn;{}'.format(_(u'2 days'))),
-                                               (3, '&plusmn;{}'.format(_(u'3 days')))])
+                                               (1, u'&plusmn;{}'.format(_(u'1 day'))),
+                                               (2, u'&plusmn;{}'.format(_(u'2 days'))),
+                                               (3, u'&plusmn;{}'.format(_(u'3 days')))])
 
     def validate_flexible_dates_range(self, field):
         if self.repeat_frequency.data == RepeatFrequency.DAY:

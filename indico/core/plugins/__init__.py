@@ -48,12 +48,12 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
 class PluginCategory(unicode, IndicoEnum):
-    search = _('Search')
-    synchronization = _('Synchronization')
-    payment = _('Payment')
-    importers = _('Importers')
-    videoconference = _('Videoconference')
-    other = _('Other')
+    search = _(u'Search')
+    synchronization = _(u'Synchronization')
+    payment = _(u'Payment')
+    importers = _(u'Importers')
+    videoconference = _(u'Videoconference')
+    other = _(u'Other')
 
 
 class IndicoPlugin(Plugin):

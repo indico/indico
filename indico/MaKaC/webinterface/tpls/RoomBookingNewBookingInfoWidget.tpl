@@ -3,7 +3,7 @@
 <%
     fields = ['booked_for_user', 'contact_email', 'contact_phone', 'booking_reason']
     field_args = {
-        'booking_reason': {'rows': 3, 'placeholder': _('Reason...')}
+        'booking_reason': {'rows': 3, 'placeholder': _(u'Reason...')}
     }
     helpers = {
         'contact_email': 'You can specify multiple email addresses separated by commas.',
