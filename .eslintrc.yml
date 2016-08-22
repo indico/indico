@@ -50,6 +50,9 @@ rules:
   space-before-function-paren:
     - warn
     - never
+  brace-style:
+      - error
+      - 1tbs
   array-callback-return: error
   comma-spacing: error
   comma-style: error
