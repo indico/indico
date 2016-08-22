@@ -15,11 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global setupListGenerator:false */
+
 (function(global) {
     'use strict';
 
-
     global.setupAbstractList = function setupAbstractList() {
+        var abstractListContainer = $('#abstract-list');
+
+        abstractListContainer.on('indico:htmlUpdated', function() {
+            abstractListContainer.find('.js-mathjax').mathJax();
+        });
+
         setupListGenerator();
     };
 })(window);
