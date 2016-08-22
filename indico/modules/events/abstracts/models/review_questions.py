@@ -66,6 +66,9 @@ class AbstractReviewQuestion(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - ratings (AbstractReviewRating.question)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', event_id=None, is_deleted=False, _text=self.text)
