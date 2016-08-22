@@ -366,14 +366,12 @@ if __name__ == '__main__':
             networks = indico_zodbimport.modules.networks:NetworkImporter
             categories = indico_zodbimport.modules.categories:CategoryImporter
             event_acls = indico_zodbimport.modules.event_acls:EventACLImporter
-            event_creation_times = indico_zodbimport.modules.event_creation_times:EventCreationTimeImporter
             upcoming_events = indico_zodbimport.modules.upcoming_events:UpcomingEventsImporter
             news = indico_zodbimport.modules.news:NewsImporter
             event_types = indico_zodbimport.modules.event_types:EventTypeImporter
-            event_visibility = indico_zodbimport.modules.event_visibility:EventVisibilityImporter
             user_management = indico_zodbimport.modules.user_management:UserManagementImporter
             event_series = indico_zodbimport.modules.event_series:EventSeriesImporter
-            event_keywords = indico_zodbimport.modules.event_keywords:EventKeywordsImporter
+            event_keywords_ctimes_visibility = indico_zodbimport.modules.event_keywords_ctimes_visibility:EventKeywordsCreationTimesVisibilityImporter
             """,
           zip_safe=False,
           packages=foundPackages,
