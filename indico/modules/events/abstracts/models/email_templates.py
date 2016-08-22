@@ -67,3 +67,6 @@ class AbstractEmailTemplate(EmailTemplateBase):
             coauthors_emails = {}
             emails.update(coauthors_emails)
         return emails
+
+    # relationship backrefs:
+    # - logs (AbstractEmailLogEntry.email_template)
