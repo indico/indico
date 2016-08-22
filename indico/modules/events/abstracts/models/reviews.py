@@ -131,6 +131,9 @@ class AbstractReview(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - ratings (AbstractReviewRating.review)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'proposed_action', abstract=self.abstract, user=self.user)
