@@ -264,7 +264,8 @@ class TimetableSerializer(object):
                 'affiliation': person_link.affiliation,
                 'email': person_link.person.email,
                 'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
-                                                  abbrev_first_name=False, show_title=True)}
+                                                  abbrev_first_name=False, show_title=True),
+                'displayOrderKey': person_link.display_order_key}
 
 
 def serialize_contribution(contribution):
