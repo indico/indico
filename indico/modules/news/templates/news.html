@@ -12,7 +12,7 @@
             <div class="right news-item-info">
                 <span class="date-time">{{ item.created_dt|format_date(timezone=session.tzinfo) }}</span>
             </div>
-            <h2>
+            <h2 data-anchor="{{ item.anchor }}">
                 {{ item.title }}
                 {% if _is_new(item) %}<i class="icon-new new-label"></i>{% endif %}
             </h2>
