@@ -45,7 +45,7 @@
                                     <span class="vertical-aligner">{{ abstract.friendly_id }}</span>
                                 </td>
                                 <td class="i-table">
-                                    <span class="vertical-aligner">{{ abstract.as_legacy.getTitle() }}</span>
+                                    <span class="vertical-aligner js-mathjax">{{ abstract.as_legacy.getTitle() }}</span>
                                 </td>
                                 {% for item in static_columns %}
                                     {% if item.id == 'proposed_type' %}
