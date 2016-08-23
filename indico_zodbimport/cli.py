@@ -93,7 +93,7 @@ class Importer(object):
         start = time.time()
         with self.app.app_context():
             self.migrate()
-        print('migration took {:.06f} seconds'.format((time.time() - start)))
+        print('migration took {:.06f} seconds\a'.format((time.time() - start)))
 
     def setup(self):
         update_session_options(db)  # get rid of the zope transaction extension
