@@ -110,7 +110,7 @@ class SettingsProxy(SettingsProxyBase):
         :param value: Setting value; must be JSON-serializable
         """
         self._check_name(name)
-        Setting.set(self.module, name, value)
+        Setting.set(self.module, name, self._convert_from_python(name, value))
         self._flush_cache()
 
     def set_multi(self, items):
@@ -118,6 +118,7 @@ class SettingsProxy(SettingsProxyBase):
 
         :param items: Dict containing the new settings
         """
+        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
         self._split_call(items,
                          lambda x: Setting.set_multi(self.module, x),
                          lambda x: SettingPrincipal.set_acl_multi(self.module, x))

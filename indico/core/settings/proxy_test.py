@@ -14,9 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime, timedelta
+
 import pytest
+import pytz
 
 from indico.core.settings import SettingsProxy
+from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
 from indico.modules.users import User
 
 
@@ -66,6 +70,20 @@ def test_proxy_delete_all():
     assert proxy.get_all() == {'hello': 'test', 'foo': None}
     proxy.delete_all()
     assert proxy.get_all() == defaults
+
+
+@pytest.mark.usefixtures('db')
+def test_proxy_converters_all():
+    epoch_dt = datetime(1970, 1, 1, tzinfo=pytz.utc)
+    xmas_dt = datetime(2016, 12, 24, 20, tzinfo=pytz.utc)
+    newyear_dt = datetime(2017, 1, 2, tzinfo=pytz.utc)
+    duration = timedelta(days=2)
+    defaults = {'epoch': epoch_dt, 'xmas': None, 'newyear': None, 'duration': None}
+    converters = {name: DatetimeConverter if name != 'duration' else TimedeltaConverter for name in defaults}
+    proxy = SettingsProxy('test', defaults, converters=converters)
+    proxy.set('xmas', xmas_dt)
+    proxy.set_multi({'newyear': newyear_dt, 'duration': duration})
+    assert proxy.get_all() == {'epoch': epoch_dt, 'xmas': xmas_dt, 'newyear': newyear_dt, 'duration': duration}
 
 
 @pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active

@@ -148,7 +148,7 @@ class EventSettingsProxy(SettingsProxyBase):
         :param value: Setting value; must be JSON-serializable
         """
         self._check_name(name)
-        EventSetting.set(self.module, name, value, event_id=event)
+        EventSetting.set(self.module, name, self._convert_from_python(name, value), event_id=event)
         self._flush_cache()
 
     @event_or_id
@@ -158,6 +158,7 @@ class EventSettingsProxy(SettingsProxyBase):
         :param event: Event (or its ID)
         :param items: Dict containing the new settings
         """
+        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
         self._split_call(items,
                          lambda x: EventSetting.set_multi(self.module, x, event_id=event),
                          lambda x: EventSettingPrincipal.set_acl_multi(self.module, x, event_id=event))

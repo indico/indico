@@ -46,11 +46,11 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
         rv = cls.get_all(proxy.module, **kwargs)
         if acl_cls and proxy.acl_names:
             rv.update(acl_cls.get_all_acls(proxy.module, **kwargs))
-        return rv
+        return {k: proxy._convert_to_python(k, v) for k, v in rv.iteritems()}
     settings = dict(proxy.defaults)
     if acl_cls and proxy.acl_names:
         settings.update({name: set() for name in proxy.acl_names})
-    settings.update(cls.get_all(proxy.module, **kwargs))
+    settings.update({k: proxy._convert_to_python(k, v) for k, v in cls.get_all(proxy.module, **kwargs).iteritems()})
     if acl_cls and proxy.acl_names:
         settings.update(acl_cls.get_all_acls(proxy.module, **kwargs))
     return settings
@@ -62,12 +62,12 @@ def get_setting(cls, proxy, name, default, cache, **kwargs):
     try:
         value = cache[cache_key]
         if value is not _not_in_db:
-            return value
+            return proxy._convert_to_python(name, value)
     except KeyError:
         setting = _preload_settings(cls, proxy, cache, **kwargs).get(name, _not_in_db)
         cache[cache_key] = setting
         if setting is not _not_in_db:
-            return setting
+            return proxy._convert_to_python(name, setting)
     # value is not_in_db, so use the default
     # we always copy the proxy's default in case it's something mutable
     return copy(proxy.defaults.get(name)) if default is SettingsProxyBase.default_sentinel else default

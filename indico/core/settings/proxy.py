@@ -51,17 +51,20 @@ class SettingsProxyBase(object):
                    `acls` is illegal and triggers a `ValueError`
     :param acls: setting names which are referencing ACLs in a
                  separate table
+    :param converters: a dict specifying how to convert the values of
+                       certain settings from/to JSON-compatible types
     """
 
     acl_proxy_class = None
     default_sentinel = object()
 
-    def __init__(self, module, defaults=None, strict=True, acls=None):
+    def __init__(self, module, defaults=None, strict=True, acls=None, converters=None):
         self.module = module
         self.defaults = defaults or {}
         self.strict = strict
         self.acl_names = set(acls or ())
         self.acls = self.acl_proxy_class(self) if self.acl_proxy_class else None
+        self.converters = converters or {}
         self._bound_args = None
         if strict and not defaults and not acls:
             raise ValueError('cannot use strict mode with no defaults')
@@ -69,6 +72,8 @@ class SettingsProxyBase(object):
             raise ValueError('this proxy does not support acl settings')
         if acls and self.acl_names & self.defaults.viewkeys():
             raise ValueError('acl settings cannot have a default value')
+        if acls and converters and acls & converters.viewkeys():
+            raise ValueError('acl settings cannot have custom converters')
 
     @return_ascii
     def __repr__(self):
@@ -134,6 +139,18 @@ class SettingsProxyBase(object):
     def _flush_cache(self):
         if has_request_context():
             g.get('settings_cache', {}).clear()
+
+    def _convert_from_python(self, name, value):
+        if value is None:
+            return None
+        converter = self.converters.get(name)
+        return converter.from_python(value) if converter else value
+
+    def _convert_to_python(self, name, value):
+        if value is None:
+            return None
+        converter = self.converters.get(name)
+        return converter.to_python(value) if converter else value
 
     @property
     def _cache(self):

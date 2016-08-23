@@ -108,7 +108,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param value: Setting value; must be JSON-serializable
         """
         self._check_name(name)
-        UserSetting.set(self.module, name, value, **user)
+        UserSetting.set(self.module, name, self._convert_from_python(name, value), **user)
         self._flush_cache()
 
     @user_or_id
@@ -120,6 +120,7 @@ class UserSettingsProxy(SettingsProxyBase):
         """
         for name in items:
             self._check_name(name)
+        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
         UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 
