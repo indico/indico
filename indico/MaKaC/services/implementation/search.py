@@ -21,6 +21,7 @@ from indico.modules.groups import GroupProxy
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
+from indico.util.string import to_unicode
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.search import searchUsers
 from MaKaC.fossils.user import IGroupFossil
@@ -58,8 +59,8 @@ class SearchUsers(SearchBase):
             event_persons = self._event.persons.filter(*criteria).all()
         fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
         fossilized_event_persons = map(serialize_event_person, event_persons)
-        unique_users = {user['email']: user for user in chain(fossilized_users, fossilized_event_persons)}
-        return sorted(unique_users.values(), key=lambda x: (x['name'].lower(), x['email']))
+        unique_users = {to_unicode(user['email']): user for user in chain(fossilized_users, fossilized_event_persons)}
+        return sorted(unique_users.values(), key=lambda x: (to_unicode(x['name']).lower(), to_unicode(x['email'])))
 
 
 class SearchGroups(SearchBase):
