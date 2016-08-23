@@ -29,8 +29,8 @@
     }
 }
 
-.time-data, .location-data {
-    .location-info, .time-info {
+.time-data, .location-data, .board-data {
+    .location-info, .time-info, .board-info {
         &:before {
             color: $orange;
             vertical-align: middle;

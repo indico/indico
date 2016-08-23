@@ -81,6 +81,13 @@
                 {{ render_location(contribution, class='contribution-location') }}
             </div>
         {% endif %}
+        {% if contribution.board_number -%}
+            <div class="board-data">
+                <span class="icon-price-tag board-info">
+                    {% trans board_number=contribution.board_number %}Board: {{ board_number }}{% endtrans %}
+                </span>
+            </div>
+        {%- endif %}
     </div>
 {%- endblock %}
 
