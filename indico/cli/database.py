@@ -89,13 +89,15 @@ def _safe_downgrade(*args, **kwargs):
     print cformat('%{yellow!}***%{reset} '
                   '%{red!}This operation may %{yellow!}PERMANENTLY ERASE %{red!}some data!%{reset}')
     if current_app.debug:
+        skip_confirm = os.environ.get('INDICO_ALWAYS_DOWNGRADE', '').lower() in ('1', 'yes')
         print cformat('%{yellow!}***%{reset} '
                       "%{green!}Debug mode is active, so you probably won't destroy valuable data")
     else:
+        skip_confirm = False
         print cformat('%{yellow!}***%{reset} '
                       "%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!")
-    if raw_input(cformat('%{yellow!}***%{reset} '
-                         'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
+    if not skip_confirm and raw_input(cformat('%{yellow!}***%{reset} '
+                                              'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
         print cformat('%{green}Aborted%{reset}')
         sys.exit(1)
     else:
