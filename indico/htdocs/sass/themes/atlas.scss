@@ -16,6 +16,9 @@
  */
 
 @import 'base/palette';
+
+$header-bg-color: #1382bb;
+
 @import 'indico';
 
-@include header-logo('../../../images/conference_atlas.png', 25px 25px);
+@include header-logo('../../../images/atlas_logo.png', 40px 15px, 160px, auto 140px);
