@@ -116,7 +116,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
                                      'force': True}
     db.session.flush()
     if changes:
-        signals.event.contribution_updated.send(contrib)
+        signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
         contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                               'Contribution "{}" has been updated'.format(contrib.title), session.user)

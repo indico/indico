@@ -104,7 +104,7 @@ def update_timetable_entry(entry, data):
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
     if changes:
-        signals.event.timetable_entry_updated.send(entry)
+        signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
         entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                             "Entry for {} '{}' modified".format(object_type, object_title), session.user,

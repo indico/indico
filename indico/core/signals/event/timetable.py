@@ -23,6 +23,8 @@ Called when a new timetable entry is created. The `sender` is the new entry.
 
 timetable_entry_updated = _signals.signal('timetable-entry-updated', """
 Called when a timetable entry is updated. The `sender` is the entry.
+A dict containing ``old, new`` tuples for all changed values is passed
+in the ``changes`` kwarg.
 """)
 
 timetable_entry_deleted = _signals.signal('timetable-entry-deleted', """

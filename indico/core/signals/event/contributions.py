@@ -27,6 +27,8 @@ Called when a contribution is deleted. The *sender* is the contribution.
 
 contribution_updated = _signals.signal('contribution-updated', """
 Called when a contribution is modified. The *sender* is the contribution.
+A dict containing ``old, new`` tuples for all changed values is passed
+in the ``changes`` kwarg.
 """)
 
 
