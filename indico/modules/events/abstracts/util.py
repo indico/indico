@@ -35,7 +35,7 @@ class AbstractListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super(AbstractListGenerator, self).__init__(event)
         self.default_list_config = {
-            'items': ('proposed_type', 'accepted_type', 'proposed_track', 'accepted_track'),
+            'items': ('proposed_type', 'final_type', 'proposed_track', 'final_track'),
             'filters': {'fields': {}, 'items': {}}
         }
         # TODO: session_empty = {None: 'No session'}
@@ -46,12 +46,12 @@ class AbstractListGenerator(ListGeneratorBase):
         self.static_items = OrderedDict([
             # TODO: ('session', {'title': _('Session'),
             #                    'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
-            ('accepted_track', {'title': _('Accepted track'),
-                                'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+            ('final_track', {'title': _('Final track'),
+                             'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
             ('proposed_track', {'title': _('Proposed track'),
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('accepted_type', {'title': _('Accepted type'),
-                               'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            ('final_type', {'title': _('Final type'),
+                            'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
             ('proposed_type', {'title': _('Proposed type'),
                                'filter_choices': OrderedDict(type_empty.items() + type_choices.items())})
         ])
@@ -84,9 +84,9 @@ class AbstractListGenerator(ListGeneratorBase):
         criteria = []
         static_filters = {
             # TODO: 'session': Contribution.session_id,
-            'accepted_track': Abstract.accepted_track_id,
+            'final_track': Abstract.final_track_id,
             # TODO: 'proposed_track': Abstract.track_id,
-            'accepted_type': Abstract.accepted_type_id,
+            'final_type': Abstract.final_type_id,
             'proposed_type': Abstract.type_id
         }
         for key, column in static_filters.iteritems():
