@@ -209,6 +209,7 @@ class IndicoModel(Model):
         :param skip: If set, keys from that list are skipped.
         """
         cls = type(self)
+        changed = {}
         for key, value in data.iteritems():
             if keys and key not in keys:
                 return False
@@ -216,7 +217,11 @@ class IndicoModel(Model):
                 continue
             if not hasattr(cls, key):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
-            setattr(self, key, value)
+            old_value = getattr(self, key, None)
+            if old_value != value:
+                changed[key] = (old_value, value)
+                setattr(self, key, value)
+        return changed
 
     def populate_from_attrs(self, obj, attrs):
         """Populates the object from another object's attributes
