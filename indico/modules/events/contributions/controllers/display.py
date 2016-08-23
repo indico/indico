@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session, request, jsonify
 from pytz import timezone
-from sqlalchemy.orm import load_only, noload, joinedload
+from sqlalchemy.orm import load_only, joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -192,7 +192,6 @@ class RHContributionAuthor(RHContributionDisplayBase):
     def _process(self):
         author_contribs = (Contribution.query.with_parent(self.event_new)
                            .join(ContributionPersonLink)
-                           .options(noload('*'))
                            .options(joinedload('event_new'))
                            .options(load_only('id', 'title'))
                            .filter(ContributionPersonLink.id == self.author.id,
