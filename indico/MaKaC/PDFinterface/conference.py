@@ -780,13 +780,13 @@ class TimeTablePlain(PDFWithTOC):
             return
 
         lt = []
-        caption_text = "[{}] {}".format(contrib.friendly_id, escape(contrib.title.encode('utf-8')))
+        caption_text = u"[{}] {}".format(contrib.friendly_id, escape(contrib.title))
         if not self._ttPDFFormat.showContribId():
-            caption_text = escape(contrib.title.encode('utf-8'))
+            caption_text = escape(contrib.title)
         if self._ttPDFFormat.showLengthContribs():
             caption_text = u"{} ({})".format(caption_text, format_human_timedelta(contrib.duration))
         caption_text = u'<font name="Times-Bold">{}</font>'.format(caption_text)
-        lt.append([self._fontify(caption_text, 10)])
+        lt.append([self._fontify(caption_text.encode('utf-8'), 10)])
         board_number = contrib.board_number
         if self._ttPDFFormat.showContribAbstract() and self._ttPDFFormat.showContribPosterAbstract():
             speaker_list = [self._get_speaker_name(spk) for spk in contrib.speakers]
@@ -890,16 +890,16 @@ class TimeTablePlain(PDFWithTOC):
                 conv = []
                 for c in sess_block.person_links:
                     if self._showSpeakerAffiliation and c.affiliation:
-                        conv.append("{} ({})".format(escape(c.get_full_name(last_name_first=True,
-                                                                            last_name_upper=False,
-                                                                            abbrev_first_name=False)),
-                                                     escape(c.affiliation)))
+                        conv.append(u"{} ({})".format(escape(c.get_full_name(last_name_first=True,
+                                                                             last_name_upper=False,
+                                                                             abbrev_first_name=False)),
+                                                      escape(c.affiliation)))
                     else:
                         conv.append(escape(c.full_name))
 
-                conv = '; '.join(conv)
+                conv = u'; '.join(conv)
                 if conv:
-                    conv = i18nformat('<font face="Times-Bold"><b>-_("Conveners"): {}</b></font>').format(conv)
+                    conv = i18nformat(u'<font face="Times-Bold"><b>-_("Conveners"): {}</b></font>').format(conv)
 
                 res.append(Paragraph('', self._styles["session_title"]))
                 start_dt = format_time(sess_block.timetable_entry.start_dt, timezone=self._tz)
@@ -926,7 +926,7 @@ class TimeTablePlain(PDFWithTOC):
                     text = u'<i>{}</i>'.format(escape(unicode(sess_block.session.description)))
                     res.append(Paragraph(text, self._styles["session_description"]))
 
-                p2 = Paragraph(conv, self._styles["conveners"])
+                p2 = Paragraph(conv.encode('utf-8'), self._styles["conveners"])
                 res.append(p2)
                 l = []
                 ts = deepcopy(originalts)
