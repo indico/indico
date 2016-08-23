@@ -483,7 +483,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
-
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
 
@@ -501,12 +500,10 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["showDLMaterial"] = True
         vars["showLayout"] = True
 
-
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
         sdate = self._conf.getStartDate().astimezone(timezone(tz))
         edate = self._conf.getEndDate().astimezone(timezone(tz))
-        dates = []
         selected = ""
         if vars.has_key("selectedDate"):
             selectedDate = vars["selectedDate"]
@@ -523,7 +520,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["datesMenu"] = "".join(dates);
 
         # Sessions Menu
-        sessions = []
         selected = ""
         if vars.has_key("selectedSession"):
             selectedSession = vars["selectedSession"]
@@ -536,8 +532,9 @@ class WMenuMeetingHeader( WConferenceHeader ):
             selected = "selected" if unicode(session_.friendly_id) == selectedSession else ''
             title = session_.title
             if len(title) > 60:
-                title = title[0:40] + "..."
-            sessions.append(""" <option value="%s" %s>%s</option> """%(session_.friendly_id, selected, title))
+                title = title[0:40] + u"..."
+            sessions.append(""" <option value="%s" %s>%s</option> """ % (session_.friendly_id, selected,
+                                                                         title.encode('utf-8')))
         vars["sessionsMenu"] = "".join(sessions)
 
         # Handle hide/show contributions option
@@ -559,6 +556,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["printURL"]=str(urlCustPrint)
         vars["pdfURL"] = url_for('timetable.export_pdf', self._conf)
         return vars
+
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):
     """Templating web component for generating the HTML header for
