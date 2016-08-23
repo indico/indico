@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.core.settings.converters import DatetimeConverter
 from indico.modules.events.settings import EventSettingsProxy
 
 
@@ -25,7 +26,14 @@ abstracts_settings = EventSettingsProxy('abstracts', {
         'is_required': True,
         'max_length': None,
         'max_words': None
-    }
+    },
+    'start_dt': None,
+    'end_dt': None,
+    'modification_end_dt': None
+}, converters={
+    'start_dt': DatetimeConverter,
+    'end_dt': DatetimeConverter,
+    'modification_end_dt': DatetimeConverter
 })
 
 
