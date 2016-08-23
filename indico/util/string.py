@@ -34,7 +34,7 @@ from enum import Enum
 from html2text import HTML2Text
 from lxml import html, etree
 from markupsafe import Markup, escape
-from speaklater import _LazyString
+from speaklater import _LazyString, is_lazy_string
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr',
@@ -361,6 +361,8 @@ def encode_utf8(f):
         rv = f(*args, **kwargs)
         if not rv:
             return ''
+        if is_lazy_string(rv):
+            rv = rv.value
         return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
 
     return _wrapper
