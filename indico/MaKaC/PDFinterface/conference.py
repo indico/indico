@@ -1237,17 +1237,20 @@ class SimplifiedTimeTablePlain(PDFBase):
                 current_day += timedelta(days=1)
                 continue
             if self._event.end_dt.astimezone(timezone(self._tz)).month != self._conf.getAdjustedEndDate(self._tz).month:
-                text = "%s - %s-%s" % (escape(self._event.title.encode('utf-8')),
-                                       escape(format_date(self._event.start_dt, timezone=self._tz)),
-                                       escape(format_date(self._event.end_dt, timezone=self._tz)))
+                text = u'{} - {}-{}'.format(
+                    escape(self._event.title),
+                    escape(to_unicode(format_date(self._event.start_dt, timezone=self._tz))),
+                    escape(to_unicode(format_date(self._event.end_dt, timezone=self._tz)))
+                )
             else:
-                text = "%s - %s-%s" % (escape(self._event.title.encode('utf-8')),
-                                       escape(format_date(self._event.start_dt, format='dd', timezone=self._tz)),
-                                       escape(format_date(self._event.end_dt, format='dd MM YY', timezone=self._tz)))
+                text = u'{} - {}-{}'.format(
+                    escape(self._event.title),
+                    escape(to_unicode(format_date(self._event.start_dt, format='dd', timezone=self._tz))),
+                    escape(to_unicode(format_date(self._event.end_dt, format='dd MM YY', timezone=self._tz)))
+                )
             if self._event.venue_name:
-                text = "%s, %s." % (text, self._event.venue_name)
-            text = "%s" % text
-            p = Paragraph(text, self._styles["title"])
+                text = u'%s, %s.' % (text, self._event.venue_name)
+            p = Paragraph(text.encode('utf-8'), self._styles["title"])
             story.append(p)
             text2 = i18nformat("_('Daily Programme'): {}").format(escape(current_day.strftime("%A %d %B %Y")))
             p2 = Paragraph(text2, self._styles["day"])
