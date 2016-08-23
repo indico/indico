@@ -155,6 +155,7 @@ class IndicoLocationField(JSONField):
         super(IndicoLocationField, self).process_formdata(valuelist)
         self.data['room'] = Room.get(int(self.data['room_id'])) if self.data.get('room_id') else None
         self.data['venue'] = Location.get(int(self.data['venue_id'])) if self.data.get('venue_id') else None
+        self.data['source'] = self.object_data.get('source') if self.object_data else None
 
     def _value(self):
         if not self.data:

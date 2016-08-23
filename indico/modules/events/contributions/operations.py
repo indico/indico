@@ -58,9 +58,13 @@ def _ensure_consistency(contrib):
 
 
 def _set_custom_fields(contrib, custom_fields_data):
+    changes = {}
     for custom_field_name, custom_field_value in custom_fields_data.iteritems():
         custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
-        contrib.set_custom_field(custom_field_id, custom_field_value)
+        old_value = contrib.set_custom_field(custom_field_id, custom_field_value)
+        if old_value != custom_field_value:
+            changes[custom_field_name] = (old_value, custom_field_value)
+    return changes
 
 
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
@@ -99,9 +103,9 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     start_dt = contrib_data.pop('start_dt', None)
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
-    contrib.populate_from_dict(contrib_data)
+    changes = contrib.populate_from_dict(contrib_data)
     if custom_fields_data:
-        _set_custom_fields(contrib, custom_fields_data)
+        changes.update(_set_custom_fields(contrib, custom_fields_data))
     if 'session' in contrib_data:
         timetable_entry = contrib.timetable_entry
         if timetable_entry is not None and _ensure_consistency(contrib):
@@ -111,10 +115,11 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
                                      'session_block_id': current_session_block.id if current_session_block else None,
                                      'force': True}
     db.session.flush()
-    signals.event.contribution_updated.send(contrib)
-    logger.info('Contribution %s updated by %s', contrib, session.user)
-    contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                          'Contribution "{}" has been updated'.format(contrib.title), session.user)
+    if changes:
+        signals.event.contribution_updated.send(contrib)
+        logger.info('Contribution %s updated by %s', contrib, session.user)
+        contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                              'Contribution "{}" has been updated'.format(contrib.title), session.user)
     return rv
 
 

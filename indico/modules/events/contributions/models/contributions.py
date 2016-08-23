@@ -57,7 +57,9 @@ class CustomFieldsMixin(object):
             field_value_cls = type(self).field_values.prop.mapper.class_
             fv = field_value_cls(contribution_field=self.event_new.get_contribution_field(field_id))
             self.field_values.append(fv)
+        old_value = fv.data
         fv.data = field_value
+        return old_value
 
 
 class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
