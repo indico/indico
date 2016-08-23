@@ -96,8 +96,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     allow_no_access_contact = True
     location_backref_name = 'events'
     allow_location_inheritance = False
-    possible_render_modes = {RenderMode.markdown}
-    default_render_mode = RenderMode.markdown
+    possible_render_modes = {RenderMode.html}
+    default_render_mode = RenderMode.html
     __logging_disabled = False
 
     ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'
