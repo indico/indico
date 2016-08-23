@@ -71,7 +71,9 @@ class DescriptionMixin(object):
 
     @hybrid_property
     def description(self):
-        selected_mode = self.default_render_mode if len(self.possible_render_modes) == 1 else self.render_mode
+        selected_mode = (self.default_render_mode
+                         if len(self.possible_render_modes) == 1 or self.render_mode is None
+                         else self.render_mode)
         description_wrapper = RENDER_MODE_WRAPPER_MAP[selected_mode]
         return description_wrapper(self._description)
 
