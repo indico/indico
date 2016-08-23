@@ -716,7 +716,7 @@ class PDFLaTeXBase(object):
             return mdx_latex.latex_escape(string, ignore_math=True)
 
         def _convert_markdown(text):
-            return render_markdown(text, md=md.convert, escape_latex_math=_escape_latex_math).encode('utf-8')
+            return render_markdown(text, md=md.convert, escape_latex_math=_escape_latex_math)
 
         self._args = {
             'md_convert': _convert_markdown

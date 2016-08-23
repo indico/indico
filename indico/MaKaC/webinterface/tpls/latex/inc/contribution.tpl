@@ -49,7 +49,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${md_convert(str(contrib.get_field_value(field.id)).decode('utf-8')).encode('utf-8')}
+            ${md_convert(contrib.get_field_value(field.id))}
         }
         \vspace{1.5em}
     \end{addmargin}
