@@ -50,6 +50,7 @@ from indico.util.date_time import format_date, now_utc, format_number
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
@@ -248,12 +249,13 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
         start_dt = event.start_dt.astimezone(tzinfo)
         end_dt = event.end_dt.astimezone(tzinfo)
         if start_dt.year != end_dt.year:
-            return '{} - {}'.format(format_date(start_dt, timezone=tzinfo), format_date(end_dt, timezone=tzinfo))
+            return '{} - {}'.format(to_unicode(format_date(start_dt, timezone=tzinfo)),
+                                    to_unicode(format_date(end_dt, timezone=tzinfo)))
         elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
-            return '{} - {}'.format(format_date(start_dt, day_month, timezone=tzinfo),
-                                    format_date(end_dt, day_month, timezone=tzinfo))
+            return '{} - {}'.format(to_unicode(format_date(start_dt, day_month, timezone=tzinfo)),
+                                    to_unicode(format_date(end_dt, day_month, timezone=tzinfo)))
         else:
-            return format_date(start_dt, day_month, timezone=tzinfo)
+            return to_unicode(format_date(start_dt, day_month, timezone=tzinfo))
 
     def group_by_month(self, events):
         def _format_tuple(x):
