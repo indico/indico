@@ -66,10 +66,9 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
-from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta, as_utc
+from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
 from indico.util.i18n import i18nformat
-from indico.util.string import html_color_to_rgb
-
+from indico.util.string import html_color_to_rgb, to_unicode
 
 styles = getSampleStyleSheet()
 
@@ -882,9 +881,9 @@ class TimeTablePlain(PDFWithTOC):
                 if not sess_block.can_access(self._aw):
                     continue
 
-                room = ''
+                room = u''
                 if sess_block.room_name:
-                    room = ' - {}'.format(escape(sess_block.room_name.encode('utf-8')))
+                    room = u' - {}'.format(escape(sess_block.room_name))
 
                 session_caption = sess_block.full_title
                 conv = []
@@ -908,8 +907,9 @@ class TimeTablePlain(PDFWithTOC):
                     start_dt = format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz)
 
                 sess_caption = u'<font face="Times-Bold">{}</font>'.format(escape(session_caption))
-                text = u'<u>{}</u>{} ({}-{})'.format(sess_caption, room, start_dt,
-                                                     format_time(sess_block.timetable_entry.end_dt, timezone=self._tz))
+                text = u'<u>{}</u>{} ({}-{})'.format(
+                    sess_caption, room, start_dt,
+                    to_unicode(format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)))
 
                 p1 = Paragraph(text, self._styles["session_title"])
                 if self._useColors():
@@ -1006,18 +1006,18 @@ class TimeTablePlain(PDFWithTOC):
                 if not contrib.can_access(self._aw):
                     continue
 
-                room = ''
+                room = u''
                 if contrib.room_name:
-                    room = ' - {}'.format(escape(contrib.room_name.encode('utf-8')))
+                    room = u' - {}'.format(escape(contrib.room_name))
 
                 speakers = ';'.join([self._get_speaker_name(spk) for spk in contrib.speakers])
                 if speakers.strip():
                     speakers = i18nformat('<font face="Times-Bold"><b>-_("Presenters"): {}</b></font>').format(speakers)
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title.encode('utf-8')), room,
-                                                    format_time(entry.start_dt, timezone=self._tz),
-                                                    format_time(entry.end_dt, timezone=self._tz))
-                p1 = Paragraph(text, self._styles["session_title"])
+                text = u'<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
+                                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
+                                                     to_unicode(format_time(entry.end_dt, timezone=self._tz)))
+                p1 = Paragraph(text.encode('utf-8'), self._styles["session_title"])
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
                     self._indexedFlowable[p1] = {'text': escape(contrib.title.encode('utf-8')), 'level': 2}
@@ -1032,15 +1032,15 @@ class TimeTablePlain(PDFWithTOC):
             elif self._ttPDFFormat.showBreaksAtConfLevel() and entry.type == TimetableEntryType.BREAK:
                 break_entry = entry
                 break_ = break_entry.object
-                room = ''
+                room = u''
                 if break_.room_name:
-                    room = ' - {}'.format(escape(break_.room_name.encode('utf-8')))
+                    room = u' - {}'.format(escape(break_.room_name))
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title.encode('utf-8')), room,
-                                                    format_time(break_entry.start_dt, timezone=self._tz),
-                                                    format_time(break_entry.end_dt, timezone=self._tz))
+                text = u'<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
+                                                     to_unicode(format_time(break_entry.start_dt, timezone=self._tz)),
+                                                     to_unicode(format_time(break_entry.end_dt, timezone=self._tz)))
 
-                p1 = Paragraph(text, self._styles["session_title"])
+                p1 = Paragraph(text.encode('utf-8'), self._styles["session_title"])
                 res.append(p1)
 
                 if self._ttPDFFormat.showTitleSessionTOC():
