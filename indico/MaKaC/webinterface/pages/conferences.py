@@ -908,8 +908,8 @@ class WConferenceDataModification(wcomponents.WTemplated):
                     label,
                     'selected' if self._conf.getVisibility() == (val or 999) else '')
                    for val, label in get_visibility_options(self._conf.as_event)]
-        return '\n'.join('<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
-                         for val, label, selected in options)
+        return u'\n'.join(u'<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
+                          for val, label, selected in options)
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
