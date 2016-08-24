@@ -549,7 +549,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
-            'categoryId': unicode(event.category_id),
+            'categoryId': event.category_id,
             'category': event.category.title,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
