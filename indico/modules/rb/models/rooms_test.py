@@ -124,9 +124,10 @@ def test_has_booking_groups(create_room_attribute, dummy_room, value, expected):
     assert dummy_room.has_booking_groups == expected
 
 
-def test_has_projector(create_equipment_type, dummy_room, db):
+@pytest.mark.parametrize('eq_name', (u'Computer Projector', u'Video projector 4:3', u'Video projector 16:9'))
+def test_has_projector(create_equipment_type, dummy_room, db, eq_name):
     assert not dummy_room.has_projector
-    dummy_room.available_equipment.append(create_equipment_type(u'Computer Projector'))
+    dummy_room.available_equipment.append(create_equipment_type(eq_name))
     db.session.flush()
     assert dummy_room.has_projector
 

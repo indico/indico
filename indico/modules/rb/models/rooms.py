@@ -326,7 +326,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @property
     @cached(_cache)
     def has_projector(self):
-        return self.has_equipment('Computer Projector')
+        return self.has_equipment(u'Computer Projector', u'Video projector 4:3', u'Video projector 16:9')
 
     @property
     @cached(_cache)
@@ -382,8 +382,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         )
 
     @cached(_cache)
-    def has_equipment(self, equipment_name):
-        return self.available_equipment.filter_by(name=equipment_name).count() > 0
+    def has_equipment(self, *names):
+        return self.available_equipment.filter(EquipmentType.name.in_(names)).count() > 0
 
     def find_available_vc_equipment(self):
         vc_equipment = (self.available_equipment
