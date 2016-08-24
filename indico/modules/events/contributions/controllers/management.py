@@ -48,7 +48,7 @@ from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import update_object_principals, track_time_changes
+from indico.modules.events.util import update_object_principals, track_time_changes, get_field_values
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -69,12 +69,6 @@ def _render_subcontribution_list(contrib):
                    .order_by(SubContribution.position)
                    .all())
     return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
-
-
-def _get_field_values(form_data):
-    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
-    return fields, custom_fields
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -183,7 +177,7 @@ class RHCreateContribution(RHManageContributionsBase):
         contrib_form_class = make_contribution_form(self.event_new)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
-            contrib = create_contribution(self.event_new, *_get_field_values(form.data))
+            contrib = create_contribution(self.event_new, *get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.list_generator.render_list(contrib)
             if tpl_components['hide_contrib']:
@@ -203,7 +197,7 @@ class RHEditContribution(RHManageContributionBase):
                                   event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
             with track_time_changes():
-                update_contribution(self.contrib, *_get_field_values(form.data))
+                update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:

@@ -27,6 +27,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.timetable.operations import (schedule_contribution, update_timetable_entry,
                                                         delete_timetable_entry)
+from indico.modules.events.util import set_custom_fields
 
 
 def _ensure_consistency(contrib):
@@ -57,16 +58,6 @@ def _ensure_consistency(contrib):
     return False
 
 
-def _set_custom_fields(contrib, custom_fields_data):
-    changes = {}
-    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
-        custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
-        old_value = contrib.set_custom_field(custom_field_id, custom_field_value)
-        if old_value != custom_field_value:
-            changes[custom_field_name] = (old_value, custom_field_value)
-    return changes
-
-
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event_new=event)
@@ -74,7 +65,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     if start_dt is not None:
         schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     if custom_fields_data:
-        _set_custom_fields(contrib, custom_fields_data)
+        set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, session.user)
@@ -105,7 +96,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
     changes = contrib.populate_from_dict(contrib_data)
     if custom_fields_data:
-        changes.update(_set_custom_fields(contrib, custom_fields_data))
+        changes.update(set_custom_fields(contrib, custom_fields_data))
     if 'session' in contrib_data:
         timetable_entry = contrib.timetable_entry
         if timetable_entry is not None and _ensure_consistency(contrib):
