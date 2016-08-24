@@ -23,7 +23,7 @@ from flask import request
 from indico.core.db import db
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.contributions.models.fields import ContributionField
-from indico.modules.events.util import ListGeneratorBase
+from indico.modules.events.util import ListGeneratorBase, serialize_person_link
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
@@ -158,3 +158,32 @@ class AbstractListGenerator(ListGeneratorBase):
             'filtering_enabled': filtering_enabled,
             'filter_statistics': filter_statistics
         }
+
+
+def serialize_abstract_person_link(person_link):
+    """Serialize AbstractPersonLink to JSON-like object"""
+    data = serialize_person_link(person_link)
+    data['isSpeaker'] = person_link.is_speaker
+    data['authorType'] = person_link.author_type.value
+    return data
+
+
+def make_abstract_form(event):
+    """Extends the abstract WTForm to add the extra fields.
+
+    Each extra field will use a field named ``custom_ID``.
+
+    :param event: The `Event` for which to create the abstract form.
+    :return: A `AbstractForm` subclass.
+    """
+    from indico.modules.events.abstracts.forms import AbstractForm
+
+    form_class = type(b'_AbstractForm', (AbstractForm,), {})
+    for custom_field in event.contribution_fields:
+        field_impl = custom_field.mgmt_field
+        if field_impl is None:
+            # field definition is not available anymore
+            continue
+        name = 'custom_{}'.format(custom_field.id)
+        setattr(form_class, name, field_impl.create_wtf_field())
+    return form_class

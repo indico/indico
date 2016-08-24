@@ -297,6 +297,16 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy=True
         )
     )
+    #: Persons associated with this abstract
+    person_links = db.relationship(
+        'AbstractPersonLink',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'abstract',
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - comments (AbstractComment.abstract)
@@ -335,6 +345,13 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
+
+    def get_field_value(self, field_id, raw=False):
+        fv = next((v for v in self.field_values if v.contribution_field_id == field_id), None)
+        if raw:
+            return fv
+        else:
+            return fv.friendly_data if fv else ''
 
     @return_ascii
     def __repr__(self):
