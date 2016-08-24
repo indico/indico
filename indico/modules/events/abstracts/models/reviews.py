@@ -22,12 +22,11 @@ from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
-class ReviewAction(int, IndicoEnum):
+class AbstractAction(int, IndicoEnum):
     accept = 1
     reject = 2
     merge = 3
     mark_as_dupe = 4
-    change_track = 5
 
 
 class AbstractReview(db.Model):
@@ -74,7 +73,7 @@ class AbstractReview(db.Model):
         default=''
     )
     proposed_action = db.Column(
-        PyIntEnum(ReviewAction),
+        PyIntEnum(AbstractAction),
         nullable=False
     )
     proposed_track_id = db.Column(
