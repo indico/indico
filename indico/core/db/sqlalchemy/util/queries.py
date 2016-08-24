@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import re
 
 from sqlalchemy import over, func, inspect
@@ -58,11 +60,11 @@ def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=Fal
 
 def escape_like(value):
     """Escapes a string to be used as a plain string in LIKE"""
-    escape_char = u'\\'
+    escape_char = '\\'
     return (value
             .replace(escape_char, escape_char * 2)  # literal escape char needs to be escaped
-            .replace(u'%', escape_char + u'%')      # we don't want % wildcards inside the value
-            .replace(u'_', escape_char + u'_'))     # same for _ wildcards
+            .replace('%', escape_char + '%')      # we don't want % wildcards inside the value
+            .replace('_', escape_char + '_'))     # same for _ wildcards
 
 
 def preprocess_ts_string(text, prefix=True):
