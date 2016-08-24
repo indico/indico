@@ -84,7 +84,7 @@ class EventPersonLinkForm(IndicoForm):
 
 
 class EventCreationFormBase(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False)
+    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False, require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)

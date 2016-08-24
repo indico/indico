@@ -131,6 +131,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
         'deep_category_count': category.deep_children_count,
         'deep_event_count': category.deep_events_count,
         'can_access': category.can_access(session.user),
+        'can_create_events': category.can_manage(session.user, role='create'),
     }
     if with_path:
         if child_path:

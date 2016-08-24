@@ -259,6 +259,9 @@ class CategoryField(HiddenField):
                          contains events.
     :param allow_subcats: Whether to allow selecting a category that
                           contains subcategories.
+    :param require_event_creation_rights: Whether to allow selecting
+                                          only categories where the
+                                          user can create events.
     """
 
     widget = JinjaWidget('forms/category_picker_widget.html')
@@ -267,6 +270,7 @@ class CategoryField(HiddenField):
         self.navigator_category_id = 0
         self.allow_events = kwargs.pop('allow_events', True)
         self.allow_subcats = kwargs.pop('allow_subcats', True)
+        self.require_event_creation_rights = kwargs.pop('require_event_creation_rights', False)
         super(CategoryField, self).__init__(*args, **kwargs)
 
     def pre_validate(self, form):

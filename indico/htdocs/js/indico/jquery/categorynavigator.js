@@ -44,6 +44,10 @@
                     disabled: false,
                     message: $T.gettext("Not possible for categories containing events")
                 },
+                categoriesWithoutEventCreationRights: {
+                    disabled: false,
+                    message: $T.gettext("Not possible for categories where you cannot create events")
+                },
                 categoriesDescendingFrom: {
                     disabled: false,
                     ids: [],
@@ -674,6 +678,7 @@
             var canActOnCategoriesDescendingFrom = self._canActOnCategoriesDescendingFrom(category, true);
             var canActOnCategoriesWithEvents = self._canActOnCategoriesWithEvents(category, true);
             var canActOnCategoriesWithSubcategories = self._canActOnCategoriesWithSubcategories(category, true);
+            var canActOnCategoriesWithoutEventCreationRights = self._canActOnCategoriesWithoutEventCreationRights(category, true);
 
             if (!canActOnCategories.allowed) {
                 result = canActOnCategories;
@@ -683,8 +688,21 @@
                 result = canActOnCategoriesWithEvents;
             } else if (!canActOnCategoriesWithSubcategories.allowed) {
                 result = canActOnCategoriesWithSubcategories;
+            } else if (!canActOnCategoriesWithoutEventCreationRights.allowed) {
+                result = canActOnCategoriesWithoutEventCreationRights;
             }
 
+            return withMessage ? result : result.allowed;
+        },
+
+        _canActOnCategoriesWithoutEventCreationRights: function(category, withMessage) {
+            var self = this;
+            var result = {allowed: true, message: ""};
+            var categoriesWithoutEventCreationRights = self.options.actionOn.categoriesWithoutEventCreationRights;
+            if (categoriesWithoutEventCreationRights.disabled && !category.can_create_events) {
+                result.allowed = false;
+                result.message = categoriesWithoutEventCreationRights.message;
+            }
             return withMessage ? result : result.allowed;
         },
 

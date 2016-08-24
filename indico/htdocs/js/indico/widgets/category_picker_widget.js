@@ -22,6 +22,7 @@
         options = $.extend(true, {
             fieldId: null,
             navigatorCategoryId: null,
+            requireEventCreationRights: false,
             allow: {
                 events: true,
                 subcats: true
@@ -35,6 +36,9 @@
         var navigatorCategory = options.navigatorCategoryId;
         var actionOn = {};
 
+        if (options.requireEventCreationRights) {
+            actionOn.categoriesWithoutEventCreationRights = {disabled: true};
+        }
         if (!options.allow.events) {
             actionOn.categoriesWithEvents = {disabled: true};
         }

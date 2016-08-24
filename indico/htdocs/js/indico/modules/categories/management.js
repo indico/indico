@@ -350,6 +350,9 @@
                 categoriesWithSubcategories: {
                     disabled: true
                 },
+                categoriesWithoutEventCreationRights: {
+                    disabled: true
+                },
                 categories: {
                     disabled: true,
                     ids: [sourceId],
