@@ -9,7 +9,7 @@ from xml.sax.saxutils import escape
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType
 
-event_types = {t.name: unicode(t.title).encode('utf-8') for t in EventType}
+event_types = {t.name: unicode(t.title) for t in EventType}
 visibilityList = dict(get_visibility_options(confObj.as_event))
 visibilityList[999] = visibilityList.pop('')
 
@@ -184,7 +184,7 @@ $E('inPlaceEditVisibility').set(new SelectEditWidget('event.main.changeVisibilit
         {'conference':'${ conferenceId }'}, ${ visibilityList|n,j }, ${ jsonEncode(visibility) }, null).draw());
 
 $E('inPlaceEditType').set(new SelectEditWidget('event.main.changeType',
-        {'conference':'${ conferenceId }'}, ${ event_types }, ${ jsonEncode(confObj.as_event.type) }, null).draw());
+        {'conference':'${ conferenceId }'}, ${ event_types|n,j }, ${ jsonEncode(confObj.as_event.type) }, null).draw());
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}, confFossile.type != 'simple_event').draw());
 
