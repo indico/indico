@@ -27,6 +27,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.timetable.operations import (schedule_contribution, update_timetable_entry,
                                                         delete_timetable_entry)
+from indico.modules.events.util import _set_custom_fields
 
 
 def _ensure_consistency(contrib):
@@ -55,16 +56,6 @@ def _ensure_consistency(contrib):
             delete_timetable_entry(entry, log=False)
             return True
     return False
-
-
-def _set_custom_fields(contrib, custom_fields_data):
-    changes = {}
-    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
-        custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
-        old_value = contrib.set_custom_field(custom_field_id, custom_field_value)
-        if old_value != custom_field_value:
-            changes[custom_field_name] = (old_value, custom_field_value)
-    return changes
 
 
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
