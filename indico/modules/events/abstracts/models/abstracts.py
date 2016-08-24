@@ -68,12 +68,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         index=True,
         nullable=False
     )
-    track_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.tracks.id'),
-        nullable=True,
-        index=True
-    )
     type_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contribution_types.id'),
@@ -170,12 +164,21 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy='dynamic'
         )
     )
-    track = db.relationship(
+    submitted_for_tracks = db.relationship(
         'Track',
-        lazy=True,
-        foreign_keys=[track_id],
+        secondary='event_abstracts.submitted_for_tracks',
+        collection_class=set,
         backref=db.backref(
-            'abstracts',
+            'abstracts_submitted',
+            lazy=True
+        )
+    )
+    proposed_for_tracks = db.relationship(
+        'Track',
+        secondary='event_abstracts.proposed_for_tracks',
+        collection_class=set,
+        backref=db.backref(
+            'abstracts_proposed',
             lazy=True
         )
     )
@@ -213,7 +216,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         lazy=True,
         foreign_keys=[final_track_id],
         backref=db.backref(
-            'completed_abstracts',
+            'abstracts_accepted',
             lazy=True
         )
     )
