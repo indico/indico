@@ -57,18 +57,6 @@ class UserGetEmail(LoggedOnlyService):
             raise ServiceError("ERR-U4", "User is not logged in")
 
 
-class UserShowPastEvents(UserModifyBase):
-    def _getAnswer(self):
-        self._target.getPersonalInfo().setShowPastEvents(True)
-        return True
-
-
-class UserHidePastEvents(UserModifyBase):
-    def _getAnswer(self):
-        self._target.getPersonalInfo().setShowPastEvents(False)
-        return True
-
-
 class UserRefreshRedisLinks(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)
@@ -83,7 +71,5 @@ class UserRefreshRedisLinks(AdminService):
 
 methodMap = {
     "data.email.get": UserGetEmail,
-    "showPastEvents": UserShowPastEvents,
-    "hidePastEvents": UserHidePastEvents,
     "refreshRedisLinks": UserRefreshRedisLinks
 }
