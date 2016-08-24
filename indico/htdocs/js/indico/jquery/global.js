@@ -173,8 +173,7 @@ $(document).ready(function() {
 
     $('.js-dropdown').each(function() {
         $(this).parent().dropdown({
-            selector: '.js-dropdown',
-            always_listen: $(this).data('dropdown-always-listen') !== undefined
+            selector: '.js-dropdown'
         });
     });
 

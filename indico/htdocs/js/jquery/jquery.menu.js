@@ -73,7 +73,8 @@
 
             elem.find(this.options.selector).each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#" || self.options.always_listen) {
+                if (!$this.attr('href') || $this.attr('href') == "#" || $this.data('ignore-href') !== undefined ||
+                        self.options.always_listen) {
                     $this.click(function(e) {
                         if ($this.data('toggle') == 'dropdown') {
                             if ($this.data('on')) {

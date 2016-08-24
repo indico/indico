@@ -23,7 +23,7 @@ ${ template_hook('global-announcement') }
 
     <div class="global-menu toolbar">
         <a href="${ url_for_index() }">${ _("Home") }</a>
-        <a class="arrow js-dropdown" href="#" data-toggle="dropdown" js-dropdown ${'data-dropdown-always-listen' if _session.user else ''}>${ _("Create event") }</a>
+        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">${ _("Create event") }</a>
         <ul class="dropdown">
             <li>
                 ${ tpl.create_event_link(currentCategory, 'lecture', _('Create lecture'), id='create-lecture') }
