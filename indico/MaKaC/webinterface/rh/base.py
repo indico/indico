@@ -472,6 +472,11 @@ class RH(RequestHandlerBase):
         message = _("Bad Request")
         return render_error(message, e.description)
 
+    @jsonify_error(status=401)
+    def _processUnauthorized(self, e):
+        message = _("Unauthorized")
+        return render_error(message, e.description)
+
     @jsonify_error(status=400)
     def _processBadData(self, e):
         message = _("Invalid or expired token")

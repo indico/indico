@@ -18,7 +18,7 @@ import traceback
 from functools import wraps
 
 from flask import request
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Unauthorized
 
 from indico.util.json import create_json_error_answer
 
@@ -93,14 +93,14 @@ def cached_writable_property(cache_attr, cache_on_set=True):
     return _cached_writable_property
 
 
-def jsonify_error(function=None, logger_name=None, logger_message=None, logging_level='info', status=200):
+def jsonify_error(function=None, logger_name='requestHandler', logger_message=None, logging_level='info', status=200):
     """
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
     """
     from indico.core.errors import IndicoError, NotFoundError
     from indico.core.logger import Logger
-    no_tb_exceptions = (NotFound, NotFoundError)
+    no_tb_exceptions = (NotFound, NotFoundError, Unauthorized)
 
     def _jsonify_error(f):
         @wraps(f)
@@ -115,11 +115,11 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
             tb = ''
             if logging_level != 'exception' and not isinstance(exception, no_tb_exceptions):
                 tb = traceback.format_exc()
-            getattr(Logger.get(logger_name), logging_level)(
+            logger_fn = getattr(Logger.get(logger_name), logging_level)
+            logger_fn(
                 logger_message if logger_message else
-                'Request {0} finished with {1}: {2}\n{3}'.format(
-                    request, exception.__class__.__name__, exception, tb
-                ).rstrip())
+                'Request finished: {} ({})\n{}'.format(exception.__class__.__name__, exception, tb).rstrip()
+            )
 
             # allow e.g. NoReportError to specify a status code without possibly
             # breaking old code that expects it with a 200 code.
