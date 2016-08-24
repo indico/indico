@@ -77,6 +77,26 @@ def upgrade():
     )
 
     op.create_table(
+        'submitted_for_tracks',
+        sa.Column('abstract_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('track_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
+        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.PrimaryKeyConstraint('abstract_id', 'track_id'),
+        schema='event_abstracts'
+    )
+
+    op.create_table(
+        'proposed_for_tracks',
+        sa.Column('abstract_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('track_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
+        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.PrimaryKeyConstraint('abstract_id', 'track_id'),
+        schema='event_abstracts'
+    )
+
+    op.create_table(
         'email_templates',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
@@ -180,15 +200,7 @@ def upgrade():
         sa.UniqueConstraint('review_id'),
         schema='event_abstracts'
     )
-    op.create_table(
-        'track_abstract_reviewers',
-        sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
-        sa.Column('track_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
-        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
-        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('user_id', 'track_id'),
-        schema='events'
-    )
+
     op.create_table(
         'email_logs',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -205,16 +217,28 @@ def upgrade():
         schema='event_abstracts'
     )
 
+    op.create_table(
+        'track_abstract_reviewers',
+        sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.Column('track_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('user_id', 'track_id'),
+        schema='events'
+    )
+
 
 def downgrade():
-    op.drop_table('email_logs', schema='event_abstracts')
     op.drop_table('track_abstract_reviewers', schema='events')
+    op.drop_table('email_logs', schema='event_abstracts')
     op.drop_table('abstract_review_ratings', schema='event_abstracts')
     op.drop_table('abstract_reviews', schema='event_abstracts')
     op.drop_table('abstract_review_questions', schema='event_abstracts')
     op.drop_table('abstract_comments', schema='event_abstracts')
     op.drop_table('abstract_person_links', schema='event_abstracts')
     op.drop_table('email_templates', schema='event_abstracts')
+    op.drop_table('proposed_for_tracks', schema='event_abstracts')
+    op.drop_table('submitted_for_tracks', schema='event_abstracts')
     op.drop_table('abstracts', schema='event_abstracts')
     op.rename_table('legacy_abstracts', 'abstracts', schema='event_abstracts')
     op.execute('''
