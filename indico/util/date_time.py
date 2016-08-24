@@ -31,6 +31,7 @@ from dateutil.relativedelta import relativedelta
 
 from indico.core.config import Config
 from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
+from indico.util.string import inject_unicode_debug
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -94,7 +95,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     elif server_tz:
         timezone = Config.getInstance().getDefaultTimezone()
 
-    return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
+    rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
+    return inject_unicode_debug(rv).encode('utf-8')
 
 
 def format_date(d, format='medium', locale=None, timezone=None):
@@ -107,7 +109,9 @@ def format_date(d, format='medium', locale=None, timezone=None):
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
         d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
-    return _format_date(d, format=format, locale=locale).encode('utf-8')
+
+    rv = _format_date(d, format=format, locale=locale)
+    return inject_unicode_debug(rv).encode('utf-8')
 
 
 def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
@@ -125,7 +129,8 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     if timezone:
         timezone = get_timezone(timezone)
 
-    return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
+    rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
+    return inject_unicode_debug(rv).encode('utf-8')
 
 
 def format_timedelta(td, format='short', threshold=0.85, locale=None):
@@ -135,7 +140,8 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None):
     if not locale:
         locale = get_current_locale()
 
-    return _format_timedelta(td, format=format, locale=locale, threshold=threshold).encode('utf-8')
+    rv = _format_timedelta(td, format=format, locale=locale, threshold=threshold)
+    return inject_unicode_debug(rv).encode('utf-8')
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):
@@ -276,7 +282,8 @@ def format_pretty_datetime(dt, locale=None, tzinfo=None):
 def format_number(number, locale=None):
     if not locale:
         locale = get_current_locale()
-    return _format_number(number, locale=locale).encode('utf-8')
+    rv = _format_number(number, locale=locale)
+    return inject_unicode_debug(rv).encode('utf-8')
 
 
 def timedelta_split(delta):

@@ -540,6 +540,22 @@ def sanitize_email(email):
     return email if m is None else m.group(1)
 
 
+def inject_unicode_debug(s):
+    """
+    Wrap a string in invisible unicode characters to trigger a unicode
+    error when erroneously mixing unicode and bytestrings.  If unicode
+    debug mode is not enabled, this function returns its argument
+    without touching it.
+
+    :param s: a unicode string
+    """
+    from indico.core.config import Config
+    if not Config.getInstance().getDebugUnicode():
+        return s
+    else:
+        return u'\N{ZERO WIDTH SPACE}' + s + u'\N{ZERO WIDTH SPACE}'
+
+
 class RichMarkup(Markup):
     """unicode/Markup subclass that detects preformatted text
 
