@@ -22,20 +22,37 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.locators import locator_property
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
+from indico.util.i18n import _
 
 
-class AbstractState(int, IndicoEnum):
+class AbstractState(TitledIntEnum):
+    __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate")]
     submitted = 1
     withdrawn = 2
     accepted = 3
     rejected = 4
     merged = 5
     duplicate = 6
+
+
+class AbstractPublicState(TitledIntEnum):
+    __titles__ = [None, _("Awaiting Review"), _("Under Review")]
+    awaiting = 1
+    under_review = 2
+
+
+class AbstractReviewingState(TitledIntEnum):
+    __titles__ = [_("Not Started"), _("Positive"), _("Negative"), _("Mixed")]
+    not_started = 0
+    positive = 1
+    negative = 2
+    mixed = 3
 
 
 class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
@@ -257,6 +274,28 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
     # - email_logs (AbstractEmailLogEntry.abstract)
     # - merged_abstracts (Abstract.merged_into)
     # - reviews (AbstractReview.abstract)
+
+    @property
+    def public_state(self):
+        if self.state != AbstractState.submitted:
+            return self.state
+        elif self.reviews:
+            return AbstractPublicState.under_review
+        else:
+            return AbstractPublicState.awaiting
+
+    @property
+    def reviewing_state(self):
+        if not self.reviews:
+            return AbstractReviewingState.not_started
+        rejections = any(x.action == AbstractAction.reject for x in self.reviews)
+        acceptances = any(x.action == AbstractAction.accept for x in self.reviews)
+        if acceptances and not rejections:
+            return AbstractReviewingState.positive
+        elif rejections and not acceptances:
+            return AbstractReviewingState.negative
+        else:
+            return AbstractReviewingState.mixed
 
     @locator_property
     def locator(self):
