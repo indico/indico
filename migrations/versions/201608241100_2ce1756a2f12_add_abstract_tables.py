@@ -126,7 +126,7 @@ def upgrade():
         sa.Column('extra_cc_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.Column('stop_on_match', sa.Boolean(), nullable=False),
         sa.Column('position', sa.Integer(), nullable=False),
-        sa.Column('conditions', postgresql.JSON(), nullable=False),
+        sa.Column('rules', postgresql.JSON(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_abstracts'

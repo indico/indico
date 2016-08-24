@@ -21,19 +21,19 @@ from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
-class Rule(object):
-    """Base class for rules.
+class Condition(object):
+    """Base class for conditions.
 
-    Rules allow you to define criteria to match on and then evaluate
-    those criteria and check whether there is a match.
+    `Condition`s allow you to define criteria to match on and then evaluate
+    those criteria and check whether there is a match (as part of a rule).
     """
 
-    #: The name of the rule. Must be unique within the context
-    #: where the rule is used
+    #: The name of the condition. Must be unique within the context
+    #: where the condition is used
     name = None
-    #: Whether the rule must always be present
+    #: Whether the condition must always be present
     required = False
-    #: A short description of the rule.
+    #: A short description of the condition.
     description = None
 
     @classproperty
@@ -42,13 +42,13 @@ class Rule(object):
         return cls.name
 
     @classmethod
-    def is_used(cls, ruleset):
-        """Check whether the rule is used in a ruleset"""
-        return ruleset.get(cls.name) is not None
+    def is_used(cls, rule):
+        """Check whether the condition is used in a rule"""
+        return rule.get(cls.name) is not None
 
     @classmethod
     def get_available_values(cls, **kwargs):
-        """Get a dict of values that can be used for the rule.
+        """Get a dict of values that can be used for the condition.
 
         Subclasses are encouraged to explicitly specify the arguments
         they expect instead of using ``**kwargs``.
@@ -56,7 +56,7 @@ class Rule(object):
         The key of each item is the actual value that will be used
         in the check while the value is what is going to be displayed.
 
-        :param kwargs: arguments specific to the rule's context
+        :param kwargs: arguments specific to the condition's context
         """
         raise NotImplementedError
 
@@ -66,7 +66,7 @@ class Rule(object):
 
     @classmethod
     def check(cls, values, **kwargs):
-        """Check whether the rule is matched
+        """Check whether the condition is matched
 
         Subclasses are encouraged to explicitly specify the arguments
         they expect instead of using ``**kwargs``.
@@ -77,46 +77,46 @@ class Rule(object):
         :param values: a collection of values that are accepted for a
                        match.  it never contains values which are not
                        available anymore.
-        :param kwargs: arguments specific to the rule's context
+        :param kwargs: arguments specific to the conditions's context
         """
         raise NotImplementedError
 
 
-def get_rules(context, **kwargs):
-    """Get a dict of available rules.
+def get_conditions(context, **kwargs):
+    """Get a dict of available conditions.
 
-    :param context: the context where the rules are used
+    :param context: the context where the conditions are used
     :param kwargs: arguments specific to the context
     """
-    return named_objects_from_signal(signals.get_rules.send(context, **kwargs))
+    return named_objects_from_signal(signals.get_conditions.send(context, **kwargs))
 
 
-def check_rules(context, ruleset, **kwargs):
-    """Check whether a ruleset matches.
+def check_rule(context, rule, **kwargs):
+    """Check whether a rule matches.
 
-    :param context: the context where the rules are used
-    :param ruleset: the ruleset to check
+    :param context: the context where the conditions are used
+    :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    for name, rule in get_rules(context, **kwargs).iteritems():
-        if not rule.is_used(ruleset):
-            if rule.required:
+    for name, condition in get_conditions(context, **kwargs).iteritems():
+        if not condition.is_used(rule):
+            if condition.required:
                 return False
             else:
                 continue
-        values = rule._clean_values(ruleset[name], **kwargs)
+        values = condition._clean_values(rule[name], **kwargs)
         # not having empty values is always a failure
-        if not values or not rule.check(values, **kwargs):
+        if not values or not condition.check(values, **kwargs):
             return False
     return True
 
 
-def get_missing_rules(context, ruleset, **kwargs):
-    """Get the set of missing required rules.
+def get_missing_conditions(context, rule, **kwargs):
+    """Get the set of missing required conditions.
 
-    :param context: the context where the rules are used
-    :param text: the text to check
+    :param context: the context where the conditions are used
+    :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    rules = {rule for rule in get_rules(context, **kwargs).itervalues() if rule.required}
-    return {rule.friendly_name for rule in rules if not rule.is_used(ruleset)}
+    rules = {condition for condition in get_conditions(context, **kwargs).itervalues() if condition.required}
+    return {condition.friendly_name for condition in rules if not condition.is_used(rule)}
