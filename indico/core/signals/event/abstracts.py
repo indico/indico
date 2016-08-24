@@ -14,13 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from blinker import Namespace
+from indico.core.signals.event import _signals
 
-_signals = Namespace()
 
-from indico.core.signals.event.abstracts import *
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.notes import *
-from indico.core.signals.event.registration import *
-from indico.core.signals.event.timetable import *
+abstract_created = _signals.signal('abstract-created', """
+Called when a new abstract is created. The `sender` is the new abstract.
+""")
+
+abstract_deleted = _signals.signal('abstract-deleted', """
+Called when an abstract is deleted. The *sender* is the abstract.
+""")
+
+abstract_updated = _signals.signal('abstract-updated', """
+Called when an abstract is modified. The *sender* is the abstract.
+""")

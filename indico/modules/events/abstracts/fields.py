@@ -16,8 +16,13 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
+from indico.modules.events.abstracts.util import serialize_abstract_person_link
+from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField, JSONField
@@ -89,3 +94,42 @@ class AbstractReviewQuestionsField(MultipleItemsField):
             return []
         else:
             return [{'id': q.id, 'text': q.text} for q in self.data]
+
+
+class AbstractPersonLinkListField(PersonLinkListFieldBase):
+    """A field to configure a list of abstract persons"""
+
+    person_link_cls = AbstractPersonLink
+    linked_object_attr = 'abstract'
+    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+
+    def __init__(self, *args, **kwargs):
+        self.author_types = AuthorType.serialize()
+        self.allow_authors = True
+        self.allow_submitters = False
+        self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
+        self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
+        self.default_is_submitter = False
+        self.default_is_speaker = True
+        super(AbstractPersonLinkListField, self).__init__(*args, **kwargs)
+
+    def _convert_data(self, data):
+        return list({self._get_person_link(x) for x in data})
+
+    @no_autoflush
+    def _get_person_link(self, data):
+        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
+                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
+        return super(AbstractPersonLinkListField, self)._get_person_link(data, extra_data)
+
+    def _serialize_person_link(self, principal, extra_data=None):
+        return serialize_abstract_person_link(principal)
+
+    def pre_validate(self, form):
+        super(AbstractPersonLinkListField, self).pre_validate(form)
+        for person_link in self.data:
+            if not self.allow_authors and person_link.author_type != AuthorType.none:
+                if not self.object_data or person_link not in self.object_data:
+                    person_link.author_type = AuthorType.none
+            if person_link.author_type == AuthorType.none and not person_link.is_speaker:
+                raise ValueError(_("{} has no role").format(person_link.full_name))
