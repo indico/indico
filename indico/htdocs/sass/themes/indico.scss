@@ -510,3 +510,36 @@ a.lecture-series-link {
         white-space: nowrap;
     }
 }
+
+.agenda-placeholder{
+    @include border-radius;
+    background-color: white;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    color: $gray;
+    text-align: center;
+    height: 250px;
+
+    .placeholder-icon {
+        font-size: 5em;
+    }
+
+    .agenda-placeholder-content {
+        margin: auto;
+    }
+
+    .placeholder-text {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    a {
+        color: $link;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+}
