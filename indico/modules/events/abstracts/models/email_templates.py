@@ -16,16 +16,61 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import ARRAY, JSON
+
 from indico.core.db import db
-from indico.modules.events.email_templates import EmailTemplateBase
+from indico.util.locators import locator_property
 
 
-class AbstractEmailTemplate(EmailTemplateBase):
-    """Represents an email template for abstracts notifications"""
+def _get_next_position(context):
+    """Get the next email template position for the event."""
+    event_id = context.current_parameters['event_id']
+    res = db.session.query(db.func.max(AbstractEmailTemplate.position)).filter_by(event_id=event_id).one()
+    return (res[0] or 0) + 1
+
+
+class AbstractEmailTemplate(db.Model):
+    """Represents an email template for abstracts notifications."""
 
     __tablename__ = 'email_templates'
     __table_args__ = {'schema': 'event_abstracts'}
-    events_backref_name = 'abstract_email_templates'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
+    #: The address to use as Reply-To in the email
+    reply_to_address = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The subject of the email
+    subject = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The body of the template
+    body = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    #: List of extra email addresses to be added as CC in the email
+    extra_cc_emails = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[],
+    )
 
     #: Whether to include authors' email addresses as To for emails
     include_authors = db.Column(
@@ -45,6 +90,35 @@ class AbstractEmailTemplate(EmailTemplateBase):
         nullable=False,
         default=False
     )
+    #: The relative position of the template in the list of templates
+    position = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_position
+    )
+    #: Whether to stop checking the rest of the conditions when a match is found
+    stop_on_match = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Conditions need to be met to send the email
+    rules = db.Column(
+        JSON,
+        nullable=False
+    )
+
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'abstract_email_templates',
+            lazy='dynamic'
+        )
+    )
+
+    # relationship backrefs:
+    # - logs (AbstractEmailLogEntry.email_template)
 
     @property
     def to_emails(self):
@@ -61,12 +135,13 @@ class AbstractEmailTemplate(EmailTemplateBase):
 
     @property
     def cc_emails(self):
-        emails = super(AbstractEmailTemplate, self).cc_emails
+        emails = set(self.extra_cc_emails)
         if self.include_coauthors:
             # TODO: get list of abstract's co-authors
             coauthors_emails = {}
             emails.update(coauthors_emails)
         return emails
 
-    # relationship backrefs:
-    # - logs (AbstractEmailLogEntry.email_template)
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, email_tpl_id=self.id)
