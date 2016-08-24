@@ -17,10 +17,10 @@
 import pytest
 
 from indico.core import signals
-from indico.util.rules import Rule, get_missing_rules, check_rules, get_rules
+from indico.util.rules import Condition, get_missing_conditions, check_rule, get_conditions
 
 
-class ActionRule(Rule):
+class ActionCondition(Condition):
     name = 'action'
     description = "The action performed"
     required = True
@@ -34,7 +34,7 @@ class ActionRule(Rule):
         return action in values
 
 
-class FooRule(Rule):
+class FooCondition(Condition):
     name = 'foo'
     description = "The foo value"
     required = False
@@ -48,7 +48,7 @@ class FooRule(Rule):
         return foo in values
 
 
-class BarRule(Rule):
+class BarCondition(Condition):
     name = 'bar'
     description = "The bar value"
     required = False
@@ -62,29 +62,29 @@ class BarRule(Rule):
         return bar in values
 
 
-def _get_test_rules(sender, **kwargs):
-    yield ActionRule
-    yield FooRule
-    yield BarRule
+def _get_test_conditions(sender, **kwargs):
+    yield ActionCondition
+    yield FooCondition
+    yield BarCondition
 
 
 @pytest.yield_fixture(autouse=True)
 def _register_test_rules():
-    with signals.get_rules.connected_to(_get_test_rules, sender='test'):
+    with signals.get_conditions.connected_to(_get_test_conditions, sender='test'):
         yield
 
 
-def test_get_rules():
-    assert get_rules('test') == {'action': ActionRule, 'foo': FooRule, 'bar': BarRule}
+def test_get_rule():
+    assert get_conditions('test') == {'action': ActionCondition, 'foo': FooCondition, 'bar': BarCondition}
 
 
 def test_get_missing_rules():
-    assert get_missing_rules('test', {'action': ['test']}) == set()
-    assert get_missing_rules('test', {'action': None}) == {'action'}
-    assert get_missing_rules('test', {}) == {'action'}
+    assert get_missing_conditions('test', {'action': ['test']}) == set()
+    assert get_missing_conditions('test', {'action': None}) == {'action'}
+    assert get_missing_conditions('test', {}) == {'action'}
 
 
-@pytest.mark.parametrize(('ruleset', 'kwargs', 'expected'), (
+@pytest.mark.parametrize(('rule', 'kwargs', 'expected'), (
     # required rule missing
     ({}, {'action': 'add', 'foo': 1, 'bar': 'a'}, False),
     # no match
@@ -98,5 +98,5 @@ def test_get_missing_rules():
     # valid values
     ({'action': ['add'], 'foo': [2, 3]}, {'action': 'add', 'foo': 3, 'bar': 'a'}, True),
 ))
-def test_check_rules(ruleset, kwargs, expected):
-    assert check_rules('test', ruleset, **kwargs) == expected
+def test_check_rules(rule, kwargs, expected):
+    assert check_rule('test', rule, **kwargs) == expected

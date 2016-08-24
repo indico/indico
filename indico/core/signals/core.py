@@ -95,8 +95,8 @@ context.  The additional kwargs passed to this signal depend on
 the context.
 """)
 
-get_rules = _signals.signal('get-rules', """
-Expected to return one or more `Rule` objects.
+get_conditions = _signals.signal('get-conditions', """
+Expected to return one or more classes inheriting from `Condition`.
 The *sender* is a string (or some other object) identifying the
 context.  The additional kwargs passed to this signal depend on
 the context.
