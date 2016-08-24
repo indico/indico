@@ -94,7 +94,10 @@ SecretKey = ''
 # silently succeeding for english (ascii) strings and then failing in languages
 # where the same string is not plain ascii.  This setting should be enabled only
 # during development and never in production.
-#DebugUnicode = False
+# Level 1 will inject it only in translated strings and is usually safe while
+# level 2 will inject it in formatted date/time values too which may result in
+# strange/broken behavior in certain form fields.
+#DebugUnicode = 0
 #
 # You can force a certain number of (simulated) database conflicts on every
 # by setting ForceConflicts to the number of conflict errors you want:

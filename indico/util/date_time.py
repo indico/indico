@@ -83,8 +83,10 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     """
     Basically a wrapper around Babel's own format_datetime
     """
+    inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy HH:mm'
+        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if keep_tz:
@@ -96,30 +98,34 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
         timezone = Config.getInstance().getDefaultTimezone()
 
     rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
-    return inject_unicode_debug(rv).encode('utf-8')
+    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
 def format_date(d, format='medium', locale=None, timezone=None):
     """
     Basically a wrapper around Babel's own format_date
     """
+    inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy'
+        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
         d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
 
     rv = _format_date(d, format=format, locale=locale)
-    return inject_unicode_debug(rv).encode('utf-8')
+    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
 def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     """
     Basically a wrapper around Babel's own format_time
     """
+    inject_unicode = True
     if format == 'code':
         format = 'HH:mm'
+        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if not timezone and t.tzinfo:
@@ -130,7 +136,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
         timezone = get_timezone(timezone)
 
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
-    return inject_unicode_debug(rv).encode('utf-8')
+    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
 def format_timedelta(td, format='short', threshold=0.85, locale=None):
@@ -141,7 +147,7 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None):
         locale = get_current_locale()
 
     rv = _format_timedelta(td, format=format, locale=locale, threshold=threshold)
-    return inject_unicode_debug(rv).encode('utf-8')
+    return inject_unicode_debug(rv, 2).encode('utf-8')
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):
@@ -283,7 +289,7 @@ def format_number(number, locale=None):
     if not locale:
         locale = get_current_locale()
     rv = _format_number(number, locale=locale)
-    return inject_unicode_debug(rv).encode('utf-8')
+    return inject_unicode_debug(rv, 2).encode('utf-8')
 
 
 def timedelta_split(delta):

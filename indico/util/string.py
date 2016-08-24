@@ -540,7 +540,7 @@ def sanitize_email(email):
     return email if m is None else m.group(1)
 
 
-def inject_unicode_debug(s):
+def inject_unicode_debug(s, level=1):
     """
     Wrap a string in invisible unicode characters to trigger a unicode
     error when erroneously mixing unicode and bytestrings.  If unicode
@@ -548,9 +548,12 @@ def inject_unicode_debug(s):
     without touching it.
 
     :param s: a unicode string
+    :param level: the minimum level of the DebugUnicode mode needed
+                  to inject the spaces.  the more likely it is to
+                  break things the higher it should be.
     """
     from indico.core.config import Config
-    if not Config.getInstance().getDebugUnicode():
+    if Config.getInstance().getDebugUnicode() < level:
         return s
     else:
         return u'\N{ZERO WIDTH SPACE}' + s + u'\N{ZERO WIDTH SPACE}'
