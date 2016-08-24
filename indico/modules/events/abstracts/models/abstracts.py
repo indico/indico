@@ -313,6 +313,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             lazy=True
         )
     )
+    #: Persons associated with this abstract
     person_links = db.relationship(
         'AbstractPersonLink',
         lazy=True,

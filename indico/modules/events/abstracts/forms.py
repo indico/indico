@@ -16,15 +16,19 @@
 
 from __future__ import unicode_literals
 
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
-from indico.modules.events.abstracts.fields import EmailRuleListField, AbstractReviewQuestionsField
+from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
+                                                    AbstractPersonLinkListField)
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType
+from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField, EmailListField
+from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
+                                     IndicoQuerySelectMultipleCheckboxField, EmailListField)
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
@@ -137,7 +141,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 
     reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
     include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
-    include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
+    include_authors = BooleanField(_('Send to primary authorized_submittershors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
     subject = StringField(_("Subject"), [DataRequired()])
@@ -161,3 +165,23 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
         ('reject', _('Reject')),
         ('merge', _('Merge'))
     ], description=_("The template that will be used as a basis for this notification. You can customize it later."))
+
+
+class AbstractForm(IndicoForm):
+    title = StringField(_("Title"), [DataRequired()])
+    description = IndicoMarkdownField(_('Content'), [DataRequired()], editor=True, mathjax=True)
+    submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
+                                              blank_text=_("No type selected"))
+    person_links = AbstractPersonLinkListField(_("People"))
+    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label=lambda x: x.title,
+                                                                  collection_class=set)
+    submission_comment = TextAreaField(_("Comments"))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        self.abstract = kwargs.pop('abstract', None)
+        super(AbstractForm, self).__init__(*args, **kwargs)
+        self.submitted_contrib_type.query = self.event.contribution_types
+        if not self.submitted_contrib_type.query.count():
+            del self.submitted_contrib_type
+        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
