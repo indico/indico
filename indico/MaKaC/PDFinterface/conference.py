@@ -67,7 +67,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, ngettext
 from indico.util.string import html_color_to_rgb, to_unicode
 
 styles = getSampleStyleSheet()
@@ -1173,13 +1173,12 @@ class SimplifiedTimeTablePlain(PDFBase):
                              .format(room_time, format_time(entry.start_dt, timezone=self._tz),
                                      format_time(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
-                chairs = []
-                for c in session_slot.person_links:
-                    chairs.append(c.full_name)
-
-                if chairs:
-                    res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Chair/s"):</b></font> {}')
-                                         .format("; ".join(chairs)), self._styles["normal"]))
+                conveners = [c.full_name for c in session_slot.person_links]
+                if conveners:
+                    conveners_text = (u'<font face="Times-Bold"><b> {}:</b></font> {}'
+                                      .format(ngettext(u'Convener', u'Conveners', len(conveners)),
+                                              u'; '.join(conveners)))
+                    res.append(Paragraph(conveners_text.encode('utf-8'), self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
             elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
                 contrib = entry.object
