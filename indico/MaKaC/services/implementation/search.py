@@ -21,7 +21,7 @@ from indico.modules.groups import GroupProxy
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, sanitize_email
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.search import searchUsers
 from MaKaC.fossils.user import IGroupFossil
@@ -29,19 +29,19 @@ from MaKaC.services.implementation.base import ServiceBase
 
 
 class SearchBase(ServiceBase):
+    CHECK_HTML = False
 
     def _checkParams(self):
         self._searchExt = self._params.get('search-ext', False)
 
 
 class SearchUsers(SearchBase):
-
     def _checkParams(self):
         SearchBase._checkParams(self)
         self._surName = self._params.get("surName", "")
         self._name = self._params.get("name", "")
         self._organisation = self._params.get("organisation", "")
-        self._email = self._params.get("email", "")
+        self._email = sanitize_email(self._params.get("email", ""))
         self._exactMatch = self._params.get("exactMatch", False)
         self._confId = self._params.get("conferenceId", None)
         self._event = Event.get(self._confId, is_deleted=False) if self._confId else None
