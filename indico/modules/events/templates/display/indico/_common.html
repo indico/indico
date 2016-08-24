@@ -29,7 +29,8 @@
     {% set show_venue = not parent or (parent.venue_name != item.venue_name) %}
     {% set show_room = item.room_name != '' %}
     {% if show_venue or show_room %}
-        <span class="icon-location location-info {{ class }}"
+        <i class="icon-location header-data"></i>
+        <span class="location-info {{ class }}"
               data-qtip-html=".qtip-hidden-content"
               data-qtip-opts='{"hide": {"fixed": true, "delay": 500}}'>
             <span class="text">

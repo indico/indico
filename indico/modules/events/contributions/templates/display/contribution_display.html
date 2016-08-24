@@ -68,7 +68,8 @@
             {%- endif %}
         </div>
         <div class="time-data">
-            <span class="time-info icon-time">
+            <i class="icon-time header-data"></i>
+            <span class="time-info">
                 {% if contribution.timetable_entry -%}
                     {{ contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event_new.display_tzinfo) }}
                 {%- else -%}
@@ -83,7 +84,8 @@
         {% endif %}
         {% if contribution.board_number -%}
             <div class="board-data">
-                <span class="icon-price-tag board-info">
+                <i class="icon-price-tag header-data"></i>
+                <span class="board-info">
                     {% trans board_number=contribution.board_number %}Board: {{ board_number }}{% endtrans %}
                 </span>
             </div>

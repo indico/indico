@@ -30,7 +30,7 @@
 }
 
 .time-data, .location-data, .board-data {
-    .location-info, .time-info, .board-info {
+    .header-data {
         &:before {
             color: $orange;
             vertical-align: middle;

@@ -17,7 +17,8 @@
 
 {% block info %}
     <div class="time-data">
-        <span class="time-info icon-time">
+        <i class="icon-time header-data"></i>
+        <span class="time-info">
             {% if sess.start_dt -%}
                 {{ sess.start_dt|format_datetime(timezone=sess.event_new.display_tzinfo) }}
             {%- else -%}

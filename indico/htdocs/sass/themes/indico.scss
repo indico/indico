@@ -138,8 +138,12 @@
     @extend %highlighted-header-data;
 }
 
-.event-location, .event-chairs {
-    margin-top: 0.5em;
+.event-location, .event-chairs, .event-date {
+    display: flex;
+
+    &.event-location, &.event-chairs {
+        margin-top: 0.5em;
+    }
 }
 
 .timetable-contrib {
