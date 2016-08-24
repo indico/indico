@@ -8,6 +8,7 @@ Create Date: 2016-08-22 14:57:28.005919
 import sqlalchemy as sa
 from alembic import op
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.persons import AuthorType
 from indico.modules.events.abstracts.models.reviews import ReviewAction
 from indico.modules.users.models.users import UserTitle
@@ -48,11 +49,25 @@ def upgrade():
         sa.Column('friendly_id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('type_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('final_track_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('final_type_id', sa.Integer(), nullable=True, index=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
+        sa.Column('submitter_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('submitted_dt', UTCDateTime, nullable=False),
+        sa.Column('modified_dt', UTCDateTime, nullable=True),
+        sa.Column('state', PyIntEnum(AbstractState), nullable=False),
+        sa.Column('judge_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('judgment_dt', UTCDateTime, nullable=True),
+        sa.Column('judgment_comment', sa.Text(), nullable=False),
+        sa.Column('final_track_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('final_type_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('merged_into_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('duplicate_of_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.ForeignKeyConstraint(['submitter_id'], ['users.users.id']),
+        sa.ForeignKeyConstraint(['judge_id'], ['users.users.id']),
+        sa.ForeignKeyConstraint(['merged_into_id'], ['event_abstracts.abstracts.id']),
+        sa.ForeignKeyConstraint(['duplicate_of_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['final_type_id'], ['events.contribution_types.id']),
         sa.ForeignKeyConstraint(['type_id'], ['events.contribution_types.id']),
         sa.ForeignKeyConstraint(['final_track_id'], ['events.tracks.id']),
