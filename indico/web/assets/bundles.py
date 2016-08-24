@@ -232,8 +232,7 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
-
-typewatch_js = rjs_bundle('dropzone_js', 'js/lib/jquery.typewatch.js')
+typewatch_js = rjs_bundle('typewatch_js', 'js/lib/jquery.typewatch.js')
 
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
