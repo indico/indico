@@ -509,3 +509,20 @@ def serialize_event_for_ical(event, detail_level):
     if detail_level == 'contributions':
         data['contributions'] = [serialize_contribution_for_ical(c) for c in event.contributions]
     return data
+
+
+def get_field_values(form_data):
+    """Split the form fields between custom and static"""
+    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
+    return fields, custom_fields
+
+
+def set_custom_fields(obj, custom_fields_data):
+    changes = {}
+    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
+        custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
+        old_value = obj.set_custom_field(custom_field_id, custom_field_value)
+        if old_value != custom_field_value:
+            changes[custom_field_name] = (old_value, custom_field_value)
+    return changes
