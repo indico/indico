@@ -446,12 +446,11 @@ div.event-header {
     @include drop-shadow;
     @extend %font-family-title-light;
 
-    background: $light-gray;
+    background: white;
     font-size: 12px;
     color: black;
     margin: 0;
     padding: 3px 10px;
-    border-bottom: 1px solid $gray;
 }
 
 .note-area-wrapper .note-area{
