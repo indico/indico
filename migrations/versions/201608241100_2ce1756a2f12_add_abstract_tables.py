@@ -10,7 +10,7 @@ from alembic import op
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.persons import AuthorType
-from indico.modules.events.abstracts.models.reviews import ReviewAction
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.users.models.users import UserTitle
 from sqlalchemy.dialects import postgresql
 
@@ -175,7 +175,7 @@ def upgrade():
         sa.Column('created_dt', UTCDateTime, nullable=False),
         sa.Column('modified_dt', UTCDateTime, nullable=True),
         sa.Column('comment', sa.Text(), nullable=False),
-        sa.Column('proposed_action', PyIntEnum(ReviewAction), nullable=False),
+        sa.Column('proposed_action', PyIntEnum(AbstractAction), nullable=False),
         sa.Column('proposed_track_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_contribution_type_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
