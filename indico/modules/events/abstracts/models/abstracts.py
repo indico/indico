@@ -19,11 +19,23 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.date_time import now_utc
+from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.struct.enum import IndicoEnum
+
+
+class AbstractState(int, IndicoEnum):
+    submitted = 1
+    withdrawn = 2
+    accepted = 3
+    rejected = 4
+    merged = 5
+    duplicate = 6
 
 
 class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
@@ -68,6 +80,47 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         nullable=True,
         index=True
     )
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: ID of the user who submitted the abstract
+    submitter_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=False
+    )
+    submitted_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        default=now_utc
+    )
+    modified_dt = db.Column(
+        UTCDateTime,
+        nullable=True,
+    )
+    state = db.Column(
+        PyIntEnum(AbstractState),
+        nullable=False,
+        default=AbstractState.submitted
+    )
+    #: ID of the user who judged the abstract
+    judge_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
+    judgment_comment = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    judgment_dt = db.Column(
+        UTCDateTime,
+        nullable=True,
+    )
     final_type_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contribution_types.id'),
@@ -80,9 +133,22 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         nullable=True,
         index=True
     )
-    title = db.Column(
-        db.String,
-        nullable=False
+    merged_into_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_abstracts.abstracts.id'),
+        index=True,
+        nullable=True
+    )
+    duplicate_of_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_abstracts.abstracts.id'),
+        index=True,
+        nullable=True
+    )
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     event_new = db.relationship(
         'Event',
@@ -91,6 +157,17 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             'abstracts',
             cascade='all, delete-orphan',
             lazy=True
+        )
+    )
+    #: User who submitted the abstract
+    submitter = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=submitter_id,
+        backref=db.backref(
+            'abstracts',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
         )
     )
     track = db.relationship(
@@ -111,6 +188,17 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy=True
         )
     )
+    #: User who judged the abstract
+    judge = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=judge_id,
+        backref=db.backref(
+            'judged_abstracts',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
     final_type = db.relationship(
         'ContributionType',
         lazy=True,
@@ -129,6 +217,26 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy=True
         )
     )
+    merged_into = db.relationship(
+        'Abstract',
+        lazy=True,
+        remote_side=id,
+        foreign_keys=merged_into_id,
+        backref=db.backref(
+            'merged_abstracts',
+            lazy=True
+        )
+    )
+    duplicate_of = db.relationship(
+        'Abstract',
+        lazy=True,
+        remote_side=id,
+        foreign_keys=duplicate_of_id,
+        backref=db.backref(
+            'duplicate_abstracts',
+            lazy=True
+        )
+    )
     #: Data stored in abstract/contribution fields
     field_values = db.relationship(
         'AbstractFieldValue',
@@ -142,7 +250,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
 
     # relationship backrefs:
     # - contribution (Contribution.abstract)
+    # - dupe_abstracts (Abstract.duplicate_of)
     # - email_logs (AbstractEmailLogEntry.abstract)
+    # - merged_abstracts (Abstract.merged_into)
     # - reviews (AbstractReview.abstract)
 
     @locator_property
@@ -154,4 +264,4 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', is_deleted=False, _text=text_to_repr(self.title))
