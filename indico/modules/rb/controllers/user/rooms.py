@@ -29,7 +29,7 @@ from indico.modules.rb.controllers.decorators import requires_location, requires
 from indico.modules.rb.forms.rooms import SearchRoomsForm
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency, Reservation
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
@@ -37,7 +37,6 @@ from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoom
                                                 WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
                                                 WPRoomBookingRoomStats, WPRoomBookingSearchRoomsResults)
 from indico.web.forms.base import FormDefaults
-from MaKaC.common.cache import GenericCache
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
@@ -50,33 +49,12 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
-    def __init__(self, *args, **kwargs):
-        RHRoomBookingBase.__init__(self, *args, **kwargs)
-        self._cache = GenericCache('MapOfRooms')
-
     def _checkParams(self):
         RHRoomBookingBase._checkParams(self, request.args)
         self._room_id = request.args.get('roomID')
 
     def _process(self):
-        key = str(sorted(dict(request.args, lang=session.lang, user=session.user.id).items()))
-        html = self._cache.get(key)
-        if not html:
-            default_location = Location.default_location
-            aspects = [a.to_serializable() for a in default_location.aspects]
-            buildings = default_location.get_buildings()
-            html = WPRoomBookingMapOfRoomsWidget(self,
-                                                 aspects=aspects,
-                                                 buildings=buildings,
-                                                 room_id=self._room_id,
-                                                 default_repeat='{}|0'.format(int(RepeatFrequency.NEVER)),
-                                                 default_start_dt=datetime.combine(date.today(),
-                                                                                   Location.working_time_start),
-                                                 default_end_dt=datetime.combine(date.today(),
-                                                                                 Location.working_time_end),
-                                                 repeat_mapping=RepeatMapping.mapping).display()
-            self._cache.set(key, html, 3600)
-        return html
+        return WPRoomBookingMapOfRoomsWidget(self, roomID=self._room_id).display()
 
 
 class RHRoomBookingSearchRooms(RHRoomBookingBase):

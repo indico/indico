@@ -17,12 +17,14 @@
 from datetime import datetime, date
 
 from dateutil.relativedelta import relativedelta
-from flask import session
+from flask import request, session
 
+from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
@@ -59,6 +61,7 @@ class WRoomBookingMapOfRooms(WTemplated):
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
     sidemenu_option = 'map'
+    cache = GenericCache('MapOfRooms')
 
     def getCSSFiles(self):
         return WPNotDecorated.getCSSFiles(self) + ['css/mapofrooms.css']
@@ -69,8 +72,23 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
     def _getTitle(self):
         return '{} - {}'.format(WPNotDecorated._getTitle(self), _('Map of rooms'))
 
+    def _get_widget_params(self):
+        default_location = Location.default_location
+        return {'aspects': [a.to_serializable() for a in default_location.aspects],
+                'buildings': default_location.get_buildings(),
+                'default_repeat': '{}|0'.format(int(RepeatFrequency.NEVER)),
+                'default_start_dt': datetime.combine(date.today(), Location.working_time_start),
+                'default_end_dt': datetime.combine(date.today(), Location.working_time_end),
+                'repeat_mapping': RepeatMapping.mapping}
+
     def _getBody(self, params):
-        return WTemplated('RoomBookingMapOfRoomsWidget').getHTML(params)
+        cache_key = str(sorted(dict(request.args, lang=session.lang).items()))
+        html = self.cache.get(cache_key)
+        if html is None:
+            params.update(self._get_widget_params())
+            html = WTemplated('RoomBookingMapOfRoomsWidget').getHTML(params)
+            self.cache.set(cache_key, html, 3600)
+        return html
 
 
 class WPRoomBookingSearchRooms(WPRoomBookingBase):

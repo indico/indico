@@ -238,7 +238,7 @@ var filters = [
         property: "owner_id",
         optional: true,
         defaultValue: false,
-        checkedValue: ${ user.id }
+        checkedValue: $('body').data('user-id')
     },
     {
         label: "${ _('Is active') }",
