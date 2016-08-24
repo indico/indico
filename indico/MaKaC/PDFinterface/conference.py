@@ -624,8 +624,8 @@ class TimeTablePlain(PDFWithTOC):
                 c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name))
             c.setFont('Times-Bold', modifiedFontSize(30, self._fontsize))
             height -= 1 * cm
-            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title.encode('utf-8'))
-            self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title.encode('utf-8')),
+            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title)
+            self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title),
                                     width=inch,
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
@@ -638,7 +638,7 @@ class TimeTablePlain(PDFWithTOC):
         maxi = self._PAGE_WIDTH - 2 * cm
         if doc.getCurrentPart().strip():
             maxi = self._PAGE_WIDTH - 6 * cm
-        self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title.encode('utf-8')),
+        self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title),
                                 width=1 * cm,
                                 height=self._PAGE_HEIGHT - 1 * cm, font='Times-Roman',
                                 size=modifiedFontSize(9, self._fontsize), color=(0.5, 0.5, 0.5), align="left",
@@ -1010,9 +1010,10 @@ class TimeTablePlain(PDFWithTOC):
                 if contrib.room_name:
                     room = u' - {}'.format(escape(contrib.room_name))
 
-                speakers = ';'.join([self._get_speaker_name(spk) for spk in contrib.speakers])
+                speakers = u';'.join([self._get_speaker_name(spk) for spk in contrib.speakers])
                 if speakers.strip():
-                    speakers = i18nformat('<font face="Times-Bold"><b>-_("Presenters"): {}</b></font>').format(speakers)
+                    speakers = i18nformat(u'<font face="Times-Bold"><b>-_("Presenters"): {}</b></font>').format(
+                        speakers)
 
                 text = u'<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
                                                      to_unicode(format_time(entry.start_dt, timezone=self._tz)),
@@ -1022,7 +1023,7 @@ class TimeTablePlain(PDFWithTOC):
                 if self._ttPDFFormat.showTitleSessionTOC():
                     self._indexedFlowable[p1] = {'text': escape(contrib.title.encode('utf-8')), 'level': 2}
 
-                p2 = Paragraph(speakers, self._styles["conveners"])
+                p2 = Paragraph(speakers.encode('utf-8'), self._styles["conveners"])
                 res.append(p2)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
