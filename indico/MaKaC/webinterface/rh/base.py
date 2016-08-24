@@ -731,7 +731,7 @@ class RH(RequestHandlerBase):
         textLog.append('{} : Request ended'.format(totalTime))
 
         # log request timing
-        if profile and totalTime > timedelta(0, 1) and os.path.isfile(profile_name):
+        if profile and os.path.isfile(profile_name):
             rep = Config.getInstance().getTempDir()
             stats = pstats.Stats(profile_name)
             stats.strip_dirs()
