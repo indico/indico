@@ -71,7 +71,7 @@ class BadgeDesignConfiguration:
             "Title": (_("Title"), lambda x: x.get_personal_data().get('title', '')),
             "Full Name": (_("Full Name"), lambda x: u"{} {}".format(x.get_personal_data().get('title', ''),
                                                                     x.get_full_name())),
-            "Full Name (w/o title)": (_("Full Name (w/o title)"), lambda x: "{}".format(x.get_full_name())),
+            "Full Name (w/o title)": (_("Full Name (w/o title)"), lambda x: x.get_full_name()),
             "Full Name B": (_("Full Name B"), lambda x: u"{} {}".format(x.get_personal_data().get('title', ''),
                                                                         x.get_full_name(last_name_first=False))),
             "Full Name B (w/o title)": (_("Full Name B (w/o title)"), lambda x: x.get_full_name(last_name_first=False)),
