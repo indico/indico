@@ -695,7 +695,7 @@ class outputGenerator(object):
             out = self._XMLGen
         out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
         out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
-        out.writeTag('subfield', '{} - Minutes'.format(note.object.title), [['code', 'y']])
+        out.writeTag('subfield', u'{} - Minutes'.format(note.object.title), [['code', 'y']])
         out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')
