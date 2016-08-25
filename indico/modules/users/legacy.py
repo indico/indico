@@ -336,8 +336,12 @@ class AvatarProvisionalWrapper(Fossilizable):
     def getFamilyName(self):
         return self.data.get('last_name', '')
 
-    def getStraightFullName(self):
-        return '{} {}'.format(self.data.get('first_name', ''), self.data.get('last_name', ''))
+    @encode_utf8
+    def getStraightFullName(self, upper=False):
+        last_name = to_unicode(self.data.get('last_name', ''))
+        if upper:
+            last_name = last_name.upper()
+        return u'{} {}'.format(to_unicode(self.data.get('first_name', '')), last_name)
 
     def getTitle(self):
         return ''
