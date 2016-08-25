@@ -301,9 +301,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
     def locator(self):
         return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
 
-    def get_field_value(self, field_id):
-        return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
-
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=text_to_repr(self.title))

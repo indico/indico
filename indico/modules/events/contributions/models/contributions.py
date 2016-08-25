@@ -51,6 +51,13 @@ def _get_next_friendly_id(context):
 class CustomFieldsMixin(object):
     """Methods to process custom field data."""
 
+    def get_field_value(self, field_id, raw=False):
+        fv = next((v for v in self.field_values if v.contribution_field_id == field_id), None)
+        if raw:
+            return fv
+        else:
+            return fv.friendly_data if fv else ''
+
     def set_custom_field(self, field_id, field_value):
         fv = self.get_field_value(field_id, raw=True)
         if not fv:
@@ -365,13 +372,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
-
-    def get_field_value(self, field_id, raw=False):
-        fv = next((v for v in self.field_values if v.contribution_field_id == field_id), None)
-        if raw:
-            return fv
-        else:
-            return fv.friendly_data if fv else ''
 
 
 Contribution.register_protection_events()
