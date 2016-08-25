@@ -85,12 +85,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         index=True,
         nullable=False
     )
-    type_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.contribution_types.id'),
-        nullable=True,
-        index=True
-    )
     title = db.Column(
         db.String,
         nullable=False
@@ -101,6 +95,12 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         db.ForeignKey('users.users.id'),
         index=True,
         nullable=False
+    )
+    submitted_contrib_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.contribution_types.id'),
+        nullable=True,
+        index=True
     )
     submitted_dt = db.Column(
         UTCDateTime,
@@ -132,15 +132,15 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         UTCDateTime,
         nullable=True,
     )
-    final_type_id = db.Column(
+    accepted_track_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.contribution_types.id'),
+        db.ForeignKey('events.tracks.id'),
         nullable=True,
         index=True
     )
-    final_track_id = db.Column(
+    accepted_contrib_type_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.tracks.id'),
+        db.ForeignKey('events.contribution_types.id'),
         nullable=True,
         index=True
     )
@@ -181,6 +181,15 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy='dynamic'
         )
     )
+    submitted_contrib_type = db.relationship(
+        'ContributionType',
+        lazy=True,
+        foreign_keys=submitted_contrib_type_id,
+        backref=db.backref(
+            'proposed_abstracts',
+            lazy=True
+        )
+    )
     submitted_for_tracks = db.relationship(
         'Track',
         secondary='event_abstracts.submitted_for_tracks',
@@ -199,15 +208,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy=True
         )
     )
-    type = db.relationship(
-        'ContributionType',
-        lazy=True,
-        foreign_keys=[type_id],
-        backref=db.backref(
-            'proposed_abstracts',
-            lazy=True
-        )
-    )
     #: User who judged the abstract
     judge = db.relationship(
         'User',
@@ -219,19 +219,19 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy='dynamic'
         )
     )
-    final_type = db.relationship(
-        'ContributionType',
+    accepted_track = db.relationship(
+        'Track',
         lazy=True,
-        foreign_keys=[final_type_id],
+        foreign_keys=accepted_track_id,
         backref=db.backref(
-            'completed_abstracts',
+            'abstracts_accepted',
             lazy=True
         )
     )
-    final_track = db.relationship(
-        'Track',
+    accepted_contrib_type = db.relationship(
+        'ContributionType',
         lazy=True,
-        foreign_keys=[final_track_id],
+        foreign_keys=accepted_contrib_type_id,
         backref=db.backref(
             'abstracts_accepted',
             lazy=True
