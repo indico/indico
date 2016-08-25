@@ -75,7 +75,7 @@ class Track(DescriptionMixin, db.Model):
 
     # relationship backrefs:
     # - abstract_reviews (AbstractReview.track)
-    # - abstracts_accepted (Abstract.final_track)
+    # - abstracts_accepted (Abstract.accepted_track)
     # - abstracts_proposed (Abstract.proposed_for_tracks)
     # - abstracts_submitted (Abstract.submitted_for_tracks)
     # - proposed_abstract_reviews (AbstractReview.proposed_track)
