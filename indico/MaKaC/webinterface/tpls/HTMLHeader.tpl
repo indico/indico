@@ -34,6 +34,7 @@
 
         <!-- global JS variables -->
         <script>
+        moment.locale(${ language | n,j });
         % if user:
             IndicoGlobalVars.isUserAuthenticated = true;
         % else:
