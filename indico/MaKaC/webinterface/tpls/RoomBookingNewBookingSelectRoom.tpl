@@ -34,7 +34,7 @@
     var userId = "rb-user-${ _session.user.id if _session.user else 'not-logged' }";
     var rbUserData = $.jStorage.get(userId, {});
     var maxRoomCapacity = ${ max_room_capacity };
-    var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
+    var rooms = ${ serializable_rooms | j, n };
     var myRooms = ${ my_rooms | j, n };
 
     $(document).ready(function() {

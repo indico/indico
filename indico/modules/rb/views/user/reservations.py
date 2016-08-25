@@ -14,12 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.rb import Room
 from indico.modules.rb import settings as rb_settings
-
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
+from indico.util.caching import memoize_redis
 from indico.util.i18n import _
 from MaKaC.webinterface.wcomponents import WTemplated
 
@@ -114,8 +115,15 @@ class WPRoomBookingNewBookingBase(WPRoomBookingBase):
     sidemenu_option = 'book_room'
 
 
+@memoize_redis(3600)
+def _get_serializable_rooms(room_ids):
+    # all the rooms are already in sqlalchemy's identity cache so they won't be queried again
+    return [Room.get(r).to_serializable('__public_exhaustive__') for r in room_ids]
+
+
 class WPRoomBookingNewBookingSelectRoom(WPRoomBookingNewBookingBase):
     def _getBody(self, params):
+        params['serializable_rooms'] = _get_serializable_rooms([r.id for r in params['rooms']])
         return WTemplated('RoomBookingNewBookingSelectRoom').getHTML(params)
 
 
