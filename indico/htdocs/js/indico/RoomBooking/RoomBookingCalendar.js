@@ -40,8 +40,8 @@ function compare_alphanum(elem1, elem2) {
     var i_elem1 = parseInt(elem1),
         i_elem2 = parseInt(elem2);
 
-    elem1 = isNaN(i_elem1) ? elem1.toLowerCase() : i_elem1;
-    elem2 = isNaN(i_elem2) ? elem2.toLowerCase() : i_elem2;
+    elem1 = isNaN(i_elem1) ? (elem1 || '').toLowerCase() : i_elem1;
+    elem2 = isNaN(i_elem2) ? (elem2 || '').toLowerCase() : i_elem2;
 
     return elem1 == elem2 ? 0 : (elem1 < elem2 ? -1 : 1);
 }
