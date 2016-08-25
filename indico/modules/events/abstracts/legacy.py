@@ -522,7 +522,7 @@ class AbstractStatusAcceptedLegacyMixin(object):
         return self._abstract.as_new.accepted_type
 
     def _setTrack(self, track):
-        self._abstract.as_new.accepted_track_id = track.id
+        self._abstract.as_new.accepted_track_id = track.id if track else None
 
     def getTrack(self):
         return self._abstract.as_new.accepted_track
