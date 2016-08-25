@@ -166,6 +166,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'abstracts',
+            primaryjoin='(Abstract.event_id == Event.id) & ~Abstract.is_deleted',
             cascade='all, delete-orphan',
             lazy=True
         )
@@ -177,6 +178,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=submitter_id,
         backref=db.backref(
             'abstracts',
+            primaryjoin='(Abstract.submitter_id == User.id) & ~Abstract.is_deleted',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -187,6 +189,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=submitted_contrib_type_id,
         backref=db.backref(
             'proposed_abstracts',
+            primaryjoin='(Abstract.submitted_contrib_type_id == ContributionType.id) & ~Abstract.is_deleted',
             lazy=True
         )
     )
@@ -196,6 +199,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         collection_class=set,
         backref=db.backref(
             'abstracts_submitted',
+            primaryjoin='event_abstracts.submitted_for_tracks.c.track_id == Track.id',
+            secondaryjoin='(event_abstracts.submitted_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
+            collection_class=set,
             lazy=True
         )
     )
@@ -205,6 +211,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         collection_class=set,
         backref=db.backref(
             'abstracts_proposed',
+            primaryjoin='event_abstracts.proposed_for_tracks.c.track_id == Track.id',
+            secondaryjoin='(event_abstracts.proposed_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
+            collection_class=set,
             lazy=True
         )
     )
@@ -215,6 +224,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=judge_id,
         backref=db.backref(
             'judged_abstracts',
+            primaryjoin='(Abstract.judge_id == User.id) & ~Abstract.is_deleted',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -222,9 +232,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
     accepted_track = db.relationship(
         'Track',
         lazy=True,
-        foreign_keys=accepted_track_id,
         backref=db.backref(
             'abstracts_accepted',
+            primaryjoin='(Abstract.accepted_track_id == Track.id) & ~Abstract.is_deleted',
             lazy=True
         )
     )
@@ -234,6 +244,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=accepted_contrib_type_id,
         backref=db.backref(
             'abstracts_accepted',
+            primaryjoin='(Abstract.accepted_contrib_type_id == ContributionType.id) & ~Abstract.is_deleted',
             lazy=True
         )
     )
@@ -244,6 +255,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=merged_into_id,
         backref=db.backref(
             'merged_abstracts',
+            primaryjoin=(db.remote(merged_into_id) == id) & ~db.remote(is_deleted),
             lazy=True
         )
     )
@@ -254,6 +266,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         foreign_keys=duplicate_of_id,
         backref=db.backref(
             'duplicate_abstracts',
+            primaryjoin=(db.remote(duplicate_of_id) == id) & ~db.remote(is_deleted),
             lazy=True
         )
     )
