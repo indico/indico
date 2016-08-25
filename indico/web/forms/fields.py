@@ -422,7 +422,7 @@ class EventPersonListField(PrincipalListField):
                 user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
                 if user:
                     return self._get_event_person_for_user(user)
-                else:
+                elif self.event:
                     person = self.event.persons.filter_by(email=email).first()
                     if person:
                         return person
