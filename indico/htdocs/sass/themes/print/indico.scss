@@ -34,16 +34,25 @@ $gray: black;
     color: black !important;
 }
 
-body {
-    @extend %black-and-white;
-
+%no-shadow {
+    box-shadow: none !important;
 }
 
-.manage-button, .event-manage-button, #session-bar, .eventHeaderButtonBar, .js-go-to-day {
+body {
+    @extend %black-and-white;
+}
+
+.manage-button,
+.event-manage-button,
+#session-bar,
+.eventHeaderButtonBar,
+.js-go-to-day,
+.trigger.icon-expand,
+.gradient-layer {
     display: none !important;
 }
 
-.timetable-duration, .dayList .day {
+.timetable-duration, .dayList .day, .participant-list-wrapper {
     @extend %black-and-white;
 }
 
@@ -60,4 +69,36 @@ body {
             @extend %black-and-white;
         }
     }
+}
+
+.participant-list-wrapper {
+    max-height: none !important;
+}
+
+.event-service-row {
+    @extend %no-shadow;
+    border: none !important;
+
+    .event-service-toolbar {
+        display: none;
+    }
+}
+
+.meeting-timetable {
+    @extend %no-shadow;
+    border: 1px solid $gray;
+
+    .start-time {
+        @extend %no-shadow;
+        border: 1px solid $gray;
+
+        &:before {
+            display: none !important;
+        }
+    }
+}
+
+.event-sub-header {
+    @extend %no-shadow;
+    border: none;
 }
