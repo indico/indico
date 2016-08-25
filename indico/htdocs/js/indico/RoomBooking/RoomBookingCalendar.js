@@ -882,27 +882,26 @@ type ("RoomBookingNavBar", [],
              */
             draw: function(firstHeader){
                 var self = this;
-                var startD = $.datepicker.parseDate('yy-mm-dd', self.data.firstDay);
-                var endD = $.datepicker.parseDate('yy-mm-dd', self.data.lastDay);
-                var periodDays = ((endD - startD) / 1000 / 86400) + 1; // number of days
-                var period = periodDays * 86400 * 1000;
+                var startD = moment(self.data.firstDay, ['YYYY-MM-DD', 'DD/MM/YYYY']);
+                var endD = moment(self.data.lastDay, ['YYYY-MM-DD', 'DD/MM/YYYY']);
+                var periodDays = endD.diff(startD, 'days') + 1; // number of days
                 var periodTitle = periodDays == 1 ? $T('day') :
                                   periodDays == 7 ? $T('week') : $T('period');
+                var format = 'dddd, DD MMMM YYYY';
                 var verbosePeriod = (self.data.firstDay == self.data.lastDay)
-                    ? $.datepicker.formatDate('DD, d MM yy', endD)
-                    : ($.datepicker.formatDate('DD, d MM yy', startD) + ' ➟ ' + $.datepicker.formatDate('DD, d MM yy', endD));
+                    ? endD.format(format)
+                    : '{0} ➟ {1}'.format(startD.format(format), endD.format(format));
 
                 function loadNewPeriod(start, end) {
                     var form = $('#room-booking-calendar-form');
-                    start = '{0}-{1}-{2}'.format(start.getFullYear(), start.getMonth() + 1, start.getDate());
-                    end = '{0}-{1}-{2}'.format(end.getFullYear(), end.getMonth() + 1, end.getDate());
-                    form.find('input[name="start_date"]').val(start);
-                    form.find('input[name="end_date"]').val(end);
+                    form.find('input[name="start_date"]').val(moment(start).format('DD/MM/YYYY'));
+                    form.find('input[name="end_date"]').val(moment(end).format('DD/MM/YYYY'));
                     form.submit();
                 }
 
                 function showDateSelector() {
-                    var dlg = new DateRangeSelector(startD, endD, loadNewPeriod, $T("Choose Period"), true);
+                    var dlg = new DateRangeSelector(startD.toDate(), endD.toDate(), loadNewPeriod,
+                                                    $T("Choose Period"), true);
                     dlg.open();
                 }
 
@@ -941,7 +940,7 @@ type ("RoomBookingNavBar", [],
                     'class': 'i-button icon-only icon-prev',
                     'click': function(e) {
                         e.preventDefault();
-                        loadNewPeriod(new Date(startD.getTime() - period), new Date(endD.getTime() - period));
+                        loadNewPeriod(startD.subtract(periodDays, 'days'), endD.subtract(periodDays, 'days'));
                     }
                 });
                 var nextButton = $('<a>', {
@@ -950,7 +949,7 @@ type ("RoomBookingNavBar", [],
                     'class': 'i-button icon-only icon-next',
                     'click': function(e) {
                         e.preventDefault();
-                        loadNewPeriod(new Date(startD.getTime() + period), new Date(endD.getTime() + period));
+                        loadNewPeriod(startD.add(periodDays, 'days'), endD.add(periodDays, 'days'));
                     }
                 });
                 var filterButton = $('<a>', {
