@@ -1,4 +1,4 @@
-{% extends 'layout/full_content_base.html' %}
+{% extends 'layout/base.html' if event.type == 'lecture' else 'layout/full_content_base.html' %}
 
 {% block content %}
     <div id="persons-list">
@@ -30,46 +30,48 @@
                         {%- trans %}Send emails{% endtrans -%}
                     </a>
                 </div>
-                <div class="group i-selection">
-                    <span class="i-button label">{% trans %}Privileges{% endtrans %}</span>
-                    <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
-                        {% trans %}Grant{% endtrans %}
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#"
-                               title="{% trans %}Grant submission rights to all speakers{% endtrans %}"
-                               data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
-                               data-href="{{ url_for('.grant_submission_rights', event) }}"
-                               data-method="POST"
-                               data-qtip-position="right">
-                                {% trans %}Submission rights{% endtrans %}</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               title="{% trans %}Grant modification rights to all session conveners{% endtrans %}"
-                               data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
-                               data-href="{{ url_for('.grant_modification_rights', event) }}"
-                               data-method="POST"
-                               data-qtip-position="right">
-                                {% trans %}Modification rights{% endtrans %}</a>
-                        </li>
-                    </ul>
-                    <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
-                        {% trans %}Revoke{% endtrans %}
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#"
-                               title="{% trans %}Revoke submission rights{% endtrans %}"
-                               data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
-                               data-href="{{ url_for('.revoke_submission_rights', event) }}"
-                               data-method="POST"
-                               data-qtip-position="right">
-                                {% trans %}Submission rights{% endtrans %}</a>
-                        </li>
-                    </ul>
-                </div>
+                {% if event.type != 'lecture' %}
+                    <div class="group i-selection">
+                        <span class="i-button label">{% trans %}Privileges{% endtrans %}</span>
+                        <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
+                            {% trans %}Grant{% endtrans %}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Grant submission rights to all speakers{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.grant_submission_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Submission rights{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Grant modification rights to all session conveners{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.grant_modification_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Modification rights{% endtrans %}</a>
+                            </li>
+                        </ul>
+                        <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
+                            {% trans %}Revoke{% endtrans %}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Revoke submission rights{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.revoke_submission_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Submission rights{% endtrans %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
                 <div class="right">
                     {% block filters %}{% endblock %}
                 </div>

@@ -11,11 +11,19 @@
     <div id="person-filters" class="group i-selection">
         <span class="i-button label">{% trans %}Show{% endtrans %}</span>
         <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
-        <label for="filter-chairpersons" class="i-button">{% trans %}Chairpersons{% endtrans %}</label>
-        <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
-        <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-        <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
-        <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+        <label for="filter-chairpersons" class="i-button">
+            {%- if event.type == 'lecture' -%}
+                {%- trans %}Speakers{% endtrans -%}
+            {%- else -%}
+                {%- trans %}Chairpersons{% endtrans -%}
+            {%- endif -%}
+        </label>
+        {% if event.type != 'lecture' %}
+            <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+            <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+            <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
+            <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+        {% endif %}
         <span class="i-button label">{% trans %}or{% endtrans %}</span>
         <input type="checkbox" id="filter-no-account" data-filter="no_account">
         <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
@@ -42,9 +50,11 @@
                 <th class="i-table">{% trans %}Email{% endtrans %}</th>
                 <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
                 <th class="i-table"></th>
-                <th class="i-table"></th>
-                <th class="i-table"></th>
-                <th class="i-table"></th>
+                {%- if event.type != 'lecture' -%}
+                    <th class="i-table"></th>
+                    <th class="i-table"></th>
+                    <th class="i-table"></th>
+                {% endif %}
                 <th class="i-table"></th>
                 <th class="i-table"></th>
             </tr>
@@ -56,7 +66,9 @@
                 </tr>
             {%- else -%}
                 <tr class="i-table">
-                    <td colspan="9">{% trans %}No persons{% endtrans %}</td>
+                    <td colspan="{{ 7 if event.type == 'lecture' else 10 }}">
+                        {%- trans %}No persons{% endtrans -%}
+                    </td>
                 </tr>
             {%- endfor %}
         </tbody>

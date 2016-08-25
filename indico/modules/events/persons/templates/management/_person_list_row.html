@@ -14,36 +14,42 @@
     </td>
     <td class="i-table">
         <span class="i-label {{ 'no-role' if not person_data.roles.chairperson }}">
-            {% trans %}Chairperson{% endtrans %}
+            {%- if person.event_new.type == 'lecture' -%}
+                {%- trans %}Speaker{% endtrans -%}
+            {%- else -%}
+                {%- trans %}Chairperson{% endtrans -%}
+            {%- endif -%}
         </span>
     </td>
-    <td class="i-table">
-        <span class="i-label js-count-label {{ 'no-role' if not person_data.contributions }}"
-              data-items="{{ person_data.contributions | tojson | forceescape }}">
-            {% trans %}Speaker{% endtrans %}
-            <span class="badge">
-                {{ person_data.contributions | length }}
+    {%- if person.event_new.type != 'lecture' -%}
+        <td class="i-table">
+            <span class="i-label js-count-label {{ 'no-role' if not person_data.contributions }}"
+                  data-items="{{ person_data.contributions | tojson | forceescape }}">
+                {% trans %}Speaker{% endtrans %}
+                <span class="badge">
+                    {{ person_data.contributions | length }}
+                </span>
             </span>
-        </span>
-    </td>
-    <td class="i-table">
-        <span class="i-label js-count-label {{ 'no-role' if not person_data.subcontributions }}"
-              data-items="{{ person_data.subcontributions | tojson | forceescape }}">
-            {% trans %}Sub-contrib. Speaker{% endtrans %}
-            <span class="badge">
-                {{ person_data.subcontributions | length }}
+        </td>
+        <td class="i-table">
+            <span class="i-label js-count-label {{ 'no-role' if not person_data.subcontributions }}"
+                  data-items="{{ person_data.subcontributions | tojson | forceescape }}">
+                {% trans %}Sub-contrib. Speaker{% endtrans %}
+                <span class="badge">
+                    {{ person_data.subcontributions | length }}
+                </span>
             </span>
-        </span>
-    </td>
-    <td class="i-table">
-        <span class="i-label js-count-label {{ 'no-role' if not person_data.session_blocks }}"
-              data-items="{{ person_data.session_blocks | tojson | forceescape }}">
-            {% trans %}Convener{% endtrans %}
-            <span class="badge">
-                {{ person_data.session_blocks | length }}
+        </td>
+        <td class="i-table">
+            <span class="i-label js-count-label {{ 'no-role' if not person_data.session_blocks }}"
+                  data-items="{{ person_data.session_blocks | tojson | forceescape }}">
+                {% trans %}Convener{% endtrans %}
+                <span class="badge">
+                    {{ person_data.session_blocks | length }}
+                </span>
             </span>
-        </span>
-    </td>
+        </td>
+    {% endif %}
     <td class="i-table">
         {% if person_data.roles.no_account %}
             <span class="i-label warning icon-warning"

@@ -22,4 +22,4 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 class WPManagePersons(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/persons/'
-    sidemenu_option = 'lists'
+    sidemenu_option = 'persons'
