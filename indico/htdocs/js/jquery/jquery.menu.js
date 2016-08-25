@@ -96,7 +96,8 @@
 
             elem.find('ul.dropdown > li > a').each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#" || self.options.always_listen) {
+                if (!$this.attr('href') || $this.attr('href') == "#" || $this.data('ignore-href') !== undefined ||
+                        self.options.always_listen) {
                     $this.click(function(e) {
                         var result = $this.triggerHandler('menu_select', self.element);
                         if(!result) {
