@@ -894,8 +894,8 @@ type ("RoomBookingNavBar", [],
 
                 function loadNewPeriod(start, end) {
                     var form = $('#room-booking-calendar-form');
-                    form.find('input[name="start_date"]').val(moment(start).format('DD/MM/YYYY'));
-                    form.find('input[name="end_date"]').val(moment(end).format('DD/MM/YYYY'));
+                    form.find('input[name="start_date"]').val(moment(start).format(self.data.paramFormat));
+                    form.find('input[name="end_date"]').val(moment(end).format(self.data.paramFormat));
                     form.submit();
                 }
 
@@ -1073,7 +1073,8 @@ type ("RoomBookingCalendar", [],
                 showLegend: true,
                 showSummary: true, // "display booking summary" link on the bottom
                 showNavBar: true, // the "< date >" navbar and the filter button
-                canNavigate: true // if disabled the navbar only shows the current date range but does not allow changes
+                canNavigate: true, // if disabled the navbar only shows the current date range but does not allow changes
+                paramFormat: 'DD/MM/YYYY'
             }, options);
 
             this.data = new RoomBookingCalendarData(options);

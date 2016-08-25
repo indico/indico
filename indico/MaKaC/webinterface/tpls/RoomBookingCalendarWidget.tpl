@@ -29,7 +29,8 @@
         openDetailsInNewTab: ${ details_in_new_tab | n, j },
         showSummary: ${ show_summary | n, j },
         showNavBar: ${ show_navbar | n, j },
-        canNavigate: ${ can_navigate | n, j }
+        canNavigate: ${ can_navigate | n, j },
+        paramFormat: ${ ('DD/MM/YYYY' if form_data else 'YYYY-MM-DD') | n,j }
     });
 
     $E('roomBookingCal').set(roomBookingCalendar.draw());
