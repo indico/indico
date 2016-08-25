@@ -27,7 +27,8 @@
             allow: {
                 authors: false,
                 submitters: false,
-                emptyEmail: false
+                emptyEmail: false,
+                externalUsers: true
             },
             defaults: {
                 authorType: 0,
@@ -220,7 +221,7 @@
 
         $field.principalfield({
             eventId: options.eventId,
-            allowExternalUsers: false,
+            allowExternalUsers: options.allow.externalUsers,
             allowEmptyEmail: options.allow.emptyEmail,
             multiChoice: true,
             overwriteChoice: false,

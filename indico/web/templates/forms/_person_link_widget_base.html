@@ -42,7 +42,8 @@
             allow: {
                 authors: {{ field.allow_authors | default(false) | tojson }},
                 submitters: {{ field.allow_submitters | default(false) | tojson }},
-                emptyEmail: {{ allow_empty_email | default(false) | tojson }}
+                emptyEmail: {{ allow_empty_email | default(false) | tojson }},
+                externalUsers: {{ field.allow_external | default(true) | tojson }}
             },
             defaults: {
                 authorType: {{ (field.default_author_type.value if field.default_author_type else 0) | tojson }},
