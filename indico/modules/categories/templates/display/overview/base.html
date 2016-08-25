@@ -4,7 +4,7 @@
     <div class="category-overview-side-menu">
         <form action="{{ url_for('.overview', category) }}" method="GET" id="category-overview-options">
             <div class="js-datepicker"></div>
-            <input type="hidden" id="date" name="date" value="{{ start_dt|format_date(format="YYYY-MM-dd") }}">
+            <input type="hidden" id="date" name="date" value="{{ start_dt|format_date(format="yyyy-MM-dd") }}">
             <h3>{% trans %}Display options{% endtrans %}</h3>
             <div class="i-form vertical" id="display-options">
                 <div class="form-group">
@@ -54,7 +54,7 @@
             <div>
                 {% for subcategory in subcategories|sort(attribute='title') %}
                     <a href="{{ url_for('categories.overview', subcategory, period=period,
-                                        date=start_dt|format_date(format="YYYY-MM-dd"), detail=detail) }}">
+                                        date=start_dt|format_date(format="yyyy-MM-dd"), detail=detail) }}">
                         <img src="{{ subcategory.icon_url }}">
                         {{ subcategory.title }}
                     </a>
@@ -72,7 +72,7 @@
 
             $form.find('.js-datepicker').datepicker({
                 'dateFormat': $.datepicker.ATOM,
-                'defaultDate': {{ start_dt|format_date(format="YYYY-MM-dd")|tojson }},
+                'defaultDate': {{ start_dt|format_date(format="yyyy-MM-dd")|tojson }},
                 'onSelect': function(dateText) {
                     $('#category-overview-options #date').val(dateText);
                     $form.trigger('submit');

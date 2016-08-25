@@ -43,7 +43,7 @@
                     {% if day.month == start_dt.month %}
                         <td class="day">
                             <div class="calendar-date">
-                                <a href="{{ url_for('.overview', category, detail=detail, period='day', date=day|format_date('YYYY-MM-dd')) }}">
+                                <a href="{{ url_for('.overview', category, detail=detail, period='day', date=day|format_date('yyyy-MM-dd')) }}">
                                     {{ day.day }}
                                 </a>
                             </div>

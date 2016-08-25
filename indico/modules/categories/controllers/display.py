@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby, imap
@@ -260,7 +260,7 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     def group_by_month(self, events):
         def _format_tuple(x):
             (year, month), events = x
-            return {'name': format_date(datetime(year=year, month=month, day=1), format='MMMM Y'),
+            return {'name': format_date(date(year, month, 1), format='MMMM yyyy'),
                     'events': list(events),
                     'is_current': year == self.now.year and month == self.now.month}
 
@@ -539,7 +539,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
 
     def _other_day_url(self, date):
         return url_for('.overview', self.category, detail=self.detail, period=self.period,
-                       date=format_date(date, 'YYYY-MM-dd'))
+                       date=format_date(date, 'yyyy-MM-dd'))
 
     def _process_multiday_events(self, info, event):
         # Add "fake" proxy events for events spanning multiple days such that there is one event per day

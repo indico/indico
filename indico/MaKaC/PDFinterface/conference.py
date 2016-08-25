@@ -1246,7 +1246,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 text = u'{} - {}-{}'.format(
                     escape(self._event.title),
                     escape(to_unicode(format_date(self._event.start_dt, format='dd', timezone=self._tz))),
-                    escape(to_unicode(format_date(self._event.end_dt, format='dd MM YY', timezone=self._tz)))
+                    escape(to_unicode(format_date(self._event.end_dt, format='dd MM yy', timezone=self._tz)))
                 )
             if self._event.venue_name:
                 text = u'%s, %s.' % (text, self._event.venue_name)
