@@ -107,6 +107,12 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         nullable=False,
         default=now_utc
     )
+    modified_by_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        nullable=True,
+        index=True
+    )
     modified_dt = db.Column(
         UTCDateTime,
         nullable=True,
@@ -179,6 +185,17 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         backref=db.backref(
             'abstracts',
             primaryjoin='(Abstract.submitter_id == User.id) & ~Abstract.is_deleted',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+    modified_by = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=modified_by_id,
+        backref=db.backref(
+            'modified_abstracts',
+            primaryjoin='(Abstract.modified_by_id == User.id) & ~Abstract.is_deleted',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
