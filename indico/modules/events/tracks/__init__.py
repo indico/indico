@@ -44,3 +44,9 @@ def _can_access_event(cls, obj, user, authorized, **kwargs):
     avatar = user.as_avatar
     if any(track.isCoordinator(avatar) for track in obj.as_legacy.getTrackList()):
         return True
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    target.reviewer_for_tracks |= source.reviewer_for_tracks
+    source.reviewer_for_tracks.clear()
