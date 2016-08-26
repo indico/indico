@@ -47,7 +47,7 @@ from indico.modules.events.management.controllers import RHContributionPersonLis
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
-from indico.modules.events.util import update_object_principals, track_time_changes
+from indico.modules.events.util import update_object_principals, track_time_changes, _get_field_values
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -68,12 +68,6 @@ def _render_subcontribution_list(contrib):
                    .order_by(SubContribution.position)
                    .all())
     return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
-
-
-def _get_field_values(form_data):
-    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
-    return fields, custom_fields
 
 
 class RHManageContributionsBase(RHConferenceModifBase):

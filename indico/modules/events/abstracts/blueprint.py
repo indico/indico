@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
-                                                                    RHAbstractListCustomize, RHAbstractListStaticURL)
+                                                                    RHAbstractListCustomize, RHAbstractListStaticURL,
+                                                                    RHCreateAbstract)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -29,4 +30,5 @@ _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('G
 _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractList)
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', RHCreateAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHAbstractListStaticURL, methods=('POST',))

@@ -115,6 +115,10 @@ class ContributionField(db.Model):
     def mgmt_field(self):
         return self._get_field(management=True)
 
+    @property
+    def filter_choices(self):
+        return {x['id']: x['option'] for x in self.field_data['options']} if self.field_data.get('options') else []
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'field_type', is_required=False, is_active=True, _text=self.title)

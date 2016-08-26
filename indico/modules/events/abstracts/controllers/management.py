@@ -20,11 +20,13 @@ from flask import redirect, flash, jsonify
 
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
-from indico.modules.events.abstracts.util import AbstractListGenerator
+from indico.modules.events.abstracts.operations import create_abstract
+from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.util import _get_field_values
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -97,3 +99,17 @@ class RHAbstractListStaticURL(RHAbstractListBase):
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())
+
+
+class RHCreateAbstract(RHAbstractListBase):
+    def _process(self):
+        abstract_form_class = make_abstract_form(self.event_new)
+        form = abstract_form_class(event=self.event_new)
+        if form.validate_on_submit():
+            abstract = create_abstract(self.event_new, *_get_field_values(form.data))
+            flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
+            tpl_components = self.list_generator.render_list()
+            if tpl_components.get('hide_abstract'):
+                self.list_generator.flash_info_message(abstract)
+            return jsonify_data(**tpl_components)
+        return jsonify_template('events/abstracts/forms/abstract.html', form=form)
