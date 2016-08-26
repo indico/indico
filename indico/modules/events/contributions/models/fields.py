@@ -21,7 +21,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, return_ascii, text_to_repr
 
 
 def _get_next_position(context):
@@ -178,4 +178,5 @@ class ContributionFieldValue(ContributionFieldValueBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'contribution_id', 'contribution_field_id', _text=self.data)
+        text = text_to_repr(self.data) if isinstance(self.data, unicode) else self.data
+        return format_repr(self, 'contribution_id', 'contribution_field_id', _text=text)
