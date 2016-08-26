@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, return_ascii, text_to_repr
 
 
 def _get_next_position(context):
@@ -82,4 +82,4 @@ class Track(DescriptionMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', _text=text_to_repr(self.title))

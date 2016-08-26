@@ -85,4 +85,4 @@ class AbstractEmailLogEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id')
+        return format_repr(self, 'id', 'abstract_id')
