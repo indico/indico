@@ -328,6 +328,10 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
         else:
             return AbstractReviewingState.mixed
 
+    @property
+    def data_by_field(self):
+        return {value.contribution_field_id: value for value in self.field_values}
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
