@@ -16,10 +16,13 @@
 
 from __future__ import unicode_literals
 
+from uuid import UUID
+
 from babel.numbers import format_currency
 from flask import session
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -362,6 +365,10 @@ class RegistrationForm(db.Model):
         if user:
             return user.registrations.filter_by(registration_form=self).filter(Registration.is_active).first()
         if uuid:
+            try:
+                UUID(hex=uuid)
+            except ValueError:
+                raise BadRequest('Malformed registration token')
             return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(Registration.is_active).first()
         if email:
             return Registration.query.with_parent(self).filter_by(email=email).filter(Registration.is_active).first()
