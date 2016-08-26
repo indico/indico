@@ -24,11 +24,11 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
-from indico.util.locators import locator_property
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import TitledIntEnum
-from indico.util.i18n import _
 
 
 class AbstractState(TitledIntEnum):
