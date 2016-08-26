@@ -299,8 +299,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
     )
 
     # relationship backrefs:
+    # - comments (AbstractComment.abstract)
     # - contribution (Contribution.abstract)
-    # - dupe_abstracts (Abstract.duplicate_of)
+    # - duplicate_abstracts (Abstract.duplicate_of)
     # - email_logs (AbstractEmailLogEntry.abstract)
     # - merged_abstracts (Abstract.merged_into)
     # - reviews (AbstractReview.abstract)
