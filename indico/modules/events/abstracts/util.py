@@ -18,8 +18,11 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
+from flask import request
+
 from indico.core.db import db
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -35,25 +38,25 @@ class AbstractListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super(AbstractListGenerator, self).__init__(event)
         self.default_list_config = {
-            'items': ('proposed_type', 'final_type', 'proposed_track', 'final_track'),
+            'items': ('submitted_type', 'accepted_type', 'submitted_for_tracks', 'accepted_track', 'state'),
             'filters': {'fields': {}, 'items': {}}
         }
-        # TODO: session_empty = {None: 'No session'}
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
         self.static_items = OrderedDict([
-            # TODO: ('session', {'title': _('Session'),
-            #                    'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
-            ('final_track', {'title': _('Final track'),
-                             'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('proposed_track', {'title': _('Proposed track'),
+            ('state', {'title': _('State'), 'filter_choices': {state.name: state.title for state in AbstractState}}),
+            ('accepted_track', {'title': _('Final track'),
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('final_type', {'title': _('Final type'),
-                            'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('proposed_type', {'title': _('Proposed type'),
-                               'filter_choices': OrderedDict(type_empty.items() + type_choices.items())})
+            ('submitted_for_tracks', {'title': _('Submitted for tracks'),
+                                      'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+            ('accepted_type', {'title': _('Accepted type'),
+                               'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            ('submitted_type', {'title': _('Submitted type'),
+                                'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            ('submitted_dt', {'title': 'Submission date'}),
+            ('modified_dt', {'title': 'Modification date'})
         ])
         self.list_config = self._get_config()
 
@@ -65,10 +68,28 @@ class AbstractListGenerator(ListGeneratorBase):
         """
         return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in ids if id_ in self.static_items]
 
+    def _get_sorted_contribution_fields(self, item_ids):
+        """Return the contribution fields ordered by their position in the abstract form."""
+
+        return (ContributionField
+                .find(ContributionField.id.in_(item_ids))
+                .with_parent(self.list_event)
+                .order_by(ContributionField.position)
+                .all())
+
+    def _get_filters_from_request(self):
+        filters = super(AbstractListGenerator, self)._get_filters_from_request()
+        for field in self.list_event.contribution_fields:
+            if field.field_type == 'single_choice':
+                options = request.form.getlist('field_{}'.format(field.id))
+                if options:
+                    filters['fields'][str(field.id)] = options
+        return filters
+
     def _build_query(self):
         return (Abstract.query
                 .with_parent(self.list_event)
-                # TODO: .filter(~Abstract.is_deleted)
+                .filter(~Abstract.is_deleted)
                 # TODO: add options to `joinedload` fields (once implemented)
                 .order_by(Abstract.id))
 
@@ -83,11 +104,11 @@ class AbstractListGenerator(ListGeneratorBase):
         # items_criteria = []
         criteria = []
         static_filters = {
-            # TODO: 'session': Contribution.session_id,
-            'final_track': Abstract.final_track_id,
-            # TODO: 'proposed_track': Abstract.track_id,
-            'final_type': Abstract.final_type_id,
-            'proposed_type': Abstract.type_id
+            'accepted_track': Abstract.accepted_track_id,
+            'submitted_for_tracks': Abstract.submitted_for_tracks,
+            'accepted_type': Abstract.accepted_type_id,
+            'submitted_type': Abstract.submitted_type,
+            'state': Abstract.state
         }
         for key, column in static_filters.iteritems():
             ids = set(filters['items'].get(key, ()))
@@ -108,11 +129,12 @@ class AbstractListGenerator(ListGeneratorBase):
         abstracts = self._filter_list_entries(abstracts_query, list_config['filters']).all()
         dynamic_item_ids, static_item_ids = self._split_item_ids(list_config['items'], 'dynamic')
         static_columns = self._get_static_columns(static_item_ids)
+        dynamic_columns = self._get_sorted_contribution_fields(dynamic_item_ids)
         return {
             'abstracts': abstracts,
             'total_abstracts': total_entries,
             'static_columns': static_columns,
-            # TODO: 'dynamic_columns'
+            'dynamic_columns': dynamic_columns,
             'filtering_enabled': total_entries != len(abstracts)
         }
 
