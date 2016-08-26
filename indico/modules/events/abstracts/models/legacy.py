@@ -114,7 +114,6 @@ class LegacyAbstract(DescriptionMixin, db.Model):
     )
 
     # relationship backrefs:
-    # - contribution (Contribution.abstract)
     # - judgments (Judgment.abstract)
 
     @locator_property
