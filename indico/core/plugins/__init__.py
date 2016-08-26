@@ -87,6 +87,12 @@ class IndicoPlugin(Plugin):
     acl_settings = frozenset()
     #: A set containing the names of event-specific settings which store ACLs
     acl_event_settings = frozenset()
+    #: A dict containing custom converters for settings
+    settings_converters = {}
+    #: A dict containing custom converters for event-specific settings
+    event_settings_converters = {}
+    #: A dict containing custom converters for user-specific settings
+    user_settings_converters = {}
     #: If the plugin should link to a details/config page in the admin interface
     configurable = False
     #: The group category that the plugin belongs to
@@ -273,7 +279,7 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings,
-                                 acls=cls.acl_settings)
+                                 acls=cls.acl_settings, converters=cls.settings_converters)
 
     @cached_classproperty
     @classmethod
@@ -284,7 +290,8 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
-                                      cls.strict_settings, acls=cls.acl_event_settings)
+                                      cls.strict_settings, acls=cls.acl_event_settings,
+                                      converters=cls.event_settings_converters)
 
     @cached_classproperty
     @classmethod
@@ -295,7 +302,7 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
-                                     cls.strict_settings)
+                                     cls.strict_settings, converters=cls.user_settings_converters)
 
 
 def include_plugin_js_assets(bundle_name):
