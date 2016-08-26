@@ -51,6 +51,7 @@ def _merge_users(target, source, **kwargs):
     from indico.models.events.abstracts.models.comments import AbstractComment
     from indico.models.events.abstracts.models.reviews import AbstractReview
     Abstract.query.filter_by(submitter_id=source.id).update({Abstract.submitter_id: target.id})
+    Abstract.query.filter_by(modified_by_id=source.id).update({Abstract.modified_by_id: target.id})
     Abstract.query.filter_by(judge_id=source.id).update({Abstract.judge_id: target.id})
     AbstractComment.query.filter_by(user_id=source.id).update({AbstractComment.user_id: target.id})
     AbstractComment.query.filter_by(modified_by_id=source.id).update({AbstractComment.modified_by_id: target.id})
