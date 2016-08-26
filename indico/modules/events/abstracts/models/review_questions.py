@@ -71,4 +71,4 @@ class AbstractReviewQuestion(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', event_id=None, is_deleted=False, _text=self.text)
+        return format_repr(self, 'id', 'event_id', is_deleted=False, _text=self.text)
