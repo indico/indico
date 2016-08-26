@@ -136,4 +136,4 @@ class AbstractReview(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', abstract_id=None, proposed_action=None)
+        return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
