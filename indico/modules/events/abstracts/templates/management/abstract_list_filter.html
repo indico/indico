@@ -70,14 +70,18 @@
            value="{{ visible_items | tojson | forceescape }}">
     <div class="clearfix">
         <h3>{% trans %}General abstract info{% endtrans %}</h3>
-
         {% for item_id, item in static_items.iteritems() %}
             {% set filter_choices = item.get('filter_choices') %}
             {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
         {% endfor %}
     </div>
 
-    {# TODO: render dynamic items #}
+    <div class="clearfix">
+        <h3>{% trans %}Abstract fields{% endtrans %}</h3>
+        {% for field in event.contribution_fields %}
+            {{ _render_column_selector(field.id, field, field.filter_choices, is_static_item=true) }}
+        {% endfor %}
+    </div>
 
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
