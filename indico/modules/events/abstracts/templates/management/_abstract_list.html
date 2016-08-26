@@ -34,7 +34,7 @@
                         {% for abstract in abstracts %}
                             <tr class="i-table abstract-row"
                                 data-friendly-id="{{ abstract.friendly_id }}"
-                                data-title="{{ abstract.as_legacy.getTitle() }}">
+                                data-title="{{ abstract.title }}">
                                 <td class="i-table id-column">
                                     <span class="vertical-aligner">
                                         <input type="checkbox" class="select-row" name="abstract_id"
@@ -45,14 +45,14 @@
                                     <span class="vertical-aligner">{{ abstract.friendly_id }}</span>
                                 </td>
                                 <td class="i-table">
-                                    <span class="vertical-aligner js-mathjax">{{ abstract.as_legacy.getTitle() }}</span>
+                                    <span class="vertical-aligner js-mathjax">{{ abstract.title }}</span>
                                 </td>
                                 {% for item in static_columns %}
-                                    {% if item.id == 'proposed_type' %}
-                                        <td class="i-table type-column" data-text="{{ abstract.type.name if abstract.type else '' }}">
+                                    {% if item.id == 'submitted_type' %}
+                                        <td class="i-table type-column" data-text="{{ abstract.submitted_type.name if abstract.submitted_type else '' }}">
                                             <span class="vertical-aligner">
-                                                {% if abstract.type -%}
-                                                    {{ abstract.type.name }}
+                                                {% if abstract.submitted_type -%}
+                                                    {{ abstract.submitted_type.name }}
                                                 {%- else %}
                                                     {% trans %}n/a{% endtrans %}
                                                 {%- endif %}
@@ -68,12 +68,37 @@
                                                 {%- endif %}
                                             </span>
                                         </td>
-                                    {% elif item.id == 'proposed_track' %}
-                                        <td class="i-table"
-                                            data-text="{{ abstract.track.getTitle().decode('utf-8') if abstract.track else '' }}">
+                                    {% elif item.id == 'submitted_for_tracks' %}
+                                        {# TODO: <td class="i-table"
+                                            data-text="{{ abstract.submitted_for_tracks_names if abstract.submitted_for_tracks_names else '' }}"
+                                            data-searchable="{{ abstract.submitted_for_tracks_names | join(', ') | lower }}"
+                                            >
                                             <span class="vertical-aligner">
-                                                {% if abstract.track %}
-                                                    {%- trans title=abstract.track.getTitle().decode('utf-8') %}
+                                                {% for track_name in abstract.submitted_for_tracks_names | sort -%}
+                                                    <div>{{ track_name }}</div>
+                                                {%- endfor %}
+                                                {% if not abstract.submitted_for_tracks_names %}
+                                                    {% trans %}No track{% endtrans %}
+                                                {% endif %}
+                                            </span>
+                                        </td> #}
+                                        <td></td>
+                                    {% elif item.id == 'accepted_track' %}
+                                        <td class="i-table"
+                                            data-text="{{ abstract.accepted_track.title if abstract.accepted_track else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.accepted_track %}
+                                                    {{ abstract.accepted_track.title }}
+                                                {% else %}
+                                                    {% trans %}No track{% endtrans %}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'state' %}
+                                        <td class="i-table" data-text="{{ abstract.state.title }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.state %}
+                                                    {%- trans title=abstract.state.title %}
                                                         {{ title }}
                                                     {% endtrans -%}
                                                 {% else %}
@@ -81,20 +106,30 @@
                                                 {% endif %}
                                             </span>
                                         </td>
-                                    {% elif item.id == 'accepted_track' %}
+                                    {% elif item.id == 'submitted_dt' %}
                                         <td class="i-table"
-                                            data-text="{{ abstract.accepted_track.getTitle().decode('utf-8') if abstract.accepted_track else '' }}">
+                                            data-text="{{ abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}">
                                             <span class="vertical-aligner">
-                                                {% if abstract.accepted_track %}
-                                                    {%- trans title=abstract.accepted_track.getTitle().decode('utf-8') %}
-                                                        {{ title }}
-                                                    {% endtrans -%}
+                                                {{ abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'modified_dt' %}
+                                        <td class="i-table" data-text="{{ abstract.state.title }}">
+                                            <span class="vertical-aligner">
+                                                {% if abstract.modified_dt %}
+                                                    {{ abstract.modified_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}
                                                 {% else %}
-                                                    {% trans %}No track{% endtrans %}
+                                                    -
                                                 {% endif %}
                                             </span>
                                         </td>
                                     {% endif %}
+                                {% endfor %}
+                                {% set data = abstract.data_by_field %}
+                                {% for item in dynamic_columns %}
+                                    <td class="i-table" data-text="{{ data[item.id].friendly_data }}">
+                                        {{ data[item.id].friendly_data }}
+                                    </td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
