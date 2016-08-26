@@ -88,34 +88,10 @@
 {% endblock %}
 
 {% block javascript %}
-    {% if field.use_editor %}
-        <script>
-            (function() {
-                'use strict';
-                $(document).ready(function() {
-                    var field = $('#{{ field.id }}');
-                    var container = field.closest('[data-field-id]');
-                    field.pagedown();
-
-                    ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(function(name) {
-                        var content = container.find('.{0}-text'.format(name));
-                        container.find('.' + name).qtip({
-                            content: content.html(),
-                            hide: {
-                                event: 'unfocus'
-                            },
-                            show: {
-                                solo: true
-                            },
-                            style: {
-                                classes: 'informational markdown-help-qtip'
-                            }
-                        }).on('click', function(evt) {
-                            evt.preventDefault();
-                        });
-                    });
-                });
-            })();
-        </script>
-    {% endif %}
+    <script>
+        setupMarkdownWidget({
+            fieldId: {{ field.id | tojson }},
+            useMarkdownEditor: {{ field.use_editor | tojson }}
+        });
+    </script>
 {% endblock %}
