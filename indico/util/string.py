@@ -25,6 +25,7 @@ import functools
 import re
 import string
 import unicodedata
+from itertools import chain
 from uuid import uuid4
 
 import bleach
@@ -35,6 +36,7 @@ from html2text import HTML2Text
 from lxml import html, etree
 from markupsafe import Markup, escape
 from speaklater import _LazyString, is_lazy_string
+from sqlalchemy import ForeignKeyConstraint, inspect
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr',
@@ -435,8 +437,16 @@ def format_repr(obj, *args, **kwargs):
     text_arg = kwargs.pop('_text', None)
     raw_text_arg = kwargs.pop('_rawtext', None)
     repr_arg = kwargs.pop('_repr', None)
-    obj_name = type(obj).__name__
-    formatted_args = [unicode(_format_value(getattr(obj, arg))) for arg in args]
+    cls = type(obj)
+    obj_name = cls.__name__
+    fkeys = set(chain.from_iterable(c.column_keys
+                                    for t in inspect(cls).tables
+                                    for c in t.constraints
+                                    if isinstance(c, ForeignKeyConstraint))) if hasattr(cls, '__table__') else set()
+    formatted_args = [unicode(_format_value(getattr(obj, arg)))
+                      if arg not in fkeys
+                      else u'{}={}'.format(arg, _format_value(getattr(obj, arg)))
+                      for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
