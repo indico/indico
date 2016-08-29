@@ -341,20 +341,18 @@ class VCRoomEventAssociation(db.Model):
                            events and deleted.
         """
         if delete_all:
-            if self.vc_room.events:
-                for e in self.vc_room.events:
-                    Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                        self.vc_room, e.event_new, e.link_object)
-                    )
-                    db.session.delete(e)
-                    db.session.flush()
+            for e in self.vc_room.events[:]:
+                Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+                    self.vc_room, e.event_new, e.link_object)
+                )
+                db.session.delete(e)
         else:
             Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
                 self.vc_room, self.event_new, self.link_object)
             )
             db.session.delete(self)
-            db.session.flush()
-        if not self.vc_room.events or delete_all:
+        db.session.flush()
+        if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
             if self.vc_room.status != VCRoomStatus.deleted:
                 self.vc_room.plugin.delete_room(self.vc_room, self.event_new)

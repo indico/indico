@@ -275,7 +275,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
                   'error')
             return redirect(url_for('.manage_vc_rooms', self.event_new))
 
-        delete_all = request.args.get("delete_all") ==  '1'
+        delete_all = request.args.get('delete_all') == '1'
         self.event_vc_room.delete(session.user, delete_all)
         flash(_("{plugin_name} room '{room.name}' removed").format(
             plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
