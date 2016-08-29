@@ -26,37 +26,31 @@ import dateutil.parser
 import pytz
 from flask import render_template, session
 from markupsafe import escape, Markup
-from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
-from wtforms.widgets.core import CheckboxInput, Select, RadioInput
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectField, SelectFieldBase, Field
+from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.validators import StopValidation
+from wtforms.widgets.core import CheckboxInput, Select, RadioInput
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
-from indico.modules.events.models.events import Event
-from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.modules.users.models.users import User, UserTitle
 from indico.modules.users.util import serialize_user
 from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
-from indico.util.user import principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
+from indico.util.user import principal_from_fossil
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, LocationWidget
 
@@ -252,67 +246,6 @@ class IndicoPasswordField(PasswordField):
         super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 
-class CategoryField(HiddenField):
-    """WTForms field that lets you select a category.
-
-    :param allow_events: Whether to allow selecting a category that
-                         contains events.
-    :param allow_subcats: Whether to allow selecting a category that
-                          contains subcategories.
-    :param require_event_creation_rights: Whether to allow selecting
-                                          only categories where the
-                                          user can create events.
-    """
-
-    widget = JinjaWidget('forms/category_picker_widget.html')
-
-    def __init__(self, *args, **kwargs):
-        self.navigator_category_id = 0
-        self.allow_events = kwargs.pop('allow_events', True)
-        self.allow_subcats = kwargs.pop('allow_subcats', True)
-        self.require_event_creation_rights = kwargs.pop('require_event_creation_rights', False)
-        super(CategoryField, self).__init__(*args, **kwargs)
-
-    def pre_validate(self, form):
-        if self.data:
-            self._validate(self.data)
-
-    def process_data(self, value):
-        if not value:
-            self.data = None
-            return
-        try:
-            self._validate(value)
-        except ValueError:
-            self.data = None
-            self.navigator_category_id = value.id
-        else:
-            self.data = value
-            self.navigator_category_id = value.id
-
-    def process_formdata(self, valuelist):
-        from indico.modules.categories import Category
-        if valuelist:
-            try:
-                category_id = int(json.loads(valuelist[0])['id'])
-            except KeyError:
-                self.data = None
-            else:
-                self.data = Category.get(category_id, is_deleted=False)
-
-    def _validate(self, category):
-        if not self.allow_events and category.has_only_events:
-            raise ValueError(_("Categories containing only events are not allowed."))
-        if not self.allow_subcats and category.children:
-            raise ValueError(_("Categories containing subcategories are not allowed."))
-
-    def _value(self):
-        return {'id': self.data.id, 'title': self.data.title} if self.data else {}
-
-    def _get_data(self):
-        return self.data
-
-
 class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 
@@ -366,6 +299,7 @@ class PrincipalListField(HiddenField):
             raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
     def _value(self):
+        from indico.modules.events.models.persons import PersonLinkBase
         def key(obj):
             if isinstance(obj, PersonLinkBase):
                 return obj.name.lower()
@@ -381,88 +315,6 @@ class AccessControlListField(PrincipalListField):
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True, acl=True)
 
 
-class EventPersonListField(PrincipalListField):
-    """"A field that lets you select a list Indico user and EventPersons
-
-    Requires its form to have an event set.
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.event_person_conversions = {}
-        super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, **kwargs)
-
-    @property
-    def event(self):
-        return getattr(self.get_form(), 'event', None)
-
-    def _convert_data(self, data):
-        return map(self._get_event_person, data)
-
-    def _create_event_person(self, data):
-        title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        person = EventPerson(event_new=self.event, email=data.get('email', '').lower(), _title=title,
-                             first_name=data.get('firstName'), last_name=data['familyName'],
-                             affiliation=data.get('affiliation'), address=data.get('address'),
-                             phone=data.get('phone'))
-        # Keep the original data to cancel the conversion if the person is not persisted to the db
-        self.event_person_conversions[person] = data
-        return person
-
-    def _get_event_person_for_user(self, user):
-        person = EventPerson.for_user(user, self.event)
-        # Keep a reference to the user to cancel the conversion if the person is not persisted to the db
-        self.event_person_conversions[person] = user
-        return person
-
-    def _get_event_person(self, data):
-        person_type = data.get('_type')
-        if person_type is None:
-            if data.get('email'):
-                email = data['email'].lower()
-                user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
-                if user:
-                    return self._get_event_person_for_user(user)
-                elif self.event:
-                    person = self.event.persons.filter_by(email=email).first()
-                    if person:
-                        return person
-            # We have no way to identify an existing event person with the provided information
-            return self._create_event_person(data)
-        elif person_type == 'Avatar':
-            return self._get_event_person_for_user(self._convert_principal(data))
-        elif person_type == 'EventPerson':
-            return self.event.persons.filter_by(id=data['id']).one()
-        elif person_type == 'PersonLink':
-            return self.event.persons.filter_by(id=data['personId']).one()
-        else:
-            raise ValueError(_("Unknown person type '{}'").format(person_type))
-
-    def _serialize_principal(self, principal):
-        from indico.modules.events.util import serialize_event_person
-        if principal.id is None:
-            # We created an EventPerson which has not been persisted to the
-            # database. Revert the conversion.
-            principal = self.event_person_conversions[principal]
-            if isinstance(principal, dict):
-                return principal
-        if not isinstance(principal, EventPerson):
-            return super(EventPersonListField, self)._serialize_principal(principal)
-        return serialize_event_person(principal)
-
-    def pre_validate(self, form):
-        # Override parent behavior
-        pass
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = json.loads(valuelist[0])
-            try:
-                self.data = self._convert_data(self.data)
-            except ValueError:
-                self.data = []
-                raise
-
-
 class PrincipalField(PrincipalListField):
     """A field that lets you select an Indico user/group ("principal")"""
 
@@ -475,63 +327,6 @@ class PrincipalField(PrincipalListField):
         if valuelist:
             data = map(self._convert_principal, json.loads(valuelist[0]))
             self.data = None if not data else data[0]
-
-
-class EventPersonField(EventPersonListField):
-    """A field to select an EventPerson or create one from an Indico user"""
-
-    widget = JinjaWidget('forms/principal_widget.html', single_line=True)
-
-    def _get_data(self):
-        return [] if self.data is None else [self.data]
-
-
-class PersonLinkListFieldBase(EventPersonListField):
-
-    #: class that inherits from `PersonLinkBase`
-    person_link_cls = None
-    #: name of the attribute on the form containing the linked object
-    linked_object_attr = None
-
-    widget = None
-
-    def __init__(self, *args, **kwargs):
-        super(PersonLinkListFieldBase, self).__init__(*args, **kwargs)
-        self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
-
-    @no_autoflush
-    def _get_person_link(self, data, extra_data=None):
-        extra_data = extra_data or {}
-        person = self._get_event_person(data)
-        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none),
-                       'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
-                       'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
-                       'phone': data.get('phone', ''), 'display_order': data['displayOrder']}
-        person_data.update(extra_data)
-        person_link = None
-        if self.object and inspect(person).persistent:
-            person_link = self.person_link_cls.find_first(person=person, object=self.object)
-        if not person_link:
-            person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(person_data)
-        email = data.get('email', '').lower()
-        if email != person_link.email:
-            if not self.event or not self.event.persons.filter_by(email=email).first():
-                person_link.person.email = email
-            else:
-                raise UserValueError(_('There is already a person with the email {}').format(email))
-        return person_link
-
-    def _serialize_principal(self, principal):
-        if not isinstance(principal, PersonLinkBase):
-            return super(PersonLinkListFieldBase, self)._serialize_principal(principal)
-        if principal.id is None:
-            return super(PersonLinkListFieldBase, self)._serialize_principal(principal.person)
-        else:
-            return self._serialize_person_link(principal)
-
-    def _serialize_person_link(self, principal, extra_data=None):
-        raise NotImplementedError
 
 
 class MultiStringField(HiddenField):
@@ -1003,15 +798,14 @@ class IndicoProtectionField(IndicoEnumRadioField):
         super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):
-        from indico.modules.categories.models.categories import Category
         protected_object = self.get_form().protected_object
         if hasattr(protected_object, 'get_non_inheriting_objects'):
             non_inheriting_objects = protected_object.get_non_inheriting_objects()
         else:
             non_inheriting_objects = []
-        if isinstance(protected_object.protection_parent, Event):
+        if isinstance(protected_object.protection_parent, db.m.Event):
             parent_type = _('Event')
-        elif isinstance(protected_object.protection_parent, Category):
+        elif isinstance(protected_object.protection_parent, db.m.Category):
             parent_type = _('Category')
         else:
             parent_type = _('Session')
