@@ -9,7 +9,7 @@ install:
   - pip install -r requirements.txt --trusted-host indico-software.org
   - python setup.py develop
 script:
-  - py.test -v
+  - pytest -v
 notifications:
   email: false
   irc:
