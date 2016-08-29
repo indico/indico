@@ -309,7 +309,7 @@ class RegistrationForm(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), reg_form_id=self.id)
+        return dict(self.event_new.locator, reg_form_id=self.id)
 
     @property
     def active_fields(self):
