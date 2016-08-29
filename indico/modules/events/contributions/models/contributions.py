@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -34,9 +32,8 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.events.models.persons import PersonLinkDataMixin
+from indico.modules.events.models.persons import PersonLinkDataMixin, AuthorsSpeakersMixin
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -71,8 +68,8 @@ class CustomFieldsMixin(object):
         return old_value
 
 
-class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
-                   AttachedNotesMixin, PersonLinkDataMixin, CustomFieldsMixin, db.Model):
+class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin, AttachedNotesMixin,
+                   PersonLinkDataMixin, AuthorsSpeakersMixin, CustomFieldsMixin, db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
                                   postgresql_where=db.text('NOT is_deleted')),
@@ -332,30 +329,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def end_dt(self):
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
-
-    @property
-    def speakers(self):
-        return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
-                if person_link.is_speaker]
-
-    @property
-    def speaker_names(self):
-        return [person_link.full_name
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
-                if person_link.is_speaker]
-
-    @property
-    def primary_authors(self):
-        return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
-                if person_link.author_type == AuthorType.primary]
-
-    @property
-    def secondary_authors(self):
-        return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
-                if person_link.author_type == AuthorType.secondary]
 
     @property
     def submitters(self):
