@@ -118,21 +118,23 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
         data['Group'] = principal.name
     elif principal.principal_type == PrincipalType.multipass_group:
         data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
+    elif principal.principal_type == PrincipalType.network:
+        data['IP Network'] = principal.name
     if entry is None:
+        data['Read Access'] = old_data['read_access']
         data['Manager'] = old_data['full_access']
         data['Roles'] = _format_roles(old_data['roles'])
-        # TODO: add item for read_access once we store it in the ACL
         obj.log(EventLogRealm.management, EventLogKind.negative, 'Protection', 'ACL entry removed', session.user,
                 data=data)
     elif is_new:
-        # TODO: add item for read_access once we store it in the ACL
+        data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
         if entry.roles:
             data['Roles'] = _format_roles(entry.roles)
         obj.log(EventLogRealm.management, EventLogKind.positive, 'Protection', 'ACL entry added', session.user,
                 data=data)
     elif entry.current_data != old_data:
-        # TODO: add item for read_access once we store it in the ACL
+        data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
         current_roles = set(entry.roles)
         added_roles = current_roles - old_data['roles']
