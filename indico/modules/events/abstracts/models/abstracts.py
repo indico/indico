@@ -23,6 +23,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -55,7 +56,7 @@ class AbstractReviewingState(TitledIntEnum):
     mixed = 3
 
 
-class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
+class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
