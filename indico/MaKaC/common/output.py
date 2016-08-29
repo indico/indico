@@ -494,7 +494,7 @@ class outputGenerator(object):
             out.closeTag('datafield')
 
     def _generate_contrib_people(self, contrib, out, subcontrib=None):
-        aList = list(contrib.primary_authors | contrib.secondary_authors)
+        aList = list(set(contrib.primary_authors) | set(contrib.secondary_authors))
         sList = list(subcontrib.person_links) if subcontrib else list(contrib.speakers)
         list_ = {}
         auth = list(contrib.primary_authors)
