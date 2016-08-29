@@ -17,11 +17,14 @@
 from __future__ import unicode_literals
 
 import json
+from operator import itemgetter
 
 from sqlalchemy import inspect
+from wtforms import SelectField
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.persons import EventPersonLink, EventPerson, PersonLinkBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.util import serialize_person_link
@@ -232,3 +235,13 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
             if person_link.person in persons:
                 raise ValueError(_("Person with email '{}' is duplicated").format(person_link.person.email))
             persons.add(person_link.person)
+
+
+class IndicoThemeSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        event_type = kwargs.pop('event_type').legacy_name
+        super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
+        self.choices = sorted([(tid, theme['title'])
+                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
+                              key=itemgetter(1))
+        self.default = theme_settings.defaults[event_type]

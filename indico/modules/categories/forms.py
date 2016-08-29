@@ -23,13 +23,13 @@ from wtforms.validators import DataRequired, Optional, InputRequired, NumberRang
 from indico.modules.categories.models.categories import EventMessageMode, Category
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event
+from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
-                                     IndicoEnumSelectField, IndicoMarkdownField, IndicoThemeSelectField,
-                                     IndicoTimezoneSelectField, EmailListField, JSONField, HiddenFieldList,
-                                     MultipleItemsField)
+                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField, JSONField,
+                                     HiddenFieldList, MultipleItemsField, IndicoMarkdownField)
 from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
 
 
