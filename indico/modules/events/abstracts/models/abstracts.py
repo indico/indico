@@ -330,7 +330,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, abstractId=self.friendly_id, confId=self.event_id)
+        return dict(self.event_new.locator, abstract_id=self.id)
 
     @return_ascii
     def __repr__(self):
