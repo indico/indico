@@ -65,4 +65,4 @@ class MultiIPNetworkField(MultiStringField):
         self._data_converted = True
 
     def pre_validate(self, form):
-        pass
+        pass  # nothing to do
