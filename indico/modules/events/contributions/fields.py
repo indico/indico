@@ -21,7 +21,7 @@ from indico.modules.events.contributions.models.persons import (ContributionPers
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.util import serialize_contribution_person_link
 from indico.util.i18n import _
-from indico.web.forms.fields import PersonLinkListFieldBase
+from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.web.forms.widgets import JinjaWidget
 
 
