@@ -25,12 +25,13 @@ from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.categories.fields import CategoryField
 from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (IndicoLocationField, CategoryField, IndicoDateTimeField, IndicoTimezoneSelectField,
+from indico.web.forms.fields import (IndicoLocationField, IndicoDateTimeField, IndicoTimezoneSelectField,
                                      IndicoEnumRadioField, OccurrencesField, IndicoThemeSelectField, IndicoTagListField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
