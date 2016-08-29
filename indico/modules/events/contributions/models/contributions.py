@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -333,19 +335,27 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     @property
     def speakers(self):
-        return [person_link for person_link in self.person_links if person_link.is_speaker]
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.is_speaker]
 
     @property
     def speaker_names(self):
-        return [person_link.full_name for person_link in self.person_links if person_link.is_speaker]
+        return [person_link.full_name
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.is_speaker]
 
     @property
     def primary_authors(self):
-        return {person_link for person_link in self.person_links if person_link.author_type == AuthorType.primary}
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.author_type == AuthorType.primary]
 
     @property
     def secondary_authors(self):
-        return {person_link for person_link in self.person_links if person_link.author_type == AuthorType.secondary}
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.author_type == AuthorType.secondary]
 
     @property
     def submitters(self):
