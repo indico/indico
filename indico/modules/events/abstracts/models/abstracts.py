@@ -297,6 +297,15 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, db.Model):
             lazy=True
         )
     )
+    person_links = db.relationship(
+        'AbstractPersonLink',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'abstract',
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - comments (AbstractComment.abstract)

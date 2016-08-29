@@ -49,6 +49,9 @@ class AbstractPersonLink(PersonLinkBase):
         default=AuthorType.none
     )
 
+    # relationship backrefs:
+    # - abstract (Abstract.person_links)
+
     @locator_property
     def locator(self):
         return dict(self.abstract.locator, person_id=self.id)
