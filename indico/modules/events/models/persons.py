@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -53,6 +55,34 @@ class PersonLinkDataMixin(object):
                 continue
             action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
             self.update_principal(principal, **action)
+
+
+class AuthorsSpeakersMixin(object):
+    @property
+    def speakers(self):
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.is_speaker]
+
+    @property
+    def speaker_names(self):
+        return [person_link.full_name
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.is_speaker]
+
+    @property
+    def primary_authors(self):
+        from indico.modules.events.contributions.models.persons import AuthorType
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.author_type == AuthorType.primary]
+
+    @property
+    def secondary_authors(self):
+        from indico.modules.events.contributions.models.persons import AuthorType
+        return [person_link
+                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                if person_link.author_type == AuthorType.secondary]
 
 
 class EventPerson(PersonMixin, db.Model):
