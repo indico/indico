@@ -21,6 +21,37 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.util.struct.enum import TitledEnum
 
+
+class BOASortField(TitledEnum):
+    id = 'id'
+    abstract_title = 'title'
+    session_title = 'session_title'
+    speaker = 'speaker'
+    schedule = 'schedule'
+
+
+class BOACorrespondingAuthorType(TitledEnum):
+    none = 'none'
+    submitter = 'submitter'
+    speakers = 'speakers'
+
+
+BOASortField.__titles__ = {
+    BOASortField.id: _('ID'),
+    BOASortField.abstract_title: _('Abstract title'),
+    BOASortField.session_title: _('Session title'),
+    BOASortField.speaker: _('Presenter'),
+    BOASortField.schedule: _('Schedule')
+}
+
+
+BOACorrespondingAuthorType.__titles__ = {
+    BOACorrespondingAuthorType.none: _('None'),
+    BOACorrespondingAuthorType.submitter: _('Submitter'),
+    BOACorrespondingAuthorType.speakers: _('Speakers')
+}
+
+
 abstracts_settings = EventSettingsProxy('abstracts', {
     'description_settings': {
         'is_active': True,
@@ -36,34 +67,6 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'end_dt': DatetimeConverter,
     'modification_end_dt': DatetimeConverter
 })
-
-
-class BOASortField(TitledEnum):
-    id = 'id'
-    title = 'title'
-    session_title = 'session_title'
-    speaker = 'speaker'
-    schedule = 'schedule'
-
-    __titles__ = {
-        id: _('ID'),
-        title: _('Title'),
-        session_title: _('Session title'),
-        speaker: _('Presenter'),
-        schedule: _('Schedule')
-    }
-
-
-class BOACorrespondingAuthorType(TitledEnum):
-    none = 'none'
-    submitter = 'submitter'
-    speakers = 'speakers'
-
-    __titles__ = {
-        none: _('None'),
-        submitter: _('Submitter'),
-        speakers: _('Speakers')
-    }
 
 
 boa_settings = EventSettingsProxy('abstracts_book', {
