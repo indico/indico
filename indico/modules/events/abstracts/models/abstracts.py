@@ -313,6 +313,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     # - contribution (Contribution.abstract)
     # - duplicate_abstracts (Abstract.duplicate_of)
     # - email_logs (AbstractEmailLogEntry.abstract)
+    # - files (AbstractFile.abstract)
     # - merged_abstracts (Abstract.merged_into)
     # - reviews (AbstractReview.abstract)
 
