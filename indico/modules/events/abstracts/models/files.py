@@ -55,7 +55,9 @@ class AbstractFile(StoredFileMixin, db.Model):
         return dict(self.abstract.locator, file_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
-        path_segments = ['event', strict_unicode(self.event_new.id), 'abstracts', strict_unicode(self.abstract.id)]
+        self.abstract.assign_id()
+        path_segments = ['event', strict_unicode(self.abstract.event_new.id),
+                         'abstracts', strict_unicode(self.abstract.id)]
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
