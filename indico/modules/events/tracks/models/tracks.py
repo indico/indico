@@ -39,6 +39,11 @@ class Track(DescriptionMixin, db.Model):
         db.String,
         nullable=False
     )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
