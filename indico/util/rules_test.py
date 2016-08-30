@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
+
 import pytest
 
 from indico.core import signals
@@ -27,7 +29,7 @@ class ActionCondition(Condition):
 
     @classmethod
     def get_available_values(cls, **kwargs):
-        return {'add': 'added', 'del': 'deleted'}
+        return OrderedDict([('add', 'added'), ('del', 'deleted')])
 
     @classmethod
     def check(cls, values, action, foo, bar):
@@ -41,7 +43,7 @@ class FooCondition(Condition):
 
     @classmethod
     def get_available_values(cls, **kwargs):
-        return {1: '1', 2: '2', 3: '3'}
+        return OrderedDict([(1, '1'), (2, '2'), (3, '3')])
 
     @classmethod
     def check(cls, values, action, foo, bar):
