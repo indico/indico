@@ -19,6 +19,7 @@ def upgrade():
         'tracks',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
+        sa.Column('code', sa.String(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
