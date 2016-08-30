@@ -72,3 +72,17 @@ class TimedeltaConverter(SettingConverter):
     @staticmethod
     def to_python(value):
         return timedelta(seconds=value)
+
+
+class EnumConverter(SettingConverter):
+    """Convert an enum object from/to its name."""
+
+    def __init__(self, enum):
+        self.enum = enum
+
+    def from_python(self, value):
+        assert isinstance(value, self.enum)
+        return value.name
+
+    def to_python(self, value):
+        return self.enum[value]
