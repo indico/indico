@@ -99,6 +99,21 @@ def upgrade():
     )
 
     op.create_table(
+        'files',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('abstract_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('storage_backend', sa.String(), nullable=False),
+        sa.Column('content_type', sa.String(), nullable=False),
+        sa.Column('size', sa.BigInteger(), nullable=False),
+        sa.Column('storage_file_id', sa.String(), nullable=False),
+        sa.Column('filename', sa.String(), nullable=False),
+        sa.Column('created_dt', UTCDateTime, nullable=False),
+        sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_abstracts'
+    )
+
+    op.create_table(
         'email_templates',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
@@ -239,6 +254,7 @@ def downgrade():
     op.drop_table('abstract_comments', schema='event_abstracts')
     op.drop_table('abstract_person_links', schema='event_abstracts')
     op.drop_table('email_templates', schema='event_abstracts')
+    op.drop_table('files', schema='event_abstracts')
     op.drop_table('proposed_for_tracks', schema='event_abstracts')
     op.drop_table('submitted_for_tracks', schema='event_abstracts')
     op.drop_table('abstracts', schema='event_abstracts')
