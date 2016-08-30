@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from contextlib import contextmanager
 
 import pytz
+from flask import has_request_context, session
 from sqlalchemy import orm, DDL
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.event import listens_for
@@ -34,6 +36,7 @@ from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -47,7 +50,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps, now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
-from indico.util.string import return_ascii, format_repr, text_to_repr
+from indico.util.string import return_ascii, format_repr, text_to_repr, to_unicode
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
@@ -638,6 +641,55 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if scheduled_only:
             query.filter(SessionBlock.timetable_entry != None)  # noqa
         return query.first()
+
+    def get_allowed_sender_emails(self, include_current_user=True, include_creator=True, include_managers=True,
+                                  include_support=True, include_chairs=True, extra=None):
+        """
+        Return the emails of people who can be used as senders (or
+        rather Reply-to contacts) in emails sent from within an event.
+
+        :param include_current_user: Whether to include the email of
+                                     the currently logged-in user
+        :param include_creator: Whether to include the email of the
+                                event creator
+        :param include_managers: Whether to include the email of all
+                                 event managers
+        :param include_support: Whether to include the "event support"
+                                email
+        :param include_chairs: Whether to include the emails of event
+                               chairpersons (or lecture speakers)
+        :param extra: An email address that is always included, even
+                      if it is not in any of the included lists.
+        :return: An OrderedDict mapping emails to pretty names
+        """
+        emails = {}
+        # Support
+        if include_support:
+            support = self.as_legacy.getSupportInfo()
+            emails[support.getEmail()] = support.getCaption() or support.getEmail()
+        # Current user
+        if include_current_user and has_request_context() and session.user:
+            emails[session.user.email] = session.user.full_name
+        # Creator
+        if include_creator:
+            emails[self.creator.email] = self.creator.full_name
+        # Managers
+        if include_managers:
+            emails.update((p.principal.email, p.principal.full_name)
+                          for p in self.acl_entries
+                          if p.type == PrincipalType.user and p.full_access)
+        # Chairs
+        if include_chairs:
+            emails.update((pl.email, pl.full_name) for pl in self.person_links if pl.email)
+        # Extra email (e.g. the current value in an object from the DB)
+        if extra:
+            emails.setdefault(extra, extra)
+        # Sanitize and format emails
+        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
+                  for email, name in emails.iteritems()
+                  if email and email.strip()}
+        own_email = session.user.email if has_request_context() and session.user else None
+        return OrderedDict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
 
     @memoize_request
     def has_feature(self, feature):
