@@ -20,7 +20,6 @@ from datetime import datetime, date
 
 import pytz
 from babel.dates import get_timezone
-from flask import session
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
@@ -28,7 +27,6 @@ from wtforms_components import TimeField
 
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, IndicoRadioField, TimeDeltaField
 from indico.web.forms.validators import HiddenUnless
@@ -66,27 +64,11 @@ class ReminderForm(IndicoForm):
         self.event = kwargs.pop('event')
         super(ReminderForm, self).__init__(*args, **kwargs)
         self.absolute_time.description = _('Your active timezone is {tz}.').format(tz=self.timezone)
-        self._set_email_choices()
+        self.reply_to_address.choices = (self.event.as_event
+                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
+                                         .items())
         if self.event.getType() == 'simple_event':
             del self.include_summary
-
-    def _set_email_choices(self):
-        # User
-        emails = {session.user.email: session.user.full_name}
-        # Creator
-        emails[self.event.as_event.creator.email] = self.event.as_event.creator.full_name
-        # Support
-        support = self.event.getSupportInfo()
-        emails[support.getEmail()] = support.getCaption() or support.getEmail()
-        # Chairs
-        emails.update((pl.email, pl.full_name) for pl in self.event.as_event.person_links if pl.email)
-        # Current email to avoid destructive modifications
-        emails.setdefault(self.reply_to_address.object_data, self.reply_to_address.object_data)
-        # Sanitize and format emails
-        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
-                  for email, name in emails.iteritems()
-                  if email and email.strip()}
-        self.reply_to_address.choices = sorted(emails.items(), key=lambda x: (x[0] != session.user.email, x[1].lower()))
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data:
