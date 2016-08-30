@@ -20,11 +20,16 @@ import traceback
 from datetime import timedelta
 from operator import attrgetter
 
+from sqlalchemy.orm import joinedload
+
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.settings import boa_settings, BOACorrespondingAuthorType, BOASortField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.users import User
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.console import verbose_iterator, cformat
 from indico.util.struct.iterables import committing_iterator
 
@@ -37,13 +42,38 @@ class AbstractMigration(object):
         self.conf = conf
         self.event = event
         self.amgr = conf.abstractMgr
+        self.track_map = {}
+        self.legacy_warnings_shown = set()
 
     def __repr__(self):
         return '<AbstractMigration({})>'.format(self.event)
 
     def run(self):
+        self.importer.print_success(cformat('%{blue!}{}').format(self.event), event_id=self.event.id)
         self._migrate_boa_settings()
+        self._migrate_tracks()
         # TODO...
+
+    def _user_from_legacy(self, legacy_user):
+        if isinstance(legacy_user, AvatarUserWrapper):
+            user = legacy_user.user
+            email = convert_to_unicode(legacy_user.__dict__.get('email', '')).lower() or None
+        elif legacy_user.__class__.__name__ == 'Avatar':
+            user = AvatarUserWrapper(legacy_user.id).user
+            email = convert_to_unicode(legacy_user.email).lower()
+        else:
+            self.importer.print_error(cformat('%{red!}Invalid legacy user: {}').format(legacy_user),
+                                      event_id=self.event.id)
+            return None
+        if user is None:
+            user = self.importer.all_users_by_email.get(email) if email else None
+            if user is not None:
+                msg = 'Using {} for {} (matched via {})'.format(user, legacy_user, email)
+            else:
+                msg = cformat('%{yellow}Invalid legacy user: {}').format(legacy_user)
+            self.importer.print_warning(msg, event_id=self.event.id, always=(msg not in self.legacy_warnings_shown))
+            self.legacy_warnings_shown.add(msg)
+        return user
 
     def _migrate_boa_settings(self):
         boa_config = self.conf._boa
@@ -61,20 +91,48 @@ class AbstractMigration(object):
             'show_abstract_ids': bool(getattr(boa_config, '_showIds', False))
         })
 
+    def _migrate_tracks(self):
+        for pos, old_track in enumerate(self.conf.program, 1):
+            track = Track(title=convert_to_unicode(old_track.title),
+                          description=convert_to_unicode(old_track.description),
+                          code=convert_to_unicode(old_track._code),
+                          position=pos,
+                          abstract_reviewers=set())
+            self.importer.print_info(cformat('%{white!}Track:%{reset} {}').format(track.title))
+            for coordinator in old_track._coordinators:
+                user = self._user_from_legacy(coordinator)
+                if user is None:
+                    continue
+                self.importer.print_info(cformat('%{blue!}  Coordinator:%{reset} {}').format(user))
+                track.abstract_reviewers.add(user)
+                self.event.update_principal(user, add_roles={'abstract_reviewer'}, quiet=True)
+            self.track_map[old_track] = track
+            self.event.tracks.append(track)
+
 
 class EventAbstractsImporter(Importer):
     def has_data(self):
-        return Abstract.has_rows()
+        return Abstract.has_rows() or Track.has_rows()
 
     def migrate(self):
+        self.load_data()
         self.migrate_event_abstracts()
+
+    def load_data(self):
+        self.print_step("Loading some data")
+        self.all_users_by_email = {}
+        all_users_query = User.query.options(joinedload('_all_emails')).filter_by(is_deleted=False)
+        for user in all_users_query:
+            for email in user.all_emails:
+                self.all_users_by_email[email] = user
 
     def migrate_event_abstracts(self):
         self.print_step("Migrating event abstracts")
         for conf, event in committing_iterator(self._iter_events()):
             amgr = conf.abstractMgr
             duration = amgr._submissionEndDate - amgr._submissionStartDate
-            if not amgr._activated and not amgr._abstracts and not amgr._notifTpls and duration < timedelta(minutes=1):
+            if (not amgr._activated and not amgr._abstracts and not amgr._notifTpls and
+                    duration < timedelta(minutes=1) and not conf.program):
                 continue
             mig = AbstractMigration(self, conf, event)
             try:
