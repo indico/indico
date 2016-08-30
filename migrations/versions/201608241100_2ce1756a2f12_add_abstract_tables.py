@@ -107,7 +107,6 @@ def upgrade():
         sa.Column('size', sa.BigInteger(), nullable=False),
         sa.Column('storage_file_id', sa.String(), nullable=False),
         sa.Column('filename', sa.String(), nullable=False),
-        sa.Column('created_dt', UTCDateTime, nullable=False),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_abstracts'
