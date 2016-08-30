@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.core.settings.converters import DatetimeConverter
+from indico.core.settings.converters import DatetimeConverter, EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
-
+from indico.util.i18n import _
+from indico.util.struct.enum import TitledEnum
 
 abstracts_settings = EventSettingsProxy('abstracts', {
     'description_settings': {
@@ -37,9 +38,40 @@ abstracts_settings = EventSettingsProxy('abstracts', {
 })
 
 
+class BOASortField(TitledEnum):
+    id = 'id'
+    title = 'title'
+    session_title = 'session_title'
+    speaker = 'speaker'
+    schedule = 'schedule'
+
+    __titles__ = {
+        id: _('ID'),
+        title: _('Title'),
+        session_title: _('Session title'),
+        speaker: _('Presenter'),
+        schedule: _('Schedule')
+    }
+
+
+class BOACorrespondingAuthorType(TitledEnum):
+    none = 'none'
+    submitter = 'submitter'
+    speakers = 'speakers'
+
+    __titles__ = {
+        none: _('None'),
+        submitter: _('Submitter'),
+        speakers: _('Speakers')
+    }
+
+
 boa_settings = EventSettingsProxy('abstracts_book', {
     'extra_text': '',
-    'sort_by': 'id',
-    'corresponding_author': 'submitter',
+    'sort_by': BOASortField.id,
+    'corresponding_author': BOACorrespondingAuthorType.submitter,
     'show_abstract_ids': False
+}, converters={
+    'sort_by': EnumConverter(BOASortField),
+    'corresponding_author': EnumConverter(BOACorrespondingAuthorType)
 })
