@@ -26,7 +26,7 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 logger = Logger.get('events.features')
-event_settings = EventSettingsProxy('features', {
+features_event_settings = EventSettingsProxy('features', {
     'enabled': None
 })
 
@@ -43,6 +43,14 @@ def _check_feature_definitions(app, **kwargs):
     # This will raise RuntimeError if the feature names are not unique
     from indico.modules.events.features.util import get_feature_definitions
     get_feature_definitions()
+
+
+@signals.event.created.connect
+def _event_created(event, **kwargs):
+    from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
+    feature_definitions = get_feature_definitions()
+    for feature in get_enabled_features(event):
+        feature_definitions[feature].enabled(event)
 
 
 @signals.event.type_changed.connect
