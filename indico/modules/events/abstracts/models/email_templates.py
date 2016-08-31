@@ -49,6 +49,12 @@ class AbstractEmailTemplate(db.Model):
         index=True,
         nullable=False
     )
+    #: The relative position of the template in the list of templates
+    position = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_position
+    )
     #: The address to use as Reply-To in the email
     reply_to_address = db.Column(
         db.String,
@@ -71,15 +77,14 @@ class AbstractEmailTemplate(db.Model):
         nullable=False,
         default=[],
     )
-
-    #: Whether to include authors' email addresses as To for emails
-    include_authors = db.Column(
+    #: Whether to include the submitter's email address as To for emails
+    include_submitter = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    #: Whether to include the submitter's email address as To for emails
-    include_submitter = db.Column(
+    #: Whether to include authors' email addresses as To for emails
+    include_authors = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -89,12 +94,6 @@ class AbstractEmailTemplate(db.Model):
         db.Boolean,
         nullable=False,
         default=False
-    )
-    #: The relative position of the template in the list of templates
-    position = db.Column(
-        db.Integer,
-        nullable=False,
-        default=_get_next_position
     )
     #: Whether to stop checking the rest of the conditions when a match is found
     stop_on_match = db.Column(
