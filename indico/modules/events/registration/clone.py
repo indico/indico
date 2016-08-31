@@ -22,8 +22,9 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features.util import is_feature_enabled
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormItem, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.i18n import _
@@ -107,7 +108,7 @@ class RegistrationCloner(EventCloner):
 
     @property
     def is_default(self):
-        return self.old_event.as_legacy.getType() == 'meeting'
+        return self.old_event.type_ == EventType.meeting
 
     def run(self, new_event, cloners, shared_data):
         form_map = shared_data['registration_forms']['form_map']

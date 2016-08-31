@@ -79,7 +79,7 @@ def _get_default_menu_entries(sender, **kwargs):
 
 @signals.event.cloned.connect
 def _event_cloned(old_event, new_event, **kwargs):
-    if old_event.as_legacy.getType() == 'conference':
+    if old_event.type_ == EventType.conference:
         return
     # for meetings/lecture we want to keep the default timetable style in all cases
     theme = layout_settings.get(old_event, 'timetable_theme')
