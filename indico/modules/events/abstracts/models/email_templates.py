@@ -119,28 +119,6 @@ class AbstractEmailTemplate(db.Model):
     # relationship backrefs:
     # - logs (AbstractEmailLogEntry.email_template)
 
-    @property
-    def to_emails(self):
-        emails = {}
-        if self.include_authors:
-            # TODO: get list of abstract's authors
-            authors_emails = {}
-            emails.update(authors_emails)
-        if self.include_submitter:
-            # TODO: get email of abstract's submitter
-            submitter_email = ''
-            emails.add(submitter_email)
-        return emails
-
-    @property
-    def cc_emails(self):
-        emails = set(self.extra_cc_emails)
-        if self.include_coauthors:
-            # TODO: get list of abstract's co-authors
-            coauthors_emails = {}
-            emails.update(coauthors_emails)
-        return emails
-
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, email_tpl_id=self.id)
