@@ -20,6 +20,7 @@ from collections import OrderedDict
 
 from indico.core.db import db
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -136,3 +137,16 @@ class AbstractListGenerator(ListGeneratorBase):
             'filtering_enabled': filtering_enabled,
             'filter_statistics': filter_statistics
         }
+
+
+def build_default_email_template(event, tpl_type):
+    """Build a default e-mail template based on a notification type provided by the user."""
+    email = get_template_module('events/abstracts/emails/abstract_{}_notification.txt'.format(tpl_type))
+    tpl = AbstractEmailTemplate(body=email.get_body(),
+                                extra_cc_emails=[],
+                                reply_to_address=to_unicode(event.as_legacy.getSupportInfo().getEmail()) or '',
+                                subject=email.get_subject(),
+                                include_authors=True,
+                                include_submitter=True,
+                                include_coauthors=True)
+    return tpl
