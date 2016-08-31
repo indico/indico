@@ -47,9 +47,10 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    from indico.models.events.abstracts.models.abstracts import Abstract
-    from indico.models.events.abstracts.models.comments import AbstractComment
-    from indico.models.events.abstracts.models.reviews import AbstractReview
+    from indico.modules.events.abstracts.models.abstracts import Abstract
+    from indico.modules.events.abstracts.models.comments import AbstractComment
+    from indico.modules.events.abstracts.models.reviews import AbstractReview
+    from indico.modules.events.abstracts.settings import abstracts_settings
     Abstract.query.filter_by(submitter_id=source.id).update({Abstract.submitter_id: target.id})
     Abstract.query.filter_by(modified_by_id=source.id).update({Abstract.modified_by_id: target.id})
     Abstract.query.filter_by(judge_id=source.id).update({Abstract.judge_id: target.id})
