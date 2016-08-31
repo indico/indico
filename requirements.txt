@@ -1,4 +1,5 @@
 --find-links https://github.com/indico/indico-fonts/releases/
+setuptools>=18.5
 Babel==1.3
 Mako==0.9.1
 MarkupSafe==0.15
@@ -42,6 +43,6 @@ beautifulsoup4==4.2.1
 Pillow==2.6.1
 qrcode==3.0
 Markdown==2.3.1
-bleach==1.4
+bleach==1.4.3
 redis==2.9.1
 hiredis==0.1.3
