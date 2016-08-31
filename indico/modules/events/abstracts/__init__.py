@@ -36,7 +36,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user):
         return
     if event.has_feature('abstracts'):
-        return SideMenuItem('abstracts', _('Abstracts'), url_for('abstracts.manage_abstracts', event),
+        return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.manage_abstracts', event),
                             section='organization')
 
 
@@ -62,7 +62,7 @@ def _merge_users(target, source, **kwargs):
 
 class AbstractsFeature(EventFeature):
     name = 'abstracts'
-    friendly_name = _('Abstracts')
+    friendly_name = _('Call for Abstracts')
     description = _('Gives event managers the opportunity to open a "Call for Abstracts" and use the abstract '
                     'reviewing workflow.')
 
