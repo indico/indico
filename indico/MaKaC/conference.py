@@ -19,9 +19,9 @@ import stat
 from datetime import datetime
 
 from BTrees.OOBTree import OOBTree
-from flask import request, has_request_context
+from flask import request, has_request_context, session
 from persistent import Persistent
-from pytz import all_timezones, timezone
+from pytz import all_timezones, timezone, utc
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
@@ -30,11 +30,10 @@ from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.modules.events.cloning import EventCloner
-from indico.modules.events.features import event_settings as features_event_settings
-from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
+from indico.modules.events.features import features_event_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.util import track_time_changes
+from indico.modules.events.operations import create_event
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import L_, _
@@ -111,16 +110,6 @@ class Conference(CommonObjectBase):
     """
 
     fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
-
-    @classmethod
-    @unify_user_args
-    def new(cls, category, creator, title, start_dt, end_dt, timezone, event_type, add_creator_as_manager=True):
-        conf = cls()
-        event = Event(creator=creator, category=category, title=to_unicode(title).strip(),
-                      start_dt=start_dt, end_dt=end_dt, timezone=timezone, type_=event_type)
-        ConferenceHolder().add(conf, event, add_creator_as_manager=add_creator_as_manager)
-        signals.event.created.send(event)
-        return conf
 
     def __init__(self, id=''):
         self.id = id
@@ -889,48 +878,39 @@ class Conference(CommonObjectBase):
         return self.as_event.theme
 
     def clone(self, startDate, options, eventManager=None, userPerformingClone=None):
-        # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
-        managing = options.get("managing", None)
-        if managing is not None:
-            creator = managing
-        else:
-            creator = self.as_event.creator
-        conf = Conference.new(self.as_event.category, creator=creator, title=self.getTitle(),
-                              start_dt=self.getStartDate(), end_dt=self.getEndDate(), timezone=self.getTimezone(),
-                              event_type=self.as_event.type_, add_creator_as_manager=False)
-        conf.setTitle(self.getTitle())
-        conf.setDescription(self.getDescription())
-        conf.setTimezone(self.getTimezone())
-        startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
-        timeDelta = startDate - self.getStartDate()
-        endDate = self.getEndDate() + timeDelta
-        with track_time_changes():
-            conf.setDates(startDate, endDate, moveEntries=1, enforce_constraints=False)
+        # startDate is in the timezone of the event
+        old_event = self.as_event
+        start_dt = old_event.tzinfo.localize(startDate).astimezone(utc)
+        end_dt = start_dt + old_event.duration
+        data = {
+            'start_dt': start_dt,
+            'end_dt': end_dt,
+            'timezone': old_event.timezone,
+            'title': old_event.title,
+            'description': old_event.description,
+            'visibility': old_event.visibility
+        }
+        event = create_event(old_event.category, old_event.type_, data,
+                             features=features_event_settings.get(self, 'enabled'),
+                             add_creator_as_manager=False)
+        conf = event.as_legacy
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
-        conf.setVisibility(self.getVisibility())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
         # Tracks in a conference
-        if options.get("tracks",False) :
-            for tr in self.getTrackList() :
+        if options.get('tracks', False):
+            for tr in self.getTrackList():
                 conf.addTrack(tr.clone(conf))
         conf.notifyModification()
 
-        # Copy the list of enabled features
-        features_event_settings.set_multi(conf.as_event, features_event_settings.get_all(self))
-        feature_definitions = get_feature_definitions()
-        for feature in get_enabled_features(conf.as_event):
-            feature_definitions[feature].enabled(conf.as_event)
-
         # Run the new modular cloning system
-        EventCloner.run_cloners(self.as_event, conf.as_event)
-        signals.event.cloned.send(self.as_event, new_event=conf.as_event)
+        EventCloner.run_cloners(old_event, event)
+        signals.event.cloned.send(old_event, new_event=event)
 
         # Grant access to the event creator -- must be done after modular cloners
         # since cloning the event ACL would result in a duplicate entry
-        if managing is not None:
-            with conf.as_event.logging_disabled:
-                conf.as_event.update_principal(managing.user, full_access=True)
+        with event.logging_disabled:
+            event.update_principal(session.user, full_access=True)
 
         return conf
 
@@ -1043,17 +1023,12 @@ class ConferenceHolder( ObjectHolder ):
     def _newId(self):
         raise RuntimeError('Tried to get new event id from zodb')
 
-    def add(self, conf, event, add_creator_as_manager=True):
-        db.session.add(event)
-        db.session.flush()
+    def add(self, conf, event):
+        event.assign_id()
         conf.setId(event.id)
         if conf.id in self._getIdx():
             raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
         ObjectHolder.add(self, conf)
-        if add_creator_as_manager:
-            with event.logging_disabled:
-                event.update_principal(event.creator, full_access=True)
-        db.session.flush()
 
     def getById(self, id, quiet=False):
         if id == 'default':
