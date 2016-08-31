@@ -182,7 +182,10 @@
         // if we haven't done that already.
         //
         function updateMJ(elem, cb) {
-            if (!pending && ready && $(elem).data('no-mathjax') === undefined) {
+            var mathjaxEnabled = ($(elem).data('no-mathjax') === undefined);
+            if (!mathjaxEnabled) {
+                cb();
+            } else if (!pending && ready) {
                 pending = true;
                 HUB.cancelTypeset = false;
                 HUB.Queue(restartMJ, cb);
