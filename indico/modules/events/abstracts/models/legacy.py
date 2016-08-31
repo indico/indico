@@ -94,6 +94,12 @@ class LegacyAbstract(DescriptionMixin, db.Model):
             lazy=True
         )
     )
+    contribution = db.relationship(
+        'Contribution',
+        lazy=True,
+        primaryjoin='Contribution.abstract_id == LegacyAbstract.id',
+        foreign_keys='Contribution.abstract_id'
+    )
     type = db.relationship(
         'ContributionType',
         lazy=True,
