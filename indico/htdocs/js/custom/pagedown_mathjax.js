@@ -203,7 +203,7 @@
             converterObject.hooks.chain("preConversion", removeMath);
             converterObject.hooks.chain("postConversion", replaceMath);
 
-            var preview = function() {
+            function preview() {
                 updateMJ(elem, function() {
                     var new_height =  $preview.outerHeight(),
                         $wrapper = $preview.closest('.md-preview-wrapper'),
@@ -218,7 +218,7 @@
 
                     $preview.scrollTop(new_height);
                 });
-            };
+            }
 
             editorObject.hooks.chain("onPreviewRefresh", preview);
             typeset($preview.get(0));
@@ -233,7 +233,7 @@
                 converter = Markdown.getSanitizingConverter();
 
             converter.hooks.chain("preBlockGamut", function block_handler(text, rbg) {
-                return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+                return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function(whole, inner) {
                     return "<blockquote>" + rbg(inner) + "</blockquote>\n";
                 });
             });
