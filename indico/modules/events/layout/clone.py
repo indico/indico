@@ -19,9 +19,10 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
+from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, EventPage
-from indico.modules.events.features.util import is_feature_enabled
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 
 
@@ -56,7 +57,7 @@ class LayoutCloner(EventCloner):
 
     @property
     def is_visible(self):
-        return self.old_event.as_legacy.getType() == 'conference'
+        return self.old_event.type_ == EventType.conference
 
     def run(self, new_event, cloners, shared_data):
         for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
