@@ -291,6 +291,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         'EventPage',
         lazy=True,
         foreign_keys=[default_page_id],
+        post_update=True,
         # don't use this backref. we just need it so SA properly NULLs
         # this column when deleting the default page
         backref=db.backref('_default_page_of_event', lazy=True)
