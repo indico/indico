@@ -18,8 +18,11 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
-from indico.modules.events import EventLogKind, EventLogRealm, logger
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
+from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.references import ReferenceType
 
@@ -52,18 +55,40 @@ def create_event_references(event, data):
         logger.info('Reference "%s" created by %s', reference, session.user)
 
 
-def create_event(category, event_type, data):
-    from MaKaC.conference import Conference
-    conf = Conference.new(category, creator=session.user, title=data.pop('title'), start_dt=data.pop('start_dt'),
-                          end_dt=data.pop('end_dt'), timezone=data.pop('timezone'), event_type=event_type)
-    event = conf.as_event
+@no_autoflush
+def create_event(category, event_type, data, add_creator_as_manager=True, features=None):
+    """Create a new event.
+
+    :param category: The category in which to create the event
+    :param event_type: An `EventType` value
+    :param data: A dict containing data used to populate the event
+    :param add_creator_as_manager: Whether the creator (current user)
+                                   should be added as a manager
+    :param features: A list of features that will be enabled for the
+                     event. If set, only those features will be used
+                     and the default feature set for the event type
+                     will be ignored.
+    """
+    from MaKaC.conference import Conference, ConferenceHolder
+    conf = Conference()
+    event = Event(category=category, type_=event_type)
+    ConferenceHolder().add(conf, event)
+    data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
-    if theme is not None:
-        layout_settings.set(event, 'timetable_theme', theme)
     event.populate_from_dict(data)
     db.session.flush()
+    if theme is not None:
+        layout_settings.set(event, 'timetable_theme', theme)
+    if add_creator_as_manager:
+        with event.logging_disabled:
+            event.update_principal(event.creator, full_access=True)
+    if features is not None:
+        features_event_settings.set(conf.as_event, 'enabled', features)
+    db.session.flush()
+    signals.event.created.send(event)
     logger.info('Event %r created in %r by %r ', event, category, session.user)
     event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event created', session.user)
+    db.session.flush()
     return event
 
 

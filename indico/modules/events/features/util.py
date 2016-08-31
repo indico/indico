@@ -23,7 +23,7 @@ from werkzeug.exceptions import NotFound
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import Event
-from indico.modules.events.features import event_settings as features_event_settings
+from indico.modules.events.features import features_event_settings
 from indico.util.signals import named_objects_from_signal
 
 
