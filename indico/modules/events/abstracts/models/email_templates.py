@@ -20,6 +20,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
 from indico.core.db import db
 from indico.util.locators import locator_property
+from indico.util.string import return_ascii, format_repr
 
 
 def _get_next_position(context):
@@ -122,3 +123,7 @@ class AbstractEmailTemplate(db.Model):
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, email_tpl_id=self.id)
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'id', 'event_id', _text=self.title)
