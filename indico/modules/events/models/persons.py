@@ -65,12 +65,6 @@ class AuthorsSpeakersMixin(object):
                 if person_link.is_speaker]
 
     @property
-    def speaker_names(self):
-        return [person_link.full_name
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
-                if person_link.is_speaker]
-
-    @property
     def primary_authors(self):
         from indico.modules.events.contributions.models.persons import AuthorType
         return [person_link

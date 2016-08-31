@@ -42,11 +42,17 @@
          {{ contrib.description }}
      </div>
     {{ render_time_and_location(contrib, editable=(editable and can_manage_contributions)) }}
-    {% if contrib.speaker_names or (editable and can_manage_contributions) %}
+    {% if contrib.speakers or (editable and can_manage_contributions) %}
         <span class="hr"></span>
         <dl class="i-data-list thirty-seventy">
-            {% if contrib.speaker_names %}
-                <dt>{% trans count=contrib.speaker_names|count %}Presenter{% pluralize %}Presenters{% endtrans %}</dt>
+            {% if contrib.speakers %}
+                <dt>
+                    {% trans count=contrib.speakers|count -%}
+                        Presenter
+                    {%- pluralize -%}
+                        Presenters
+                    {%- endtrans %}
+                </dt>
                 <dd>
                     {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
                         <div>{{ speaker.full_name }}</div>
