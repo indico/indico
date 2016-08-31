@@ -1,0 +1,11 @@
+{% from 'forms/_form.html' import form_header, form_row, form_rows, form_footer  %}
+
+{% block content %}
+    {{ form_header(form) }}
+    {{ form_rows(form, skip=('body',)) }}
+    {{ form_row(form.body, widget_attrs={'rows': 15}) }}
+    {% call form_footer(form) %}
+        <input type="submit" class="i-button highlight big" value="{% trans %}Save{% endtrans %}">
+        <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}

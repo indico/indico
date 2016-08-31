@@ -35,6 +35,9 @@ class Condition(object):
     required = False
     #: A short description of the condition.
     description = None
+    #: {value: condition_name} containing conditions that are allowed for each value type
+    #: non-specified values are considered as compatible with all other conditions.
+    compatible_with = None
 
     @classproperty
     @classmethod
