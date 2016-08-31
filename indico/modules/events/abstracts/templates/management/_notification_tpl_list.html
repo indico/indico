@@ -1,0 +1,67 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_notification_list(event) -%}
+    {% if not event.abstract_email_templates %}
+        {% call message_box('info', classes='no-rules-placeholder') %}
+            {% trans %}There are currently no e-mail templates{% endtrans%}
+        {% endcall %}
+    {% else %}
+        <ul class="email-template-list">
+            {% for tpl in event.abstract_email_templates %}
+                <li class="email-template i-box">
+                    <div class="ui-i-box-sortable-handle"></div>
+                    <div class="i-box-header">
+                        <span class="i-box-title">{{ tpl.title }}</span>
+                        <div class="i-box-buttons toolbar right">
+                            <div class="group">
+                                <a class="i-button icon-edit arrow js-edit-tpl-dropdown"
+                                   data-toggle="dropdown">{% trans %}Edit{% endtrans %}</a>
+                                <ul class="dropdown">
+                                    <li>
+                                        <a data-href="{{ url_for('.email_tpl_rule_edit', tpl) }}"
+                                           title="{% trans %}Edit ruleset{% endtrans %}"
+                                           data-title="{% trans %}Edit ruleset{% endtrans %}"
+                                           data-ajax-dialog>
+                                           {% trans %}Ruleset{% endtrans %}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-href="{{ url_for('.email_tpl_text_edit', tpl) }}"
+                                           title="{% trans %}Edit e-mail text{% endtrans %}"
+                                           data-title="{% trans %}Edit e-mail text{% endtrans %}"
+                                           data-ajax-dialog>
+                                           {% trans %}E-mail text{% endtrans %}
+                                        </a>
+                                    </li>
+                                </ul>
+                                <a href="#" class="i-button js-delete-item icon-remove icon-only"
+                                   title="{% trans %}Delete template{% endtrans %}"
+                                   data-qtip-style="danger"
+                                   data-href="{{ url_for('.email_tpl_delete', tpl) }}"
+                                   data-method="DELETE"
+                                   data-confirm="{% trans %}Are you sure you want to delete this template?{% endtrans %}"
+                                   data-title="{% trans %}Delete template{% endtrans %}"
+                                   data-update="#email-template-manager">
+                                </a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="toolbar">
+        <div class="group right">
+            <a href="#" class="i-button icon-plus highlight"
+               data-href="{{ url_for('.email_tpl_add', event) }}"
+               data-title="{% trans %}Add a new template{% endtrans %}"
+               data-ajax-dialog
+               data-update="#email-template-manager">
+                {% trans %}Add new one{% endtrans %}
+            </a>
+        </div>
+    </div>
+    <script>
+        $('.js-edit-tpl-dropdown').parent().dropdown();
+    </script>
+{%- endmacro %}

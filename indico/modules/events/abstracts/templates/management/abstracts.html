@@ -15,7 +15,10 @@
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a href="#" class="i-button icon-mail">
+                    <a href="#" class="i-button icon-mail"
+                       data-href="{{ url_for('.email_tpl_list', event) }}"
+                       data-title="{% trans %}Configure e-mail notifications{% endtrans %}"
+                       data-ajax-dialog>
                         {% trans %}Notifications{% endtrans %}
                     </a>
                 </div>
