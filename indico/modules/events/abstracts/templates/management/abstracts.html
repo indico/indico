@@ -25,7 +25,10 @@
                     </a>
                 </div>
                 <div class="group">
-                    <a href="#" class="i-button icon-settings">
+                    <a href="#" class="i-button icon-settings"
+                       data-href="{{ url_for('.manage_submission_settings', event) }}"
+                       data-title="{% trans %}Configure abstract submission{% endtrans %}"
+                       data-ajax-dialog>
                         {% trans %}Settings{% endtrans %}
                     </a>
                 </div>
