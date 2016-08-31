@@ -20,12 +20,14 @@ import traceback
 from datetime import timedelta
 from operator import attrgetter
 
+from pytz import utc
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract
-from indico.modules.events.abstracts.settings import boa_settings, BOACorrespondingAuthorType, BOASortField
+from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings,
+                                                      BOACorrespondingAuthorType, BOASortField)
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
@@ -50,8 +52,9 @@ class AbstractMigration(object):
 
     def run(self):
         self.importer.print_success(cformat('%{blue!}{}').format(self.event), event_id=self.event.id)
-        self._migrate_boa_settings()
         self._migrate_tracks()
+        self._migrate_boa_settings()
+        self._migrate_settings()
         # TODO...
 
     def _user_from_legacy(self, legacy_user):
@@ -75,21 +78,8 @@ class AbstractMigration(object):
             self.legacy_warnings_shown.add(msg)
         return user
 
-    def _migrate_boa_settings(self):
-        boa_config = self.conf._boa
-        sort_field_map = {'number': 'id', 'none': 'id', 'name': 'abstract_title', 'sessionTitle': 'session_title',
-                          'speakers': 'speaker', 'submitter': 'id'}
-        try:
-            sort_by = sort_field_map.get(boa_config._sortBy, boa_config._sortBy)
-        except AttributeError:
-            sort_by = 'id'
-        corresponding_author = getattr(boa_config, '_correspondingAuthor', 'submitter')
-        boa_settings.set_multi(self.event, {
-            'extra_text': convert_to_unicode(boa_config._text),
-            'sort_by': BOASortField[sort_by],
-            'corresponding_author': BOACorrespondingAuthorType[corresponding_author],
-            'show_abstract_ids': bool(getattr(boa_config, '_showIds', False))
-        })
+    def _event_to_utc(self, dt):
+        return self.event.tzinfo.localize(dt).astimezone(utc)
 
     def _migrate_tracks(self):
         for pos, old_track in enumerate(self.conf.program, 1):
@@ -108,6 +98,47 @@ class AbstractMigration(object):
                 self.event.update_principal(user, add_roles={'abstract_reviewer'}, quiet=True)
             self.track_map[old_track] = track
             self.event.tracks.append(track)
+
+    def _migrate_boa_settings(self):
+        boa_config = self.conf._boa
+        sort_field_map = {'number': 'id', 'none': 'id', 'name': 'abstract_title', 'sessionTitle': 'session_title',
+                          'speakers': 'speaker', 'submitter': 'id'}
+        try:
+            sort_by = sort_field_map.get(boa_config._sortBy, boa_config._sortBy)
+        except AttributeError:
+            sort_by = 'id'
+        corresponding_author = getattr(boa_config, '_correspondingAuthor', 'submitter')
+        boa_settings.set_multi(self.event, {
+            'extra_text': convert_to_unicode(boa_config._text),
+            'sort_by': BOASortField[sort_by],
+            'corresponding_author': BOACorrespondingAuthorType[corresponding_author],
+            'show_abstract_ids': bool(getattr(boa_config, '_showIds', False))
+        })
+
+    def _migrate_settings(self):
+        start_dt = self._event_to_utc(self.amgr._submissionStartDate)
+        end_dt = self._event_to_utc(self.amgr._submissionEndDate)
+        modification_end_dt = (self._event_to_utc(self.amgr._modifDeadline)
+                               if getattr(self.amgr, '_modifDeadline', None)
+                               else None)
+        assert start_dt < end_dt
+        if modification_end_dt and modification_end_dt - end_dt < timedelta(minutes=1):
+            if modification_end_dt != end_dt:
+                self.importer.print_warning('Ignoring mod deadline ({} > {})'.format(end_dt, modification_end_dt),
+                                            event_id=self.event.id)
+            modification_end_dt = None
+        abstracts_settings.set_multi(self.event, {
+            'start_dt': start_dt,
+            'end_dt': end_dt,
+            'modification_end_dt': modification_end_dt,
+            'announcement': convert_to_unicode(self.amgr._announcement),
+            'allow_multiple_tracks': bool(getattr(self.amgr, '_multipleTracks', True)),
+            'tracks_required': bool(getattr(self.amgr, '_tracksMandatory', False)),
+            'allow_attachments': bool(getattr(self.amgr, '_attachFiles', False)),
+            'allow_speakers': bool(getattr(self.amgr, '_showSelectAsSpeaker', True)),
+            'speakers_required': bool(getattr(self.amgr, '_selectSpeakerMandatory', True)),
+            'authorized_submitters': set(filter(None, map(self._user_from_legacy, self.amgr._authorizedSubmitter)))
+        })
 
 
 class EventAbstractsImporter(Importer):
