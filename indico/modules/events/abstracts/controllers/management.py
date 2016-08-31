@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash, jsonify
 
-from indico.modules.events.abstracts.forms import BOASettingsForm
-from indico.modules.events.abstracts.settings import boa_settings
+from indico.modules.events.abstracts.forms import BOASettingsForm, AbstractSubmissionSettingsForm
+from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.util.i18n import _
@@ -62,6 +62,18 @@ class RHManageBOA(RHManageAbstractsBase):
         if form.validate_on_submit():
             boa_settings.set_multi(self.event_new, form.data)
             flash(_('Book of Abstract settings have been saved'), 'success')
+            return jsonify_data()
+        return jsonify_form(form)
+
+
+class RHManageAbstractSubmission(RHManageAbstractsBase):
+    """Configure abstract submission"""
+
+    def _process(self):
+        form = AbstractSubmissionSettingsForm(obj=FormDefaults(**abstracts_settings.get_all(self.event_new)))
+        if form.validate_on_submit():
+            abstracts_settings.set_multi(self.event_new, form.data)
+            flash(_('Abstract submission settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
 
