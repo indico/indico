@@ -83,7 +83,7 @@ class ReminderCloner(EventCloner):
         attrs = get_simple_column_attrs(db.m.EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
         attrs |= {'creator_id'}
         for old_reminder in self._find_reminders():
-            scheduled_dt = new_event.as_legacy.getStartDate() - old_reminder.event_start_delta
+            scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.
             # We ignore the time on purpose so cloning an event shortly before will
             # still trigger a reminder that's just a few hours overdue.

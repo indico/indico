@@ -21,6 +21,7 @@ from sqlalchemy.orm import joinedload, defaultload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
+from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.i18n import _
@@ -37,11 +38,11 @@ class TimetableCloner(EventCloner):
 
     @property
     def is_default(self):
-        return self.old_event.as_legacy.getType() == 'meeting'
+        return self.old_event.type_ == EventType.meeting
 
     @property
     def is_visible(self):
-        return self.old_event.as_legacy.getType() in {'meeting', 'conference'}
+        return self.old_event.type_ in {EventType.meeting, EventType.conference}
 
     def run(self, new_event, cloners, shared_data):
         self._session_block_map = shared_data['sessions']['session_block_map']
@@ -51,7 +52,7 @@ class TimetableCloner(EventCloner):
         db.session.flush()
 
     def _clone_timetable(self, new_event):
-        offset = new_event.as_legacy.getStartDate() - self.old_event.as_legacy.getStartDate()
+        offset = new_event.start_dt - self.old_event.start_dt
         # no need to copy the type; it's set automatically based on the object
         attrs = get_simple_column_attrs(TimetableEntry) - {'type', 'start_dt'}
         break_strategy = defaultload('break_')
