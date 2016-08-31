@@ -29,7 +29,7 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
                 <div class="subtitle">
                     % if cloned_from:
                         ${ _(u'Created by {name} ({email}) from event on <a href="{link}" title="{title}">{date}</a>').format(
-                            date=formatDate(cloned_from.start_dt, format="medium"),
+                            date=format_date(cloned_from.start_dt, format="medium").decode('utf-8'),
                             title=event.title,
                             link=url_for('event_mgmt.conferenceModification', cloned_from),
                             name=event.creator.full_name,

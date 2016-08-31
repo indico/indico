@@ -43,7 +43,7 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
 from indico.util.serializer import Serializer
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
@@ -649,19 +649,19 @@ class Reservation(Serializer, db.Model):
         repetition_fields = {'repeat_frequency', 'repeat_interval'}
         # pretty names for logging
         field_names = {
-            'start_dt/date': "start date",
-            'end_dt/date': "end date",
-            'start_dt/time': "start time",
-            'end_dt/time': "end time",
-            'repetition': "booking type",
-            'booked_for_user': "'Booked for' user",
-            'contact_email': "contact email",
-            'contact_phone': "contact phone number",
-            'booking_reason': "booking reason",
-            'used_equipment': "list of equipment",
-            'needs_assistance': "option 'General Assistance'",
-            'uses_vc': "option 'Uses Videoconference'",
-            'needs_vc_assistance': "option 'Videoconference Setup Assistance'"
+            'start_dt/date': u"start date",
+            'end_dt/date': u"end date",
+            'start_dt/time': u"start time",
+            'end_dt/time': u"end time",
+            'repetition': u"booking type",
+            'booked_for_user': u"'Booked for' user",
+            'contact_email': u"contact email",
+            'contact_phone': u"contact phone number",
+            'booking_reason': u"booking reason",
+            'used_equipment': u"list of equipment",
+            'needs_assistance': u"option 'General Assistance'",
+            'uses_vc': u"option 'Uses Videoconference'",
+            'needs_vc_assistance': u"option 'Videoconference Setup Assistance'"
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
@@ -716,8 +716,8 @@ class Reservation(Serializer, db.Model):
         for field, change in changes.iteritems():
             field_title = field_names.get(field, field)
             converter = change['converter']
-            old = converter(change['old'])
-            new = converter(change['new'])
+            old = to_unicode(converter(change['old']))
+            new = to_unicode(converter(change['new']))
             if not old:
                 log.append(u"The {} was set to '{}'".format(field_title, new))
             elif not new:

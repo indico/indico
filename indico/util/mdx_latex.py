@@ -74,6 +74,7 @@ import sys
 import textwrap
 from io import BytesIO
 from mimetypes import guess_extension
+from requests.exceptions import InvalidURL
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
@@ -248,7 +249,10 @@ def latex_render_image(src, alt, strict=False):
         if urlparse(src).scheme not in ('http', 'https'):
             raise ImageURLException("URL scheme not supported: {}".format(src))
         else:
-            resp = requests.get(src, verify=False)
+            try:
+                resp = requests.get(src, verify=False)
+            except InvalidURL:
+                raise ImageURLException("Cannot understand URL '{}'".format(src))
             extension = None
 
             if resp.status_code != 200:

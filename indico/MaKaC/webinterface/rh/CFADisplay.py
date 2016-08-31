@@ -183,16 +183,16 @@ class _AbstractSubmissionNotification:
         msg.append("")
         msg.append(i18nformat("""_("Comments"): %s""") % self._abstract.getComments())
         msg.append("")
-        return "\n".join(map(to_unicode, msg))
+        return u"\n".join(map(to_unicode, msg))
 
     def getBody(self):
         msg = self.getMsg()
-        return i18nformat("""
+        return i18nformat(u"""
 _("The following email has been sent to %s"):
 
 ===
 
-%s""") % (self.getDestination().getFullName(), msg)
+%s""") % (to_unicode(self.getDestination().getFullName()), msg)
 
 
 class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):

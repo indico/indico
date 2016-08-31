@@ -197,7 +197,7 @@ class WUserAbstracts(WConfDisplayBodyBase):
         if isinstance(status, review.AbstractStatusAccepted):
             statusLabel = _("Accepted")
             if status.getType() is not None and status.getType() != "":
-                return "%s as %s" % (statusLabel, status.getType().name)
+                return "%s as %s" % (statusLabel, status.getType().name.encode('utf-8'))
         elif isinstance(status, review.AbstractStatusRejected):
             return _("Rejected")
         elif isinstance(status, review.AbstractStatusWithdrawn):
