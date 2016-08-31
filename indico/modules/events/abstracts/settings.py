@@ -61,7 +61,15 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     },
     'start_dt': None,
     'end_dt': None,
-    'modification_end_dt': None
+    'modification_end_dt': None,
+    'announcement': '',
+    'allow_multiple_tracks': True,
+    'tracks_required': False,
+    'allow_attachments': False,
+    'allow_speakers': True,
+    'speakers_required': True
+}, acls={
+    'authorized_submitters'
 }, converters={
     'start_dt': DatetimeConverter,
     'end_dt': DatetimeConverter,

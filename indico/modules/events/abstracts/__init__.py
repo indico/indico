@@ -57,6 +57,7 @@ def _merge_users(target, source, **kwargs):
     AbstractComment.query.filter_by(user_id=source.id).update({AbstractComment.user_id: target.id})
     AbstractComment.query.filter_by(modified_by_id=source.id).update({AbstractComment.modified_by_id: target.id})
     AbstractReview.query.filter_by(user_id=source.id).update({AbstractReview.user_id: target.id})
+    abstracts_settings.acls.merge_users(target, source)
 
 
 class AbstractsFeature(EventFeature):
