@@ -543,11 +543,14 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
 
 
-def sanitize_email(email):
-    if '<' not in email:
+def sanitize_email(email, require_valid=False):
+    if '<' in email:
+        m = re.search(r'<([^>]+)>', email)
+        email = email if m is None else m.group(1)
+    if not require_valid or is_valid_mail(email, False):
         return email
-    m = re.search(r'<([^>]+)>', email)
-    return email if m is None else m.group(1)
+    else:
+        return None
 
 
 def inject_unicode_debug(s, level=1):
