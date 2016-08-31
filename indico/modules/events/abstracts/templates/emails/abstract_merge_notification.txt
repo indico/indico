@@ -1,0 +1,18 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    Abstract Merge notification (#{abstract_id})
+{%- endblock %}
+
+{% block header_recipient -%}
+    {submitter_name}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        Your abstract "{abstract_title}" with ID #{abstract_id} has been merged into "{merge_target_abstract_title}".
+
+        Kind regards,
+        The organizers of {event_title}
+    {%- endfilter -%}
+{%- endblock %}

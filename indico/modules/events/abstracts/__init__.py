@@ -24,7 +24,9 @@ from indico.core.roles import ManagementRole
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import EventType, Event
+from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
 from indico.util.i18n import _
+from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -66,6 +68,13 @@ def _merge_users(target, source, **kwargs):
     abstracts_settings.acls.merge_users(target, source)
 
 
+@signals.get_conditions.connect_via('abstract-notifications')
+def _get_abstract_notification_rules(sender, **kwargs):
+    yield StateCondition
+    yield TrackCondition
+    yield ContributionTypeCondition
+
+
 class AbstractsFeature(EventFeature):
     name = 'abstracts'
     friendly_name = _('Call for Abstracts')
@@ -90,3 +99,12 @@ class AbstractReviewerRole(ManagementRole):
     name = 'abstract_reviewer'
     friendly_name = _('Reviewer')
     description = _('Grants abstract reviewing rights on an event.')
+
+
+@signals.get_placeholders.connect_via('abstract-notification-email')
+def _get_notification_placeholders(sender, **kwargs):
+    from indico.modules.events.abstracts import placeholders
+    for name in placeholders.__all__:
+        obj = getattr(placeholders, name)
+        if issubclass(obj, Placeholder):
+            yield obj

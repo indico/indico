@@ -17,9 +17,13 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
+from indico.modules.events.abstracts.controllers.email_templates import (RHEmailTemplateAdd, RHEmailTemplateRuleEdit,
+                                                                         RHEmailTemplateTextEdit, RHEmailTemplateList,
+                                                                         RHEmailTemplateDelete)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract)
+
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -37,6 +41,16 @@ _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractLi
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHAbstractListStaticURL, methods=('POST',))
+
+# E-mail templates
+_bp.add_url_rule('/manage/abstracts/email-templates/', 'email_tpl_list', RHEmailTemplateList)
+_bp.add_url_rule('/manage/abstracts/email-templates/add', 'email_tpl_add', RHEmailTemplateAdd, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_delete', RHEmailTemplateDelete,
+                 methods=('DELETE',))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit', 'email_tpl_rule_edit',
+                 RHEmailTemplateRuleEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit-text', 'email_tpl_text_edit',
+                 RHEmailTemplateTextEdit, methods=('GET', 'POST'))
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
