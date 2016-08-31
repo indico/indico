@@ -917,10 +917,10 @@ class Conference(CommonObjectBase):
         conf.notifyModification()
 
         # Copy the list of enabled features
-        features_event_settings.set_multi(conf, features_event_settings.get_all(self))
+        features_event_settings.set_multi(conf.as_event, features_event_settings.get_all(self))
         feature_definitions = get_feature_definitions()
-        for feature in get_enabled_features(conf):
-            feature_definitions[feature].enabled(conf)
+        for feature in get_enabled_features(conf.as_event):
+            feature_definitions[feature].enabled(conf.as_event)
 
         # Run the new modular cloning system
         EventCloner.run_cloners(self.as_event, conf.as_event)
