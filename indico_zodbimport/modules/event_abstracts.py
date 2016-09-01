@@ -20,12 +20,14 @@ import traceback
 from datetime import timedelta
 from operator import attrgetter
 
+import click
 from pytz import utc
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.events import Event
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings,
                                                       BOACorrespondingAuthorType, BOASortField)
 from indico.modules.events.models.events import EventType
@@ -33,12 +35,21 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.console import verbose_iterator, cformat
+from indico.util.string import sanitize_email
 from indico.util.struct.iterables import committing_iterator
 
 from indico_zodbimport import Importer, convert_to_unicode
 
 
+def strict_sanitize_email(email, fallback=None):
+    return sanitize_email(convert_to_unicode(email).lower(), require_valid=True) or fallback
+
+
 class AbstractMigration(object):
+    CONDITION_MAP = {'NotifTplCondAccepted': AbstractState.accepted,
+                     'NotifTplCondRejected': AbstractState.rejected,
+                     'NotifTplCondMerged': AbstractState.merged}
+
     def __init__(self, importer, conf, event):
         self.importer = importer
         self.conf = conf
@@ -55,6 +66,7 @@ class AbstractMigration(object):
         self._migrate_tracks()
         self._migrate_boa_settings()
         self._migrate_settings()
+        self._migrate_email_templates()
         # TODO...
 
     def _user_from_legacy(self, legacy_user):
@@ -140,8 +152,127 @@ class AbstractMigration(object):
             'authorized_submitters': set(filter(None, map(self._user_from_legacy, self.amgr._authorizedSubmitter)))
         })
 
+    def _convert_email_template(self, tpl):
+        placeholders = {'abstract_URL': 'abstract_url',
+                        'abstract_id': 'abstract_id',
+                        'abstract_review_comments': 'judgment_comment',
+                        'abstract_session': 'abstract_session',
+                        'abstract_title': 'abstract_title',
+                        'abstract_track': 'abstract_track',
+                        'conference_URL': 'event_url',
+                        'conference_title': 'event_title',
+                        'contribution_URL': 'contribution_url',
+                        'contribution_type': 'contribution_type',
+                        'merge_target_abstract_id': 'target_abstract_id',
+                        'merge_target_abstract_title': 'target_abstract_title',
+                        'merge_target_submitter_family_name': 'target_submitter_last_name',
+                        'merge_target_submitter_first_name': 'target_submitter_first_name',
+                        'primary_authors': 'primary_authors',
+                        'submitter_family_name': 'submitter_last_name',
+                        'submitter_first_name': 'submitter_first_name',
+                        'submitter_title': 'submitter_title'}
+        tpl = convert_to_unicode(tpl)
+        for old, new in placeholders.iteritems():
+            tpl = tpl.replace('%({})s'.format(old), '{%s}' % new)
+        return tpl.replace('%%', '%')
+
+    def _migrate_email_templates(self):
+        assert bool(dict(self.amgr._notifTpls.iteritems())) == bool(self.amgr._notifTplsOrder)
+        pos = 1
+        for old_tpl in self.amgr._notifTplsOrder:
+            title = convert_to_unicode(old_tpl._name)
+            body = self._convert_email_template(old_tpl._tplBody)
+            subject = self._convert_email_template(old_tpl._tplSubject) or 'Your Abstract Submission'
+            reply_to_address = strict_sanitize_email(old_tpl._fromAddr, self.importer.default_email)
+            extra_cc_emails = sorted(set(filter(None, map(strict_sanitize_email, old_tpl._ccAddrList))))
+            include_submitter = any(x.__class__.__name__ == 'NotifTplToAddrSubmitter' for x in old_tpl._toAddrs)
+            include_authors = any(x.__class__.__name__ == 'NotifTplToAddrPrimaryAuthors' for x in old_tpl._toAddrs)
+            if not body:
+                self.importer.print_warning(cformat('%{yellow!}Template "{}" has no body').format(title),
+                                            event_id=self.event.id)
+                continue
+            tpl = AbstractEmailTemplate(title=title,
+                                        position=pos,
+                                        reply_to_address=reply_to_address,
+                                        subject=subject,
+                                        body=body,
+                                        extra_cc_emails=extra_cc_emails,
+                                        include_submitter=include_submitter,
+                                        include_authors=include_authors,
+                                        include_coauthors=bool(getattr(old_tpl, '_CAasCCAddr', False)))
+            pos += 1
+            self.importer.print_info(cformat('%{white!}Email Template:%{reset} {}').format(tpl.title))
+            self.event.abstract_email_templates.append(tpl)
+            rules = []
+            for old_cond in old_tpl._conditions:
+                # state
+                try:
+                    state = self.CONDITION_MAP[old_cond.__class__.__name__]
+                except KeyError:
+                    self.importer.print_error(cformat('%{red!}Invalid condition type: {}')
+                                              .format(old_cond.__class__.__name__), event_id=self.event.id)
+                    continue
+                if state == AbstractState.rejected:
+                    track = contrib_type = any
+                else:
+                    # track
+                    if getattr(old_cond, '_track', '--any--') == '--any--':
+                        track = any
+                    elif getattr(old_cond, '_track', '--any--') == '--none--':
+                        track = None
+                    else:
+                        try:
+                            track = self.track_map[old_cond._track]
+                        except KeyError:
+                            self.importer.print_warning(cformat('%{yellow!}Invalid track: {}').format(old_cond._track),
+                                                        event_id=self.event.id)
+                            continue
+                    # contrib type
+                    if hasattr(old_cond, '_contrib_type_id'):
+                        contrib_type_id = old_cond._contrib_type_id
+                        if contrib_type_id == '--any--':
+                            contrib_type = any
+                        elif contrib_type_id == '--none--':
+                            contrib_type = None
+                        else:
+                            contrib_type = self.event.contribution_types.filter_by(id=contrib_type_id).one()
+                    elif not hasattr(old_cond, '_contribType'):
+                        contrib_type = any
+                        self.importer.print_warning(cformat('%{yellow}No contrib type data, using any [{}]')
+                                                    .format(old_cond.__dict__), event_id=self.event.id)
+                    else:
+                        contrib_type = None
+                        self.importer.print_error(cformat('%{red!}Legacy contribution type found: {}')
+                                                  .format(old_cond._contribType), event_id=self.event.id)
+                _any_str = cformat('%{green}any%{reset}')
+                self.importer.print_success(cformat('%{white!}Condition:%{reset} {} | {} | {}')
+                                            .format(state.name,
+                                                    track if track is not any else _any_str,
+                                                    contrib_type if contrib_type is not any else _any_str),
+                                            event_id=self.event.id)
+                rule = {'state': [state.value]}
+                if track is not any:
+                    rule['track'] = [track.id if track else None]
+                if contrib_type is not any:
+                    rule['contribution_type'] = [contrib_type.id if contrib_type else None]
+                rules.append(rule)
+            if not rules:
+                self.importer.print_warning(cformat('%{yellow}Template "{}" has no rules').format(tpl.title),
+                                            event_id=self.event.id, always=False)
+            tpl.rules = rules
+
 
 class EventAbstractsImporter(Importer):
+    def __init__(self, **kwargs):
+        self.default_email = kwargs.pop('default_email').lower()
+        self.all_users_by_email = {}
+        super(EventAbstractsImporter, self).__init__(**kwargs)
+
+    @staticmethod
+    def decorate_command(command):
+        command = click.option('--default-email', required=True, help="Fallback email in case of garbage")(command)
+        return command
+
     def has_data(self):
         return Abstract.has_rows() or Track.has_rows()
 
@@ -151,7 +282,6 @@ class EventAbstractsImporter(Importer):
 
     def load_data(self):
         self.print_step("Loading some data")
-        self.all_users_by_email = {}
         all_users_query = User.query.options(joinedload('_all_emails')).filter_by(is_deleted=False)
         for user in all_users_query:
             for email in user.all_emails:
