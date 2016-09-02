@@ -78,7 +78,6 @@ $toolbar-thin-height: 1.9em;
         height: $toolbar-height;
         line-height: $toolbar-button-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
-        text-align: center;
 
         &.open {
             color: $dark-gray !important;
@@ -155,13 +154,8 @@ $toolbar-thin-height: 1.9em;
     @extend %toolbar-group-datepicker;
     @extend %toolbar-group-slider;
     display: inline-block;
-    padding: 0 0.4em;
+    padding-right: 0.3rem;
     margin-bottom: 0.2rem;
-
-    &:first-child,
-    &.right:last-child {
-        padding-left: 0;
-    }
 
     &:last-child,
     &.right:first-child {
