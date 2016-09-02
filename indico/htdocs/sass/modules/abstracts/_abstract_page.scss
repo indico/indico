@@ -1,0 +1,158 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+@import 'compass';
+@import 'partials/boxes';
+@import 'partials/icons';
+
+#abstract-title {
+    display: flex;
+
+    h3 {
+        color: $blue;
+        flex: 1;
+        font-size: 1.4em;
+        margin: 0;
+    }
+
+    .abstract-id {
+        color: $gray;
+    }
+
+    .toolbar {
+        padding: 0;
+        margin: 0;
+        margin-left: 0.5rem;
+
+        .group {
+            display: inline-flex;
+            margin-bottom: 0;
+        }
+    }
+}
+
+.abstract-summary {
+    display: flex;
+    margin-top: 0.5rem;
+    align-items: baseline;
+
+    .abstract-summary-state {
+        @include border-radius();
+        color: white;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-right: 1rem;
+        padding: 0.3em 0.6em;
+
+        &.awaiting {
+            background: $dark-gray;
+        }
+
+        &.under-review {
+            background: $blue;
+        }
+
+        &.accepted {
+            background: $green;
+        }
+
+        &.rejected {
+            background: $red;
+        }
+
+        &.merged {
+            background: $purple;
+        }
+
+        &.duplicate {
+            background: $black;
+        }
+
+        &.withdrawn {
+            @include border-all();
+            border-style: dashed;
+            color: $dark-gray;
+        }
+    }
+
+    .abstract-summary-content {
+        color: $black;
+        flex: 1;
+    }
+}
+
+.abstract-contribution-type,
+.abstract-track {
+    @include border-bottom($style: dashed);
+}
+
+.abstract-content {
+    @extend .i-box;
+    @extend .i-box.no-shadow;
+    @extend .text-paper;
+    padding: 10px 10em;
+    margin-top: 1rem;
+}
+
+.abstract-public-comments {
+    @extend .i-box-group;
+    @extend .i-box-group.vert;
+}
+
+.abstract-public-comment {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+
+.abstract-public-comment-pic {
+    @include icon-before('icon-user');
+    @include border-all();
+    @include border-radius();
+    color: $light-black;
+    content: "";
+    margin-right: 1em;
+    // Icon centering
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: column;
+    // To match i-box-header height
+    height: 39px;
+    width: 39px;
+
+    &:before {
+        font-size: 2.5em;
+    }
+}
+
+.abstract-public-comment-box {
+    @extend .i-box;
+    @extend .i-box.no-shadow;
+    flex: 1;
+
+    .abstract-submission-edited {
+        cursor: default;
+        color: $gray;
+        float: right;
+
+        &:hover {
+            color: $dark-gray;
+        }
+    }
+}
