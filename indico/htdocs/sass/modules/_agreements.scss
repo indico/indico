@@ -103,21 +103,8 @@
     }
 
     .legal-body {
-        @extend %font-family-serif;
+        @extend .text-paper;
         padding: 10px 10em;
-        text-align: justify;
-        text-indent: 2em;
-
-        h3 {
-            color: inherit;
-            font-family: inherit;
-            font-size: 1.1em;
-            font-weight: inherit;
-            margin: 0 0 1.2em 0;
-            text-align: center;
-            text-indent: 0;
-            text-transform: uppercase;
-        }
     }
 
     .legal-confirmation {

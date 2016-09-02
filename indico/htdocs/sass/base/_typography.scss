@@ -260,6 +260,23 @@ td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
     color: #BBB;
 }
 
+.text-paper {
+    @extend %font-family-serif;
+    text-align: justify;
+    text-indent: 2em;
+
+    h3 {
+        color: inherit;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: inherit;
+        margin: 0 0 1.2em 0;
+        text-align: center;
+        text-indent: 0;
+        text-transform: uppercase;
+    }
+}
+
 a.small-link {
     color: $light-black;
     font-size: 11px;
