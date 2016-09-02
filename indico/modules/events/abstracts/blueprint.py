@@ -16,13 +16,17 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
-                                                                    RHManageAbstractSubmission)
+                                                                    RHManageAbstractSubmission, RHManageAbstract)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/abstracts')
+
+# Display pages
+_bp.add_url_rule('/abstracts/<int:abstract_id>/', 'display_abstract', RHDisplayAbstract)
 
 # Management
 _bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', RHAbstracts)
@@ -33,3 +37,6 @@ _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractLi
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHAbstractListStaticURL, methods=('POST',))
+
+# Abstract-specific management
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)

@@ -1,0 +1,202 @@
+{% macro _render_tracks(tracks) %}
+    {% for track in tracks %}
+        <span class="abstract-track">{{ track.title }}</span>
+        {%- if not loop.last -%},{% endif %}
+    {% endfor %}
+{% endmacro %}
+
+
+{% macro render_abstract_public(abstract) %}
+    <div id="abstract-title">
+        <h3 class="abstract-title">
+            {{ abstract.title }}
+            <span class="abstract-id">
+                #{{ abstract.friendly_id }}
+            </span>
+        </h3>
+        <div class="toolbar thin">
+            <div class="group">
+                <a class="i-button icon-edit"></a>
+            </div>
+            <div class="group">
+                <a class="i-button icon-file-download"></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="abstract-public">
+        <div class="abstract-summary">
+            <div class="abstract-summary-state {{ abstract.public_state.name }}">
+                {{ abstract.public_state.title }}
+            </div>
+            <div class="abstract-summary-content">
+                <div>
+                    {% if abstract.submitted_contrib_type %}
+                        {% trans name=abstract.submitter.name, type=abstract.submitted_contrib_type.name|lower -%}
+                            <strong>{{ name }}</strong> submitted this <span class="abstract-contribution-type">{{ type }}</span>
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract
+                        {%- endtrans %}
+                    {% endif %}
+                </div>
+                {% if abstract.submitted_for_tracks %}
+                    <div>
+                        {% trans count=abstract.submitted_for_tracks|length -%}
+                            For track:
+                        {%- pluralize -%}
+                            For tracks:
+                        {%- endtrans %}
+                        {{ _render_tracks(abstract.submitted_for_tracks) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="abstract-content">
+            <div class="center">
+                <div>
+                    {% trans count=abstract.primary_authors|length, names=abstract.primary_authors|map(attribute='name')|join(', ') -%}
+                        <strong>Author:</strong> {{ names }}
+                    {%- pluralize -%}
+                        <strong>Authors:</strong> {{ names }}
+                    {%- endtrans %}
+                </div>
+                {% if abstract.secondary_authors %}
+                    {% trans count=abstract.secondary_authors|length, names=abstract.secondary_authors|map(attribute='name')|join(', ') -%}
+                        <strong>Co-Author:</strong> {{ names }}
+                    {%- pluralize -%}
+                        <strong>Co-Authors:</strong> {{ names }}
+                    {%- endtrans %}
+                {% endif %}
+            </div>
+            <div class>
+                {{ abstract.description }}
+            </div>
+        </div>
+
+        <div class="abstract-public-comments">
+            <div class="abstract-public-comment">
+                <div class="abstract-public-comment-pic"></div>
+                <div class="abstract-public-comment-box">
+                    <div class="i-box-header">
+                        {% trans name=abstract.submitter.name, date=abstract.submitted_dt|format_human_date -%}
+                            <strong>{{ name }}</strong> submitted this abstract on {{ date }}.
+                        {%- endtrans %}
+                        {% if abstract.modified_dt %}
+                            <span class="abstract-submission-edited" title="by {{ abstract.modified_by.name }} on {{ abstract.modified_dt|format_human_date }}">
+                                {% trans %}edited{% endtrans %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="i-box-content">
+                        {% if abstract.submitted_contrib_type %}
+                            <div>
+                                {% trans type=abstract.submitted_contrib_type.name -%}
+                                    Contribution type: {{ type }}
+                                {%- endtrans %}
+                            </div>
+                        {% endif %}
+                        {% if abstract.submitted_for_tracks %}
+                            <div>
+                                {% trans count=abstract.submitted_for_tracks|length -%}
+                                    Track:
+                                {%- pluralize -%}
+                                    Tracks:
+                                {%- endtrans -%}
+                                {{ _render_tracks(abstract.submitted_for_tracks) }}
+                            </div>
+                        {% endif %}
+                        {% if abstract.primary_authors %}
+                            <div>
+                                {% trans count=abstract.primary_authors|length, names=abstract.primary_authors|map(attribute='name')|join(', ') -%}
+                                    Author: {{ names }}
+                                {%- pluralize -%}
+                                    Authors: {{ names }}
+                                {%- endtrans %}
+                            </div>
+                        {% endif %}
+                        {% if abstract.secondary_authors %}
+                            <div>
+                                {% trans count=abstract.secondary_authors|length, names=abstract.secondary_authors|map(attribute='name')|join(', ') -%}
+                                    Co-Author: {{ names }}
+                                {%- pluralize -%}
+                                    Co-Authors: {{ names }}
+                                {%- endtrans %}
+                            </div>
+                        {% endif %}
+                        {% if abstract.speakers %}
+                            <div>
+                                {% trans count=abstract.speakers|length, names=abstract.speakers|map(attribute='name')|join(', ') -%}
+                                    Speaker: {{ names }}
+                                {%- pluralize -%}
+                                    Speakers: {{ names }}
+                                {%- endtrans %}
+                            </div>
+                        {% endif %}
+                        {# TODO custom fields #}
+                        {# TODO comment #}
+                        {# TODO attachment #}
+                    </div>
+                </div>
+            </div>
+
+            {% if abstract.state.name != 'submitted' %}
+                <div class="abstract-public-comment">
+                    <div class="abstract-public-comment-pic"></div>
+                    <div class="abstract-public-comment-box">
+                        <div class="i-box-header">
+                            {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
+                                <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
+                            {%- endtrans %}
+                        </div>
+                        <div class="i-box-content">
+                            {% if abstract.state.name == 'accepted' %}
+                                {% if abstract.accepted_contrib_type and abstract.accepted_track %}
+                                    {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title, url='#' -%}
+                                        The abstract was accepted
+                                        as <span class="abstract-contribution-type">{{ type }}</span>
+                                        for track <span class="abstract-track">{{ track }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% elif abstract.accepted_contrib_type %}
+                                    {% trans type=abstract.accepted_contrib_type.name, url='#' -%}
+                                        The abstract was accepted
+                                        as <span class="abstract-contribution-type">{{ type }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% elif abstract.accepted_track %}
+                                    {% trans track=abstract.accepted_track.title, url='#' -%}
+                                        The abstract was accepted
+                                        for track <span class="abstract-track">{{ track }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% else %}
+                                    {% trans url='#' -%}
+                                        The abstract was accepted and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% endif %}
+                            {% elif abstract.state.name == 'rejected' %}
+                                {% trans %}The abstract was rejected.{% endtrans %}
+                            {% elif abstract.state.name == 'merged' %}
+                                {% trans url=url_for(abstract.merged_into), other=abstract.merged_into.title -%}
+                                    The abstract was merged into <a href="{{ url }}">{{ other }}</a>.
+                                {%- endtrans %}
+                            {% elif abstract.state.name == 'duplicate'%}
+                                {% trans url=url_for(abstract.duplicate_of), other=abstract.duplicate_of.title -%}
+                                    The abstract was marked as a duplicate of <a href="{{ url }}">{{ other }}</a>
+                                {%- endtrans %}
+                            {% endif %}
+                            {% if abstract.judgment_comment %}
+                                <div class="titled-rule">
+                                    {% trans %}Comment{% endtrans %}
+                                </div>
+                                {{ abstract.judgment_comment }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
