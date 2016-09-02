@@ -14,6 +14,13 @@
                         <span class="i-box-title">{{ tpl.title }}</span>
                         <div class="i-box-buttons toolbar right">
                             <div class="group">
+                                <a class="i-button icon-eye"
+                                   data-href="{{ url_for('.email_tpl_preview', tpl) }}"
+                                   data-method="GET"
+                                   data-title="{% trans %}E-mail preview{% endtrans %}"
+                                   data-ajax-dialog>
+                                   {% trans %}Preview{% endtrans %}
+                                </a>
                                 <a class="i-button icon-edit arrow js-edit-tpl-dropdown"
                                    data-toggle="dropdown">{% trans %}Edit{% endtrans %}</a>
                                 <ul class="dropdown">
