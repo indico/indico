@@ -22,6 +22,7 @@ from indico.modules.events.abstracts.forms import BOASettingsForm, AbstractSubmi
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
@@ -45,6 +46,19 @@ class RHAbstractListBase(RHManageAbstractsBase):
     def _checkParams(self, params):
         RHManageAbstractsBase._checkParams(self, params)
         self.list_generator = AbstractListGenerator(event=self.event_new)
+
+
+class RHManageAbstract(AbstractMixin, RHManageAbstractsBase):
+    def _checkParams(self, params):
+        RHManageAbstractsBase._checkParams(self, params)
+        AbstractMixin._checkParams(self)
+
+    def _checkProtection(self):
+        RHManageAbstractsBase._checkProtection(self)
+        AbstractMixin._checkProtection(self)
+
+    def _process(self):
+        return WPManageAbstracts.render_template('management/abstract.html', self._conf, abstract=self.abstract)
 
 
 class RHAbstracts(RHManageAbstractsBase):
