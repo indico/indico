@@ -25,6 +25,7 @@ from wtforms import BooleanField, ValidationError
 
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.fields.choices import (ChoiceBaseField, AccommodationField,
@@ -243,6 +244,10 @@ def create_registration(regform, data, invitation=None, management=False, notify
     db.session.flush()
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, session.user)
+    regform.event_new.log(EventLogRealm.management if management else EventLogRealm.participants,
+                          EventLogKind.positive, 'Registration',
+                          'New registration: {}'.format(registration.full_name),
+                          session.user, data={'Email': registration.email})
     return registration
 
 
@@ -284,6 +289,10 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
+    regform.event_new.log(EventLogRealm.management if management else EventLogRealm.participants,
+                          EventLogKind.change, 'Registration',
+                          'Registration modified: {}'.format(registration.full_name),
+                          session.user, data={'Email': registration.email})
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):

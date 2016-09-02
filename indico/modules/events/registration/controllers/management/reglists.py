@@ -31,6 +31,7 @@ from indico.core import signals
 from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.attachments.controllers.event_package import adjust_path_length
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
@@ -244,6 +245,9 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
+            self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
+                               'Registration deleted: {}'.format(registration.full_name),
+                               session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
