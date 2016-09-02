@@ -291,3 +291,7 @@ textarea.log {
   color: $dark-gray;
   font-size: 0.7em;
 }
+
+.preformatted {
+    white-space: pre-wrap;
+}
