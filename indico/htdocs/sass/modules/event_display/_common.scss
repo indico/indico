@@ -23,10 +23,6 @@
      }
  }
 
- .preformatted {
-     white-space: pre-wrap;
- }
-
  .speaker-list {
      @extend %font-family-modern-body;
      color: $black;
