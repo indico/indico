@@ -75,7 +75,7 @@ class AbstractURLPlaceholder(Placeholder):
     @classmethod
     def render(cls, abstract):
         # TODO: Replace with proper abstract display URL
-        return url_for('event.abstractDisplay', abstract, _external=True)
+        return url_for('abstracts.display_abstract', abstract, _external=True)
 
 
 class AbstractTrackPlaceholder(Placeholder):

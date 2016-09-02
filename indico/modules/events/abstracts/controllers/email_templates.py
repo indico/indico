@@ -23,7 +23,7 @@ from indico.modules.events.abstracts.controllers.management import RHManageAbstr
 from indico.modules.events.abstracts.forms import (EditEmailTemplateRuleForm, EditEmailTemplateTextForm,
                                                    CreateEmailTemplateForm)
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
-from indico.modules.events.abstracts.util import build_default_email_template
+from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
@@ -98,3 +98,14 @@ class RHEmailTemplateDelete(RHEMailTemplateModifBase):
         db.session.delete(self.email_tpl)
         tpl = get_template_module('events/abstracts/management/_notification_tpl_list.html')
         return jsonify_data(html=tpl.render_notification_list(self.event_new), flash=False)
+
+
+class RHEmailTemplatePreview(RHEMailTemplateModifBase):
+    """Delete an e-mail template."""
+
+    def _process(self):
+        abstract = create_mock_abstract(self.event_new)
+        body = replace_placeholders('abstract-notification-email', self.email_tpl.body,
+                                    abstract=abstract, escape_html=False)
+        self.commit = False
+        return jsonify_template('events/abstracts/management/notification_preview.html', body=body)
