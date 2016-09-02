@@ -351,3 +351,12 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
+
+    def can_access(self, user):
+        if self.submitter == user:
+            return True
+        if self.event_new.can_manage(user):
+            return True
+        if any(x.person.user == user for x in self.person_links):
+            return True
+        return False
