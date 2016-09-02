@@ -58,5 +58,5 @@ class AbstractPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'person_id', 'abstract_id', is_speaker=False, author_type=AuthorType.none,
+        return format_repr(self, 'id', 'person_id', 'abstract_id', is_speaker=False, author_type=None,
                            _text=self.full_name)
