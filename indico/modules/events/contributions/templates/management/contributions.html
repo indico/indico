@@ -38,7 +38,7 @@
 
 {% block content %}
     <div class="list-section">
-        <div class="toolbar">
+        <div class="toolbar left">
             <div class="group">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                 <ul class="dropdown">
@@ -128,29 +128,29 @@
                     </li>
                 </ul>
             </div>
-            <div class="group right">
+        </div>
+        <div class="toolbar right">
+            <div class="group" id="filter-statistics">
+                {{ render_filter_statistics(contribs|length, total_entries, total_duration) }}
+            </div>
+            <div class="group">
+                <button class="i-button icon-filter js-dialog-action"
+                        data-href="{{ url_for('.customize_contrib_list', event) }}"
+                        data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                        data-dialog-classes="list-filter-dialog"
+                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
+                        data-ajax-dialog>
+                    {% trans %}Filters{% endtrans %}
+                </button>
+            </div>
+            <div class="group">
+                <button class="i-button icon-link js-static-url"
+                        data-href="{{ url_for('.generate_static_url', event) }}"
+                        title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+            </div>
+            <div class="group">
                 <span class="i-button label icon-search"></span>
                 <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
-            </div>
-            <div class="right">
-                <div class="group" id="filter-statistics">
-                    {{ render_filter_statistics(contribs|length, total_entries, total_duration) }}
-                </div>
-                <div class="group">
-                    <button class="i-button icon-filter js-dialog-action"
-                            data-href="{{ url_for('.customize_contrib_list', event) }}"
-                            data-title="{% trans %}Contribution list configuration{% endtrans %}"
-                            data-dialog-classes="list-filter-dialog"
-                            data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
-                            data-ajax-dialog>
-                        {% trans %}Filters{% endtrans %}
-                    </button>
-                </div>
-                <div class="group">
-                    <button class="i-button icon-link js-static-url"
-                            data-href="{{ url_for('.generate_static_url', event) }}"
-                            title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
-                </div>
             </div>
         </div>
         <div class="list" id="contribution-list">
