@@ -361,6 +361,7 @@
 .entry-attachments {
     @extend %timetable-entry-button;
     @include border-bottom-left-radius();
+    @include border-top-right-radius();
     @include border-left();
     @include border-bottom();
     @include icon-before(icon-attachment);

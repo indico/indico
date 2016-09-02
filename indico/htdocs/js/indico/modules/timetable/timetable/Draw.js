@@ -433,9 +433,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     ));
 
                 this.div.insert(pileEffect);
-                this.titleWrapper.dom.style.paddingTop = '20px';
+                this.titleWrapper.dom.style.paddingTop = '15px';
                 if (this.compactMode) {
-                    this.timeDiv.dom.style.paddingTop = '20px';
+                    this.timeDiv.dom.style.paddingTop = '15px';
                 }
 
                 return pileEffect;
