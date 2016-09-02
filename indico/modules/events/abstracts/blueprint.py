@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
 from indico.modules.events.abstracts.controllers.email_templates import (RHEmailTemplateAdd, RHEmailTemplateRuleEdit,
                                                                          RHEmailTemplateTextEdit, RHEmailTemplateList,
-                                                                         RHEmailTemplateDelete)
+                                                                         RHEmailTemplateDelete, RHEmailTemplatePreview)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract)
@@ -51,6 +51,8 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit', 'email
                  RHEmailTemplateRuleEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit-text', 'email_tpl_text_edit',
                  RHEmailTemplateTextEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/preview', 'email_tpl_preview',
+                 RHEmailTemplatePreview)
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
