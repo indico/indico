@@ -107,6 +107,29 @@
     @extend .text-paper;
     padding: 10px 10em;
     margin-top: 1rem;
+
+    .abstract-authorship-block {
+        display: flex;
+        justify-content: center;
+        margin-top: 0.5em;
+
+        &:first-child {
+            margin-top: 1em;
+        }
+
+        .abstract-authorship-label {
+            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
+
+        }
+
+        .abstract-authorship-list {
+            font-style: italic;
+            margin-left: 0.5em;
+            text-indent: 0;
+        }
+    }
 }
 
 .abstract-public-comments {

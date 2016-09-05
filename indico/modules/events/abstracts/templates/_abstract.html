@@ -54,25 +54,31 @@
             </div>
         </div>
         <div class="abstract-content">
-            <div class="center">
-                <div>
-                    {% trans count=abstract.primary_authors|length, names=abstract.primary_authors|map(attribute='name')|join(', ') -%}
-                        <strong>Author:</strong> {{ names }}
+            <div class="abstract-authorship-block">
+                <div class="abstract-authorship-label">
+                    {% trans count=abstract.primary_authors|length -%}
+                        Author:
                     {%- pluralize -%}
-                        <strong>Authors:</strong> {{ names }}
+                        Authors:
                     {%- endtrans %}
                 </div>
-                {% if abstract.secondary_authors %}
-                    {% trans count=abstract.secondary_authors|length, names=abstract.secondary_authors|map(attribute='name')|join(', ') -%}
-                        <strong>Co-Author:</strong> {{ names }}
+                <div class="abstract-authorship-list">
+                    {{ abstract.primary_authors|map(attribute='name')|join(', ') }}
+                </div>
+            </div>
+            {% if abstract.secondary_authors %}
+                <div class="abstract-authorship-label">
+                    {% trans count=abstract.secondary_authors|length -%}
+                        Co-author:
                     {%- pluralize -%}
-                        <strong>Co-Authors:</strong> {{ names }}
+                        Co-authors:
                     {%- endtrans %}
-                {% endif %}
-            </div>
-            <div class>
-                {{ abstract.description }}
-            </div>
+                </div>
+                <div class="abstract-authorship-list">
+                    {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                </div>
+            {% endif %}
+            {{ abstract.description }}
         </div>
 
         <div class="abstract-public-comments">
@@ -119,9 +125,9 @@
                         {% if abstract.secondary_authors %}
                             <div>
                                 {% trans count=abstract.secondary_authors|length, names=abstract.secondary_authors|map(attribute='name')|join(', ') -%}
-                                    Co-Author: {{ names }}
+                                    Co-author: {{ names }}
                                 {%- pluralize -%}
-                                    Co-Authors: {{ names }}
+                                    Co-authors: {{ names }}
                                 {%- endtrans %}
                             </div>
                         {% endif %}
