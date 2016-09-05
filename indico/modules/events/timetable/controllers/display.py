@@ -22,10 +22,11 @@ from flask import jsonify, request, session
 
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.timetable.util import (render_entry_info_balloon, serialize_event_info,
                                                   get_timetable_offline_pdf_generator)
+from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.web.flask.util import send_file, url_for
+from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -66,7 +67,7 @@ class RHTimetableEntryInfo(RHConferenceBaseDisplay):
 
 class RHTimetableExportPDF(RHConferenceBaseDisplay):
     def _process(self):
-        form = TimetablePDFExportForm()
+        form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
             form_data = form.data_for_format
             pdf_format = TimetablePDFFormat(form_data)
@@ -78,11 +79,15 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
                 additional_params = {'firstPageNumber': form.firstPageNumber.data,
                                      'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
                                      'showSessionDescription': form_data['showSessionDescription']}
-            pdf = pdf_class(self.event_new, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
-                            pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
-            return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
-        return WPDisplayTimetable.render_template('timetable_pdf_export.html', self._conf, form=form,
-                                                  back_url=url_for('.timetable', self.event_new))
+            if request.args.get('download') == '1':
+                pdf = pdf_class(self.event_new, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
+                                pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
+                return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+            else:
+                url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
+                return jsonify_data(flash=False, redirect=url)
+        return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
+                                back_url=url_for('.timetable', self.event_new))
 
 
 class RHTimetableExportDefaultPDF(RHConferenceBaseDisplay):

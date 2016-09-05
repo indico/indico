@@ -26,7 +26,7 @@ moreMenu.observeClick(function(e) {
     var menu = new PopupMenu(menuItems, [moreMenu], ${"'darkPopupList'" if dark else "null"});
 
     % if showExportToPDF:
-    menuItems["exportPDF"] = {action: '${ pdfURL }', display: "${ _('Export to PDF') }"};
+    menuItems["exportPDF"] = {action: '${ pdfURL }', ajaxDialog: true, closeOnClick: true, display: "${ _('Export to PDF')}"};
     % endif
     % if showDLMaterial:
     menuItems["downloadMaterial"] = {action: ${ url_for("attachments.package", self_._rh._conf) | n,j }, display: $T.gettext('Download material')};

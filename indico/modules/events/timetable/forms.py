@@ -19,8 +19,9 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+from flask import request
 from pytz import utc
-from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, IntegerField
+from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, IntegerField, HiddenField
 from wtforms.validators import DataRequired, ValidationError, InputRequired, NumberRange
 from wtforms_components import TimeField
 from wtforms.widgets.html5 import NumberInput
@@ -191,6 +192,10 @@ class TimetablePDFExportForm(IndicoForm):
                                                     ('large', _('large')), ('larger', _('larger'))], default='normal')
     firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,
                                    widget=NumberInput(step=1))
+    submitted = HiddenField()
+
+    def is_submitted(self):
+        return 'submitted' in request.args
 
     @property
     def data_for_format(self):

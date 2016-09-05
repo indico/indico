@@ -247,8 +247,14 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     pdf: function() {
-        var urlTemplate = Indico.Urls.Timetable[window.indicoOfflineSite ? 'default_pdf' : 'pdf'];
-        window.location = build_url(urlTemplate, {confId: this.eventInfo.id});
+        if (window.indicoOfflineSite) {
+            window.location = build_url(Indico.Urls.Timetable.default_pdf, {confId: this.eventInfo.id});
+        } else {
+            ajaxDialog({
+                url: build_url(Indico.Urls.Timetable.pdf, {confId: this.eventInfo.id}),
+                title: $T.gettext('Export to PDF')
+            });
+        }
     },
 
     fullScreen: function() {

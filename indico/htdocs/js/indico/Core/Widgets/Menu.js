@@ -108,7 +108,12 @@ type("PopupMenu", ["ChainedPopupWidget"],
                 if (self.linkToExternalWindow) {
                     link.setAttribute('target', '_blank');
                 }
-                if (self.closeOnClick) {
+                if (value.ajaxDialog) {
+                    $(link.dom).ajaxDialog({
+                        title: value.display
+                    });
+                }
+                if (self.closeOnClick || value.closeOnClick) {
                     link.observeClick(function() {
                         self.close();
                     });
