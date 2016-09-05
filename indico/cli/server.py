@@ -114,6 +114,9 @@ class DebuggedIndico(DebuggedApplication):
 
     def __call__(self, environ, start_response):
         self._request_ip = environ['REMOTE_ADDR']
+        if self._request_ip.startswith('::ffff:'):
+            # convert ipv6-style ipv4 to the regular ipv4 notation
+            self._request_ip = self._request_ip[7:]
         return super(DebuggedIndico, self).__call__(environ, start_response)
 
 
