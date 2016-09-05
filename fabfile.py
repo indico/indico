@@ -476,7 +476,7 @@ def init_submodules(src_dir='.'):
         local('pwd')
         local('git submodule init')
         local('git submodule sync')
-        local('git submodule update --recursive')
+        local('git submodule update --init --recursive')
 
 
 def _install_deps():
