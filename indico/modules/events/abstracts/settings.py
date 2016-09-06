@@ -77,6 +77,14 @@ abstracts_settings = EventSettingsProxy('abstracts', {
 })
 
 
+abstracts_reviewing_settings = EventSettingsProxy('abstracts_reviewing', {
+    'num_answers': 7,
+    'scale_lower': 0,
+    'scale_upper': 10,
+    'reviewers_final_judgement': False  # whether reviewers can make a final judgment (e.g. accept/reject)
+})
+
+
 boa_settings = EventSettingsProxy('abstracts_book', {
     'extra_text': '',
     'sort_by': BOASortField.id,
