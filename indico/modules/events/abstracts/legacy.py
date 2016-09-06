@@ -400,9 +400,9 @@ class AbstractLegacyMixin(object):
                 field = self.event.contribution_fields.filter_by(legacy_id=field_id).one()
             except NoResultFound:
                 field = self.event.contribution_fields.filter_by(id=field_id).one()
-            afv = AbstractFieldValue.find_first(contribution_field=field, abstract=self.as_new)
+            afv = AbstractFieldValue.find_first(contribution_field=field, legacy_abstract=self.as_new)
             if afv is None and create:
-                afv = AbstractFieldValue(contribution_field=field, abstract=self.as_new)
+                afv = AbstractFieldValue(contribution_field=field, legacy_abstract=self.as_new)
             return afv
 
     @property
