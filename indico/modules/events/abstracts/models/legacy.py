@@ -97,7 +97,8 @@ class LegacyAbstract(DescriptionMixin, db.Model):
     contribution = db.relationship(
         'Contribution',
         lazy=True,
-        primaryjoin='Contribution.abstract_id == LegacyAbstract.id',
+        uselist=False,
+        primaryjoin='(Contribution.abstract_id == LegacyAbstract.id) & ~Contribution.is_deleted',
         foreign_keys='Contribution.abstract_id'
     )
     type = db.relationship(
