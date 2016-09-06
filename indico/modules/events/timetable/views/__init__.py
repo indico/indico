@@ -141,8 +141,9 @@ def inject_meeting_body(event, **kwargs):
     theme_id = view if view and view in theme_settings.themes else event.theme
     theme = theme_settings.themes[theme_id]
     tt_tpl = theme.get('tt_template', theme['template'])
+    total_days = (event.end_dt - event.start_dt).days + 1
 
     return render_template(posixpath.join('events/timetable/display', tt_tpl), event=event, entries=entries, days=days,
                            timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
                            theme_settings=theme.get('settings', {}), show_siblings_location=show_siblings_location,
-                           show_children_location=show_children_location, **kwargs)
+                           show_children_location=show_children_location, total_days=total_days, **kwargs)
