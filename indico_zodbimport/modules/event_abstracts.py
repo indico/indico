@@ -28,7 +28,8 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
-from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings,
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
+from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings, abstracts_reviewing_settings,
                                                       BOACorrespondingAuthorType, BOASortField)
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.models.tracks import Track
@@ -56,6 +57,7 @@ class AbstractMigration(object):
         self.event = event
         self.amgr = conf.abstractMgr
         self.track_map = {}
+        self.question_map = {}
         self.legacy_warnings_shown = set()
 
     def __repr__(self):
@@ -66,6 +68,7 @@ class AbstractMigration(object):
         self._migrate_tracks()
         self._migrate_boa_settings()
         self._migrate_settings()
+        self._migrate_review_settings()
         self._migrate_email_templates()
         # TODO...
 
@@ -151,6 +154,22 @@ class AbstractMigration(object):
             'speakers_required': bool(getattr(self.amgr, '_selectSpeakerMandatory', True)),
             'authorized_submitters': set(filter(None, map(self._user_from_legacy, self.amgr._authorizedSubmitter)))
         })
+
+    def _migrate_review_settings(self):
+        try:
+            old_settings = self.conf._confAbstractReview
+        except AttributeError:
+            return
+        abstracts_reviewing_settings.set_multi(self.event, {
+            'num_answers': int(old_settings._numberOfAnswers),
+            'scale_lower': int(old_settings._scaleLower),
+            'scale_upper': int(old_settings._scaleHigher),
+            'reviewers_final_judgement': bool(getattr(old_settings, '_canReviewerAccept', False))
+        })
+        for pos, old_question in enumerate(old_settings._reviewingQuestions, 1):
+            question = AbstractReviewQuestion(position=pos, text=convert_to_unicode(old_question._text))
+            self.question_map[old_question] = question
+            self.event.abstract_review_questions.append(question)
 
     def _convert_email_template(self, tpl):
         placeholders = {'abstract_URL': 'abstract_url',
