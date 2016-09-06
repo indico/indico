@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session
 from sqlalchemy.orm import load_only, joinedload
 
@@ -73,7 +75,8 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     :param submission_ids: The list of submissions to include in the file
     """
     field_names = ['Submitter', 'Submission Date']
-    field_names += [unique_col(question.title, question.id) for question in survey.questions]
+    sorted_questions = sorted(survey.questions, key=attrgetter('parent.position', 'position'))
+    field_names += [unique_col(question.title, question.id) for question in sorted_questions]
 
     submissions = _filter_submissions(survey, submission_ids)
     rows = []
@@ -82,7 +85,8 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
             'Submitter': submission.user.full_name if submission.user else None,
             'Submission Date': to_unicode(format_datetime(submission.submitted_dt)),
         }
-
+        for key in field_names:
+            submission_dict.setdefault(key, '')
         for answer in submission.answers:
             key = unique_col(answer.question.title, answer.question.id)
             submission_dict[key] = answer.answer_data
