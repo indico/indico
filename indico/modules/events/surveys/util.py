@@ -76,7 +76,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     """
     field_names = ['Submitter', 'Submission Date']
     sorted_questions = sorted(survey.questions, key=attrgetter('parent.position', 'position'))
-    field_names += [unique_col(question.title, question.id) for question in sorted_questions]
+    field_names += [unique_col(_format_title(question), question.id) for question in sorted_questions]
 
     submissions = _filter_submissions(survey, submission_ids)
     rows = []
@@ -88,10 +88,17 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
         for key in field_names:
             submission_dict.setdefault(key, '')
         for answer in submission.answers:
-            key = unique_col(answer.question.title, answer.question.id)
+            key = unique_col(_format_title(answer.question), answer.question.id)
             submission_dict[key] = answer.answer_data
         rows.append(submission_dict)
     return field_names, rows
+
+
+def _format_title(question):
+    if question.parent.title:
+        return '{}: {}'.format(question.parent.title, question.title)
+    else:
+        return question.title
 
 
 def _filter_submissions(survey, submission_ids):
