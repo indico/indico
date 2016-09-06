@@ -52,6 +52,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
                          {'schema': 'events'})
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
+    inheriting_have_acl = True
     default_colors = ColorTuple('#202020', '#e3f2d3')
     allow_relationship_preloading = True
 
