@@ -73,6 +73,10 @@ def _flat_map(func, list_):
 class RHCategoryIcon(RHDisplayCategoryBase):
     _category_query_options = undefer('icon'),
 
+    def _checkProtection(self):
+        # Category icons are always public
+        pass
+
     def _process(self):
         if not self.category.has_icon:
             raise NotFound
@@ -483,8 +487,14 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             'next_month_url': self._other_day_url(self.start_dt + relativedelta(months=1)),
             'previous_year_url': self._other_day_url(self.start_dt - relativedelta(years=1)),
             'next_year_url': self._other_day_url(self.start_dt + relativedelta(years=1)),
-            'mathjax': self.detail != 'event'
+            'mathjax': True
         }
+
+        if self.detail != 'event':
+            cte = self.category.get_protection_parent_cte()
+            params['accessible_categories'] = {cat_id
+                                               for cat_id, prot_parent_id in db.session.query(cte)
+                                               if prot_parent_id == self.category.id}
 
         if self.period == 'day':
             return WPCategory.render_template('display/overview/day.html', self.category, events=events, **params)

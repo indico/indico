@@ -44,11 +44,11 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 def _get_object_type(obj):
     if isinstance(obj, db.m.Event):
-        return 'Event'
+        return u'Event'
     elif isinstance(obj, db.m.Session):
-        return 'Session'
+        return u'Session'
     elif isinstance(obj, db.m.Contribution):
-        return 'Contribution'
+        return u'Contribution'
     else:
         raise TypeError('Invalid type: {}'.format(type(obj)))
 
@@ -56,7 +56,7 @@ def _get_object_type(obj):
 def _get_defaults_from_object(obj):
     defaults = {'start_dt': obj.start_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
                 'end_dt': obj.end_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
-                'booking_reason': "{} '{}'".format(_get_object_type(obj), obj.title)}
+                'booking_reason': u"{} '{}'".format(_get_object_type(obj), obj.title)}
     if defaults['end_dt'].date() != defaults['start_dt'].date():
         defaults['repeat_frequency'] = RepeatFrequency.DAY
         defaults['repeat_interval'] = 1
