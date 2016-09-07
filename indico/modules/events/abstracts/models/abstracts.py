@@ -43,9 +43,17 @@ class AbstractState(TitledIntEnum):
 
 
 class AbstractPublicState(TitledIntEnum):
-    __titles__ = [None, _("Awaiting Review"), _("Under Review")]
-    awaiting = 1
-    under_review = 2
+    __titles__ = {i: title for i, title in enumerate(AbstractState.__titles__[2:], 2)}
+    __titles__.update({-1: _("Awaiting Review"), -2: _("Under Review")})
+    # regular states (must match AbstractState!)
+    withdrawn = 2
+    accepted = 3
+    rejected = 4
+    merged = 5
+    duplicate = 6
+    # special states
+    awaiting = -1
+    under_review = -2
 
 
 class AbstractReviewingState(TitledIntEnum):
@@ -325,7 +333,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     @property
     def public_state(self):
         if self.state != AbstractState.submitted:
-            return self.state
+            return getattr(AbstractPublicState, self.state.name)
         elif self.reviews:
             return AbstractPublicState.under_review
         else:
@@ -362,15 +370,17 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         return False
 
     def can_edit(self, user):
+        if not user:
+            return False
         is_owner = user == self.submitter or any(x.person.user == user for x in self.person_links)
-        is_manager = user == self.event_new.can_manage(user)
+        is_manager = self.event_new.can_manage(user)
         if not is_owner and not is_manager:
             return False
         elif self.public_state == AbstractPublicState.awaiting:
             return True
         elif self.public_state == AbstractPublicState.under_review and is_manager:
             return True
-        elif self.public_state == AbstractState.withdrawn and is_manager:
+        elif self.public_state == AbstractPublicState.withdrawn and is_manager:
             return True
         else:
             return False
