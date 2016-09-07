@@ -6,30 +6,13 @@
 {% endmacro %}
 
 
-{% macro render_abstract_public(abstract) %}
-    <div id="abstract-title">
-        <h3 class="abstract-title">
-            {{ abstract.title }}
-            <span class="abstract-id">
-                #{{ abstract.friendly_id }}
-            </span>
-        </h3>
-        <div class="toolbar thin">
-            <div class="group">
-                <a class="i-button icon-edit"></a>
-            </div>
-            <div class="group">
-                <a class="i-button icon-file-download"></a>
-            </div>
+{% macro _render_abstract_summary(abstract, management=false) %}
+    <div class="abstract-summary">
+        <div class="abstract-summary-state {{ abstract.public_state.name }}">
+            {{ abstract.public_state.title }}
         </div>
-    </div>
-
-    <div id="abstract-public">
-        <div class="abstract-summary">
-            <div class="abstract-summary-state {{ abstract.public_state.name }}">
-                {{ abstract.public_state.title }}
-            </div>
-            <div class="abstract-summary-content">
+        <div class="abstract-summary-content">
+            {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
                 <div>
                     {% if abstract.submitted_contrib_type %}
                         {% trans name=abstract.submitter.name, type=abstract.submitted_contrib_type.name|lower -%}
@@ -51,8 +34,93 @@
                         {{ _render_tracks(abstract.submitted_for_tracks) }}
                     </div>
                 {% endif %}
+            {% elif abstract.state.name == 'accepted' %}
+                <div>
+                    {% if abstract.accepted_contrib_type and abstract.accepted_track %}
+                        {% trans name=abstract.submitter.name,
+                            type=abstract.accepted_contrib_type.name,
+                            track=abstract.accepted_track.title -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            for track <span class="abstract-track">{{ track }}</span>
+                            as <span class="abstract-contribution-type">{{ type }}</span>.
+                        {% endtrans %}
+                    {% elif abstract.accepted_contrib_type %}
+                        {% trans name=abstract.submitter.name,
+                            type=abstract.accepted_contrib_type.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            as <span class="abstract-contribution-type">{{ type }}</span>.
+                        {% endtrans %}
+                    {% elif abstract.accepted_track %}
+                        {% trans name=abstract.submitter.name,
+                            track=abstract.accepted_track.title -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            for track <span class="abstract-track">{{ track }}</span>.
+                        {% endtrans %}
+                    {% else %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted.
+                        {%- endtrans %}
+                    {% endif %}
+                </div>
+                <div>
+                    {# TODO: link to contribution #}
+                    {% trans url='#' %}
+                        <a href="{{ url }}">Go to contribution</a>
+                    {% endtrans %}
+                </div>
+            {% elif abstract.state.name == 'merged' %}
+                <div>
+                    {% trans name=abstract.submitter.name -%}
+                        <strong>{{ name }}</strong> submitted this abstract but it was merged into another.
+                    {%- endtrans %}
+                </div>
+                {% if abstract.merged_into.can_access(session.user) %}
+                    <div>
+                        {% set endpoint = '.manage_abstract' if management else '.display_abstract' %}
+                        {% trans url=url_for(endpoint, abstract.merged_into) %}
+                            <a href="{{ url }}">Go to abstract</a>
+                        {% endtrans %}
+                    </div>
+                {% endif %}
+            {% elif abstract.state.name == 'duplicate' %}
+                {% trans name=abstract.submitter.name -%}
+                    <strong>{{ name }}</strong> submitted this abstract but it was marked as duplicate of another.
+                {%- endtrans %}
+                {% if abstract.duplicate_of.can_access(session.user) %}
+                    <div>
+                        {% set endpoint = '.manage_abstract' if management else '.display_abstract' %}
+                        {% trans url=url_for(endpoint, abstract.duplicate_of) %}
+                            <a href="{{ url }}">Go to abstract</a>
+                        {% endtrans %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_abstract_public(abstract, management=false) %}
+    <div id="abstract-title">
+        <h3 class="abstract-title">
+            {{ abstract.title }}
+            <span class="abstract-id">
+                #{{ abstract.friendly_id }}
+            </span>
+        </h3>
+        <div class="toolbar thin">
+            <div class="group">
+                <a class="i-button icon-edit" title="{% trans %}Edit abstract{% endtrans %}"></a>
+            </div>
+            <div class="group">
+                <a class="i-button icon-file-download"
+                    title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
             </div>
         </div>
+    </div>
+
+    <div id="abstract-public">
+        {{ _render_abstract_summary(abstract, management) }}
         <div class="abstract-content">
             <div class="abstract-authorship-block">
                 <div class="abstract-authorship-label">
