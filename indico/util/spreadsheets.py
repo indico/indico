@@ -71,6 +71,7 @@ def generate_csv(headers, rows):
     writer = csv.writer(buf)
     writer.writerow(map(_prepare_header, headers))
     header_positions = {name: i for i, name in enumerate(headers)}
+    assert all(len(row) == len(headers) for row in rows)
     for row in rows:
         row = sorted(row.items(), key=lambda x: header_positions[x[0]])
         writer.writerow([_prepare_csv_data(v) for k, v in row])
