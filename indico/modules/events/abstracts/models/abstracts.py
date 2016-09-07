@@ -360,3 +360,17 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         if any(x.person.user == user for x in self.person_links):
             return True
         return False
+
+    def can_edit(self, user):
+        is_owner = user == self.submitter or any(x.person.user == user for x in self.person_links)
+        is_manager = user == self.event_new.can_manage(user)
+        if not is_owner and not is_manager:
+            return False
+        elif self.public_state == AbstractPublicState.awaiting:
+            return True
+        elif self.public_state == AbstractPublicState.under_review and is_manager:
+            return True
+        elif self.public_state == AbstractState.withdrawn and is_manager:
+            return True
+        else:
+            return False
