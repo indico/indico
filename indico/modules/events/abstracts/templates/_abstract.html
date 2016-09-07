@@ -109,9 +109,38 @@
             </span>
         </h3>
         <div class="toolbar thin">
-            <div class="group">
-                <a class="i-button icon-edit" title="{% trans %}Edit abstract{% endtrans %}"></a>
-            </div>
+            {% if management == false and abstract.event_new.can_manage(session.user) %}
+                <div class="group">
+                    <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                        {% trans %}Management view{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
+            {% if management == true %}
+                <div class="group">
+                    {# TODO: scroll to decission buttons #}
+                    <a href="#" class="i-button highlight icon-hammer">
+                        {% trans %}Judge{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
+            {% if abstract.submitter == session.user or abstract.event_new.can_manage(session.user) %}
+                <div class="group">
+                    {% if abstract.state.name not in ('submitted', 'withdrawn') %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it has been processed already{% endtrans %}"></a>
+                    {% elif abstract.state.name == 'withdrawn' and not abstract.event_new.can_access(session.user) %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it was withdrawn{% endtrans %}"></a>
+                    {% elif abstract.public_state.name == 'under_review' and not abstract.event_new.can_access(session.user) %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it is under review already {% endtrans %}"></a>
+                    {% else %}
+                        {# TODO: open abstract edition form #}
+                        <a href="#" class="i-button icon-edit" title="{% trans %}Edit abstract{% endtrans %}"></a>
+                    {% endif %}
+                </div>
+            {% endif %}
             <div class="group">
                 <a class="i-button icon-file-download"
                     title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
