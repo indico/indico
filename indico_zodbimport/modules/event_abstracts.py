@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import mimetypes
 import traceback
 from datetime import timedelta
 from operator import attrgetter
@@ -25,25 +26,74 @@ from pytz import utc
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import UTCDateTime
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
+from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
+from indico.modules.events.abstracts.models.reviews import AbstractReview, AbstractAction
 from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings, abstracts_reviewing_settings,
                                                       BOACorrespondingAuthorType, BOASortField)
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.console import verbose_iterator, cformat
-from indico.util.string import sanitize_email
+from indico.util.date_time import as_utc
+from indico.util.fs import secure_filename
+from indico.util.string import sanitize_email, format_repr
 from indico.util.struct.iterables import committing_iterator
 
 from indico_zodbimport import Importer, convert_to_unicode
+from indico_zodbimport.util import LocalFileImporterMixin
 
 
 def strict_sanitize_email(email, fallback=None):
     return sanitize_email(convert_to_unicode(email).lower(), require_valid=True) or fallback
+
+
+class OldAbstract(db.Model):
+    __tablename__ = 'legacy_abstracts'
+    # XXX: remove keep_existing when removing the LegacyAbstract model from core
+    __table_args__ = {'schema': 'event_abstracts', 'keep_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    friendly_id = db.Column(db.Integer)
+    description = db.Column(db.Text)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.events.id'))
+    type_id = db.Column(db.Integer, db.ForeignKey('events.contribution_types.id'))
+    accepted_track_id = db.Column(db.Integer)
+    accepted_type_id = db.Column(db.Integer, db.ForeignKey('events.contribution_types.id'))
+
+    judgments = db.relationship('OldJudgment', lazy=False)
+    event_new = db.relationship('Event', backref='old_abstracts')
+
+    def __repr__(self):
+        return format_repr(self, 'id')
+
+
+class OldJudgment(db.Model):
+    __tablename__ = 'judgments'
+    # XXX: remove keep_existing when removing the Judgment model from core
+    __table_args__ = {'schema': 'event_abstracts', 'keep_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    creation_dt = db.Column(UTCDateTime)
+    abstract_id = db.Column(db.Integer, db.ForeignKey('event_abstracts.legacy_abstracts.id'))
+    track_id = db.Column(db.Integer)
+    judge_user_id = db.Column(db.Integer, db.ForeignKey('users.users.id'))
+    accepted_type_id = db.Column(db.Integer, db.ForeignKey('events.contribution_types.id'))
+
+    judge = db.relationship('User')
+    accepted_type = db.relationship('ContributionType')
+
+    def __repr__(self):
+        return format_repr(self, 'id')
 
 
 class AbstractMigration(object):
@@ -51,12 +101,31 @@ class AbstractMigration(object):
                      'NotifTplCondRejected': AbstractState.rejected,
                      'NotifTplCondMerged': AbstractState.merged}
 
+    STATE_MAP = {'AbstractStatusSubmitted': AbstractState.submitted,
+                 'AbstractStatusWithdrawn': AbstractState.withdrawn,
+                 'AbstractStatusAccepted': AbstractState.accepted,
+                 'AbstractStatusRejected': AbstractState.rejected,
+                 'AbstractStatusMerged': AbstractState.merged,
+                 'AbstractStatusDuplicated': AbstractState.duplicate,
+                 # obsolete states
+                 'AbstractStatusUnderReview': AbstractState.submitted,
+                 'AbstractStatusProposedToReject': AbstractState.submitted,
+                 'AbstractStatusProposedToAccept': AbstractState.submitted,
+                 'AbstractStatusInConflict': AbstractState.submitted}
+
+    ACTION_MAP = {'AbstractAcceptance': AbstractAction.accept,
+                  'AbstractRejection': AbstractAction.reject,
+                  'AbstractReallocation': AbstractAction.change_tracks,
+                  'AbstractMarkedAsDuplicated': AbstractAction.mark_as_duplicate,
+                  'AbstractUnMarkedAsDuplicated': AbstractAction.mark_as_not_duplicate}
+
     def __init__(self, importer, conf, event):
         self.importer = importer
         self.conf = conf
         self.event = event
         self.amgr = conf.abstractMgr
         self.track_map = {}
+        self.track_map_by_id = {}
         self.question_map = {}
         self.legacy_warnings_shown = set()
 
@@ -70,9 +139,9 @@ class AbstractMigration(object):
         self._migrate_settings()
         self._migrate_review_settings()
         self._migrate_email_templates()
-        # TODO...
+        self._migrate_abstracts()
 
-    def _user_from_legacy(self, legacy_user):
+    def _user_from_legacy(self, legacy_user, janitor=False):
         if isinstance(legacy_user, AvatarUserWrapper):
             user = legacy_user.user
             email = convert_to_unicode(legacy_user.__dict__.get('email', '')).lower() or None
@@ -82,7 +151,7 @@ class AbstractMigration(object):
         else:
             self.importer.print_error(cformat('%{red!}Invalid legacy user: {}').format(legacy_user),
                                       event_id=self.event.id)
-            return None
+            return self.importer.janitor_user if janitor else None
         if user is None:
             user = self.importer.all_users_by_email.get(email) if email else None
             if user is not None:
@@ -91,7 +160,7 @@ class AbstractMigration(object):
                 msg = cformat('%{yellow}Invalid legacy user: {}').format(legacy_user)
             self.importer.print_warning(msg, event_id=self.event.id, always=(msg not in self.legacy_warnings_shown))
             self.legacy_warnings_shown.add(msg)
-        return user
+        return user or (self.importer.janitor_user if janitor else None)
 
     def _event_to_utc(self, dt):
         return self.event.tzinfo.localize(dt).astimezone(utc)
@@ -112,6 +181,7 @@ class AbstractMigration(object):
                 track.abstract_reviewers.add(user)
                 self.event.update_principal(user, add_roles={'abstract_reviewer'}, quiet=True)
             self.track_map[old_track] = track
+            self.track_map_by_id[int(old_track.id)] = track
             self.event.tracks.append(track)
 
     def _migrate_boa_settings(self):
@@ -167,9 +237,15 @@ class AbstractMigration(object):
             'reviewers_final_judgement': bool(getattr(old_settings, '_canReviewerAccept', False))
         })
         for pos, old_question in enumerate(old_settings._reviewingQuestions, 1):
-            question = AbstractReviewQuestion(position=pos, text=convert_to_unicode(old_question._text))
-            self.question_map[old_question] = question
-            self.event.abstract_review_questions.append(question)
+            self._migrate_question(old_question, pos=pos)
+
+    def _migrate_question(self, old_question, pos=None, is_deleted=False):
+        assert old_question not in self.question_map
+        question = AbstractReviewQuestion(position=pos, text=convert_to_unicode(old_question._text),
+                                          is_deleted=is_deleted)
+        self.question_map[old_question] = question
+        self.event.abstract_review_questions.append(question)
+        return question
 
     def _convert_email_template(self, tpl):
         placeholders = {'abstract_URL': 'abstract_url',
@@ -280,31 +356,210 @@ class AbstractMigration(object):
                                             event_id=self.event.id, always=False)
             tpl.rules = rules
 
+    def _migrate_abstracts(self):
+        old_by_id = {oa.friendly_id: oa for oa in self.event.old_abstracts}
+        abstract_map = {}
+        old_abstract_state_map = {}
+        as_duplicate_reviews = set()
+        for zodb_abstract in self.amgr._abstracts.itervalues():
+            old_abstract = old_by_id[int(zodb_abstract._id)]
+            submitter = self._user_from_legacy(zodb_abstract._submitter._user, janitor=True)
+            submitted_dt = zodb_abstract._submissionDate
+            modified_dt = (zodb_abstract._modificationDate
+                           if (submitted_dt - zodb_abstract._modificationDate) > timedelta(seconds=10)
+                           else None)
+            try:
+                accepted_track = (self.track_map_by_id[old_abstract.accepted_track_id]
+                                  if old_abstract.accepted_track_id is not None
+                                  else None)
+            except KeyError:
+                self.importer.print_error(cformat('%{yellow!}Abstract #{} accepted in invalid track #{}')
+                                          .format(old_abstract.friendly_id, old_abstract.accepted_track_id),
+                                          event_id=self.event.id)
+                accepted_track = None
+            abstract = Abstract(id=old_abstract.id,
+                                friendly_id=old_abstract.friendly_id,
+                                title=convert_to_unicode(zodb_abstract._title),
+                                description=old_abstract.description,
+                                submitter=submitter,
+                                submitted_dt=submitted_dt,
+                                submitted_contrib_type_id=old_abstract.type_id,
+                                submission_comment=convert_to_unicode(zodb_abstract._comments),
+                                modified_dt=modified_dt,
+                                accepted_contrib_type_id=old_abstract.accepted_type_id,
+                                accepted_track=accepted_track)
+            self.importer.print_info(cformat('%{white!}Abstract:%{reset} {}').format(abstract.title))
+            self.event.abstracts.append(abstract)
+            abstract_map[zodb_abstract] = abstract
 
-class EventAbstractsImporter(Importer):
+            # files
+            for old_attachment in getattr(zodb_abstract, '_attachments', {}).itervalues():
+                storage_backend, storage_path, size = self.importer._get_local_file_info(old_attachment)
+                if storage_path is None:
+                    self.importer.print_error(cformat('%{red!}File not found on disk; skipping it [{}]')
+                                              .format(convert_to_unicode(old_attachment.fileName)),
+                                              event_id=self.event.id)
+                    continue
+                content_type = mimetypes.guess_type(old_attachment.fileName)[0] or 'application/octet-stream'
+                filename = secure_filename(convert_to_unicode(old_attachment.fileName), 'attachment')
+                attachment = AbstractFile(filename=filename, content_type=content_type, size=size,
+                                          storage_backend=storage_backend, storage_file_id=storage_path)
+                abstract.files.append(attachment)
+
+            # internal comments
+            for old_comment in zodb_abstract._intComments:
+                comment = AbstractComment(user=self._user_from_legacy(old_comment._responsible),
+                                          text=convert_to_unicode(old_comment._content),
+                                          created_dt=old_comment._creationDate,
+                                          modified_dt=old_comment._modificationDate)
+                abstract.comments.append(comment)
+
+            # state
+            old_state = zodb_abstract._currentStatus
+            old_state_name = old_state.__class__.__name__
+            old_abstract_state_map[abstract] = old_state
+            abstract.state = self.STATE_MAP[old_state_name]
+
+            # tracks
+            reallocated = set(r._track for r in getattr(zodb_abstract, '_trackReallocations', {}).itervalues())
+            for old_track in zodb_abstract._tracks.values():
+                abstract.reviewed_for_tracks.add(self.track_map[old_track])
+                if old_track not in reallocated:
+                    abstract.submitted_for_tracks.add(self.track_map[old_track])
+
+            # judgments (reviews)
+            old_judgments = {(j.track_id, j.judge): j for j in old_abstract.judgments}
+            for old_track_id, zodb_judgments in getattr(zodb_abstract, '_trackJudgementsHistorical', {}).iteritems():
+                seen_judges = set()
+                for zodb_judgment in zodb_judgments:
+                    if zodb_judgment is None:
+                        continue
+                    try:
+                        track = self.track_map_by_id[int(zodb_judgment._track.id)]
+                    except KeyError:
+                        self.importer.print_warning(
+                            cformat('%{blue!}Abstract {} {yellow}judged in invalid track {}%{reset}').format(
+                                zodb_abstract._id, int(zodb_judgment._track.id)), event_id=self.event.id)
+                        continue
+                    judge = self._user_from_legacy(zodb_judgment._responsible)
+                    if not judge:
+                        # self.importer.print_warning(
+                        #     cformat('%{blue!}Abstract {} {yellow}had an empty judge ({})!%{reset}').format(
+                        #         zodb_abstract._id, zodb_judgment), event_id=self.event.id)
+                        continue
+                    elif judge in seen_judges:
+                        # self.importer.print_warning(
+                        #     cformat("%{blue!}Abstract {}: {yellow}judge '{}' seen more than once ({})!%{reset}")
+                        #         .format(zodb_abstract._id, judge, zodb_judgment), event_id=self.event.id)
+                        continue
+
+                    seen_judges.add(judge)
+                    try:
+                        created_dt = as_utc(zodb_judgment._date)
+                    except AttributeError:
+                        created_dt = self.event.start_dt
+                    review = AbstractReview(user=judge, track=track, created_dt=created_dt,
+                                            proposed_action=self.ACTION_MAP[zodb_judgment.__class__.__name__],
+                                            comment=convert_to_unicode(zodb_judgment._comment))
+                    if review.proposed_action == AbstractAction.accept:
+                        try:
+                            old_judgment = old_judgments[int(old_track_id), judge]
+                        except KeyError:
+                            self.importer.print_error(cformat('%{yellow!}Abstract #{} has no new judgment for {} / {}')
+                                                      .format(abstract.friendly_id, int(old_track_id), judge),
+                                                      event_id=self.event.id)
+                        else:
+                            review.proposed_contribution_type = old_judgment.accepted_type
+                            review.proposed_track = self.track_map_by_id[old_judgment.track_id]
+                    elif review.proposed_action == AbstractAction.change_tracks:
+                        review.proposed_other_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
+                    elif review.proposed_action == AbstractAction.mark_as_duplicate:
+                        as_duplicate_reviews.add((review, zodb_judgment._originalAbst))
+
+                    answered_questions = set()
+                    for old_answer in getattr(zodb_judgment, '_answers', []):
+                        if old_answer._question in answered_questions:
+                            self.importer.print_warning(
+                                cformat("%{blue!}Abstract {}: {yellow}question answered more than once!").format(
+                                    abstract.friendly_id), event_id=self.event.id)
+                            continue
+                        try:
+                            question = self.question_map[old_answer._question]
+                        except KeyError:
+                            question = self._migrate_question(old_answer._question, is_deleted=True)
+                            self.importer.print_warning(
+                                cformat("%{blue!}Abstract {}: {yellow}answer for deleted question").format(
+                                    abstract.friendly_id), event_id=self.event.id)
+                        rating = AbstractReviewRating(question=question, value=old_answer._rbValue)
+                        review.ratings.append(rating)
+                        answered_questions.add(old_answer._question)
+
+                    abstract.reviews.append(review)
+
+            # TODO: authors
+
+        # merges/duplicates
+        for abstract in self.event.abstracts:
+            old_state = old_abstract_state_map[abstract]
+            if abstract.state == AbstractState.merged:
+                abstract.merged_into = abstract_map[old_state._target]
+            elif abstract.state == AbstractState.duplicate:
+                abstract.duplicate_of = abstract_map[old_state._original]
+
+        # mark-as-duplicate judgments
+        for review, old_abstract in as_duplicate_reviews:
+            try:
+                review.proposed_duplicate_abstract = abstract_map[old_abstract]
+            except KeyError:
+                self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
+                                          .format(review.abstract.friendly_id, old_abstract._id),
+                                          event_id=self.event.id)
+
+
+class EventAbstractsImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
+        kwargs = self._set_config_options(**kwargs)
         self.default_email = kwargs.pop('default_email').lower()
+        self.janitor_user_id = kwargs.pop('janitor_user_id')
+        self.janitor_user = None
         self.all_users_by_email = {}
         super(EventAbstractsImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
         command = click.option('--default-email', required=True, help="Fallback email in case of garbage")(command)
-        return command
+        command = click.option('--janitor-user-id', type=int, required=True, help="The ID of the Janitor user")(command)
+        return super(EventAbstractsImporter, EventAbstractsImporter).decorate_command(command)
 
     def has_data(self):
         return Abstract.has_rows() or Track.has_rows()
 
     def migrate(self):
         self.load_data()
+        self.delete_orphaned_abstract_data()
         self.migrate_event_abstracts()
+        self.fix_sequences('event_abstracts', {'abstracts'})
 
     def load_data(self):
         self.print_step("Loading some data")
+        self.janitor_user = User.get_one(self.janitor_user_id)
         all_users_query = User.query.options(joinedload('_all_emails')).filter_by(is_deleted=False)
         for user in all_users_query:
             for email in user.all_emails:
                 self.all_users_by_email[email] = user
+
+    def delete_orphaned_abstract_data(self):
+        self.print_step("Deleting orphaned abstract data")
+        ids = {a.id for a in OldAbstract.query.join('event_new').filter(Event.is_deleted).all()}
+        if ids:
+            self.print_warning('Deleting abstract field values for abstracts in deleted events: {}'
+                               .format(', '.join(map(unicode, ids))))
+            Contribution.query.filter(Contribution.abstract_id.in_(ids)).update({Contribution.abstract_id: None},
+                                                                                synchronize_session=False)
+            OldAbstract.query.filter(OldAbstract.id.in_(ids)).delete(synchronize_session=False)
+            OldJudgment.query.filter(OldJudgment.abstract_id.in_(ids)).delete(synchronize_session=False)
+            AbstractFieldValue.query.filter(AbstractFieldValue.abstract_id.in_(ids)).delete(synchronize_session=False)
+            db.session.commit()
 
     def migrate_event_abstracts(self):
         self.print_step("Migrating event abstracts")
@@ -330,8 +585,8 @@ class EventAbstractsImporter(Importer):
         from sqlalchemy.orm import subqueryload
         query = (Event.query
                  .filter(~Event.is_deleted)
-                 .filter(Event.legacy_abstracts.any() | (Event.type_ == EventType.conference))
-                 .options(subqueryload('legacy_abstracts')))
+                 .filter(Event.old_abstracts.any() | (Event.type_ == EventType.conference))
+                 .options(subqueryload('old_abstracts')))
         it = iter(query)
         if self.quiet:
             it = verbose_iterator(query, query.count(), attrgetter('id'), lambda x: '')
