@@ -1,6 +1,6 @@
 {% from 'events/display/indico/_common.html' import render_location %}
 
-{% macro render_event(event, timezone, detail) %}
+{% macro render_event(event, timezone, detail, accessible_categories=()) %}
     {% set category = event.category %}
     <tr class="event">
         <td class="time">
@@ -35,7 +35,10 @@
     </tr>
     <tr>
         <td class="content-info" colspan="2">
-            {% if detail in ('session', 'contribution') and event.timetable_objects and event.can_access(session.user) %}
+            {% if (detail in ('session', 'contribution') and event.timetable_objects and
+                       ((not event.is_self_protected and event.category_id in accessible_categories) or
+                        event.effective_protection_mode.name == 'public' or
+                        event.can_access(session.user))) %}
                 {% if detail == 'session' %}
                     {{ _render_timetable(event, timezone, show_session=true) }}
                 {% elif detail == 'contribution' %}

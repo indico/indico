@@ -153,6 +153,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
        :param tz: the ``timezone`` information should be displayed in
        :param from_categ: ``Category`` that will be taken into account to calculate
                           visibility
+       :param grouped: Whether to group results by start date
        :returns: a dictionary containing timetable information in a
                  structured way. See source code for examples.
     """

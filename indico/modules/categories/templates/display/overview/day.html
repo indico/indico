@@ -26,7 +26,8 @@
 {% block overview %}
     <table class="day">
         {% for event in events %}
-            {{ render_event(event, timezone=category.display_tzinfo, detail=detail) }}
+            {{ render_event(event, timezone=category.display_tzinfo, detail=detail,
+                            accessible_categories=accessible_categories) }}
         {% endfor %}
     </table>
 {% endblock %}

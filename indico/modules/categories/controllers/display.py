@@ -490,6 +490,12 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             'mathjax': True
         }
 
+        if self.detail != 'event':
+            cte = self.category.get_protection_parent_cte()
+            params['accessible_categories'] = {cat_id
+                                               for cat_id, prot_parent_id in db.session.query(cte)
+                                               if prot_parent_id == self.category.id}
+
         if self.period == 'day':
             return WPCategory.render_template('display/overview/day.html', self.category, events=events, **params)
         elif self.period == 'week':
