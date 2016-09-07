@@ -123,6 +123,11 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         nullable=False,
         default=AbstractState.submitted
     )
+    submission_comment = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
     #: ID of the user who judged the abstract
     judge_id = db.Column(
         db.Integer,
