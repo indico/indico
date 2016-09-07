@@ -53,20 +53,25 @@
             evt.preventDefault();
             var $this = $(this);
             var selectedRows = getSelectedRows();
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                data: {registration_id: selectedRows},
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function() {
-                    for (var i = 0; i < selectedRows.length; i++) {
-                        var row = $('#registration-' + selectedRows[i]);
-                        row.fadeOut('fast', function() {
-                            $(this).remove();
-                        });
+            var msg = $T.ngettext('Do you really want to delete the selected registration?',
+                                  'Do you really want to delete the {0} selected registrations?',
+                                  selectedRows.length).format(selectedRows.length);
+            confirmPrompt(msg).then(function() {
+                $.ajax({
+                    url: $this.data('href'),
+                    method: $this.data('method'),
+                    data: {registration_id: selectedRows},
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function() {
+                        for (var i = 0; i < selectedRows.length; i++) {
+                            var row = $('#registration-' + selectedRows[i]);
+                            row.fadeOut('fast', function() {
+                                $(this).remove();
+                            });
+                        }
                     }
-                }
+                });
             });
         });
 
