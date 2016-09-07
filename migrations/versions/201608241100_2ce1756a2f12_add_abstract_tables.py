@@ -56,6 +56,7 @@ def upgrade():
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.Column('modified_dt', UTCDateTime, nullable=True),
         sa.Column('state', PyIntEnum(AbstractState), nullable=False),
+        sa.Column('submission_comment', sa.Text(), nullable=False),
         sa.Column('judge_id', sa.Integer(), nullable=True, index=True),
         sa.Column('judgment_dt', UTCDateTime, nullable=True),
         sa.Column('judgment_comment', sa.Text(), nullable=False),
