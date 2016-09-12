@@ -132,50 +132,56 @@
     }
 }
 
-.abstract-public-comments {
+.abstract-comments {
     @extend .i-box-group;
     @extend .i-box-group.vert;
-}
 
-.abstract-public-comment {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 1rem;
-}
+    .abstract-comment {
+        display: flex;
+        align-items: flex-start;
+        margin-top: 1rem;
 
-.abstract-public-comment-pic {
-    @include icon-before('icon-user');
-    @include border-all();
-    @include border-radius();
-    color: $light-black;
-    content: "";
-    margin-right: 1em;
-    // Icon centering
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-direction: column;
-    // To match i-box-header height
-    height: 39px;
-    width: 39px;
+        .abstract-comment-pic {
+            @include icon-before('icon-user');
+            @include border-all();
+            @include border-radius();
+            color: $light-black;
+            content: "";
+            margin-right: 1em;
+            // Icon centering
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-direction: column;
+            // To match i-box-header height
+            height: 39px;
+            width: 39px;
 
-    &:before {
-        font-size: 2.5em;
-    }
-}
+            &:before {
+                font-size: 2.5em;
+            }
+        }
 
-.abstract-public-comment-box {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
-    flex: 1;
+        .abstract-comment-box {
+            @extend .i-box;
+            @extend .i-box.no-shadow;
+            flex: 1;
 
-    .abstract-submission-edited {
-        cursor: default;
-        color: $gray;
-        float: right;
+            .abstract-comment-edited {
+                cursor: default;
+                color: $gray;
 
-        &:hover {
-            color: $dark-gray;
+                &:hover {
+                    color: $dark-gray;
+                }
+            }
         }
     }
+}
+
+
+#abstract-private {
+    @include border-top($width: 2px);
+    margin-top: 2em;
+    padding-top: 1em;
 }
