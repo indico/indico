@@ -25,6 +25,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.contributions.models.fields import ContributionField
+from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -40,25 +41,30 @@ class AbstractListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super(AbstractListGenerator, self).__init__(event)
         self.default_list_config = {
-            'items': ('submitted_type', 'accepted_type', 'submitted_for_tracks', 'accepted_track', 'state'),
+            'items': ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks', 'proposed_for_tracks',
+                      'accepted_track', 'state'),
             'filters': {'fields': {}, 'items': {}}
         }
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
+        track_choices = {unicode(track.id): track.title for track in event.tracks}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
         self.static_items = OrderedDict([
             ('state', {'title': _('State'), 'filter_choices': {state.name: state.title for state in AbstractState}}),
-            ('accepted_track', {'title': _('Final track'),
+            ('authors', {'title': _('Primary authors')}),
+            ('accepted_track', {'title': _('Accepted track'),
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
             ('submitted_for_tracks', {'title': _('Submitted for tracks'),
                                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('accepted_type', {'title': _('Accepted type'),
-                               'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('submitted_type', {'title': _('Submitted type'),
-                                'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('submitted_dt', {'title': 'Submission date'}),
-            ('modified_dt', {'title': 'Modification date'})
+            ('proposed_for_tracks', {'title': _('Proposed for tracks'),
+                                     'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+            ('accepted_contrib_type', {'title': _('Accepted type'),
+                                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            ('submitted_contrib_type', {'title': _('Submitted type'),
+                                        'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            # TODO: Rating
+            ('submitted_dt', {'title': _('Submission date')}),
+            ('modified_dt', {'title': _('Modification date')})
         ])
         self.list_config = self._get_config()
 
@@ -68,7 +74,7 @@ class AbstractListGenerator(ListGeneratorBase):
 
         :return: a list of {'id': ..., 'caption': ...} dicts
         """
-        return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in ids if id_ in self.static_items]
+        return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
 
     def _get_sorted_contribution_fields(self, item_ids):
         """Return the contribution fields ordered by their position in the abstract form."""
@@ -105,20 +111,27 @@ class AbstractListGenerator(ListGeneratorBase):
         criteria = []
         static_filters = {
             'accepted_track': Abstract.accepted_track_id,
+            'accepted_contrib_type': Abstract.accepted_contrib_type_id,
+            'submitted_contrib_type': Abstract.submitted_contrib_type_id,
+            'state': Abstract.state,
             'submitted_for_tracks': Abstract.submitted_for_tracks,
-            'accepted_type': Abstract.accepted_type_id,
-            'submitted_type': Abstract.submitted_type,
-            'state': Abstract.state
+            'proposed_for_tracks': Abstract.proposed_for_tracks
         }
         for key, column in static_filters.iteritems():
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue
             column_criteria = []
-            if None in ids:
-                column_criteria.append(column.is_(None))
-            if ids - {None}:
-                column_criteria.append(column.in_(ids - {None}))
+            if '_for_tracks' in key:
+                if None in ids:
+                    column_criteria.append(~column.any())
+                if ids - {None}:
+                    column_criteria.append(column.any(Track.id.in_(ids)))
+            else:
+                if None in ids:
+                    column_criteria.append(column.is_(None))
+                if ids - {None}:
+                    column_criteria.append(column.in_(ids - {None}))
             criteria.append(db.or_(*column_criteria))
         return query.filter(db.and_(*criteria))
 
