@@ -1,23 +1,8 @@
-{% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
 {% from 'message_box.html' import message_box %}
 {% set editable = not reminder or not reminder.is_sent %}
 {% set disabled_fields = () if editable else form._fields.viewkeys() %}
 {% set widget_attrs = form.default_widget_attrs %}
-
-{% block title %}
-    {% trans %}Reminders{% endtrans %}
-{% endblock %}
-
-{% block subtitle %}
-    {% if not reminder %}
-        {%- trans %}Add Reminder{% endtrans -%}
-    {% elif reminder.is_sent %}
-        {%- trans %}Reminder Details{% endtrans -%}
-    {% else %}
-        {%- trans %}Edit Reminder{% endtrans -%}
-    {% endif %}
-{% endblock %}
 
 {% block content %}
     <div class="reminders">

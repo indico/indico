@@ -29,6 +29,7 @@ from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -117,10 +118,10 @@ class RHEditReminder(RHSpecificReminderBase):
                 logger.info('Reminder modified by %s: %s', session.user, reminder)
                 flash(_("The reminder at {} has been modified.").format(format_datetime(reminder.scheduled_dt)),
                       'success')
-            return redirect(url_for('.list', self.event))
+            return jsonify_data(flash=False)
 
-        return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=reminder,
-                                           form=form)
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=reminder,
+                                form=form)
 
 
 class RHAddReminder(RHRemindersBase):
@@ -138,10 +139,10 @@ class RHAddReminder(RHRemindersBase):
             else:
                 logger.info('Reminder created by %s: %s', session.user, reminder)
                 flash(_("A reminder at {} has been created.").format(format_datetime(reminder.scheduled_dt)), 'success')
-            return redirect(url_for('.list', self.event))
+            return jsonify_data(flash=False)
 
-        return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=None, form=form,
-                                           widget_attrs=form.default_widget_attrs)
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form,
+                                widget_attrs=form.default_widget_attrs)
 
 
 class RHPreviewReminder(RHRemindersBase):

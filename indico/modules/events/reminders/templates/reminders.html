@@ -11,7 +11,12 @@
         {% for reminder in reminders %}
             <li>
                 <strong>
-                    <a href="{{ url_for('.edit', reminder) }}">
+                    <a href="#" data-href="{{ url_for('.edit', reminder) }}"
+                        {% set button_title =_("Reminder details") if reminder.is_sent else _("Edit reminder") %}
+                        data-title="{{ button_title }}"
+                        data-ajax-dialog
+                        data-hide-page-header
+                        data-reload-after>
                         {%- if reminder.is_relative -%}
                             {{ reminder.event_start_delta|format_human_timedelta('hours') }} before the event
                         {%- else -%}
@@ -43,9 +48,12 @@
             <div class="i-box-header">
                 <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
                 <div class="i-box-buttons">
-                    <a class="i-button icon-plus" href="{{ url_for('.add', event) }}">
-                        {%- trans %}Add Reminder{% endtrans -%}
-                    </a>
+                    <a class="i-button icon-plus" data-href="{{ url_for('.add', event) }}"
+                       data-title="{%- trans %}Add Reminder{% endtrans -%}"
+                       data-ajax-dialog
+                       data-hide-page-header
+                       data-reload-after>
+                       {%- trans %}Add Reminder{% endtrans -%}</a>
                 </div>
             </div>
             <div class="i-box-content">
