@@ -337,14 +337,16 @@ button::-moz-focus-inner {
 }
 
 a.i-button-icon {
-    color: $dark-gray;
+    @include transition();
+    @include transition-property(color);
+    color: $gray;
     cursor: pointer;
 
     &:not(.disabled):not(:disabled) {
         &:hover,
         &:active,
         &.active {
-            color: $dark-blue;
+            color: $black;
 
             &.accept {
                 color: $green;
@@ -352,6 +354,10 @@ a.i-button-icon {
 
             &.danger {
                 color: $red;
+            }
+
+            &.highlight {
+                color: $blue;
             }
 
             &.warning {
