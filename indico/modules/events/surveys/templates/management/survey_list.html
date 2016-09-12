@@ -60,7 +60,12 @@
     {% endfor %}
     <div class="toolbar">
         <div class="group right">
-            <a href="{{ url_for('.create', event) }}" class="i-button">
+            <a href="#" class="i-button"
+               data-href="{{ url_for('.create', event) }}"
+               data-title="{%- trans %}Create survey{% endtrans -%}"
+               data-ajax-dialog
+               data-hide-page-header
+               data-reload-after>
                 {% trans %}Create survey{% endtrans %}
             </a>
         </div>
