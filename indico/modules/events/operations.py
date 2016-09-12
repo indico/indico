@@ -75,8 +75,10 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     ConferenceHolder().add(conf, event)
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
+    person_link_data = data.pop('person_link_data', {})
     event.populate_from_dict(data)
     db.session.flush()
+    event.person_link_data = person_link_data
     if theme is not None:
         layout_settings.set(event, 'timetable_theme', theme)
     if add_creator_as_manager:
