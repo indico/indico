@@ -27,7 +27,6 @@ from indico.modules.events.registration.controllers.display import RHRegistratio
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.date_time import format_date
 from indico.util.i18n import _
@@ -35,6 +34,7 @@ from indico.web.flask.util import url_for, send_file, secure_filename
 
 from MaKaC.PDFinterface.conference import TicketToPDF
 from MaKaC.common import Config
+from indico.web.util import jsonify_data, jsonify_template
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
@@ -60,11 +60,10 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
-            return redirect(url_for('.tickets', self.regform))
+            return jsonify_data()
 
-        return WPManageRegistration.render_template('management/regform_tickets.html', self.event,
-                                                    regform=self.regform, form=form,
-                                                    can_enable_tickets=self._check_ticket_app_enabled())
+        return jsonify_template('events/registration/management/regform_tickets.html', event=self.event,
+                                regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
 
 
 def generate_ticket(registration):
