@@ -79,7 +79,7 @@
     <div class="clearfix">
         <h3>{% trans %}Abstract fields{% endtrans %}</h3>
         {% for field in event.contribution_fields %}
-            {{ _render_column_selector(field.id, field, field.filter_choices, is_static_item=true) }}
+            {{ _render_column_selector(field.id, field, field.filter_choices) }}
         {% endfor %}
     </div>
 
