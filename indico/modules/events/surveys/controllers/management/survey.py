@@ -28,7 +28,7 @@ from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageSurveys(RHManageSurveysBase):
@@ -60,9 +60,9 @@ class RHEditSurvey(RHManageSurveyBase):
             db.session.flush()
             flash(_('Survey modified'), 'success')
             logger.info('Survey %s modified by %s', self.survey, session.user)
-            return redirect(url_for('.manage_survey', self.survey))
-        return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form,
-                                              survey=self.survey)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form,
+                                survey=self.survey)
 
 
 class RHDeleteSurvey(RHManageSurveyBase):
@@ -89,9 +89,8 @@ class RHCreateSurvey(RHManageSurveysBase):
             db.session.flush()
             flash(_('Survey created'), 'success')
             logger.info('Survey %s created by %s', survey, session.user)
-            return redirect(url_for('.manage_survey', survey))
-        return WPManageSurvey.render_template('management/edit_survey.html',
-                                              self.event, event=self.event, form=form, survey=None)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form, survey=None)
 
 
 class RHScheduleSurvey(RHManageSurveyBase):
