@@ -28,6 +28,7 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
 
     def __init__(self, *args, **kwargs):
         self.modify_object_list = kwargs.pop('modify_object_list', None)
+        self.collection_class = kwargs.pop('collection_class', list)
         super(IndicoQuerySelectMultipleField, self).__init__(*args, **kwargs)
 
     def _get_object_list(self):
@@ -35,6 +36,12 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
         if self.modify_object_list:
             object_list = list(self.modify_object_list(object_list))
         return object_list
+
+    def _get_data(self):
+        data = super(IndicoQuerySelectMultipleField, self)._get_data()
+        return self.collection_class(data)
+
+    data = property(_get_data, QuerySelectMultipleField._set_data)
 
 
 class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
