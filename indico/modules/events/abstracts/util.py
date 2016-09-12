@@ -100,15 +100,17 @@ class AbstractListGenerator(ListGeneratorBase):
                 .order_by(Abstract.id))
 
     def _filter_list_entries(self, query, filters):
+        criteria = []
         if not (filters.get('fields') or filters.get('items')):
             return query
-        # TODO: Get field filters
-        field_filters = {}
-        if not field_filters and not filters['items']:
+        for contribution_type_id, field_values in filters.get('fields').iteritems():
+            criteria.append(Abstract.field_values.any(db.and_(
+                AbstractFieldValue.contribution_field_id == contribution_type_id,
+                AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
+            )))
+
+        if not criteria and not filters.get('items'):
             return query
-        # TODO: Construct field items criteria
-        # items_criteria = []
-        criteria = []
         static_filters = {
             'accepted_track': Abstract.accepted_track_id,
             'accepted_contrib_type': Abstract.accepted_contrib_type_id,
