@@ -516,7 +516,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         person_link.populate_from_dict(person_data)
         email = data.get('email', '').lower()
         if email != person_link.email:
-            if not self.event.persons.filter_by(email=email).first():
+            if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
             else:
                 raise UserValueError(_('There is already a person with the email {}').format(email))

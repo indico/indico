@@ -19,11 +19,11 @@ import tempfile
 import string
 import os
 
-
 from MaKaC.common.utils import utf8rep
 from MaKaC.errors import MaKaCError
 from MaKaC import conference
 from indico.core.config import Config
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 
 
@@ -113,7 +113,7 @@ class ReviewingPacker:
         for contribution in self._conf.as_event.contributions:
             reviewingStatus = self._conf.getReviewManager(contribution).getLastReview().getRefereeJudgement().getJudgement()
             if reviewingStatus == "Accept":
-                dirName = "%s" % self._normalisePathItem(contribution.title)
+                dirName = secure_filename(contribution.title, fallback='')
                 self._packContribution(contribution, dirName, fileHandler)
 
         fileHandler.close()
