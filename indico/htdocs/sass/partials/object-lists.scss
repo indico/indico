@@ -130,6 +130,10 @@
                 float: left;
             }
 
+            .dropdown {
+                z-index: 100;
+            }
+
             &:hover {
                 > a:before {
                     color: $yellow !important;
