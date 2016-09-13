@@ -25,8 +25,9 @@ from indico.util.struct.enum import IndicoEnum
 class AbstractAction(int, IndicoEnum):
     accept = 1
     reject = 2
-    merge = 3
-    mark_as_dupe = 4
+    change_tracks = 3
+    mark_as_duplicate = 4
+    mark_as_not_duplicate = 5
 
 
 class AbstractReview(db.Model):
@@ -76,6 +77,12 @@ class AbstractReview(db.Model):
         PyIntEnum(AbstractAction),
         nullable=False
     )
+    proposed_duplicate_abstract_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_abstracts.abstracts.id'),
+        index=True,
+        nullable=True
+    )
     proposed_track_id = db.Column(
         db.Integer,
         db.ForeignKey('events.tracks.id'),
@@ -91,6 +98,7 @@ class AbstractReview(db.Model):
     abstract = db.relationship(
         'Abstract',
         lazy=False,
+        foreign_keys=abstract_id,
         backref=db.backref(
             'reviews',
             lazy=True
@@ -110,6 +118,25 @@ class AbstractReview(db.Model):
         foreign_keys=track_id,
         backref=db.backref(
             'abstract_reviews',
+            lazy='dynamic'
+        )
+    )
+    proposed_duplicate_abstract = db.relationship(
+        'Abstract',
+        lazy=False,
+        foreign_keys=proposed_duplicate_abstract_id,
+        backref=db.backref(
+            'proposed_duplicate_abstract_reviews',
+            lazy='dynamic'
+        )
+    )
+    proposed_other_tracks = db.relationship(
+        'Track',
+        secondary='event_abstracts.review_proposed_other_tracks',
+        lazy=False,
+        collection_class=set,
+        backref=db.backref(
+            'proposed_other_abstract_reviews',
             lazy='dynamic'
         )
     )

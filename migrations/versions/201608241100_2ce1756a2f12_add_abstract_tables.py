@@ -193,9 +193,11 @@ def upgrade():
         sa.Column('modified_dt', UTCDateTime, nullable=True),
         sa.Column('comment', sa.Text(), nullable=False),
         sa.Column('proposed_action', PyIntEnum(AbstractAction), nullable=False),
+        sa.Column('proposed_duplicate_abstract_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_track_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_contribution_type_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
+        sa.ForeignKeyConstraint(['proposed_duplicate_abstract_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['proposed_track_id'], ['events.tracks.id']),
         sa.ForeignKeyConstraint(['proposed_contribution_type_id'], ['events.contribution_types.id']),
         sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
@@ -214,7 +216,17 @@ def upgrade():
         sa.ForeignKeyConstraint(['question_id'], ['event_abstracts.abstract_review_questions.id']),
         sa.ForeignKeyConstraint(['review_id'], ['event_abstracts.abstract_reviews.id']),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('review_id'),
+        sa.UniqueConstraint('review_id', 'question_id'),
+        schema='event_abstracts'
+    )
+
+    op.create_table(
+        'review_proposed_other_tracks',
+        sa.Column('review_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('track_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['review_id'], ['event_abstracts.abstract_reviews.id']),
+        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.PrimaryKeyConstraint('review_id', 'track_id'),
         schema='event_abstracts'
     )
 
@@ -248,6 +260,7 @@ def upgrade():
 def downgrade():
     op.drop_table('track_abstract_reviewers', schema='events')
     op.drop_table('email_logs', schema='event_abstracts')
+    op.drop_table('review_proposed_other_tracks', schema='event_abstracts')
     op.drop_table('abstract_review_ratings', schema='event_abstracts')
     op.drop_table('abstract_reviews', schema='event_abstracts')
     op.drop_table('abstract_review_questions', schema='event_abstracts')
