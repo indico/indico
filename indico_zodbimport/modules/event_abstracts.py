@@ -116,8 +116,7 @@ class AbstractMigration(object):
     ACTION_MAP = {'AbstractAcceptance': AbstractAction.accept,
                   'AbstractRejection': AbstractAction.reject,
                   'AbstractReallocation': AbstractAction.change_tracks,
-                  'AbstractMarkedAsDuplicated': AbstractAction.mark_as_duplicate,
-                  'AbstractUnMarkedAsDuplicated': AbstractAction.mark_as_not_duplicate}
+                  'AbstractMarkedAsDuplicated': AbstractAction.mark_as_duplicate}
 
     def __init__(self, importer, conf, event):
         self.importer = importer
@@ -433,6 +432,9 @@ class AbstractMigration(object):
                 seen_judges = set()
                 for zodb_judgment in zodb_judgments:
                     if zodb_judgment is None:
+                        continue
+                    if zodb_judgment.__class__.__name__ == 'AbstractUnMarkedAsDuplicated':
+                        # we don't have "unmarked as duplicate" anymore
                         continue
                     try:
                         track = self.track_map_by_id[int(zodb_judgment._track.id)]

@@ -27,7 +27,6 @@ class AbstractAction(int, IndicoEnum):
     reject = 2
     change_tracks = 3
     mark_as_duplicate = 4
-    mark_as_not_duplicate = 5
 
 
 class AbstractReview(db.Model):
