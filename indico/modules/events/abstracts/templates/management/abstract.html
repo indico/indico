@@ -1,9 +1,66 @@
 {% extends 'events/abstracts/management/_base.html' %}
-{% from 'events/abstracts/_abstract.html' import render_abstract_public, render_abstract_comments %}
+{% from 'events/abstracts/_abstract.html' import render_abstract_public, render_abstract_comments, render_edited_hint %}
 
 {% block content %}
     {{ render_abstract_public(abstract, management=true) }}
     <div id="abstract-private">
         {{ render_abstract_comments(abstract) }}
+        {{ _render_abstract_reviews(abstract) }}
     </div>
 {% endblock %}
+
+{% macro _render_abstract_reviews(abstract) %}
+    {% for track in abstract.proposed_for_tracks %}
+        {% set reviews = track.abstract_reviews|selectattr('abstract', 'equalto', abstract)|list %}
+        <h3>{{ track.title }}</h3>
+        {% for review in reviews %}
+            {{ _render_review(review) }}
+        {% endfor %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro _render_review(review) %}
+    <div class="abstract-comments">
+        <div class="abstract-comment">
+            <div class="abstract-comment-pic"></div>
+            <div class="abstract-comment-box">
+                <div class="i-box-header">
+                    {% trans name=review.user.name, date=review.created_dt|format_human_date -%}
+                        <strong>{{ name }}</strong> reviewed on {{ date }}
+                    {%- endtrans %}
+                    {% if review.modified_dt %}
+                        {{ render_edited_hint(comment.modified_dt) }}
+                    {% endif %}
+                    <div class="abstract-review-action">
+                        <span>
+                            {% trans %}Proposes to{% endtrans %}
+                        </span>
+                        <span class="abstract-review-state {{ review.proposed_action.name }}">
+                            {{ review.proposed_action.title }}
+                        </span>
+                        {% if review.score %}
+                            <span class="abstract-review-state score" title="{% trans %}Score{% endtrans %}">
+                                {{ review.score }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if review.ratings %}
+                    {% for rating in review.ratings %}
+                        <div>
+                            {# TODO: UI #}
+                            {{ rating.question.text }}
+                            {{ rating.value }}
+                        </div>
+                    {% endfor %}
+                    <div class="titled-rule">
+                        {% trans %}Comment{% endtrans %}
+                    </div>
+                {% endif %}
+                <div class="i-box-content">
+                    {{ review.comment }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
