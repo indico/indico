@@ -31,11 +31,10 @@ from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, send_file, secure_filename
+from indico.web.util import jsonify_data, jsonify_template
 
 from MaKaC.PDFinterface.conference import TicketToPDF
 from MaKaC.common import Config
-from indico.web.util import jsonify_data, jsonify_template
-
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
@@ -60,9 +59,9 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
-            return jsonify_data()
+            return jsonify_data(flash=False)
 
-        return jsonify_template('events/registration/management/regform_tickets.html', event=self.event,
+        return jsonify_template('events/registration/management/regform_tickets.html',
                                 regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
 
 
