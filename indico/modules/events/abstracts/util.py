@@ -43,7 +43,7 @@ class AbstractListGenerator(ListGeneratorBase):
         self.default_list_config = {
             'items': ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks', 'proposed_for_tracks',
                       'accepted_track', 'state'),
-            'filters': {'fields': {}, 'items': {}}
+            'filters': {'fields': {}, 'items': {}, 'extra': {}}
         }
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
@@ -65,6 +65,10 @@ class AbstractListGenerator(ListGeneratorBase):
             # TODO: Rating
             ('submitted_dt', {'title': _('Submission date')}),
             ('modified_dt', {'title': _('Modification date')})
+        ])
+        self.extra_filters = OrderedDict([
+            ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
+            ('comments', {'title': _('Must have comments'), 'type': 'bool'})
         ])
         self.list_config = self._get_config()
 
@@ -101,40 +105,56 @@ class AbstractListGenerator(ListGeneratorBase):
 
     def _filter_list_entries(self, query, filters):
         criteria = []
-        if not (filters.get('fields') or filters.get('items')):
-            return query
-        for contribution_type_id, field_values in filters.get('fields').iteritems():
-            criteria.append(Abstract.field_values.any(db.and_(
-                AbstractFieldValue.contribution_field_id == contribution_type_id,
-                AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
-            )))
+        field_filters = filters.get('fields')
+        item_filters = filters.get('items')
+        extra_filters = filters.get('extra')
 
-        if not criteria and not filters.get('items'):
+        if not (field_filters or item_filters or extra_filters):
             return query
-        static_filters = {
-            'accepted_track': Abstract.accepted_track_id,
-            'accepted_contrib_type': Abstract.accepted_contrib_type_id,
-            'submitted_contrib_type': Abstract.submitted_contrib_type_id,
-            'state': Abstract.state,
-            'submitted_for_tracks': Abstract.submitted_for_tracks,
-            'proposed_for_tracks': Abstract.proposed_for_tracks
-        }
-        for key, column in static_filters.iteritems():
-            ids = set(filters['items'].get(key, ()))
-            if not ids:
-                continue
-            column_criteria = []
-            if '_for_tracks' in key:
-                if None in ids:
-                    column_criteria.append(~column.any())
-                if ids - {None}:
-                    column_criteria.append(column.any(Track.id.in_(ids)))
-            else:
-                if None in ids:
-                    column_criteria.append(column.is_(None))
-                if ids - {None}:
-                    column_criteria.append(column.in_(ids - {None}))
-            criteria.append(db.or_(*column_criteria))
+
+        if field_filters:
+            for contribution_type_id, field_values in field_filters.iteritems():
+                criteria.append(Abstract.field_values.any(db.and_(
+                    AbstractFieldValue.contribution_field_id == contribution_type_id,
+                    AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
+                )))
+
+        if item_filters:
+            static_filters = {
+                'accepted_track': Abstract.accepted_track_id,
+                'accepted_contrib_type': Abstract.accepted_contrib_type_id,
+                'submitted_contrib_type': Abstract.submitted_contrib_type_id,
+                'state': Abstract.state,
+                'submitted_for_tracks': Abstract.submitted_for_tracks,
+                'proposed_for_tracks': Abstract.proposed_for_tracks
+            }
+            for key, column in static_filters.iteritems():
+                ids = set(item_filters.get(key, ()))
+                if not ids:
+                    continue
+                column_criteria = []
+                if '_for_tracks' in key:
+                    if None in ids:
+                        column_criteria.append(~column.any())
+                        ids.discard(None)
+                    if ids:
+                        column_criteria.append(column.any(Track.id.in_(ids)))
+                else:
+                    if None in ids:
+                        column_criteria.append(column.is_(None))
+                        ids.discard(None)
+                    if ids:
+                        column_criteria.append(column.in_(ids))
+                criteria.append(db.or_(*column_criteria))
+
+        if extra_filters:
+            if extra_filters.get('multiple_tracks'):
+                submitted_for_count = (db.select([db.func.count()])
+                                       .as_scalar()
+                                       .where(Abstract.submitted_for_tracks.prop.primaryjoin))
+                criteria.append(submitted_for_count > 1)
+            if extra_filters.get('comments'):
+                criteria.append(Abstract.submission_comment != '')
         return query.filter(db.and_(*criteria))
 
     def get_list_kwargs(self):

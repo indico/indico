@@ -251,7 +251,8 @@ class ListGeneratorBase(object):
         #: Columns that originate from the list item's properties,
         #: relationships etc, but not from user defined fields (e.g.
         #: registration/contribution fields)
-        self.static_items = None
+        self.static_items = {}
+        self.extra_filters = {}
         self.static_link_used = 'config' in request.args
 
     def _get_config_session_key(self):
@@ -310,12 +311,19 @@ class ListGeneratorBase(object):
 
     def _get_filters_from_request(self):
         """Get the new filters after the filter form is submitted."""
+        def get_selected_options(item_id, item):
+            if item.get('filter_choices') or item.get('type') == 'bool':
+                return [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
+
         filters = deepcopy(self.default_list_config['filters'])
         for item_id, item in self.static_items.iteritems():
-            if item.get('filter_choices'):
-                options = [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
-                if options:
-                    filters['items'][item_id] = options
+            options = get_selected_options(item_id, item)
+            if options:
+                filters['items'][item_id] = options
+        for item_id, item in self.extra_filters.iteritems():
+            options = get_selected_options(item_id, item)
+            if options:
+                filters['extra'][item_id] = options
         return filters
 
     def get_list_url(self, uuid=None, external=False):
