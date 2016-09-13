@@ -1,21 +1,34 @@
-{% extends 'layout/base.html' %}
-
-{% block title %}{% trans %}Video services{% endtrans %}{% endblock %}
-
-{%- block content %}
-    {%- if plugins %}
-        <p>{% trans %}The following video services are available. Click on one to create a new room:{% endtrans %}</p>
-        <div class="i-badges-list-left i-badges-list-hover">
-            {%- for plugin in plugins %}
-                <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for(vc_room_action, event, service=plugin.service_name) }}">
-                    <div class="i-badge-content">
-                        <span class="i-badge-img">
-                            <img src="{{ plugin.logo_url }}">
-                        </span>
-                        <span class="i-badge-title">{{ plugin.title }}</span>
-                    </div>
-                </a>
-            {%- endfor %}
-        </div>
-    {%- endif %}
-{%- endblock %}
+{%- if plugins %}
+    <p>
+        {% if attach == '1' %}
+            {% trans %}The following video services are available. Click on one to attach a new room:{% endtrans %}
+        {% else %}
+            {% trans %}The following video services are available. Click on one to create a new room:{% endtrans %}
+        {% endif %}
+    </p>
+    <div class="i-badges-list-left i-badges-list-hover">
+        {%- for plugin in plugins %}
+            {% set action=_("Attach") if attach == '1' else _("Create") %}
+            <a href="#" class="js-vc-plugin i-badge i-badge-gray"
+               data-href="{{ url_for(vc_room_action, event, service=plugin.service_name) }}"
+               data-title="{% trans plugin_name=plugin.friendly_name %} {{ action }} {{ plugin_name }} room{% endtrans %}"
+               data-ajax-dialog
+               data-reload-after>
+                <div class="i-badge-content">
+                    <span class="i-badge-img">
+                        <img src="{{ plugin.logo_url }}">
+                    </span>
+                    <span class="i-badge-title">{{ plugin.title }}</span>
+                </div>
+            </a>
+        {%- endfor %}
+    </div>
+{%- endif %}
+<script>
+    $('.js-vc-plugin').on('click', function() {
+        var $this = $(this);
+        _.defer(function() {
+            $this.parent().trigger('ajaxDialog:close');
+        });
+    });
+</script>

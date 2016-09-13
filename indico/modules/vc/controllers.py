@@ -20,7 +20,7 @@ from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 import transaction
-from flask import request, session, redirect, flash, json, Response
+from flask import request, session, redirect, flash, json, Response, jsonify
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
 from werkzeug.exceptions import NotFound, BadRequest, Forbidden
@@ -42,6 +42,7 @@ from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.web.util import _pop_injected_js, jsonify_data
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
@@ -114,8 +115,9 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
 
     def _process(self):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
+        attach = request.args.get('attach', '')
         return WPVCManageEvent.render_template('manage_event_select.html', self._conf, vc_room_action=action,
-                                               event=self._conf, plugins=get_vc_plugins().values())
+                                               event=self._conf, plugins=get_vc_plugins().values(), attach=attach)
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
@@ -167,12 +169,12 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
                 flash(_("{plugin_name} room '{room.name}' created").format(
                     plugin_name=self.plugin.friendly_name, room=vc_room), 'success')
-                return redirect(url_for('.manage_vc_rooms', self.event_new))
+                return jsonify_data(flash=False)
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event_new, form=form,
                                             skip_fields=form.skip_fields | {'name'})
 
-        return WPVCManageEvent.render_string(form_html, self.event)
+        return jsonify(html=form_html, js=_pop_injected_js())
 
 
 class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
@@ -228,13 +230,13 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
                 flash(_("{plugin_name} room '{room.name}' updated").format(
                     plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
-                return redirect(url_for('.manage_vc_rooms', self.event_new))
+                return jsonify_data(flash=False)
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event_new, form=form,
                                             existing_vc_room=self.vc_room,
                                             skip_fields=form.skip_fields | {'name'})
 
-        return WPVCManageEvent.render_string(form_html, self.event)
+        return jsonify(html=form_html, js=_pop_injected_js())
 
 
 class RHVCManageEventRefresh(RHVCSystemEventBase):

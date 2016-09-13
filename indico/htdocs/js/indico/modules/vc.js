@@ -23,19 +23,6 @@
 
     global.eventManageVCRooms = function() {
 
-        $('.js-create-room:not([data-vc-system])').ajaxDialog({
-            title: $T('Video services'),
-            hidePageHeader: true
-        });
-
-        $('#btn-add-existing').ajaxDialog({
-            onClose: function(data) {
-                if (data) {
-                    location.reload();
-                }
-            }
-        });
-
         $('.js-vcroom-remove').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
