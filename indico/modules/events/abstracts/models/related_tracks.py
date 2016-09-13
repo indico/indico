@@ -62,3 +62,25 @@ _submitted_for_tracks = db.Table(
     ),
     schema='event_abstracts'
 )
+
+_review_proposed_other_tracks = db.Table(
+    'review_proposed_other_tracks',
+    db.metadata,
+    db.Column(
+        'review_id',
+        db.Integer,
+        db.ForeignKey('event_abstracts.abstract_reviews.id'),
+        primary_key=True,
+        autoincrement=False,
+        index=True
+    ),
+    db.Column(
+        'track_id',
+        db.Integer,
+        db.ForeignKey('events.tracks.id'),
+        primary_key=True,
+        autoincrement=False,
+        index=True
+    ),
+    schema='event_abstracts'
+)

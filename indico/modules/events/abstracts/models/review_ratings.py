@@ -22,7 +22,7 @@ from indico.util.string import format_repr, return_ascii
 
 class AbstractReviewRating(db.Model):
     __tablename__ = 'abstract_review_ratings'
-    __table_args__ = (db.UniqueConstraint('review_id'),
+    __table_args__ = (db.UniqueConstraint('review_id', 'question_id'),
                       {'schema': 'event_abstracts'})
 
     id = db.Column(
