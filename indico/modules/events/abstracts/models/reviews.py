@@ -172,3 +172,9 @@ class AbstractReview(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
+
+    @property
+    def score(self):
+        if not self.ratings:
+            return None
+        return sum((x.value for x in self.ratings)) / len(self.ratings)
