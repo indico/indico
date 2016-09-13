@@ -5,10 +5,17 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro _render_edited_hint(dt, user) %}
-    <span class="abstract-comment-edited" title="On {{ dt|format_human_date }} by {{ user.name }}">
-        · {% trans %}edited{% endtrans %}
-    </span>
+{% macro render_edited_hint(dt, user=None) %}
+    {% if user %}
+        <span class="abstract-comment-edited"
+            title="{% trans dt=dt|format_human_date, name=user.name %}On {{ dt }} by {{ name }}{% endtrans %}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% else %}
+        <span class="abstract-comment-edited" title="{{ dt|format_human_date }}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% endif %}
 {% endmacro %}
 
 {% macro _render_abstract_summary(abstract, management=false) %}
@@ -192,7 +199,7 @@
                             <strong>{{ name }}</strong> submitted this abstract on {{ date }}
                         {%- endtrans %}
                         {% if abstract.modified_dt %}
-                            {{ _render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
+                            {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
                         {% endif %}
                     </div>
                     <div class="i-box-content">
@@ -320,7 +327,7 @@
                                     <strong>{{ name }}</strong> commented on {{ date }}
                                 {%- endtrans %}
                                 {% if comment.modified_dt %}
-                                    {{ _render_edited_hint(comment.modified_dt, comment.modified_by) }}
+                                    {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
                                 {% endif %}
                                 {% if comment.can_edit(user) %}
                                     <a class="i-button-icon icon-edit right" title="{% trans %}Edit comment{% endtrans %}"></a>
