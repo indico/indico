@@ -1,4 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from '_switch.html' import switch %}
 
 {% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
@@ -28,6 +29,19 @@
                 </ul>
             </div>
         {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro _render_boolean_filter(id=none, name=none, label=none) %}
+    <div id="form-group-tracks_required" class="form-group">
+        {% if label %}
+            <div class="form-label">
+                <label for="{{ id }}">{{ label }}</label>
+            </div>
+        {% endif %}
+        <div class="form-field">
+            {{ switch(id=id, name=name, checked=filters['extra'][id]|bool) }}
+        </div>
     </div>
 {% endmacro %}
 
@@ -80,6 +94,16 @@
         <h3>{% trans %}Abstract fields{% endtrans %}</h3>
         {% for field in event.contribution_fields %}
             {{ _render_column_selector(field.id, field, field.filter_choices) }}
+        {% endfor %}
+    </div>
+
+    <div class="clearfix i-form horizontal">
+        <h3>{% trans %}Extra filters{% endtrans %}</h3>
+        {% for item_id, item in extra_filters.iteritems() %}
+            {% set name = 'field_{}'.format(item_id) %}
+            {% if item.type == 'bool' %}
+                {{ _render_boolean_filter(id=item_id, name=name, label=item.title) }}
+            {% endif %}
         {% endfor %}
     </div>
 

@@ -145,6 +145,7 @@ class RHAbstractListCustomize(RHAbstractListBase):
         return WPManageAbstracts.render_template('management/abstract_list_filter.html', self._conf,
                                                  event=self.event_new, visible_items=list_config['items'],
                                                  static_items=self.list_generator.static_items,
+                                                 extra_filters=self.list_generator.extra_filters,
                                                  filters=list_config['filters'])
 
     def _process_POST(self):
