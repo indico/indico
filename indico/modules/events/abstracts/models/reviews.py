@@ -18,11 +18,13 @@ from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
 
 
-class AbstractAction(int, IndicoEnum):
+class AbstractAction(TitledIntEnum):
+    __titles__ = [None, _("Accept"), _("Reject"), _("Merge"), _("Mark as duplicate")]
     accept = 1
     reject = 2
     change_tracks = 3

@@ -20,6 +20,48 @@
 @import 'partials/boxes';
 @import 'partials/icons';
 
+%abstract-state {
+    @include border-radius();
+    color: white;
+    font-weight: bold;
+    padding: 0.3em 0.6em;
+
+    &.awaiting {
+        background: $dark-gray;
+    }
+
+    &.score,
+    &.under-review {
+        background: $blue;
+    }
+
+    &.accept,
+    &.accepted {
+        background: $green;
+    }
+
+    &.reject,
+    &.rejected {
+        background: $red;
+    }
+
+    &.merge,
+    &.merged {
+        background: $purple;
+    }
+
+    &.mark_as_duplicate,
+    &.duplicate {
+        background: $black;
+    }
+
+    &.withdrawn {
+        @include border-all();
+        border-style: dashed;
+        color: $dark-gray;
+    }
+}
+
 #abstract-title {
     display: flex;
 
@@ -52,42 +94,9 @@
     align-items: baseline;
 
     .abstract-summary-state {
-        @include border-radius();
-        color: white;
+        @extend %abstract-state;
         font-size: 1.1em;
-        font-weight: bold;
         margin-right: 1rem;
-        padding: 0.3em 0.6em;
-
-        &.awaiting {
-            background: $dark-gray;
-        }
-
-        &.under-review {
-            background: $blue;
-        }
-
-        &.accepted {
-            background: $green;
-        }
-
-        &.rejected {
-            background: $red;
-        }
-
-        &.merged {
-            background: $purple;
-        }
-
-        &.duplicate {
-            background: $black;
-        }
-
-        &.withdrawn {
-            @include border-all();
-            border-style: dashed;
-            color: $dark-gray;
-        }
     }
 
     .abstract-summary-content {
@@ -173,6 +182,15 @@
 
                 &:hover {
                     color: $dark-gray;
+                }
+            }
+
+            .abstract-review-action {
+                color: $gray;
+                float: right;
+
+                .abstract-review-state {
+                    @extend %abstract-state;
                 }
             }
         }
