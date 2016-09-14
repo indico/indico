@@ -100,6 +100,7 @@ class AbstractReview(db.Model):
         foreign_keys=abstract_id,
         backref=db.backref(
             'reviews',
+            cascade='all, delete-orphan',
             lazy=True
         )
     )
