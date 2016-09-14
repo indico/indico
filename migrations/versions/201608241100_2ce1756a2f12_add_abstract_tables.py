@@ -204,6 +204,12 @@ def upgrade():
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
+        sa.CheckConstraint("(proposed_action = {}) = (proposed_track_id IS NOT NULL)"
+                           .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
+        sa.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
+                           .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
+        sa.CheckConstraint("(proposed_action = 4) = (proposed_duplicate_abstract_id IS NOT NULL)"
+                           .format(AbstractAction.mark_as_duplicate), name='prop_abstract_id_only_duplicate'),
         schema='event_abstracts'
     )
 
