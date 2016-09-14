@@ -35,6 +35,12 @@
                 authorType: 0,
                 isSpeaker: false,
                 isSubmitter: false
+            },
+            require: {
+                primaryAuthor: false,
+                secondaryAuthor: false,
+                submitter: false,
+                speaker: false
             }
         }, options);
 
@@ -345,6 +351,39 @@
                 });
             }
             $field.principalfield('refresh');
+        });
+
+        $field.closest('form').on('ajaxDialog:validateBeforeSubmit', function(evt) {
+            var $this = $(this);
+            var req = options.require;
+            if (req.primaryAuthor || req.secondaryAuthor || req.submitter || req.speaker) {
+                var hiddenData = JSON.parse($field.val());
+                var $formField = $field.closest('.form-field');
+                var $formGroup = $field.closest('.form-group');
+                var hasError = false;
+
+                if (req.speaker && _.indexOf(_.pluck(hiddenData, 'isSpeaker'), true) === -1) {
+                    hasError = true;
+                    $formField.data('error', $T.gettext('You must add at least one speaker'));
+                } else if (req.submitter && _.indexOf(_.pluck(hiddenData, 'isSubmitter'), true) === -1) {
+                    hasError = true;
+                    $formField.data('error', $T.gettext('You must add at least one submitter'));
+                } else if (req.secondaryAuthor && _.indexOf(_.pluck(hiddenData, 'authorType'), 2) === -1) {
+                    hasError = true;
+                    $formField.data('error', $T.gettext('You must add at least one co-author'));
+                } else if (req.primaryAuthor && _.indexOf(_.pluck(hiddenData, 'authorType'), 1) === -1) {
+                    hasError = true;
+                    $formField.data('error', $T.gettext('You must add at least one author'));
+                }
+                if (hasError) {
+                    evt.preventDefault();
+                    $formGroup.addClass('has-error');
+                    showFormErrors($this.parent());
+                } else {
+                    $formGroup.removeClass('has-error');
+                    $formField.removeData('error');
+                }
+            }
         });
     };
 })(window);
