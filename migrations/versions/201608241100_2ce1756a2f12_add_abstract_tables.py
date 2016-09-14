@@ -235,6 +235,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('abstract_id', sa.Integer(), nullable=False, index=True),
         sa.Column('email_template_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('sent_dt', UTCDateTime, nullable=False),
         sa.Column('recipients', postgresql.ARRAY(sa.String()), nullable=False),
         sa.Column('subject', sa.String(), nullable=False),
@@ -242,6 +243,7 @@ def upgrade():
         sa.Column('data', postgresql.JSON(), nullable=False),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['email_template_id'], ['event_abstracts.email_templates.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_abstracts'
     )

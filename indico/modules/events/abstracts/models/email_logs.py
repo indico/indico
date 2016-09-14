@@ -43,6 +43,12 @@ class AbstractEmailLogEntry(db.Model):
         index=True,
         nullable=True
     )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
     sent_dt = db.Column(
         UTCDateTime,
         nullable=False,
@@ -79,6 +85,14 @@ class AbstractEmailLogEntry(db.Model):
         lazy=True,
         backref=db.backref(
             'logs',
+            lazy='dynamic'
+        )
+    )
+    user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'abstract_email_log_entries',
             lazy='dynamic'
         )
     )
