@@ -41,9 +41,12 @@
                     {% trans %}New abstract{% endtrans %}
                 </a>
                 <a class="i-button icon-remove js-requires-selected-row disabled js-delete-abstracts"
-                   {# TODO: data-href="{{ url_for('.delete_abstracts', event) }}" #}
-                   data-method="POST"
-                   data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}">
+                   data-href="{{ url_for('.manage_delete_abstracts', event) }}"
+                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                   data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}"
+                   data-title="{% trans %}Confirm deletion{% endtrans %}"
+                   data-method="POST">
                     {%- trans %}Remove{% endtrans -%}
                 </a>
                 <a class="i-button icon-checkmark js-requires-selected-row js-dialog-action accept">

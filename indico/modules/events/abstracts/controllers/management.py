@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash, jsonify
+from flask import redirect, flash, jsonify, request
 
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
@@ -24,12 +24,12 @@ from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubm
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import create_abstract
+from indico.modules.events.abstracts.operations import create_abstract, delete_abstract
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.util import get_field_values
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
@@ -52,6 +52,15 @@ class RHAbstractListBase(RHManageAbstractsBase):
     def _checkParams(self, params):
         RHManageAbstractsBase._checkParams(self, params)
         self.list_generator = AbstractListGenerator(event=self.event_new)
+
+
+class RHManageAbstractsActionsBase(RHAbstractListBase):
+    """Base class for classes performing actions on abstract"""
+
+    def _checkParams(self, params):
+        RHAbstractListBase._checkParams(self, params)
+        ids = map(int, request.form.getlist('abstract_id'))
+        self.abstracts = Abstract.query.with_parent(self.event_new).filter(Abstract.id.in_(ids)).all()
 
 
 class RHManageAbstract(AbstractMixin, RHManageAbstractsBase):
@@ -172,3 +181,14 @@ class RHCreateAbstract(RHAbstractListBase):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
         return jsonify_template('events/abstracts/forms/abstract.html', form=form)
+
+
+class RHDeleteAbstracts(RHManageAbstractsActionsBase):
+    def _process(self):
+        for abstract in self.abstracts:
+            delete_abstract(abstract)
+        deleted_count = len(self.abstracts)
+        flash(ngettext("The abstract has been deleted.",
+                       "{count} abstracts have been deleted.", deleted_count)
+              .format(count=deleted_count), 'success')
+        return jsonify_data(**self.list_generator.render_list())
