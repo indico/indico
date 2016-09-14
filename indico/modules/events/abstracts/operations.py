@@ -37,3 +37,12 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
                            'Abstract "{}" has been created'.format(abstract.title), session.user)
     return abstract
+
+
+def delete_abstract(abstract):
+    abstract.is_deleted = True
+    db.session.flush()
+    signals.event.abstract_deleted.send(abstract)
+    logger.info('Abstract %s deleted by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
+                           'Abstract "{}" has been deleted'.format(abstract.title), session.user)
