@@ -172,7 +172,7 @@ class AbstractForm(IndicoForm):
     description = IndicoMarkdownField(_('Content'), [DataRequired()], editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
-    person_links = AbstractPersonLinkListField(_("People"))
+    person_links = AbstractPersonLinkListField(_("People"), [DataRequired()])
     submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label=lambda x: x.title,
                                                                   collection_class=set)
     submission_comment = TextAreaField(_("Comments"))
