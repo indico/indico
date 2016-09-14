@@ -54,6 +54,12 @@
                 authorType: {{ (field.default_author_type.value if field.default_author_type else 0) | tojson }},
                 isSpeaker: {{ field.default_is_speaker | default(false) |tojson }},
                 isSubmitter: {{ field.default_is_submitter | default(false) |tojson }}
+            },
+            require: {
+                primaryAuthor: {{ field.require_primary_author | default(false) | tojson }},
+                secondaryAuthor: {{ field.require_secondary_author | default(false) | tojson }},
+                submitter: {{ field.require_submitter_author | default(false) | tojson }},
+                speaker: {{ field.require_speaker_author | default(false) | tojson }}
             }
         });
     </script>
