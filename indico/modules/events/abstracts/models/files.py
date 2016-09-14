@@ -43,7 +43,7 @@ class AbstractFile(StoredFileMixin, db.Model):
     )
     abstract = db.relationship(
         'Abstract',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'files',
             lazy=True

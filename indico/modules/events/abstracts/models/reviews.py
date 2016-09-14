@@ -96,7 +96,7 @@ class AbstractReview(db.Model):
     )
     abstract = db.relationship(
         'Abstract',
-        lazy=False,
+        lazy=True,
         foreign_keys=abstract_id,
         backref=db.backref(
             'reviews',
@@ -105,7 +105,7 @@ class AbstractReview(db.Model):
     )
     user = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'abstract_reviews',
             lazy='dynamic'
@@ -113,7 +113,7 @@ class AbstractReview(db.Model):
     )
     track = db.relationship(
         'Track',
-        lazy=False,
+        lazy=True,
         foreign_keys=track_id,
         backref=db.backref(
             'abstract_reviews',
@@ -122,7 +122,7 @@ class AbstractReview(db.Model):
     )
     proposed_duplicate_abstract = db.relationship(
         'Abstract',
-        lazy=False,
+        lazy=True,
         foreign_keys=proposed_duplicate_abstract_id,
         backref=db.backref(
             'proposed_duplicate_abstract_reviews',
@@ -132,7 +132,7 @@ class AbstractReview(db.Model):
     proposed_other_tracks = db.relationship(
         'Track',
         secondary='event_abstracts.review_proposed_other_tracks',
-        lazy=False,
+        lazy=True,
         collection_class=set,
         backref=db.backref(
             'proposed_other_abstract_reviews',
@@ -141,7 +141,7 @@ class AbstractReview(db.Model):
     )
     proposed_track = db.relationship(
         'Track',
-        lazy=False,
+        lazy=True,
         foreign_keys=proposed_track_id,
         backref=db.backref(
             'proposed_abstract_reviews',
@@ -150,7 +150,7 @@ class AbstractReview(db.Model):
     )
     proposed_contribution_type = db.relationship(
         'ContributionType',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'abstract_reviews',
             lazy='dynamic'
