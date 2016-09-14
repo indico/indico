@@ -228,14 +228,6 @@ class EventPerson(PersonMixin, db.Model):
             value = getattr(self, column_name) or getattr(other, column_name)
             setattr(self, column_name, value)
 
-        def _get_author_type(src_link, dest_link):
-            if AuthorType.primary in (src_link.author_type, dest_link.author_type):
-                return AuthorType.primary
-            elif src_link.author_type == AuthorType.none:
-                return dest_link.author_type
-            else:
-                return src_link.author_type
-
         for event_link in other.event_links:
             existing_event_link = next((link for link in self.event_links if link.event_id == event_link.event_id),
                                        None)
@@ -243,6 +235,18 @@ class EventPerson(PersonMixin, db.Model):
                 event_link.person = self
             else:
                 db.session.delete(event_link)
+
+        for abstract_link in other.abstract_links:
+            existing_abstract_link = next((link for link in self.abstract_links
+                                           if link.abstract_id == abstract_link.abstract_id), None)
+
+            if existing_abstract_link is None:
+                abstract_link.person = self
+            else:
+                existing_abstract_link.is_speaker |= abstract_link.is_speaker
+                existing_abstract_link.author_type = AuthorType.get_highest(existing_abstract_link.author_type,
+                                                                            abstract_link.author_type)
+                db.session.delete(abstract_link)
 
         for contribution_link in other.contribution_links:
             existing_contribution_link = next((link for link in self.contribution_links
@@ -252,7 +256,8 @@ class EventPerson(PersonMixin, db.Model):
                 contribution_link.person = self
             else:
                 existing_contribution_link.is_speaker |= contribution_link.is_speaker
-                existing_contribution_link.author_type = _get_author_type(existing_contribution_link, contribution_link)
+                existing_contribution_link.author_type = AuthorType.get_highest(existing_contribution_link.author_type,
+                                                                                contribution_link.author_type)
                 db.session.delete(contribution_link)
 
         for subcontribution_link in other.subcontribution_links:
