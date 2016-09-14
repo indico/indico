@@ -445,7 +445,7 @@ class User(PersonMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<User({}, {}, {}, {})>'.format(self.id, self.first_name, self.last_name, self.email)
+        return format_repr(self, 'id', 'email', is_deleted=False, is_pending=False, _text=self.full_name)
 
     def can_be_modified(self, user):
         """If this user can be modified by the given user"""
