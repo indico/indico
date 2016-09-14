@@ -308,6 +308,11 @@
                     dataType: 'json',
                     data: options.getExtraData.call(this, options.trigger),
                     beforeSubmit: function() {
+                        var evt = $.Event('ajaxDialog:validateBeforeSubmit');
+                        $this.trigger(evt);
+                        if (evt.isDefaultPrevented()) {
+                            return false;
+                        }
                         $this.trigger('ajaxDialog:beforeSubmit');
                     },
                     error: function(xhr) {
