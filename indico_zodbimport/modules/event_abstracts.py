@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+import textwrap
 import traceback
 from collections import defaultdict
 from datetime import timedelta
@@ -125,6 +126,13 @@ class AbstractMigration(object):
                   'AbstractMarkedAsDuplicated': AbstractAction.mark_as_duplicate}
 
     USER_TITLE_MAP = {unicode(x.title): x for x in UserTitle}
+
+    SUBMISSION_NOTIFICATION_BODY = textwrap.dedent('''
+        We've received your abstract "{abstract_title}" to which we have assigned id #{abstract_id}.
+
+        Kind regards,
+        The organizers of {event_title}
+    ''').strip()
 
     def __init__(self, importer, conf, event):
         self.importer = importer
@@ -376,6 +384,23 @@ class AbstractMigration(object):
                 self.importer.print_warning(cformat('%{yellow}Template "{}" has no rules').format(tpl.title),
                                             event_id=self.event.id, always=False)
             tpl.rules = rules
+
+        # submission notification
+        reply_to_address = strict_sanitize_email(self.conf._supportInfo._email, self.importer.default_email)
+        try:
+            old_sn = self.amgr._submissionNotification
+        except AttributeError:
+            emails = []
+        else:
+            emails = old_sn._toList + old_sn._ccList
+        tpl = AbstractEmailTemplate(title='Abstract submitted', position=pos,
+                                    reply_to_address=reply_to_address,
+                                    subject='Abstract Submission confirmation (#{abstract_id})',
+                                    body=self.SUBMISSION_NOTIFICATION_BODY,
+                                    extra_cc_emails=sorted(set(filter(None, map(strict_sanitize_email, emails)))),
+                                    include_submitter=True,
+                                    rules=[{'state': [AbstractState.submitted.value]}])
+        self.event.abstract_email_templates.append(tpl)
 
     def _migrate_abstracts(self):
         old_by_id = {oa.friendly_id: oa for oa in self.event.old_abstracts}
