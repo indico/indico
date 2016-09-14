@@ -73,7 +73,7 @@ class AbstractEmailLogEntry(db.Model):
 
     abstract = db.relationship(
         'Abstract',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'email_logs',
             order_by=sent_dt,

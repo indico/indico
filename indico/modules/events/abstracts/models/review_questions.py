@@ -57,7 +57,7 @@ class AbstractReviewQuestion(db.Model):
     )
     event_new = db.relationship(
         'Event',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'abstract_review_questions',
             primaryjoin='(AbstractReviewQuestion.event_id == Event.id) & ~AbstractReviewQuestion.is_deleted',
