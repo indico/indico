@@ -477,80 +477,9 @@ class AbstractMigration(object):
                     abstract.submitted_for_tracks.add(self.track_map[old_track])
 
             # judgments (reviews)
-            old_judgments = {(j.track_id, j.judge): j for j in old_abstract.judgments}
-            for old_track_id, zodb_judgments in getattr(zodb_abstract, '_trackJudgementsHistorical', {}).iteritems():
-                seen_judges = set()
-                for zodb_judgment in zodb_judgments:
-                    if zodb_judgment is None:
-                        continue
-                    if zodb_judgment.__class__.__name__ == 'AbstractUnMarkedAsDuplicated':
-                        # we don't have "unmarked as duplicate" anymore
-                        continue
-                    try:
-                        track = self.track_map_by_id[int(zodb_judgment._track.id)]
-                    except KeyError:
-                        self.importer.print_warning(
-                            cformat('%{blue!}Abstract {} {yellow}judged in invalid track {}%{reset}').format(
-                                zodb_abstract._id, int(zodb_judgment._track.id)), event_id=self.event.id)
-                        continue
-                    judge = self._user_from_legacy(zodb_judgment._responsible)
-                    if not judge:
-                        # self.importer.print_warning(
-                        #     cformat('%{blue!}Abstract {} {yellow}had an empty judge ({})!%{reset}').format(
-                        #         zodb_abstract._id, zodb_judgment), event_id=self.event.id)
-                        continue
-                    elif judge in seen_judges:
-                        # self.importer.print_warning(
-                        #     cformat("%{blue!}Abstract {}: {yellow}judge '{}' seen more than once ({})!%{reset}")
-                        #         .format(zodb_abstract._id, judge, zodb_judgment), event_id=self.event.id)
-                        continue
-
-                    seen_judges.add(judge)
-                    try:
-                        created_dt = as_utc(zodb_judgment._date)
-                    except AttributeError:
-                        created_dt = self.event.start_dt
-                    review = AbstractReview(user=judge, track=track, created_dt=created_dt,
-                                            proposed_action=self.ACTION_MAP[zodb_judgment.__class__.__name__],
-                                            comment=convert_to_unicode(zodb_judgment._comment))
-                    if review.proposed_action == AbstractAction.accept:
-                        try:
-                            old_judgment = old_judgments[int(old_track_id), judge]
-                        except KeyError:
-                            self.importer.print_error(cformat('%{yellow!}Abstract #{} has no new judgment for {} / {}')
-                                                      .format(abstract.friendly_id, int(old_track_id), judge),
-                                                      event_id=self.event.id)
-                        else:
-                            review.proposed_contribution_type = old_judgment.accepted_type
-                            review.proposed_track = self.track_map_by_id[old_judgment.track_id]
-                    elif review.proposed_action == AbstractAction.change_tracks:
-                        review.proposed_other_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
-                    elif review.proposed_action == AbstractAction.mark_as_duplicate:
-                        as_duplicate_reviews.add((review, zodb_judgment._originalAbst))
-
-                    answered_questions = set()
-                    for old_answer in getattr(zodb_judgment, '_answers', []):
-                        if old_answer._question in answered_questions:
-                            self.importer.print_warning(
-                                cformat("%{blue!}Abstract {}: {yellow}question answered more than once!").format(
-                                    abstract.friendly_id), event_id=self.event.id)
-                            continue
-                        try:
-                            question = self.question_map[old_answer._question]
-                        except KeyError:
-                            question = self._migrate_question(old_answer._question, is_deleted=True)
-                            self.importer.print_warning(
-                                cformat("%{blue!}Abstract {}: {yellow}answer for deleted question").format(
-                                    abstract.friendly_id), event_id=self.event.id)
-                        rating = AbstractReviewRating(question=question, value=old_answer._rbValue)
-                        review.ratings.append(rating)
-                        answered_questions.add(old_answer._question)
-
-                    abstract.reviews.append(review)
-
+            self._migrate_abstract_reviews(abstract, zodb_abstract, old_abstract, as_duplicate_reviews)
             # persons
             self._migrate_abstract_persons(abstract, zodb_abstract)
-
             # email log
             self._migrate_abstract_email_log(abstract, zodb_abstract)
 
@@ -570,6 +499,78 @@ class AbstractMigration(object):
                 self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
                                           .format(review.abstract.friendly_id, old_abstract._id),
                                           event_id=self.event.id)
+
+    def _migrate_abstract_reviews(self, abstract, zodb_abstract, old_abstract, as_duplicate_reviews):
+        old_judgments = {(j.track_id, j.judge): j for j in old_abstract.judgments}
+        for old_track_id, zodb_judgments in getattr(zodb_abstract, '_trackJudgementsHistorical', {}).iteritems():
+            seen_judges = set()
+            for zodb_judgment in zodb_judgments:
+                if zodb_judgment is None:
+                    continue
+                if zodb_judgment.__class__.__name__ == 'AbstractUnMarkedAsDuplicated':
+                    # we don't have "unmarked as duplicate" anymore
+                    continue
+                try:
+                    track = self.track_map_by_id[int(zodb_judgment._track.id)]
+                except KeyError:
+                    self.importer.print_warning(
+                        cformat('%{blue!}Abstract {} {yellow}judged in invalid track {}%{reset}').format(
+                            zodb_abstract._id, int(zodb_judgment._track.id)), event_id=self.event.id)
+                    continue
+                judge = self._user_from_legacy(zodb_judgment._responsible)
+                if not judge:
+                    # self.importer.print_warning(
+                    #     cformat('%{blue!}Abstract {} {yellow}had an empty judge ({})!%{reset}').format(
+                    #         zodb_abstract._id, zodb_judgment), event_id=self.event.id)
+                    continue
+                elif judge in seen_judges:
+                    # self.importer.print_warning(
+                    #     cformat("%{blue!}Abstract {}: {yellow}judge '{}' seen more than once ({})!%{reset}")
+                    #         .format(zodb_abstract._id, judge, zodb_judgment), event_id=self.event.id)
+                    continue
+
+                seen_judges.add(judge)
+                try:
+                    created_dt = as_utc(zodb_judgment._date)
+                except AttributeError:
+                    created_dt = self.event.start_dt
+                review = AbstractReview(user=judge, track=track, created_dt=created_dt,
+                                        proposed_action=self.ACTION_MAP[zodb_judgment.__class__.__name__],
+                                        comment=convert_to_unicode(zodb_judgment._comment))
+                if review.proposed_action == AbstractAction.accept:
+                    try:
+                        old_judgment = old_judgments[int(old_track_id), judge]
+                    except KeyError:
+                        self.importer.print_error(cformat('%{yellow!}Abstract #{} has no new judgment for {} / {}')
+                                                  .format(abstract.friendly_id, int(old_track_id), judge),
+                                                  event_id=self.event.id)
+                    else:
+                        review.proposed_contribution_type = old_judgment.accepted_type
+                        review.proposed_track = self.track_map_by_id[old_judgment.track_id]
+                elif review.proposed_action == AbstractAction.change_tracks:
+                    review.proposed_other_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
+                elif review.proposed_action == AbstractAction.mark_as_duplicate:
+                    as_duplicate_reviews.add((review, zodb_judgment._originalAbst))
+
+                answered_questions = set()
+                for old_answer in getattr(zodb_judgment, '_answers', []):
+                    if old_answer._question in answered_questions:
+                        self.importer.print_warning(
+                            cformat("%{blue!}Abstract {}: {yellow}question answered more than once!").format(
+                                abstract.friendly_id), event_id=self.event.id)
+                        continue
+                    try:
+                        question = self.question_map[old_answer._question]
+                    except KeyError:
+                        question = self._migrate_question(old_answer._question, is_deleted=True)
+                        self.importer.print_warning(
+                            cformat("%{blue!}Abstract {}: {yellow}answer for deleted question").format(
+                                abstract.friendly_id), event_id=self.event.id)
+                    rating = AbstractReviewRating(question=question, value=old_answer._rbValue)
+                    review.ratings.append(rating)
+                    answered_questions.add(old_answer._question)
+
+                abstract.reviews.append(review)
 
     def _migrate_abstract_email_log(self, abstract, zodb_abstract):
         for old_entry in zodb_abstract._notifLog._entries:
