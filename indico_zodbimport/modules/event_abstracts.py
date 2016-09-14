@@ -499,6 +499,11 @@ class AbstractMigration(object):
                 self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
                                           .format(review.abstract.friendly_id, old_abstract._id),
                                           event_id=self.event.id)
+                # delete the review; it would violate our CHECKs
+                review.abstract = None
+                # not needed but avoids some warnings about the object not in the session
+                review.track = None
+                review.user = None
 
     def _migrate_abstract_reviews(self, abstract, zodb_abstract, old_abstract, as_duplicate_reviews):
         old_judgments = {(j.track_id, j.judge): j for j in old_abstract.judgments}
@@ -534,7 +539,7 @@ class AbstractMigration(object):
                     created_dt = as_utc(zodb_judgment._date)
                 except AttributeError:
                     created_dt = self.event.start_dt
-                review = AbstractReview(user=judge, track=track, created_dt=created_dt,
+                review = AbstractReview(created_dt=created_dt,
                                         proposed_action=self.ACTION_MAP[zodb_judgment.__class__.__name__],
                                         comment=convert_to_unicode(zodb_judgment._comment))
                 if review.proposed_action == AbstractAction.accept:
@@ -544,13 +549,16 @@ class AbstractMigration(object):
                         self.importer.print_error(cformat('%{yellow!}Abstract #{} has no new judgment for {} / {}')
                                                   .format(abstract.friendly_id, int(old_track_id), judge),
                                                   event_id=self.event.id)
-                    else:
-                        review.proposed_contribution_type = old_judgment.accepted_type
-                        review.proposed_track = self.track_map_by_id[old_judgment.track_id]
+                        continue
+                    review.proposed_contribution_type = old_judgment.accepted_type
+                    review.proposed_track = self.track_map_by_id[old_judgment.track_id]
                 elif review.proposed_action == AbstractAction.change_tracks:
                     review.proposed_other_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
                 elif review.proposed_action == AbstractAction.mark_as_duplicate:
                     as_duplicate_reviews.add((review, zodb_judgment._originalAbst))
+
+                review.user = judge
+                review.track = track
 
                 answered_questions = set()
                 for old_answer in getattr(zodb_judgment, '_answers', []):
