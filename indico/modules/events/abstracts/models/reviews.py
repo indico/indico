@@ -34,6 +34,13 @@ class AbstractReview(db.Model):
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
+                      db.CheckConstraint("(proposed_action = {}) = (proposed_track_id IS NOT NULL)"
+                                         .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
+                      db.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
+                                         .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
+                      db.CheckConstraint("(proposed_action = 4) = (proposed_duplicate_abstract_id IS NOT NULL)"
+                                         .format(AbstractAction.mark_as_duplicate),
+                                         name='prop_abstract_id_only_duplicate'),
                       {'schema': 'event_abstracts'})
 
     id = db.Column(
