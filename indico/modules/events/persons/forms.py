@@ -32,7 +32,8 @@ class EmailEventPersonsForm(IndicoForm):
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
     recipients = IndicoStaticTextField(_('Recipients'))
-    person_id = HiddenFieldList(validators=[DataRequired()])
+    person_id = HiddenFieldList()
+    user_id = HiddenFieldList()
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):

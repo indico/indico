@@ -34,6 +34,7 @@ from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.users import User
 from indico.util.i18n import ngettext, _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
@@ -151,8 +152,10 @@ class RHEmailEventPersons(RHConferenceModifBase):
 
     def _process(self):
         person_ids = request.form.getlist('person_id')
+        user_ids = request.form.getlist('user_id')
         recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
-        form = EmailEventPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
+        recipients |= {u.email for u in self._find_users(user_ids) if u.email}
+        form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids, recipients=', '.join(recipients))
         if form.validate_on_submit():
             for recipient in recipients:
                 email = make_email(to_list=recipient, from_address=form.from_address.data,
@@ -167,6 +170,9 @@ class RHEmailEventPersons(RHConferenceModifBase):
         return (self.event_new.persons
                 .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
                 .all())
+
+    def _find_users(self, user_ids):
+        return User.query.filter(User.id.in_(user_ids), User.email != '').all()
 
 
 class RHGrantSubmissionRights(RHConferenceModifBase):

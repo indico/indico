@@ -21,6 +21,10 @@
                 <span class="i-button label">{% trans %}Show{% endtrans %}</span>
                 <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
                 <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+                {% if include_submitters %}
+                    <input type="checkbox" id="filter-submitters" data-filter="submitter" checked>
+                    <label for="filter-submitters" class="i-button">{% trans %}Submitters{% endtrans %}</label>
+                {% endif %}
                 <input type="checkbox" name="authors" id="filter-primary" data-filter="primary_author" checked>
                 <label for="filter-primary" class="i-button">{% trans %}Primary authors{% endtrans %}</label>
                 <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary_author" checked>
@@ -37,6 +41,9 @@
                     <th class="i-table">{% trans %}Email{% endtrans %}</th>
                     <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                     <th class="i-table">{% trans %}Author type{% endtrans %}</th>
+                    {% if include_submitters %}
+                        <th class="i-table submitter-column" data-sorter="false">{% trans %}Submitter{% endtrans %}</th>
+                    {% endif %}
                     <th class="i-table speaker-column" data-sorter="false"></th>
                 </tr>
             </thead>
@@ -45,7 +52,8 @@
                     {% set is_speaker = person_roles.speaker %}
                     <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
                         <td class="i-table">
-                            <input type="checkbox" value="{{ event_person.id }}" class="select-row" name="person_id"
+                            <input type="checkbox" value="{{ event_person.id }}" class="select-row"
+                                   name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
                                    {{ 'disabled' if not event_person.email }}>
                         </td>
                         <td class="i-table">{{ event_person.full_name }}</td>
@@ -60,6 +68,18 @@
                                 -
                             {% endif %}
                         </td>
+                        {% if include_submitters %}
+                            {% set is_submitter = person_roles.submitter %}
+                            <td class="i-table submitter-column">
+                                {%- if is_submitter %}
+                                    {% set submitter_title = _("This person submitted an abstract") %}
+                                {%- else -%}
+                                    {% set submitter_title = _("This person hasn't submitted any abstracts") %}
+                                {% endif -%}
+                                <i class="icon-checkmark submitter-icon {{ 'inactive' if not is_submitter }}"
+                                   title="{{ submitter_title }}"></i>
+                            </td>
+                        {% endif %}
                         <td class="i-table">
                             {%- if is_speaker %}
                                 {% set speaker_title = _('This person is a speaker') %}
@@ -83,7 +103,7 @@
            data-href="{{ url_for('persons.email_event_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
            data-method="POST"
-           data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
+           data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible, #persons-list input[name=user_id]:checkbox:checked:visible"
            data-ajax-dialog>
             {%- trans %}Send emails{% endtrans -%}
         </a>
