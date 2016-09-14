@@ -47,7 +47,7 @@ class AbstractReviewRating(db.Model):
     )
     question = db.relationship(
         'AbstractReviewQuestion',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'ratings',
             cascade='all, delete-orphan',
@@ -56,7 +56,7 @@ class AbstractReviewRating(db.Model):
     )
     review = db.relationship(
         'AbstractReview',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'ratings',
             cascade='all, delete-orphan',

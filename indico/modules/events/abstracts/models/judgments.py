@@ -62,7 +62,7 @@ class Judgment(db.Model):
     )
     abstract = db.relationship(
         'LegacyAbstract',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'judgments',
             lazy='dynamic'
@@ -70,7 +70,7 @@ class Judgment(db.Model):
     )
     judge = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'abstract_judgments',
             lazy='dynamic'
@@ -78,7 +78,7 @@ class Judgment(db.Model):
     )
     accepted_type = db.relationship(
         'ContributionType',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'abstract_judgments',
             lazy='dynamic'
