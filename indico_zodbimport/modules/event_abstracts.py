@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 import mimetypes
 import traceback
+from collections import defaultdict
 from datetime import timedelta
 from operator import attrgetter
 
 import click
 from pytz import utc
 from sqlalchemy.orm import joinedload
+from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -33,16 +35,20 @@ from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.files import AbstractFile
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview, AbstractAction
 from indico.modules.events.abstracts.settings import (abstracts_settings, boa_settings, abstracts_reviewing_settings,
                                                       BOACorrespondingAuthorType, BOASortField)
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.models.users import UserTitle
 from indico.util.console import verbose_iterator, cformat
 from indico.util.date_time import as_utc
 from indico.util.fs import secure_filename
@@ -118,6 +124,8 @@ class AbstractMigration(object):
                   'AbstractReallocation': AbstractAction.change_tracks,
                   'AbstractMarkedAsDuplicated': AbstractAction.mark_as_duplicate}
 
+    USER_TITLE_MAP = {unicode(x.title): x for x in UserTitle}
+
     def __init__(self, importer, conf, event):
         self.importer = importer
         self.conf = conf
@@ -130,6 +138,20 @@ class AbstractMigration(object):
 
     def __repr__(self):
         return '<AbstractMigration({})>'.format(self.event)
+
+    @cached_property
+    def event_persons_by_email(self):
+        return {ep.email: ep for ep in self.event.persons if ep.email}
+
+    @cached_property
+    def event_persons_by_user(self):
+        return {ep.user: ep for ep in self.event.persons if ep.user}
+
+    @cached_property
+    def event_persons_noemail_by_data(self):
+        return {(ep.first_name, ep.last_name, ep.affiliation): ep
+                for ep in self.event.persons
+                if not ep.email and not ep.user}
 
     def run(self):
         self.importer.print_success(cformat('%{blue!}{}').format(self.event), event_id=self.event.id)
@@ -498,7 +520,8 @@ class AbstractMigration(object):
 
                     abstract.reviews.append(review)
 
-            # TODO: authors
+            # persons
+            self._migrate_abstract_persons(abstract, zodb_abstract)
 
         # merges/duplicates
         for abstract in self.event.abstracts:
@@ -516,6 +539,85 @@ class AbstractMigration(object):
                 self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
                                           .format(review.abstract.friendly_id, old_abstract._id),
                                           event_id=self.event.id)
+
+    def _migrate_abstract_persons(self, abstract, zodb_abstract):
+        old_persons = defaultdict(lambda: {'is_speaker': False, 'author_type': AuthorType.none})
+        for old_person in zodb_abstract._coAuthors:
+            old_persons[old_person]['author_type'] = AuthorType.secondary
+        for old_person in zodb_abstract._primaryAuthors:
+            old_persons[old_person]['author_type'] = AuthorType.primary
+        for old_person in zodb_abstract._speakers:
+            old_persons[old_person]['is_speaker'] = True
+
+        person_links_by_person = {}
+        for person, roles in old_persons.iteritems():
+            person_link = self._event_person_from_legacy(person)
+            person_link.author_type = roles['author_type']
+            person_link.is_speaker = roles['is_speaker']
+            try:
+                existing = person_links_by_person[person_link.person]
+            except KeyError:
+                person_links_by_person[person_link.person] = person_link
+            else:
+                author_type = AuthorType.get_highest(existing.author_type, person_link.author_type)
+                new_flags = '{}{}{}'.format('P' if person_link.author_type == AuthorType.primary else '_',
+                                            'S' if person_link.author_type == AuthorType.secondary else '_',
+                                            's' if person_link.is_speaker else '_')
+                existing_flags = '{}{}{}'.format('P' if existing.author_type == AuthorType.primary else '_',
+                                                 'S' if existing.author_type == AuthorType.secondary else '_',
+                                                 's' if existing.is_speaker else '_')
+                if person_link.author_type == author_type and existing.author_type != author_type:
+                    # the new one has the higher author type -> use that one
+                    person_link.author_type = author_type
+                    person_link.is_speaker |= existing.is_speaker
+                    person_links_by_person[person_link.person] = person_link
+                    self.importer.print_warning(cformat('%{blue!}Abstract {}: {yellow}Author {} already exists '
+                                                        '(%{magenta}{} [{}] %{yellow}/ %{green}{} [{}]%{yellow})')
+                                                .format(abstract.friendly_id, existing.person.full_name,
+                                                        existing.full_name, existing_flags,
+                                                        person_link.full_name, new_flags),
+                                                event_id=self.event.id)
+                    existing.person = None  # cut the link to an already-persistent object
+                else:
+                    # the existing one has the higher author type -> use that one
+                    existing.author_type = author_type
+                    existing.is_speaker |= person_link.is_speaker
+                    self.importer.print_warning(cformat('%{blue!}Abstract {}: {yellow}Author {} already exists '
+                                                        '(%{green}{} [{}]%{yellow} / %{magenta}{} [{}]%{yellow})')
+                                                .format(abstract.friendly_id, existing.person.full_name,
+                                                        existing.full_name, existing_flags,
+                                                        person_link.full_name, new_flags),
+                                                event_id=self.event.id)
+                    person_link.person = None  # cut the link to an already-persistent object
+
+        abstract.person_links.extend(person_links_by_person.viewvalues())
+
+    def _event_person_from_legacy(self, old_person):
+        data = dict(first_name=convert_to_unicode(old_person._firstName),
+                    last_name=convert_to_unicode(old_person._surName),
+                    _title=self.USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none),
+                    affiliation=convert_to_unicode(old_person._affilliation),
+                    address=convert_to_unicode(old_person._address),
+                    phone=convert_to_unicode(old_person._telephone))
+        email = strict_sanitize_email(old_person._email)
+        if email:
+            person = (self.event_persons_by_email.get(email) or
+                      self.event_persons_by_user.get(self.importer.all_users_by_email.get(email)))
+        else:
+            person = self.event_persons_noemail_by_data.get((data['first_name'], data['last_name'],
+                                                             data['affiliation']))
+        if not person:
+            user = self.importer.all_users_by_email.get(email)
+            person = EventPerson(event_new=self.event, user=user, email=email, **data)
+            if email:
+                self.event_persons_by_email[email] = person
+            if user:
+                self.event_persons_by_user[user] = person
+            if not email and not user:
+                self.event_persons_noemail_by_data[(person.first_name, person.last_name, person.affiliation)] = person
+        person_link = AbstractPersonLink(person=person)
+        person_link.populate_from_dict(data)
+        return person_link
 
 
 class EventAbstractsImporter(LocalFileImporterMixin, Importer):
