@@ -111,6 +111,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
         self.default_is_submitter = False
         self.default_is_speaker = True
+        self.require_primary_author = True
         super(AbstractPersonLinkListField, self).__init__(*args, **kwargs)
 
     def _convert_data(self, data):
