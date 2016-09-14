@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from indico.core.db.sqlalchemy import db
 
 
-_proposed_for_tracks = db.Table(
-    'proposed_for_tracks',
+_reviewed_for_tracks = db.Table(
+    'reviewed_for_tracks',
     db.metadata,
     db.Column(
         'abstract_id',
@@ -63,8 +63,8 @@ _submitted_for_tracks = db.Table(
     schema='event_abstracts'
 )
 
-_review_proposed_other_tracks = db.Table(
-    'review_proposed_other_tracks',
+_proposed_for_tracks = db.Table(
+    'proposed_for_tracks',
     db.metadata,
     db.Column(
         'review_id',

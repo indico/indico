@@ -236,14 +236,14 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             lazy=True
         )
     )
-    proposed_for_tracks = db.relationship(
+    reviewed_for_tracks = db.relationship(
         'Track',
-        secondary='event_abstracts.proposed_for_tracks',
+        secondary='event_abstracts.reviewed_for_tracks',
         collection_class=set,
         backref=db.backref(
-            'abstracts_proposed',
-            primaryjoin='event_abstracts.proposed_for_tracks.c.track_id == Track.id',
-            secondaryjoin='(event_abstracts.proposed_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
+            'abstracts_reviewed',
+            primaryjoin='event_abstracts.reviewed_for_tracks.c.track_id == Track.id',
+            secondaryjoin='(event_abstracts.reviewed_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
             collection_class=set,
             lazy=True
         )

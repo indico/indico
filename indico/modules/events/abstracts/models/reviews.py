@@ -131,7 +131,7 @@ class AbstractReview(db.Model):
     )
     proposed_other_tracks = db.relationship(
         'Track',
-        secondary='event_abstracts.review_proposed_other_tracks',
+        secondary='event_abstracts.proposed_for_tracks',
         lazy=True,
         collection_class=set,
         backref=db.backref(
