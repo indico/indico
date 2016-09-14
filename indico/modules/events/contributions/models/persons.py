@@ -28,6 +28,15 @@ class AuthorType(int, IndicoEnum):
     primary = 1
     secondary = 2
 
+    @classmethod
+    def get_highest(cls, *types):
+        if any(t == cls.primary for t in types):
+            return cls.primary
+        elif any(t == cls.secondary for t in types):
+            return cls.secondary
+        else:
+            return cls.none
+
 
 class ContributionPersonLink(PersonLinkBase):
     """Association between EventPerson and Contribution."""
