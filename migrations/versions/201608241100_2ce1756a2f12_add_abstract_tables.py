@@ -90,7 +90,7 @@ def upgrade():
     )
 
     op.create_table(
-        'proposed_for_tracks',
+        'reviewed_for_tracks',
         sa.Column('abstract_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
         sa.Column('track_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
@@ -221,7 +221,7 @@ def upgrade():
     )
 
     op.create_table(
-        'review_proposed_other_tracks',
+        'proposed_for_tracks',
         sa.Column('review_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
         sa.Column('track_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
         sa.ForeignKeyConstraint(['review_id'], ['event_abstracts.abstract_reviews.id']),
@@ -262,7 +262,7 @@ def upgrade():
 def downgrade():
     op.drop_table('track_abstract_reviewers', schema='events')
     op.drop_table('email_logs', schema='event_abstracts')
-    op.drop_table('review_proposed_other_tracks', schema='event_abstracts')
+    op.drop_table('proposed_for_tracks', schema='event_abstracts')
     op.drop_table('abstract_review_ratings', schema='event_abstracts')
     op.drop_table('abstract_reviews', schema='event_abstracts')
     op.drop_table('abstract_review_questions', schema='event_abstracts')
@@ -270,7 +270,7 @@ def downgrade():
     op.drop_table('abstract_person_links', schema='event_abstracts')
     op.drop_table('email_templates', schema='event_abstracts')
     op.drop_table('files', schema='event_abstracts')
-    op.drop_table('proposed_for_tracks', schema='event_abstracts')
+    op.drop_table('reviewed_for_tracks', schema='event_abstracts')
     op.drop_table('submitted_for_tracks', schema='event_abstracts')
     op.drop_table('abstracts', schema='event_abstracts')
     op.rename_table('legacy_abstracts', 'abstracts', schema='event_abstracts')
