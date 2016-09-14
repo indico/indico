@@ -847,8 +847,8 @@ You have been chosen as a %s for the paper entitled "%s" (id: %s) for the confer
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, role, contribution.title, str(contribution.friendly_id),
-        conference.getTitle(), role, url, conference.getTitle()))
+""" % (user.full_name.encode('utf-8'), role, contribution.title.encode('utf-8'), str(contribution.friendly_id),
+       conference.getTitle(), role, url, conference.getTitle()))
 
 class ContributionReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer
@@ -869,7 +869,8 @@ Please, be aware that you are no longer a %s of the paper entitled "%s" (id: %s)
 
 Kind regards,
 Indico on behalf of "%s"
-""" % (  user.full_name, role, contribution.title, str(contribution.friendly_id), conference.getTitle(), str(urlHandlers.UHConferenceDisplay.getURL(conference)), conference.getTitle()))
+""" % (user.full_name.encode('utf-8'), role, contribution.title.encode('utf-8'), str(contribution.friendly_id),
+       conference.getTitle(), str(urlHandlers.UHConferenceDisplay.getURL(conference)), conference.getTitle()))
 
 class ContributionReviewingJudgementNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
@@ -901,7 +902,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
 
     def setFullyReviewed(self, user, judgement, contribution, conference, role):
         self.setSubject("""Your paper "%s" for "%s" has been completely reviewed """
-                    % (contribution.title, conference.getTitle()))
+                    % (contribution.title.encode('utf-8'), conference.getTitle()))
         self.setBody("""Dear %s,
 
 The %s has reviewed your paper entitled "%s" (id: %s), submitted for "%s".
@@ -913,14 +914,14 @@ You may then apply the requested modifications to your paper and submit the modi
 
 Kind regards,
 Indico on behalf of "%s"
-""" % (user.full_name, role, contribution.title, str(contribution.friendly_id),
+""" % (user.full_name.encode('utf-8'), role, contribution.title.encode('utf-8'), str(contribution.friendly_id),
        conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
        url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
 
     def setPartiallyReviewed(self, user, judgement, contribution, conference, typeR):
                 self.setSubject("""%s Assessment of your paper "%s" for "%s" """
-                            % (typeR, contribution.title, conference.getTitle()))
+                            % (typeR, contribution.title.encode('utf-8'), conference.getTitle()))
                 self.setBody("""Dear %s,
 
 The assigned %s Reviewer has partially reviewed your paper entitled "%s" (id: %s) submitted for "%s".
@@ -933,7 +934,7 @@ Note that this is a partial review, a final assessment will be done by the refer
 
 Kind regards,
 Indico on behalf of "%s"
-"""  % (user.full_name, typeR, contribution.title, str(contribution.friendly_id),
+"""  % (user.full_name.encode('utf-8'), typeR, contribution.title.encode('utf-8'), str(contribution.friendly_id),
         conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
         url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
@@ -943,7 +944,7 @@ Indico on behalf of "%s"
         elif judgement.getJudgement() == "Reject":
             judgementText = "REJECTED"
         self.setSubject("""Your paper "%s" for "%s" has been completely reviewed"""
-                            % (contribution.title, conference.getTitle()))
+                            % (contribution.title.encode('utf-8'), conference.getTitle()))
         self.setBody("""Dear %s,
 
 The %s has %s your paper entitled "%s" (id: %s), submitted for "%s".
@@ -954,8 +955,8 @@ You may proceed to your paper page:
 
 Kind regards,
 Indico on behalf of "%s"
-""" % (user.full_name, role, judgementText, contribution.title, str(contribution.friendly_id),
-       conference.getTitle(), judgement.getCommentsVerbose(),
+""" % (user.full_name.encode('utf-8'), role, judgementText, contribution.title.encode('utf-8'),
+       str(contribution.friendly_id), conference.getTitle(), judgement.getCommentsVerbose(),
        url_for('contributions.display_contribution', contribution, _external=True), conference.getTitle()))
 
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
@@ -975,7 +976,8 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
             typeR = "Layout Reviewer"
         elif isinstance(judgement, ReviewerJudgement):
             typeR = "Content Reviewer"
-        self.setSubject(""""%s" has been put back into reviewing by the %s """ % (contribution.title, typeR))
+        self.setSubject(""""%s" has been put back into reviewing by the %s """ % (contribution.title.encode('utf-8'),
+                                                                                  typeR))
         self.setBody("""Dear %s,
 
 Your paper entitled  "%s" (id: %s) submitted for "%s" has been put back into reviewing by the assigned %s:
@@ -984,7 +986,7 @@ Your paper entitled  "%s" (id: %s) submitted for "%s" has been put back into rev
 
 Kind regards,
 Indico on behalf of "%s"
-""" % (user.full_name, contribution.title, str(contribution.friendly_id),
+""" % (user.full_name.encode('utf-8'), contribution.title.encode('utf-8'), str(contribution.friendly_id),
        conference.getTitle(), typeR, url_for('contributions.display_contribution', contribution, _external=True),
        conference.getTitle()))
 
@@ -1003,7 +1005,8 @@ class ContributionReviewingJudgementRefereeNotification(GenericNotification):
         elif isinstance(judgement, ReviewerJudgement):
             typeR = "Content"
 
-        self.setSubject("""%s Assessment of the paper "%s" for "%s" """% (typeR, contribution.title, conference.getTitle()))
+        self.setSubject("""%s Assessment of the paper "%s" for "%s" """% (typeR, contribution.title.encode('utf-8'),
+                                                                          conference.getTitle()))
         self.setBody("""Dear %s,
 
 The assigned %s Reviewer, %s, has partially reviewed the paper entitled "%s" (id: %s) submitted for "%s".
@@ -1015,7 +1018,7 @@ You may proceed to the Referee Area for this paper:
 
 Kind regards,
 Indico on behalf of "%s"
-"""  % (user.user.full_name, typeR, judgement.getAuthor().getStraightFullName(), contribution.title,
+"""  % (user.user.full_name.encode('utf-8'), typeR, judgement.getAuthor().getStraightFullName(), contribution.title.encode('utf-8'),
         str(contribution.friendly_id),conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
         url_for('event_mgmt.contributionReviewing-contributionReviewingJudgements', contribution, _external=True),
         conference.getTitle()))
@@ -1035,7 +1038,8 @@ class ContributionReviewingJudgementRefereeWithdrawalNotification(GenericNotific
             typeR = "Layout"
         elif isinstance(judgement, ReviewerJudgement):
             typeR = "Content"
-        self.setSubject(""""%s" has been put back into reviewing by the %s Reviewer"""% (contribution.title, typeR))
+        self.setSubject(""""%s" has been put back into reviewing by the %s Reviewer""" %
+                        (contribution.title.encode('utf-8'), typeR))
         self.setBody("""Dear %s,
 
 The paper entitled "%s" (id: %s) submitted for "%s" has been put back into reviewing by the assigned %s Reviewer:
@@ -1044,7 +1048,7 @@ The paper entitled "%s" (id: %s) submitted for "%s" has been put back into revie
 
 Kind regards,
 Indico on behalf of "%s"
-""" % (user.user.full_name, contribution.title, str(contribution.friendly_id), conference.getTitle(),
+""" % (user.user.full_name.encode('utf-8'), contribution.title.encode('utf-8'), str(contribution.friendly_id), conference.getTitle(),
        typeR, url_for('event_mgmt.confListContribToJudge', contribution, _external=True), conference.getTitle()))
 
 class MaterialsSubmittedNotification(GenericNotification):
@@ -1071,4 +1075,5 @@ An author has submitted a paper entitled "%s" (id: %s) for the conference "%s". 
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.full_name, contribution.title, str(contribution.friendly_id), conference.getTitle(), role, url, conference.getTitle()))
+""" % (user.full_name.encode('utf-8'), contribution.title.encode('utf-8'), str(contribution.friendly_id),
+       conference.getTitle(), role, url, conference.getTitle()))
