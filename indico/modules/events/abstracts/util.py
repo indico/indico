@@ -24,6 +24,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
+from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link

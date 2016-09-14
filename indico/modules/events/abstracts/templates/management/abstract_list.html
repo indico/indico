@@ -62,9 +62,9 @@
                 </a>
             </div>
             <div class="group left">
-                <button class="i-button icon-users js-enable-if-checked disabled"
+                <button class="i-button icon-users js-requires-selected-row disabled"
                         data-title="{% trans %}Author list{% endtrans %}"
-                        {# TODO: data-href="{{ url_for('.person_list', event) }}" #}
+                        data-href="{{ url_for('.person_list', event) }}"
                         data-params-selector="#abstract-list input[name=abstract_id]:checked"
                         data-method="POST"
                         data-dialog-classes="event-persons-dialog"
@@ -73,7 +73,7 @@
                 </button>
             </div>
             <div class="group left">
-                <a href="#" class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
+                <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-form disabled"
                    {# TODO: data-href="{{ url_for('.download_attachments', event) }}" #}>
                     {%- trans %}Download attachments{%- endtrans %}
                 </a>

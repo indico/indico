@@ -16,18 +16,22 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
 from flask import redirect, flash, jsonify, request
 
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingSettingsForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import create_abstract, delete_abstract
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
@@ -192,3 +196,28 @@ class RHDeleteAbstracts(RHManageAbstractsActionsBase):
                        "{count} abstracts have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
         return jsonify_data(**self.list_generator.render_list())
+
+
+class RHAbstractPersonList(RHManageAbstractsActionsBase):
+    """List of persons somehow related to abstracts (co-authors, speakers...)"""
+
+    @property
+    def _membership_filter(self):
+        abstract_ids = {abstract.id for abstract in self.abstracts}
+        return Abstract.id.in_(abstract_ids)
+
+    def _process(self):
+        submitters = {abstract.submitter for abstract in self.abstracts}
+        abstract_persons = AbstractPersonLink.find_all(AbstractPersonLink.abstract.has(self._membership_filter))
+        abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
+                                                     'secondary_author': False})
+        for abstract_person in abstract_persons:
+            dict_key = abstract_person.person.user if abstract_person.person.user else abstract_person.person
+            person_roles = abstract_persons_dict[dict_key]
+            person_roles['speaker'] |= abstract_person.is_speaker
+            person_roles['primary_author'] |= abstract_person.author_type == AuthorType.primary
+            person_roles['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
+        for submitter in submitters:
+            abstract_persons_dict[submitter]['submitter'] |= True
+        return jsonify_template('events/management/contribution_person_list.html',
+                                event_persons=abstract_persons_dict, event=self.event_new, include_submitters=True)
