@@ -38,7 +38,7 @@ from indico.modules.users.models.favorites import favorite_user_table, favorite_
 from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_full_name
+from indico.util.string import return_ascii, format_full_name, format_repr
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -68,7 +68,7 @@ class PersonMixin(object):
     def _get_title(self):
         """Return title text"""
         if self._title is None:
-            return get_default_values(type(self))['_title'].title
+            return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
     def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False,
