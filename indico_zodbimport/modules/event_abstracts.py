@@ -33,6 +33,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
+from indico.modules.events.abstracts.models.email_logs import AbstractEmailLogEntry
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -142,6 +143,7 @@ class AbstractMigration(object):
         self.track_map = {}
         self.track_map_by_id = {}
         self.question_map = {}
+        self.email_template_map = {}
         self.legacy_warnings_shown = set()
 
     def __repr__(self):
@@ -327,6 +329,7 @@ class AbstractMigration(object):
             pos += 1
             self.importer.print_info(cformat('%{white!}Email Template:%{reset} {}').format(tpl.title))
             self.event.abstract_email_templates.append(tpl)
+            self.email_template_map[old_tpl] = tpl
             rules = []
             for old_cond in old_tpl._conditions:
                 # state
@@ -548,6 +551,9 @@ class AbstractMigration(object):
             # persons
             self._migrate_abstract_persons(abstract, zodb_abstract)
 
+            # email log
+            self._migrate_abstract_email_log(abstract, zodb_abstract)
+
         # merges/duplicates
         for abstract in self.event.abstracts:
             old_state = old_abstract_state_map[abstract]
@@ -564,6 +570,16 @@ class AbstractMigration(object):
                 self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
                                           .format(review.abstract.friendly_id, old_abstract._id),
                                           event_id=self.event.id)
+
+    def _migrate_abstract_email_log(self, abstract, zodb_abstract):
+        for old_entry in zodb_abstract._notifLog._entries:
+            email_template = self.email_template_map.get(old_entry._tpl)
+            email_template_name = email_template.title if email_template else convert_to_unicode(old_entry._tpl._name)
+            entry = AbstractEmailLogEntry(email_template=email_template, sent_dt=old_entry._date,
+                                          user=self._user_from_legacy(old_entry._responsible),
+                                          recipients=[], subject='<not available>', body='<not available>',
+                                          data={'_legacy': True, 'template_name': email_template_name or '<unnamed>'})
+            abstract.email_logs.append(entry)
 
     def _migrate_abstract_persons(self, abstract, zodb_abstract):
         old_persons = defaultdict(lambda: {'is_speaker': False, 'author_type': AuthorType.none})
