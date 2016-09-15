@@ -55,25 +55,26 @@ table.i-table {
     }
 
     thead th {
-        padding: 5px;
+        padding: 10px 5px;
         font-weight: bold;
         text-align: left;
-        background-color: #EAEAEA;
+        background-color: $light-gray;
 
         @include sortable-table-header();
     }
 }
 
 tr.i-table {
-    border-bottom: 1px solid #E5E5E5;
-    border-top: 1px solid #E5E5E5;
+    border-bottom: 1px solid $pastel-gray;
+    border-top: 1px solid $pastel-gray;
 
     &.selected {
         background-color: $pastel-blue !important;
     }
 
     &:hover {
-        background-color: $light-gray;
+        @include transition(background-color .2s);
+        background-color: $light-blue;
     }
 }
 
@@ -114,7 +115,7 @@ h3.i-table {
     }
 
     &.border {
-        border-bottom: 1px solid #E5E5E5;
+        border-bottom: 1px solid $pastel-gray;
     }
 
     & + table.i-table {
