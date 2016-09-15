@@ -105,6 +105,9 @@
                 }
                 var items = tableTitles.filter('.searchable').textContains(term).next().find('tr.interactive');
                 items = items.add(logEntries.find('.searchable').textContains(term).parents('tr.interactive'));
+                items = items.add(tables.find('tr').find('*').filter('.searchable')
+                                                             .textContains(term)
+                                                             .parents('tr.details-row').prev());
                 resultCache[term] = items;
                 return items;
             }
