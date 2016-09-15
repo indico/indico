@@ -84,6 +84,7 @@ class Track(DescriptionMixin, db.Model):
     # - abstracts_reviewed (Abstract.reviewed_for_tracks)
     # - abstracts_submitted (Abstract.submitted_for_tracks)
     # - proposed_abstract_reviews (AbstractReview.proposed_track)
+    # - proposed_other_abstract_reviews (AbstractReview.proposed_other_tracks)
 
     @return_ascii
     def __repr__(self):

@@ -328,6 +328,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     # - email_logs (AbstractEmailLogEntry.abstract)
     # - files (AbstractFile.abstract)
     # - merged_abstracts (Abstract.merged_into)
+    # - proposed_related_abstract_reviews (AbstractReview.proposed_related_abstract)
     # - reviews (AbstractReview.abstract)
 
     @property

@@ -27,6 +27,7 @@ class AbstractAction(int, IndicoEnum):
     reject = 2
     change_tracks = 3
     mark_as_duplicate = 4
+    merge = 5
 
 
 class AbstractReview(db.Model):
@@ -36,11 +37,11 @@ class AbstractReview(db.Model):
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
                       db.CheckConstraint("(proposed_action = {}) = (proposed_track_id IS NOT NULL)"
                                          .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
-                      db.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
+                      db.CheckConstraint("proposed_action = {} OR (proposed_contribution_type_id IS NULL)"
                                          .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
-                      db.CheckConstraint("(proposed_action = 4) = (proposed_duplicate_abstract_id IS NOT NULL)"
-                                         .format(AbstractAction.mark_as_duplicate),
-                                         name='prop_abstract_id_only_duplicate'),
+                      db.CheckConstraint("(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)"
+                                         .format(AbstractAction.mark_as_duplicate, AbstractAction.merge),
+                                         name='prop_abstract_id_only_duplicate_merge'),
                       {'schema': 'event_abstracts'})
 
     id = db.Column(
@@ -83,7 +84,7 @@ class AbstractReview(db.Model):
         PyIntEnum(AbstractAction),
         nullable=False
     )
-    proposed_duplicate_abstract_id = db.Column(
+    proposed_related_abstract_id = db.Column(
         db.Integer,
         db.ForeignKey('event_abstracts.abstracts.id'),
         index=True,
@@ -128,12 +129,12 @@ class AbstractReview(db.Model):
             lazy='dynamic'
         )
     )
-    proposed_duplicate_abstract = db.relationship(
+    proposed_related_abstract = db.relationship(
         'Abstract',
         lazy=True,
-        foreign_keys=proposed_duplicate_abstract_id,
+        foreign_keys=proposed_related_abstract_id,
         backref=db.backref(
-            'proposed_duplicate_abstract_reviews',
+            'proposed_related_abstract_reviews',
             lazy='dynamic'
         )
     )

@@ -494,7 +494,7 @@ class AbstractMigration(object):
         # mark-as-duplicate judgments
         for review, old_abstract in as_duplicate_reviews:
             try:
-                review.proposed_duplicate_abstract = abstract_map[old_abstract]
+                review.proposed_related_abstract = abstract_map[old_abstract]
             except KeyError:
                 self.importer.print_error(cformat('%{yellow!}Abstract #{} marked as duplicate of invalid abstract #{}')
                                           .format(review.abstract.friendly_id, old_abstract._id),
