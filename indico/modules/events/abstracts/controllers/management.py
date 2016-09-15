@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import os
 from collections import defaultdict
 
 from flask import redirect, flash, jsonify, request
@@ -32,7 +33,8 @@ from indico.modules.events.abstracts.settings import boa_settings, abstracts_set
 from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.util import get_field_values
+from indico.modules.events.util import get_field_values, ZipGeneratorMixin
+from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -224,3 +226,21 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
             abstract_persons_dict[submitter]['submitter'] |= True
         return jsonify_template('events/management/contribution_person_list.html',
                                 event_persons=abstract_persons_dict, event=self.event_new, include_submitters=True)
+
+
+class RHAbstractsDownloadAttachments(RHManageAbstractsActionsBase, ZipGeneratorMixin):
+    """Generate a ZIP file with attachment files for a given list of abstracts"""
+
+    def _prepare_folder_structure(self, item):
+        abstract_title = secure_filename('{}_{}'.format(item.abstract.title, unicode(item.abstract.id)), 'abstract')
+        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
+        return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
+
+    def _iter_items(self, abstracts):
+        for abstract in abstracts:
+            for f in abstract.files:
+                yield f
+
+    def _process(self):
+        return self._generate_zip_file(self.abstracts, name_prefix='abstract-attachments',
+                                       name_suffix=self.event_new.id)
