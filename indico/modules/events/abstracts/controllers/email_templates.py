@@ -36,7 +36,7 @@ class RHEmailTemplateList(RHManageAbstractsBase):
         return jsonify_template('events/abstracts/management/notification_tpl_list.html', event=self.event_new)
 
 
-class RHEmailTemplateAdd(RHManageAbstractsBase):
+class RHAddEmailTemplate(RHManageAbstractsBase):
     """Add a new e-mail template."""
 
     def _process(self):
@@ -52,8 +52,8 @@ class RHEmailTemplateAdd(RHManageAbstractsBase):
         return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form)
 
 
-class RHEMailTemplateModifBase(RHManageAbstractsBase):
-    """Base RH for a specific subcontribution"""
+class RHEditEmailTemplateBase(RHManageAbstractsBase):
+    """Base class for operations that involve editing an e-mail template."""
 
     normalize_url_spec = {
         'locators': {
@@ -66,8 +66,8 @@ class RHEMailTemplateModifBase(RHManageAbstractsBase):
         self.email_tpl = AbstractEmailTemplate.get_one(request.view_args['email_tpl_id'])
 
 
-class RHEmailTemplateRuleEdit(RHEMailTemplateModifBase):
-    """Add a new e-mail template."""
+class RHEditEmailTemplateRules(RHEditEmailTemplateBase):
+    """Edit the rules of a notification template."""
 
     def _process(self):
         form = EditEmailTemplateRuleForm(obj=self.email_tpl, event=self.event_new)
@@ -79,8 +79,8 @@ class RHEmailTemplateRuleEdit(RHEMailTemplateModifBase):
                                 form=form, is_edit=True)
 
 
-class RHEmailTemplateTextEdit(RHEMailTemplateModifBase):
-    """Add a new e-mail template."""
+class RHEditEmailTemplateText(RHEditEmailTemplateBase):
+    """Edit the e-mail text of a notification template."""
 
     def _process(self):
         form = EditEmailTemplateTextForm(obj=self.email_tpl, event=self.event_new)
@@ -91,7 +91,7 @@ class RHEmailTemplateTextEdit(RHEMailTemplateModifBase):
         return jsonify_template('events/abstracts/management/notification_tpl_text_form.html', form=form, is_edit=True)
 
 
-class RHEmailTemplateDelete(RHEMailTemplateModifBase):
+class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
     """Delete an e-mail template."""
 
     def _process(self):
@@ -100,8 +100,8 @@ class RHEmailTemplateDelete(RHEMailTemplateModifBase):
         return jsonify_data(html=tpl.render_notification_list(self.event_new), flash=False)
 
 
-class RHEmailTemplatePreview(RHEMailTemplateModifBase):
-    """Delete an e-mail template."""
+class RHPreviewEmailTemplate(RHEditEmailTemplateBase):
+    """Preview an e-mail template."""
 
     def _process(self):
         abstract = create_mock_abstract(self.event_new)
