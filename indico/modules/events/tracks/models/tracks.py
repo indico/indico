@@ -77,6 +77,17 @@ class Track(DescriptionMixin, db.Model):
             lazy=True
         )
     )
+    conveners = db.relationship(
+        'User',
+        secondary='events.track_conveners',
+        collection_class=set,
+        lazy=True,
+        backref=db.backref(
+            'convener_for_tracks',
+            collection_class=set,
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - abstract_reviews (AbstractReview.track)
