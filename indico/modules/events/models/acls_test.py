@@ -147,31 +147,17 @@ def test_update_principal_signal(create_event, dummy_user):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_update_principal_resolve_email(create_event, create_user, smtp):
+def test_update_principal_resolve_email(create_event, create_user):
     event = create_event()
     user = create_user(123, email='user@example.com')
     # add email that belongs to a user
     entry = event.update_principal(EmailPrincipal('user@example.com'), full_access=True)
     assert entry.principal == user
     assert entry.type == PrincipalType.user
-    extract_emails(smtp, required=False, count=0)
     # add email that has no user associated
     entry = event.update_principal(EmailPrincipal('unknown@example.com'), full_access=True)
     assert entry.principal == EmailPrincipal('unknown@example.com')
     assert entry.type == PrincipalType.email
-    extract_emails(smtp, required=True, count=1)
-
-
-@pytest.mark.usefixtures('request_context')
-def test_update_principal_email(create_event, smtp):
-    event = create_event()
-    principal = EmailPrincipal('unknown@example.com')
-    event.update_principal(principal, roles={'submit'})
-    email = extract_emails(smtp, required=True, one=True, to=principal.email)
-    assert email['Subject'] == '[Indico] Please register'
-    # adding more privs to the user should not send another email
-    event.update_principal(principal, full_access=True)
-    extract_emails(smtp, required=False, count=0)
 
 
 @pytest.mark.usefixtures('request_context')
