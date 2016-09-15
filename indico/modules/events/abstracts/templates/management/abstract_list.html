@@ -73,8 +73,8 @@
                 </button>
             </div>
             <div class="group left">
-                <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-form disabled"
-                   {# TODO: data-href="{{ url_for('.download_attachments', event) }}" #}>
+                <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-list-form disabled"
+                   data-href="{{ url_for('.download_attachments', event) }}">
                     {%- trans %}Download attachments{%- endtrans %}
                 </a>
             </div>
