@@ -264,8 +264,19 @@ def upgrade():
         schema='events'
     )
 
+    op.create_table(
+        'track_conveners',
+        sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.Column('track_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('user_id', 'track_id'),
+        schema='events'
+    )
+
 
 def downgrade():
+    op.drop_table('track_conveners', schema='events')
     op.drop_table('track_abstract_reviewers', schema='events')
     op.drop_table('email_logs', schema='event_abstracts')
     op.drop_table('proposed_for_tracks', schema='event_abstracts')
