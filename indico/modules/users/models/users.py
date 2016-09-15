@@ -325,6 +325,7 @@ class User(PersonMixin, db.Model):
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
     # - blockings (Blocking.created_by_user)
+    # - convener_for_tracks (Track.conveners)
     # - created_events (Event.creator)
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
