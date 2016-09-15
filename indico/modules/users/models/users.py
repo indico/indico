@@ -317,6 +317,7 @@ class User(PersonMixin, db.Model):
     # relationship backrefs:
     # - _all_settings (UserSetting.user)
     # - abstract_comments (AbstractComment.user)
+    # - abstract_email_log_entries (AbstractEmailLogEntry.user)
     # - abstract_judgments (Judgment.judge)
     # - abstract_reviews (AbstractReview.user)
     # - abstracts (Abstract.submitter)
