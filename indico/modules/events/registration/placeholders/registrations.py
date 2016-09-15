@@ -21,7 +21,6 @@ from markupsafe import Markup, escape
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder, ParametrizedPlaceholder
-from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
 
@@ -49,7 +48,7 @@ class EventTitlePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, regform, registration):
-        return registration.registration_form.event.title
+        return registration.registration_form.event_new.title
 
 
 class EventLinkPlaceholder(Placeholder):
@@ -58,9 +57,9 @@ class EventLinkPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, regform, registration):
-        event = registration.registration_form.event
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=event.getURL(),
-                                                                         title=escape(to_unicode(event.title))))
+        regform = registration.registration_form
+        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event.getURL(),
+                                                                         title=escape(regform.event_new.title)))
 
 
 class IDPlaceholder(Placeholder):
