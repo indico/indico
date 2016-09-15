@@ -25,7 +25,8 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract,
                                                                     RHManageAbstractReviewing, RHCreateAbstract,
-                                                                    RHDeleteAbstracts, RHAbstractPersonList)
+                                                                    RHDeleteAbstracts, RHAbstractPersonList,
+                                                                    RHAbstractsDownloadAttachments)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -47,6 +48,8 @@ _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', 
 _bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', RHCreateAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', RHDeleteAbstracts, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/person-list', 'person_list', RHAbstractPersonList, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/attachments', 'download_attachments', RHAbstractsDownloadAttachments,
+                 methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHAbstractListStaticURL, methods=('POST',))
 
 # E-mail templates
