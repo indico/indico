@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
-from indico.modules.events.abstracts.controllers.email_templates import (RHEmailTemplateAdd, RHEmailTemplateRuleEdit,
-                                                                         RHEmailTemplateTextEdit, RHEmailTemplateList,
-                                                                         RHEmailTemplateDelete, RHEmailTemplatePreview)
+from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
+                                                                         RHEditEmailTemplateText, RHEmailTemplateList,
+                                                                         RHDeleteEmailTemplate, RHPreviewEmailTemplate)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract)
@@ -44,15 +44,15 @@ _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHA
 
 # E-mail templates
 _bp.add_url_rule('/manage/abstracts/email-templates/', 'email_tpl_list', RHEmailTemplateList)
-_bp.add_url_rule('/manage/abstracts/email-templates/add', 'email_tpl_add', RHEmailTemplateAdd, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_delete', RHEmailTemplateDelete,
+_bp.add_url_rule('/manage/abstracts/email-templates/add', 'email_tpl_add', RHAddEmailTemplate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_delete', RHDeleteEmailTemplate,
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit', 'email_tpl_rule_edit',
-                 RHEmailTemplateRuleEdit, methods=('GET', 'POST'))
+                 RHEditEmailTemplateRules, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit-text', 'email_tpl_text_edit',
-                 RHEmailTemplateTextEdit, methods=('GET', 'POST'))
+                 RHEditEmailTemplateText, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/preview', 'email_tpl_preview',
-                 RHEmailTemplatePreview)
+                 RHPreviewEmailTemplate)
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
