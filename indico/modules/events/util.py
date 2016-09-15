@@ -144,27 +144,6 @@ def get_random_color(event):
     return random.choice(tuple(unused_colors) or get_colors())
 
 
-def notify_pending(acl_entry):
-    """Sends a notification to a user with an email-based ACL entry
-
-    :param acl_entry: An email-based EventPrincipal
-    """
-    assert acl_entry.type == PrincipalType.email
-    if acl_entry.full_access:
-        template_name = 'events/emails/pending_manager.txt'
-        endpoint = 'event_mgmt.conferenceModification-managementAccess'
-    elif acl_entry.has_management_role('submit', explicit=True):
-        template_name = 'events/emails/pending_submitter.txt'
-        endpoint = 'event.conferenceDisplay'
-    else:
-        return
-    event = acl_entry.event_new
-    email = acl_entry.principal.email
-    template = get_template_module(template_name, event=event, email=email,
-                                   url=url_for_register(url_for(endpoint, event), email=email))
-    send_email(make_email(to_list={email}, template=template), event.as_legacy, module='Protection')
-
-
 def serialize_event_person(person):
     """Serialize EventPerson to JSON-like object"""
     return {'_type': 'EventPerson',
