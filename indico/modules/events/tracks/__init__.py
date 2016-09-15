@@ -20,6 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
@@ -52,3 +53,14 @@ def _merge_users(target, source, **kwargs):
     source.reviewer_for_tracks.clear()
     target.convener_for_tracks |= source.convener_for_tracks
     source.convener_for_tracks.clear()
+
+
+@signals.acl.get_management_roles.connect_via(Event)
+def _get_management_roles(sender, **kwargs):
+    return TrackConvenerRole
+
+
+class TrackConvenerRole(ManagementRole):
+    name = 'track_convener'
+    friendly_name = _('Track convener')
+    description = _('Grants track convener rights in an event')
