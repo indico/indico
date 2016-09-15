@@ -193,11 +193,11 @@ def upgrade():
         sa.Column('modified_dt', UTCDateTime, nullable=True),
         sa.Column('comment', sa.Text(), nullable=False),
         sa.Column('proposed_action', PyIntEnum(AbstractAction), nullable=False),
-        sa.Column('proposed_duplicate_abstract_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('proposed_related_abstract_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_track_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_contribution_type_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
-        sa.ForeignKeyConstraint(['proposed_duplicate_abstract_id'], ['event_abstracts.abstracts.id']),
+        sa.ForeignKeyConstraint(['proposed_related_abstract_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['proposed_track_id'], ['events.tracks.id']),
         sa.ForeignKeyConstraint(['proposed_contribution_type_id'], ['events.contribution_types.id']),
         sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
@@ -208,8 +208,8 @@ def upgrade():
                            .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
         sa.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
                            .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
-        sa.CheckConstraint("(proposed_action = 4) = (proposed_duplicate_abstract_id IS NOT NULL)"
-                           .format(AbstractAction.mark_as_duplicate), name='prop_abstract_id_only_duplicate'),
+        sa.CheckConstraint("(proposed_action IN (4, 5)) = (proposed_related_abstract_id IS NOT NULL)"
+                           .format(AbstractAction.mark_as_duplicate), name='prop_abstract_id_only_duplicate_merge'),
         schema='event_abstracts'
     )
 
