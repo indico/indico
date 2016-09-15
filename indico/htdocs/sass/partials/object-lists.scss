@@ -20,11 +20,22 @@
     .i-table {
         thead {
             font-weight: bold;
+            border-bottom: 2px solid $pastel-gray;
+            color: $black;
+
+            tr {
+                border-top: 0;
+            }
         }
 
         th {
             &.tablesorter-header:not(.sorter-false){
                 cursor: pointer;
+
+                &:hover {
+                    @include transition(background-color .2s);
+                    background-color: darken($light-gray, 5%);
+                }
             }
 
             &:before {
@@ -51,6 +62,7 @@
 
         td {
             vertical-align: top;
+            padding: 12px 5px;
 
             .vertical-aligner {
                 display: block;
