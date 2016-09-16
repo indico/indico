@@ -178,13 +178,16 @@ class RHCreateAbstract(RHAbstractListBase):
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
-            abstract = create_abstract(self.event_new, *get_field_values(form.data))
+            data = form.data
+            del data['attachments']
+            files = request.files.getlist('file')
+            abstract = create_abstract(self.event_new, *get_field_values(data), files=files)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list()
             if tpl_components.get('hide_abstract'):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
-        return jsonify_template('events/abstracts/forms/abstract.html', form=form)
+        return jsonify_template('events/abstracts/forms/abstract.html', event=self.event_new, form=form)
 
 
 class RHDeleteAbstracts(RHManageAbstractsActionsBase):

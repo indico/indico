@@ -98,6 +98,91 @@ $dropzone-border-width: 2;
             }
         }
     }
+
+    &.thin {
+        min-height: initial;
+
+        .dropzone-inner {
+            display: block;
+            padding: 10px;
+        }
+
+        .dropzone-previews {
+            display: block;
+        }
+
+        .dz-preview {
+            display: flex;
+            min-height: initial;
+            margin: 0 0 5px 0;
+
+            &:hover {
+                @include transition(background-color .2s);
+                background-color: $light-gray;
+            }
+        }
+
+        .dz-details {
+            opacity: 1;
+            font-size: 1em;
+            padding: 0;
+            text-align: initial;
+            color: $black;
+            min-width: initial;
+            position: initial;
+            flex-grow: 1;
+            cursor: initial;
+            width: 300px;
+        }
+
+        .select-files-btn {
+            display: block;
+
+            button {
+                margin: 5px 0 0 0;
+            }
+        }
+
+        .dz-message {
+            font-size: 1em;
+            margin: 0;
+        }
+
+        .message-seperator {
+            font-size: 1em;
+            margin-top: 0;
+        }
+
+        .dz-filename{
+            span:hover {
+                @include transition(background-color .2s);
+                background-color: $light-gray;
+                border-color: transparent;
+            }
+
+            &:hover {
+                span {
+                    @include transition(background-color .2s);
+                    background-color: $light-gray;
+                    border-color: transparent;
+                }
+            }
+        }
+
+        .dz-remove {
+            margin-left: 5px;
+            color: $link;
+
+            i:before {
+                cursor: pointer;
+            }
+
+            &:hover {
+                color: $bright-orange;
+                text-decoration: initial;
+            }
+        }
+    }
 }
 
 .dropzone-upload-btn {
