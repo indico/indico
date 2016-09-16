@@ -1,7 +1,11 @@
 {% extends 'forms/base_widget.html' %}
+{% from 'forms/_dropzone_themes.html' import thin_preview_template %}
 
 {% block html %}
-    <div id="dz-{{ field.id }}" class="dropzone" data-options="{{ options|tojson|forceescape }}" data-value="{{ field.data|tojson|forceescape }}">
+    <div id="dz-{{ field.id }}"
+         class="dropzone {% if lightweight %}thin{% endif %}"
+         data-options="{{ options|tojson|forceescape }}"
+         data-value="{{ field.data|tojson|forceescape }}">
         <div class="dropzone-inner">
             <div class="dropzone-previews"></div>
             <div class="select-files-btn">
