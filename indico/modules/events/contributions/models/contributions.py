@@ -126,6 +126,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     )
     track_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.tracks.id'),
+        index=True,
         nullable=True
     )
     abstract_id = db.Column(
@@ -237,6 +239,15 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             uselist=False
         )
     )
+    track = db.relationship(
+        'Track',
+        lazy=True,
+        backref=db.backref(
+            'contributions',
+            primaryjoin='(Contribution.track_id == Track.id) & ~Contribution.is_deleted',
+            lazy=True
+        )
+    )
     #: External references associated with this contribution
     references = db.relationship(
         'ContributionReference',
@@ -317,10 +328,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def protection_parent(self):
         return self.session if self.session_id is not None else self.event_new
-
-    @property
-    def track(self):
-        return self.event_new.as_legacy.getTrackById(str(self.track_id))
 
     @property
     def start_dt(self):
