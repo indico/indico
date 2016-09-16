@@ -274,8 +274,19 @@ def upgrade():
         schema='events'
     )
 
+    op.alter_column('contributions', 'track_id', new_column_name='legacy_track_id', schema='events')
+    op.drop_index('ix_contributions_event_id_track_id', table_name='contributions', schema='events')
+    op.add_column('contributions', sa.Column('track_id', sa.Integer(), nullable=True), schema='events')
+    op.create_index(None, 'contributions', ['track_id'], schema='events')
+    op.create_index(None, 'contributions', ['event_id', 'track_id'], schema='events')
+
 
 def downgrade():
+    op.drop_index(op.f('ix_contributions_event_id_track_id'), table_name='contributions', schema='events')
+    op.drop_column('contributions', 'track_id', schema='events')
+    op.alter_column('contributions', 'legacy_track_id', new_column_name='track_id', schema='events')
+    op.create_index(None, 'contributions', ['event_id', 'track_id'], schema='events')
+
     op.drop_table('track_conveners', schema='events')
     op.drop_table('track_abstract_reviewers', schema='events')
     op.drop_table('email_logs', schema='event_abstracts')
