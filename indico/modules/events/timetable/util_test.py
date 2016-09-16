@@ -21,8 +21,7 @@ from pytz import utc
 
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
 
-pytest_plugins = ('indico.modules.events.contributions.testing.fixtures',
-                  'indico.modules.events.timetable.testing.fixtures')
+pytest_plugins = ('indico.modules.events.timetable.testing.fixtures',)
 
 
 @pytest.mark.parametrize(('event_start_dt', 'event_end_dt', 'day', 'valid'), (
