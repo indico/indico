@@ -182,7 +182,7 @@
                             <td class="i-table actions-column">
                                 <div class="group right entry-action-buttons vertical-aligner">
                                     <a href="#" class="icon-edit i-button-icon highlight js-dialog-action"
-                                       data-href="{{ url_for('.manage_update_contrib', contrib) }}"
+                                       data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                        data-ajax-dialog></a>
