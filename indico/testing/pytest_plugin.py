@@ -27,7 +27,8 @@ from indico.core.config import Config
 from indico.core.logger import Logger
 
 
-pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.category', 'indico.testing.fixtures.database',
+pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.category',
+                  'indico.testing.fixtures.contribution', 'indico.testing.fixtures.database',
                   'indico.testing.fixtures.disallow', 'indico.testing.fixtures.user', 'indico.testing.fixtures.event',
                   'indico.testing.fixtures.smtp', 'indico.testing.fixtures.util')
 
