@@ -30,12 +30,12 @@ from indico.modules.events.contributions.models.persons import (ContributionPers
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
 from indico.modules.events.management.forms import EventProtectionForm
-from indico.modules.events.management.util import can_lock
+from indico.modules.events.management.util import can_lock, find_unregistered_users, flash_if_unregistered
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.operations import delete_event, create_event_references, update_event
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -265,8 +265,10 @@ class RHManageEventPersonLinks(RHConferenceModifBase):
 
     def _process(self):
         form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
+        non_users_before = find_unregistered_users(self.event_new.person_links)
         if form.validate_on_submit():
             update_event(self.event_new, form.data)
+            flash_if_unregistered(non_users_before, self.event_new.person_links, self.event_new)
             tpl = get_template_module('events/management/_event_person_links.html')
             return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
         self.commit = False

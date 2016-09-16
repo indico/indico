@@ -44,6 +44,7 @@ from indico.modules.events.contributions.util import (ContributionListGenerator,
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.management.util import find_unregistered_users, flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
@@ -195,14 +196,16 @@ class RHEditContribution(RHManageContributionBase):
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
                                                    **custom_field_values),
                                   event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
+        non_users_before = find_unregistered_users(self.contrib.speakers)
         if form.validate_on_submit():
             with track_time_changes():
                 update_contribution(self.contrib, *get_field_values(form.data))
+            flash_if_unregistered(non_users_before, self.contrib.speakers, self.event_new)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
-            return jsonify_data(**tpl_components)
+            return jsonify_data(flash='flash' in request.args, **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
         self.commit = False

@@ -33,11 +33,8 @@ from sqlalchemy.orm import load_only, noload
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import UserValueError
-from indico.core.notifications import send_email, make_email
 from indico.modules.api import settings as api_settings
-from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
