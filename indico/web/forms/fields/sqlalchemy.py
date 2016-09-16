@@ -19,6 +19,8 @@ from __future__ import unicode_literals, absolute_import
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.widgets import CheckboxInput
 
+from indico.web.forms.widgets import JinjaWidget
+
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
     """Like the parent, but with a callback that allows you to modify the list
@@ -46,3 +48,4 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
 
 class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
     option_widget = CheckboxInput()
+    widget = JinjaWidget('forms/checkbox_group_widget.html', single_kwargs=True)
