@@ -55,9 +55,7 @@
                                         <td class="i-table" data-text="{{ abstract.state.title }}">
                                             <span class="vertical-aligner">
                                                 {% if abstract.state %}
-                                                    {%- trans title=abstract.state.title %}
-                                                        {{ title }}
-                                                    {% endtrans -%}
+                                                    {{ abstract.state.title }}
                                                 {% else %}
                                                     {% trans %}No track{% endtrans %}
                                                 {% endif %}
