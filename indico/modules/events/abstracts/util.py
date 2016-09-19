@@ -42,7 +42,7 @@ class AbstractListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super(AbstractListGenerator, self).__init__(event)
         self.default_list_config = {
-            'items': ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks', 'proposed_for_tracks',
+            'items': ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks', 'reviewed_for_tracks',
                       'accepted_track', 'state'),
             'filters': {'fields': {}, 'items': {}, 'extra': {}}
         }
@@ -57,7 +57,7 @@ class AbstractListGenerator(ListGeneratorBase):
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
             ('submitted_for_tracks', {'title': _('Submitted for tracks'),
                                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('proposed_for_tracks', {'title': _('Proposed for tracks'),
+            ('reviewed_for_tracks', {'title': _('Reviewed for tracks'),
                                      'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
             ('accepted_contrib_type', {'title': _('Accepted type'),
                                        'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
@@ -127,7 +127,7 @@ class AbstractListGenerator(ListGeneratorBase):
                 'submitted_contrib_type': Abstract.submitted_contrib_type_id,
                 'state': Abstract.state,
                 'submitted_for_tracks': Abstract.submitted_for_tracks,
-                'proposed_for_tracks': Abstract.proposed_for_tracks
+                'reviewed_for_tracks': Abstract.reviewed_for_tracks
             }
             for key, column in static_filters.iteritems():
                 ids = set(item_filters.get(key, ()))
