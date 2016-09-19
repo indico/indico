@@ -70,11 +70,12 @@
                                                 {%- endfor %}
                                             </span>
                                         </td>
-                                    {% elif item.id == 'submitted_type' %}
-                                        <td class="i-table type-column" data-text="{{ abstract.submitted_type.name if abstract.submitted_type else '' }}">
+                                    {% elif item.id == 'submitted_contrib_type' %}
+                                        <td class="i-table type-column"
+                                            data-text="{{ abstract.submitted_contrib_type.name if abstract.submitted_contrib_type else '' }}">
                                             <span class="vertical-aligner">
-                                                {% if abstract.submitted_type -%}
-                                                    {{ abstract.submitted_type.name }}
+                                                {% if abstract.submitted_contrib_type -%}
+                                                    {{ abstract.submitted_contrib_type.name }}
                                                 {%- else %}
                                                     {% trans %}n/a{% endtrans %}
                                                 {%- endif %}
@@ -105,16 +106,16 @@
                                                 {% endif %}
                                             </span>
                                         </td>
-                                    {% elif item.id == 'proposed_for_tracks' %}
-                                        {% set track_titles = abstract.proposed_for_tracks | join(', ', attribute='title') %}
+                                    {% elif item.id == 'reviewed_for_tracks' %}
+                                        {% set track_titles = abstract.reviewed_for_tracks | join(', ', attribute='title') %}
                                         <td class="i-table"
                                             data-text="{{ track_titles }}"
                                             data-searchable="{{ track_titles | lower }}">
                                             <span class="vertical-aligner">
-                                                {% for track in abstract.proposed_for_tracks | sort(attribute='title') -%}
+                                                {% for track in abstract.reviewed_for_tracks | sort(attribute='title') -%}
                                                     <div>{{ track.title }}</div>
                                                 {%- endfor %}
-                                                {% if not abstract.proposed_for_tracks %}
+                                                {% if not abstract.reviewed_for_tracks %}
                                                     {% trans %}No track{% endtrans %}
                                                 {% endif %}
                                             </span>
