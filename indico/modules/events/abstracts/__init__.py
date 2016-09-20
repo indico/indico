@@ -21,6 +21,7 @@ from flask import session
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
+from indico.modules.events.abstracts.clone import AbstractSettingsCloner
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import EventType, Event
 from indico.util.i18n import _
@@ -43,6 +44,11 @@ def _extend_event_management_menu(sender, event, **kwargs):
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return AbstractsFeature
+
+
+@signals.event_management.get_cloners.connect
+def _get_cloners(sender, **kwargs):
+    yield AbstractSettingsCloner
 
 
 @signals.users.merged.connect
