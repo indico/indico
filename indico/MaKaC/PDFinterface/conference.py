@@ -142,12 +142,12 @@ class ProgrammeToPDF(PDFBase):
         story.append(p)
         story.append(Spacer(1, 0.4*inch))
 
-        for track in self._conf.getTrackList():
+        for track in self._event.tracks:
 
-            bogustext = track.getTitle()
+            bogustext = track.title.encode('utf-8')
             p = Paragraph(escape(bogustext), styles["Heading1"])
             self._story.append(p)
-            bogustext = track.getDescription()
+            bogustext = track.description.encode('utf-8')
             p = Paragraph(escape(bogustext), style)
             story.append(p)
             story.append(Spacer(1, 0.4*inch))
