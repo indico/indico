@@ -113,7 +113,7 @@ class AbstractEmailTemplate(db.Model):
         lazy=True,
         backref=db.backref(
             'abstract_email_templates',
-            lazy='dynamic'
+            lazy=True
         )
     )
 
