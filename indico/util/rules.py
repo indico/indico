@@ -50,6 +50,14 @@ class Condition(object):
         return rule.get(cls.name) is not None
 
     @classmethod
+    def is_none(cls, **kwargs):
+        """Check whether the condition requires a null value.
+
+            Inheriting methods should overload this
+        """
+        raise NotImplementedError
+
+    @classmethod
     def get_available_values(cls, **kwargs):
         """Get a dict of values that can be used for the condition.
 
@@ -108,8 +116,10 @@ def check_rule(context, rule, **kwargs):
             else:
                 continue
         values = condition._clean_values(rule[name], **kwargs)
-        # not having empty values is always a failure
-        if not values or not condition.check(values, **kwargs):
+        if not values and condition.is_none(**kwargs):
+            # the property we're checking is null and the rule wants null
+            return True
+        elif not condition.check(values, **kwargs):
             return False
     return True
 
