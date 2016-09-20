@@ -23,6 +23,7 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
+from indico.modules.events.tracks.clone import TrackCloner
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -53,6 +54,11 @@ def _merge_users(target, source, **kwargs):
     source.reviewer_for_tracks.clear()
     target.convener_for_tracks |= source.convener_for_tracks
     source.convener_for_tracks.clear()
+
+
+@signals.event_management.get_cloners.connect
+def _get_cloners(sender, **kwargs):
+    yield TrackCloner
 
 
 @signals.acl.get_management_roles.connect_via(Event)
