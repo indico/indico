@@ -117,7 +117,7 @@ class ContributionListGenerator(ListGeneratorBase):
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
         session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
-        track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.list_event.as_legacy.getTrackList()}
+        track_choices = {unicode(t.id): t.title for t in self.list_event.tracks}
         type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
@@ -178,8 +178,7 @@ class ContributionListGenerator(ListGeneratorBase):
         total_entries = contributions_query.count()
         contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.list_event.sessions]
-        tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
-                  for t in self.list_event.as_legacy.getTrackList()]
+        tracks = [{'id': int(t.id), 'title': t.title} for t in self.list_event.tracks]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
