@@ -28,6 +28,7 @@ from indico.util.i18n import _
 class TrackCloner(EventCloner):
     name = 'tracks'
     friendly_name = _('Tracks')
+    always_available_dep = True
 
     @property
     def is_visible(self):
