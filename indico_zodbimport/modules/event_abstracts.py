@@ -209,8 +209,9 @@ class AbstractMigration(object):
                 if user is None:
                     continue
                 self.importer.print_info(cformat('%{blue!}  Coordinator:%{reset} {}').format(user))
+                track.conveners.add(user)
                 track.abstract_reviewers.add(user)
-                self.event.update_principal(user, add_roles={'abstract_reviewer'}, quiet=True)
+                self.event.update_principal(user, add_roles={'abstract_reviewer', 'track_convener'}, quiet=True)
             self.track_map[old_track] = track
             self.track_map_by_id[int(old_track.id)] = track
             self.event.tracks.append(track)
@@ -265,7 +266,7 @@ class AbstractMigration(object):
             'num_answers': int(old_settings._numberOfAnswers),
             'scale_lower': int(old_settings._scaleLower),
             'scale_upper': int(old_settings._scaleHigher),
-            'reviewers_final_judgement': bool(getattr(old_settings, '_canReviewerAccept', False))
+            'conveners_final_judgement': bool(getattr(old_settings, '_canReviewerAccept', False))
         })
         for pos, old_question in enumerate(old_settings._reviewingQuestions, 1):
             self._migrate_question(old_question, pos=pos)
