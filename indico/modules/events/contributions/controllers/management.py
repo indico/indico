@@ -47,6 +47,7 @@ from indico.modules.events.management.controllers import RHContributionPersonLis
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
+from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import update_object_principals, track_time_changes
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
@@ -278,7 +279,7 @@ class RHContributionREST(RHManageContributionBase):
         if track_id is None:
             updates['track_id'] = None
         else:
-            track = self._conf.getTrackById(str(track_id))
+            track = Track.get(track_id)
             if not track:
                 raise BadRequest('Invalid track id')
             if track_id != self.contrib.track_id:
