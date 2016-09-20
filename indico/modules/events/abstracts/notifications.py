@@ -19,9 +19,13 @@ from __future__ import unicode_literals
 import itertools
 from collections import OrderedDict
 
+from flask import session
+
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.util.i18n import _
-from indico.util.rules import Condition, check_rule, get_missing_conditions
+from indico.core.notifications import make_email, send_email
+from indico.util.placeholders import replace_placeholders
+from indico.util.rules import Condition, check_rule
 
 
 class EmailNotificationCondition(Condition):
@@ -140,7 +144,26 @@ def send_abstract_notifications(abstract):
                      against the event's notification rules
     """
     for tpl in abstract.event_new.abstract_email_templates:
+        matched = False
         for rule in tpl.rules:
-            if check_rule('abstract-notification-email', rule, abstract=abstract):
-                pass
-                # TODO: Actually send an e-mail in case there's a match
+            if check_rule('abstract-notifications', rule, abstract=abstract, event=abstract.event_new):
+                matched = True
+                to_recipients = []
+                if tpl.include_submitter:
+                    to_recipients.append(abstract.submitter.email)
+                if tpl.include_authors:
+                    to_recipients += [author.email for author in abstract.primary_authors]
+
+                cc_recipients = list(tpl.extra_cc_emails)
+                if tpl.include_coauthors:
+                    cc_recipients += [author.email for author in abstract.secondary_authors]
+
+                subject = replace_placeholders('abstract-notification-email', tpl.subject,
+                                               abstract=abstract, escape_html=False)
+                body = replace_placeholders('abstract-notification-email', tpl.body,
+                                            abstract=abstract, escape_html=False)
+                email = make_email(to_list=to_recipients, cc_list=cc_recipients, reply_address=tpl.reply_to_address,
+                                   subject=subject, body=body)
+                send_email(email, event=abstract.event_new, user=session.user)
+        if tpl.stop_on_match and matched:
+            break
