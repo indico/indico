@@ -41,18 +41,20 @@ def unique_col(name, id_):
 
 
 def _prepare_header(header):
-    return header[0] if isinstance(header, tuple) else header
+    if isinstance(header, tuple):
+        header = header[0]
+    return header.encode('utf-8')
 
 
 def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
-        data = ', '.join(data)
+        data = ', '.join(data).encode('utf-8')
     elif isinstance(data, set):
-        data = ', '.join(sorted(data, key=unicode.lower))
+        data = ', '.join(sorted(data, key=unicode.lower)).encode('utf-8')
     elif isinstance(data, bool):
-        data = 'Yes' if data else 'No'
+        data = b'Yes' if data else b'No'
     elif data is None:
-        data = ''
+        data = b''
     return _linebreak_re.sub('    ', unicode(data)).encode('utf-8')
 
 
