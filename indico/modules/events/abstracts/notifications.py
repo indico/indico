@@ -60,11 +60,19 @@ class TrackCondition(EmailNotificationCondition):
         return ((t.id, t.title) for t in event.tracks)
 
     @classmethod
-    def check(cls, values, abstract, **kwargs):
+    def get_test_track_set(cls, abstract):
         if abstract.state == AbstractState.accepted:
-            return abstract.accepted_track_id in values
+            return {abstract.accepted_track_id} if abstract.accepted_track_id else set()
         else:
-            return bool(set(values) & {track.id for track in abstract.submitted_for_tracks})
+            return {track.id for track in abstract.submitted_for_tracks}
+
+    @classmethod
+    def check(cls, values, abstract, **kwargs):
+        return bool(set(values) & cls.get_test_track_set(abstract))
+
+    @classmethod
+    def is_none(cls, abstract, **kwargs):
+        return not bool(cls.get_test_track_set(abstract))
 
 
 class StateCondition(EmailNotificationCondition):
@@ -91,6 +99,10 @@ class StateCondition(EmailNotificationCondition):
     def check(cls, values, abstract, **kwargs):
         return abstract.state in values
 
+    @classmethod
+    def is_none(cls, abstract, **kwargs):
+        return False
+
 
 class ContributionTypeCondition(EmailNotificationCondition):
     """"A condition that matches a particular contribution type."""
@@ -106,11 +118,19 @@ class ContributionTypeCondition(EmailNotificationCondition):
         return ((ct.id, ct.name) for ct in event.contribution_types)
 
     @classmethod
-    def check(cls, values, abstract, **kwargs):
+    def get_test_contrib_type_id(cls, abstract):
         if abstract.state == AbstractState.accepted:
-            return abstract.accepted_contrib_type_id in values
+            return abstract.accepted_contrib_type_id
         else:
-            return abstract.submitted_contrib_type_id in values
+            return abstract.submitted_contrib_type_id
+
+    @classmethod
+    def check(cls, values, abstract, **kwargs):
+        return cls.get_test_contrib_type_id(abstract) in values
+
+    @classmethod
+    def is_none(cls, abstract, **kwargs):
+        return cls.get_test_contrib_type_id(abstract) is None
 
 
 def send_abstract_notifications(abstract):
