@@ -17,14 +17,15 @@
 from __future__ import unicode_literals
 
 import json
+import os
 import random
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from copy import deepcopy
 from mimetypes import guess_extension
-from os import path
 from tempfile import NamedTemporaryFile
+from zipfile import ZipFile
 
 from flask import session, request, g, current_app
 from sqlalchemy import inspect
@@ -46,10 +47,11 @@ from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 
 
 def get_object_from_args(args=None):
@@ -384,7 +386,7 @@ def get_base_ical_parameters(user, object, detail, path):
 def create_event_logo_tmp_file(event):
     """Creates a temporary file with the event's logo"""
     logo_meta = event.logo_metadata
-    logo_extension = guess_extension(logo_meta['content_type']) or path.splitext(logo_meta['filename'])[1]
+    logo_extension = guess_extension(logo_meta['content_type']) or os.path.splitext(logo_meta['filename'])[1]
     temp_file = NamedTemporaryFile(delete=False, dir=Config.getInstance().getTempDir(), suffix=logo_extension)
     temp_file.write(event.logo)
     temp_file.flush()
@@ -534,3 +536,66 @@ def set_custom_fields(obj, custom_fields_data):
         if old_value != custom_field_value:
             changes[custom_field_name] = (old_value, custom_field_value)
     return changes
+
+
+class ZipGeneratorMixin:
+    """Mixin for RHs that generate zip with files"""
+
+    def _adjust_path_length(self, segments):
+        """
+        Shorten the path length to < 260 chars.
+
+        Windows' built-in ZIP tool doesn't like files whose
+        total path exceeds ~260 chars. Here we progressively
+        shorten the total until it matches that constraint.
+        """
+        result = []
+        total_len = sum(len(seg) for seg in segments) + len(segments) - 1
+        excess = (total_len - 255) if total_len > 255 else 0
+
+        for seg in reversed(segments):
+            fname, ext = os.path.splitext(seg)
+            cut = min(excess, (len(fname) - 10) if len(fname) > 14 else 0)
+            if cut:
+                excess -= cut
+                fname = fname[:-cut]
+            result.append(fname + ext)
+
+        return reversed(result)
+
+    def _iter_items(self, files_holder):
+        for f in files_holder:
+            yield f
+
+    def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None):
+        """Generate a zip file containing the files passed.
+
+        :param files_holder: An iterable (or an iterable containing) object that
+                             contains the files to be added in the zip file.
+        :param name_prefix: The prifix to the zip file name
+        :param name_suffix: The suffix to the zip file name
+        :return: The generated zip file.
+        """
+
+        from indico.util.tasks import delete_file
+
+        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
+        with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
+            self.used_filenames = set()
+            for item in self._iter_items(files_holder):
+                name = self._prepare_folder_structure(item)
+                self.used_filenames.add(name)
+                with item.storage.get_local_path(item.storage_file_id) as filepath:
+                    zip_handler.write(filepath, name)
+
+        # Delete the temporary file after some time.  Even for a large file we don't
+        # need a higher delay since the webserver will keep it open anyway until it's
+        # done sending it to the client.
+        delete_file.apply_async(args=[temp_file.name], countdown=3600)
+        temp_file.delete = False
+        zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
+        return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
+
+    def _prepare_folder_structure(self, item):
+        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
+        return os.path.join(*self._adjust_path_length([file_name]))
