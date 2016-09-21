@@ -27,8 +27,8 @@
                 {% if event.has_location_info %}
                     {{ render_location(event, class='right') }}
                 {% endif %}
-                {% if category.has_icon %}
-                    <img src="{{ category.icon_url }}" class="category-icon" title="{{ category.title }}">
+                {% if category.has_effective_icon %}
+                    <img src="{{ category.effective_icon_url }}" class="category-icon" title="{{ category.title }}">
                 {% endif %}
             </span>
         </td>

@@ -263,6 +263,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return self.icon_metadata is not None
 
     @property
+    def has_effective_icon(self):
+        return self.effective_icon_data['metadata'] is not None
+
+    @property
     def has_logo(self):
         return self.logo_metadata is not None
 
@@ -343,6 +347,20 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                                                                                      self.id)},
                                      else_=Category.id, value=Category.protection_mode)])
                      .where(Category.parent_id == cte_query.c.id))
+        return cte_query.union_all(rec_query)
+
+    @classmethod
+    def get_icon_data_cte(cls):
+        cat_alias = db.aliased(cls)
+        cte_query = (select([cat_alias.id, cat_alias.id.label('source_id'), cat_alias.icon_metadata])
+                     .where(cat_alias.parent_id.is_(None))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id,
+                             db.case({'null': cte_query.c.source_id}, else_=cat_alias.id,
+                                     value=db.func.json_typeof(cat_alias.icon_metadata)),
+                             db.case({'null': cte_query.c.icon_metadata}, else_=cat_alias.icon_metadata,
+                                     value=db.func.json_typeof(cat_alias.icon_metadata))])
+                     .where(cat_alias.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
     @property
@@ -472,6 +490,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return url_for('categories.display_icon', self, slug=self.icon_metadata['hash'])
 
     @property
+    def effective_icon_url(self):
+        """Get the HTTP URL of the icon (possibly inherited)."""
+        data = self.effective_icon_data
+        return url_for('categories.display_icon', category_id=data['source_id'], slug=data['metadata']['hash'])
+
+    @property
     def logo_url(self):
         """Get the HTTP URL of the logo."""
         return url_for('categories.display_logo', self, slug=self.logo_metadata['hash'])
@@ -499,6 +523,15 @@ def _mappers_configured():
     cte = Category.get_protection_cte()
     query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte)
     Category.effective_protection_mode = column_property(query, deferred=True)
+
+    # Category.effective_icon_data -- the effective icon data of the category,
+    # either set on the category itself or inherited from it
+    cte = Category.get_icon_data_cte()
+    query = (select([db.func.json_build_object('source_id', cte.c.source_id,
+                                               'metadata', cte.c.icon_metadata)])
+             .where(cte.c.id == Category.id)
+             .correlate_except(cte))
+    Category.effective_icon_data = column_property(query, deferred=True)
 
     # Category.event_count -- the number of events in the category itself,
     # excluding deleted events
