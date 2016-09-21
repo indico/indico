@@ -423,7 +423,7 @@ class RHContributionsMaterialPackage(RHManageContributionsActionsBase, Attachmen
         if not attachments:
             flash(_('The selected contributions do not have any materials.'), 'warning')
             return redirect(url_for('.manage_contributions', self.event_new))
-        return self._generate_zip_file(attachments)
+        return self._generate_zip_file(attachments, name_suffix=self.event_new.id)
 
 
 class RHContributionsExportCSV(RHManageContributionsActionsBase):
