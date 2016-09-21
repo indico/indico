@@ -57,6 +57,17 @@ class EventCloner(object):
     #: sure to check the super return value of `is_visible` to prevent
     #: an internal cloner from showing up in the cloner selection.
     is_internal = False
+    #: Whether this cloner is always available when pulled in as a
+    #: 'requires' dependency.  This allows requiring a cloner without
+    #: having to keep it available even if there are no clonable
+    #: objects.  For example, you may have something that uses the
+    #: 'tracks' cloner since it can reference tracks (and thus needs
+    #: them cloned) but also contains various other things that may
+    #: be clone-worthy even without tracks being set-up.  While one
+    #: may think about using 'uses' instead of 'requires' first this
+    #: would result in people having to explicitly enable the other
+    #: cloner even if it makes no sense to not run it.
+    always_available_dep = False
 
     @classmethod
     def get_form_items(cls, old_event):
@@ -75,8 +86,15 @@ class EventCloner(object):
         selected |= {c.name
                      for c in all_cloners.itervalues()
                      if c.is_internal and (c.is_default or c.required_by_deep & selected)}
+        # enable unavailable cloners that may be pulled in as a dependency nonetheless
+        extra = {c.name
+                 for c in all_cloners.itervalues()
+                 if not c.is_available and c.always_available_dep and c.required_by_deep & selected}
+        selected |= extra
         active_cloners = OrderedDict((name, cloner) for name, cloner in all_cloners.iteritems() if name in selected)
-        if not all((c.is_internal or c.is_visible) and c.is_available for c in active_cloners.itervalues()):
+        if not all((c.is_internal or c.is_visible) and c.is_available
+                   for c in active_cloners.itervalues()
+                   if c.name not in extra):
             raise Exception('An invisible/unavailable cloner was selected')
         for name, cloner in active_cloners.iteritems():
             if not (selected >= cloner.requires_deep):
