@@ -152,7 +152,7 @@ class RHManageParticipants(RHManageRegFormsBase):
 
     def _process_POST(self):
         regform = self.event_new.participation_regform
-        set_feature_enabled(self.event, 'registration', True)
+        set_feature_enabled(self.event_new, 'registration', True)
         if not regform:
             regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True,
                                        currency=payment_global_settings.get('currency'))
@@ -160,8 +160,8 @@ class RHManageParticipants(RHManageRegFormsBase):
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
-                           'Registration form "{}" has been created'.format(regform.title), session.user)
+            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+                               'Registration form "{}" has been created'.format(regform.title), session.user)
         return redirect(url_for('event_registration.manage_regform', regform))
 
     def _process_GET(self):
