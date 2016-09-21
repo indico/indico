@@ -44,7 +44,7 @@ from indico.modules.events.contributions.util import (ContributionListGenerator,
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
-from indico.modules.events.management.util import find_unregistered_users, flash_if_unregistered
+from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
@@ -178,7 +178,9 @@ class RHCreateContribution(RHManageContributionsBase):
         contrib_form_class = make_contribution_form(self.event_new)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
-            contrib = create_contribution(self.event_new, *get_field_values(form.data))
+            contrib = Contribution()
+            with flash_if_unregistered(self.event_new, lambda: contrib.speakers):
+                contrib = create_contribution(self.event_new, *get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.list_generator.render_list(contrib)
             if tpl_components['hide_contrib']:
@@ -196,16 +198,14 @@ class RHEditContribution(RHManageContributionBase):
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
                                                    **custom_field_values),
                                   event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
-        non_users_before = find_unregistered_users(self.contrib.speakers)
         if form.validate_on_submit():
-            with track_time_changes():
+            with track_time_changes(), flash_if_unregistered(self.event_new, lambda: self.contrib.speakers):
                 update_contribution(self.contrib, *get_field_values(form.data))
-            flash_if_unregistered(non_users_before, self.contrib.speakers, self.event_new)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
-            return jsonify_data(flash='flash' in request.args, **tpl_components)
+            return jsonify_data(flash=(request.args.get('flash') == '1'), **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
         self.commit = False

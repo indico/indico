@@ -16,7 +16,10 @@
 
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
+
 from flask import flash, session
+from markupsafe import Markup, escape
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
@@ -185,33 +188,38 @@ def get_non_inheriting_objects(root):
         raise TypeError('Unexpected object of type {}: {}'.format(type(root).__name__, root))
 
 
-def find_unregistered_users(person_list):
+def find_unregistered_users(person_links):
     """Get a set of users which don't have an Indico account
 
-    :param person_list: List of persons to check
+    :param person_links: List of persons to check
     """
-    return {pl for pl in person_list if pl.person.user is None}
+    return {pl for pl in person_links if pl.person.user is None}
 
 
-def flash_if_unregistered(former_person_list, new_person_list, event):
-    """Flash a message when user(s) with no Indico account is added
+@contextmanager
+def flash_if_unregistered(event, get_person_links):
+    """Flash message when adding users with no indico account
 
-    :param former_person_list: List of persons before new users were added
-    :param new_person_list: List of persons with new users
+    :param get_person_links: Callable returning list of person links to
+                             check
     :param event: Current event
     """
-    added_non_users = len(find_unregistered_users(new_person_list) - former_person_list)
-    if added_non_users:
-        msg = _(' An Indico account may be needed to upload materials and/or manage contents. ')
-        if event.can_manage(session.user):
-            continue_msg = ngettext('To send an invitation email for this user, please go to the Roles section',
-                                    'To send invitation emails for these users, please go to the Roles section',
-                                    added_non_users)
-        else:
-            continue_msg = ngettext('Please contact the manager if you think this user should be able to access these '
-                                    'features.',
-                                    'Please contact the manager if you think these users should be able to access '
-                                    'these features.', added_non_users)
-        flash(ngettext('You have added a user with no Indico account. ',
-                       'You have added {} users with no Indico account.', added_non_users)
-              .format(added_non_users) + msg + continue_msg, 'warning')
+    old_non_users = find_unregistered_users(get_person_links())
+    yield
+    new_non_users = find_unregistered_users(get_person_links())
+    added_non_users = len(new_non_users - old_non_users)
+    if not added_non_users:
+        return
+    warning = ngettext('You have added a user with no Indico account. ',
+                       'You have added {} users with no Indico account.', added_non_users).format(added_non_users)
+    msg = _('An Indico account may be needed to upload materials and/or manage contents.')
+    if event.can_manage(session.user):
+        continue_msg = (escape(_('To invite them, please go to the {link_start}Roles page{link_end}'))
+                        .format(link_start=Markup('<a href="{}">').format(url_for('persons.person_list', event)),
+                                link_end=Markup('</a>')))
+    else:
+        continue_msg = ngettext('Please contact the manager if you think this user should be able to access these '
+                                'features.',
+                                'Please contact the manager if you think these users should be able to access '
+                                'these features.', added_non_users)
+    flash(Markup(' ').join([warning, msg, continue_msg]), 'warning')

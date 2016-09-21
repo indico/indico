@@ -16,3 +16,65 @@
 
 from __future__ import unicode_literals
 
+from markupsafe import Markup, escape
+
+from indico.modules.auth.util import url_for_register
+from indico.util.i18n import _
+from indico.util.placeholders import Placeholder
+from indico.web.flask.util import url_for
+
+
+class FirstNamePlaceholder(Placeholder):
+    name = 'first_name'
+    description = _("First name of the person")
+
+    @classmethod
+    def render(cls, person, event):
+        return person.first_name
+
+
+class LastNamePlaceholder(Placeholder):
+    name = 'last_name'
+    description = _("Last name of the person")
+
+    @classmethod
+    def render(cls, person, event):
+        return person.last_name
+
+
+class EmailPlaceholder(Placeholder):
+    name = 'email'
+    description = _("Email of the person")
+
+    @classmethod
+    def render(cls, person, event):
+        return person.email
+
+
+class EventTitlePlaceholder(Placeholder):
+    name = 'event_title'
+    description = _("The title of the event")
+
+    @classmethod
+    def render(cls, person, event):
+        return event.title
+
+
+class EventLinkPlaceholder(Placeholder):
+    name = 'event_link'
+    description = _("Link to the event")
+
+    @classmethod
+    def render(cls, person, event):
+        url = url_for('event.conferenceDisplay', event, _external=True)
+        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=url, title=escape(event.title)))
+
+
+class RegisterLinkPlaceholder(Placeholder):
+    name = 'register_link'
+    description = _("The link for the registration page")
+
+    @classmethod
+    def render(cls, person, event):
+        url = url_for_register(event.url, email=person.email)
+        return Markup('<a href="{url}">{url}</a>'.format(url=url))

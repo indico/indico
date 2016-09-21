@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>$Title$</title>
-    </head>
-    <body>
-        $END$
-    </body>
-</html>
+{% extends 'emails/base.html' %}
+
+{% block subject -%}
+    Please register
+{%- endblock %}
+
+{% block header_recipient -%}
+    {first_name}
+{%- endblock %}
+
+{% block body -%}
+    You have been added with some submission privileges to the event <strong>{event_title}</strong>.<br>
+    <br>
+    <br>
+    To use those privileges, you need to create a new Indico profile.<br>
+    You can do so at the following URL:<br>
+    {register_link}<br>
+    <br>
+    When creating the profile, please make sure to use the email address <strong>{email}</strong>.<br>
+    If you already have an Indico profile, simply add the email address <strong>{email}</strong> to your profile.
+    {% if session %}
+        <br>
+        <br>
+        Best regards<br>
+        {{ session.user.full_name }}
+    {% endif %}
+{%- endblock %}
+
+{% block footer_title %}Event Roles{% endblock %}
+{% block footer %}
+    {# Show default footer if sent from command line #}
+    {% if not session.user %}
+        {{ super() }}
+    {% endif %}
+{% endblock %}
