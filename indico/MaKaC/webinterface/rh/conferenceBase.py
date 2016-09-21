@@ -252,7 +252,10 @@ class RHSubmitMaterialBase(object):
                 if type(fileUpload) != str and fileUpload.filename.strip() != "":
                     fDict = {}
 
-                    fDict["fileName"] = fileUpload.filename.encode("utf-8")
+                    try:
+                        fDict["fileName"] = fileUpload.filename.encode("utf-8")
+                    except UnicodeDecodeError:
+                        fDict["fileName"] = fileUpload.filename
                     estimSize = request.content_length
 
                     if maxUploadFilesTotalSize and estimSize > (maxUploadFilesTotalSize * BYTES_1MB):
