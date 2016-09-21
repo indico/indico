@@ -140,6 +140,10 @@
            vertical-align: bottom;
         }
     }
+
+    .email-body p:first-child {
+        margin-top: 0;
+    }
 }
 
 %enabled-action {
