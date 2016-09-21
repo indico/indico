@@ -371,7 +371,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
     if _is_office_mimetype(mimetype):
         inline = False
-    if safe and mimetype == 'text/html':
+    if safe and mimetype in ('text/html', 'image/svg+xml'):
         inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
