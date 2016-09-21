@@ -19,22 +19,17 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 from datetime import timedelta
-from tempfile import NamedTemporaryFile
-from zipfile import ZipFile
 
 from flask import session, flash
 from markupsafe import escape
 from sqlalchemy import cast, Date
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.date_time import format_date, format_time
 from indico.util.i18n import _
 from indico.util.fs import secure_filename
 from indico.util.string import natural_sort_key
-from indico.util.tasks import delete_file
-from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -42,29 +37,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions.models.sessions import Session
-
-
-def adjust_path_length(segments):
-    """
-    Shorten the path length to < 260 chars.
-
-    Windows' built-in ZIP tool doesn't like files whose
-    total path exceeds ~260 chars. Here we progressively
-    shorten the total until it matches that constraint.
-    """
-    result = []
-    total_len = sum(len(seg) for seg in segments) + len(segments) - 1
-    excess = (total_len - 255) if total_len > 255 else 0
-
-    for seg in reversed(segments):
-        fname, ext = os.path.splitext(seg)
-        cut = min(excess, (len(fname) - 10) if len(fname) > 14 else 0)
-        if cut:
-            excess -= cut
-            fname = fname[:-cut]
-        result.append(fname + ext)
-
-    return reversed(result)
+from indico.modules.events.util import ZipGeneratorMixin
 
 
 def _get_start_dt(obj):
@@ -86,7 +59,7 @@ def _get_obj_parent(obj):
     return obj.event_new
 
 
-class AttachmentPackageGeneratorMixin:
+class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
 
     #: Whether unscheduled contributions should be included
     ALLOW_UNSCHEDULED = False
@@ -162,24 +135,12 @@ class AttachmentPackageGeneratorMixin:
 
         return filter(_check_date, self._build_base_query())
 
-    def _generate_zip_file(self, attachments):
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
-        with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
-            self.used = set()
-            for attachment in attachments:
-                name = self._prepare_folder_structure(attachment)
-                self.used.add(name)
-                with attachment.file.storage.get_local_path(attachment.file.storage_file_id) as filepath:
-                    zip_handler.write(filepath, name)
+    def _iter_items(self, attachments):
+        for attachment in attachments:
+            yield attachment.file
 
-        # Delete the temporary file after some time.  Even for a large file we don't
-        # need a higher delay since the webserver will keep it open anyway until it's
-        # done sending it to the client.
-        delete_file.apply_async(args=[temp_file.name], countdown=3600)
-        temp_file.delete = False
-        return send_file('material-{}.zip'.format(self.event_new.id), temp_file.name, 'application/zip', inline=False)
-
-    def _prepare_folder_structure(self, attachment):
+    def _prepare_folder_structure(self, item):
+        attachment = item.attachment
         event_dir = secure_filename(self.event_new.title, None)
         segments = [event_dir] if event_dir else []
         if _get_start_dt(attachment.folder.object) is None:
@@ -188,11 +149,11 @@ class AttachmentPackageGeneratorMixin:
         if not attachment.folder.is_default:
             segments.append(secure_filename(attachment.folder.title, unicode(attachment.folder.id)))
         segments.append(attachment.file.filename)
-        path = os.path.join(*adjust_path_length(filter(None, segments)))
-        while path in self.used:
+        path = os.path.join(*self._adjust_path_length(filter(None, segments)))
+        while path in self.used_filenames:
             # prepend the id if there's a path collision
             segments[-1] = '{}-{}'.format(attachment.id, segments[-1])
-            path = os.path.join(*adjust_path_length(filter(None, segments)))
+            path = os.path.join(*self._adjust_path_length(filter(None, segments)))
         return path
 
     def _get_base_path(self, attachment):

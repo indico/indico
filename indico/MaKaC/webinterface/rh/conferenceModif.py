@@ -1512,7 +1512,7 @@ class RHMaterialPackage(RHConferenceModifBase, AttachmentPackageGeneratorMixin):
         if not attachments:
             flash(_('The selected contributions do not have any materials.'), 'warning')
             return redirect(url_for('event_mgmt.confModifContribList', self._conf))
-        return self._generate_zip_file(attachments)
+        return self._generate_zip_file(attachments, name_suffix=self.event_new.id)
 
 
 class RHAbstractBook( RHConfModifCFABase ):
