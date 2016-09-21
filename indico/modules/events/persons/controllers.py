@@ -36,6 +36,7 @@ from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users import User
 from indico.util.i18n import ngettext, _
+from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.forms.base import FormDefaults
@@ -105,12 +106,6 @@ class RHPersonsBase(RHConferenceModifBase):
 
 
 class RHPersonsList(RHPersonsBase):
-    @classmethod
-    def get_person_list(cls):
-        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
-        return sorted(persons.viewvalues(), key=lambda x: x['person'].display_full_name.lower())
-
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
                                  .filter(EventPrincipal.type == PrincipalType.email,
@@ -155,16 +150,32 @@ class RHEmailEventPersons(RHConferenceModifBase):
         user_ids = request.form.getlist('user_id')
         recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
         recipients |= {u.email for u in self._find_users(user_ids) if u.email}
-        form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids, recipients=', '.join(recipients))
+        default_body = ''
+        default_subject = ''
+        disable_until_change = True
+        if request.args.get('no_account') == '1':
+            tpl = get_template_module('events/registration/emails/pending_submitter.html', event=self.event_new)
+            default_body = tpl.get_html_body()
+            default_subject = tpl.get_subject()
+            disable_until_change = False
+        form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids, recipients=', '.join(recipients),
+                                     body=default_body, subject=default_subject)
         if form.validate_on_submit():
-            for recipient in recipients:
-                email = make_email(to_list=recipient, from_address=form.from_address.data,
-                                   subject=form.subject.data, body=form.body.data, html=True)
-                send_email(email, self.event_new, 'Event Persons')
+            self._send_emails(form, self._find_event_persons(person_ids))
             num = len(recipients)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
-        return jsonify_form(form, submit=_('Send'))
+        return jsonify_form(form, submit=_('Send'), disabled_until_change=disable_until_change)
+
+    def _send_emails(self, form, recipients):
+        for recipient in recipients:
+            email_body = replace_placeholders('event-persons-email', form.body.data, person=recipient,
+                                              event=self.event_new)
+            email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
+                                                 event=self.event_new)
+            email = make_email(to_list=recipient.email, from_address=form.from_address.data,
+                               body=email_body, subject=email_subject, html=True)
+            send_email(email, self.event_new, 'Event Persons')
 
     def _find_event_persons(self, person_ids):
         return (self.event_new.persons

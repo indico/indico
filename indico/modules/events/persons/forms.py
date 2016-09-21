@@ -22,6 +22,7 @@ from wtforms.validators import DataRequired
 
 from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
+from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoStaticTextField, HiddenFieldList, IndicoEnumSelectField
 from indico.web.forms.widgets import CKEditorWidget
@@ -41,6 +42,7 @@ class EmailEventPersonsForm(IndicoForm):
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.from_address.choices = zip(from_addresses, from_addresses)
+        self.body.description = render_placeholder_info('event-persons-email', event=None, person=None)
 
     def is_submitted(self):
         return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form

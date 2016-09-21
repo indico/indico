@@ -32,3 +32,16 @@ logger = Logger.get('events.persons')
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
         return SideMenuItem('persons', _('Roles'), url_for('persons.person_list', event), section='reports')
+
+
+@signals.get_placeholders.connect_via('event-persons-email')
+def _get_placeholders(sender, person, event, **kwargs):
+    from indico.modules.events.persons.placeholders import (FirstNamePlaceholder, LastNamePlaceholder, EmailPlaceholder,
+                                                            EventTitlePlaceholder, EventLinkPlaceholder,
+                                                            RegisterLinkPlaceholder)
+    yield FirstNamePlaceholder
+    yield LastNamePlaceholder
+    yield EmailPlaceholder
+    yield EventTitlePlaceholder
+    yield EventLinkPlaceholder
+    yield RegisterLinkPlaceholder
