@@ -590,7 +590,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     data.session_id = self.tt.contextInfo.timetableSession.id;
                 }
                 if (self.tt.isSessionTimetable) {
-                    urlArgs.session_id = self.tt.contextInfo.timetableSession.id;
+                    urlArgs.session_id = self.tt.contextInfo.sessionId.toString();
                 }
                 $.ajax({
                     url: build_url(Indico.Urls.Timetable.reschedule, urlArgs),
