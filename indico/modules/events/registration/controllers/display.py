@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
 from uuid import UUID
 
 from flask import request, session, redirect, flash, jsonify
@@ -156,7 +157,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                       for column_id in registration_settings.get_participant_list_columns(self.event, regform)
                       if column_id in active_fields]
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
-        registrations = [_process_registration(reg, column_ids, active_fields) for reg in regform.active_registrations]
+        active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
+        registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations]
         table = {'headers': headers, 'rows': registrations, 'title': regform.title}
         table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
         return table
