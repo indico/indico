@@ -91,6 +91,17 @@ class RHEditEmailTemplateText(RHEditEmailTemplateBase):
         return jsonify_template('events/abstracts/management/notification_tpl_text_form.html', form=form, is_edit=True)
 
 
+class RHSortEmailTemplates(RHManageAbstractsBase):
+    """Sort e-mail templates according to the order provided by the client."""
+
+    def _process(self):
+        sort_order = request.json['sort_order']
+        tpls = {s.id: s for s in self.event_new.abstract_email_templates}
+        for position, tpl_id in enumerate(sort_order, 1):
+            if tpl_id in tpls:
+                tpls[tpl_id].position = position
+
+
 class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
     """Delete an e-mail template."""
 

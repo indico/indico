@@ -61,6 +61,10 @@
     width: 800px;
 
     .email-template {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
+
+    /* this padding is needed so that dragging after
+       the last element works properly. */
+    padding-bottom: 15px;
 }
