@@ -35,6 +35,9 @@ class Condition(object):
     required = False
     #: A short description of the condition.
     description = None
+    #: {value: condition_name} containing conditions that are allowed for each value type
+    #: non-specified values are considered as compatible with all other conditions.
+    compatible_with = None
 
     @classproperty
     @classmethod
@@ -45,6 +48,14 @@ class Condition(object):
     def is_used(cls, rule):
         """Check whether the condition is used in a rule"""
         return rule.get(cls.name) is not None
+
+    @classmethod
+    def is_none(cls, **kwargs):
+        """Check whether the condition requires a null value.
+
+            Inheriting methods should overload this
+        """
+        raise NotImplementedError
 
     @classmethod
     def get_available_values(cls, **kwargs):
@@ -105,8 +116,10 @@ def check_rule(context, rule, **kwargs):
             else:
                 continue
         values = condition._clean_values(rule[name], **kwargs)
-        # not having empty values is always a failure
-        if not values or not condition.check(values, **kwargs):
+        if not values and condition.is_none(**kwargs):
+            # the property we're checking is null and the rule wants null
+            return True
+        elif not condition.check(values, **kwargs):
             return False
     return True
 

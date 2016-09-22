@@ -65,6 +65,10 @@ def strict_sanitize_email(email, fallback=None):
     return sanitize_email(convert_to_unicode(email).lower(), require_valid=True) or fallback
 
 
+# Add "temporary" column to model
+Contribution.legacy_track_id = db.Column(db.Integer, nullable=True)
+
+
 class OldAbstract(db.Model):
     __tablename__ = 'legacy_abstracts'
     # XXX: remove keep_existing when removing the LegacyAbstract model from core
@@ -171,6 +175,7 @@ class AbstractMigration(object):
         self._migrate_review_settings()
         self._migrate_email_templates()
         self._migrate_abstracts()
+        self._migrate_contribution_tracks()
 
     def _user_from_legacy(self, legacy_user, janitor=False):
         if isinstance(legacy_user, AvatarUserWrapper):
@@ -505,6 +510,21 @@ class AbstractMigration(object):
                 # not needed but avoids some warnings about the object not in the session
                 review.track = None
                 review.user = None
+
+    def _migrate_contribution_tracks(self):
+        for contrib in Contribution.find(Contribution.event_new == self.event, ~Contribution.legacy_track_id.is_(None)):
+            if contrib.legacy_track_id not in self.track_map_by_id:
+                self.importer.print_warning(cformat(
+                    "%{yellow!}{} %{reset}assigned to track %{yellow!}{}%{reset} which doesn't exist. Unassigning it.")
+                    .format(contrib, contrib.track_id),
+                    event_id=self.event.id)
+                contrib.track = None
+                continue
+
+            track = self.track_map_by_id[contrib.legacy_track_id]
+            contrib.track = track
+            self.importer.print_success(cformat('%{blue!}{} %{reset}-> %{yellow!}{}').format(contrib, track),
+                                        event_id=self.event.id)
 
     def _migrate_abstract_reviews(self, abstract, zodb_abstract, old_abstract, as_duplicate_reviews):
         old_judgments = {(j.track_id, j.judge): j for j in old_abstract.judgments}

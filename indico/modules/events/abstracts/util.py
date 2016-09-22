@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 from indico.core.db import db
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -136,3 +138,62 @@ class AbstractListGenerator(ListGeneratorBase):
             'filtering_enabled': filtering_enabled,
             'filter_statistics': filter_statistics
         }
+
+
+def build_default_email_template(event, tpl_type):
+    """Build a default e-mail template based on a notification type provided by the user."""
+    email = get_template_module('events/abstracts/emails/abstract_{}_notification.txt'.format(tpl_type))
+    tpl = AbstractEmailTemplate(body=email.get_body(),
+                                extra_cc_emails=[],
+                                reply_to_address=to_unicode(event.as_legacy.getSupportInfo().getEmail()) or '',
+                                subject=email.get_subject(),
+                                include_authors=True,
+                                include_submitter=True,
+                                include_coauthors=True)
+    return tpl
+
+
+@no_autoflush
+def create_mock_abstract(event):
+    """Create a mock abstract that can be used in previews.
+
+    Brace for geek references.
+    """
+    User = namedtuple('Author', ['first_name', 'last_name', 'title', 'full_name'])
+    Track = namedtuple('Track', ['title'])
+    Session = namedtuple('Session', ['title'])
+    ContributionType = namedtuple('ContributionType', ['name'])
+    Contribution = namedtuple('Contribution', ['title', 'track', 'session', 'type', 'locator'])
+    Abstract = namedtuple('Abstract', ['friendly_id', 'title', 'event_new', 'submitter', 'contribution',
+                                       'primary_authors', 'secondary_authors', 'locator', 'judgment_comment',
+                                       'accepted_track', 'accepted_contrib_type', 'state'])
+
+    englert = User(full_name="Fran\xe7ois Englert", first_name="Fran\xe7ois", last_name="Englert", title="Prof.")
+    brout = User(full_name="Robert Brout", first_name="Robert", last_name="Brout", title="Prof.")
+    guralnik = User(full_name="Gerald Guralnik", first_name="Gerald", last_name="Guralnik", title="Prof.")
+    hagen = User(full_name="Carl Hagen", first_name="Carl", last_name="Hagen", title="Prof.")
+    kibble = User(full_name="Tom Kibble", first_name="Tom", last_name="Kibble", title="Prof.")
+    higgs = User(full_name="Peter Higgs", first_name="Peter", last_name="Higgs", title="Prof.")
+
+    track = Track(title=_("Higgs Fields"))
+    session = Session(title=_("Higgs Fields Posters"))
+    contribution_type = ContributionType(name=_("Poster"))
+    contribution = Contribution(title="Broken Symmetry and the Mass of Gauge Vector Mesons",
+                                track=track,
+                                session=session,
+                                type=contribution_type,
+                                locator={'confId': -314, 'contrib_id': 1234})
+    abstract = Abstract(friendly_id=314,
+                        title="Broken Symmetry and the Mass of Gauge Vector Mesons",
+                        accepted_track=track,
+                        accepted_contrib_type=contribution_type,
+                        event_new=event,
+                        submitter=brout,
+                        state=AbstractState.accepted,
+                        contribution=contribution,
+                        primary_authors=[englert, brout],
+                        secondary_authors=[guralnik, hagen, kibble, higgs],
+                        locator={'confId': -314, 'abstract_id': 1234},
+                        judgment_comment='Vague but interesting!')
+
+    return abstract

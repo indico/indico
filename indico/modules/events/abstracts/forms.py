@@ -16,13 +16,15 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, IntegerField
-from wtforms.validators import NumberRange, Optional, DataRequired
+from wtforms.fields import BooleanField, IntegerField, SelectField, TextField, TextAreaField
+from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError
 
+from indico.modules.events.abstracts.fields import EmailRuleListField
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType
 from indico.util.i18n import _
+from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField
+from indico.web.forms.fields import PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField, EmailListField
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
@@ -61,3 +63,53 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     authorized_submitters = PrincipalListField(_("Authorized submitters"),
                                                description=_("These users may always submit abstracts, even outside "
                                                              "the regular submission period."))
+
+
+class EditEmailTemplateRuleForm(IndicoForm):
+    """Form for editing a new e-mail template."""
+
+    title = TextField(_("Title"), [DataRequired()])
+    rules = EmailRuleListField(_("Rules"), [DataRequired()])
+    stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
+                                 description=_("Do not evaluate any other rules once this one matches."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EditEmailTemplateRuleForm, self).__init__(*args, **kwargs)
+        self.rules.event = self.event
+
+    def validate_rules(self, field):
+        dedup_data = {tuple((k, tuple(v)) for k, v in r.viewitems()) for r in field.data}
+        if len(field.data) != len(dedup_data):
+            raise ValidationError(_("There is a duplicate rule"))
+
+
+class EditEmailTemplateTextForm(IndicoForm):
+    """Form for editing the text of a new e-mail template."""
+
+    reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
+    include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
+    include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
+    include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
+    cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
+    subject = TextField(_("Subject"), [DataRequired()])
+    body = TextAreaField(_("Body"), [DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EditEmailTemplateTextForm, self).__init__(*args, **kwargs)
+        self.reply_to_address.choices = (self.event
+                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
+                                         .items())
+        self.body.description = render_placeholder_info('abstract-notification-email', event=self.event)
+
+
+class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
+    """Form for adding a new e-mail template."""
+
+    default_tpl = SelectField(_('Default template'), [DataRequired()], choices=[
+        ('submit', _('Submit')),
+        ('accept', _('Accept')),
+        ('reject', _('Reject')),
+        ('merge', _('Merge'))
+    ], description=_("The template that will be used as a basis for this notification. You can customize it later."))

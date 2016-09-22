@@ -55,13 +55,24 @@ class Placeholder(object):
         return re.compile(r'\{%s}' % re.escape(cls.name))
 
     @classmethod
-    def replace(cls, text, **kwargs):
-        """Replaces all occurrences of the placeholder in a string
+    def replace(cls, text, escape_html=True, **kwargs):
+        """Replace all occurrences of the placeholder in a string.
 
         :param text: The text to replace placeholders in
+        :param escape_html: whether HTML escaping should be done
         :param kwargs: arguments specific to the placeholder's context
         """
-        return cls.get_regex(**kwargs).sub(escape(cls.render(**kwargs)), text)
+        rendered = []
+
+        def _replace(m):
+            if rendered:
+                return rendered[0]
+            rendered.append(cls.render(**kwargs))
+            if escape_html:
+                rendered[0] = escape(rendered[0])
+            return rendered[0]
+
+        return cls.get_regex(**kwargs).sub(_replace, text)
 
     @classmethod
     def is_in(cls, text, **kwargs):
@@ -92,7 +103,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     If you use `iter_param_info` to show parameter-specific
     descriptions and do not want a generic info line (with just the
-    `param_friendl_name` in place of an actual param), set the
+    `param_friendly_name` in place of an actual param), set the
     `description` of the placeholder to ``None``.
     """
 
@@ -127,8 +138,14 @@ class ParametrizedPlaceholder(Placeholder):
         return iter([])
 
     @classmethod
-    def replace(cls, text, **kwargs):
-        return cls.get_regex(**kwargs).sub(lambda m: escape(cls.render(m.group(1), **kwargs)), text)
+    def replace(cls, text, escape_html=True, **kwargs):
+        def _replace(m):
+            rendered_text = cls.render(m.group(1), **kwargs)
+            if escape_html:
+                rendered_text = escape(rendered_text)
+            return rendered_text
+
+        return cls.get_regex(**kwargs).sub(_replace, text)
 
     @classmethod
     def render(cls, param, **kwargs):
@@ -139,15 +156,16 @@ def _get_placeholders(context, **kwargs):
     return named_objects_from_signal(signals.get_placeholders.send(context, **kwargs))
 
 
-def replace_placeholders(context, text, **kwargs):
+def replace_placeholders(context, text, escape_html=True, **kwargs):
     """Replaces placeholders in a string.
 
     :param context: the context where the placeholders are used
     :param text: the text to replace placeholders in
+    :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
     for name, placeholder in _get_placeholders(context, **kwargs).iteritems():
-        text = placeholder.replace(text, **kwargs)
+        text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
 
 

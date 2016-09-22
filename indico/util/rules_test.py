@@ -22,7 +22,13 @@ from indico.core import signals
 from indico.util.rules import Condition, get_missing_conditions, check_rule, get_conditions
 
 
-class ActionCondition(Condition):
+class TestCondition(Condition):
+    @classmethod
+    def is_none(cls, **kwargs):
+        return False
+
+
+class ActionCondition(TestCondition):
     name = 'action'
     description = "The action performed"
     required = True
@@ -32,11 +38,11 @@ class ActionCondition(Condition):
         return OrderedDict([('add', 'added'), ('del', 'deleted')])
 
     @classmethod
-    def check(cls, values, action, foo, bar):
+    def check(cls, values, action, **kwargs):
         return action in values
 
 
-class FooCondition(Condition):
+class FooCondition(TestCondition):
     name = 'foo'
     description = "The foo value"
     required = False
@@ -46,11 +52,15 @@ class FooCondition(Condition):
         return OrderedDict([(1, '1'), (2, '2'), (3, '3')])
 
     @classmethod
-    def check(cls, values, action, foo, bar):
+    def check(cls, values, foo, **kwargs):
         return foo in values
 
+    @classmethod
+    def is_none(cls, foo, **kwargs):
+        return foo == 42
 
-class BarCondition(Condition):
+
+class BarCondition(TestCondition):
     name = 'bar'
     description = "The bar value"
     required = False
@@ -60,7 +70,7 @@ class BarCondition(Condition):
         return {'a': 'a', 'b': 'b', 'c': 'c'}
 
     @classmethod
-    def check(cls, values, action, foo, bar):
+    def check(cls, values, bar, **kwargs):
         return bar in values
 
 
@@ -89,6 +99,11 @@ def test_get_missing_rules():
 @pytest.mark.parametrize(('rule', 'kwargs', 'expected'), (
     # required rule missing
     ({}, {'action': 'add', 'foo': 1, 'bar': 'a'}, False),
+    # match "any" value
+    ({'action': ['add']}, {'action': 'add', 'foo': 1}, True),
+    # match "none" value
+    ({'action': ['add'], 'foo': []}, {'action': 'add', 'foo': 42}, True),
+    ({'action': ['add'], 'foo': []}, {'action': 'add', 'foo': 1}, False),
     # no match
     ({'action': ['del']}, {'action': 'add', 'foo': 1, 'bar': 'a'}, False),
     # invalid value

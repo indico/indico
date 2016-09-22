@@ -40,6 +40,11 @@ class MockConferenceHolder:
         return cls._events.get(int(id_))
 
 
+class MockSupportInfo(object):
+    def getEmail(self):
+        return 'support@example.com'
+
+
 class MockConference(object):
     def __repr__(self):
         return '<MockConference({})>'.format(self.id)
@@ -61,3 +66,6 @@ class MockConference(object):
 
     def log(self, *args, **kwargs):
         pass
+
+    def getSupportInfo(self):
+        return MockSupportInfo()
