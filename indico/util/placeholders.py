@@ -56,16 +56,23 @@ class Placeholder(object):
 
     @classmethod
     def replace(cls, text, escape_html=True, **kwargs):
-        """Replaces all occurrences of the placeholder in a string
+        """Replace all occurrences of the placeholder in a string.
 
         :param text: The text to replace placeholders in
         :param escape_html: whether HTML escaping should be done
         :param kwargs: arguments specific to the placeholder's context
         """
-        rendered_text = cls.render(**kwargs)
-        if escape_html:
-            rendered_text = escape(rendered_text)
-        return cls.get_regex(**kwargs).sub(rendered_text, text)
+        rendered = []
+
+        def _replace(m):
+            if rendered:
+                return rendered[0]
+            rendered.append(cls.render(**kwargs))
+            if escape_html:
+                rendered[0] = escape(rendered[0])
+            return rendered[0]
+
+        return cls.get_regex(**kwargs).sub(_replace, text)
 
     @classmethod
     def is_in(cls, text, **kwargs):
