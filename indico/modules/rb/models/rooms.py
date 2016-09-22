@@ -738,7 +738,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if quiet or ok:
             return ok
         else:
-            msg = _('You cannot book this room more than {} days in advance')
+            msg = _(u'You cannot book this room more than {} days in advance')
             raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
