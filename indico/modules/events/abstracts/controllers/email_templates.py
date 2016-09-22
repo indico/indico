@@ -116,7 +116,9 @@ class RHPreviewEmailTemplate(RHEditEmailTemplateBase):
 
     def _process(self):
         abstract = create_mock_abstract(self.event_new)
+        subject = replace_placeholders('abstract-notification-email', self.email_tpl.subject,
+                                       abstract=abstract, escape_html=False)
         body = replace_placeholders('abstract-notification-email', self.email_tpl.body,
                                     abstract=abstract, escape_html=False)
         self.commit = False
-        return jsonify_template('events/abstracts/management/notification_preview.html', body=body)
+        return jsonify_template('events/abstracts/management/notification_preview.html', subject=subject, body=body)
