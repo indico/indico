@@ -6,9 +6,9 @@
             {% trans %}There are currently no e-mail templates{% endtrans%}
         {% endcall %}
     {% else %}
-        <ul class="email-template-list">
-            {% for tpl in event.abstract_email_templates %}
-                <li class="email-template i-box">
+        <ul class="email-template-list" data-url="{{ url_for('.email_tpl_sort', event) }}">
+            {% for tpl in event.abstract_email_templates|sort(attribute='position') %}
+                <li class="email-template i-box" data-id="{{ tpl.id }}">
                     <div class="ui-i-box-sortable-handle"></div>
                     <div class="i-box-header">
                         <span class="i-box-title">{{ tpl.title }}</span>
@@ -70,5 +70,30 @@
     </div>
     <script>
         $('.js-edit-tpl-dropdown').parent().dropdown();
+        $('.email-template-list').sortable({
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            distance: 2,
+            handle: '.ui-i-box-sortable-handle',
+            items: '> li.email-template',
+            tolerance: 'pointer',
+            forcePlaceholderSize: true,
+            update: function(e) {
+                var $elem = $('.email-template-list');
+                var sortedList = $elem.find('li.email-template').map(function(i, elem) {
+                    return $(elem).data('id');
+                }).get();
+
+                $.ajax({
+                    url: $elem.data('url'),
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({'sort_order': sortedList}),
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError
+                });
+            }
+        });
     </script>
 {%- endmacro %}

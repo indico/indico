@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
-                                                                         RHDeleteEmailTemplate, RHPreviewEmailTemplate)
+                                                                         RHDeleteEmailTemplate, RHPreviewEmailTemplate,
+                                                                         RHSortEmailTemplates)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract)
@@ -45,6 +46,7 @@ _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHA
 # E-mail templates
 _bp.add_url_rule('/manage/abstracts/email-templates/', 'email_tpl_list', RHEmailTemplateList)
 _bp.add_url_rule('/manage/abstracts/email-templates/add', 'email_tpl_add', RHAddEmailTemplate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/sort', 'email_tpl_sort', RHSortEmailTemplates, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_delete', RHDeleteEmailTemplate,
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit', 'email_tpl_rule_edit',
