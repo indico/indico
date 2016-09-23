@@ -485,6 +485,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return url_for('event.conferenceDisplay', self)
 
     @property
+    def external_url(self):
+        return url_for('event.conferenceDisplay', self, _external=True)
+
+    @property
     def web_factory(self):
         return self.type_.web_factory
 
