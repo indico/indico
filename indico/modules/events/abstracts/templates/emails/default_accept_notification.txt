@@ -1,0 +1,13 @@
+{% extends 'events/abstracts/emails/default_notification.txt' %}
+
+{% block subject -%}
+    Abstract Acceptance notification (#{abstract_id})
+{%- endblock %}
+
+{% block body -%}
+    We're pleased to announce that your abstract "{abstract_title}" with ID #{abstract_id} has been accepted
+    in track "{abstract_track}" ({contribution_type}).
+
+    Kind regards,
+    The organizers of {event_title}
+{%- endblock %}

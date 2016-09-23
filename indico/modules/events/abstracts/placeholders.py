@@ -46,7 +46,7 @@ class EventURLPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return url_for('event.conferenceDisplay', abstract.event_new, _external=True)
+        return abstract.event_new.external_url
 
 
 class AbstractIDPlaceholder(Placeholder):
