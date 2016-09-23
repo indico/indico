@@ -60,12 +60,18 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     """Settings form for abstract submission"""
 
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
-    allow_multiple_tracks = BooleanField(_('Multiple tracks'), widget=SwitchWidget())
-    tracks_required = BooleanField(_('Require tracks'), widget=SwitchWidget())
-    contrib_type_required = BooleanField(_('Require contrib. type'), widget=SwitchWidget())
-    allow_attachments = BooleanField(_('Allow attachments'), widget=SwitchWidget())
-    allow_speakers = BooleanField(_('Allow speakers'), widget=SwitchWidget())
-    speakers_required = BooleanField(_('Require a speaker'), [HiddenUnless('allow_speakers')], widget=SwitchWidget())
+    allow_multiple_tracks = BooleanField(_('Multiple tracks'), widget=SwitchWidget(),
+                                         description=_("Allow the selection of multiple tracks"))
+    tracks_required = BooleanField(_('Require tracks'), widget=SwitchWidget(),
+                                   description=_("Make the track selection mandatory"))
+    contrib_type_required = BooleanField(_('Require contrib. type'), widget=SwitchWidget(),
+                                         description=_("Make the selection of a contribution type mandatory"))
+    allow_attachments = BooleanField(_('Allow attachments'), widget=SwitchWidget(),
+                                     description=_("Allow files to be attached to the abstract"))
+    allow_speakers = BooleanField(_('Allow speakers'), widget=SwitchWidget(),
+                                  description=_("Allow the selection of the abstract speakers"))
+    speakers_required = BooleanField(_('Require a speaker'), [HiddenUnless('allow_speakers')], widget=SwitchWidget(),
+                                     description=_("Make the selection of at least one author as speaker mandatory"))
     authorized_submitters = PrincipalListField(_("Authorized submitters"),
                                                description=_("These users may always submit abstracts, even outside "
                                                              "the regular submission period."))
