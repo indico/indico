@@ -61,13 +61,6 @@ class EmailRuleListField(JSONField):
             } for c in self.accepted_condition_types
         }
 
-    def _convert_condition(self, condition_data):
-        condition_type = condition_data.pop('type')
-        return self.condition_class_map[condition_type](**condition_data)
-
-    def _convert_condition_list(self, condition_list):
-        return map(self._convert_condition, condition_list)
-
     def _value(self):
         return super(EmailRuleListField, self)._value() if self.data else '[]'
 
