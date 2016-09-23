@@ -1,8 +1,12 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows, form_fieldset %}
+
+{% set skip_fields = ('title', 'description', 'references', 'board_number') + form.custom_field_names %}
 
 {%- block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, fields=fields or none, skip=('references', 'board_number') + form.custom_field_names) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.description, widget_attrs={'rows': 10}) }}
+    {{ form_rows(form, fields=fields or none, skip=skip_fields) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
         {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number')) }}
     {% endcall %}
