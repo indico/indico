@@ -99,7 +99,7 @@ class AbstractEmailLogEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'abstract_id')
+        return format_repr(self, 'id', 'abstract_id', _text=self.subject)
 
     @classmethod
     def create_from_email(cls, email_data, email_tpl, user=None):
