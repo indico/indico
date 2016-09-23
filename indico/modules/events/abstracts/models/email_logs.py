@@ -100,3 +100,18 @@ class AbstractEmailLogEntry(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id')
+
+    @classmethod
+    def create_from_email(cls, email_data, email_tpl, user=None):
+        """Create a new log entry from the data used to send an email
+
+        :param email_data: email data as returned from `make_email`
+        :param email_tpl: the abstract email template that created the
+                          email
+        :param user: the user who performed the action causing the
+                     notification
+        """
+        recipients = sorted(email_data['toList'] | email_data['ccList'] | email_data['bccList'])
+        data = {'template_name': email_tpl.title}
+        return cls(email_template=email_tpl, user=user, recipients=recipients, subject=email_data['subject'],
+                   body=email_data['body'], data=data)

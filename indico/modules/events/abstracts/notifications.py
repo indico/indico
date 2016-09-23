@@ -21,9 +21,10 @@ from collections import OrderedDict
 
 from flask import session
 
-from indico.modules.events.abstracts.models.abstracts import AbstractState
-from indico.util.i18n import _
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.abstracts.models.abstracts import AbstractState
+from indico.modules.events.abstracts.models.email_logs import AbstractEmailLogEntry
+from indico.util.i18n import _
 from indico.util.placeholders import replace_placeholders
 from indico.util.rules import Condition, check_rule
 from indico.web.flask.templating import get_template_module
@@ -178,5 +179,7 @@ def send_abstract_notifications(abstract):
                 email = make_email(to_list=to_recipients, cc_list=cc_recipients,
                                    reply_address=email_tpl.reply_to_address, template=tpl)
                 send_email(email, event=abstract.event_new, user=session.user)
+                abstract.email_logs.append(AbstractEmailLogEntry.create_from_email(email, email_tpl=email_tpl,
+                                                                                   user=session.user))
         if email_tpl.stop_on_match and matched:
             break
