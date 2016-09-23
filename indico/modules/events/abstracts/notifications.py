@@ -26,6 +26,7 @@ from indico.util.i18n import _
 from indico.core.notifications import make_email, send_email
 from indico.util.placeholders import replace_placeholders
 from indico.util.rules import Condition, check_rule
+from indico.web.flask.templating import get_template_module
 
 
 class EmailNotificationCondition(Condition):
@@ -137,33 +138,45 @@ class ContributionTypeCondition(EmailNotificationCondition):
         return cls.get_test_contrib_type_id(abstract) is None
 
 
+def get_abstract_notification_tpl_module(email_tpl, abstract):
+    """Get the Jinja template module for a notification email
+
+    :param email_tpl: the abstract email template used to populate the
+                      email subject/body
+    :param abstract: the abstract the notification email is for
+    """
+    subject = replace_placeholders('abstract-notification-email', email_tpl.subject,
+                                   abstract=abstract, escape_html=False)
+    body = replace_placeholders('abstract-notification-email', email_tpl.body,
+                                abstract=abstract, escape_html=False)
+    return get_template_module('events/abstracts/emails/abstract_notification.txt',
+                               event=email_tpl.event_new, subject=subject, body=body)
+
+
 def send_abstract_notifications(abstract):
     """Send abstract notification e-mails.
 
     :param abstract: the abstract that is going to be checked
                      against the event's notification rules
     """
-    for tpl in abstract.event_new.abstract_email_templates:
+    for email_tpl in abstract.event_new.abstract_email_templates:
         matched = False
-        for rule in tpl.rules:
+        for rule in email_tpl.rules:
             if check_rule('abstract-notifications', rule, abstract=abstract, event=abstract.event_new):
                 matched = True
                 to_recipients = []
-                if tpl.include_submitter:
+                if email_tpl.include_submitter:
                     to_recipients.append(abstract.submitter.email)
-                if tpl.include_authors:
+                if email_tpl.include_authors:
                     to_recipients += [author.email for author in abstract.primary_authors]
 
-                cc_recipients = list(tpl.extra_cc_emails)
-                if tpl.include_coauthors:
+                cc_recipients = list(email_tpl.extra_cc_emails)
+                if email_tpl.include_coauthors:
                     cc_recipients += [author.email for author in abstract.secondary_authors]
 
-                subject = replace_placeholders('abstract-notification-email', tpl.subject,
-                                               abstract=abstract, escape_html=False)
-                body = replace_placeholders('abstract-notification-email', tpl.body,
-                                            abstract=abstract, escape_html=False)
-                email = make_email(to_list=to_recipients, cc_list=cc_recipients, reply_address=tpl.reply_to_address,
-                                   subject=subject, body=body)
+                tpl = get_abstract_notification_tpl_module(email_tpl, abstract)
+                email = make_email(to_list=to_recipients, cc_list=cc_recipients,
+                                   reply_address=email_tpl.reply_to_address, template=tpl)
                 send_email(email, event=abstract.event_new, user=session.user)
-        if tpl.stop_on_match and matched:
+        if email_tpl.stop_on_match and matched:
             break

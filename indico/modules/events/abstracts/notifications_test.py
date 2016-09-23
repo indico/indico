@@ -233,15 +233,14 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template):
             The organizers of dummy#0
 
             --
-            Indico :: Email Notifier
-            http://localhost/
-        """)
+            Indico :: Call for Abstracts
+            http://localhost/event/{}/
+        """.format(ev.id))
         assert event == ev
 
     ev, abstract, track, contrib_type = abstract_objects
     monkeypatch.setattr('indico.modules.events.abstracts.notifications.send_email', _mock_send_email)
 
-    ev = abstract.event_new
     ev.abstract_email_templates.append(
         create_email_template(ev, 0, 'accept', 'accept', [{'state': [AbstractState.accepted.value]}], True))
 

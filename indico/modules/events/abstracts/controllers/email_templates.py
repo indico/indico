@@ -23,8 +23,8 @@ from indico.modules.events.abstracts.controllers.management import RHManageAbstr
 from indico.modules.events.abstracts.forms import (EditEmailTemplateRuleForm, EditEmailTemplateTextForm,
                                                    CreateEmailTemplateForm)
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
+from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module
 from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
-from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -115,10 +115,8 @@ class RHPreviewEmailTemplate(RHEditEmailTemplateBase):
     """Preview an e-mail template."""
 
     def _process(self):
-        abstract = create_mock_abstract(self.event_new)
-        subject = replace_placeholders('abstract-notification-email', self.email_tpl.subject,
-                                       abstract=abstract, escape_html=False)
-        body = replace_placeholders('abstract-notification-email', self.email_tpl.body,
-                                    abstract=abstract, escape_html=False)
         self.commit = False
-        return jsonify_template('events/abstracts/management/notification_preview.html', subject=subject, body=body)
+        abstract = create_mock_abstract(self.event_new)
+        tpl = get_abstract_notification_tpl_module(self.email_tpl, abstract)
+        return jsonify_template('events/abstracts/management/notification_preview.html',
+                                subject=tpl.get_subject(), body=tpl.get_body())

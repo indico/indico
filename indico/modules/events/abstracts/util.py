@@ -142,7 +142,7 @@ class AbstractListGenerator(ListGeneratorBase):
 
 def build_default_email_template(event, tpl_type):
     """Build a default e-mail template based on a notification type provided by the user."""
-    email = get_template_module('events/abstracts/emails/abstract_{}_notification.txt'.format(tpl_type))
+    email = get_template_module('events/abstracts/emails/default_{}_notification.txt'.format(tpl_type))
     tpl = AbstractEmailTemplate(body=email.get_body(),
                                 extra_cc_emails=[],
                                 reply_to_address=to_unicode(event.as_legacy.getSupportInfo().getEmail()) or '',

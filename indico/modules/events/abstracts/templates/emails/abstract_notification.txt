@@ -1,0 +1,20 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {{ subject }}
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {{ body }}
+{%- endblock %}
+
+{% block footer_title -%}
+    Call for Abstracts
+{%- endblock %}
+
+{% block footer_url -%}
+    {{ event.external_url }}
+{%- endblock %}
+
