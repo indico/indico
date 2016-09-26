@@ -1,7 +1,7 @@
 """Add abstract FKs
 
 Revision ID: 55d523872c43
-Revises: 2ce1756a2f12
+Revises: 7f4d95fd173
 Create Date: 2016-09-14 16:52:29.196932
 """
 
@@ -10,7 +10,7 @@ from alembic import context, op
 
 # revision identifiers, used by Alembic.
 revision = '55d523872c43'
-down_revision = '2ce1756a2f12'
+down_revision = '7f4d95fd173'
 
 
 def upgrade():
