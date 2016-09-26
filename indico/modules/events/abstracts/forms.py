@@ -30,6 +30,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField)
+from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget, DropzoneWidget
 
@@ -180,22 +181,48 @@ class AbstractForm(IndicoForm):
     submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
     person_links = AbstractPersonLinkListField(_("People"), [DataRequired()])
-    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label=lambda x: x.title,
-                                                                  collection_class=set)
     submission_comment = TextAreaField(_("Comments"))
     attachments = HiddenField(_('Attachments'), widget=DropzoneWidget(lightweight=True))
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
         self.abstract = kwargs.pop('abstract', None)
+        if abstracts_settings.get(self.event, 'contrib_type_required'):
+            inject_validators(self, 'submitted_contrib_type', [DataRequired()])
         super(AbstractForm, self).__init__(*args, **kwargs)
         self.submitted_contrib_type.query = self.event.contribution_types
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
-        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
         if abstracts_settings.get(self.event, 'allow_attachments'):
             tpl = get_template_module('forms/_dropzone_themes.html')
             self.attachments.widget.options['previewTemplate'] = tpl.thin_preview_template()
             self.attachments.widget.options['dictRemoveFile'] = tpl.remove_icon()
         else:
             del self.attachments
+        self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
+        self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
+
+
+class SingleTrackMixin(object):
+    submitted_for_tracks = QuerySelectField(_("Tracks"), get_label=lambda x: x.title)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        if abstracts_settings.get(self.event, 'tracks_required'):
+            inject_validators(self, 'submitted_for_tracks', [DataRequired()])
+        super(SingleTrackMixin, self).__init__(*args, **kwargs)
+        if not abstracts_settings.get(self.event, 'tracks_required'):
+            self.submitted_for_tracks.allow_blank = True
+            self.submitted_for_tracks.blank_text = _('No track selected')
+        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
+
+
+class MultiTrackMixin(object):
+    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label=lambda x: x.title,
+                                                                  collection_class=set)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        if abstracts_settings.get(self.event, 'tracks_required'):
+            inject_validators(self, 'submitted_for_tracks', [DataRequired()])
+        super(MultiTrackMixin, self).__init__(*args, **kwargs)
+        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
