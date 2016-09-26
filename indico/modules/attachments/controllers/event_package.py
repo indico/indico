@@ -27,6 +27,7 @@ from markupsafe import escape
 from sqlalchemy import cast, Date
 
 from indico.core.config import Config
+from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.date_time import format_date, format_time
 from indico.util.i18n import _
@@ -122,11 +123,16 @@ class AttachmentPackageGeneratorMixin:
         return query
 
     def _filter_by_sessions(self, session_ids, added_since):
-        session_ids = set(session_ids)
-        query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.session,
-                                                                                           LinkType.contribution,
-                                                                                           LinkType.subcontribution]))
-        return [attachment for attachment in query if attachment.folder.object.id in session_ids]
+        sid_query = Contribution.session_id.in_(set(session_ids))
+        session_query = db.and_(AttachmentFolder.link_type == LinkType.session,
+                                AttachmentFolder.session.has(Session.id.in_(session_ids) & ~Session.is_deleted))
+        contrib_query = db.and_(AttachmentFolder.link_type == LinkType.contribution,
+                                AttachmentFolder.contribution.has(sid_query & ~Contribution.is_deleted))
+        subcontrib_query = db.and_(AttachmentFolder.link_type == LinkType.subcontribution,
+                                   AttachmentFolder.subcontribution.has(
+                                       sid_query & ~SubContribution.is_deleted & ~Contribution.is_deleted))
+
+        return self._build_base_query(added_since).filter(db.or_(session_query, contrib_query, subcontrib_query)).all()
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.contribution,
