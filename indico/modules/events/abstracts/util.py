@@ -25,6 +25,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
@@ -271,9 +272,14 @@ def make_abstract_form(event):
     :param event: The `Event` for which to create the abstract form.
     :return: An `AbstractForm` subclass.
     """
-    from indico.modules.events.abstracts.forms import AbstractForm
+    from indico.modules.events.abstracts.forms import AbstractForm, MultiTrackMixin, SingleTrackMixin
 
-    form_class = type(b'_AbstractForm', (AbstractForm,), {})
+    mixins = []
+    if abstracts_settings.get(event, 'allow_multiple_tracks'):
+        mixins.append(MultiTrackMixin)
+    else:
+        mixins.append(SingleTrackMixin)
+    form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field
         if field_impl is None:

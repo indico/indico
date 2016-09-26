@@ -20,6 +20,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
+from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.abstracts.util import serialize_abstract_person_link
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
