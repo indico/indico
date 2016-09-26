@@ -29,7 +29,8 @@
                 authors: false,
                 submitters: false,
                 emptyEmail: false,
-                externalUsers: true
+                externalUsers: true,
+                speakers: true
             },
             defaults: {
                 authorType: 0,
@@ -170,12 +171,12 @@
                 $personRoles.append($submitterLabel.toggleClass('selected', person.isSubmitter));
             }
 
-            if (options.allow.authors) {
+            if (options.allow.authors && options.allow.speakers) {
                 $personRoles.prepend($speakerLabel.toggleClass('selected', person.isSpeaker));
             }
 
             if (entryType !== null && entryType === options.authorTypes.none) {
-                if (options.allow.authors) {
+                if (options.allow.authors && options.allow.speakers) {
                     $speakerLabel.addClass('other');
                 }
             }
@@ -233,33 +234,34 @@
                     $buttons.append(actionButton($T.gettext("Move to co-authors"), $coauthorList, {authorType: 2}));
                 }
 
-                if (person.authorType !== options.authorTypes.none) {
-                    $buttons.append(actionButton($T.gettext("Move to others"), $otherList,
-                                                 {authorType: 0, isSpeaker: true}));
+                if (options.allow.speakers) {
+                    if (person.authorType !== options.authorTypes.none) {
+                        $buttons.append(actionButton($T.gettext("Move to others"), $otherList,
+                                                     {authorType: 0, isSpeaker: true}));
+                        var text = person.isSpeaker ? $T.gettext("Not a speaker anymore")
+                                                    : $T.gettext("Make a speaker");
 
-                    var text = person.isSpeaker ? $T.gettext("Not a speaker anymore")
-                                                : $T.gettext("Make a speaker");
+                        $buttons.append($buttonsSeparator);
+                        $buttons.append(actionButton(text, null, {isSpeaker: !person.isSpeaker}));
 
-                    $buttons.append($buttonsSeparator);
-                    $buttons.append(actionButton(text, null, {isSpeaker: !person.isSpeaker}));
-
-                    $speakerLabel.on('click', function() {
-                        $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
-                    });
-                } else {
-                    $buttons.append($buttonsSeparator);
-                    $speakerLabel.qtip({
-                        content: {
-                            text: $T.gettext("People in the 'Others' section <strong>must</strong> be speakers.")
-                        },
-                        show: {
-                            event: 'click',
-                            solo: true
-                        },
-                        hide: {
-                            event: 'unfocus click'
-                        }
-                    });
+                        $speakerLabel.on('click', function() {
+                            $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
+                        });
+                    } else {
+                        $buttons.append($buttonsSeparator);
+                        $speakerLabel.qtip({
+                            content: {
+                                text: $T.gettext("People in the 'Others' section <strong>must</strong> be speakers.")
+                            },
+                            show: {
+                                event: 'click',
+                                solo: true
+                            },
+                            hide: {
+                                event: 'unfocus click'
+                            }
+                        });
+                    }
                 }
             }
 
@@ -356,10 +358,11 @@
         $field.closest('form').on('ajaxDialog:validateBeforeSubmit', function(evt) {
             var $this = $(this);
             var req = options.require;
-            if (req.primaryAuthor || req.secondaryAuthor || req.submitter || req.speaker) {
-                var hiddenData = JSON.parse($field.val());
+
+            if (req.primaryAuthor || req.secondaryAuthor || req.submitter || req.speaker || !options.allow.speakers) {
                 var $formField = $field.closest('.form-field');
                 var $formGroup = $field.closest('.form-group');
+                var hiddenData = JSON.parse($field.val());
                 var hasError = false;
 
                 if (req.speaker && _.indexOf(_.pluck(hiddenData, 'isSpeaker'), true) === -1) {
@@ -374,7 +377,12 @@
                 } else if (req.primaryAuthor && _.indexOf(_.pluck(hiddenData, 'authorType'), 1) === -1) {
                     hasError = true;
                     $formField.data('error', $T.gettext('You must add at least one author'));
+                } else if (!options.allow.speakers && _.indexOf(_.pluck(hiddenData, 'authorType'), 0) !== -1) {
+                    hasError = true;
+                    $formField.data('error', $T.gettext('You cannot have users in the Other section, please make ' +
+                                                        'them authors or co-authors'));
                 }
+
                 if (hasError) {
                     evt.preventDefault();
                     $formGroup.addClass('has-error');
