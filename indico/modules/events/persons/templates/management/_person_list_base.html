@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' if event.type == 'lecture' else 'layout/full_content_base.html' %}
 
 {% block content %}
-    <div id="persons-list">
+    <div id="person-list">
         <div class="flashed-messages"></div>
         <div>
             <div class="toolbar form-group">
@@ -26,7 +26,8 @@
                        data-title="{% trans %}Send email{% endtrans %}"
                        data-method="POST"
                        data-params-selector="#person-list input[name=person_id]:checkbox:checked:visible"
-                       data-ajax-dialog>
+                       data-ajax-dialog
+                       data-reload-after>
                         {%- trans %}Send emails{% endtrans -%}
                     </a>
                 </div>
@@ -72,18 +73,37 @@
                         </ul>
                     </div>
                 {% endif %}
-                {% if num_no_account %}
-                    <div class="group">
-                        <a href="#" class="i-button icon-mail right highlight send-mails-btn"
-                           data-href="{{ url_for('persons.email_event_persons', event, no_account = True) }}"
-                           data-params-selector="#persons-list [data-no-account] input[name=person_id]:checkbox"
-                           data-title="{% trans %}Send email{% endtrans %}"
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Mail users with no account{% endtrans -%}
-                        </a>
-                    </div>
-                {% endif %}
+                <div class="group">
+                    <a id="no-account-dropdown" href="#" class="i-button arrow highlight disabled js-dropdown" data-toggle="dropdown">
+                        {% trans %}Users with no account{% endtrans %}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#"
+                               title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
+                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
+                               data-params-selector="#persons-list [data-no-account] input[name=person_id]:checkbox"
+                               data-title="{% trans %}Send email{% endtrans %}"
+                               data-method="POST"
+                               data-ajax-dialog
+                               data-reload-after>
+                                {% trans %}Email all{% endtrans %}</a>
+                        </li>
+                        <li>
+                            <a href="#" id="not-invited-only"
+                               title="{% trans %}Send an email to all users with no Indico account who have not
+                                     received an invitation email yet{% endtrans %}"
+                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
+                                                      not_invited_only=true) }}"
+                               data-params-selector="#persons-list [data-no-account] input[name=person_id]:checkbox"
+                               data-title="{% trans %}Send email{% endtrans %}"
+                               data-method="POST"
+                               data-ajax-dialog
+                               data-reload-after>
+                                {% trans %}Email not invited yet{% endtrans %}</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="right">
                     {% block filters %}{% endblock %}
                 </div>

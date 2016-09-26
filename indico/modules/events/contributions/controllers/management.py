@@ -178,8 +178,9 @@ class RHCreateContribution(RHManageContributionsBase):
         contrib_form_class = make_contribution_form(self.event_new)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
+            # Creating empty contribution so it can be compared to the created one in flash_if_unregistered
             contrib = Contribution()
-            with flash_if_unregistered(self.event_new, lambda: contrib.speakers):
+            with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
                 contrib = create_contribution(self.event_new, *get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.list_generator.render_list(contrib)
@@ -199,7 +200,7 @@ class RHEditContribution(RHManageContributionBase):
                                                    **custom_field_values),
                                   event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
-            with track_time_changes(), flash_if_unregistered(self.event_new, lambda: self.contrib.speakers):
+            with track_time_changes(), flash_if_unregistered(self.event_new, lambda: self.contrib.person_links):
                 update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)

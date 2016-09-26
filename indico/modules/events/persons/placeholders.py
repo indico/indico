@@ -24,12 +24,15 @@ from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
 
 
+# XXX: `person` may be either an `EventPerson` or a `USer`
+
+
 class FirstNamePlaceholder(Placeholder):
     name = 'first_name'
     description = _("First name of the person")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         return person.first_name
 
 
@@ -38,7 +41,7 @@ class LastNamePlaceholder(Placeholder):
     description = _("Last name of the person")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         return person.last_name
 
 
@@ -47,7 +50,7 @@ class EmailPlaceholder(Placeholder):
     description = _("Email of the person")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         return person.email
 
 
@@ -56,7 +59,7 @@ class EventTitlePlaceholder(Placeholder):
     description = _("The title of the event")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         return event.title
 
 
@@ -65,7 +68,7 @@ class EventLinkPlaceholder(Placeholder):
     description = _("Link to the event")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         url = url_for('event.conferenceDisplay', event, _external=True)
         return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=url, title=escape(event.title)))
 
@@ -75,6 +78,6 @@ class RegisterLinkPlaceholder(Placeholder):
     description = _("The link for the registration page")
 
     @classmethod
-    def render(cls, person, event):
+    def render(cls, person, event, **kwargs):
         url = url_for_register(event.url, email=person.email)
         return Markup('<a href="{url}">{url}</a>'.format(url=url))

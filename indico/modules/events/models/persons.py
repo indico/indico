@@ -23,7 +23,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
-from indico.core.db.sqlalchemy import db, PyIntEnum
+from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -141,7 +141,10 @@ class EventPerson(PersonMixin, db.Model):
         nullable=False,
         default=''
     )
-
+    invited_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
     event_new = db.relationship(
         'Event',
         lazy=True,

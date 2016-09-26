@@ -30,12 +30,12 @@ from indico.modules.events.contributions.models.persons import (ContributionPers
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
 from indico.modules.events.management.forms import EventProtectionForm
-from indico.modules.events.management.util import flash_if_unregistered
+from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.operations import delete_event, create_event_references, update_event
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults

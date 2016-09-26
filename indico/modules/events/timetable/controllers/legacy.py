@@ -53,7 +53,7 @@ from indico.modules.events.timetable.util import (find_next_start_dt, get_sessio
                                                   shift_following_entries)
 from indico.modules.events.util import get_random_color, track_time_changes, get_field_values
 from indico.util.date_time import iterdays, as_utc
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -114,10 +114,10 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
         form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
         if form.validate_on_submit():
             contrib = Contribution()
-            with flash_if_unregistered(self.event_new, lambda: contrib.speakers),\
-                track_time_changes(auto_extend=True, user=session.user) as changes:
-                contrib = create_contribution(self.event_new, form.data, session_block=self.session_block,
-                                              extend_parent=True)
+            with track_time_changes(auto_extend=True, user=session.user) as changes:
+                with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
+                    contrib = create_contribution(self.event_new, form.data, session_block=self.session_block,
+                                                  extend_parent=True)
             entry = contrib.timetable_entry
             notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=entry)
             return jsonify_data(entries=[serialize_entry_update(entry, session_=self.session)],
@@ -197,9 +197,9 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                                          event=self.event_new, contrib=contrib, to_schedule=False,
                                          day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
-                with flash_if_unregistered(self.event_new, lambda: contrib.speakers), \
-                     track_time_changes(auto_extend=True, user=session.user) as changes:
-                    update_contribution(contrib, *get_field_values(form.data))
+                with track_time_changes(auto_extend=True, user=session.user) as changes:
+                    with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
+                        update_contribution(contrib, *get_field_values(form.data))
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event_new.tzinfo, entry=self.entry)
                 return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                     notifications=notifications)
