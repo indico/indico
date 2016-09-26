@@ -14,3 +14,67 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
+%semantic-background {
+    color: white;
+    background: $dark-gray;
+
+    &.highlight {
+        background: $blue;
+    }
+
+    &.success {
+        background: $green;
+    }
+
+    &.error {
+        background: $red;
+    }
+
+    &.warning {
+        background: $yellow;
+    }
+
+    &.visited {
+        background: $purple;
+    }
+
+    &.strong {
+        background: $black;
+    }
+}
+
+%semantic-outline {
+    @include border-all($dark-gray);
+    color: $dark-gray;
+
+    &.highlight {
+        border-color: $blue;
+        color: $blue;
+    }
+
+    &.success {
+        border-color: $green;
+        color: $green;
+    }
+
+    &.error {
+        border-color: $red;
+        color: $red;
+    }
+
+    &.warning {
+        border-color: $yellow;
+        color: $yellow;
+    }
+
+    &.visited {
+        border-color: $purple;
+        color: $purple;
+    }
+
+    &.strong {
+        border-color: $black;
+        color: $black;
+    }
+}
