@@ -25,7 +25,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.roles import get_available_roles
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
-from indico.testing.util import bool_matrix, extract_emails
+from indico.testing.util import bool_matrix
 
 
 @pytest.fixture(autouse=True)

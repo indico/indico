@@ -54,9 +54,17 @@
         {% if person_data.roles.no_account %}
             <span class="i-label warning icon-warning"
                    title="{% trans email=person.email %}This user seems to have no Indico
-                   account. If they do have an account, they should add {{ email }} to their profile
-                   {%- endtrans %}">
-                {% trans %}No Indico account{% endtrans %}
+                   account. If they do have an account, they should add {{ email }} to their profile{%- endtrans %}">
+                   {% trans %}No Indico account{% endtrans %}
+            </span>
+        {% endif %}
+    </td>
+    <td class="i-table">
+        {% if person.invited_dt %}
+            <span class="i-icon icon-mail"
+                  title="{% trans date=person.invited_dt | format_date(timezone=person_data.person.event_new.tzinfo) -%}
+                  Invited on {{ date }}
+                  {%- endtrans %}">
             </span>
         {% endif %}
     </td>

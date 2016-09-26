@@ -188,29 +188,21 @@ def get_non_inheriting_objects(root):
         raise TypeError('Unexpected object of type {}: {}'.format(type(root).__name__, root))
 
 
-def find_unregistered_users(person_links):
-    """Get a set of users which don't have an Indico account
-
-    :param person_links: List of persons to check
-    """
-    return {pl for pl in person_links if pl.person.user is None}
-
-
 @contextmanager
 def flash_if_unregistered(event, get_person_links):
     """Flash message when adding users with no indico account
 
+    :param event: Current event
     :param get_person_links: Callable returning list of person links to
                              check
-    :param event: Current event
     """
-    old_non_users = find_unregistered_users(get_person_links())
+    old_non_users = {pl for pl in get_person_links() if pl.person.user is None}
     yield
-    new_non_users = find_unregistered_users(get_person_links())
+    new_non_users = {pl for pl in get_person_links() if pl.person.user is None}
     added_non_users = len(new_non_users - old_non_users)
     if not added_non_users:
         return
-    warning = ngettext('You have added a user with no Indico account. ',
+    warning = ngettext('You have added a user with no Indico account.',
                        'You have added {} users with no Indico account.', added_non_users).format(added_non_users)
     msg = _('An Indico account may be needed to upload materials and/or manage contents.')
     if event.can_manage(session.user):
