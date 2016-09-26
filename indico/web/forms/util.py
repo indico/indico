@@ -16,6 +16,11 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+from copy import deepcopy
+
+from wtforms.fields.core import UnboundField
+
 
 def get_form_field_names(form_class):
     """Returns the list of field names of a WTForm
@@ -33,3 +38,31 @@ def get_form_field_names(form_class):
             if hasattr(unbound_field, '_formfield'):
                 field_names.append(name)
     return field_names
+
+
+def inject_validators(form, field_name, validators):
+    """Add extra validators to a form field.
+
+    This function may be called from the ``__init__`` method of a
+    form before the ``super().__init__()`` call or on a form class.
+    When using a Form class note that this will modify the class, so
+    all new instances of it will be affected!
+
+    :param form: the `Form` instance or a `Form` subclass
+    :param field_name: the name of the field to change
+    :param validators: a list of validators to add
+    """
+    unbound = deepcopy(getattr(form, field_name))
+    assert isinstance(unbound, UnboundField)
+    if 'validators' in unbound.kwargs:
+        unbound.kwargs['validators'] += validators
+    elif len(unbound.args) > 1:
+        validators_arg = unbound.args[1] + validators
+        unbound.args = unbound.args[:1] + (validators_arg,) + unbound.args[2:]
+    else:
+        unbound.kwargs['validators'] = validators
+    setattr(form, field_name, unbound)
+    if form._unbound_fields is not None:
+        unbound_fields = OrderedDict(form._unbound_fields)
+        unbound_fields[field_name] = unbound
+        form._unbound_fields = unbound_fields.items()
