@@ -353,6 +353,13 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return AbstractReviewingState.mixed
 
+    @property
+    def score(self):
+        scores = [x.score for x in self.reviews if x.score is not None]
+        if not scores:
+            return None
+        return sum(scores) / len(scores)
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, abstract_id=self.id)
