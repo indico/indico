@@ -33,6 +33,7 @@ from indico.modules.events.abstracts.settings import boa_settings, abstracts_set
 from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values, ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -181,7 +182,9 @@ class RHCreateAbstract(RHAbstractListBase):
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             data = form.data
-            del data['attachments']
+            data.pop('attachments', None)
+            if isinstance(data['submitted_for_tracks'], Track):
+                data['submitted_for_tracks'] = {data['submitted_for_tracks']}
             files = request.files.getlist('file')
             abstract = create_abstract(self.event_new, *get_field_values(data), files=files)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
