@@ -63,18 +63,20 @@
                     }
                 }
 
-                $button.on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $button.prop('disabled', true);
-                    $.each(self.getRejectedFiles(), function(index, file) {
-                        self.removeFile(file);
-                    });
-                    if (self.getQueuedFiles().length) {
-                        $dz.find('.dz-progress').show();
-                        self.processQueue();
-                    } else if (options.submitIfEmpty) {
-                        $form.submit();
+                $form.on('submit', function(e) {
+                    var evt = $.Event('ajaxDialog:validateBeforeSubmit');
+                    $(this).trigger(evt);
+                    if (!evt.isDefaultPrevented()) {
+                        $button.prop('disabled', true);
+                        $.each(self.getRejectedFiles(), function(index, file) {
+                            self.removeFile(file);
+                        });
+                        if (self.getQueuedFiles().length) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $dz.find('.dz-progress').show();
+                            self.processQueue();
+                        }
                     }
                 });
 
