@@ -113,8 +113,8 @@
                    data-href="{{ url_for('.generate_static_url', event) }}"
                    title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
             </div>
-            <div class="right">
-                <div class="group" id="filter-statistics">
+            <div class="group right">
+                <div id="filter-statistics">
                     {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
                 </div>
             </div>
