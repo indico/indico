@@ -63,6 +63,7 @@ rules:
   semi-spacing: error
   space-in-parens: error
   space-infix-ops: error
+  space-before-blocks: warn
   strict: error
   yoda: error
   no-unmodified-loop-condition: error
