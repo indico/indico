@@ -272,7 +272,7 @@ class DropzoneWidget(JinjaWidget):
     """Renders a dropzone file upload field"""
 
     def __init__(self, post_url=None, max_file_size=None, max_files=10, add_remove_links=True, accepted_file_types=None,
-                 param_name='file', submit_if_empty=True, submit_form=False, handle_flashes=False, lightweight=False):
+                 param_name='file', submit_form=False, handle_flashes=False, lightweight=False):
         super(DropzoneWidget, self).__init__('forms/dropzone_widget.html')
 
         config = Config.getInstance()
@@ -290,7 +290,6 @@ class DropzoneWidget(JinjaWidget):
             'acceptedFiles': accepted_file_types,
             'paramName': param_name,
             'submitForm': submit_form,
-            'submitIfEmpty': submit_if_empty,
             'parallelUploads': max_files,
             'handleFlashes': handle_flashes
         }
