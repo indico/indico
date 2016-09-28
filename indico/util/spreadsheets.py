@@ -50,15 +50,15 @@ def _prepare_header(header, as_unicode=True):
 _prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
 
 
-def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+')):
+def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
-        data = ', '.join(data).encode('utf-8')
+        data = ', '.join(data)
     elif isinstance(data, set):
-        data = ', '.join(sorted(data, key=unicode.lower)).encode('utf-8')
+        data = ', '.join(sorted(data, key=unicode.lower))
     elif isinstance(data, bool):
-        data = b'Yes' if data else b'No'
+        data = 'Yes' if data else 'No'
     elif data is None:
-        data = b''
+        data = ''
     return _linebreak_re.sub('    ', unicode(data)).encode('utf-8')
 
 
