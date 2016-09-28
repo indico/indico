@@ -86,14 +86,22 @@
                 </div>
                 {% trans %}Configure ticketing system{% endtrans %}
             </div>
+
             <div class="toolbar">
-                <a href="#" class="i-button icon-settings"
-                   data-href="{{ url_for('.tickets', regform) }}"
-                   data-title="{%- trans %}Configure tickets{% endtrans -%}"
-                   data-ajax-dialog
-                   data-reload-after>
-                    {% trans %}Configure{% endtrans %}
-                </a>
+                <div class="group">
+                    <a id="qr-code" class="i-button icon-qrcode"
+                       style="{{ 'display: none;' if not regform.tickets_enabled }}"
+                       data-href="{{ url_for('.tickets_qrcode', regform) }}"
+                       title="In order to configure your mobile app to use this event, you will have to scan the QR code">
+                        {% trans %}QR Code{% endtrans %}
+                    </a>
+                    <a href="#" id="qr-code-config" class="i-button icon-settings"
+                       data-href="{{ url_for('.tickets', regform) }}"
+                       data-title="{%- trans %}Configure tickets{% endtrans -%}"
+                       data-ajax-dialog>
+                        {% trans %}Configure{% endtrans %}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -102,4 +110,25 @@
             {% trans %}Stats{% endtrans %}
         </a>
     </div>
+    <script>
+        (function() {
+            'use strict';
+            var qrCodeButton = $('#qr-code');
+            qrCodeButton.qbubble({
+                content: {
+                    text: function() {
+                        return $.ajax({
+                            url: qrCodeButton.data('href'),
+                            cache: false
+                        });
+                    }
+                }
+            });
+            $('#qr-code-config').on('ajaxDialog:closed', function(evt, data) {
+                if (data) {
+                    qrCodeButton.toggle(data.tickets_enabled);
+                }
+            });
+        })();
+    </script>
 {% endblock %}
