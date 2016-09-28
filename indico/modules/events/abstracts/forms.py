@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, IntegerField, SelectField, TextField, TextAreaField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError
 
 from indico.modules.events.abstracts.fields import EmailRuleListField
@@ -68,7 +68,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
 class EditEmailTemplateRuleForm(IndicoForm):
     """Form for editing a new e-mail template."""
 
-    title = TextField(_("Title"), [DataRequired()])
+    title = StringField(_("Title"), [DataRequired()])
     rules = EmailRuleListField(_("Rules"), [DataRequired()])
     stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
                                  description=_("Do not evaluate any other rules once this one matches."))
@@ -92,7 +92,7 @@ class EditEmailTemplateTextForm(IndicoForm):
     include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
-    subject = TextField(_("Subject"), [DataRequired()])
+    subject = StringField(_("Subject"), [DataRequired()])
     body = TextAreaField(_("Body"), [DataRequired()])
 
     def __init__(self, *args, **kwargs):
