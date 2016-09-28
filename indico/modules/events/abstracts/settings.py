@@ -67,7 +67,8 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'tracks_required': False,
     'allow_attachments': False,
     'allow_speakers': True,
-    'speakers_required': True
+    'speakers_required': True,
+    'contrib_type_required': False
 }, acls={
     'authorized_submitters'
 }, converters={
