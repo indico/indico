@@ -38,7 +38,9 @@
             {% endif %}
         </div>
     </div>
-    <div class="description">{{ contrib.description }}</div>
+    <div class="description" data-display-href="{{ url_for('contributions.display_contribution', contrib) }}">
+         {{ contrib.description }}
+     </div>
     {{ render_time_and_location(contrib, editable=(editable and can_manage_contributions)) }}
     {% if contrib.speaker_names or (editable and can_manage_contributions) %}
         <span class="hr"></span>
