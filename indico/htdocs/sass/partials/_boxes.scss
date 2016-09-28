@@ -212,6 +212,7 @@ $i-box-padding: 10px;
         background-color: $light-gray;
         overflow: hidden;
         margin-bottom: $i-box-padding;
+        word-break: break-word;
 
         .i-box-header-text {
             float: left;

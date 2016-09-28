@@ -1,0 +1,100 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.i-timeline {
+    @extend .i-box-group;
+    @extend .i-box-group.vert;
+
+    & .i-timeline {
+        margin-left: 51px;
+    }
+}
+
+.i-timeline-item {
+    $min-height: 19px;
+
+    display: flex;
+    align-items: flex-start;
+    margin-top: 1rem;
+
+    .i-timeline-item-label {
+        @include border-all($color: transparent);
+        @include border-radius();
+        @include box-sizing(border-box);
+        margin-right: 12px;
+        // To match i-box-header height
+        height: 39px;
+        width: 39px;
+    }
+
+    .i-timeline-item-box {
+        @extend .i-box;
+        @extend .i-box.no-shadow;
+        flex: 1;
+        position: relative;
+
+        .i-box-header {
+            // To match i-timeline-item-label height
+            min-height: $min-height;
+        }
+
+        &.header-indicator {
+            @include indicator-left($background-color: $light-gray);
+        }
+
+        &.content-indicator {
+            @include indicator-left();
+        }
+    }
+}
+
+.i-timeline-item-label.action {
+    @extend %semantic-background;
+    color: white;
+    background: $dark-gray;
+    // Icon centering
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    &:before {
+        font-size: 2em;
+    }
+}
+
+.i-timeline-separator {
+    @include border-top($width: 2px);
+    margin: 2em 0;
+}
+
+.i-timetable-connect-down {
+    @include border-left($width: 2px);
+    margin-left: 71px;
+    margin-bottom: -2em;
+    height: 2em;
+}
+
+.i-timetable-connect-up {
+    @include border-left($width: 2px);
+    margin-left: 71px;
+    margin-top: -2em;
+    height: 2em;
+
+    & + .i-timeline-item {
+        margin-top: 0;
+    }
+}
