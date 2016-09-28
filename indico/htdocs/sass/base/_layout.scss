@@ -136,3 +136,11 @@ body > * {
         width: 0;
     }
 }
+
+.flex {
+    display: flex;
+}
+
+.stretch {
+    flex: 1;
+}
