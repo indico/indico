@@ -57,12 +57,21 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
     allow_multiple_tracks = BooleanField(_('Multiple tracks'), widget=SwitchWidget())
     tracks_required = BooleanField(_('Require tracks'), widget=SwitchWidget())
+    contrib_type_required = BooleanField(_('Require contrib. type'), widget=SwitchWidget())
     allow_attachments = BooleanField(_('Allow attachments'), widget=SwitchWidget())
     allow_speakers = BooleanField(_('Allow speakers'), widget=SwitchWidget())
     speakers_required = BooleanField(_('Require a speaker'), [HiddenUnless('allow_speakers')], widget=SwitchWidget())
     authorized_submitters = PrincipalListField(_("Authorized submitters"),
                                                description=_("These users may always submit abstracts, even outside "
                                                              "the regular submission period."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(AbstractSubmissionSettingsForm, self).__init__(*args, **kwargs)
+
+    def validate_contrib_type_required(self, field):
+        if field.data and not self.event.contribution_types.count():
+            raise ValidationError(_('The event has no contribution types defined.'))
 
 
 class EditEmailTemplateRuleForm(IndicoForm):
