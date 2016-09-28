@@ -84,7 +84,8 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
     """Configure abstract submission"""
 
     def _process(self):
-        form = AbstractSubmissionSettingsForm(obj=FormDefaults(**abstracts_settings.get_all(self.event_new)))
+        form = AbstractSubmissionSettingsForm(event=self.event_new,
+                                              obj=FormDefaults(**abstracts_settings.get_all(self.event_new)))
         if form.validate_on_submit():
             abstracts_settings.set_multi(self.event_new, form.data)
             flash(_('Abstract submission settings have been saved'), 'success')
