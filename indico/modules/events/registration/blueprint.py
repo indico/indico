@@ -24,6 +24,7 @@ from indico.modules.events.registration.controllers.display import (RHRegistrati
                                                                     RHRegistrationFormDeclineInvitation,
                                                                     RHParticipantList)
 from indico.modules.events.registration.controllers.management.tickets import (RHRegistrationFormTickets,
+                                                                               RHTicketConfigQRCodeImage,
                                                                                RHTicketConfigQRCode,
                                                                                RHTicketDownload)
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
@@ -170,7 +171,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invita
 # E-ticket management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', RHRegistrationFormTickets,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode', 'tickets_qrcode', RHTicketConfigQRCode)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode', 'tickets_qrcode',
+                 RHTicketConfigQRCode)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode.png', 'tickets_qrcode_image',
+                 RHTicketConfigQRCodeImage)
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated

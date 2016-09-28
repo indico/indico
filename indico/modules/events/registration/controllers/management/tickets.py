@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 import qrcode
-from flask import flash, json, redirect
+from flask import flash, json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -35,6 +35,7 @@ from indico.web.util import jsonify_data, jsonify_template
 
 from MaKaC.PDFinterface.conference import TicketToPDF
 from MaKaC.common import Config
+
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
@@ -59,7 +60,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
-            return jsonify_data(flash=False)
+            return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
         return jsonify_template('events/registration/management/regform_tickets.html',
                                 regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
@@ -92,7 +93,7 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
-class RHTicketConfigQRCode(RHManageRegFormBase):
+class RHTicketConfigQRCodeImage(RHManageRegFormBase):
     """Display configuration QRCode."""
 
     def _process(self):
@@ -131,3 +132,8 @@ class RHTicketConfigQRCode(RHManageRegFormBase):
         output.seek(0)
 
         return send_file('config.png', output, 'image/png')
+
+
+class RHTicketConfigQRCode(RHManageRegFormBase):
+    def _process(self):
+        return render_template('events/registration/management/regform_qr_code.html', regform=self.regform)
