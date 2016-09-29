@@ -79,9 +79,8 @@ abstracts_settings = EventSettingsProxy('abstracts', {
 
 
 abstracts_reviewing_settings = EventSettingsProxy('abstracts_reviewing', {
-    'num_answers': 7,
     'scale_lower': 0,
-    'scale_upper': 10,
+    'scale_upper': 5,
     'conveners_final_judgment': False  # whether track conveners can make a final judgment (e.g. accept/reject)
 })
 
