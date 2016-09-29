@@ -25,7 +25,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField, EmailListField
-from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -77,8 +77,10 @@ class AbstractSubmissionSettingsForm(IndicoForm):
 class AbstractReviewingSettingsForm(IndicoForm):
     """Settings form for abstract reviewing"""
 
-    scale_lower = IntegerField(_('Scale (from)'), [InputRequired()])
-    scale_upper = IntegerField(_('Scale (to)'), [InputRequired()])
+    RATING_FIELDS = ('scale_lower', 'scale_upper')
+
+    scale_lower = IntegerField(_('Scale (from)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
+    scale_upper = IntegerField(_('Scale (to)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
     conveners_final_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
                                             description=_('Enabling this allows track conveners to make a final '
                                                           'judgment such as accepting or rejecting an abstract.'))
@@ -86,13 +88,29 @@ class AbstractReviewingSettingsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.has_ratings = kwargs.pop('has_ratings', False)
         super(AbstractReviewingSettingsForm, self).__init__(*args, **kwargs)
+        if self.has_ratings:
+            self.scale_upper.warning = _("Some reviewers have already submitted ratings so the scale cannot be changed "
+                                         "anymore.")
 
     def validate_scale_upper(self, field):
         lower = self.scale_lower.data
         upper = self.scale_upper.data
-        if lower is not None and upper is not None and lower >= upper:
+        if lower is None or upper is None:
+            return
+        if lower >= upper:
             raise ValidationError(_("The scale's 'to' value must be greater than the 'from' value."))
+        if upper - lower > 20:
+            raise ValidationError(_("The difference between 'to' and' from' may not be greater than 20."))
+
+    @property
+    def data(self):
+        data = super(AbstractReviewingSettingsForm, self).data
+        if self.has_ratings:
+            for key in self.RATING_FIELDS:
+                del data[key]
+        return data
 
 
 class EditEmailTemplateRuleForm(IndicoForm):
