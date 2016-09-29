@@ -102,3 +102,8 @@ class AbstractComment(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', is_deleted=False, _text=text_to_repr(self.text))
+
+    def can_edit(self, user):
+        if user is None:
+            return False
+        return self.user == user or self.abstract.event_new.can_manage(user)
