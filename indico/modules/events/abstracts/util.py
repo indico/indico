@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict, namedtuple
 
-from flask import request
+from flask import request, flash
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -183,7 +183,7 @@ class AbstractListGenerator(ListGeneratorBase):
             # TODO: 'dynamic_item_ids'
         }
 
-    def render_list(self):
+    def render_list(self, abstract=None):
         list_kwargs = self.get_list_kwargs()
         tpl = get_template_module('events/abstracts/management/_abstract_list.html')
         filtering_enabled = list_kwargs.pop('filtering_enabled')
@@ -193,8 +193,13 @@ class AbstractListGenerator(ListGeneratorBase):
         return {
             'html': tpl.render_abstract_list(**list_kwargs),
             'filtering_enabled': filtering_enabled,
-            'filter_statistics': filter_statistics
+            'filter_statistics': filter_statistics,
+            'hide_abstract': abstract not in list_kwargs['abstracts'] if abstract else None
         }
+
+    def flash_info_message(self, abstract):
+        flash(_("The abstract '{}' is not displayed in the list due to the enabled filters")
+              .format(abstract.title), 'info')
 
 
 def build_default_email_template(event, tpl_type):
