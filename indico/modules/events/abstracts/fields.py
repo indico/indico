@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
 from indico.util.decorators import classproperty
-from indico.web.forms.fields import JSONField
+from indico.util.i18n import _
+from indico.web.forms.fields import MultipleItemsField, JSONField
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -55,3 +57,35 @@ class EmailRuleListField(JSONField):
 
     def _value(self):
         return super(EmailRuleListField, self)._value() if self.data else '[]'
+
+
+class AbstractReviewQuestionsField(MultipleItemsField):
+    def __init__(self, *args, **kwargs):
+        self.fields = [{'id': 'text', 'caption': _("Question"), 'type': 'text', 'required': True}]
+        super(AbstractReviewQuestionsField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True,
+                                                           sortable=True, **kwargs)
+
+    def process_formdata(self, valuelist):
+        super(AbstractReviewQuestionsField, self).process_formdata(valuelist)
+        if valuelist:
+            existing = {x.id: x for x in self.object_data or ()}
+            data = []
+            for pos, entry in enumerate(self.data, 1):
+                question = existing.pop(int(entry['id'])) if entry.get('id') is not None else AbstractReviewQuestion()
+                question.text = entry['text']
+                question.position = pos
+                data.append(question)
+            for question in existing.itervalues():
+                if question.ratings:
+                    # keep it around and soft-delete if it has been used; otherwise we just skip it
+                    # which will delete it once it's gone from the relationship (when populating the
+                    # Event from the form's data)
+                    question.is_deleted = True
+                    data.append(question)
+            self.data = data
+
+    def _value(self):
+        if not self.data:
+            return []
+        else:
+            return [{'id': q.id, 'text': q.text} for q in self.data]
