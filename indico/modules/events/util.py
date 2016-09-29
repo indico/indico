@@ -356,6 +356,9 @@ class ListGeneratorBase(object):
             self.list_config['items'] = sorted(visible_items)
         session.modified = True
 
+    def flash_info_message(self, obj):
+        raise NotImplementedError
+
 
 def get_base_ical_parameters(user, object, detail, path):
     """Returns a dict of all parameters expected by iCal template"""
