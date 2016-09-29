@@ -20,47 +20,6 @@
 @import 'partials/boxes';
 @import 'partials/icons';
 
-%abstract-state {
-    @include border-radius();
-    color: white;
-    font-weight: bold;
-    padding: 0.3em 0.6em;
-
-    &.awaiting {
-        background: $dark-gray;
-    }
-
-    &.score,
-    &.under-review {
-        background: $blue;
-    }
-
-    &.accept,
-    &.accepted {
-        background: $green;
-    }
-
-    &.reject,
-    &.rejected {
-        background: $red;
-    }
-
-    &.merge,
-    &.merged {
-        background: $purple;
-    }
-
-    &.mark_as_duplicate,
-    &.duplicate {
-        background: $black;
-    }
-
-    &.withdrawn {
-        @include border-all();
-        border-style: dashed;
-        color: $dark-gray;
-    }
-}
 
 #abstract-title {
     display: flex;
@@ -93,10 +52,11 @@
     margin-top: 0.5rem;
     align-items: baseline;
 
-    .abstract-summary-state {
-        @extend %abstract-state;
-        font-size: 1.1em;
+    .abstract-summary-badge {
         margin-right: 1rem;
+        .i-tag {
+            font-size: 1.1em;
+        }
     }
 
     .abstract-summary-content {
@@ -141,65 +101,43 @@
     }
 }
 
-.abstract-comments {
-    @extend .i-box-group;
-    @extend .i-box-group.vert;
+.abstract-comment-edited {
+    cursor: default;
+    color: $gray;
 
-    .abstract-comment {
-        display: flex;
-        align-items: flex-start;
-        margin-top: 1rem;
+    &:hover {
+        color: $dark-gray;
+    }
+}
 
-        .abstract-comment-pic {
-            @include icon-before('icon-user');
-            @include border-all();
-            @include border-radius();
-            color: $light-black;
-            content: "";
-            margin-right: 1em;
-            // Icon centering
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            flex-direction: column;
-            // To match i-box-header height
-            height: 39px;
-            width: 39px;
+.abstract-comment-badges {
+    align-self: flex-end;
+    color: $gray;
+    margin-left: 1em;
+}
 
-            &:before {
-                font-size: 2.5em;
-            }
-        }
+#abstract-submission-details,
+#abstract-comments,
+#abstract-reviews {
+    .i-timeline-item-label {
+        @include icon-before('icon-user');
+        border-color: $default-border-color !important;
+        background: white !important;
+        color: $light-black !important;
+        justify-content: flex-end !important;
 
-        .abstract-comment-box {
-            @extend .i-box;
-            @extend .i-box.no-shadow;
-            flex: 1;
-
-            .abstract-comment-edited {
-                cursor: default;
-                color: $gray;
-
-                &:hover {
-                    color: $dark-gray;
-                }
-            }
-
-            .abstract-review-action {
-                color: $gray;
-                float: right;
-
-                .abstract-review-state {
-                    @extend %abstract-state;
-                }
-            }
+        &:before {
+            font-size: 2.5em !important;
         }
     }
 }
 
-
-#abstract-private {
-    @include border-top($width: 2px);
-    margin-top: 2em;
-    padding-top: 1em;
+#abstract-decision-box {
+    .track-review {
+        @extend %i-box-cancel-horizontal-margin;
+        @extend %i-box-horizontal-padding;
+        @include border-top();
+        margin-top: 10px;
+        padding-top: 10px;
+    }
 }
