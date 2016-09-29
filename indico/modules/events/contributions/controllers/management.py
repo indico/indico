@@ -178,7 +178,7 @@ class RHCreateContribution(RHManageContributionsBase):
         contrib_form_class = make_contribution_form(self.event_new)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
-            # Creating empty contribution so it can be compared to the created one in flash_if_unregistered
+            # Create empty contribution so it can be compared to the new one in flash_if_unregistered
             contrib = Contribution()
             with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
                 contrib = create_contribution(self.event_new, *get_field_values(form.data))
