@@ -77,8 +77,6 @@ class AbstractSubmissionSettingsForm(IndicoForm):
 class AbstractReviewingSettingsForm(IndicoForm):
     """Settings form for abstract reviewing"""
 
-    num_answers = IntegerField(_('Number of choices'), [NumberRange(min=2), DataRequired()],
-                               description=_('The number of choices reviewers have for each question.'))
     scale_lower = IntegerField(_('Scale (from)'), [InputRequired()])
     scale_upper = IntegerField(_('Scale (to)'), [InputRequired()])
     conveners_final_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
