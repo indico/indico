@@ -5,7 +5,7 @@ Revises: 2ce1756a2f12
 Create Date: 2016-09-14 16:52:29.196932
 """
 
-from alembic import op
+from alembic import context, op
 
 
 # revision identifiers, used by Alembic.
@@ -14,6 +14,14 @@ down_revision = '2ce1756a2f12'
 
 
 def upgrade():
+    if not context.is_offline_mode():
+        # sanity check to avoid running w/o abstracts migrated
+        conn = op.get_bind()
+        has_new_abstracts = conn.execute("SELECT EXISTS (SELECT 1 FROM event_abstracts.abstracts)").fetchone()[0]
+        has_old_abstracts = (conn.execute("SELECT EXISTS (SELECT 1 FROM event_abstracts.legacy_abstracts)")
+                             .fetchone())[0]
+        if has_new_abstracts != has_old_abstracts:
+            raise Exception('Upgrade to {} and run the event_abstracts zodb import first!'.format(down_revision))
     op.create_foreign_key(None,
                           'abstract_field_values', 'abstracts',
                           ['abstract_id'], ['id'],
