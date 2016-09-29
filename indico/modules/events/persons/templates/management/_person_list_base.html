@@ -75,7 +75,7 @@
                 {% endif %}
                 <div class="group">
                     <a id="no-account-dropdown" href="#" class="i-button arrow highlight disabled js-dropdown" data-toggle="dropdown">
-                        {% trans %}Users with no account{% endtrans %}
+                        {% trans %}Send invitation{% endtrans %}
                     </a>
                     <ul class="dropdown">
                         <li>
@@ -87,7 +87,7 @@
                                data-method="POST"
                                data-ajax-dialog
                                data-reload-after>
-                                {% trans %}Email all{% endtrans %}</a>
+                                {% trans %}To all users with no account{% endtrans %}</a>
                         </li>
                         <li>
                             <a href="#" id="not-invited-only"
@@ -100,7 +100,7 @@
                                data-method="POST"
                                data-ajax-dialog
                                data-reload-after>
-                                {% trans %}Email not invited yet{% endtrans %}</a>
+                                {% trans %}To users not invited yet{% endtrans %}</a>
                         </li>
                     </ul>
                 </div>
