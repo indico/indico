@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash, jsonify
 
-from indico.modules.events.abstracts.forms import BOASettingsForm, AbstractSubmissionSettingsForm
-from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings
+from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
+                                                   AbstractReviewingSettingsForm)
+from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
@@ -90,6 +91,27 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
             abstracts_settings.set_multi(self.event_new, form.data)
             flash(_('Abstract submission settings have been saved'), 'success')
             return jsonify_data()
+        return jsonify_form(form)
+
+
+class RHManageAbstractReviewing(RHManageAbstractsBase):
+    """Configure abstract reviewing"""
+
+    def _process(self):
+        defaults = FormDefaults(abstract_review_questions=self.event_new.abstract_review_questions,
+                                **abstracts_reviewing_settings.get_all(self.event_new))
+        form = AbstractReviewingSettingsForm(event=self.event_new, obj=defaults)
+        if form.validate_on_submit():
+            data = form.data
+            # XXX: we need to do this assignment for new questions,
+            # but editing or deleting existing questions changes an
+            # object that is already in the session so it's updated
+            # in any case
+            self.event_new.abstract_review_questions = data.pop('abstract_review_questions')
+            abstracts_reviewing_settings.set_multi(self.event_new, data)
+            flash(_('Abstract reviewing settings have been saved'), 'success')
+            return jsonify_data()
+        self.commit = False
         return jsonify_form(form)
 
 

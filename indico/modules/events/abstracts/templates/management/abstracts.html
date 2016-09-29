@@ -57,7 +57,10 @@
                     </a>
                 </div>
                 <div class="group">
-                    <a href="#" class="i-button icon-settings">
+                    <a href="#" class="i-button icon-settings"
+                       data-href="{{ url_for('.manage_reviewing_settings', event) }}"
+                       data-title="{% trans %}Configure abstract reviewing{% endtrans %}"
+                       data-ajax-dialog>
                         {% trans %}Settings{% endtrans %}
                     </a>
                 </div>
