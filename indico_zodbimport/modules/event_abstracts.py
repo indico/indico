@@ -268,7 +268,6 @@ class AbstractMigration(object):
         except AttributeError:
             return
         abstracts_reviewing_settings.set_multi(self.event, {
-            'num_answers': int(old_settings._numberOfAnswers),
             'scale_lower': int(old_settings._scaleLower),
             'scale_upper': int(old_settings._scaleHigher),
             'conveners_final_judgment': bool(getattr(old_settings, '_canReviewerAccept', False))
