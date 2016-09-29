@@ -20,11 +20,11 @@ import json
 
 from wtforms.fields import RadioField, BooleanField
 from wtforms.widgets.core import Input, Select, TextArea, HiddenInput
-from wtforms.validators import Length, Regexp, NumberRange
+from wtforms.validators import Length, NumberRange
 
 from indico.util.struct.enum import TitledEnum
 from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoEnumRadioField
-from indico.web.forms.validators import ConfirmPassword, HiddenUnless
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp
 
 
 def is_single_line_field(field):
@@ -45,7 +45,7 @@ def _attrs_for_validators(field, validators):
                 attrs['minlength'] = validator.min
             if validator.max >= 0:
                 attrs['maxlength'] = validator.max
-        elif isinstance(validator, Regexp):
+        elif isinstance(validator, IndicoRegexp) and validator.client_side:
             attrs['pattern'] = validator.regex.pattern
         elif isinstance(validator, NumberRange):
             if validator.min is not None:
