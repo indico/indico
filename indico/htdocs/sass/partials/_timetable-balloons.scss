@@ -86,6 +86,10 @@
         }
     }
 
+    &.no-details .description {
+        cursor: auto;
+    }
+
     .description {
         position: relative;
         font-style: italic;

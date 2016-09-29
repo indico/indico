@@ -726,6 +726,8 @@ function drawBalloon(self, evt, editable) {
         }
         location.href = url;
     } else {
+        var isBreak = self.eventData.entryType == 'Break';
+
         timetableBlock.qbubble({
             id: entryId.toString(),
             content: {
@@ -762,7 +764,7 @@ function drawBalloon(self, evt, editable) {
                 effect: false
             },
             style: {
-                classes: 'balloon-qtip ' + (editable ? 'edit-mode' : 'display-mode')
+                classes: 'balloon-qtip ' + (editable ? 'edit-mode' : 'display-mode') + (isBreak ? ' no-details' : '')
             }
         });
     }
@@ -1530,7 +1532,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 (function() {
     'use strict';
 
-    $(document).on('qbubble:ajaxload', '.balloon-qtip.display-mode', function() {
+    $(document).on('qbubble:ajaxload', '.balloon-qtip.display-mode:not(.no-details)', function() {
         var $description = $(this).find('.description');
         $description.on('click', function(e) {
             var newTab = e.which == 2;  // Middle click
