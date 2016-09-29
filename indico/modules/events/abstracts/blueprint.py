@@ -23,7 +23,8 @@ from indico.modules.events.abstracts.controllers.email_templates import (RHAddEm
                                                                          RHSortEmailTemplates)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
-                                                                    RHManageAbstractSubmission, RHManageAbstract)
+                                                                    RHManageAbstractSubmission, RHManageAbstract,
+                                                                    RHManageAbstractReviewing)
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -37,6 +38,8 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/', 'display_abstract', RHDisplayA
 _bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', RHAbstracts)
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/settings', 'manage_submission_settings', RHManageAbstractSubmission,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings', RHManageAbstractReviewing,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractList)
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,

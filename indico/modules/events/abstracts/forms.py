@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError
+from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
-from indico.modules.events.abstracts.fields import EmailRuleListField
+from indico.modules.events.abstracts.fields import EmailRuleListField, AbstractReviewQuestionsField
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
@@ -72,6 +72,29 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     def validate_contrib_type_required(self, field):
         if field.data and not self.event.contribution_types.count():
             raise ValidationError(_('The event has no contribution types defined.'))
+
+
+class AbstractReviewingSettingsForm(IndicoForm):
+    """Settings form for abstract reviewing"""
+
+    num_answers = IntegerField(_('Number of choices'), [NumberRange(min=2), DataRequired()],
+                               description=_('The number of choices reviewers have for each question.'))
+    scale_lower = IntegerField(_('Scale (from)'), [InputRequired()])
+    scale_upper = IntegerField(_('Scale (to)'), [InputRequired()])
+    conveners_final_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
+                                            description=_('Enabling this allows track conveners to make a final '
+                                                          'judgment such as accepting or rejecting an abstract.'))
+    abstract_review_questions = AbstractReviewQuestionsField(_('Review questions'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(AbstractReviewingSettingsForm, self).__init__(*args, **kwargs)
+
+    def validate_scale_upper(self, field):
+        lower = self.scale_lower.data
+        upper = self.scale_upper.data
+        if lower is not None and upper is not None and lower >= upper:
+            raise ValidationError(_("The scale's 'to' value must be greater than the 'from' value."))
 
 
 class EditEmailTemplateRuleForm(IndicoForm):
