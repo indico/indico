@@ -18,12 +18,15 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash, jsonify
 
+from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingSettingsForm)
+from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import AbstractListGenerator
 from indico.modules.events.abstracts.views import WPManageAbstracts
-from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
@@ -98,9 +101,14 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
     """Configure abstract reviewing"""
 
     def _process(self):
+        has_ratings = bool(AbstractReviewRating.query
+                           .join(AbstractReviewRating.review)
+                           .join(AbstractReview.abstract)
+                           .filter(~Abstract.is_deleted, Abstract.event_new == self.event_new)
+                           .count())
         defaults = FormDefaults(abstract_review_questions=self.event_new.abstract_review_questions,
                                 **abstracts_reviewing_settings.get_all(self.event_new))
-        form = AbstractReviewingSettingsForm(event=self.event_new, obj=defaults)
+        form = AbstractReviewingSettingsForm(event=self.event_new, obj=defaults, has_ratings=has_ratings)
         if form.validate_on_submit():
             data = form.data
             # XXX: we need to do this assignment for new questions,
@@ -112,7 +120,8 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
             flash(_('Abstract reviewing settings have been saved'), 'success')
             return jsonify_data()
         self.commit = False
-        return jsonify_form(form)
+        disabled_fields = form.RATING_FIELDS if has_ratings else ()
+        return jsonify_form(form, disabled_fields=disabled_fields)
 
 
 class RHAbstractList(RHAbstractListBase):
