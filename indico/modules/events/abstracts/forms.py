@@ -185,6 +185,7 @@ class AbstractForm(IndicoForm):
     attachments = HiddenField(_('Attachments'), widget=DropzoneWidget(lightweight=True))
 
     def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
         self.abstract = kwargs.pop('abstract', None)
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
@@ -206,14 +207,14 @@ class SingleTrackMixin(object):
     submitted_for_tracks = QuerySelectField(_("Tracks"), get_label=lambda x: x.title)
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        if abstracts_settings.get(self.event, 'tracks_required'):
+        event = kwargs['event']
+        if abstracts_settings.get(event, 'tracks_required'):
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(SingleTrackMixin, self).__init__(*args, **kwargs)
-        if not abstracts_settings.get(self.event, 'tracks_required'):
+        if not abstracts_settings.get(event, 'tracks_required'):
             self.submitted_for_tracks.allow_blank = True
             self.submitted_for_tracks.blank_text = _('No track selected')
-        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
+        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
 
 
 class MultiTrackMixin(object):
@@ -221,8 +222,8 @@ class MultiTrackMixin(object):
                                                                   collection_class=set)
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        if abstracts_settings.get(self.event, 'tracks_required'):
+        event = kwargs['event']
+        if abstracts_settings.get(event, 'tracks_required'):
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
-        self.submitted_for_tracks.query = Track.query.with_parent(self.event).order_by(Track.title)
+        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
