@@ -188,7 +188,7 @@ class RHCreateAbstract(RHAbstractListBase):
             files = request.files.getlist('file')
             abstract = create_abstract(self.event_new, *get_field_values(data), files=files)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
-            tpl_components = self.list_generator.render_list()
+            tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
