@@ -20,8 +20,8 @@
 
 {% macro _render_abstract_summary(abstract, management=false) %}
     <div class="abstract-summary">
-        <div class="abstract-summary-state {{ abstract.public_state.name }}">
-            {{ abstract.public_state.title }}
+        <div class="abstract-summary-badge">
+            {{ _render_summary_state(abstract) }}
         </div>
         <div class="abstract-summary-content">
             {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
@@ -111,6 +111,17 @@
     </div>
 {% endmacro %}
 
+{% macro _render_summary_state(abstract) %}
+    {% set mapping = {'under_review': 'highlight',
+                      'withdrawn': 'outline dashed',
+                      'accepted': 'success',
+                      'rejected': 'error',
+                      'merged': 'visited',
+                      'duplicate': 'strong'} %}
+    <div class="i-tag {{ mapping[abstract.public_state.name] }}">
+        {{ abstract.public_state.title }}
+    </div>
+{% endmacro %}
 
 {% macro render_abstract_public(abstract, management=false) %}
     <div id="abstract-title">
@@ -190,10 +201,10 @@
             {{ abstract.description }}
         </div>
 
-        <div class="abstract-comments">
-            <div class="abstract-comment">
-                <div class="abstract-comment-pic"></div>
-                <div class="abstract-comment-box">
+        <div id="abstract-submission-details" class="i-timeline">
+            <div class="i-timeline-item">
+                <div class="i-timeline-item-label action"></div>
+                <div class="i-timeline-item-box header-indicator">
                     <div class="i-box-header">
                         {% trans name=abstract.submitter.name, date=abstract.submitted_dt|format_human_date -%}
                             <strong>{{ name }}</strong> submitted this abstract on {{ date }}
@@ -255,9 +266,9 @@
             </div>
 
             {% if abstract.state.name != 'submitted' %}
-                <div class="abstract-comment">
-                    <div class="abstract-comment-pic"></div>
-                    <div class="abstract-comment-box">
+                <div class="i-timeline-item">
+                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-box header-indicator">
                         <div class="i-box-header">
                             {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
                                 <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
@@ -316,26 +327,28 @@
 
 {% macro render_abstract_comments(abstract) %}
     {% if abstract.comments %}
-        <div class="abstract-comments">
+        <div id="abstract-comments" class="i-timeline">
             {% for comment in abstract.comments %}
-                <div class="abstract-comments">
-                    <div class="abstract-comment">
-                        <div class="abstract-comment-pic"></div>
-                        <div class="abstract-comment-box">
-                            <div class="i-box-header">
+                <div class="i-timeline-item">
+                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-box header-indicator">
+                        <div class="i-box-header flex">
+                            <div class="stretch">
                                 {% trans name=comment.user.name, date=comment.created_dt|format_human_date -%}
                                     <strong>{{ name }}</strong> commented on {{ date }}
                                 {%- endtrans %}
                                 {% if comment.modified_dt %}
                                     {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
                                 {% endif %}
-                                {% if comment.can_edit(user) %}
-                                    <a class="i-button-icon icon-edit right" title="{% trans %}Edit comment{% endtrans %}"></a>
-                                {% endif %}
                             </div>
-                            <div class="i-box-content">
-                                {{ comment.text }}
-                            </div>
+                            {% if comment.can_edit(user) %}
+                                <div class="abstract-comment-badges">
+                                    <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="i-box-content">
+                            {{ comment.text }}
                         </div>
                     </div>
                 </div>
