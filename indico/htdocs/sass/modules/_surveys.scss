@@ -68,7 +68,7 @@
     }
 
     .i-box-content > ul {
-        @extend %i-box-cancel-padding;
+        @extend %i-box-cancel-margin;
 
         & > li.survey-item {
             background-color: white;
