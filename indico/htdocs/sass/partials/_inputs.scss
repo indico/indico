@@ -315,12 +315,12 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-select-box {
+    @include border-all();
     @include border-radius();
     display: block;
     height: 2.5em;
     line-height: 1.5;
     color: $black;
-    border: 1px solid $gray;
     @include transition-property(border-color, box-shadow);
     @include transition-duration(0.12s, 0.12s);
     @include transition-timing-function(ease-in-out, ease-in-out);
