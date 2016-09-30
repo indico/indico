@@ -37,11 +37,11 @@
 }
 
 %box-hr {
+    @include border-bottom();
     height: 0;
     overflow: hidden;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid $gray;
     margin-left: -10px;
     margin-right: -10px;
 
@@ -309,7 +309,7 @@ $i-box-padding: 10px;
     }
 
     .i-box-sortable-placeholder {
-        @include border-all($gray, dashed);
+        @include border-all($style: dashed);
         background-color: $light-gray;
         margin-bottom: $margin;
     }
@@ -359,7 +359,7 @@ $i-box-padding: 10px;
     position: relative;
 
     > li {
-        border-top: 1px solid lighten($gray, $color-variation);
+        @include border-top(lighten($gray, $color-variation));
         display: block;
         padding: 10px 10px;
         position: relative;
@@ -368,7 +368,7 @@ $i-box-padding: 10px;
 
     &.content-after {
         > li:last-child {
-            border-bottom: 1px solid lighten($gray, $color-variation);
+            @include border-bottom(lighten($gray, $color-variation));
         }
     }
 
@@ -444,6 +444,7 @@ $i-box-padding: 10px;
 }
 
 .error-box {
+    @include border-all();
     font-size: 1.2em;
     padding: 2em;
     background-color: $light-gray;
@@ -452,7 +453,6 @@ $i-box-padding: 10px;
     padding-top: 20px;
     text-align: center;
     border-radius: .5em;
-    border: 1px solid $gray;
 
     h1 {
         color: $dark-blue;
