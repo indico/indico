@@ -277,7 +277,7 @@ class AbstractMigration(object):
         abstracts_reviewing_settings.set_multi(self.event, {
             'scale_lower': self.new_scale[0],
             'scale_upper': self.new_scale[1],
-            'conveners_final_judgment': bool(getattr(old_settings, '_canReviewerAccept', False))
+            'allow_convener_judgment': bool(getattr(old_settings, '_canReviewerAccept', False))
         })
         for pos, old_question in enumerate(old_settings._reviewingQuestions, 1):
             self._migrate_question(old_question, pos=pos)
