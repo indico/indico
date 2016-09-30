@@ -18,15 +18,15 @@ from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
-from wtforms.fields.simple import StringField, HiddenField
+from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import Config
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import JSONField
+from indico.web.forms.fields import FileField
 from indico.web.forms.validators import UsedIf, HiddenUnless
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget, DropzoneWidget
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget
 
 THEMES = [('', _('No theme selected')),
           ('orange.css', _('Orange')),
@@ -79,16 +79,14 @@ class LayoutForm(IndicoForm):
 
 
 class LogoForm(IndicoForm):
-    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-                                                   max_files=1, submit_form=False, add_remove_links=False,
-                                                   handle_flashes=True),
+    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', max_files=1,
+                     add_remove_links=False, handle_flashes=True,
                      description=_("Logo to be displayed next to the event's title"))
 
 
 class CSSForm(IndicoForm):
-    css_file = HiddenField(_("Custom CSS file"),
-                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=False,
-                                                 add_remove_links=False, handle_flashes=True))
+    css_file = FileField(_("Custom CSS file"), accepted_file_types='.css', max_files=1, add_remove_links=False,
+                         handle_flashes=True)
 
     def __init__(self, *args, **kwargs):
         super(CSSForm, self).__init__(*args, **kwargs)
@@ -130,7 +128,7 @@ class MenuPageForm(MenuUserEntryFormBase):
 
 
 class AddImagesForm(IndicoForm):
-    image = JSONField("Image", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif'))
+    image = FileField("Image", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
 
 
 class CSSSelectionForm(IndicoForm):
