@@ -25,7 +25,7 @@
     &:before,
     &:after {
         box-shadow: 1px 1px 1px $light-gray;
-        background-color: $gray;
+        background-color: $default-border-color;
         content: "";
         display: inline-block;
         height: 1px;

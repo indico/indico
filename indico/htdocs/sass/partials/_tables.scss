@@ -138,7 +138,7 @@ tr.i-table.interactive {
         background-color: $light-gray;
 
         > td {
-            border-left-color: lighten($gray, $color-variation);
+            border-left-color: lighten($default-border-color, $color-variation);
         }
     }
 
@@ -162,7 +162,7 @@ tr.i-table.details-row {
     border-top: none;
 
     > td {
-        border-left-color: lighten($gray, $color-variation);
+        border-left-color: lighten($default-border-color, $color-variation);
         padding: 0px;
     }
 }

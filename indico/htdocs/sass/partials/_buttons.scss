@@ -18,7 +18,7 @@
 %button {
     @include user-select(none);
     @include border-radius();
-    @include border-all($gray);
+    @include border-all();
     @include box-sizing(border-box);
     display: inline-block;
     cursor: pointer;
@@ -29,7 +29,7 @@
 }
 
 %button-disabled {
-    border-color: $gray;
+    border-color: $default-border-color;
     background: #EAEAEA;
     box-shadow: none;
     color: $gray !important;
@@ -72,7 +72,7 @@
 
     &:active:not(.disabled):not(:disabled) {
         @include gradient(#E2E2E2, #F7F7F7);
-        border-color: $gray;
+        border-color: $default-border-color;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
     }
 
@@ -182,7 +182,7 @@
     &.label:hover:not(.disabled):not(:disabled),
     &.label:active:not(.disabled):not(:disabled) {
         background: white;
-        border-color: $gray !important;
+        border-color: $default-border-color !important;
         box-shadow: none !important;
         color: $dark-gray !important;
         cursor: default;
