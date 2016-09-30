@@ -182,11 +182,9 @@ class RHCreateAbstract(RHAbstractListBase):
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             data = form.data
-            data.pop('attachments', None)
             if isinstance(data['submitted_for_tracks'], Track):
                 data['submitted_for_tracks'] = {data['submitted_for_tracks']}
-            files = request.files.getlist('file')
-            abstract = create_abstract(self.event_new, *get_field_values(data), files=files)
+            abstract = create_abstract(self.event_new, *get_field_values(data))
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):
