@@ -3,9 +3,9 @@
 
 {% block html %}
     <div id="dz-{{ field.id }}"
-         class="dropzone {% if lightweight %}thin{% endif %}"
-         data-options="{{ options|tojson|forceescape }}"
-         data-value="{{ field.data|tojson|forceescape }}">
+         class="dropzone {% if field.lightweight %}thin{% endif %}"
+         data-options="{{ field.widget_options|tojson|forceescape }}"
+         data-value="{{ field._value()|tojson|forceescape }}">
         <div class="dropzone-inner">
             <div class="dropzone-previews"></div>
             <div class="select-files-btn">

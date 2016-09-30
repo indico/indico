@@ -23,6 +23,7 @@ from .simple import (IndicoSelectMultipleCheckboxField, IndicoRadioField, JSONFi
 from .colors import IndicoPalettePickerField
 from .datetime import TimeDeltaField, IndicoDateTimeField, OccurrencesField, IndicoTimezoneSelectField
 from .enums import IndicoEnumSelectField, IndicoEnumRadioField
+from .files import FileField
 from .itemlists import MultiStringField, MultipleItemsField, OverrideMultipleItemsField
 from .location import IndicoLocationField
 from .markdown import IndicoMarkdownField
