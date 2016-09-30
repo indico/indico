@@ -359,7 +359,7 @@ $i-box-padding: 10px;
     position: relative;
 
     > li {
-        @include border-top(lighten($gray, $color-variation));
+        @include border-top(lighten($default-border-color, $color-variation));
         display: block;
         padding: 10px 10px;
         position: relative;
@@ -368,7 +368,7 @@ $i-box-padding: 10px;
 
     &.content-after {
         > li:last-child {
-            @include border-bottom(lighten($gray, $color-variation));
+            @include border-bottom(lighten($default-border-color, $color-variation));
         }
     }
 

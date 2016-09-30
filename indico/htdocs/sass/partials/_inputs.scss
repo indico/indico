@@ -132,7 +132,7 @@ span[contenteditable] {
     }
 
     &:hover {
-        outline: 1px dashed $gray;
+        outline: 1px dashed $default-border-color;
     }
 
     &:focus,
@@ -179,7 +179,7 @@ span[contenteditable] {
     label {
         &:hover {
             @include gradient(#E2E2E2, #F7F7F7);
-            border-color: $gray !important;
+            border-color: $default-border-color !important;
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
         }
 
@@ -398,7 +398,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     > input[type=text], textarea {
         &[readonly] {
             @extend %tilted-strips-bg;
-            border-color: $gray;
+            border-color: $default-border-color;
         }
     }
 }
