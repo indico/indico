@@ -46,7 +46,8 @@ class AbstractFile(StoredFileMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'files',
-            lazy=True
+            lazy=True,
+            cascade='all, delete-orphan'
         )
     )
 
