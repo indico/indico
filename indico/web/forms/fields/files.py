@@ -19,6 +19,7 @@ from __future__ import unicode_literals, absolute_import
 from wtforms import Field
 
 from indico.core.config import Config
+from indico.web.flask.templating import get_template_module
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -56,6 +57,12 @@ class FileField(Field):
             'parallelUploads': kwargs.pop('max_files', self.default_options['max_files']),
             'handleFlashes': kwargs.pop('handle_flashes', self.default_options['handle_flashes'])
         }
+
+        if self.lightweight:
+            tpl = get_template_module('forms/_dropzone_themes.html')
+            self.widget_options['previewTemplate'] = tpl.thin_preview_template()
+            self.widget_options['dictRemoveFile'] = tpl.remove_icon()
+
         super(FileField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
