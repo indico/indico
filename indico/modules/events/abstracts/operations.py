@@ -30,8 +30,9 @@ from indico.modules.events.util import set_custom_fields
 from indico.util.fs import secure_filename
 
 
-def create_abstract(event, abstract_data, custom_fields_data=None, files=None):
+def create_abstract(event, abstract_data, custom_fields_data=None):
     abstract = Abstract(event_new=event, submitter=session.user)
+    files = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)

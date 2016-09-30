@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, StringField, HiddenField
+from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, StringField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
@@ -26,13 +26,12 @@ from indico.modules.events.abstracts.settings import BOASortField, BOACorrespond
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
-from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
-                                     IndicoQuerySelectMultipleCheckboxField, EmailListField)
+                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf
-from indico.web.forms.widgets import SwitchWidget, DropzoneWidget
+from indico.web.forms.widgets import SwitchWidget
 
 
 class AbstractContentSettingsForm(IndicoForm):
@@ -182,7 +181,7 @@ class AbstractForm(IndicoForm):
                                               blank_text=_("No type selected"))
     person_links = AbstractPersonLinkListField(_("People"), [DataRequired()])
     submission_comment = TextAreaField(_("Comments"))
-    attachments = HiddenField(_('Attachments'), widget=DropzoneWidget(lightweight=True))
+    attachments = FileField(_('Attachments'), param_name='attachments', lightweight=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -193,11 +192,7 @@ class AbstractForm(IndicoForm):
         self.submitted_contrib_type.query = self.event.contribution_types
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
-        if abstracts_settings.get(self.event, 'allow_attachments'):
-            tpl = get_template_module('forms/_dropzone_themes.html')
-            self.attachments.widget.options['previewTemplate'] = tpl.thin_preview_template()
-            self.attachments.widget.options['dictRemoveFile'] = tpl.remove_icon()
-        else:
+        if not abstracts_settings.get(self.event, 'allow_attachments'):
             del self.attachments
         self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
