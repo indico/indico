@@ -17,14 +17,11 @@
 from __future__ import unicode_literals
 
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import JSONField
-from indico.web.forms.widgets import DropzoneWidget
+from indico.web.forms.fields import FileField
 from indico.util.i18n import _
 
 
 class PaperUploadForm(IndicoForm):
     """Form to upload a new paper version."""
 
-    paper_file = JSONField(_("Paper file"),
-                           widget=DropzoneWidget(max_files=10, submit_form=False, add_remove_links=True,
-                                                 handle_flashes=True))
+    paper_file = FileField(_("Paper file"), add_remove_links=True, handle_flashes=True)

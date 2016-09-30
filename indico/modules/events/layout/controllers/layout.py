@@ -85,9 +85,9 @@ class RHLayoutEdit(RHLayoutBase):
             return redirect(url_for('event_layout.index', self._conf))
         else:
             if self.event.logo_metadata:
-                logo_form.logo.data = _logo_data(self.event)
+                logo_form.logo.get_metadata = lambda __: _logo_data(self.event)
             if self.event.has_stylesheet:
-                css_form.css_file.data = _css_file_data(self.event)
+                css_form.css_file.get_metadata = lambda __: _css_file_data(self.event)
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf,
                                             logo_form=logo_form, css_form=css_form)
 

@@ -107,9 +107,9 @@ class RHManageCategorySettings(RHManageCategoryBase):
             return redirect(url_for('.manage_settings', self.category))
         else:
             if self.category.icon_metadata:
-                icon_form.icon.data = _get_image_data(self.category, 'icon')
+                icon_form.icon.get_metadata = lambda __: _get_image_data(self.category, 'icon')
             if self.category.logo_metadata:
-                logo_form.logo.data = _get_image_data(self.category, 'logo')
+                logo_form.logo.get_metadata = lambda __: _get_image_data(self.category, 'logo')
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
                                                     icon_form=icon_form, logo_form=logo_form)
 
