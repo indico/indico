@@ -168,7 +168,7 @@ $toolbar-thin-height: 1.9em;
 
         &:not(.label):not(.disabled):not(:disabled) {
             &:hover + .i-button {
-                border-left-color: $dark-gray;
+                border-left-color: $gray;
             }
         }
 
@@ -210,6 +210,9 @@ $toolbar-thin-height: 1.9em;
         &:not(.label) {
             &:hover ~ .i-button {
                 border-left-color: $gray;
+            }
+            &:hover ~ .i-button ~ .i-button {
+                border-left-color: $default-border-color;
             }
         }
     }
