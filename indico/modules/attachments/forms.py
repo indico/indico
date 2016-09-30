@@ -30,9 +30,10 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoRadioField, AccessControlListField
+from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoRadioField, AccessControlListField,
+                                     FileField)
 from indico.web.forms.validators import UsedIf, HiddenUnless
-from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget, DropzoneWidget
+from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
 
 class AttachmentFormBase(IndicoForm):
@@ -62,12 +63,12 @@ class EditAttachmentFormBase(AttachmentFormBase):
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):
-    files = HiddenField(_("Files"), widget=DropzoneWidget(submit_form=False))
+    files = FileField(_("Files"))
 
 
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    file = HiddenField(_("File"), widget=DropzoneWidget(max_files=1, submit_form=False, add_remove_links=False),
-                       description=_("Already uploaded file. Replace it by adding a new file."))
+    file = FileField(_("File"), max_files=1, add_remove_links=False,
+                     description=_("Already uploaded file. Replace it by adding a new file."))
 
 
 class AttachmentLinkFormMixin(object):
