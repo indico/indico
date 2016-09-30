@@ -81,9 +81,9 @@ class AbstractReviewingSettingsForm(IndicoForm):
 
     scale_lower = IntegerField(_('Scale (from)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
     scale_upper = IntegerField(_('Scale (to)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
-    conveners_final_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
-                                            description=_('Enabling this allows track conveners to make a final '
-                                                          'judgment such as accepting or rejecting an abstract.'))
+    allow_convener_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
+                                           description=_('Enabling this allows track conveners to make a judgment '
+                                                         'such as accepting or rejecting an abstract.'))
     abstract_review_questions = AbstractReviewQuestionsField(_('Review questions'))
 
     def __init__(self, *args, **kwargs):
