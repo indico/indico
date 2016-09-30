@@ -29,7 +29,7 @@
     }
 
     .person-list {
-        @extend %i-box-cancel-horizontal-padding;
+        @extend %i-box-cancel-horizontal-margin;
     }
 
     .nobody-placeholder {
