@@ -19,15 +19,15 @@ from __future__ import unicode_literals
 from datetime import time
 
 from markupsafe import escape
-from wtforms.fields import StringField, TextAreaField, BooleanField, HiddenField
+from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange
 
 from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoDateTimeField, EmailListField
-from indico.web.forms.widgets import SwitchWidget, DropzoneWidget
+from indico.web.forms.fields import IndicoDateTimeField, EmailListField, FileField
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime, UsedIf
 from indico.util.i18n import _
 
@@ -112,8 +112,6 @@ class TextForm(IndicoForm):
 
 
 class ImportQuestionnaireForm(IndicoForm):
-    json_file = HiddenField(_('File'),
-                            description=_("Choose a previously exported survey content to import."
-                                          " Existing sections will be preserved."),
-                            widget=DropzoneWidget(max_files=1, submit_form=False,
-                                                  accepted_file_types="application/json,.json"))
+    json_file = FileField(_('File'), max_files=1, accepted_file_types="application/json,.json",
+                          description=_("Choose a previously exported survey content to import. "
+                                        "Existing sections will be preserved."))

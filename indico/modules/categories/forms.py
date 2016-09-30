@@ -28,9 +28,9 @@ from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
-                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField, JSONField,
+                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField, FileField,
                                      HiddenFieldList, MultipleItemsField, IndicoMarkdownField)
-from indico.web.forms.widgets import DropzoneWidget, SwitchWidget, HiddenCheckbox
+from indico.web.forms.widgets import SwitchWidget, HiddenCheckbox
 
 
 class CategorySettingsForm(IndicoForm):
@@ -82,18 +82,16 @@ class CategorySettingsForm(IndicoForm):
 
 
 class CategoryIconForm(IndicoForm):
-    icon = JSONField("Icon", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-                                                   max_files=1, submit_form=False,  add_remove_links=False,
-                                                   handle_flashes=True),
+    icon = FileField("Icon", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', max_files=1,
+                     add_remove_links=False, handle_flashes=True,
                      description=_("Small icon that will show up next to category names in overview pages. Will be "
                                    "automatically resized to 16x16 pixels. This may involve loss of image quality, "
                                    "so try to upload images as close as possible to those dimensions."))
 
 
 class CategoryLogoForm(IndicoForm):
-    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-                                                   max_files=1, submit_form=False, add_remove_links=False,
-                                                   handle_flashes=True),
+    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', max_files=1,
+                     add_remove_links=False, handle_flashes=True,
                      description=_("Logo that will show up next to the category description. Will be "
                                    "automatically resized to at most 200x200 pixels."))
 

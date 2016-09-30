@@ -266,35 +266,3 @@ class ColorPickerWidget(JinjaWidget):
 
     def __call__(self, field, **kwargs):
         return super(ColorPickerWidget, self).__call__(field, input_args=kwargs)
-
-
-class DropzoneWidget(JinjaWidget):
-    """Renders a dropzone file upload field"""
-
-    def __init__(self, post_url=None, max_file_size=None, max_files=10, add_remove_links=True, accepted_file_types=None,
-                 param_name='file', submit_form=False, handle_flashes=False, lightweight=False):
-        super(DropzoneWidget, self).__init__('forms/dropzone_widget.html')
-
-        config = Config.getInstance()
-
-        if max_file_size is None:
-            max_file_size = min(config.getMaxUploadFileSize() or 10240,
-                                config.getMaxUploadFilesTotalSize() or 10240)  # in MB
-
-        self.options = {
-            'url': post_url,
-            'uploadMultiple': max_files > 1,
-            'maxFilesize': max_file_size,
-            'maxFiles': max_files,
-            'addRemoveLinks': add_remove_links,
-            'acceptedFiles': accepted_file_types,
-            'paramName': param_name,
-            'submitForm': submit_form,
-            'parallelUploads': max_files,
-            'handleFlashes': handle_flashes
-        }
-        self.lightweight = lightweight
-
-    def __call__(self, field, **kwargs):
-        return super(DropzoneWidget, self).__call__(field, input_args=kwargs, options=self.options,
-                                                    lightweight=self.lightweight)
