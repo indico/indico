@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 import mimetypes
 import textwrap
@@ -149,6 +149,8 @@ class AbstractMigration(object):
         self.question_map = {}
         self.email_template_map = {}
         self.legacy_warnings_shown = set()
+        self.old_scale = None
+        self.new_scale = None
 
     def __repr__(self):
         return '<AbstractMigration({})>'.format(self.event)
@@ -267,9 +269,14 @@ class AbstractMigration(object):
             old_settings = self.conf._confAbstractReview
         except AttributeError:
             return
+        self.old_scale = (int(old_settings._scaleLower), int(old_settings._scaleHigher))
+        if self.old_scale[1] - self.old_scale[0] <= 20:
+            self.new_scale = self.old_scale
+        else:
+            self.new_scale = (0, 10)
         abstracts_reviewing_settings.set_multi(self.event, {
-            'scale_lower': int(old_settings._scaleLower),
-            'scale_upper': int(old_settings._scaleHigher),
+            'scale_lower': self.new_scale[0],
+            'scale_upper': self.new_scale[1],
             'conveners_final_judgment': bool(getattr(old_settings, '_canReviewerAccept', False))
         })
         for pos, old_question in enumerate(old_settings._reviewingQuestions, 1):
@@ -594,11 +601,23 @@ class AbstractMigration(object):
                         self.importer.print_warning(
                             cformat("%{blue!}Abstract {}: {yellow}answer for deleted question").format(
                                 abstract.friendly_id), event_id=self.event.id)
-                    rating = AbstractReviewRating(question=question, value=old_answer._rbValue)
+                    rating = AbstractReviewRating(question=question, value=self._convert_scale(old_answer))
                     review.ratings.append(rating)
                     answered_questions.add(old_answer._question)
 
                 abstract.reviews.append(review)
+
+    def _convert_scale(self, old_answer):
+        old_value = float(old_answer._value)
+        old_min, old_max = self.old_scale
+        new_min, new_max = self.new_scale
+        new_value = int(round((((old_value - old_min) * (new_max - new_min)) / (old_max - old_min)) + new_min))
+        if int(old_value) != new_value:
+            self.importer.print_warning(cformat('Adjusted value: %{cyan}{} [{}..{}] %{white}==> %{cyan!}{} [{}..{}]')
+                                        .format(old_value, self.old_scale[0], self.old_scale[1],
+                                                new_value, self.new_scale[0], self.new_scale[1]),
+                                        always=False, event_id=self.event.id)
+        return new_value
 
     def _migrate_abstract_email_log(self, abstract, zodb_abstract):
         for old_entry in zodb_abstract._notifLog._entries:
