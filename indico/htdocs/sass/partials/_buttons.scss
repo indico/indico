@@ -101,7 +101,7 @@
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient(#0DA500, #0B8D00);
-            border-color: #999;
+            border-color: $dark-green;
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
             color: #FDFDFD !important;
         }
