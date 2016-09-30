@@ -57,11 +57,11 @@
 
 .side-menu {
     @extend %font-family-title;
-    font-size: 1.1em;
     @include user-select(none);
-    border-radius: 2px;
-    border: 1px solid lightgray;
     @include single-box-shadow();
+    @include border-all();
+    @include border-radius();
+    font-size: 1.1em;
 
     ul.menu-items > li.section {
         padding: 0;
@@ -92,8 +92,8 @@
         margin: 0;
 
         > li {
+            @include border-bottom();
             display: block;
-            border-bottom: 1px solid darken($pastel-gray, 2%);
             margin: 0;
 
             &.disabled {
