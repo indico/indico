@@ -11,8 +11,9 @@
     {% else %}
         {% set contribution_links = contribution_links|selectattr('author_type') %}
     {% endif %}
+    {% set contribution_links = contribution_links|sort(attribute='contribution.title')|sort(attribute='author_type.value') %}
     <ul class="author-links">
-        {% for link in contribution_links|sort(attribute='author_type.value') if not link.contribution.is_deleted %}
+        {% for link in contribution_links if not link.contribution.is_deleted %}
             {% set contribution = link.contribution %}
             <li>
                 <span class="contrib-role">
