@@ -181,7 +181,7 @@ class AbstractForm(IndicoForm):
                                               blank_text=_("No type selected"))
     person_links = AbstractPersonLinkListField(_("People"), [DataRequired()])
     submission_comment = TextAreaField(_("Comments"))
-    attachments = FileField(_('Attachments'), param_name='attachments', lightweight=True)
+    attachments = FileField(_('Attachments'), param_name='attachments', multiple_files=True, lightweight=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
