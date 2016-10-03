@@ -38,10 +38,9 @@
 {% macro _render_person_list(authors, rendering) %}
     {% call(user_data) render_users(authors, separator='') %}
         <li>
-            <span class="speaker-item" data-searchable="{{ user_data.full_name | lower }}">
+            <span class="speaker-item" data-searchable="{{ user_data.display_full_name | lower }}">
                 <span class="name">
-                    {{ user_data.get_full_name(last_name_first=true, last_name_upper=false,
-                                               abbrev_first_name=false) }}
+                    {{ user_data.display_full_name }}
                 </span>
                 {% if user_data.affiliation -%}
                     <span class="affiliation" data-searchable="{{ user_data.affiliation | lower }}">

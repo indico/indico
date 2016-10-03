@@ -30,8 +30,7 @@
                     </span>
                 {%- endif %}
                 <a href="{{ url_for('contributions.display_author', user_data) }}">
-                    <span itemprop="givenName">{{ user_data.first_name }}</span>
-                    <span itemprop="lastName">{{ user_data.last_name }}</span>
+                    <span>{{ user_data.display_full_name }}</span>
                 </a>
                 {% if user_data.affiliation -%}
                     <span class="affiliation">

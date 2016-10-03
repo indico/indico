@@ -55,8 +55,7 @@
             {{ user_data.title }}
         </span>
     {%- endif %}
-    <span itemprop="givenName">{{ user_data.first_name }}</span>
-    <span itemprop="lastName">{{ user_data.last_name }}</span>
+    <span>{{ user_data.display_full_name }}</span>
     {% if user_data.affiliation -%}
         <span class="affiliation">
             ({#- -#}

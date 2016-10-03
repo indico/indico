@@ -36,6 +36,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
+from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.i18n import L_
@@ -298,6 +299,11 @@ class Registration(db.Model):
     def full_name(self):
         """Returns the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
+
+    @property
+    def display_full_name(self):
+        """Return the full name using the user's preferred name format."""
+        return format_display_full_name(session.user, self)
 
     @property
     def is_paid(self):

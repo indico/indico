@@ -55,7 +55,7 @@
                 </dt>
                 <dd>
                     {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
-                        <div>{{ speaker.full_name }}</div>
+                        <div>{{ speaker.display_full_name }}</div>
                     {%- endfor %}
                 </dd>
             {% endif %}

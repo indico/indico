@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="i-table">
                                     <a href="{{ url_for('.registration_details', registration) }}">
-                                        {{- registration.get_full_name() -}}
+                                        {{- registration.display_full_name -}}
                                     </a>
                                 </td>
                                 {% for item in static_columns %}
