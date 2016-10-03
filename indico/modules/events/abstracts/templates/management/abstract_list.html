@@ -40,15 +40,34 @@
                    data-ajax-dialog>
                     {% trans %}New abstract{% endtrans %}
                 </a>
-                <a class="i-button icon-remove js-requires-selected-row disabled js-delete-abstracts"
-                   data-href="{{ url_for('.manage_delete_abstracts', event) }}"
-                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                   data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}"
-                   data-title="{% trans %}Confirm deletion{% endtrans %}"
-                   data-method="POST">
+                <a class="i-button arrow icon-remove js-requires-selected-row disabled"
+                   data-toggle="dropdown">
                     {%- trans %}Remove{% endtrans -%}
                 </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="js-requires-selected-row"
+                           data-href="{{ url_for('.manage_delete_abstracts', event) }}"
+                           data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                           data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                           data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}"
+                           data-title="{% trans %}Confirm deletion{% endtrans %}"
+                           data-method="POST">
+                            {% trans %}Abstracts{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="js-requires-selected-row"
+                           data-href="{{ url_for('.manage_delete_abstracts', event, delete_contribs=1) }}"
+                           data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                           data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                           data-confirm="{% trans %}Do you really want to delete the selected abstracts and their linked contributions?{% endtrans %}"
+                           data-title="{% trans %}Confirm deletion{% endtrans %}"
+                           data-method="POST">
+                            {% trans %}Abstracts & linked contributions{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
                 <a class="i-button icon-checkmark js-requires-selected-row js-dialog-action accept">
                     {% trans %}Accept{% endtrans %}
                 </a>
