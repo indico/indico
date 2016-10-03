@@ -4,7 +4,7 @@
         <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id" {{ 'disabled' if not person.email }}>
     </td>
     <td class="i-table name-column">
-        {{ person.get_full_name(last_name_first=true, last_name_upper=false, abbrev_first_name=false) }}
+        {{ person.display_full_name }}
     </td>
     <td class="i-contributiontable email-column">
         {{ person.email }}

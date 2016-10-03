@@ -42,11 +42,12 @@ user_settings = UserSettingsProxy('users', {
     'timezone': None,
     'force_timezone': False,  # always use the user's timezone instead of an event's timezone
     'show_past_events': False,
+    'name_format': NameFormat.first_last,
     'use_previewer_pdf': True,
     'synced_fields': None,  # None to synchronise all fields, empty set to not synchronize
     'suggest_categories': False  # whether the user should receive category suggestions
 }, converters={
-    'name_format': EnumConverter(NameFormat.first_last)
+    'name_format': EnumConverter(NameFormat)
 })
 
 user_management_settings = SettingsProxy('user_management', {
