@@ -79,14 +79,13 @@ class LayoutForm(IndicoForm):
 
 
 class LogoForm(IndicoForm):
-    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', max_files=1,
-                     add_remove_links=False, handle_flashes=True,
+    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', add_remove_links=False,
+                     handle_flashes=True,
                      description=_("Logo to be displayed next to the event's title"))
 
 
 class CSSForm(IndicoForm):
-    css_file = FileField(_("Custom CSS file"), accepted_file_types='.css', max_files=1, add_remove_links=False,
-                         handle_flashes=True)
+    css_file = FileField(_("Custom CSS file"), accepted_file_types='.css', add_remove_links=False, handle_flashes=True)
 
     def __init__(self, *args, **kwargs):
         super(CSSForm, self).__init__(*args, **kwargs)
@@ -128,7 +127,7 @@ class MenuPageForm(MenuUserEntryFormBase):
 
 
 class AddImagesForm(IndicoForm):
-    image = FileField("Image", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
+    image = FileField("Image", multiple_files=True, accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
 
 
 class CSSSelectionForm(IndicoForm):
