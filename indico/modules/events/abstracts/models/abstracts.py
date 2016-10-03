@@ -57,11 +57,13 @@ class AbstractPublicState(TitledIntEnum):
 
 
 class AbstractReviewingState(TitledIntEnum):
-    __titles__ = [_("Not Started"), _("Positive"), _("Negative"), _("Mixed")]
+    __titles__ = [_("Not Started"), _("In progress"), _("Positive"), _("Conflicting"), _("Negative"), _("Mixed")]
     not_started = 0
-    positive = 1
-    negative = 2
-    mixed = 3
+    in_progress = 1
+    positive = 2
+    conflicting = 3
+    negative = 4
+    mixed = 5
 
 
 class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
@@ -344,12 +346,16 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def reviewing_state(self):
         if not self.reviews:
             return AbstractReviewingState.not_started
-        rejections = any(x.action == AbstractAction.reject for x in self.reviews)
-        acceptances = any(x.action == AbstractAction.accept for x in self.reviews)
-        if acceptances and not rejections:
-            return AbstractReviewingState.positive
-        elif rejections and not acceptances:
+        track_reviews = {x: self.get_track_reviewing_state(x) for x in self.reviewed_for_tracks}
+        if any(x == AbstractReviewingState.not_started for x in track_reviews.itervalues()):
+            return AbstractReviewingState.in_progress
+        elif all(x == AbstractReviewingState.negative for x in track_reviews.itervalues()):
             return AbstractReviewingState.negative
+        elif all(x == AbstractReviewingState.positive for x in track_reviews.itervalues()):
+            if len(self.reviewed_for_tracks) == 1:
+                return AbstractReviewingState.positive
+            else:
+                return AbstractReviewingState.conflicting
         else:
             return AbstractReviewingState.mixed
 
