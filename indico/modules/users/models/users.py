@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import flash
+from flask import flash, session
 from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -54,6 +54,19 @@ class UserTitle(TitledIntEnum):
     @classmethod
     def from_legacy(cls, text):
         return next((x for x in cls if unicode(x.title) == text), None)
+
+
+class NameFormat(TitledIntEnum):
+    __titles__ = (_('John Doe'), _('Doe, John'), _('Doe, J.'), _('J. Doe'),
+                  _('John DOE'), _('DOE, John'), _('DOE, J.'), _('J. DOE'))
+    first_last = 0
+    last_first = 1
+    last_f = 2
+    f_last = 3
+    first_last_upper = 4
+    last_first_upper = 5
+    last_f_upper = 6
+    f_last_upper = 7
 
 
 class PersonMixin(object):
@@ -107,6 +120,11 @@ class PersonMixin(object):
         """Return the person's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
 
+    @property
+    def display_full_name(self):
+        """Return the person's name in format specified in user settings"""
+        return format_display_full_name(session.user, self)
+
     # Convenience property to have a canonical `name` property
     name = full_name
 
@@ -120,6 +138,22 @@ syncable_fields = {
     'address': _("address"),
     'phone': _("phone number")
 }
+
+
+def format_display_full_name(user, obj):
+    name_format = user.settings.get('name_format') if user else NameFormat.first_last
+    upper = name_format in (NameFormat.first_last_upper, NameFormat.f_last_upper, NameFormat.last_f_upper,
+                            NameFormat.last_first_upper)
+    if name_format in (NameFormat.first_last, NameFormat.first_last_upper):
+        return obj.get_full_name(last_name_first=False, last_name_upper=upper, abbrev_first_name=False)
+    elif name_format in (NameFormat.last_first, NameFormat.last_first_upper):
+        return obj.get_full_name(last_name_first=True, last_name_upper=upper, abbrev_first_name=False)
+    elif name_format in (NameFormat.last_f, NameFormat.last_f_upper):
+        return obj.get_full_name(last_name_first=True, last_name_upper=upper, abbrev_first_name=True)
+    elif name_format in (NameFormat.f_last, NameFormat.f_last_upper):
+        return obj.get_full_name(last_name_first=False, last_name_upper=upper, abbrev_first_name=True)
+    else:
+        raise ValueError('Invalid name format: {}'.format(name_format))
 
 
 class User(PersonMixin, db.Model):

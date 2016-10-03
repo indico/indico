@@ -21,9 +21,10 @@ from flask import session, render_template
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.notifications import send_email, make_email
+from indico.core.settings.converters import EnumConverter
 from indico.core.settings.core import SettingsProxy
 from indico.modules.users.ext import ExtraUserPreferences
-from indico.modules.users.models.users import User
+from indico.modules.users.models.users import User, NameFormat
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
@@ -44,6 +45,8 @@ user_settings = UserSettingsProxy('users', {
     'use_previewer_pdf': True,
     'synced_fields': None,  # None to synchronise all fields, empty set to not synchronize
     'suggest_categories': False  # whether the user should receive category suggestions
+}, converters={
+    'name_format': EnumConverter(NameFormat.first_last)
 })
 
 user_management_settings = SettingsProxy('user_management', {
