@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import weakref
 
 from flask import request, session, flash, g
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
@@ -77,7 +77,7 @@ class IndicoFormMeta(FormMeta):
         return ext_cls(*args, **kwargs)
 
 
-class IndicoForm(Form):
+class IndicoForm(FlaskForm):
     __metaclass__ = IndicoFormMeta
 
     class Meta:
