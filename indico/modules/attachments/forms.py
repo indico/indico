@@ -63,11 +63,11 @@ class EditAttachmentFormBase(AttachmentFormBase):
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):
-    files = FileField(_("Files"))
+    files = FileField(_("Files"), multiple_files=True)
 
 
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    file = FileField(_("File"), max_files=1, add_remove_links=False,
+    file = FileField(_("File"), add_remove_links=False,
                      description=_("Already uploaded file. Replace it by adding a new file."))
 
 
