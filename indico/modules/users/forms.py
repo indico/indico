@@ -28,7 +28,7 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import UserTitle
+from indico.modules.users.models.users import UserTitle, NameFormat
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
 from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField
@@ -58,6 +58,9 @@ class UserPreferencesForm(IndicoForm):
         _('Show past events'),
         widget=SwitchWidget(),
         description=_('Show past events by default.'))
+
+    name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat,
+                                        description=_('Default format in which names are displayed'))
 
     use_previewer_pdf = BooleanField(
         _('Use previewer for PDF files'),
