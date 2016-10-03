@@ -199,7 +199,7 @@ class AbstractForm(IndicoForm):
 
 
 class SingleTrackMixin(object):
-    submitted_for_tracks = QuerySelectField(_("Tracks"), get_label=lambda x: x.title)
+    submitted_for_tracks = QuerySelectField(_("Track"), get_label=lambda x: x.title, allow_blank=True)
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
@@ -207,7 +207,6 @@ class SingleTrackMixin(object):
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(SingleTrackMixin, self).__init__(*args, **kwargs)
         if not abstracts_settings.get(event, 'tracks_required'):
-            self.submitted_for_tracks.allow_blank = True
             self.submitted_for_tracks.blank_text = _('No track selected')
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
 
