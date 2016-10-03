@@ -52,6 +52,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
 
 def delete_abstract(abstract):
     abstract.is_deleted = True
+    abstract.contribution = None
     db.session.flush()
     signals.event.abstract_deleted.send(abstract)
     logger.info('Abstract %s deleted by %s', abstract, session.user)
