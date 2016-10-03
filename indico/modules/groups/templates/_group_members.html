@@ -1,5 +1,5 @@
 {% macro group_members(group) %}
-    {% set members = group.get_members()|sort(attribute='full_name') %}
+    {% set members = group.get_members()|sort(attribute='display_full_name') %}
     {% if not members %}
         <strong>{% trans %}There are no users in this group.{% endtrans %}</strong>
     {% else %}
@@ -16,7 +16,7 @@
             <tbody id="group-members">
                 {% for user in members %}
                     <tr>
-                        <td>{{ user.full_name }}</td>
+                        <td>{{ user.display_full_name }}</td>
                         <td>{{ user.email }}</td>
                         {% if group.is_local %}
                             <td>

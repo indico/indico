@@ -109,7 +109,7 @@ class RHPersonsList(RHPersonsBase):
     def get_person_list(cls):
         persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
                                        'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
-        return sorted(persons.viewvalues(), key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
+        return sorted(persons.viewvalues(), key=lambda x: x['person'].display_full_name.lower())
 
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
@@ -129,7 +129,7 @@ class RHPersonsList(RHPersonsBase):
 
         persons = self.get_persons()
         person_list = sorted(persons.viewvalues(),
-                             key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
+                             key=lambda x: x['person'].display_full_name.lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):

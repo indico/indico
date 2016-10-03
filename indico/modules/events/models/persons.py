@@ -401,7 +401,7 @@ class PersonLinkBase(PersonMixin, db.Model):
 
     @property
     def display_order_key(self):
-        return self.display_order, self.first_name, self.last_name
+        return self.display_order, self.display_full_name
 
     @hybrid_property
     def object(self):

@@ -56,9 +56,9 @@
         <td>
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
-                    {%- for participant in event.published_registrations -%}
+                    {%- for participant in event.published_registrations|sort(attribute='display_full_name') -%}
                         <li class="event-user {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %}checked-in{% endif %}">
-                            {{ participant.full_name }}
+                            {{ participant.display_full_name }}
                         </li>
                     {%- endfor -%}
                 </ul>

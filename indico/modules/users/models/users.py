@@ -122,7 +122,7 @@ class PersonMixin(object):
 
     @property
     def display_full_name(self):
-        """Return the person's name in format specified in user settings"""
+        """Return the full name using the user's preferred name format."""
         return format_display_full_name(session.user, self)
 
     # Convenience property to have a canonical `name` property
