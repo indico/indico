@@ -29,6 +29,7 @@ class FileField(Field):
     widget = JinjaWidget('forms/dropzone_widget.html')
 
     default_options = {
+        'multiple_files': False,
         'max_files': 10,
         'add_remove_links': True,
         'param_name': 'file',
@@ -45,12 +46,12 @@ class FileField(Field):
         if max_file_size is None:
             max_file_size = min(config.getMaxUploadFileSize() or 10240,
                                 config.getMaxUploadFilesTotalSize() or 10240)  # in MB
-
+        self.allow_multiple_files = kwargs.pop('multiple_files', self.default_options['multiple_files'])
         self.widget_options = {
             'url': kwargs.pop('post_url', None),
-            'uploadMultiple': kwargs.pop('max_files', self.default_options['max_files']) > 1,
+            'uploadMultiple': self.allow_multiple_files,
             'maxFilesize': max_file_size,
-            'maxFiles': kwargs.pop('max_files', self.default_options['max_files']),
+            'maxFiles': kwargs.pop('max_files', self.default_options['max_files']) if self.allow_multiple_files else 1,
             'addRemoveLinks': kwargs.pop('add_remove_links', self.default_options['add_remove_links']),
             'acceptedFiles': kwargs.pop('accepted_file_types', None),
             'paramName': kwargs.pop('param_name', self.default_options['param_name']),

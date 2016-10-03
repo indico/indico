@@ -112,6 +112,6 @@ class TextForm(IndicoForm):
 
 
 class ImportQuestionnaireForm(IndicoForm):
-    json_file = FileField(_('File'), max_files=1, accepted_file_types="application/json,.json",
+    json_file = FileField(_('File'), accepted_file_types="application/json,.json",
                           description=_("Choose a previously exported survey content to import. "
                                         "Existing sections will be preserved."))
