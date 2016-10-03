@@ -184,6 +184,8 @@ class RHCreateAbstract(RHAbstractListBase):
             data = form.data
             if isinstance(data['submitted_for_tracks'], Track):
                 data['submitted_for_tracks'] = {data['submitted_for_tracks']}
+            elif data['submitted_for_tracks'] is None:
+                data['submitted_for_tracks'] = set()
             abstract = create_abstract(self.event_new, *get_field_values(data))
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
