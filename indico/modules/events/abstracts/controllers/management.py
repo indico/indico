@@ -197,12 +197,20 @@ class RHCreateAbstract(RHAbstractListBase):
 
 class RHDeleteAbstracts(RHManageAbstractsActionsBase):
     def _process(self):
+        delete_contribs = request.values.get('delete_contribs') == '1'
+        deleted_contrib_count = 0
         for abstract in self.abstracts:
-            delete_abstract(abstract)
-        deleted_count = len(self.abstracts)
+            if delete_contribs and abstract.contribution:
+                deleted_contrib_count += 1
+            delete_abstract(abstract, delete_contribs)
+        deleted_abstract_count = len(self.abstracts)
         flash(ngettext("The abstract has been deleted.",
-                       "{count} abstracts have been deleted.", deleted_count)
-              .format(count=deleted_count), 'success')
+                       "{count} abstracts have been deleted.", deleted_abstract_count)
+              .format(count=deleted_abstract_count), 'success')
+        if deleted_contrib_count:
+            flash(ngettext("The linked contribution has been deleted.",
+                           "{count} linked contributions have been deleted.", deleted_contrib_count)
+                  .format(count=deleted_contrib_count), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
 
