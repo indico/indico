@@ -307,7 +307,7 @@ class ListGeneratorBase(object):
         """
         raise NotImplementedError
 
-    def _filter_list_entries(self):
+    def _filter_list_entries(self, query, filters):
         """Apply user's filters to query and return it."""
         raise NotImplementedError
 
