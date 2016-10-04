@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, namedtuple
 
 from flask import request, flash
+from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -103,7 +104,14 @@ class AbstractListGenerator(ListGeneratorBase):
     def _build_query(self):
         return (Abstract.query
                 .with_parent(self.event)
-                .order_by(Abstract.id))
+                .options(joinedload('accepted_track'),
+                         joinedload('accepted_contrib_type'),
+                         joinedload('submitted_contrib_type'),
+                         subqueryload('field_values'),
+                         subqueryload('submitted_for_tracks'),
+                         subqueryload('reviewed_for_tracks'),
+                         subqueryload('person_links'))
+                .order_by(Abstract.friendly_id))
 
     def _filter_list_entries(self, query, filters):
         criteria = []
