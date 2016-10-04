@@ -131,8 +131,8 @@
                                 {% endfor %}
                                 {% set data = abstract.data_by_field %}
                                 {% for item in dynamic_columns %}
-                                    <td class="i-table" data-text="{{ data[item.id].friendly_data }}">
-                                        {{ data[item.id].friendly_data }}
+                                    <td class="i-table" data-text="{{ data[item.id].friendly_data if item.id in data }}">
+                                        {{ data[item.id].friendly_data if item.id in data }}
                                     </td>
                                 {% endfor %}
                             </tr>
