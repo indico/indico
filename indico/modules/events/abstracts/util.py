@@ -53,7 +53,7 @@ class AbstractListGenerator(ListGeneratorBase):
         track_choices = {unicode(track.id): track.title for track in event.tracks}
         type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
         self.static_items = OrderedDict([
-            ('state', {'title': _('State'), 'filter_choices': {state.name: state.title for state in AbstractState}}),
+            ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
             ('authors', {'title': _('Primary authors')}),
             ('accepted_track', {'title': _('Accepted track'),
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
@@ -134,7 +134,6 @@ class AbstractListGenerator(ListGeneratorBase):
                 'accepted_track': Abstract.accepted_track_id,
                 'accepted_contrib_type': Abstract.accepted_contrib_type_id,
                 'submitted_contrib_type': Abstract.submitted_contrib_type_id,
-                'state': Abstract.state,
                 'submitted_for_tracks': Abstract.submitted_for_tracks,
                 'reviewed_for_tracks': Abstract.reviewed_for_tracks
             }
@@ -156,7 +155,9 @@ class AbstractListGenerator(ListGeneratorBase):
                     if ids:
                         column_criteria.append(column.in_(ids))
                 criteria.append(db.or_(*column_criteria))
-
+            if 'state' in item_filters:
+                states = [AbstractState(int(state)) for state in item_filters['state']]
+                criteria.append(Abstract.state.in_(states))
         if extra_filters:
             if extra_filters.get('multiple_tracks'):
                 submitted_for_count = (db.select([db.func.count()])
