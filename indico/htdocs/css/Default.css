@@ -76,9 +76,15 @@ pre {
     activating javascript code
 */
 
-a:link, .fakeLink {
-   color: #0b63a5;
+a:link,
+a:visited,
+.fakeLink {
    text-decoration: none;
+}
+
+a:not(.i-button),
+.fakeLink {
+   color: #0b63a5;
 }
 
 a.fakeLink span.infoBubble{
@@ -102,10 +108,6 @@ a.fakeLink:hover span.infoBubble{
     /*height: 150px; /* to decide the max */
 }
 
-a:visited {
-   color: #0b63a5;
-   text-decoration: none;
-}
 a:active {
    color: #E25300;
 }

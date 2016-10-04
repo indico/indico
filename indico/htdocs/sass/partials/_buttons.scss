@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$i-button-background-color: darken($light-gray, 5%);
+
 %button {
     @include user-select(none);
     @include border-radius();
@@ -22,18 +24,96 @@
     @include box-sizing(border-box);
     display: inline-block;
     cursor: pointer;
-    color: $light-black !important;
+    color: $light-black;
     outline: none;
     text-align: center;
     vertical-align: middle;
 }
 
 %button-disabled {
-    border-color: $default-border-color;
-    background: #EAEAEA;
-    box-shadow: none;
+    border-color: $default-border-color !important;
+    background: $i-button-background-color !important;
+    box-shadow: none !important;
     color: $gray !important;
     cursor: default;
+}
+
+@mixin _i-button-borderless($color, $dark-color) {
+    &.borderless {
+        box-shadow: none !important;
+        background: none !important;
+        border-color: transparent !important;
+        color: $color;
+
+        &:hover,
+        &:active {
+            color: $dark-color;
+        }
+    }
+}
+
+@mixin _i-button-outlines($color, $dark-color) {
+    &.outline {
+        color: $color;
+
+        &:hover,
+        &:active {
+            color: $dark-color;
+        }
+
+        &.full {
+            border-color: $color;
+            background: white;
+        }
+
+        &.dashed {
+            border-style: dashed;
+            background: white;
+        }
+
+        &.subtle:not(:hover):not(:active) {
+            box-shadow: none;
+            background: transparent;
+            border-color: transparent;
+        }
+    }
+}
+
+@mixin _i-button-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
+    $flavor-darkened-color: darken($flavor-color, 5%);
+    $no-modes: '';
+
+    @if $with-modes == true {
+        $no-modes: ':not(.borderless):not(.outline)';
+    }
+
+    &:not(.label)#{$no-modes} {
+        background: $flavor-color;
+        border-color: $border-color;
+        color: $font-color;
+
+        &:hover,
+        &:active {
+            border-color: $border-accent-color;
+            color: $font-accent-color;
+        }
+
+        &:hover {
+            @include gradient($flavor-color, $flavor-darkened-color);
+        }
+
+        &:active,
+        &.open {
+            @include gradient($flavor-darkened-color, $flavor-color);
+        }
+    }
+}
+
+@mixin i-button-flavor($flavor-color, $border-color) {
+    $flavor-darkened-color: darken($flavor-color, 5%);
+    @include _i-button-states($flavor-color, $border-color, $border-color, $light-gray, white);
+    @include _i-button-borderless($flavor-color, $flavor-darkened-color);
+    @include _i-button-outlines($flavor-color, $flavor-darkened-color);
 }
 
 @mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
@@ -58,21 +138,19 @@
     @extend %button;
     @include transition();
     @include transition-property(color);
-    background-color: #EAEAEA;
+    @include _i-button-states($i-button-background-color, $default-border-color, $gray, $light-black, $black, false);
+    @include _i-button-borderless($light-black, $black);
+    @include _i-button-outlines($light-black, $black);
     line-height: 1em;
     margin: 0;
     padding: 4px 10px 4px;
 
-    &:hover:not(.disabled):not(:disabled) {
-        @include gradient(#F7F7F7, #E2E2E2);
-        border-color: $gray;
+    &:hover {
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-        color: $black !important;
     }
 
-    &:active:not(.disabled):not(:disabled) {
-        @include gradient(#E2E2E2, #F7F7F7);
-        border-color: $default-border-color;
+    &:active,
+    &.open {
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
     }
 
@@ -93,100 +171,29 @@
     }
 
     &.accept {
-        &:not(.disabled):not(:disabled) {
-            color: #FDFDFD !important;
-            background: $green;
-            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
-        }
-
-        &:hover:not(.disabled):not(:disabled) {
-            @include gradient(#0DA500, #0B8D00);
-            border-color: $dark-green;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-            color: #FDFDFD !important;
-        }
+        @include i-button-flavor($green, $dark-green);
     }
 
-    &.danger:not(.light) {
-        &:not(.disabled):not(:disabled) {
-            background: $red;
-            border-color: $dark-red;
-            color: #FDFDFD !important;
-        }
-
-        &:hover:not(.disabled):not(:disabled) {
-            @include gradient(lighten($red, 5%), $red);
-            border-color: $dark-red;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-            color: #FDFDFD !important;
-        }
-
-        &:active:not(.disabled):not(:disabled) {
-            @include gradient(darken($red, 5%), $red);
-            border-color: $dark-red;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-        }
-    }
-
-    &.danger.light {
-        @include transition-property(box-shadow);
-        &:not(.disabled):not(:disabled) {
-            color: $red !important;
-        }
-
-        &:hover:not(.disabled):not(:disabled) {
-            border-color: $dark-red;
-            box-shadow: 0px 0px 2px rgba($red, 0.5);
-            color: $dark-red;
-        }
+    &.danger {
+        @include i-button-flavor($red, $dark-red);
     }
 
     &.highlight {
-        &:not(.disabled):not(:disabled) {
-            background: $blue;
-            border-color: $dark-blue;
-            color: #FDFDFD !important;
-        }
-
-        &:hover:not(.disabled):not(:disabled) {
-            @include gradient($blue, darken($blue, $color-variation));
-            border-color: $dark-blue;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-            color: #FDFDFD !important;
-        }
-
-        &:active:not(.disabled):not(:disabled) {
-            @include gradient(darken($blue, $color-variation), $blue);
-            border-color: $dark-blue;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-        }
+        @include i-button-flavor($blue, $dark-blue);
     }
 
     &.warning {
-        &:not(.disabled):not(:disabled) {
-            background: $yellow;
-            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
-            color: #EFEFEF !important;
-            font-weight: normal !important;
-        }
-
-        &:hover:not(.disabled):not(:disabled) {
-            @include gradient(#F3BB08, #E99E18);
-            color: #FDFDFD !important;
-            border-color: #999;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-        }
+        @include i-button-flavor($yellow, $dark-yellow);
     }
 
     &.label,
-    &.label:hover:not(.disabled):not(:disabled),
-    &.label:active:not(.disabled):not(:disabled) {
+    &.label:hover,
+    &.label:active {
         background: white;
-        border-color: $default-border-color !important;
-        box-shadow: none !important;
-        color: $dark-gray !important;
+        box-shadow: none;
+        color: $light-black;
         cursor: default;
-        font-weight: normal !important;
+        font-weight: normal;
 
         &.heavy {
             background: $light-gray;
@@ -194,21 +201,13 @@
 
         &.active {
             background-color: $light-yellow;
-            color: $dark-yellow !important;
-            border-color: $dark-yellow !important;
+            border-color: $dark-yellow;
+            color: $dark-yellow;
         }
-    }
 
-    &.clickable-label {
-        @extend .i-button.label;
-        cursor: pointer !important;
-    }
-
-    &.inconspicuous {
-        box-shadow: none !important;
-        background: transparent !important;
-        border: none;
-        padding: 4px;
+        &.clickable {
+            cursor: pointer;
+        }
     }
 }
 
