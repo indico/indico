@@ -79,19 +79,9 @@ $toolbar-thin-height: 1.9em;
         line-height: $toolbar-button-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
 
-        &.open {
-            color: $dark-gray !important;
-            background: #ddd;
-            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
-        }
-
-        &.arrow:last-of-type:not(.inconspicuous) {
+        &.arrow:last-of-type:not(.borderless) {
             border-right-width: 1px;
             border-right-style: solid;
-        }
-
-        &.arrow:last-of-type:not(.highlight):not(.accept):not(.danger):not(.warning) {
-            border-color: $default-border-color;
         }
     }
 
@@ -166,7 +156,8 @@ $toolbar-thin-height: 1.9em;
         @include border-radius(0);
         border-right-width: 0px;
 
-        &:not(.label):not(.disabled):not(:disabled) {
+        // i-button flavors don't change border color on hover
+        &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
             &:hover + .i-button {
                 border-left-color: $gray;
             }

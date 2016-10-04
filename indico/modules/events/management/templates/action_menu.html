@@ -7,7 +7,7 @@
                 <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
                    title="{% trans %}Clone event{% endtrans %}">Clone</a>
                 {% if clones %}
-                <a id="action-menu-clones-target" class="i-button clickable-label arrow" >{{ clones|length }}</a>
+                    <a id="action-menu-clones-target" class="i-button label clickable arrow">{{ clones|length }}</a>
                 {% endif %}
             </div>
 

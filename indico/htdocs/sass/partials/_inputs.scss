@@ -153,12 +153,9 @@ span[contenteditable] {
     input[type=radio] {
         display: none;
 
-        &:checked + label,
-        &:checked:disabled + label,
-        &:checked:not(:disabled) + label:hover {
-            @include gradient(#387EE5, #5D95EA);
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-            color: white !important;
+        &:checked + label {
+            @extend .i-button.highlight;
+            @extend .i-button.highlight.open;
         }
 
         &:first-child + label {
@@ -171,20 +168,13 @@ span[contenteditable] {
     }
 
     input[type=radio] {
-        &:checked + label:hover {
-            cursor: default !important;
-        }
-    }
-
-    label {
-        &:hover {
-            @include gradient(#E2E2E2, #F7F7F7);
-            border-color: $default-border-color !important;
-            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+        &:checked + label {
+            cursor: default;
         }
 
-        &:active {
-            @include gradient(#81ADEF, #A5C4F3);
+        &:checked + label:hover,
+        &:checked + label:active, {
+            @extend .i-button.highlight.open;
         }
     }
 }

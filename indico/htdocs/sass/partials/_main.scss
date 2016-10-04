@@ -112,7 +112,7 @@ div.main-breadcrumb {
         }
     }
 
-    a {
+    .path a {
         color: $light-black;
 
         &:hover {
@@ -143,36 +143,15 @@ div.session-bar {
 
     .i-button {
         &.protection-public {
-            background: $green;
-            border-color: $green;
-            color: #fff !important;
-
-            &:hover {
-                color: #fafafa !important;
-                background: lighten($green, 5%);
-            }
+            @extend .i-button.accept;
         }
 
         &.protection-restricted {
-            background: $red;
-            border-color: $red;
-            color: #fff !important;
-
-            &:hover {
-                color: #fafafa !important;
-                background: lighten($red, 5%);
-            }
+            @extend .i-button.danger;
         }
 
         &.protection-domainprotected {
-            background: $yellow;
-            border-color: $yellow;
-            color: #fff !important;
-
-            &:hover {
-                color: #fafafa !important;
-                background: lighten($yellow, 5%);
-            }
+            @extend .i-button.warning;
         }
     }
 
