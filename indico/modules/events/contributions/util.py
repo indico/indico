@@ -37,7 +37,6 @@ from indico.modules.attachments.util import get_attached_items
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_human_timedelta, format_datetime
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -116,9 +115,9 @@ class ContributionListGenerator(ListGeneratorBase):
         session_empty = {None: 'No session'}
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        session_choices = {unicode(s.id): s.title for s in self.list_event.sessions}
-        track_choices = {unicode(t.id): t.title for t in self.list_event.tracks}
-        type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
+        session_choices = {unicode(s.id): s.title for s in self.event.sessions}
+        track_choices = {unicode(t.id): t.title for t in self.event.tracks}
+        type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
@@ -132,10 +131,10 @@ class ContributionListGenerator(ListGeneratorBase):
 
         self.list_config = self._get_config()
 
-    def build_query(self):
+    def _build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
-        return (Contribution.query.with_parent(self.list_event)
+        return (Contribution.query.with_parent(self.event)
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
@@ -174,11 +173,11 @@ class ContributionListGenerator(ListGeneratorBase):
         return query.filter(*criteria)
 
     def get_list_kwargs(self):
-        contributions_query = self.build_query()
+        contributions_query = self._build_query()
         total_entries = contributions_query.count()
         contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
-        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.list_event.sessions]
-        tracks = [{'id': int(t.id), 'title': t.title} for t in self.list_event.tracks]
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
+        tracks = [{'id': int(t.id), 'title': t.title} for t in self.event.tracks]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
@@ -200,7 +199,7 @@ class ContributionListGenerator(ListGeneratorBase):
         contribs = contrib_list_kwargs['contribs']
         filter_statistics = tpl_lists.render_filter_statistics(len(contribs), total_entries,
                                                                contrib_list_kwargs.pop('total_duration'))
-        return {'html': tpl_contrib.render_contrib_list(self.list_event, total_entries, **contrib_list_kwargs),
+        return {'html': tpl_contrib.render_contrib_list(self.event, total_entries, **contrib_list_kwargs),
                 'hide_contrib': contrib not in contribs if contrib else None,
                 'filter_statistics': filter_statistics}
 
@@ -314,6 +313,6 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
         contribs = contrib_list_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
-        tz = timezone(DisplayTZ(session.user, self.list_event.as_legacy).getDisplayTZ())
-        return {'html': tpl.render_contribution_list(self.list_event, tz, contribs),
+        tz = timezone(DisplayTZ(session.user, self.event.as_legacy).getDisplayTZ())
+        return {'html': tpl.render_contribution_list(self.event, tz, contribs),
                 'counter': tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)}

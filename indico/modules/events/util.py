@@ -247,7 +247,7 @@ class ListGeneratorBase(object):
 
     def __init__(self, event, entry_parent=None):
         #: The event the list is associated with
-        self.list_event = event
+        self.event = event
         #: The parent object of the list items
         self.entry_parent = entry_parent or event
         #: Columns that originate from the list item's properties,
@@ -270,7 +270,7 @@ class ListGeneratorBase(object):
         session_key = self._get_config_session_key()
         if self.static_link_used:
             uuid = request.args['config']
-            configuration = StaticListLink.load(self.list_event, self.list_link_type, uuid)
+            configuration = StaticListLink.load(self.event, self.list_link_type, uuid)
             if configuration and configuration['entry_parent_id'] == self.entry_parent.id:
                 session[session_key] = configuration['data']
         return session.get(session_key, self.default_list_config)
@@ -303,7 +303,7 @@ class ListGeneratorBase(object):
         The query should not take into account the user's filtering
         configuration, for example::
 
-            return Contribution.query.with_parent(self.list_event)
+            return Contribution.query.with_parent(self.event)
         """
         raise NotImplementedError
 
@@ -340,7 +340,7 @@ class ListGeneratorBase(object):
             'data': session.get(session_key)
         }
         if configuration['data']:
-            link = StaticListLink.create(self.list_event, self.list_link_type, configuration)
+            link = StaticListLink.create(self.event, self.list_link_type, configuration)
             return self.get_list_url(uuid=link.uuid, external=True)
         else:
             return self.get_list_url(external=True)
