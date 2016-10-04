@@ -50,7 +50,7 @@ class AbstractListGenerator(ListGeneratorBase):
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
         track_choices = {unicode(track.id): track.title for track in event.tracks}
-        type_choices = {unicode(t.id): t.name for t in self.list_event.contribution_types}
+        type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
         self.static_items = OrderedDict([
             ('state', {'title': _('State'), 'filter_choices': {state.name: state.title for state in AbstractState}}),
             ('authors', {'title': _('Primary authors')}),
@@ -86,14 +86,14 @@ class AbstractListGenerator(ListGeneratorBase):
         """Return the contribution fields ordered by their position in the abstract form."""
 
         return (ContributionField.query
-                .with_parent(self.list_event)
+                .with_parent(self.event)
                 .filter(ContributionField.id.in_(item_ids))
                 .order_by(ContributionField.position)
                 .all())
 
     def _get_filters_from_request(self):
         filters = super(AbstractListGenerator, self)._get_filters_from_request()
-        for field in self.list_event.contribution_fields:
+        for field in self.event.contribution_fields:
             if field.field_type == 'single_choice':
                 options = request.form.getlist('field_{}'.format(field.id))
                 if options:
@@ -102,7 +102,7 @@ class AbstractListGenerator(ListGeneratorBase):
 
     def _build_query(self):
         return (Abstract.query
-                .with_parent(self.list_event)
+                .with_parent(self.event)
                 .order_by(Abstract.id))
 
     def _filter_list_entries(self, query, filters):
