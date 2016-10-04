@@ -18,7 +18,7 @@
 
 from MaKaC.conference import CategoryManager
 
-from MaKaC.services.implementation.base import ServiceBase
+from MaKaC.services.implementation.base import ServiceBase, LoggedOnlyService
 
 from MaKaC.common import search
 
@@ -36,7 +36,7 @@ from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 # User and group search
 #################################
 
-class SearchBase(ServiceBase):
+class SearchBase(LoggedOnlyService):
 
     def _checkParams(self):
         """ Checks for external authenticators
@@ -93,7 +93,7 @@ class SearchGroups(SearchBase):
         return fossilizedResults
 
 
-class SearchUsersGroups(ServiceBase):
+class SearchUsersGroups(LoggedOnlyService):
 
     def _getAnswer(self):
         results = {}
