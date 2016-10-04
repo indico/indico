@@ -65,7 +65,7 @@ class AbstractListGenerator(ListGeneratorBase):
                                        'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
             ('submitted_contrib_type', {'title': _('Submitted type'),
                                         'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            # TODO: Rating
+            ('score', {'title': _('Score')}),
             ('submitted_dt', {'title': _('Submission date')}),
             ('modified_dt', {'title': _('Modification date')})
         ])
@@ -110,7 +110,8 @@ class AbstractListGenerator(ListGeneratorBase):
                          subqueryload('field_values'),
                          subqueryload('submitted_for_tracks'),
                          subqueryload('reviewed_for_tracks'),
-                         subqueryload('person_links'))
+                         subqueryload('person_links'),
+                         subqueryload('reviews').joinedload('ratings'))
                 .order_by(Abstract.friendly_id))
 
     def _filter_list_entries(self, query, filters):

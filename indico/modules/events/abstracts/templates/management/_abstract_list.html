@@ -114,6 +114,14 @@
                                                 {% trans %}No track{% endtrans %}
                                             {% endif %}
                                         </td>
+                                    {% elif item.id == 'score' %}
+                                        <td class="i-table">
+                                            {% if abstract.score is not none %}
+                                                {{ abstract.score | round(1) }}
+                                            {% else %}
+                                                {% trans %}Not reviewed yet{% endtrans %}
+                                            {% endif %}
+                                        </td>
                                     {% elif item.id == 'submitted_dt' %}
                                         <td class="i-table"
                                             data-text="{{ abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}">
