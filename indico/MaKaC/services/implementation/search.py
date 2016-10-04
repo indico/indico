@@ -25,10 +25,10 @@ from indico.util.string import to_unicode, sanitize_email
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.search import searchUsers
 from MaKaC.fossils.user import IGroupFossil
-from MaKaC.services.implementation.base import ServiceBase
+from MaKaC.services.implementation.base import LoggedOnlyService
 
 
-class SearchBase(ServiceBase):
+class SearchBase(LoggedOnlyService):
     CHECK_HTML = False
 
     def _checkParams(self):
