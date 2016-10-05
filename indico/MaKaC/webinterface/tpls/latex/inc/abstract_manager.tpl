@@ -11,7 +11,7 @@
     \setdescription{leftmargin=2em,labelindent=2em}
 
     % if track_judgements and any(x[1] for x in track_judgements):
-        \textbf{${_("Track Judgements:") | latex_escape}}
+        \textbf{${_("Track Reviews:") | latex_escape}}
         \begin{description}
             % for track_name, judgement in track_judgements:
                 % if judgement:

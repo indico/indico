@@ -11,7 +11,7 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Abstract ID") | latex_escape} : \textbf {${abstract.getId()}}
+    ${_(u"Abstract ID") | latex_escape} : \textbf {${abstract.friendly_id}}
 }
 
 \vspace{2em}
@@ -20,18 +20,37 @@
     \textbf {
         \LARGE
         \sffamily
-        ${abstract.getTitle() | latex_escape}
+        ${abstract.title | latex_escape}
     }
 \end{center}
 
 \vspace{1em}
+
+{\bf
+    \noindent
+    \large
+    ${_("Content")}
+}
+\vspace{0.5em}
+
+\begin{addmargin}[1em]{1em}
+    %% Markdown content
+    \rmfamily {
+        \allsectionsfont{\rmfamily}
+        \sectionfont{\normalsize\rmfamily}
+        \subsectionfont{\small\rmfamily}
+        \small
+        ${md_convert(abstract.description)}
+    }
+    \vspace{1.5em}
+\end{addmargin}
 
 % for field in fields:
 
     {\bf
         \noindent
         \large
-        ${field.getCaption() | latex_escape}
+        ${field.title | latex_escape}
     }
     \vspace{0.5em}
 
@@ -42,11 +61,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            % if field._type == 'selection':
-                ${md_convert(abstract.getField(field.getId()))}
-            % else:
-                ${md_convert(unicode(abstract.getField(field.getId()).value or ''))}
-            % endif
+            ${md_convert(abstract.data_by_field[field.id].friendly_data if field.id in abstract.data_by_field else '')}
         }
         \vspace{1.5em}
     \end{addmargin}
@@ -55,9 +70,9 @@
 
 \vspace{1.5em}
 
-<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=abstract.getPrimaryAuthorsList()" />
-<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=abstract.getCoAuthorList()" />
-<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=abstract.getSpeakerList()" />
+<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=abstract.primary_authors" />
+<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=abstract.secondary_authors" />
+<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=abstract.speakers" />
 
 \vspace{0.5em}
 
@@ -81,11 +96,11 @@
 }
 % endif
 
-% if abstract.getComments():
+% if abstract.submission_comment:
     \vspace{0.5em}
     \textbf{${_("Comments:") | latex_escape}}
     \begin{addmargin}[1em]{1em}
-        ${abstract.getComments() | latex_escape}
+        ${abstract.submission_comment | latex_escape}
     \end{addmargin}
 % endif
 
@@ -95,6 +110,8 @@
 \vspace{0.5em}
 
 ${latex_escape(_("Submitted by {0} on {1}"), ignore_braces=True).format(
-    r"\textbf{{{0}}}".format(latex_escape(abstract.getSubmitter().getFullName())),
-    r"\textbf{{{0}}}".format(latex_escape(abstract.getSubmissionDate().strftime("%A %d %B %Y"))))}
-\fancyfoot[C]{\color{gray} ${_("Last modified:") | latex_escape} ${abstract.getModificationDate().strftime("%A %d %B %Y") | latex_escape}}
+    r"\textbf{{{0}}}".format(latex_escape(abstract.submitter.get_full_name(abbrev_first_name=False, show_title=True).encode('utf-8'))),
+    r"\textbf{{{0}}}".format(latex_escape(abstract.submitted_dt.strftime("%A %d %B %Y"))))}
+% if abstract.modified_dt:
+    \fancyfoot[C]{\color{gray} ${_("Last modified:") | latex_escape} ${abstract.modified_dt.strftime("%A %d %B %Y") | latex_escape}}
+% endif
