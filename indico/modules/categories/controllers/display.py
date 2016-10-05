@@ -463,7 +463,9 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         events = info['events']
 
         # Only categories with icons are listed in the sidebar
-        subcategories = {event.category for event in events if event.category.has_icon}
+        subcategory_ids = {event.category.effective_icon_data['source_id']
+                           for event in events if event.category.has_effective_icon}
+        subcategories = Category.query.filter(Category.id.in_(subcategory_ids))
 
         # Events spanning multiple days must appear on all days
         events = _flat_map(partial(self._process_multiday_events, info), events)

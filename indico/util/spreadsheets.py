@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import csv
 import re
+from functools import partial
 from io import BytesIO
 
 from markupsafe import Markup
@@ -40,11 +41,16 @@ def unique_col(name, id_):
     return name, id_
 
 
-def _prepare_header(header):
-    return header[0] if isinstance(header, tuple) else header
+def _prepare_header(header, as_unicode=True):
+    if isinstance(header, tuple):
+        header = header[0]
+    return header if as_unicode else header.encode('utf-8')
 
 
-def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+')):
+_prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
+
+
+def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
         data = ', '.join(data)
     elif isinstance(data, set):
@@ -69,7 +75,7 @@ def generate_csv(headers, rows):
     """
     buf = BytesIO()
     writer = csv.writer(buf)
-    writer.writerow(map(_prepare_header, headers))
+    writer.writerow(map(_prepare_header_utf8, headers))
     header_positions = {name: i for i, name in enumerate(headers)}
     assert all(len(row) == len(headers) for row in rows)
     for row in rows:

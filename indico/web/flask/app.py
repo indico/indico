@@ -28,7 +28,7 @@ from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
@@ -297,6 +297,14 @@ def inject_current_url(response):
     # Make the current URL available. This is useful e.g. in case of
     # AJAX requests that were redirected due to url normalization if
     # we need to know the actual URL
+    try:
+        # Werkzeug encodes header values as latin1 in Python2.
+        # In case of URLs containing utter garbage (usually a 404
+        # anyway) they may not be latin1-compatible so let's not
+        # add the header at all in this case instead of failing later
+        request.relative_url.encode('latin1')
+    except UnicodeEncodeError:
+        return response
     response.headers['X-Indico-URL'] = request.relative_url
     return response
 
@@ -308,7 +316,7 @@ def handle_404(exception):
             raise NotFound
         try:
             return send_from_directory(current_app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
-        except UnicodeEncodeError:
+        except (UnicodeEncodeError, BadRequest):
             raise NotFound
     except NotFound:
         if exception.description == NotFound.description:

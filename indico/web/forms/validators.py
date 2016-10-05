@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import re
 from datetime import timedelta
 
-from wtforms.validators import StopValidation, ValidationError, EqualTo
+from wtforms.validators import StopValidation, ValidationError, EqualTo, Regexp
 
 from indico.util.date_time import as_utc, format_datetime, format_time, now_utc, format_human_timedelta
 from indico.util.i18n import _, ngettext
@@ -280,3 +280,15 @@ class WordCount(object):
             else:
                 message = _('Field must have between {min} and {max} words.')
             raise ValidationError(message.format(min=self.min, max=self.max, length=count))
+
+
+class IndicoRegexp(Regexp):
+    """
+    Like the WTForms `Regexp` validator, but supports populating the
+    HTML5 `patttern` attribute (the regex may not use any non-standard
+    Python extensions such as named groups in this case).
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.client_side = kwargs.pop('client_side', True)
+        super(IndicoRegexp, self).__init__(*args, **kwargs)

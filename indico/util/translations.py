@@ -17,9 +17,11 @@
 
 from functools import wraps
 
+from indico.util.string import encode_if_unicode
+
 
 def ensure_str(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        return str(fn(*args, **kwargs))
+        return encode_if_unicode(fn(*args, **kwargs))
     return wrapper

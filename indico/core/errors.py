@@ -65,6 +65,9 @@ class IndicoError(Exception):
         else:
             return self.message
 
+    def __unicode__(self):
+        return str(self).decode('utf-8')
+
     def getMessage(self):
         return self.message
 

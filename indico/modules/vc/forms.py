@@ -25,7 +25,7 @@ from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.html5 import IntegerField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional, Regexp, ValidationError
+from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -34,7 +34,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import PrincipalListField, IndicoRadioField, EmailListField
-from indico.web.forms.validators import UsedIf, Exclusive
+from indico.web.forms.validators import UsedIf, Exclusive, IndicoRegexp
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget, SelectizeWidget
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
@@ -118,7 +118,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
     skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), IndicoRegexp(ROOM_NAME_RE)],
                        description=_('The name of the room. It can contain only alphanumerical characters, underscores '
                                      'and dashes. No spaces allowed.'))
 

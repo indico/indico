@@ -10,7 +10,9 @@
             {%- endif -%}
         </div>
     </div>
-    <div class="description">{{ block.session.description }}</div>
+    <div class="description" data-display-href="{{ url_for('sessions.display_session', block.session) }}">
+        {{ block.session.description }}
+    </div>
     <span class="hr"></span>
     <div class="section-title-container">
         <div class="title-header">

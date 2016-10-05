@@ -42,9 +42,7 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     # Get a pending user if there is one
     user = User.find_first(~User.is_deleted, User.is_pending,
                            User.all_emails.contains(db.func.any(list({email} | set(other_emails)))))
-    if user:
-        user.is_pending = False
-    else:
+    if not user:
         user = User()
 
     if email in user.secondary_emails:
@@ -54,6 +52,7 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     else:
         user.email = email
     user.populate_from_dict(data)
+    user.is_pending = False
     user.secondary_emails |= other_emails
     user.favorite_users.add(user)
     if identity is not None:

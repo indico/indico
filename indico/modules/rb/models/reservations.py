@@ -381,7 +381,7 @@ class Reservation(Serializer, db.Model):
         reservation.created_by_user = user
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
-            raise NoReportError(_('Reservation has no valid occurrences'))
+            raise NoReportError(_(u'Reservation has no valid occurrences'))
         notify_creation(reservation)
         return reservation
 
@@ -752,7 +752,7 @@ class Reservation(Serializer, db.Model):
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
-            raise NoReportError(_('Reservation has no valid occurrences'))
+            raise NoReportError(_(u'Reservation has no valid occurrences'))
 
         notify_modification(self, changes)
         return True

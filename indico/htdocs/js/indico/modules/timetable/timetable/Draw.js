@@ -682,7 +682,7 @@ function loadBalloonContent(self, api, editable) {
         }
         $content.find('.js-hide-balloon').on('click', hideBalloon);
         // Change the target of the qTip position in order to open it at the mouse position
-        api.options.position.target = 'mouse';
+        $content.closest('.qtip').trigger('qbubble:ajaxload');
     }, function(xhr, status, error) {
         if (xhr.status == 404) {
             handleErrorResponse(xhr);
@@ -726,6 +726,8 @@ function drawBalloon(self, evt, editable) {
         }
         location.href = url;
     } else {
+        var isBreak = self.eventData.entryType == 'Break';
+
         timetableBlock.qbubble({
             id: entryId.toString(),
             content: {
@@ -762,7 +764,7 @@ function drawBalloon(self, evt, editable) {
                 effect: false
             },
             style: {
-                classes: 'balloon-qtip'
+                classes: 'balloon-qtip ' + (editable ? 'edit-mode' : 'display-mode') + (isBreak ? ' no-details' : '')
             }
         });
     }
@@ -1526,3 +1528,20 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
     }
 );
+
+(function() {
+    'use strict';
+
+    $(document).on('qbubble:ajaxload', '.balloon-qtip.display-mode:not(.no-details)', function() {
+        var $description = $(this).find('.description');
+        $description.on('click', function(e) {
+            var newTab = e.which == 2;  // Middle click
+            var url = $(this).data('displayHref');
+            if (newTab) {
+                window.open(url, '_blank');
+            } else {
+                window.location.href = url;
+            }
+        });
+    });
+})();

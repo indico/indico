@@ -86,12 +86,17 @@
         }
     }
 
+    &.no-details .description {
+        cursor: auto;
+    }
+
     .description {
         position: relative;
         font-style: italic;
         color: $dark-gray;
         max-height: 10em;
         overflow: hidden;
+        cursor: pointer;
 
         &:before {
             content: '';
@@ -100,7 +105,8 @@
             left: 0;
             top: 0;
             position: absolute;
-            background: linear-gradient(transparent 0.4em, white 8.2em)
+            background: linear-gradient(transparent 0.4em, white 8.2em);
+            pointer-events: none;
         }
     }
 

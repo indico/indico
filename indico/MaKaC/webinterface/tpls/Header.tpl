@@ -72,7 +72,13 @@ ${ template_hook('global-announcement') }
 
         <a class="arrow js-dropdown" href="#" data-toggle="dropdown">${ _("Help") }</a>
         <ul class="dropdown">
-            <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
+            <li>
+                <a style="color: #777; cursor: initial;"
+                   ## href="${ urlHandlers.UHConferenceHelp.getURL() }"
+                   title="We are working on updating the documentation. Stay tuned!">
+                    ${ _("Indico help") }
+                </a>
+            </li>
             % if show_contact:
                 <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
             % endif
