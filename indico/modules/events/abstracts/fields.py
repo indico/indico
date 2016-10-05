@@ -16,18 +16,24 @@
 
 from __future__ import unicode_literals
 
+from flask import jsonify, request, session
+from werkzeug.exceptions import BadRequest
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+
+from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
-from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.abstracts.util import serialize_abstract_person_link
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.web.forms.base import AjaxFieldMixin
 from indico.web.forms.fields import MultipleItemsField, JSONField
-from indico.web.forms.widgets import JinjaWidget
+from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
 
 
 class EmailRuleListField(JSONField):
@@ -135,3 +141,54 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                     person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
                 raise ValueError(_("{} has no role").format(person_link.full_name))
+
+
+class AbstractField(AjaxFieldMixin, QuerySelectField):
+    """A selectize-based field to select an abstract from an event."""
+
+    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title')
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('allow_blank', True)
+        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter #id or search string'))
+        kwargs['query_factory'] = self._get_query
+        kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
+        self.excluded_abstract = None
+        super(AbstractField, self).__init__(*args, **kwargs)
+
+    def process_ajax(self):
+        query = self._get_query()
+        if 'id' in request.args:
+            query = query.filter_by(friendly_id=int(request.args['id']))
+        else:
+            q = request.args.get('q', '').strip()
+            if len(q) < 3:
+                raise BadRequest('An ID or query (min. 3 chars) must be provided')
+            query = query.filter(Abstract.title.ilike('%{}%'.format(escape_like(q))))
+        result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
+                   'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
+                  for abstract in query
+                  if abstract.can_access(session.user)]
+        return jsonify(result)
+
+    def _get_query(self):
+        query = Abstract.query.with_parent(self.event)
+        if self.excluded_abstract is not None:
+            query = query.filter(Abstract.id != self.excluded_abstract.id)
+        return query.order_by(Abstract.friendly_id)
+
+    def _get_object_list(self):
+        return [(key, abstract)
+                for key, abstract in super(AbstractField, self)._get_object_list()
+                if abstract.can_access(session.user)]
+
+    @property
+    def event(self):
+        # This cannot be accessed in __init__ since `get_form` is set
+        # afterwards (when the field gets bound to its form) so we
+        # need to access it through a property instead.
+        return self.get_form().event
+
+    @property
+    def search_url(self):
+        return self.get_ajax_url()
