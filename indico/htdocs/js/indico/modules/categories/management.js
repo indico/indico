@@ -133,7 +133,7 @@
 
         function restoreCategoryOrder(order) {
             $.each(order, function(index, id) {
-                $tbody.find('[data-category-id=' + id + ']').detach().appendTo($tbody);
+                $tbody.find('[data-category-id=' + id + ']').not('.js-move-category').detach().appendTo($tbody);
             });
         }
 
