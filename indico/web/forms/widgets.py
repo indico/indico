@@ -165,19 +165,33 @@ class SelectizeWidget(JinjaWidget):
     :param search_url: The URL used to retrieve items.
     :param min_trigger_length: Number of characters needed to start
                                searching for suggestions.
+    :param allow_by_id: Whether to allow `#123` searches regardless of
+                        the trigger length.  Such searches will be sent
+                        as 'id' instead of 'q' in the AJAX request.
+    :param value_field: The attribute of the response used as the
+                        field value.
+    :param label_field: The attribute of the response used as the
+                        item label.
+    :param search_field: The attribute of the response used to search
+                         in locally available data.
     """
 
-    def __init__(self, search_url=None, min_trigger_length=3):
+    def __init__(self, search_url=None, min_trigger_length=3, allow_by_id=False,
+                 value_field='id', label_field='name', search_field='name'):
         self.min_trigger_length = min_trigger_length
+        self.allow_by_id = allow_by_id
         self.search_url = search_url
+        self.value_field = value_field
+        self.label_field = label_field
+        self.search_field = search_field
         super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
 
     def __call__(self, field, **kwargs):
         choices = [{'name': field.data.name, 'id': field.data.id}] if field.data is not None else []
         options = {
-            'valueField': 'id',
-            'labelField': 'name',
-            'searchField': 'name',
+            'valueField': self.value_field,
+            'labelField': self.label_field,
+            'searchField': self.search_field,
             'persist': False,
             'options': choices,
             'create': False,
@@ -186,8 +200,10 @@ class SelectizeWidget(JinjaWidget):
         }
 
         options.update(kwargs.pop('options', {}))
-        return super(SelectizeWidget, self).__call__(field, options=options, search_url=self.search_url,
-                                                     min_trigger_length=self.min_trigger_length)
+        return super(SelectizeWidget, self).__call__(field, options=options,
+                                                     search_url=getattr(field, 'search_url', self.search_url),
+                                                     min_trigger_length=self.min_trigger_length,
+                                                     allow_by_id=self.allow_by_id, input_args=kwargs)
 
 
 class TypeaheadWidget(JinjaWidget):
