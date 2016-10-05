@@ -420,7 +420,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def get_track_reviewing_state(self, track):
         if track not in self.reviewed_for_tracks:
             raise ValueError("Abstract not in review for given track")
-        reviews = [x for x in self.reviews if x.track == track]
+        reviews = self.get_track_reviews(track)
         if not reviews:
             return AbstractReviewingState.not_started
         rejections = any(x.proposed_action == AbstractAction.reject for x in reviews)
@@ -431,6 +431,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return AbstractReviewingState.negative
         else:
             return AbstractReviewingState.mixed
+
+    def get_track_reviews(self, track):
+        return [x for x in self.reviews if x.track == track]
 
     def get_track_score(self, track):
         if track not in self.reviewed_for_tracks:

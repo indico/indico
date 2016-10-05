@@ -26,7 +26,8 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHManageAbstractSubmission, RHManageAbstract,
                                                                     RHManageAbstractReviewing, RHCreateAbstract,
                                                                     RHDeleteAbstracts, RHAbstractPersonList,
-                                                                    RHAbstractsDownloadAttachments)
+                                                                    RHAbstractsDownloadAttachments,
+                                                                    RHAbstractsExportPDF)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -45,6 +46,8 @@ _bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings
 _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractList)
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/abstracts.pdf', 'abstracts_pdf_export', RHAbstractsExportPDF,
+                 methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', RHCreateAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', RHDeleteAbstracts, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/person-list', 'person_list', RHAbstractPersonList, methods=('POST',))

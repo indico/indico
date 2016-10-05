@@ -62,6 +62,7 @@ from MaKaC.common import utils
 
 from indico.core.db import db
 from indico.core.config import Config
+from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import create_event_logo_tmp_file
@@ -182,39 +183,29 @@ class AbstractToPDF(PDFLaTeXBase):
 
     @staticmethod
     def _get_track_classification(abstract):
-        status = abstract.getCurrentStatus()
-        if isinstance(status, review.AbstractStatusAccepted):
-            if status.getTrack() is not None:
-                return escape(status.getTrack().getTitle())
+        if abstract.state == AbstractState.accepted:
+            if abstract.accepted_track:
+                return escape(abstract.accepted_track.title)
         else:
-            listTrack = []
-            for track in abstract.getTrackListSorted():
-                listTrack.append(escape(track.getTitle()))
-            return "; ".join(listTrack)
+            tracks = sorted(abstract.submitted_for_tracks | abstract.reviewed_for_tracks, key=attrgetter('position'))
+            return u'; '.join(escape(t.title) for t in tracks)
 
     @staticmethod
     def _get_contrib_type(abstract):
-        status = abstract.getCurrentStatus()
-        if isinstance(status, review.AbstractStatusAccepted):
-            return status.getType()
-        else:
-            return abstract.getContribType()
+        is_accepted = abstract.state == AbstractState.accepted
+        return abstract.accepted_contrib_type if is_accepted else abstract.submitted_contrib_type
 
 
 class AbstractsToPDF(PDFLaTeXBase):
 
     _tpl_filename = "report.tpl"
 
-    def __init__(self, conf, abstract_ids, tz=None):
+    def __init__(self, conf, abstracts, tz=None):
         super(AbstractsToPDF, self).__init__()
         self._conf = conf
 
         if tz is None:
             self._tz = conf.getTimezone()
-
-        ab_mgr = conf.getAbstractMgr()
-
-        abstracts = [ab_mgr.getAbstractById(aid) for aid in abstract_ids]
 
         self._args.update({
             'conf': conf,
@@ -223,7 +214,7 @@ class AbstractsToPDF(PDFLaTeXBase):
             'get_track_classification': AbstractToPDF._get_track_classification,
             'get_contrib_type': AbstractToPDF._get_contrib_type,
             'items': abstracts,
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+            'fields': [f for f in conf.as_event.contribution_fields if f.is_active]
         })
 
 
@@ -235,65 +226,52 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         self._args.update({
             'doc_type': 'abstract_manager',
             'status': self._get_status(abstract),
-            'track_judgements': self._get_track_judgements(abstract)
+            'track_judgements': self._get_track_reviewing_states(abstract)
         })
 
     @staticmethod
     def _get_status(abstract):
-        status = abstract.getCurrentStatus()
-        #style = ParagraphStyle({})
-        #style.firstLineIndent = -90
-        #style.leftIndent = 90
-        if isinstance(status, review.AbstractStatusDuplicated):
-            original = status.getOriginal()
-            return _("DUPLICATED ({0}: {1})").format(original.getId(), original.getTitle())
-        elif isinstance(status, review.AbstractStatusMerged):
-            target = status.getTargetAbstract()
-            return _("MERGED ({0}: {1})").format(target.getId(), target.getTitle())
+        state_title = abstract.state.title.upper()
+        if abstract.state == AbstractState.duplicate:
+            return _(u"{} (#{}: {})").format(state_title, abstract.duplicate_of.friendly_id,
+                                             abstract.duplicate_of.title)
+        elif abstract.state == AbstractState.merged:
+            return _(u"{} (#{}: {})").format(state_title, abstract.merged_into.friendly_id, abstract.merged_into.title)
         else:
-            return AbstractStatusList.getInstance().getCaption(status.__class__).upper()
+            return abstract.state.title.upper()
 
     @staticmethod
-    def _get_track_judgements(abstract):
-        judgements = []
-
-        for track in abstract.getTrackListSorted():
-            status = abstract.getTrackJudgement(track)
-            if isinstance(status, review.AbstractAcceptance):
-                if status.getContribType() is None:
-                    contribType = ""
-                else:
-                    contribType = status.getContribType().name
-                st = _("Proposed to accept: {0}").format(contribType)
-
-            elif isinstance(status, review.AbstractRejection):
-                st = _("Proposed to reject")
-
-            elif isinstance(status, review.AbstractInConflict):
-                st = _("Conflict")
-
-            elif isinstance(status, review.AbstractReallocation):
-                l = []
-                for track in status.getProposedTrackList():
-                    l.append(track.getTitle())
-                st = _("Proposed for other tracks (%s)").format(", ".join(l))
-
-            else:
-                st = ""
-
-            judgements.append((track.getTitle(), st))
-        return judgements
+    def _get_track_reviewing_states(abstract):
+        reviews = []
+        for track in abstract.reviewed_for_tracks:
+            track_review_state = abstract.get_track_reviewing_state(track)
+            review_state = track_review_state.title
+            if track_review_state == AbstractReviewingState.positive:
+                track_reviews = abstract.get_track_reviews(track)
+                proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews}
+                contrib_types = u', '.join(proposed_contrib_types)
+                review_state = u'{}: {}'.format(review_state, contrib_types)
+            elif track_review_state == AbstractReviewingState.mixed:
+                track_reviews = abstract.get_track_reviews(track)
+                other_tracks = {x.title for r in track_reviews for x in r.proposed_tracks}
+                if other_tracks:
+                    review_state = _(u"{}: Proposed for other tracks: {}").format(review_state,
+                                                                                  u', '.join(other_tracks))
+            elif track_review_state not in {AbstractReviewingState.negative, AbstractReviewingState.conflicting}:
+                continue
+            reviews.append((track.title, review_state))
+        return reviews
 
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
-    def __init__(self, conf, abstract_ids, tz=None):
-        super(ConfManagerAbstractsToPDF, self).__init__(conf, abstract_ids, tz)
+    def __init__(self, conf, abstracts, tz=None):
+        super(ConfManagerAbstractsToPDF, self).__init__(conf, abstracts, tz)
 
         self._args.update({
             'doc_type': 'abstract_manager',
             'get_status': ConfManagerAbstractToPDF._get_status,
-            'get_track_judgements': ConfManagerAbstractToPDF._get_track_judgements
+            'get_track_judgements': ConfManagerAbstractToPDF._get_track_reviewing_states
         })
 
 

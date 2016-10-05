@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import defaultdict
+from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request
 
@@ -37,8 +38,10 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values, ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -255,3 +258,10 @@ class RHAbstractsDownloadAttachments(RHManageAbstractsActionsBase, ZipGeneratorM
     def _process(self):
         return self._generate_zip_file(self.abstracts, name_prefix='abstract-attachments',
                                        name_suffix=self.event_new.id)
+
+
+class RHAbstractsExportPDF(RHManageAbstractsActionsBase):
+    def _process(self):
+        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
+        pdf = ConfManagerAbstractsToPDF(self._conf, sorted_abstracts)
+        return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
