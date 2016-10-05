@@ -90,47 +90,46 @@ def get_object_from_args(args=None):
         return object_type, None, None
 
 
-def get_events_managed_by(user, from_dt=None, to_dt=None):
+def get_events_managed_by(user, dt=None):
     """Gets the IDs of events where the user has management privs.
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     :return: A set of event ids
     """
     query = (user.in_event_acls
              .join(Event)
              .options(noload('user'), noload('local_group'), load_only('event_id'))
-             .filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt))
+             .filter(~Event.is_deleted, Event.ends_after(dt))
              .filter(EventPrincipal.has_management_role('ANY')))
     return {principal.event_id for principal in query}
 
 
-def get_events_created_by(user, from_dt=None, to_dt=None):
+def get_events_created_by(user, dt=None):
     """Gets the IDs of events created by the user
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     :return: A set of event ids
     """
-    query = user.created_events.filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt)).options(load_only('id'))
+    query = (user.created_events
+             .filter(~Event.is_deleted, Event.ends_after(dt))
+             .options(load_only('id')))
     return {event.id for event in query}
 
 
-def get_events_with_linked_event_persons(user, from_dt=None, to_dt=None):
+def get_events_with_linked_event_persons(user, dt=None):
     """Returns a list of all events for which the user is an EventPerson
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     """
     query = (user.event_persons
              .options(load_only('event_id'))
              .options(noload('*'))
              .join(Event, Event.id == EventPerson.event_id)
              .filter(EventPerson.event_links.any())
-             .filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
+             .filter(~Event.is_deleted, Event.ends_after(dt)))
     return {ep.event_id for ep in query}
 
 

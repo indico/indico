@@ -595,6 +595,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         else:
             return True
 
+    @hybrid_method
+    def ends_after(self, dt):
+        """Check whether the event ends on/after the specified date"""
+        return self.end_dt >= dt if dt is not None else True
+
+    @ends_after.expression
+    def ends_after(cls, dt):
+        return cls.end_dt >= dt if dt is not None else True
+
     @hybrid_property
     def duration(self):
         return self.end_dt - self.start_dt

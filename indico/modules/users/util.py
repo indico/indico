@@ -100,8 +100,13 @@ def get_suggested_categories(user):
     return res
 
 
-def get_linked_events(user, from_dt, to_dt, limit=None):
-    """Get the linked events and the user's roles in them"""
+def get_linked_events(user, dt, limit=None):
+    """Get the linked events and the user's roles in them
+
+    :param user: A `User`
+    :param dt: Only include events taking place on/after that date
+    :param limit: Max number of events
+    """
     from indico.modules.events.contributions.util import get_events_with_linked_contributions
     from indico.modules.events.registration.util import get_events_registered
     from indico.modules.events.sessions.util import get_events_with_linked_sessions
@@ -109,20 +114,20 @@ def get_linked_events(user, from_dt, to_dt, limit=None):
     from indico.modules.events.util import (get_events_managed_by, get_events_created_by,
                                             get_events_with_linked_event_persons)
 
-    links = avatar_links.get_links(user, from_dt, to_dt) if redis_client else OrderedDict()
-    for event_id in get_events_registered(user, from_dt, to_dt):
+    links = avatar_links.get_links(user, dt) if redis_client else OrderedDict()
+    for event_id in get_events_registered(user, dt):
         links.setdefault(str(event_id), set()).add('registration_registrant')
-    for event_id in get_events_with_submitted_surveys(user, from_dt, to_dt):
+    for event_id in get_events_with_submitted_surveys(user, dt):
         links.setdefault(str(event_id), set()).add('survey_submitter')
-    for event_id in get_events_managed_by(user, from_dt, to_dt):
+    for event_id in get_events_managed_by(user, dt):
         links.setdefault(str(event_id), set()).add('conference_manager')
-    for event_id in get_events_created_by(user, from_dt, to_dt):
+    for event_id in get_events_created_by(user, dt):
         links.setdefault(str(event_id), set()).add('conference_creator')
-    for event_id, principal_roles in get_events_with_linked_sessions(user, from_dt, to_dt).iteritems():
+    for event_id, principal_roles in get_events_with_linked_sessions(user, dt).iteritems():
         links.setdefault(str(event_id), set()).update(principal_roles)
-    for event_id, principal_roles in get_events_with_linked_contributions(user, from_dt, to_dt).iteritems():
+    for event_id, principal_roles in get_events_with_linked_contributions(user, dt).iteritems():
         links.setdefault(str(event_id), set()).update(principal_roles)
-    for event_id in get_events_with_linked_event_persons(user, from_dt, to_dt):
+    for event_id in get_events_with_linked_event_persons(user, dt):
         links.setdefault(str(event_id), set()).add('conference_chair')
 
     query = (Event.query
