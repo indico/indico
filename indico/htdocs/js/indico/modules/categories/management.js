@@ -95,16 +95,6 @@
             }
         });
 
-        enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {
-            return $checkboxes.filter(':not([data-is-empty=true])').length == 0;
-        });
-        $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
-            suppress: false,
-            content: {
-                text: getBulkDeleteButtonTooltipContent
-            }
-        });
-
         enableIfChecked($tbody, checkboxSelector, $bulkMoveButton);
         $bulkMoveButton.qtip({
             suppress: false,
