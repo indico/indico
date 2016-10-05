@@ -375,12 +375,11 @@ def get_published_registrations(event):
             .all())
 
 
-def get_events_registered(user, from_dt=None, to_dt=None):
+def get_events_registered(user, dt=None):
     """Gets the IDs of events where the user is registered.
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     :return: A set of event ids
     """
     query = (user.registrations
@@ -389,7 +388,7 @@ def get_events_registered(user, from_dt=None, to_dt=None):
              .join(Registration.registration_form)
              .join(RegistrationForm.event_new)
              .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted,
-                     Event.starts_between(from_dt, to_dt)))
+                     Event.ends_after(dt)))
     return {registration.event_id for registration in query}
 
 

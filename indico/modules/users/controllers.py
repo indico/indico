@@ -128,7 +128,7 @@ class RHUserDashboard(RHUserBase):
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
-                         for event, roles in get_linked_events(self.user, from_dt, None, 10).iteritems()]
+                         for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,

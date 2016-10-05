@@ -119,13 +119,12 @@ def session_coordinator_priv_enabled(event, priv):
     return session_settings.get(event, COORDINATOR_PRIV_SETTINGS[priv])
 
 
-def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
+def get_events_with_linked_sessions(user, dt=None):
     """Returns a dict with keys representing event_id and the values containing
     data about the user rights for sessions within the event
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     """
     query = (user.in_session_acls
              .options(load_only('session_id', 'roles', 'full_access', 'read_access'))
@@ -133,7 +132,7 @@ def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
              .options(contains_eager(SessionPrincipal.session).load_only('event_id'))
              .join(Session)
              .join(Event, Event.id == Session.event_id)
-             .filter(~Session.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
+             .filter(~Session.is_deleted, ~Event.is_deleted, Event.ends_after(dt)))
     data = defaultdict(set)
     for principal in query:
         roles = data[principal.session.event_id]
