@@ -38,13 +38,12 @@ from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
 
 
-def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
+def get_events_with_linked_contributions(user, dt=None):
     """Returns a dict with keys representing event_id and the values containing
     data about the user rights for contributions within the event
 
     :param user: A `User`
-    :param from_dt: The earliest event start time to look for
-    :param to_dt: The latest event start time to look for
+    :param dt: Only include events taking place on/after that date
     """
     def add_acl_data():
         query = (user.in_contribution_acls
@@ -53,7 +52,7 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
                  .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
                  .join(Contribution)
                  .join(Event, Event.id == Contribution.event_id)
-                 .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
+                 .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.ends_after(dt)))
         for principal in query:
             roles = data[principal.contribution.event_id]
             if 'submit' in principal.roles:
@@ -74,7 +73,7 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
                  .options(load_only('id'))
                  .options(noload('*'))
                  .filter(~Event.is_deleted,
-                         Event.starts_between(from_dt, to_dt),
+                         Event.ends_after(dt),
                          Event.persons.any((EventPerson.user_id == user.id) & (has_contrib | has_subcontrib))))
         for event in query:
             data[event.id].add('contributor')
