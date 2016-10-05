@@ -23,26 +23,58 @@
             fieldId: null,
             minTriggerLength: 0,
             searchUrl: null,
-            selectizeOptions: null
+            selectizeOptions: null,
+            allowById: false
         }, options);
+
+        function getSearchData(query) {
+            var m;
+            if (options.allowById && (m = query.match(/^#(\d+)$/))) {
+                return {id: m[1]};
+            } else if (query.length >= options.minTriggerLength) {
+                return {q: query};
+            } else {
+                return null;
+            }
+        }
 
         var params = {
             load: function(query, callback) {
-                if (query.length < options.minTriggerLength) {
+                var data = getSearchData(query);
+                if (!data) {
                     return callback();
                 }
                 $.ajax(options.searchUrl, {
-                    data: {q: query},
+                    data: data,
                     cache: false
                 }).fail(function() {
                     callback();
                 }).done(function(res) {
                     callback(res);
                 });
+            },
+            score: function(query) {
+                var data = getSearchData(query);
+                if (data && data.id !== undefined) {
+                    return function(item) {
+                        return item.friendly_id === +data.id;
+                    };
+                } else {
+                    var scoreFunc = this.getScoreFunction(query);
+                    return function(item) {
+                        return scoreFunc(item);
+                    };
+                }
             }
         };
 
         _.extend(params, options.selectizeOptions);
-        $('#' + options.fieldId).selectize(params);
+        var $field = $('#' + options.fieldId);
+        $field.selectize(params);
+
+        // disallow removing options
+        $field[0].selectize.removeOption = function() {
+            return false;
+        };
     };
 })(window);
