@@ -25,9 +25,12 @@ from wtforms.validators import Length, NumberRange
 from indico.util.struct.enum import TitledEnum
 from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoEnumRadioField
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp
+from indico.web.forms.widgets import SelectizeWidget
 
 
 def is_single_line_field(field):
+    if isinstance(field.widget, SelectizeWidget):
+        return True
     if isinstance(field.widget, Select):
         return not field.widget.multiple
     if isinstance(field.widget, Input):

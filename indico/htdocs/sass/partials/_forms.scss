@@ -195,6 +195,9 @@ $i-form-button-line-height: 1.8;
     }
 
     @include apply-to-text-inputs('%form-field-input');
+    .selectize-control input[type=text] {
+        height: auto;
+    }
     textarea {
         @extend %form-field-input;
         height: auto;
