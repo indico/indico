@@ -386,7 +386,20 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return True
         if any(x.person.user == user for x in self.person_links):
             return True
-        return False
+        return self.can_review(user)
+
+    def can_review(self, user):
+        if not user:
+            return False
+        elif not self.event_new.can_manage(user, role='abstract_reviewer', explicit_role=True):
+            return False
+        else:
+            # The total number of tracks a user is reviewing (indico-wide) is usually
+            # reasonably low so we just access the relationship instead of sending a
+            # more specific query which would need to be cached to avoid repeating it
+            # when performing this check on many abstracts.
+            tracks = {t for t in user.reviewer_for_tracks if t.event_new == self.event_new}
+            return bool(tracks) and bool(tracks & self.reviewed_for_tracks)
 
     def can_edit(self, user):
         if not user:
