@@ -21,7 +21,7 @@ from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaFiel
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
-                                                    AbstractPersonLinkListField)
+                                                    AbstractPersonLinkListField, AbstractField)
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
