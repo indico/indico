@@ -45,6 +45,21 @@
 {% macro subcategories_table(subcategories) %}
     <div class="toolbar">
         <div class="group">
+            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#" data-select-all=".category-management input:checkbox[name=category_id]">
+                        {% trans %}All{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-select-none=".category-management input:checkbox[name=category_id]">
+                        {% trans %}None{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="group">
             {{ _create_category_button(classes='highlight icon-plus') }}
         </div>
         <div class="group">
