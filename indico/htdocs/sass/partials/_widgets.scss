@@ -63,6 +63,11 @@ i.info-helper {
     .ui-sortable-helper {
         display: table;
     }
+    .checkbox-column {
+        width: 2.5em;
+        min-width: 2.5em;
+        white-space: nowrap;
+    }
 }
 
 .multiple-items-widget,
