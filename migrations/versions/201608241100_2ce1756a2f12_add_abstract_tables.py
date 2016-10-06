@@ -176,6 +176,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('text', sa.Text(), nullable=False),
+        sa.Column('no_score', sa.Boolean(), nullable=False),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
