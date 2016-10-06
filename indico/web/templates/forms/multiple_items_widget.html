@@ -12,7 +12,9 @@
                         <th class="small-column"></th>
                     {% endif %}
                     {% for item in field.fields -%}
-                        <th>{{ item.caption }}</th>
+                        <th {% if item.type == 'checkbox' %}style="white-space: nowrap; width: 1%;"{% endif %}>
+                            {{ item.caption }}
+                        </th>
                     {% endfor -%}
                     <th class="action-column">Action</th>
                 </tr>
