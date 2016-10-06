@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global repositionTooltips:False */
+
 (function(global) {
     'use strict';
 
@@ -33,16 +35,16 @@
         var data = JSON.parse(field.val());
         var addButton = $('#' + options.fieldId + '-add-button');
         var deleteButton = $('<a>', {
-            'class': 'action-icon icon-remove js-remove-row',
-            'href': '#',
-            'title': $T('Delete')
+            class: 'action-icon icon-remove js-remove-row',
+            href: '#',
+            title: $T('Delete')
         });
-        var saveButton = $('<a>', {'class': 'action-icon icon-floppy js-save-row', 'href': '#', 'title': $T('Save')});
-        var editButton = $('<a>', {'class': 'action-icon icon-edit js-edit-row', 'href': '#', 'title': $T('Edit')});
+        var saveButton = $('<a>', {class: 'action-icon icon-floppy js-save-row', href: '#', title: $T('Save')});
+        var editButton = $('<a>', {class: 'action-icon icon-edit js-edit-row', href: '#', title: $T('Edit')});
         var cancelButton = $('<a>', {
-            'class': 'action-icon icon-close js-cancel-edit',
-            'href': '#',
-            'title': $T('Cancel')
+            class: 'action-icon icon-close js-cancel-edit',
+            href: '#',
+            title: $T('Cancel')
         });
         var initialIndex;
 
@@ -153,10 +155,10 @@
             var row = $(this).closest('tr');
             updateRow(row, true, false);
         }).on('keypress', 'input', function(e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 e.preventDefault();
                 $(this).closest('tr').find('.js-save-row').trigger('click');
-            } else if (e.keyCode == 27) {
+            } else if (e.keyCode === 27) {
                 e.preventDefault();
                 $(this).closest('tr').find('.js-cancel-edit').trigger('click');
             }
@@ -204,57 +206,55 @@
                 } else {
                     return {text: item[col.id]};
                 }
-            } else {
-                if (col.type === 'select') {
-                    var sel = $('<select>', {
-                        'class': 'js-table-input',
-                        'data-required': col.required
-                    });
-                    sel.append($('<option>')); // Default empty option
-                    for (var choiceID in options.columnChoices[col.id]) {
-                        sel.append($('<option>', {
-                            value: choiceID,
-                            text: options.columnChoices[col.id][choiceID],
-                            selected: item ? item[col.id] === choiceID : false
-                        }));
+            } else if (col.type === 'select') {
+                var sel = $('<select>', {
+                    'class': 'js-table-input',
+                    'data-required': col.required
+                });
+                sel.append($('<option>')); // Default empty option
+                for (var choiceID in options.columnChoices[col.id]) {
+                    sel.append($('<option>', {
+                        value: choiceID,
+                        text: options.columnChoices[col.id][choiceID],
+                        selected: item ? item[col.id] === choiceID : false
+                    }));
+                }
+                return {html: sel};
+            } else if (col.type === 'checkbox') {
+                return {
+                    html: $('<input>', {
+                        type: 'checkbox',
+                        class: 'js-table-input',
+                        value: '1',
+                        checked: item ? item[col.id] : false
+                    }),
+                    css: {
+                        width: '1%'
                     }
-                    return {html: sel};
-                } else if (col.type === 'checkbox') {
-                    return {
-                        html: $('<input>', {
-                            type: 'checkbox',
-                            class: 'js-table-input',
-                            value: '1',
-                            checked: item ? item[col.id] : false
-                        }),
-                        css: {
-                            width: '1%'
-                        }
-                    };
-                } else if (col.type === 'number') {
-                    var numberInput = $('<input>', {
-                        'type': 'number',
+                };
+            } else if (col.type === 'number') {
+                var numberInput = $('<input>', {
+                    'type': 'number',
+                    'class': 'js-table-input',
+                    'value': item ? item[col.id] : '',
+                    'placeholder': col.caption,
+                    'data-required': col.required,
+                    'min': col.min,
+                    'max': col.max,
+                    'step': col.step ? col.step : 'any'
+                });
+                initNumberErrorMessage(numberInput, col.min, col.max);
+                return {html: numberInput};
+            } else { // Assuming the type is 'text'
+                return {
+                    html: $('<input>', {
+                        'type': 'text',
                         'class': 'js-table-input',
                         'value': item ? item[col.id] : '',
                         'placeholder': col.caption,
-                        'data-required': col.required,
-                        'min': col.min,
-                        'max': col.max,
-                        'step': col.step ? col.step : 'any'
-                    });
-                    initNumberErrorMessage(numberInput, col.min, col.max);
-                    return {html: numberInput};
-                } else { // Assuming the type is 'text'
-                    return {
-                        html: $('<input>', {
-                            'type': 'text',
-                            'class': 'js-table-input',
-                            'value': item ? item[col.id] : '',
-                            'placeholder': col.caption,
-                            'data-required': col.required
-                        })
-                    };
-                }
+                        'data-required': col.required
+                    })
+                };
             }
         }
 
@@ -313,14 +313,15 @@
                 row.data('uuid', item[options.uuidField]);
             }
             if (options.sortable) {
-                $('<td>', {'class': 'sort-handle'}).appendTo(row);
+                $('<td>', {class: 'sort-handle'}).appendTo(row);
             }
             options.columns.forEach(function(col) {
                 $('<td>', makeColData(item, col)).appendTo(row);
             });
             $('<td>', {
-                'html': item ? deleteButton.clone().add(editButton.clone()) : cancelButton.clone().add(saveButton.clone()),
-                'class': 'js-action-col'
+                html: item ? deleteButton.clone().add(editButton.clone())
+                           : cancelButton.clone().add(saveButton.clone()),
+                class: 'js-action-col'
             }).appendTo(row);
             widgetBody.append(row);
             rowsChanged();
