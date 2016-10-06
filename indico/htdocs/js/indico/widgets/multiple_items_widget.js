@@ -103,6 +103,8 @@
                 if (!value.trim() && inputField.data('required')) {
                     requiredFieldIsEmpty = true;
                     inputField.addClass('hasError');
+                } else if (inputField.attr('type') === 'checkbox') {
+                    item[col.id] = inputField.prop('checked');
                 } else {
                     item[col.id] = value;
                     inputField.removeClass('hasError');
@@ -187,7 +189,21 @@
 
         function makeColData(item, col, forceEditable) {
             if (item && !forceEditable) {
-                return col.type === 'select' ? {text: options.columnChoices[col.id][item[col.id]]} : {text: item[col.id]};
+                if (col.type === 'select') {
+                    return {text: options.columnChoices[col.id][item[col.id]]};
+                } else if (col.type === 'checkbox') {
+                    // return {text: item[col.id] ? '✓' : ''};
+                    return {
+                        html: $('<span>', {
+                            class: 'icon-checkbox-{0}'.format(item[col.id] ? 'checked' : 'unchecked')
+                        }),
+                        css: {
+                            'text-align': 'center'
+                        }
+                    };
+                } else {
+                    return {text: item[col.id]};
+                }
             } else {
                 if (col.type === 'select') {
                     var sel = $('<select>', {
@@ -203,6 +219,18 @@
                         }));
                     }
                     return {html: sel};
+                } else if (col.type === 'checkbox') {
+                    return {
+                        html: $('<input>', {
+                            type: 'checkbox',
+                            class: 'js-table-input',
+                            value: '1',
+                            checked: item ? item[col.id] : false
+                        }),
+                        css: {
+                            width: '1%'
+                        }
+                    };
                 } else if (col.type === 'number') {
                     var numberInput = $('<input>', {
                         'type': 'number',
