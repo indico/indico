@@ -112,7 +112,7 @@
                         {% endif %}
                     </div>
                 </div>
-                {% for track in abstract.reviewed_for_tracks %}
+                {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
                     <div class="track-review flex">
                         <div class="stretch">
                             {{ track.title }}
