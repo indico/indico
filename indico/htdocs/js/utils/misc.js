@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false */
+
 (function(global) {
     'use strict';
 
@@ -28,6 +30,19 @@
                 dfd.reject();
             }
         }).open();
+        return dfd.promise();
+    };
+
+    global.choiceConfirmPrompt = function choiceConfirmPrompt(message, title, choice1, choice2) {
+        var dfd = $.Deferred();
+        message = $('<div>', {width: 400, html: message});
+        new SpecialRemovePopup(title || $T('Please confirm'), message, function(action) {
+            if (action === 0) {
+                dfd.reject();
+            } else {
+                dfd.resolve(action);
+            }
+        }, choice1, choice2).open();
         return dfd.promise();
     };
 
