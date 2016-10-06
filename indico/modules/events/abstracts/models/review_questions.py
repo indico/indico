@@ -66,6 +66,7 @@ class AbstractReviewQuestion(db.Model):
         backref=db.backref(
             'abstract_review_questions',
             primaryjoin='(AbstractReviewQuestion.event_id == Event.id) & ~AbstractReviewQuestion.is_deleted',
+            order_by=position,
             cascade='all, delete-orphan',
             lazy=True
         )
