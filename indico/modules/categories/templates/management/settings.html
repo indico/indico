@@ -7,10 +7,11 @@
         {% call form_fieldset(title) %}
             {{ form_rows(image_form, skip_labels=true) }}
         {% endcall %}
-    {% call form_footer(image_form) %}
+    {% call form_footer(image_form, skip_label=true) %}
         <input class="i-button big highlight icon-upload" type="submit"
                value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
-        <button class="i-button js-remove-button danger icon-remove{% if not image_form|attr(type)|attr('data') %} weak-hidden{% endif %}"
+        {% set field = image_form|attr(type) %}
+        <button class="i-button js-remove-button danger icon-remove{% if not field._value() %} hidden{% endif %}"
                 data-method="DELETE"
                 data-href="{{ url_for(endpoint, category) }}"
                 data-title="{{ deletion_prompt_title }}"
@@ -47,7 +48,7 @@
             $('.image-form').on('indico:fieldsSaved', function(evt, response) {
                 var hidden = !response.content;
                 var $this = $(this);
-                $this.find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+                $this.find('.js-remove-button').toggleClass('hidden', hidden).prop('disabled', hidden);
             }).on('indico:confirmed', '.js-remove-button', function(evt) {
                 evt.preventDefault();
 
