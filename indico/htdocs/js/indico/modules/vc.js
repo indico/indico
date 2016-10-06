@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global choiceConfirmPrompt:false */
+
 (function(global) {
     'use strict';
 
@@ -22,40 +24,43 @@
     var $t = $T;
 
     global.eventManageVCRooms = function() {
-
         $('.js-vcroom-remove').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
+            var title, msg;
 
-            var msg = $t('Do you really want to remove this videoconference room from the event?');
-            if ($this.data('numEvents') == 1) {
-                msg += ' ' + $t('Since it is only used in this event, it will be deleted from the server, too!');
-                confirmPrompt(msg).then(function() {
-                     var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
-                     $('<form>', {
-                        action: $this.data('href'),
-                        method: 'post'
-                     }).append(csrf).appendTo('body').submit();
-                 });
+            function execute(url) {
+                var csrf = $('<input>', {
+                    type: 'hidden',
+                    name: 'csrf_token',
+                    value: $('#csrf-token').attr('content')
+                });
+                $('<form>', {
+                    action: url,
+                    method: 'post'
+                }).append(csrf).appendTo('body').submit();
+            }
+
+            if ($this.data('numEvents') === 1) {
+                title = $t('Delete videoconference room');
+                msg = $t('Do you really want to remove this videoconference room from the event?') + ' ' +
+                      $t('Since it is only used in this event, it will be deleted from the server, too!');
+                confirmPrompt(msg, title).then(function() {
+                    execute($this.data('href'));
+                });
             } else {
-                new SpecialRemovePopup($T("Videoconference room removal"),
-                                       $T('This video conference room is used in {0} Indico events.<br> Do you want to remove this videoconference from <strong>All</strong> {0} events  or just this <strong>One</strong>?').format($this.data('numEvents')),
-                    function(action) {
-                        var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
-                        if (action === 1) {
-                             $('<form>', {
-                                action: $this.data('href'),
-                                method: 'post'
-                            }).append(csrf).appendTo('body').submit();
-                        } else if (action === 2) {
-                             $('<form>', {
-                                action: build_url($this.data('href'),{delete_all: '1'}),
-                                method: 'post'
-                            }).append(csrf).appendTo('body').submit();
-                        }
-                    }, $T("Delete One"), $T("Delete All")).open();
-
-
+                title = $t('Detach videoconference room');
+                msg = $t.ngettext(
+                    '*',
+                    'This videoconference room is used in other Indico events.<br>Do you want to \
+                     <strong>delete</strong> it from all {0} events or just <strong>detach</strong> \
+                     it from this event?',
+                    $this.data('numEvents')
+                ).format($this.data('numEvents'));
+                choiceConfirmPrompt(msg, title, $t('Detach'), $t('Delete')).then(function(choice) {
+                    var url = build_url($this.data('href'), {delete_all: choice === 2 ? '1' : ''});
+                    execute(url);
+                });
             }
         });
 
@@ -101,5 +106,4 @@
             $input.prop('type', $input.prop('type') === 'text' ? 'password' : 'text');
         });
     };
-
 })(window);
