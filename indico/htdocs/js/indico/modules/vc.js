@@ -26,21 +26,37 @@
         $('.js-vcroom-remove').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
+
             var msg = $t('Do you really want to remove this videoconference room from the event?');
             if ($this.data('numEvents') == 1) {
                 msg += ' ' + $t('Since it is only used in this event, it will be deleted from the server, too!');
-            }
-            new ConfirmPopup($t('Delete this videoconference room?'), msg, function(confirmed) {
-                if (!confirmed) {
-                    return;
-                }
+                confirmPrompt(msg).then(function() {
+                     var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
+                     $('<form>', {
+                        action: $this.data('href'),
+                        method: 'post'
+                     }).append(csrf).appendTo('body').submit();
+                 });
+            } else {
+                new SpecialRemovePopup($T("Videoconference room removal"),
+                                       $T('This video conference room is used in {0} Indico events.<br> Do you want to remove this videoconference from <strong>All</strong> {0} events  or just this <strong>One</strong>?').format($this.data('numEvents')),
+                    function(action) {
+                        var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
+                        if (action === 1) {
+                             $('<form>', {
+                                action: $this.data('href'),
+                                method: 'post'
+                            }).append(csrf).appendTo('body').submit();
+                        } else if (action === 2) {
+                             $('<form>', {
+                                action: build_url($this.data('href'),{delete_all: '1'}),
+                                method: 'post'
+                            }).append(csrf).appendTo('body').submit();
+                        }
+                    }, $T("Delete One"), $T("Delete All")).open();
 
-                var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
-                $('<form>', {
-                    action: $this.data('href'),
-                    method: 'post'
-                }).append(csrf).appendTo('body').submit();
-            }).open();
+
+            }
         });
 
         $('.js-vcroom-refresh').on('click', function(e) {
