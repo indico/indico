@@ -194,7 +194,6 @@
                 if (col.type === 'select') {
                     return {text: options.columnChoices[col.id][item[col.id]]};
                 } else if (col.type === 'checkbox') {
-                    // return {text: item[col.id] ? '✓' : ''};
                     return {
                         html: $('<span>', {
                             class: 'icon-checkbox-{0}'.format(item[col.id] ? 'checked' : 'unchecked')
@@ -227,10 +226,7 @@
                         class: 'js-table-input',
                         value: '1',
                         checked: item ? item[col.id] : false
-                    }),
-                    css: {
-                        width: '1%'
-                    }
+                    })
                 };
             } else if (col.type === 'number') {
                 var numberInput = $('<input>', {
