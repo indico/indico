@@ -347,6 +347,20 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     # - reviews (AbstractReview.abstract)
 
     @property
+    def candidate_contrib_types(self):
+        contrib_types = set()
+        for track in self.reviewed_for_tracks:
+            if self.get_track_reviewing_state(track) == AbstractReviewingState.positive:
+                review = next((x for x in self.reviews if x.track == track), None)
+                contrib_types.add(review.proposed_contribution_type)
+        return contrib_types
+
+    @property
+    def candidate_tracks(self):
+        states = {AbstractReviewingState.positive, AbstractReviewingState.conflicting}
+        return {t for t in self.reviewed_for_tracks if self.get_track_reviewing_state(t) in states}
+
+    @property
     def public_state(self):
         if self.state != AbstractState.submitted:
             return getattr(AbstractPublicState, self.state.name)
