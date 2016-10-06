@@ -490,14 +490,54 @@ th.i-table {
 }
 
 #person-list {
-    .affiliation-column, .name-column {
-        max-width: 20em;
-    }
-
     .no-role {
         opacity: 0.25;
         .badge {
             background-color: $dark-gray;
+        }
+    }
+
+    thead {
+        @include border-bottom();
+        display: block;
+        position: relative;
+        background-color: $light-gray;
+    }
+
+    tbody {
+        display: block;
+        max-height: 50em;
+        overflow: auto;
+    }
+
+    .checkbox-column {
+        min-width: 2.5em;
+    }
+
+    .name-column, .affiliation-column, .email-column {
+        max-width: 20em;
+        min-width: 20em;
+    }
+
+    .author-type-column {
+        width: 11em;
+    }
+
+    .speaker-column {
+        width: 2.1em;
+    }
+
+    .form-group-mail {
+        display: block;
+    }
+
+    tbody > tr:not(.hidden) {
+        td {
+            border-top-width: 0;
+        }
+
+        ~ tr td {
+            border-top-width: 1px;
         }
     }
 }
