@@ -37,7 +37,7 @@
             field.closest('.form-group').toggle(active);
             if (!field.is(':input')) {
                 field.find(':input').prop('disabled', !active);
-            } else if(!field.data('initiallyDisabled')) {
+            } else if (!field.data('initiallyDisabled')) {
                 field.prop('disabled', !active);
             }
         });
@@ -185,7 +185,7 @@
             // in case of dynamically updated rows, this must remain the same
             // all the time as events are bound to it
             containerSelector: null,
-            // the selector for the row selection checkboxes. used within the 
+            // the selector for the row selection checkboxes. used within the
             // context of containerSelector
             checkboxSelector: null,
             // the selector for the (usually hidden) all-items-on-all-pages-selected
