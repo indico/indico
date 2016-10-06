@@ -12,15 +12,13 @@
                         {% trans %}Parent category{% endtrans %}
                     </a>
                 {% endif %}
-                {% if category.has_events %}
-                    <a href="#"
-                       class="i-button icon-calendar arrow js-export-ical"
-                       title="{% trans %}Export to scheduling tool{% endtrans %}"
-                       data-id="{{ category.id }}"></a>
-                    {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
-                        {% include 'categories/category_export_ical.html' %}
-                    {%- endwith %}
-                {% endif %}
+                <a href="#"
+                   class="i-button icon-calendar arrow js-export-ical"
+                   title="{% trans %}Export to scheduling tool{% endtrans %}"
+                   data-id="{{ category.id }}"></a>
+                {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
+                    {% include 'categories/category_export_ical.html' %}
+                {%- endwith %}
                 <a class="i-button icon-eye arrow js-dropdown"
                    title="{% trans %}View{% endtrans %}"
                    data-toggle="dropdown"></a>
