@@ -119,7 +119,7 @@
                                             {% if abstract.score is not none %}
                                                 {{ abstract.score | round(1) }}
                                             {% else %}
-                                                {% trans %}Not reviewed yet{% endtrans %}
+                                                -
                                             {% endif %}
                                         </td>
                                     {% elif item.id == 'submitted_dt' %}
