@@ -82,12 +82,12 @@
                         $('#filter-no-account').prop('checked', false);
                     }
                 } else {
-                    $('#persons-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
+                    $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
                 }
                 refreshPersonFilters();
             }
 
-            $('#persons-list [data-filter]:not(#filter-no-account)').on('change', function() {
+            $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
                 var $target = $(this);
                 switch_to('persons', $target);
             });
