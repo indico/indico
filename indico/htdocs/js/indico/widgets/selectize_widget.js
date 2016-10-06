@@ -56,8 +56,9 @@
             score: function(query) {
                 var data = getSearchData(query);
                 if (data && data.id !== undefined) {
+                    // when searching by ID ensure we don't get other results from selectize's internal cache
                     return function(item) {
-                        return item.friendly_id === +data.id;
+                        return +(item.friendly_id === +data.id);
                     };
                 } else {
                     var scoreFunc = this.getScoreFunction(query);
