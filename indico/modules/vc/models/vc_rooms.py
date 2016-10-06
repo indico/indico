@@ -340,24 +340,25 @@ class VCRoomEventAssociation(db.Model):
         :param delete_all: if True, the room is detached from all
                            events and deleted.
         """
+        vc_room = self.vc_room
         if delete_all:
-            for e in self.vc_room.events[:]:
+            for assoc in vc_room.events[:]:
                 Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                    self.vc_room, e.event_new, e.link_object)
+                    vc_room, assoc.event_new, assoc.link_object)
                 )
-                db.session.delete(e)
+                vc_room.events.remove(assoc)
         else:
             Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                self.vc_room, self.event_new, self.link_object)
+                vc_room, self.event_new, self.link_object)
             )
-            db.session.delete(self)
+            vc_room.events.remove(self)
         db.session.flush()
-        if not self.vc_room.events:
-            Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
-            if self.vc_room.status != VCRoomStatus.deleted:
-                self.vc_room.plugin.delete_room(self.vc_room, self.event_new)
-                notify_deleted(self.vc_room.plugin, self.vc_room, self, self.event_new, user)
-            db.session.delete(self.vc_room)
+        if not vc_room.events:
+            Logger.get('modules.vc').info("Deleting VC room {}".format(vc_room))
+            if vc_room.status != VCRoomStatus.deleted:
+                vc_room.plugin.delete_room(vc_room, self.event_new)
+                notify_deleted(vc_room.plugin, vc_room, self, self.event_new, user)
+            db.session.delete(vc_room)
 
 
 VCRoomEventAssociation.register_link_events()
