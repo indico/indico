@@ -73,7 +73,8 @@ class EmailRuleListField(JSONField):
 
 class AbstractReviewQuestionsField(MultipleItemsField):
     def __init__(self, *args, **kwargs):
-        self.fields = [{'id': 'text', 'caption': _("Question"), 'type': 'text', 'required': True}]
+        self.fields = [{'id': 'text', 'caption': _("Question"), 'type': 'text', 'required': True},
+                       {'id': 'no_score', 'caption': _("Exclude from score"), 'type': 'checkbox'}]
         super(AbstractReviewQuestionsField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True,
                                                            sortable=True, **kwargs)
 
@@ -86,6 +87,7 @@ class AbstractReviewQuestionsField(MultipleItemsField):
                 question = existing.pop(int(entry['id'])) if entry.get('id') is not None else AbstractReviewQuestion()
                 question.text = entry['text']
                 question.position = pos
+                question.no_score = entry['no_score']
                 data.append(question)
             for question in existing.itervalues():
                 if question.ratings:
@@ -100,7 +102,7 @@ class AbstractReviewQuestionsField(MultipleItemsField):
         if not self.data:
             return []
         else:
-            return [{'id': q.id, 'text': q.text} for q in self.data]
+            return [{'id': q.id, 'text': q.text, 'no_score': q.no_score} for q in self.data]
 
 
 class AbstractPersonLinkListField(PersonLinkListFieldBase):
