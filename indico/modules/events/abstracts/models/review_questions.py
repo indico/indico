@@ -45,6 +45,11 @@ class AbstractReviewQuestion(db.Model):
         db.Text,
         nullable=False
     )
+    no_score = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     position = db.Column(
         db.Integer,
         nullable=False,
@@ -71,4 +76,4 @@ class AbstractReviewQuestion(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', is_deleted=False, _text=self.text)
+        return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.text)

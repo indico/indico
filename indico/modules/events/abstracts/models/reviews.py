@@ -177,6 +177,7 @@ class AbstractReview(db.Model):
 
     @property
     def score(self):
-        if not self.ratings:
+        ratings = [r for r in self.ratings if not r.question.no_score]
+        if not ratings:
             return None
-        return sum((x.value for x in self.ratings)) / len(self.ratings)
+        return sum(x.value for x in ratings) / len(ratings)
