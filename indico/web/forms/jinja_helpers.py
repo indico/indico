@@ -59,8 +59,7 @@ def _attrs_for_validators(field, validators):
             attrs['data-confirm-password'] = field.get_form()[validator.fieldname].name
         elif isinstance(validator, HiddenUnless):
             condition_field = field.get_form()[validator.field]
-            checked_only = (isinstance(condition_field, (RadioField, BooleanField, IndicoEnumRadioField)) or
-                            isinstance(condition_field.widget, Select))
+            checked_only = isinstance(condition_field, (RadioField, BooleanField, IndicoEnumRadioField))
             val = validator.value
             attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
                                                       'value': val if not isinstance(val, TitledEnum) else val.name,
