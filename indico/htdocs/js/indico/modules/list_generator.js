@@ -55,11 +55,10 @@
         $('.list .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
+            sortReset: true,
             headerTemplate: '',
             headers: {
-                0: {
-                    sorter: false
-                }
+                0: {sorter: false}
             }
         });
     };
