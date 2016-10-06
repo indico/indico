@@ -24,7 +24,7 @@ from indico.util.struct.enum import TitledIntEnum
 
 
 class AbstractAction(TitledIntEnum):
-    __titles__ = [None, _("Accept"), _("Reject"), _("Merge"), _("Mark as duplicate")]
+    __titles__ = [None, _("Accept"), _("Reject"), _("Merge"), _("Change track"), _("Mark as duplicate")]
     accept = 1
     reject = 2
     change_tracks = 3
