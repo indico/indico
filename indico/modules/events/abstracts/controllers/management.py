@@ -22,6 +22,7 @@ from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request
 
+from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingSettingsForm)
@@ -90,7 +91,9 @@ class RHAbstracts(RHManageAbstractsBase):
     """Display abstracts management page"""
 
     def _process(self):
-        return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new)
+        abstracts_count = Abstract.query.with_parent(self.event_new).count()
+        return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new,
+                                                 abstracts_count=abstracts_count)
 
 
 class RHManageBOA(RHManageAbstractsBase):
