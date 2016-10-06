@@ -480,7 +480,7 @@ type ("RoomMap", ["IWidget"],
 
             var self = this;
 
-            $('#filter_canvas').on('keydown', ':input:not(button)', function(e) {
+            $('#filters_canvas').on('keydown', ':input:not(button)', function(e) {
                 if (e.which == 13) {
                     self.filterMarkers(false);
                 }
