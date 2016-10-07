@@ -580,7 +580,7 @@ class AbstractMigration(object):
                     review.proposed_contribution_type = old_judgment.accepted_type
                     review.proposed_track = self.track_map_by_id[old_judgment.track_id]
                 elif review.proposed_action == AbstractAction.change_tracks:
-                    review.proposed_other_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
+                    review.proposed_tracks = {self.track_map[t] for t in zodb_judgment._proposedTracks}
                 elif review.proposed_action == AbstractAction.mark_as_duplicate:
                     as_duplicate_reviews.add((review, zodb_judgment._originalAbst))
 
