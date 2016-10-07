@@ -516,6 +516,8 @@ class RegistrationListGenerator(ListGeneratorBase):
     def _get_sorted_regform_items(self, item_ids):
         """Return the form items ordered by their position in the registration form."""
 
+        if not item_ids:
+            return []
         return (RegistrationFormItem
                 .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
                 .with_parent(self.regform)

@@ -86,6 +86,8 @@ class AbstractListGenerator(ListGeneratorBase):
     def _get_sorted_contribution_fields(self, item_ids):
         """Return the contribution fields ordered by their position in the abstract form."""
 
+        if not item_ids:
+            return []
         return (ContributionField.query
                 .with_parent(self.event)
                 .filter(ContributionField.id.in_(item_ids))
