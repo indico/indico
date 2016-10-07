@@ -380,6 +380,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
 
     def can_access(self, user):
+        if not user:
+            return False
         if self.submitter == user:
             return True
         if self.event_new.can_manage(user):
