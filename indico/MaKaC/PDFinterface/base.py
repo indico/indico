@@ -507,35 +507,6 @@ class PDFBase:
                     self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
         return 0
 
-    def _getLogo(self, c, drawTitle = True):
-        logo = self._conf.getLogo()
-        if logo:
-            img_path = logo.getFilePath()
-            if img_path:
-                try:
-                    img = PILImage.open(imagePath)
-                    width, height = img.size
-
-                    # resize in case too big for page
-                    if width > self._PAGE_WIDTH / 2:
-                        ratio =  float(height)/width
-                        width = self._PAGE_WIDTH / 2
-                        height = width * ratio
-                    startHeight = self._PAGE_HEIGHT
-
-                    if drawTitle:
-                        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-
-                    # lower edge of the image
-                    startHeight = startHeight - inch / 2 - height
-
-                    # draw horizontally centered, with recalculated width and height
-                    c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
-                    return startHeight
-                except IOError:
-                    if drawTitle:
-                        self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-
 
 def _doNothing(canvas, doc):
     "Dummy callback for onPage"
