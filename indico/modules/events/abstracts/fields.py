@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -148,33 +149,25 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 class AbstractField(AjaxFieldMixin, QuerySelectField):
     """A selectize-based field to select an abstract from an event."""
 
-    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title')
+    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True)
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)
-        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter #id or search string'))
+        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter abstract title or #id'))
         kwargs['query_factory'] = self._get_query
         kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
         self.excluded_abstract = None
         super(AbstractField, self).__init__(*args, **kwargs)
 
     def process_ajax(self):
-        query = self._get_query()
-        if 'id' in request.args:
-            query = query.filter_by(friendly_id=int(request.args['id']))
-        else:
-            q = request.args.get('q', '').strip()
-            if len(q) < 3:
-                raise BadRequest('An ID or query (min. 3 chars) must be provided')
-            query = query.filter(Abstract.title.ilike('%{}%'.format(escape_like(q))))
         result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
                    'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
-                  for abstract in query
+                  for abstract in self._get_query()
                   if abstract.can_access(session.user)]
         return jsonify(result)
 
     def _get_query(self):
-        query = Abstract.query.with_parent(self.event)
+        query = Abstract.query.with_parent(self.event).options(joinedload('submitter').lazyload('*'))
         if self.excluded_abstract is not None:
             query = query.filter(Abstract.id != self.excluded_abstract.id)
         return query.order_by(Abstract.friendly_id)
