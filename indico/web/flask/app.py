@@ -334,7 +334,7 @@ def handle_exception(exception):
     return render_error(_("An unexpected error occurred."), str(exception), standalone=True), 500
 
 
-def make_app(set_path=False, db_setup=True, testing=False):
+def make_app(set_path=False, testing=False):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
@@ -360,9 +360,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
     with app.app_context():
         setup_assets()
 
-    if db_setup:
-        configure_db(app)
-
+    configure_db(app)
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
