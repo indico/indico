@@ -21,6 +21,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request, session
+from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
@@ -35,6 +36,7 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
                                                         close_cfa, judge_abstract, reset_abstract_judgment)
+from indico.modules.events.abstracts.schemas import abstracts_schema
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
                                                   generate_spreadsheet_from_abstracts)
@@ -86,10 +88,19 @@ class RHAbstractListBase(RHManageAbstractsBase):
 class RHManageAbstractsActionsBase(RHAbstractListBase):
     """Base class for classes performing actions on abstract"""
 
+    _abstract_query_options = ()
+
+    @property
+    def _abstract_query(self):
+        query = Abstract.query.with_parent(self.event_new)
+        if self._abstract_query_options:
+            query = query.options(*self._abstract_query_options)
+        return query
+
     def _checkParams(self, params):
         RHAbstractListBase._checkParams(self, params)
         ids = map(int, request.form.getlist('abstract_id'))
-        self.abstracts = Abstract.query.with_parent(self.event_new).filter(Abstract.id.in_(ids)).all()
+        self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 
 class RHManageAbstract(RHManageAbstractBase):
@@ -395,9 +406,19 @@ class RHAbstractsExportExcel(RHAbstractsExportBase):
 
 
 class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
+    _abstract_query_options = (joinedload('submitter'),
+                               joinedload('accepted_track'),
+                               joinedload('accepted_contrib_type'),
+                               joinedload('submitted_contrib_type'),
+                               subqueryload('field_values'),
+                               subqueryload('submitted_for_tracks'),
+                               subqueryload('reviewed_for_tracks'),
+                               subqueryload('person_links'),
+                               subqueryload('reviews').joinedload('ratings'))
+
     def _process(self):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        response = jsonify(version=1, abstracts=[])
+        response = jsonify(version=1, abstracts=abstracts_schema.dump(sorted_abstracts).data)
         response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
         return response
 
