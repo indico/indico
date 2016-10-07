@@ -446,9 +446,7 @@ class AbstractMigration(object):
                                 submitted_dt=submitted_dt,
                                 submitted_contrib_type_id=old_abstract.type_id,
                                 submission_comment=convert_to_unicode(zodb_abstract._comments),
-                                modified_dt=modified_dt,
-                                accepted_contrib_type_id=old_abstract.accepted_type_id,
-                                accepted_track=accepted_track)
+                                modified_dt=modified_dt)
             self.importer.print_info(cformat('%{white!}Abstract:%{reset} {}').format(abstract.title))
             self.event.abstracts.append(abstract)
             abstract_map[zodb_abstract] = abstract
@@ -480,6 +478,9 @@ class AbstractMigration(object):
             old_state_name = old_state.__class__.__name__
             old_abstract_state_map[abstract] = old_state
             abstract.state = self.STATE_MAP[old_state_name]
+            if abstract.state == AbstractState.accepted:
+                abstract.accepted_contrib_type_id = old_abstract.accepted_type_id
+                abstract.accepted_track = accepted_track
 
             # tracks
             reallocated = set(r._track for r in getattr(zodb_abstract, '_trackReallocations', {}).itervalues())

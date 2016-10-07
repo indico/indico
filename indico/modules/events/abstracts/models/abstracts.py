@@ -71,6 +71,18 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
 
     __tablename__ = 'abstracts'
     __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
+                         db.CheckConstraint('(state = {}) OR (accepted_track_id IS NULL)'
+                                            .format(AbstractState.accepted),
+                                            name='accepted_track_id_only_accepted'),
+                         db.CheckConstraint('(state = {}) OR (accepted_contrib_type_id IS NULL)'
+                                            .format(AbstractState.accepted),
+                                            name='accepted_contrib_type_id_only_accepted'),
+                         db.CheckConstraint('(state = {}) = (merged_into_id IS NOT NULL)'
+                                            .format(AbstractState.merged),
+                                            name='merged_into_id_only_merged'),
+                         db.CheckConstraint('(state = {}) = (duplicate_of_id IS NOT NULL)'
+                                            .format(AbstractState.duplicate),
+                                            name='duplicate_of_id_only_duplicate'),
                          {'schema': 'event_abstracts'})
 
     possible_render_modes = {RenderMode.markdown}
