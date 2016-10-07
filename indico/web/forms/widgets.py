@@ -168,6 +168,8 @@ class SelectizeWidget(JinjaWidget):
     :param allow_by_id: Whether to allow `#123` searches regardless of
                         the trigger length.  Such searches will be sent
                         as 'id' instead of 'q' in the AJAX request.
+    :param preload: Whether to load all choices with a single AJAX
+                    request instead of sending requests when searching.
     :param value_field: The attribute of the response used as the
                         field value.
     :param label_field: The attribute of the response used as the
@@ -176,10 +178,11 @@ class SelectizeWidget(JinjaWidget):
                          in locally available data.
     """
 
-    def __init__(self, search_url=None, min_trigger_length=3, allow_by_id=False,
+    def __init__(self, search_url=None, min_trigger_length=3, allow_by_id=False, preload=False,
                  value_field='id', label_field='name', search_field='name'):
         self.min_trigger_length = min_trigger_length
         self.allow_by_id = allow_by_id
+        self.preload = preload
         self.search_url = search_url
         self.value_field = value_field
         self.label_field = label_field
@@ -196,13 +199,14 @@ class SelectizeWidget(JinjaWidget):
             'options': choices,
             'create': False,
             'maxItems': 1,
-            'closeAfterSelect': True
+            'closeAfterSelect': True,
+            'preload': self.preload
         }
 
         options.update(kwargs.pop('options', {}))
         return super(SelectizeWidget, self).__call__(field, options=options,
                                                      search_url=getattr(field, 'search_url', self.search_url),
-                                                     min_trigger_length=self.min_trigger_length,
+                                                     min_trigger_length=self.min_trigger_length, preload=self.preload,
                                                      allow_by_id=self.allow_by_id, input_args=kwargs)
 
 
