@@ -22,7 +22,6 @@ from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request
 
-from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingSettingsForm)
@@ -42,7 +41,7 @@ from indico.util.i18n import _, ngettext
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -55,6 +54,18 @@ class RHManageAbstractsBase(RHConferenceModifBase):
 
     def _process(self):
         return RH._process(self)
+
+
+class RHManageAbstractBase(AbstractMixin, RHManageAbstractsBase):
+    """Base class for all abstract management RHs"""
+
+    def _checkParams(self, params):
+        RHManageAbstractsBase._checkParams(self, params)
+        AbstractMixin._checkParams(self)
+
+    def _checkProtection(self):
+        RHManageAbstractsBase._checkProtection(self)
+        AbstractMixin._checkProtection(self)
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
@@ -74,17 +85,17 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
         self.abstracts = Abstract.query.with_parent(self.event_new).filter(Abstract.id.in_(ids)).all()
 
 
-class RHManageAbstract(AbstractMixin, RHManageAbstractsBase):
-    def _checkParams(self, params):
-        RHManageAbstractsBase._checkParams(self, params)
-        AbstractMixin._checkParams(self)
-
-    def _checkProtection(self):
-        RHManageAbstractsBase._checkProtection(self)
-        AbstractMixin._checkProtection(self)
-
+class RHManageAbstract(RHManageAbstractBase):
+    """Display abstract management page"""
     def _process(self):
         return WPManageAbstracts.render_template('management/abstract.html', self._conf, abstract=self.abstract)
+
+
+class RHAbstractExportPDF(RHManageAbstractBase):
+    def _process(self):
+        pdf = ConfManagerAbstractToPDF(self.abstract)
+        file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
+        return send_file(file_name, pdf.generate(), 'application/pdf')
 
 
 class RHAbstracts(RHManageAbstractsBase):
