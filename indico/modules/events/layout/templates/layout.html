@@ -42,7 +42,7 @@
                 {%- trans %}Preview{% endtrans -%}
             </a>
         {% endcall %}
-    {% call form_footer(css_form) %}
+    {% call form_footer(css_form, skip_label=true) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload CSS file{% endtrans %}
         </button>
@@ -56,7 +56,7 @@
     {{ form_header(logo_form, classes='logo-form', action=url_for('event_layout.upload_logo', event)) }}
         <div class="flashed-messages"></div>
         {{ form_rows(logo_form, skip_labels=true) }}
-    {% call form_footer(css_form) %}
+    {% call form_footer(css_form, skip_label=true) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload logo{% endtrans %}
         </button>

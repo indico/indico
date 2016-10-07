@@ -92,10 +92,12 @@
 {% endmacro %}
 
 {# `form` and `i_form` args are there in case we need them in the future #}
-{% macro form_footer(form, i_form=true) -%}
+{% macro form_footer(form, i_form=true, skip_label=false) -%}
     {% if caller %}
         <div class="form-group form-group-footer">
-            <div class="form-label"></div>
+            {% if not skip_label -%}
+                <div class="form-label"></div>
+            {%- endif %}
             <div class="form-field">
                 {{ caller() }}
             </div>
