@@ -27,7 +27,7 @@ import urllib
 from uuid import UUID
 
 import transaction
-from flask import request, session, g
+from flask import request, session, g, current_app
 from urlparse import parse_qs
 from werkzeug.exceptions import NotFound, BadRequest
 
@@ -180,6 +180,7 @@ def handler(prefix, path):
     ts = int(time.time())
     typeMap = {}
     responseUtil = ResponseUtil()
+    is_response = False
     try:
         used_session = None
         if cookieAuth:
@@ -239,7 +240,11 @@ def handler(prefix, path):
             ContextManager.set("currentAW", aw)
             # Perform the actual exporting
             res = hook(aw)
-            if isinstance(res, tuple) and len(res) == 4:
+            if isinstance(res, current_app.response_class):
+                addToCache = False
+                is_response = True
+                result, extra, complete, typeMap = res, {}, True, {}
+            elif isinstance(res, tuple) and len(res) == 4:
                 result, extra, complete, typeMap = res
             else:
                 result, extra, complete, typeMap = res, {}, True, {}
@@ -272,7 +277,8 @@ def handler(prefix, path):
         # Log successful POST api requests
         if error is None and request.method == 'POST':
             logger.info('API request: %s?%s', path, query)
-
+        if is_response:
+            return result
         serializer = Serializer.create(dformat, query_params=queryParams, pretty=pretty, typeMap=typeMap,
                                        **hook.serializer_args)
         if error:

@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, time
 from types import GeneratorType
 
 import transaction
-from flask import request
+from flask import request, current_app
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError
 
@@ -87,7 +87,7 @@ class HTTPAPIHook(object):
                     return None, None
                 elif expCls.VALID_FORMATS and format not in expCls.VALID_FORMATS:
                     return None, None
-                return expCls(queryParams, type, gd), format
+                return expCls(queryParams, type, gd, format), format
         return None, None
 
     @staticmethod
@@ -106,7 +106,8 @@ class HTTPAPIHook(object):
             cls._RE = re.compile(r'/' + cls.PREFIX + '/(' + types + r')' + ('/' + cls.RE).rstrip('/') + r'\.(\w+)$')
         return cls._RE.match(path)
 
-    def __init__(self, queryParams, type, pathParams):
+    def __init__(self, queryParams, type, pathParams, format):
+        self._format = format
         self._queryParams = queryParams
         self._type = type
         self._pathParams = pathParams
@@ -178,8 +179,10 @@ class HTTPAPIHook(object):
         if not self._hasAccess(aw):
             raise HTTPAPIError('Access to this resource is restricted.', 403)
         resultList, complete = self._performCall(func, aw)
+        if isinstance(resultList, current_app.response_class):
+            return True, resultList, None, None
         extra = extra_func(aw, resultList) if extra_func else None
-        return resultList, complete, extra
+        return False, resultList, complete, extra
 
     def __call__(self, aw):
         """Perform the actual exporting"""
@@ -195,7 +198,7 @@ class HTTPAPIHook(object):
             raise NotImplementedError(method_name)
 
         if not self.COMMIT:
-            resultList, complete, extra = self._perform(aw, func, extra_func)
+            is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
         else:
             dbi = DBMgr.getInstance()
             try:
@@ -207,7 +210,7 @@ class HTTPAPIHook(object):
                         GenericMailer.flushQueue(False)
                         dbi.sync()
                         try:
-                            resultList, complete, extra = self._perform(aw, func, extra_func)
+                            is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
                             transaction.commit()
                             flush_after_commit_queue(True)
                             GenericMailer.flushQueue(True)
@@ -222,7 +225,8 @@ class HTTPAPIHook(object):
             except Exception:
                 transaction.abort()
                 raise
-
+        if is_response:
+            return resultList
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 

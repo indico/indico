@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
+from itertools import ifilter
 
 from lxml import html
 from lxml.etree import ParserError
@@ -31,21 +32,24 @@ from indico.util.date_time import now_utc
 from indico.web.flask.util import url_for
 
 
-def serialize_category_ical(category, user, event_filter):
+def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
     """Export the events in a category to iCal
 
-    :param category: The category to export
+    :param category_ids: Category IDs to export
     :param user: The user who needs to be able to access the events
     :param event_filter: A SQLalchemy criterion to restrict which
                          events will be returned.  Usually something
                          involving the start/end date of the event.
+    :param event_filter_fn: A callable that determines which events to include (after querying)
+    :param update_query: A callable that can update the query used to retrieve the events.
+                         Must return the updated query object.
     """
     own_room_strategy = joinedload('own_room')
     own_room_strategy.load_only('building', 'floor', 'number', 'name')
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
-             .filter(Event.category_chain_overlaps(category.id),
+             .filter(Event.category_chain_overlaps(category_ids),
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
@@ -55,13 +59,18 @@ def serialize_category_ical(category, user, event_filter):
                       own_room_strategy,
                       own_venue_strategy)
              .order_by(Event.start_dt))
-    events = [e for e in query if e.can_access(user)]
+    if update_query:
+        query = update_query(query)
+    it = iter(query)
+    if event_filter_fn:
+        it = ifilter(event_filter_fn, it)
+    it = (e for e in it if e.can_access(user))
     cal = ical.Calendar()
     cal.add('version', '2.0')
     cal.add('prodid', '-//CERN//INDICO//EN')
 
     now = now_utc(False)
-    for event in events:
+    for event in it:
         url = url_for('event.conferenceDisplay', confId=event.id, _external=True)
         location = ('{} ({})'.format(event.room_name, event.venue_name)
                     if event.venue_name and event.room_name
