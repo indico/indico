@@ -36,7 +36,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.serialize import (serialize_category_atom, serialize_category_ical,
+from indico.modules.categories.serialize import (serialize_category_atom, serialize_categories_ical,
                                                  serialize_category_chain, serialize_category)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
@@ -400,7 +400,8 @@ class RHShowPastEventsInCategory(RHDisplayCategoryBase):
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):
         filename = '{}-category.ics'.format(secure_filename(self.category.title, str(self.category.id)))
-        buf = serialize_category_ical(self.category, session.user, Event.end_dt >= (now_utc() - timedelta(weeks=4)))
+        buf = serialize_categories_ical([self.category.id], session.user,
+                                        Event.end_dt >= (now_utc() - timedelta(weeks=4)))
         return send_file(filename, buf, 'text/calendar')
 
 

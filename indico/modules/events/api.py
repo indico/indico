@@ -31,6 +31,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.categories import LegacyCategoryMapping, Category
+from indico.modules.categories.serialize import serialize_categories_ical
 from indico.modules.events import Event
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
@@ -41,7 +42,7 @@ from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
@@ -134,7 +135,7 @@ class CategoryEventHook(HTTPAPIHook):
         legacy_id_map = {m.legacy_category_id: m.category_id
                          for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
-        return expInt.category(id_list)
+        return expInt.category(id_list, self._format)
 
     def export_categ_extra(self, aw, resultList):
         expInt = CategoryEventFetcher(aw, self)
@@ -447,16 +448,23 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         options.append(undefer('effective_protection_mode'))
         return options
 
-    def category(self, idlist):
+    def category(self, idlist, format):
         try:
             idlist = map(int, idlist)
         except ValueError:
             raise HTTPAPIError('Category IDs must be numeric', 400)
-        query = (Event.query
-                 .filter(~Event.is_deleted,
-                         Event.category_chain_overlaps(idlist),
-                         Event.happens_between(self._fromDT, self._toDT))
-                 .options(*self._get_query_options(self._detail_level)))
+        if format == 'ics':
+            buf = serialize_categories_ical(idlist, self.user,
+                                            event_filter=Event.happens_between(self._fromDT, self._toDT),
+                                            event_filter_fn=self._filter_event,
+                                            update_query=self._update_query)
+            return send_file('events.ics', buf, 'text/calendar')
+        else:
+            query = (Event.query
+                     .filter(~Event.is_deleted,
+                             Event.category_chain_overlaps(idlist),
+                             Event.happens_between(self._fromDT, self._toDT))
+                     .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
 
@@ -481,7 +489,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
     def _filter_event(self, event):
         if self._room or self._location or self._eventType:
-            if self._eventType and event.as_legacy.getType() != self._eventType:
+            if self._eventType and event.type_.legacy_name != self._eventType:
                 return False
             if self._location:
                 name = event.venue_name
