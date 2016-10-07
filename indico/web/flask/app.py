@@ -41,6 +41,7 @@ from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
+from indico.core.marshmallow import mm
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -361,6 +362,7 @@ def make_app(set_path=False, testing=False):
         setup_assets()
 
     configure_db(app)
+    mm.init_app(app)
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)

@@ -82,3 +82,7 @@ Jinja2==2.8
 xlsxwriter==0.9.3
 jsonschema==2.5.1
 html2text==2016.5.29
+marshmallow==2.10.3
+marshmallow-sqlalchemy==0.12.0
+marshmallow-enum==1.0
+flask-marshmallow==0.7.0
