@@ -84,6 +84,9 @@ class PyIntEnum(TypeDecorator, SchemaType):
         else:
             return '{}({})'.format(type(self).__name__, self.enum.__name__)
 
+    def marshmallow_get_field_kwargs(self):
+        return {'enum': self.enum}
+
 
 @listens_for(PyIntEnum, 'before_parent_attach')
 def _type_before_parent_attach(type_, col):

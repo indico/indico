@@ -46,6 +46,7 @@ class DescriptionMixin(object):
 
     possible_render_modes = {RenderMode.plain_text}
     default_render_mode = RenderMode.plain_text
+    marshmallow_aliases = {'_description': 'description'}
 
     @declared_attr
     def _description(cls):
