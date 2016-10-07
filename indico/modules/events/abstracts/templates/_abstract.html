@@ -124,6 +124,7 @@
 {% endmacro %}
 
 {% macro render_abstract_public(abstract, management=false) %}
+    {% set abstract_endpoint = '.manage_abstract' if management else '.display_abstract' %}
     <div id="abstract-title">
         <h3 class="abstract-title">
             {{ abstract.title }}
@@ -132,18 +133,17 @@
             </span>
         </h3>
         <div class="toolbar thin">
-            {% if management == false and abstract.event_new.can_manage(session.user) %}
+            {% if management %}
+                <div class="group">
+                    {# TODO: scroll to decision buttons #}
+                    <a href="#" class="i-button highlight icon-hammer">
+                        {% trans %}Judge{% endtrans %}
+                    </a>
+                </div>
+            {% elif abstract.event_new.can_manage(session.user) %}
                 <div class="group">
                     <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
                         {% trans %}Management view{% endtrans %}
-                    </a>
-                </div>
-            {% endif %}
-            {% if management == true %}
-                <div class="group">
-                    {# TODO: scroll to decission buttons #}
-                    <a href="#" class="i-button highlight icon-hammer">
-                        {% trans %}Judge{% endtrans %}
                     </a>
                 </div>
             {% endif %}
@@ -303,11 +303,11 @@
                             {% elif abstract.state.name == 'rejected' %}
                                 {% trans %}The abstract was rejected.{% endtrans %}
                             {% elif abstract.state.name == 'merged' %}
-                                {% trans url=url_for(abstract.merged_into), other=abstract.merged_into.title -%}
+                                {% trans url=url_for(abstract_endpoint, abstract.merged_into), other=abstract.merged_into.title -%}
                                     The abstract was merged into <a href="{{ url }}">{{ other }}</a>.
                                 {%- endtrans %}
                             {% elif abstract.state.name == 'duplicate'%}
-                                {% trans url=url_for(abstract.duplicate_of), other=abstract.duplicate_of.title -%}
+                                {% trans url=url_for(abstract_endpoint, abstract.duplicate_of), other=abstract.duplicate_of.title -%}
                                     The abstract was marked as a duplicate of <a href="{{ url }}">{{ other }}</a>
                                 {%- endtrans %}
                             {% endif %}
