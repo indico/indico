@@ -263,5 +263,5 @@ class RHAbstractsDownloadAttachments(RHManageAbstractsActionsBase, ZipGeneratorM
 class RHAbstractsExportPDF(RHManageAbstractsActionsBase):
     def _process(self):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        pdf = ConfManagerAbstractsToPDF(self._conf, sorted_abstracts)
+        pdf = ConfManagerAbstractsToPDF(self.event_new, sorted_abstracts)
         return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')

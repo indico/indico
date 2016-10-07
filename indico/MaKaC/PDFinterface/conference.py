@@ -200,21 +200,19 @@ class AbstractsToPDF(PDFLaTeXBase):
 
     _tpl_filename = "report.tpl"
 
-    def __init__(self, conf, abstracts, tz=None):
+    def __init__(self, event, abstracts, tz=None):
         super(AbstractsToPDF, self).__init__()
-        self._conf = conf
-
         if tz is None:
-            self._tz = conf.getTimezone()
+            self._tz = event.timezone
 
         self._args.update({
-            'conf': conf,
+            'conf': event.as_legacy,
             'doc_type': 'abstract',
             'title': _("Report of Abstracts"),
             'get_track_classification': AbstractToPDF._get_track_classification,
             'get_contrib_type': AbstractToPDF._get_contrib_type,
             'items': abstracts,
-            'fields': [f for f in conf.as_event.contribution_fields if f.is_active]
+            'fields': [f for f in event.contribution_fields if f.is_active]
         })
 
 
@@ -265,8 +263,8 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
-    def __init__(self, conf, abstracts, tz=None):
-        super(ConfManagerAbstractsToPDF, self).__init__(conf, abstracts, tz)
+    def __init__(self, event, abstracts, tz=None):
+        super(ConfManagerAbstractsToPDF, self).__init__(event, abstracts, tz)
 
         self._args.update({
             'doc_type': 'abstract_manager',
