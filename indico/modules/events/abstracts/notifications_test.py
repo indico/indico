@@ -126,7 +126,7 @@ def test_abstract_notification(mocker, abstract_objects, create_email_template):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_notification_rules(mocker, abstract_objects, create_email_template):
+def test_notification_rules(mocker, abstract_objects, create_email_template, dummy_user, dummy_event_new):
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
 
     event, abstract, track, contrib_type = abstract_objects
@@ -144,6 +144,7 @@ def test_notification_rules(mocker, abstract_objects, create_email_template):
     assert send_email.call_count == 0
 
     abstract.state = AbstractState.merged
+    abstract.merged_into = Abstract(title='test', submitter=dummy_user, event_new=dummy_event_new)
     abstract.accepted_track = None
     abstract.submitted_for_tracks = {track}
     send_abstract_notifications(abstract)
