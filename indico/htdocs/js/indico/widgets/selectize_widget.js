@@ -24,7 +24,8 @@
             minTriggerLength: 0,
             searchUrl: null,
             selectizeOptions: null,
-            allowById: false
+            allowById: false,
+            preload: false
         }, options);
 
         function getSearchData(query) {
@@ -33,6 +34,8 @@
                 return {id: m[1]};
             } else if (query.length >= options.minTriggerLength) {
                 return {q: query};
+            } else if (!query && options.preload) {
+                return {};
             } else {
                 return null;
             }
@@ -40,6 +43,7 @@
 
         var params = {
             load: function(query, callback) {
+                var self = this;
                 var data = getSearchData(query);
                 if (!data) {
                     return callback();
@@ -47,9 +51,14 @@
                 $.ajax(options.searchUrl, {
                     data: data,
                     cache: false
-                }).fail(function() {
+                }).fail(function(data) {
                     callback();
+                    handleAjaxError(data);
                 }).done(function(res) {
+                    if (!query && options.preload) {
+                        // prevent extra queries after preloading
+                        self.settings.load = null;
+                    }
                     callback(res);
                 });
             },
@@ -61,9 +70,10 @@
                         return +(item.friendly_id === +data.id);
                     };
                 } else {
+                    // disable scoring to avoid reordering
                     var scoreFunc = this.getScoreFunction(query);
                     return function(item) {
-                        return scoreFunc(item);
+                        return scoreFunc(item) ? 1 : 0;
                     };
                 }
             }
