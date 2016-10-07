@@ -800,7 +800,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         if contrib is not None:
             res = '<a href="{}">{} - {}</a>'.format(
                 url_for('contributions.manage_contributions', contrib.event_new, selected=contrib.friendly_id),
-                contrib.id, contrib.title
+                contrib.id, contrib.title.encode('utf-8')
             )
         return res
 
