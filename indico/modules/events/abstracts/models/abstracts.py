@@ -95,6 +95,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
+    marshmallow_aliases = {'_description': 'content'}
 
     @declared_attr
     def __table_args__(cls):
