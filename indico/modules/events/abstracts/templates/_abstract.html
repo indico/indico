@@ -165,8 +165,10 @@
                 </div>
             {% endif %}
             <div class="group">
+            {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
                 <a class="i-button icon-file-download"
-                    title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
+                   href="{{ url_for(endpoint, abstract) }}"
+                   title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
             </div>
         </div>
     </div>

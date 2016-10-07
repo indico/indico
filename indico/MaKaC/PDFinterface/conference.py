@@ -162,24 +162,22 @@ class AbstractToPDF(PDFLaTeXBase):
         super(AbstractToPDF, self).__init__()
 
         self._abstract = abstract
-        conf = abstract.getConference()
+        event = abstract.event_new
 
         if tz is None:
-            tz = conf.getTimezone()
+            tz = event.timezone
 
         self._args.update({
             'doc_type': 'abstract',
             'abstract': abstract,
-            'conf': conf,
+            'conf': event.as_legacy,
             'tz': tz,
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+            'fields': [f for f in event.contribution_fields if f.is_active]
         })
-
-        logo = conf.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
+        if event.logo:
+            self._args['logo_img'] = create_event_logo_tmp_file(event).name
 
     @staticmethod
     def _get_track_classification(abstract):

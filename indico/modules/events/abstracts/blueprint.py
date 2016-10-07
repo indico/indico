@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract
+from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract, RHDisplayAbstractExportPDF
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHPreviewEmailTemplate,
@@ -27,7 +27,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHManageAbstractReviewing, RHCreateAbstract,
                                                                     RHDeleteAbstracts, RHAbstractPersonList,
                                                                     RHAbstractsDownloadAttachments,
-                                                                    RHAbstractsExportPDF)
+                                                                    RHAbstractsExportPDF, RHAbstractExportPDF)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -35,6 +35,7 @@ _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', templ
 
 # Display pages
 _bp.add_url_rule('/abstracts/<int:abstract_id>/', 'display_abstract', RHDisplayAbstract)
+_bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_pdf_export', RHDisplayAbstractExportPDF)
 
 # Management
 _bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', RHAbstracts)
@@ -70,3 +71,4 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/preview', 'em
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)

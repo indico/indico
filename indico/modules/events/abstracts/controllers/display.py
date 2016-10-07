@@ -18,6 +18,9 @@ from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.views import WPDisplayAbstracts
+from indico.util.fs import secure_filename
+from indico.web.flask.util import send_file
+from MaKaC.PDFinterface.conference import AbstractToPDF
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -34,3 +37,10 @@ class RHDisplayAbstract(AbstractMixin, RHConferenceBaseDisplay):
 
     def _process(self):
         return WPDisplayAbstracts.render_template('display/abstract.html', self._conf, abstract=self.abstract)
+
+
+class RHDisplayAbstractExportPDF(RHDisplayAbstract):
+    def _process(self):
+        pdf = AbstractToPDF(self.abstract)
+        file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
+        return send_file(file_name, pdf.generate(), 'application/pdf')
