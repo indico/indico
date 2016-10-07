@@ -76,6 +76,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['duplicate_of_id'], ['event_abstracts.abstracts.id']),
         sa.UniqueConstraint('friendly_id', 'event_id'),
         sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('(state = 3) OR (accepted_track_id IS NULL)',
+                           name='accepted_track_id_only_accepted'),
+        sa.CheckConstraint('(state = 3) OR (accepted_contrib_type_id IS NULL)',
+                           name='accepted_contrib_type_id_only_accepted'),
+        sa.CheckConstraint('(state = 5) = (merged_into_id IS NOT NULL)',
+                           name='merged_into_id_only_merged'),
+        sa.CheckConstraint('(state = 6) = (duplicate_of_id IS NOT NULL)',
+                           name='duplicate_of_id_only_duplicate'),
         schema='event_abstracts'
     )
 
@@ -203,10 +211,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
-        sa.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
-                           .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
-        sa.CheckConstraint("(proposed_action IN (4, 5)) = (proposed_related_abstract_id IS NOT NULL)"
-                           .format(AbstractAction.mark_as_duplicate), name='prop_abstract_id_only_duplicate_merge'),
+        sa.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)",
+                           name='prop_contrib_id_only_accepted'),
+        sa.CheckConstraint("(proposed_action IN (4, 5)) = (proposed_related_abstract_id IS NOT NULL)",
+                           name='prop_abstract_id_only_duplicate_merge'),
         schema='event_abstracts'
     )
 
