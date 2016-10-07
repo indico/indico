@@ -30,6 +30,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsDownloadAttachments,
                                                                     RHAbstractsExportPDF, RHAbstractExportPDF,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
+                                                                    RHAbstractsExportJSON,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHResetAbstractJudgment,
                                                                     RHBulkAbstractJudgment, RHAbstractNotificationLog)
@@ -68,6 +69,8 @@ _bp.add_url_rule('/manage/abstracts/abstracts.pdf', 'abstracts_pdf_export', RHAb
 _bp.add_url_rule('/manage/abstracts/abstracts.csv', 'abstracts_csv_export', RHAbstractsExportCSV,
                  methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/abstracts.xlsx', 'abstracts_xlsx_export', RHAbstractsExportExcel,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/abstracts.json', 'abstracts_json_export', RHAbstractsExportJSON,
                  methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', RHCreateAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', RHDeleteAbstracts, methods=('POST',))

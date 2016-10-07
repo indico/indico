@@ -394,6 +394,14 @@ class RHAbstractsExportExcel(RHAbstractsExportBase):
         return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet())
 
 
+class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
+    def _process(self):
+        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
+        response = jsonify(version=1, abstracts=[])
+        response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
+        return response
+
+
 class RHManageReviewingRoles(RHManageAbstractsBase):
     """Configure track roles (reviewers/conveners)."""
 
