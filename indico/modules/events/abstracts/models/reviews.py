@@ -37,8 +37,6 @@ class AbstractReview(db.Model):
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
-                      db.CheckConstraint("(proposed_action = {}) = (proposed_track_id IS NOT NULL)"
-                                         .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
                       db.CheckConstraint("proposed_action = {} OR (proposed_contribution_type_id IS NULL)"
                                          .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
                       db.CheckConstraint("(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)"
@@ -92,12 +90,6 @@ class AbstractReview(db.Model):
         index=True,
         nullable=True
     )
-    proposed_track_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.tracks.id'),
-        index=True,
-        nullable=True
-    )
     proposed_contribution_type_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contribution_types.id'),
@@ -140,20 +132,11 @@ class AbstractReview(db.Model):
             lazy='dynamic'
         )
     )
-    proposed_other_tracks = db.relationship(
+    proposed_tracks = db.relationship(
         'Track',
         secondary='event_abstracts.proposed_for_tracks',
         lazy=True,
         collection_class=set,
-        backref=db.backref(
-            'proposed_other_abstract_reviews',
-            lazy='dynamic'
-        )
-    )
-    proposed_track = db.relationship(
-        'Track',
-        lazy=True,
-        foreign_keys=proposed_track_id,
         backref=db.backref(
             'proposed_abstract_reviews',
             lazy='dynamic'

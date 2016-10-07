@@ -195,18 +195,14 @@ def upgrade():
         sa.Column('comment', sa.Text(), nullable=False),
         sa.Column('proposed_action', PyIntEnum(AbstractAction), nullable=False),
         sa.Column('proposed_related_abstract_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('proposed_track_id', sa.Integer(), nullable=True, index=True),
         sa.Column('proposed_contribution_type_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['proposed_related_abstract_id'], ['event_abstracts.abstracts.id']),
-        sa.ForeignKeyConstraint(['proposed_track_id'], ['events.tracks.id']),
         sa.ForeignKeyConstraint(['proposed_contribution_type_id'], ['events.contribution_types.id']),
         sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
-        sa.CheckConstraint("(proposed_action = {}) = (proposed_track_id IS NOT NULL)"
-                           .format(AbstractAction.accept), name='prop_track_id_only_accepted'),
         sa.CheckConstraint("proposed_action = 1 OR (proposed_contribution_type_id IS NULL)"
                            .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
         sa.CheckConstraint("(proposed_action IN (4, 5)) = (proposed_related_abstract_id IS NOT NULL)"
