@@ -20,7 +20,7 @@ from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 import transaction
-from flask import request, session, redirect, flash, json, Response, jsonify
+from flask import request, session, redirect, flash, jsonify
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
 from werkzeug.exceptions import NotFound, BadRequest, Forbidden
@@ -354,8 +354,8 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
         return ((room, count) for room, count in query if room.plugin.can_manage_vc_room(session.user, room))
 
     def _process(self):
-        return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
-                                   for room, count in self._iter_allowed_rooms()]), mimetype='application/json')
+        result = [{'id': room.id, 'name': room.name} for room, count in self._iter_allowed_rooms()]
+        return jsonify(result)
 
 
 class RHVCRoomList(RHProtected):
