@@ -23,10 +23,18 @@
     global.setupAbstractList = function setupAbstractList() {
         var abstractListContainer = $('#abstract-list');
 
+        var filterConfig = {
+            itemHandle: 'tr',
+            listItems: '#abstract-list tbody tr',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+
         abstractListContainer.on('indico:htmlUpdated', function() {
             abstractListContainer.find('.js-mathjax').mathJax();
         });
 
-        setupListGenerator();
+        setupListGenerator(filterConfig);
     };
 })(window);

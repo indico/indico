@@ -196,7 +196,6 @@
 
         $('.list-section [data-toggle=dropdown]').closest('.group').dropdown();
         setupTableSorter('#contribution-list .tablesorter');
-        setupSearchBox(filterConfig);
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         setupStartDateQBubbles();
@@ -211,7 +210,7 @@
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
-        setupListGenerator();
+        setupListGenerator(filterConfig);
         $('.js-submit-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -271,9 +270,8 @@
             placeholder: '#filter-placeholder'
         };
 
-        setupSearchBox(filterConfig);
         applySearchFilters();
-        setupListGenerator();
+        setupListGenerator(filterConfig);
     };
 
     global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {

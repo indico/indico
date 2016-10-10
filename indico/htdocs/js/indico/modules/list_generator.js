@@ -152,7 +152,10 @@
         });
     };
 
-    global.setupListGenerator = function() {
+    global.setupListGenerator = function(filterConfig) {
+        if (filterConfig) {
+            setupSearchBox(filterConfig);
+        }
         setupStaticURLGeneration();
         handleRowSelection();
         setupTableSorter();

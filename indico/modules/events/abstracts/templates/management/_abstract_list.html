@@ -40,21 +40,17 @@
                                            value="{{ abstract.id }}">
                                 </td>
                                 <td class="i-table id-column">
-                                    {{ abstract.friendly_id }}
+                                    {{- abstract.friendly_id -}}
                                 </td>
-                                <td class="i-table">
+                                <td class="i-table" data-searchable="{{ abstract.title | lower }}">
                                     <a class="js-mathjax" href="{{ url_for('abstracts.manage_abstract', abstract) }}">
                                         {{- abstract.title -}}
                                     </a>
                                 </td>
                                 {% for item in static_columns %}
                                     {% if item.id == 'state' %}
-                                        <td class="i-table" data-text="{{ abstract.state.title }}">
-                                            {% if abstract.state %}
-                                                {{ abstract.state.title }}
-                                            {% else %}
-                                                {% trans %}No track{% endtrans %}
-                                            {% endif %}
+                                        <td class="i-table" data-searchable="{{ abstract.state.title | lower }}">
+                                            {{- abstract.state.title -}}
                                         </td>
                                     {% elif item.id == 'authors' %}
                                         <td class="i-table person-row-cell"
@@ -64,83 +60,77 @@
                                             {%- endfor %}
                                         </td>
                                     {% elif item.id == 'submitted_contrib_type' %}
-                                        <td class="i-table type-column"
-                                            data-text="{{ abstract.submitted_contrib_type.name if abstract.submitted_contrib_type else '' }}">
-                                            {% if abstract.submitted_contrib_type -%}
-                                                {{ abstract.submitted_contrib_type.name }}
+                                        {% set contrib_type = abstract.submitted_contrib_type.name if abstract.submitted_contrib_type else '' %}
+                                        <td class="i-table type-column" data-text="{{ contrib_type }}"
+                                            data-searchable="{{ contrib_type | lower }}">
+                                            {%- if contrib_type %}
+                                                {{- contrib_type }}
                                             {%- else %}
-                                                {% trans %}n/a{% endtrans %}
-                                            {%- endif %}
+                                                {%- trans %}n/a{% endtrans %}
+                                            {%- endif -%}
                                         </td>
                                     {% elif item.id == 'accepted_contrib_type' %}
-                                        <td class="i-table type-column"
-                                            data-text="{{ abstract.accepted_contrib_type.name if abstract.accepted_contrib_type else '' }}">
-                                            {% if abstract.accepted_contrib_type -%}
-                                                {{ abstract.accepted_contrib_type.name }}
+                                        {% set contrib_type = abstract.accepted_contrib_type.name if abstract.accepted_contrib_type else '' %}
+                                        <td class="i-table type-column" data-text="{{ contrib_type }}"
+                                            data-searchable="{{ contrib_type | lower }}">
+                                            {%- if contrib_type %}
+                                                {{- contrib_type }}
                                             {%- else %}
-                                                {% trans %}n/a{% endtrans %}
-                                            {%- endif %}
+                                                {%- trans %}n/a{% endtrans %}
+                                            {%- endif -%}
                                         </td>
                                     {% elif item.id == 'submitted_for_tracks' %}
-                                        {% set track_titles = abstract.submitted_for_tracks | join(', ', attribute='title') %}
-                                        <td class="i-table"
-                                            data-text="{{ track_titles }}"
+                                        {% set tracks = abstract.submitted_for_tracks %}
+                                        {% set track_titles = tracks | join(', ', attribute='title') %}
+                                        <td class="i-table" data-text="{{ track_titles }}"
                                             data-searchable="{{ track_titles | lower }}">
-                                            {% for track in abstract.submitted_for_tracks | sort(attribute='title') -%}
+                                            {%- for track in tracks | sort(attribute='title') -%}
                                                 <div>{{ track.title }}</div>
                                             {%- endfor %}
-                                            {% if not abstract.submitted_for_tracks %}
-                                                {% trans %}No track{% endtrans %}
-                                            {% endif %}
+                                            {%- if not tracks %}
+                                                {%- trans %}No track{% endtrans %}
+                                            {%- endif -%}
                                         </td>
                                     {% elif item.id == 'reviewed_for_tracks' %}
-                                        {% set track_titles = abstract.reviewed_for_tracks | join(', ', attribute='title') %}
-                                        <td class="i-table"
-                                            data-text="{{ track_titles }}"
+                                        {% set tracks = abstract.reviewed_for_tracks %}
+                                        {% set track_titles = tracks | join(', ', attribute='title') %}
+                                        <td class="i-table" data-text="{{ track_titles }}"
                                             data-searchable="{{ track_titles | lower }}">
-                                            {% for track in abstract.reviewed_for_tracks | sort(attribute='title') -%}
+                                            {%- for track in tracks | sort(attribute='title') -%}
                                                 <div>{{ track.title }}</div>
                                             {%- endfor %}
-                                            {% if not abstract.reviewed_for_tracks %}
-                                                {% trans %}No track{% endtrans %}
-                                            {% endif %}
+                                            {%- if not tracks %}
+                                                {%- trans %}No track{% endtrans %}
+                                            {%- endif -%}
                                         </td>
                                     {% elif item.id == 'accepted_track' %}
-                                        <td class="i-table"
-                                            data-text="{{ abstract.accepted_track.title if abstract.accepted_track else '' }}">
-                                            {% if abstract.accepted_track %}
-                                                {{ abstract.accepted_track.title }}
-                                            {% else %}
-                                                {% trans %}No track{% endtrans %}
-                                            {% endif %}
+                                        {% set track = abstract.accepted_track.title if abstract.accepted_track else '' %}
+                                        <td class="i-table" data-text="{{ track }}"
+                                            data-searchable="{{ track | lower }}">
+                                            {%- if track %}
+                                                {{- track }}
+                                            {%- else %}
+                                                {%- trans %}No track{% endtrans %}
+                                            {%- endif -%}
                                         </td>
                                     {% elif item.id == 'score' %}
                                         <td class="i-table">
-                                            {% if abstract.score is not none %}
-                                                {{ abstract.score | round(1) }}
-                                            {% else %}
-                                                -
-                                            {% endif %}
+                                            {{- abstract.score | round(1) if abstract.score is not none else '-' }}
                                         </td>
                                     {% elif item.id == 'submitted_dt' %}
-                                        <td class="i-table"
-                                            data-text="{{ abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}">
-                                            {{ abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}
-                                        </td>
+                                        {% set dt = abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) %}
+                                        <td class="i-table" data-text="{{ dt }}">{{- dt -}}</td>
                                     {% elif item.id == 'modified_dt' %}
-                                        <td class="i-table" data-text="{{ abstract.state.title }}">
-                                            {% if abstract.modified_dt %}
-                                                {{ abstract.modified_dt | format_datetime('short', timezone=abstract.event_new.timezone) }}
-                                            {% else %}
-                                                -
-                                            {% endif %}
-                                        </td>
+                                        {% set dt = abstract.modified_dt | format_datetime('short', timezone=abstract.event_new.timezone) if abstract.modified_dt else '' %}
+                                        <td class="i-table" data-text="{{ dt }}">{{ dt if dt else '-' }}</td>
                                     {% endif %}
                                 {% endfor %}
                                 {% set data = abstract.data_by_field %}
                                 {% for item in dynamic_columns %}
-                                    <td class="i-table" data-text="{{ data[item.id].friendly_data if item.id in data }}">
-                                        {{ data[item.id].friendly_data if item.id in data }}
+                                    {% set friendly_data = data[item.id].friendly_data if item.id in data else '' %}
+                                    <td class="i-table" data-text="{{ friendly_data }}"
+                                        data-searchable="{{ friendly_data | lower }}">
+                                        {{- friendly_data if friendly_data else '-' -}}
                                     </td>
                                 {% endfor %}
                             </tr>
