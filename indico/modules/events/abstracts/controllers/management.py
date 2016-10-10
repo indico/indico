@@ -39,7 +39,7 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values, ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
-from indico.util.spreadsheets import send_csv
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -283,9 +283,24 @@ class RHAbstractsExportPDF(RHManageAbstractsActionsBase):
         return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHAbstractsExportCSV(RHManageAbstractsActionsBase):
+class RHAbstractsExportBase(RHManageAbstractsActionsBase):
+    """RH for all abstract list export classes"""
+
+    def _generate_spreadsheet(self):
+        export_config = self.list_generator.get_list_export_config()
+        return generate_spreadsheet_from_abstracts(self.abstracts, export_config['static_item_ids'],
+                                                   export_config['dynamic_items'])
+
+
+class RHAbstractsExportCSV(RHAbstractsExportBase):
+    """Export list of abstracts to CSV"""
+
     def _process(self):
-        self.export_config = self.list_generator.get_list_export_config()
-        headers, rows = generate_spreadsheet_from_abstracts(self.abstracts, self.export_config['static_item_ids'],
-                                                            self.export_config['dynamic_items'])
-        return send_csv('abstracts.csv', headers, rows)
+        return send_csv('abstracts.csv', *self._generate_spreadsheet())
+
+
+class RHAbstractsExportExcel(RHAbstractsExportBase):
+    """Export list of abstracts to XLSX"""
+
+    def _process(self):
+        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet())
