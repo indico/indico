@@ -75,8 +75,7 @@
                     {% endif %}
                 </div>
                 <div>
-                    {# TODO: link to contribution #}
-                    {% trans url='#' %}
+                    {% trans url=url_for('contributions.display_contribution', abstract.contribution) %}
                         <a href="{{ url }}">Go to contribution</a>
                     {% endtrans %}
                 </div>
@@ -278,27 +277,28 @@
                         </div>
                         <div class="i-box-content">
                             {% if abstract.state.name == 'accepted' %}
+                                {% set url = url_for('contributions.display_contribution', abstract.contribution) %}
                                 {% if abstract.accepted_contrib_type and abstract.accepted_track %}
-                                    {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title, url='#' -%}
+                                    {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title -%}
                                         The abstract was accepted
                                         as <span class="abstract-contribution-type">{{ type }}</span>
                                         for track <span class="abstract-track">{{ track }}</span>
                                         and a <a href="{{ url }}">contribution</a> was created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_contrib_type %}
-                                    {% trans type=abstract.accepted_contrib_type.name, url='#' -%}
+                                    {% trans type=abstract.accepted_contrib_type.name -%}
                                         The abstract was accepted
                                         as <span class="abstract-contribution-type">{{ type }}</span>
                                         and a <a href="{{ url }}">contribution</a> was created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_track %}
-                                    {% trans track=abstract.accepted_track.title, url='#' -%}
+                                    {% trans track=abstract.accepted_track.title -%}
                                         The abstract was accepted
                                         for track <span class="abstract-track">{{ track }}</span>
                                         and a <a href="{{ url }}">contribution</a> was created in the event.
                                     {%- endtrans %}
                                 {% else %}
-                                    {% trans url='#' -%}
+                                    {% trans -%}
                                         The abstract was accepted and a <a href="{{ url }}">contribution</a> was created in the event.
                                     {%- endtrans %}
                                 {% endif %}
