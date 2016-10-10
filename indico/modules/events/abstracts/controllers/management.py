@@ -31,13 +31,15 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import create_abstract, delete_abstract
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
-from indico.modules.events.abstracts.util import AbstractListGenerator, make_abstract_form
+from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form,
+                                                  generate_spreadsheet_from_abstracts)
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values, ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.spreadsheets import send_csv
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -279,3 +281,11 @@ class RHAbstractsExportPDF(RHManageAbstractsActionsBase):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
         pdf = ConfManagerAbstractsToPDF(self.event_new, sorted_abstracts)
         return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHAbstractsExportCSV(RHManageAbstractsActionsBase):
+    def _process(self):
+        self.export_config = self.list_generator.get_list_export_config()
+        headers, rows = generate_spreadsheet_from_abstracts(self.abstracts, self.export_config['static_item_ids'],
+                                                            self.export_config['dynamic_items'])
+        return send_csv('abstracts.csv', headers, rows)

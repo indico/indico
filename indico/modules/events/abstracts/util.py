@@ -30,7 +30,9 @@ from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
+from indico.util.date_time import format_datetime
 from indico.util.i18n import _
+from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
@@ -192,7 +194,7 @@ class AbstractListGenerator(ListGeneratorBase):
         static_item_ids, dynamic_item_ids = self._split_item_ids(list_config['items'], 'static')
         return {
             'static_item_ids': static_item_ids,
-            # TODO: 'dynamic_item_ids'
+            'dynamic_items': self._get_sorted_contribution_fields(dynamic_item_ids)
         }
 
     def render_list(self, abstract=None):
@@ -225,6 +227,51 @@ def build_default_email_template(event, tpl_type):
                                 include_submitter=True,
                                 include_coauthors=True)
     return tpl
+
+
+def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
+    """Generates a spreadsheet data from a given abstract list.
+
+    :param abstracts: The list of abstracts to include in the file
+    :param static_item_ids: The abstract properties to be used as columns
+    :param dynamic_items: Contribution fields as extra columns
+    """
+    field_names = ['ID', 'Title']
+    static_item_mapping = OrderedDict([
+        ('state', ('State', lambda x: x.state.title)),
+        ('authors', ('Primary authors', lambda x: [a.full_name for a in x.primary_authors])),
+        ('accepted_track', ('Accepted track', lambda x: x.accepted_track.title if x.accepted_track else None)),
+        ('submitted_for_tracks', ('Submitted for tracks',
+                                  lambda x: [t.title for t in x.submitted_for_tracks])),
+        ('reviewed_for_tracks', ('Reviewed for tracks', lambda x: [t.title for t in x.reviewed_for_tracks])),
+        ('accepted_contrib_type', ('Accepted type',
+                                   lambda x: x.accepted_contrib_type.name if x.accepted_contrib_type else None)),
+        ('submitted_contrib_type', ('Submitted type',
+                                    lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None)),
+        ('score', ('Score', lambda x: x.score)),
+        ('submitted_dt', ('Submission date', lambda x: to_unicode(format_datetime(x.submitted_dt)))),
+        ('modified_dt', ('Modification date', lambda x: (to_unicode(format_datetime(x.modified_dt)) if x.modified_dt
+                                                         else '')))
+    ])
+    field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
+    field_names.extend(title for name, (title, fn) in static_item_mapping.iteritems() if name in static_item_ids)
+    rows = []
+    for abstract in abstracts:
+        data = abstract.data_by_field
+        abstract_dict = {
+            'ID': abstract.friendly_id,
+            'Title': abstract.title
+        }
+        for item in dynamic_items:
+            key = unique_col(item.title, item.id)
+            abstract_dict[key] = data[item.id].friendly_data if item.id in data else ''
+        for name, (title, fn) in static_item_mapping.iteritems():
+            if name not in static_item_ids:
+                continue
+            value = fn(abstract)
+            abstract_dict[title] = value
+        rows.append(abstract_dict)
+    return field_names, rows
 
 
 @no_autoflush
