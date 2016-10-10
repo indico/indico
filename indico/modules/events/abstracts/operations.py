@@ -23,7 +23,7 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
@@ -62,6 +62,14 @@ def delete_abstract(abstract, delete_contrib=False):
     logger.info('Abstract %s deleted by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
+
+
+def reset_abstract_judgment(abstract):
+    abstract.reset_judgment()
+    db.session.flush()
+    logger.info('Abstract %s judgment reset by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'Judgment from abstract "{}" has been reset'.format(abstract.title), session.user)
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
