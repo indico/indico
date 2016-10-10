@@ -144,15 +144,23 @@
                         {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
                     </div>
                 </div>
-                <div id="filter-placeholder"></div>
+                <div class="group">
+                    <span class="i-button label icon-search"></span>
+                    <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                </div>
             </div>
         </div>
         <div class="list-content" id="abstract-list">
             {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) }}
         </div>
+        <div id="filter-placeholder"></div>
     </div>
 
     <script>
+        {% if selected_entry %}
+            $('#search-input').val('#{{ selected_entry }}').trigger('change');
+        {% endif %}
+
         setupAbstractList();
     </script>
 {% endblock %}
