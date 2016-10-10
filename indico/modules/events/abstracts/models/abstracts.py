@@ -471,3 +471,13 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         if not scores:
             return None
         return sum(scores) / len(scores)
+
+    def reset_judgment(self):
+        self.state = AbstractState.submitted
+        self.judgment_comment = ''
+        self.judge = None
+        self.judgment_dt = None
+        self.accepted_track = None
+        self.accepted_contrib_type = None
+        self.merged_into = None
+        self.duplicate_of = None
