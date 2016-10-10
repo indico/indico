@@ -24,6 +24,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
@@ -62,6 +63,35 @@ def delete_abstract(abstract, delete_contrib=False):
     logger.info('Abstract %s deleted by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
+
+
+def judge_abstract(abstract, abstract_data, judgment, contrib_session=None, merge_persons=False,
+                   send_notification=False):
+    abstract.judgment_comment = abstract_data['judgment_comment']
+    if judgment == AbstractAction.accept:
+        abstract.state = AbstractState.accepted
+        abstract.accepted_track = abstract_data['accepted_track']
+        abstract.accepted_contrib_type = abstract_data['accepted_contrib_type']
+        if not abstract.contribution:
+            # TODO: generate contribution
+            pass
+    elif judgment == AbstractAction.reject:
+        abstract.state = AbstractState.rejected
+    elif judgment == AbstractAction.mark_as_duplicate:
+        abstract.state = AbstractState.duplicate
+        abstract.duplicate_of = abstract_data['duplicate_of']
+    elif judgment == AbstractAction.merge:
+        abstract.state = AbstractState.merged
+        abstract.merged_into = abstract_data['merged_into']
+        if merge_persons:
+            abstract.merged_into.person_links |= abstract.person_links
+    db.session.flush()
+    if send_notification:
+        # TODO: send notification
+        pass
+    logger.info('Abstract %s judged by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'Abstract "{}" has been judged'.format(abstract.title), session.user)
 
 
 def reset_abstract_judgment(abstract):
