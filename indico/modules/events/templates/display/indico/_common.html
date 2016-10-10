@@ -87,8 +87,11 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro render_datetime(prop_name, dt, timezone, format='medium') -%}
+{% macro render_datetime(prop_name, dt, timezone, format='medium', show_weekday=false) -%}
     <time itemprop="{{ prop_name }}" datetime="{{ dt.isoformat() }}">
+        {% if show_weekday %}
+            {{ dt | format_datetime(format='EEEE', timezone=timezone) }}
+        {% endif %}
         {{ dt | format_datetime(format=format, timezone=timezone) }}
     </time>
 {%- endmacro %}
@@ -97,15 +100,16 @@
     <i class="icon-calendar header-data" title="{% trans %}Start/end date/time of the event{% endtrans %}"></i>
     <span class="event-time-data">
         {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
-            {{ render_datetime('startDate', event.start_dt, timezone=timezone) }}
+            {{ render_datetime('startDate', event.start_dt, timezone=timezone, show_weekday=true) }}
             &rarr;
             <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
                 {{ event.end_dt | format_time(format='medium', timezone=timezone) }}
             </time>
         {% else %}
-            {{ render_datetime('startDate', event.start_dt, timezone=timezone) }}
+            {%- set show_weekday = event.type == 'lecture' -%}
+            {{ render_datetime('startDate', event.start_dt, timezone=timezone, show_weekday=show_weekday) }}
             &rarr;
-            {{ render_datetime('endDate', event.end_dt, timezone=timezone) }}
+            {{ render_datetime('endDate', event.end_dt, timezone=timezone, show_weekday=show_weekday) }}
         {% endif %}
         <span class="timezone">{{ timezone }}</span>
     </span>
