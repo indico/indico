@@ -37,9 +37,35 @@
             field.closest('.form-group').toggle(active);
             if (!field.is(':input')) {
                 field.find(':input').prop('disabled', !active);
-            } else if(!field.data('initiallyDisabled')) {
+            } else if (!field.data('initiallyDisabled')) {
                 field.prop('disabled', !active);
             }
+        });
+    }
+
+    function isElementInView(elem) {
+        var docViewTop = $(window).scrollTop();
+        var docViewBottom = docViewTop + $(window).height();
+        var elemTop = $(elem).offset().top;
+        var elemBottom = elemTop + $(elem).height();
+        return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+    }
+
+    function showSaveCornerMessage($form) {
+        cornerMessage({
+            actionLabel: $T.gettext('Save now'),
+            progressMessage: $T.gettext('Saving...'),
+            message: $T.gettext('Do not forget to save your changes!'),
+            class: 'highlight save-corner-message',
+            actionCallback: function() {
+                $form.submit();
+            }
+        });
+    }
+
+    function hideSaveCornerMessage($cornerMessage) {
+        $cornerMessage.fadeOut(300, function() {
+            $cornerMessage.remove();
         });
     }
 
@@ -77,10 +103,33 @@
             });
         }).on('change input', function() {
             var $this = $(this);
-            var untouched = $this.serialize() == $this.data('initialData');
+            var untouched = $this.serialize() === $this.data('initialData');
+            var $cornerMessage = $('.save-corner-message');
             $this.find('[data-disabled-until-change]').prop('disabled', untouched);
             $this.closest('form').data('fieldsChanged', !untouched);
+            if ($this.find('[data-save-reminder]').length) {
+                if (!isElementInView($this.find('[data-save-reminder]'))
+                    && !untouched && !$cornerMessage.length) {
+                    showSaveCornerMessage($this);
+                } else if (untouched) {
+                    hideSaveCornerMessage($cornerMessage);
+                }
+            }
         });
+
+        // Remove corner message when 'Save' button is visible on screen
+        $(window).on('scroll', _.debounce(function() {
+            var $form = forms.find('[data-save-reminder]').closest('form');
+            if ($form.length) {
+                var $cornerMessage = $('.save-corner-message');
+                var untouched = $form.serialize() === $form.data('initialData');
+                if (isElementInView($form.find('[data-save-reminder]'))) {
+                    hideSaveCornerMessage($cornerMessage);
+                } else if (!untouched && !$cornerMessage.length) {
+                    showSaveCornerMessage($form);
+                }
+            }
+        }, 100));
 
         forms.find('fieldset.collapsible > legend').on('click', function(evt) {
             evt.preventDefault();
@@ -185,7 +234,7 @@
             // in case of dynamically updated rows, this must remain the same
             // all the time as events are bound to it
             containerSelector: null,
-            // the selector for the row selection checkboxes. used within the 
+            // the selector for the row selection checkboxes. used within the
             // context of containerSelector
             checkboxSelector: null,
             // the selector for the (usually hidden) all-items-on-all-pages-selected
