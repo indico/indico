@@ -1,8 +1,13 @@
 {% extends 'events/abstracts/management/_base.html' %}
 
 {% block content %}
-    <!-- TODO: Add missing templates for the rest of the states -->
-    {% include 'events/abstracts/management/abstracts_setup_actions/not_started.html' %}
+    {% if not cfa.has_started %}
+        {% include 'events/abstracts/management/cfa_actions/not_started.html' %}
+    {% elif cfa.has_started and not cfa.has_ended %}
+        {% include 'events/abstracts/management/cfa_actions/open.html' %}
+    {% elif cfa.has_ended %}
+        {% include 'events/abstracts/management/cfa_actions/ended.html' %}
+    {% endif %}
 
     <div class="action-box">
         <div class="section">

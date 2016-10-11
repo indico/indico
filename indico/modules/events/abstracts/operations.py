@@ -62,3 +62,28 @@ def delete_abstract(abstract, delete_contrib=False):
     logger.info('Abstract %s deleted by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
+
+
+def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
+    event.cfa.schedule(start_dt, end_dt, modification_end_dt)
+    logger.info("Call for abstracts for %s scheduled by %s", event, session.user)
+    log_data = {
+        'Start': start_dt.isoformat(),
+        'End': end_dt.isoformat()
+    }
+    if modification_end_dt:
+        log_data['Modification deadline'] = modification_end_dt.isoformat()
+    event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts', 'Call for abstracts scheduled', session.user,
+              data=log_data)
+
+
+def open_cfa(event):
+    event.cfa.open()
+    logger.info("Call for abstracts for %s opened by %s", event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts', 'Call for abstracts opened', session.user)
+
+
+def close_cfa(event):
+    event.cfa.close()
+    logger.info("Call for abstracts for %s closed by %s", event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts', 'Call for abstracts closed', session.user)

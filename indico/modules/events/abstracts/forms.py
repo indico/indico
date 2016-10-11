@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import time
+
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
@@ -28,9 +30,10 @@ from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
-                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField)
+                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
+                                     IndicoDateTimeField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, UsedIf
+from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -232,3 +235,18 @@ class MultiTrackMixin(object):
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
+
+
+class AbstractsScheduleForm(IndicoForm):
+    start_dt = IndicoDateTimeField(_("Start"), default_time=time(0, 0),
+                                   description=_("The moment users can start submitting abstracts"))
+    end_dt = IndicoDateTimeField(_("End"), [LinkedDateTime('start_dt')], default_time=time(23, 59),
+                                 description=_("The moment the submission process will end"))
+    modification_end_dt = IndicoDateTimeField(_("Modification deadline"), [Optional(), LinkedDateTime('end_dt')],
+                                              default_time=time(23, 59),
+                                              description=_("Deadline until which the submitted abstracts can be "
+                                                            "modified"))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(AbstractsScheduleForm, self).__init__(*args, **kwargs)
