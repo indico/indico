@@ -25,12 +25,14 @@ from flask import redirect, flash, jsonify, request, session
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
-                                                   AbstractReviewingRolesForm, AbstractReviewingSettingsForm)
+                                                   AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
+                                                   AbstractsScheduleForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import create_abstract, delete_abstract
+from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
+                                                        close_cfa)
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
                                                   generate_spreadsheet_from_abstracts)
@@ -41,7 +43,7 @@ from indico.modules.events.util import get_field_values, update_object_principal
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF
@@ -107,7 +109,38 @@ class RHAbstracts(RHManageAbstractsBase):
     def _process(self):
         abstracts_count = Abstract.query.with_parent(self.event_new).count()
         return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new,
-                                                 abstracts_count=abstracts_count)
+                                                 abstracts_count=abstracts_count, cfa=self.event_new.cfa)
+
+
+class RHScheduleCFA(RHManageAbstractsBase):
+    """Schedule the call for abstracts"""
+
+    def _process(self):
+        form = AbstractsScheduleForm(obj=FormDefaults(**abstracts_settings.get_all(self.event_new)),
+                                     event=self.event_new)
+        if form.validate_on_submit():
+            schedule_cfa(self.event_new, **form.data)
+            flash(_("Call for abstracts has been scheduled"), 'success')
+            return jsonify_data()
+        return jsonify_form(form)
+
+
+class RHOpenCFA(RHManageAbstractsBase):
+    """Opens the call for abstracts"""
+
+    def _process(self):
+        open_cfa(self.event_new)
+        flash(_("Call for abstracts is now open"), 'success')
+        return redirect(url_for('.manage_abstracts', self.event_new))
+
+
+class RHCloseCFA(RHManageAbstractsBase):
+    """Closes the call for abstracts"""
+
+    def _process(self):
+        close_cfa(self.event_new)
+        flash(_("Call for abstracts is now closed"), 'success')
+        return redirect(url_for('.manage_abstracts', self.event_new))
 
 
 class RHManageBOA(RHManageAbstractsBase):
