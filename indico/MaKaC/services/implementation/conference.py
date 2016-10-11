@@ -61,7 +61,7 @@ def _serialize_contribution(contrib):
         'endDate': Conversion.datetime(contrib.end_dt),
         'duration': Conversion.duration(contrib.duration),
         'description': contrib.description,
-        'track': to_unicode(contrib.track.getTitle()) if contrib.track else None,
+        'track': to_unicode(contrib.track.title) if contrib.track else None,
         'session': contrib.session.title if contrib.session else None,
         'type': contrib.type.name if contrib.type else None,
         'address': contrib.address,
