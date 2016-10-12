@@ -53,7 +53,7 @@ $i-button-background-color: darken($light-gray, 5%);
 }
 
 @mixin _i-button-outlines($color, $dark-color) {
-    &.outline {
+    &.text-color {
         color: $color;
 
         &:hover,
@@ -61,7 +61,7 @@ $i-button-background-color: darken($light-gray, 5%);
             color: $dark-color;
         }
 
-        &.full {
+        &.outline {
             border-color: $color;
             background: white;
         }
@@ -84,7 +84,7 @@ $i-button-background-color: darken($light-gray, 5%);
     $no-modes: '';
 
     @if $with-modes == true {
-        $no-modes: ':not(.borderless):not(.outline)';
+        $no-modes: ':not(.borderless):not(.text-color)';
     }
 
     &:not(.label)#{$no-modes} {
