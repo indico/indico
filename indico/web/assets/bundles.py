@@ -172,7 +172,8 @@ indico_jquery = rjs_bundle(
                'palettepicker.js',
                'itempicker.js',
                'sortablelist.js',
-               'categorynavigator.js'))
+               'categorynavigator.js',
+               'track_role_widget.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
