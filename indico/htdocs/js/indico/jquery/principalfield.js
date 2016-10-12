@@ -47,7 +47,7 @@
             self.options.render(self.people);
         },
 
-        _add: function _add(people) {
+        add: function add(people) {
             var self = this;
 
             function comparePersons(first, second) {
@@ -75,7 +75,7 @@
 
         choose: function choose() {
             var self = this;
-            function handle(people) { self._add(people); }
+            function handle(people) { self.add(people); }
             var userChoosePopup = new ChooseUsersPopup($T("Choose person"), true, self.options.eventId,
                                                        self.options.enableGroupsTab, self.options.showFavoriteUsers,
                                                        self.options.suggestedUsers, !self.options.multiChoice,
@@ -95,7 +95,7 @@
 
         enter: function enter() {
             var self = this;
-            function handle(person) { self._add([person.getAll()]); }
+            function handle(person) { self.add([person.getAll()]); }
             var personCreatePopup = new UserDataPopup($T("Enter person"), $O(), handle, false, false, false,
                                                       self.options.allowEmptyEmail);
             personCreatePopup.open();
