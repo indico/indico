@@ -70,6 +70,28 @@
     }
 }
 
+.event-user {
+    @include border-radius();
+    @include border-all();
+    @include icon-before('icon-user');
+
+    display: inline-block;
+    font-size: 0.95em;
+    padding: 0.2em 0.5em;
+    margin-bottom: 0.1em;
+    color: $black;
+    background: $pastel-gray;
+
+    &:before {
+        color: $gray;
+        margin-right: 0.4em;
+    }
+
+    &:not(first-child) {
+        margin-left: 0.1em;
+    }
+}
+
 .user-search-results {
     height: 300px;
     border: 1px solid $gray;
