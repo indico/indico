@@ -261,21 +261,29 @@ def upgrade():
 
     op.create_table(
         'track_abstract_reviewers',
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True, index=True),
         sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
-        sa.Column('track_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.Column('event_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
+        sa.Column('track_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
         sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('user_id', 'track_id'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('(track_id IS NULL) != (event_id IS NULL)', name='track_xor_event_id_null'),
         schema='events'
     )
 
     op.create_table(
         'track_conveners',
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True, index=True),
         sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
-        sa.Column('track_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
+        sa.Column('event_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
+        sa.Column('track_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
         sa.ForeignKeyConstraint(['track_id'], ['events.tracks.id']),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('user_id', 'track_id'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('(track_id IS NULL) != (event_id IS NULL)', name='track_xor_event_id_null'),
         schema='events'
     )
 
