@@ -1,0 +1,97 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+
+#form-group-roles .form-field {
+    width: inherit;
+}
+
+#reviewing-role-form {
+    margin-top: 0;
+}
+
+.role-widget {
+    padding-right: 20px;
+    max-height: 700px;
+    width: 800px;
+    overflow-y: auto;
+}
+
+.role-list {
+    margin: 0;
+    padding-left: 0;
+
+    li.i-box {
+        margin: 20px 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .user-role-list {
+        padding-left: 0;
+
+        .event-user {
+            margin-top: 0.1em;
+
+            .icon-cross {
+                vertical-align: middle;
+                font-size: 0.8em;
+                margin-left: 0.5em;
+            }
+        }
+    }
+
+    .actions {
+        overflow: auto;
+    }
+
+    .role-description {
+        .title {
+            height: 2em !important;
+            vertical-align: middle;
+            font-size: 1.2em;
+        }
+
+        .add-user {
+            padding: 0;
+            height: 2em !important;
+        }
+
+        margin: 1em 0 0.5em 0;
+        overflow: auto;
+    }
+
+    .reviewer-container {
+        &:not(:first-child) {
+            @include border-top();
+        }
+        margin: 0 -10px;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        &:not(:last-child) {
+            padding-bottom: 1em;
+        }
+    }
+}

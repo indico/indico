@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request, session
+from collections import defaultdict
+from flask import jsonify, session
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-from indico.core.db.sqlalchemy.util.queries import escape_like
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
@@ -30,11 +30,28 @@ from indico.modules.events.abstracts.notifications import StateCondition, TrackC
 from indico.modules.events.abstracts.util import serialize_abstract_person_link
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
+from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.forms.base import AjaxFieldMixin
 from indico.web.forms.fields import MultipleItemsField, JSONField
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
+
+
+def _serialize_user(user):
+    return {
+        'id': user.id,
+        'name': user.name
+    }
+
+
+def get_users_in_roles(data):
+    user_ids = {user_id
+                for user_roles in data.viewvalues()
+                for users in user_roles.viewvalues()
+                for user_id in users}
+    return db.session.query(User.id, User).filter(User.id.in_(user_ids))
 
 
 class EmailRuleListField(JSONField):
@@ -180,3 +197,54 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
     @property
     def search_url(self):
         return self.get_ajax_url()
+
+
+class TrackRoleField(JSONField):
+    """A field that stores a list of e-mail template rules."""
+
+    CAN_POPULATE = True
+    widget = JinjaWidget('events/abstracts/forms/track_role_widget.html')
+
+    @property
+    def users(self):
+        return {user_id: _serialize_user(user) for user_id, user in get_users_in_roles(self.data)}
+
+    @property
+    def role_data(self):
+        conveners = set()
+        reviewers = set()
+
+        # Handle global reviewers/conveners
+        role_data = self.data.pop('*')
+        global_conveners = set(User.find(User.id.in_(role_data['convener']), ~User.is_deleted))
+        global_reviewers = set(User.find(User.id.in_(role_data['reviewer']), ~User.is_deleted))
+        conveners |= global_conveners
+        reviewers |= global_reviewers
+
+        track_dict = {track.id: track
+                      for track in Track.query.with_parent(self.event).filter(Track.id.in_(self.data))}
+        user_dict = dict(get_users_in_roles(self.data))
+
+        track_roles = {}
+        # Update track-specific reviewers/conveners
+        for track_id, roles in self.data.viewitems():
+            track = track_dict[int(track_id)]
+            track_roles[track] = defaultdict(set)
+            for role_id, user_ids in roles.viewitems():
+                users = {user_dict[user_id] for user_id in user_ids}
+                track_roles[track][role_id] = users
+                if role_id == 'convener':
+                    conveners |= users
+                elif role_id == 'reviewer':
+                    reviewers |= users
+
+        return {
+            'track_roles': track_roles,
+            'global_conveners': global_conveners,
+            'global_reviewers': global_reviewers,
+            'all_conveners': conveners,
+            'all_reviewers': reviewers
+        }
+
+    def _value(self):
+        return super(TrackRoleField, self)._value() if self.data else '[]'

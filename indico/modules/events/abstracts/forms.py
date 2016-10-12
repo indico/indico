@@ -17,11 +17,11 @@
 from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaField, StringField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
-                                                    AbstractPersonLinkListField, AbstractField)
+                                                    AbstractPersonLinkListField, TrackRoleField)
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
@@ -122,6 +122,17 @@ class AbstractReviewingSettingsForm(IndicoForm):
             for key in self.RATING_FIELDS:
                 del data[key]
         return data
+
+
+class AbstractReviewingRolesForm(IndicoForm):
+    """Settings form for abstract reviewing roles"""
+    roles = TrackRoleField()
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(AbstractReviewingRolesForm, self).__init__(*args, **kwargs)
+        self.roles.event = self.event
+        self.roles.tracks = self.event.tracks
 
 
 class EditEmailTemplateRuleForm(IndicoForm):

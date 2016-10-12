@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 
 from flask import request, flash
-from sqlalchemy.orm import joinedload, subqueryload
+from sqlalchemy.orm import joinedload, subqueryload, joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -352,3 +352,22 @@ def make_abstract_form(event):
         name = 'custom_{}'.format(custom_field.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
+
+
+def get_roles_for_event(event):
+    """Return a dictionary of all abstract reviewing roles for this event.
+
+    :param event: the actual event object.
+    :return: A dictionary in the form ``{track: {role: [users]}}``
+    """
+    roles = defaultdict(dict)
+    for track in Track.query.with_parent(event).options(joinedload('conveners'), joinedload('abstract_reviewers')):
+        roles[str(track.id)].setdefault('reviewer', [])
+        roles[str(track.id)].setdefault('convener', [])
+        for reviewer in track.abstract_reviewers:
+            roles[str(track.id)]['reviewer'].append(reviewer.id)
+        for convener in track.conveners:
+            roles[str(track.id)]['convener'].append(convener.id)
+    roles['*']['reviewer'] = [reviewer.id for reviewer in event.global_abstract_reviewers]
+    roles['*']['convener'] = [reviewer.id for reviewer in event.global_conveners]
+    return roles
