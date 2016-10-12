@@ -20,23 +20,24 @@ import os
 from collections import defaultdict
 from operator import attrgetter
 
-from flask import redirect, flash, jsonify, request
+from flask import redirect, flash, jsonify, request, session
 
+from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
-                                                   AbstractReviewingSettingsForm)
+                                                   AbstractReviewingRolesForm, AbstractReviewingSettingsForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import create_abstract, delete_abstract
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
-from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form,
+from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
                                                   generate_spreadsheet_from_abstracts)
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import get_field_values, ZipGeneratorMixin
+from indico.modules.events.util import get_field_values, update_object_principals, ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -304,3 +305,30 @@ class RHAbstractsExportExcel(RHAbstractsExportBase):
 
     def _process(self):
         return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet())
+
+
+class RHManageReviewingRoles(RHManageAbstractsBase):
+    """Configure track roles (reviewers/conveners)."""
+
+    def _process(self):
+        roles = get_roles_for_event(self.event_new)
+        form = AbstractReviewingRolesForm(event=self.event_new, obj=FormDefaults(roles=roles))
+
+        if form.validate_on_submit():
+            role_data = form.roles.role_data
+            self.event_new.global_conveners = set(role_data['global_conveners'])
+            self.event_new.global_abstract_reviewers = set(role_data['global_reviewers'])
+
+            for track, user_roles in role_data['track_roles'].viewitems():
+                track.conveners = set(user_roles['convener'])
+                track.abstract_reviewers = set(user_roles['reviewer'])
+
+            # Update actual ACLs
+            update_object_principals(self.event_new, role_data['all_conveners'], role='track_convener')
+            update_object_principals(self.event_new, role_data['all_reviewers'], role='abstract_reviewer')
+
+            flash(_("Abstract reviewing roles have been updated."), 'success')
+            logger.info("Abstract reviewing roles of %s have been updated by %s", self.event_new, session.user)
+            return jsonify_data()
+        return jsonify_form(form, skip_labels=True, form_header_kwargs={'id': 'reviewing-role-form'},
+                            disabled_until_change=True)

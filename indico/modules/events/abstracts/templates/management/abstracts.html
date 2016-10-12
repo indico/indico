@@ -52,8 +52,11 @@
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a href="#" class="i-button icon-users">
-                        {% trans %}Teams{% endtrans %}
+                    <a href="#" class="i-button icon-users"
+                       data-href="{{ url_for('.manage_reviewing_roles', event) }}"
+                       data-title="{% trans %}Abstract Reviewing Roles{% endtrans %}"
+                       data-ajax-dialog>
+                        {% trans %}Roles{% endtrans %}
                     </a>
                 </div>
                 <div class="group">

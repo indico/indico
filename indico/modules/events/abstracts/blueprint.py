@@ -28,7 +28,8 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHDeleteAbstracts, RHAbstractPersonList,
                                                                     RHAbstractsDownloadAttachments,
                                                                     RHAbstractsExportPDF, RHAbstractExportPDF,
-                                                                    RHAbstractsExportCSV, RHAbstractsExportExcel)
+                                                                    RHAbstractsExportCSV, RHAbstractsExportExcel,
+                                                                    RHManageReviewingRoles)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -45,6 +46,7 @@ _bp.add_url_rule('/manage/abstracts/settings', 'manage_submission_settings', RHM
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings', RHManageAbstractReviewing,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/teams', 'manage_reviewing_roles', RHManageReviewingRoles, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', RHAbstractList)
 _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', RHAbstractListCustomize,
                  methods=('GET', 'POST'))
