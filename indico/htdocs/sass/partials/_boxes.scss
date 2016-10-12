@@ -359,7 +359,7 @@ $i-box-padding: 10px;
     position: relative;
 
     > li {
-        @include border-top(lighten($default-border-color, $color-variation));
+        @include border-top();
         display: block;
         padding: 10px 10px;
         position: relative;
