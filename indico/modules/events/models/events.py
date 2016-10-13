@@ -781,6 +781,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
 
+    @property
+    @memoize_request
+    def cfa(self):
+        from indico.modules.events.abstracts.models.call_for_abstracts import CallForAbstracts
+        return CallForAbstracts(self)
+
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it
