@@ -2,9 +2,9 @@
 
 {{ form_header(form) }}
     {{ form_row(form.title) }}
+    {{ form_row(form.stop_on_match) }}
     {% call form_fieldset(_('Rules')) %}
         {{ form_row(form.rules, skip_label=true) }}
-        {{ form_row(form.stop_on_match) }}
     {% endcall %}
 
     {% if not is_edit %}

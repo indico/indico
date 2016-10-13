@@ -68,3 +68,11 @@
        the last element works properly. */
     padding-bottom: 15px;
 }
+
+#form-group-rules {
+    margin-top: 0;
+
+    .form-field {
+        width: 100%;
+    }
+}

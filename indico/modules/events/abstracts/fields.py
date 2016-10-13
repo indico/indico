@@ -16,12 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request, session
+from flask import jsonify, session
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink

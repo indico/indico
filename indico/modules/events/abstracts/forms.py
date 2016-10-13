@@ -21,7 +21,7 @@ from wtforms.fields import BooleanField, IntegerField, SelectField, TextAreaFiel
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
-                                                    AbstractPersonLinkListField, AbstractField)
+                                                    AbstractPersonLinkListField)
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
@@ -130,7 +130,8 @@ class EditEmailTemplateRuleForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     rules = EmailRuleListField(_("Rules"), [DataRequired()])
     stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
-                                 description=_("Do not evaluate any other rules once this one matches."))
+                                 description=_("If any of the rules from this email template matches, do not "
+                                               "send emails from any following email template."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -148,7 +149,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 
     reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
     include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
-    include_authors = BooleanField(_('Send to primary authorized_submittershors'), widget=SwitchWidget())
+    include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
     subject = StringField(_("Subject"), [DataRequired()])
