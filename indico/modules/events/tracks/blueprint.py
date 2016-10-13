@@ -16,15 +16,18 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHDisplayTracks, RHTracksPDF,
-                                                      RHCreateTrackOld)
+from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHCreateTrackOld, RHEditTrack,
+                                                      RHSortTracks, RHDeleteTrack, RHDisplayTracks, RHTracksPDF)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_template_folder='events/tracks',
                       url_prefix='/event/<confId>')
 
 _bp.add_url_rule('/manage/tracks/', 'manage', RHManageTracks)
-_bp.add_url_rule('/manage/tracks/create', 'create', RHCreateTrack, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/tracks/create', 'create_track', RHCreateTrack, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/tracks/sort', 'sort_tracks', RHSortTracks, methods=('POST',))
+_bp.add_url_rule('/manage/tracks/<int:track_id>', 'edit_track', RHEditTrack, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/tracks/<int:track_id>', 'delete_track', RHDeleteTrack, methods=('DELETE',))
 
 _bp.add_url_rule('/program', 'program', RHDisplayTracks)
 _bp.add_url_rule('/program.pdf', 'program_pdf', RHTracksPDF)

@@ -1,20 +1,30 @@
-{% extends 'layout/full_content_base.html' %}
+{% extends 'layout/base.html' %}
+{% from 'events/tracks/_track_list.html' import render_track_list %}
 
 {% block title %}
     {%- trans %}Programme{% endtrans -%}
 {% endblock %}
 
-{% block content %}
-    {% for track in tracks %}
-        <div>
-            {{ track.title }}
-        </div>
-    {% endfor %}
+{% block description %}
+    {%- trans -%}
+        Tracks represent the subject matter of the conference.
+        They represent both the basis for the Scientific Programme and a taxonomy that can be used to classify
+        submissions during the Call for Abstracts process.
+    {%- endtrans -%}
+{% endblock %}
 
+{% block content %}
     <a class="i-button highlight icon-plus"
-        data-href="{{ url_for('.create', event) }}"
-        data-ajax-dialog
-        data-reload-after>
+       data-href="{{ url_for('.create_track', event) }}"
+       data-title="{% trans %}Add new track{% endtrans %}"
+       data-update="#track-list"
+       data-ajax-dialog>
         {% trans %}Add track{% endtrans %}
     </a>
+    <div>
+        {{ render_track_list(event) }}
+    </div>
+    <script>
+        setupTrackManagement();
+    </script>
 {% endblock %}

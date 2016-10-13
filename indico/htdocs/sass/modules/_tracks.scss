@@ -1,0 +1,56 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+@import 'compass';
+@import 'partials/core';
+
+#track-list {
+    list-style-type: none;
+    padding-left: 0;
+
+    .track-row {
+        padding: 10px 10px 0 10px;
+
+        &:last-child {
+            margin-bottom: 150px;
+        }
+
+        .i-box-header {
+            margin-bottom: 0;
+        }
+
+        .i-box-content {
+            word-wrap: break-word;
+            padding: 10px 0px;
+        }
+    }
+    
+    .track-content-collapsible {
+        cursor: pointer;
+    }
+
+    .track-content-collapsed {
+        @extend .transparent-overlay;
+        max-height: 50px;
+        overflow: hidden;
+    }
+}
+
+#no-tracks-box{
+    margin-top: 20px;
+}

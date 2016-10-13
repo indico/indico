@@ -18,18 +18,28 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
+from flask import request, flash
+
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.tracks.forms import TrackForm
-from indico.modules.events.tracks.operations import create_track
+from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.tracks.operations import create_track, update_track, delete_track
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
+from indico.util.i18n import _
+from indico.util.string import to_unicode
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_form, jsonify_data
-from indico.util.string import to_unicode
 from MaKaC.PDFinterface.conference import ProgrammeToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+def _render_track_list(event):
+    tpl = get_template_module('events/tracks/_track_list.html', event=event)
+    return tpl.render_track_list(event)
 
 
 class RHManageTracksBase(RHConferenceModifBase):
@@ -39,6 +49,20 @@ class RHManageTracksBase(RHConferenceModifBase):
 
     def _process(self):
         return RH._process(self)
+
+
+class RHManageTrackBase(RHManageTracksBase):
+    """Base class for track management RHs related to a specific track"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.track
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageTracksBase._checkParams(self, params)
+        self.track = Track.get_one(request.view_args['track_id'])
 
 
 class RHManageTracks(RHManageTracksBase):
@@ -51,9 +75,36 @@ class RHCreateTrack(RHManageTracksBase):
     def _process(self):
         form = TrackForm()
         if form.validate_on_submit():
-            create_track(self.event_new, form.data)
-            return jsonify_data(flash=False)
+            track = create_track(self.event_new, form.data)
+            flash(_('Track "{}" has been created.').format(track.title), 'success')
+            return jsonify_data(html=_render_track_list(self.event_new))
         return jsonify_form(form)
+
+
+class RHEditTrack(RHManageTrackBase):
+    def _process(self):
+        form = TrackForm(obj=self.track)
+        if form.validate_on_submit():
+            update_track(self.track, form.data)
+            flash(_('Track "{}" has been modified.').format(self.track.title), 'success')
+            return jsonify_data(html=_render_track_list(self.event_new))
+        return jsonify_form(form)
+
+
+class RHSortTracks(RHManageTracksBase):
+    def _process(self):
+        sort_order = request.json['sort_order']
+        tracks = {t.id: t for t in self.event_new.tracks}
+        for position, track_id in enumerate(sort_order, 1):
+            if track_id in tracks:
+                tracks[track_id].position = position
+
+
+class RHDeleteTrack(RHManageTrackBase):
+    def _process(self):
+        delete_track(self.track)
+        flash(_('Track "{}" has been deleted.').format(self.track.title), 'success')
+        return jsonify_data(html=_render_track_list(self.event_new))
 
 
 class RHCreateTrackOld(RHManageTracksBase):
