@@ -107,19 +107,13 @@ li > table + .note-area-wrapper {
     position: relative;
 
     &.collapsible {
+        &.transparent-overlay {
+            cursor: pointer;
+        }
+
         &.collapsed {
             max-height: 4.75em;
             overflow: hidden;
-
-            .gradient-layer {
-                @include gradient(rgba(0,0,0,0.0), white);
-                display: block;
-                position: absolute;
-                bottom: 0;
-                height: 1.5em;
-                width: 100%;
-                cursor: pointer;
-            }
         }
 
         &:hover {
@@ -143,12 +137,7 @@ li > table + .note-area-wrapper {
         }
     }
 
-    .gradient-layer, .trigger {
-        display: none;
-    }
-
-    .height-control {
-        height: 5.3em; // Enough to display 3 rows of participants
+    .trigger {
         display: none;
     }
 

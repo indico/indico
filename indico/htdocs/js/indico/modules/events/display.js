@@ -102,24 +102,19 @@
             });
         });
 
-        var gradientLayer = $('.participant-list-wrapper > .gradient-layer');
-        var heightControl = $('<div>', {'class': 'height-control'});
-        gradientLayer.append(heightControl);
-        var threeRowsHeight = heightControl.height();
-        $('.participant-list-wrapper').toggleClass('collapsible collapsed',
+        var threeRowsHeight = 70;
+        $('.participant-list-wrapper').toggleClass('collapsible collapsed transparent-overlay',
             $('.participant-list').height() > threeRowsHeight);
         var initialHeight = $('.participant-list-wrapper').height();
-        heightControl.remove();
 
-        $('.participant-list-wrapper > .trigger, .participant-list-wrapper > .gradient-layer').on('click', function() {
+        $('.participant-list-wrapper > .trigger, .participant-list-wrapper.transparent-overlay').on('click', function() {
             var toggler = $('.participant-list-wrapper > .trigger');
             var participantList = toggler.siblings('.participant-list');
             var wrapper = participantList.parent();
             if (wrapper.hasClass('collapsed')) {
                 var newHeight = participantList.height();
                 participantList.height(initialHeight);
-                wrapper.find('.gradient-layer').fadeOut();
-                wrapper.removeClass('collapsed');
+                wrapper.removeClass('collapsed transparent-overlay');
                 wrapper.animate({
                     height: newHeight
                 }, {
@@ -132,7 +127,7 @@
                     }
                 });
             } else {
-                wrapper.find('.gradient-layer').fadeIn();
+                wrapper.addClass('transparent-overlay');
                 wrapper.animate({
                     height: initialHeight
                 }, {

@@ -392,6 +392,7 @@ module_js = {
                                           'sectiontoolbar.js', 'table.js')),
     'contributions': rjs_bundle('modules_contributions',
                                 *namespace('js/indico/modules/contributions', 'common.js')),
+    'tracks': rjs_bundle('modules_tracks', 'js/indico/modules/tracks.js'),
     'abstracts': rjs_bundle('modules_abstracts',
                             'js/indico/modules/abstracts.js',
                             'js/indico/jquery/rulelistwidget.js'),
@@ -441,6 +442,7 @@ agreements_sass = sass_module_bundle('agreements')
 attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
 abstracts_sass = sass_module_bundle('abstracts')
+tracks_sass = sass_module_bundle('tracks')
 registration_sass = sass_module_bundle('registrationform')
 payment_sass = sass_module_bundle('payment')
 roombooking_sass = sass_module_bundle('roombooking')
@@ -554,6 +556,7 @@ def register_all_css(env, main_css_file):
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)
     env.register('abstracts_sass', abstracts_sass)
+    env.register('tracks_sass', tracks_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('category_management_sass', category_management_sass)

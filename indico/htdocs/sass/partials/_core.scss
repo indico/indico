@@ -104,3 +104,16 @@
     overflow-x: hidden;
     overflow-y: auto;
 }
+
+.transparent-overlay {
+    position: relative;
+
+    &:before {
+        @include gradient(rgba(0, 0, 0, 0.0), white);
+        bottom: 0;
+        content: '';
+        height: 3em;
+        position: absolute;
+        width: 100%;
+    }
+}

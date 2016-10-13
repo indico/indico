@@ -24,6 +24,12 @@ class WPManageTracks(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
 
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_tracks_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['tracks_sass'].urls()
+
 
 class WPDisplayTracks(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/tracks/'

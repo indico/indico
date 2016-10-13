@@ -25,4 +25,5 @@ from indico.web.forms.base import IndicoForm
 
 class TrackForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_('Title of the track'))
+    code = StringField(_('Code'), description=_('Code for the track'))
     description = TextAreaField(_('Description'), description=_('Text describing the track'))
