@@ -27,12 +27,12 @@ from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm)
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
-                                                        close_cfa)
+                                                        close_cfa, judge_abstract, reset_abstract_judgment)
 from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
                                                   generate_spreadsheet_from_abstracts)
@@ -94,6 +94,15 @@ class RHManageAbstract(RHManageAbstractBase):
     """Display abstract management page"""
     def _process(self):
         return WPManageAbstracts.render_template('management/abstract.html', self._conf, abstract=self.abstract)
+
+
+class RHResetAbstractJudgment(RHManageAbstractBase):
+    def _process(self):
+        # TODO: make this an AJAX RH
+        if self.abstract.state not in (AbstractState.submitted, AbstractState.withdrawn):
+            reset_abstract_judgment(self.abstract)
+            flash(_("Abstract judgment has been reset"), 'success')
+        return redirect(url_for('.manage_abstract', self.abstract))
 
 
 class RHAbstractExportPDF(RHManageAbstractBase):
