@@ -273,6 +273,14 @@ $i-box-padding: 10px;
     @include single-box-shadow(none);
 }
 
+.i-box.highlight {
+    border-color: $pastel-blue;
+
+    .i-box-header {
+        background-color: $light-blue;
+        border-bottom-color: $pastel-blue;
+    }
+}
 
 // ============================================================================
 // Group of boxes

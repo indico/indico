@@ -94,6 +94,7 @@ class Track(DescriptionMixin, db.Model):
     # - abstracts_accepted (Abstract.accepted_track)
     # - abstracts_reviewed (Abstract.reviewed_for_tracks)
     # - abstracts_submitted (Abstract.submitted_for_tracks)
+    # - contributions (Contribution.track)
     # - proposed_abstract_reviews (AbstractReview.proposed_tracks)
 
     @return_ascii
