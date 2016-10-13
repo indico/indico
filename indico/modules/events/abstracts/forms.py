@@ -23,8 +23,11 @@ from wtforms.fields import BooleanField, IntegerField, SelectField, StringField,
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
-                                                    AbstractPersonLinkListField, TrackRoleField)
+                                                    AbstractPersonLinkListField, AbstractField, TrackRoleField)
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
+from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
@@ -125,6 +128,51 @@ class AbstractReviewingSettingsForm(IndicoForm):
             for key in self.RATING_FIELDS:
                 del data[key]
         return data
+
+
+class AbstractJudgmentForm(IndicoForm):
+    """Form for judging an abstract"""
+
+    judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=AbstractAction,
+                                     skip={AbstractAction.change_tracks})
+    accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
+                                      get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
+                                      description=_("The abstract will be accepted in this track"))
+    accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept)],
+                                             get_label=lambda x: x.name.title(), allow_blank=True,
+                                             blank_text=_("Choose the contribution type..."),
+                                             description=_("The abstract will be converted "
+                                                           "into a contribution of this type"))
+    session = QuerySelectField(_("Session"), [HiddenUnless('judgment', AbstractAction.accept)],
+                               get_label='title', allow_blank=True, blank_text=_("Choose a session..."),
+                               description=_("The generated contribution will be allocated in this session"))
+    merged_into = AbstractField(_("Merge into"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
+                                description=_("The current abstract will be merged onto the selected one"))
+    merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
+                                 description=_("Authors and speakers of the current abstract will be added to the "
+                                               "selected one"))
+    duplicate_of = AbstractField(_("Duplicate of"),
+                                 [HiddenUnless('judgment', AbstractAction.mark_as_duplicate), DataRequired()],
+                                 description=_("The current abstract will be marked as duplicate of the selected one"))
+    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
+    # TODO: show only if notifications apply?
+    send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
+
+    def __init__(self, *args, **kwargs):
+        abstract = kwargs.pop('abstract')
+        self.event = abstract.event_new
+        candidate_tracks = list(abstract.candidate_tracks)
+        candidate_contrib_types = list(abstract.candidate_contrib_types)
+        if len(candidate_tracks) == 1:
+            kwargs.setdefault('accepted_track', candidate_tracks[0])
+        if len(candidate_contrib_types) == 1:
+            kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
+        super(AbstractJudgmentForm, self).__init__(*args, **kwargs)
+        self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
+        self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.title)
+        self.accepted_contrib_type.query = (ContributionType.query
+                                                            .with_parent(self.event)
+                                                            .order_by(ContributionType.name))
 
 
 class AbstractReviewingRolesForm(IndicoForm):
