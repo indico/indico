@@ -1,5 +1,6 @@
 {% extends 'events/abstracts/management/_base.html' %}
 {% from 'events/abstracts/_abstract.html' import render_abstract_public, render_abstract_comments, render_edited_hint %}
+{% from 'forms/_form.html' import simple_form %}
 
 {% block content %}
     {{ render_abstract_public(abstract, management=true) }}
@@ -131,9 +132,8 @@
                 {% endfor %}
             </div>
             <div class="i-box-footer">
-                <a href="" class="i-button">
-                    {% trans %}Judge{% endtrans %}
-                </a>
+                {{ simple_form(form, back_button=false, skip_labels=true, submit=_("Judge"),
+                               disabled_until_change=false, form_header_kwargs={'orientation': 'vertical'}) }}
             </div>
         </div>
     </div>

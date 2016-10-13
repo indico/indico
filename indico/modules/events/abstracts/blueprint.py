@@ -81,7 +81,7 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/preview', 'em
                  RHPreviewEmailTemplate)
 
 # Abstract-specific management
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/reset',
                  'reset_abstract_judgment', RHResetAbstractJudgment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
