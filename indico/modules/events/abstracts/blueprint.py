@@ -30,7 +30,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsExportPDF, RHAbstractExportPDF,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
-                                                                    RHManageReviewingRoles)
+                                                                    RHManageReviewingRoles, RHResetAbstractJudgment)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -82,4 +82,6 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/preview', 'em
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract)
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/reset',
+                 'reset_abstract_judgment', RHResetAbstractJudgment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
