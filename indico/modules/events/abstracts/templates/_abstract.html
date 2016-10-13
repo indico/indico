@@ -270,10 +270,22 @@
                 <div class="i-timeline-item">
                     <div class="i-timeline-item-label action"></div>
                     <div class="i-timeline-item-box header-indicator">
-                        <div class="i-box-header">
-                            {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
-                                <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
-                            {%- endtrans %}
+                        <div class="i-box-header flex">
+                            <div class="stretch">
+                                {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
+                                    <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
+                                {%- endtrans %}
+                            </div>
+                            {% if abstract.event_new.can_manage(session.user) %}
+                                <div>
+                                    <a class="i-button-icon icon-remove"
+                                       title="{% trans %}Reset judgement{% endtrans %}"
+                                       data-href="{{ url_for('.reset_abstract_judgment', abstract) }}"
+                                       data-method="POST"
+                                       data-title="{% trans %}Reset judgment{% endtrans %}"
+                                       data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="i-box-content">
                             {% if abstract.state.name == 'accepted' %}
@@ -336,7 +348,7 @@
                     <div class="i-timeline-item-box header-indicator">
                         <div class="i-box-header flex">
                             <div class="stretch">
-                                {% trans name=comment.user.name, date=comment.created_dt|format_human_date -%}
+                                {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
                                     <strong>{{ name }}</strong> commented on {{ date }}
                                 {%- endtrans %}
                                 {% if comment.modified_dt %}
