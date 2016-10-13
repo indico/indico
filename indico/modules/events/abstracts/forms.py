@@ -149,7 +149,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 
     reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
     include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
-    include_authors = BooleanField(_('Send to primary authorized_submittershors'), widget=SwitchWidget())
+    include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
     subject = StringField(_("Subject"), [DataRequired()])
