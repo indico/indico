@@ -130,7 +130,8 @@ class EditEmailTemplateRuleForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     rules = EmailRuleListField(_("Rules"), [DataRequired()])
     stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
-                                 description=_("Do not evaluate any other rules once this one matches."))
+                                 description=_("If any of the rules from this email template matches, do not "
+                                               "send emails from any following email template."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

@@ -63,6 +63,10 @@
                     self.element.trigger('change');
                 });
 
+            if (condition.value === 'track') {
+                $select.css('width', '100%');
+            }
+
             if (condition.required) {
                 $select.prepend($('<option disabled selected>', {
                     value: ''
