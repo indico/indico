@@ -133,11 +133,10 @@ $toolbar-thin-height: 1.9em;
         display: table-row;
 
         .i-button {
+            @include ellipsis;
+
             display: table-cell;
             float: none;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
 }

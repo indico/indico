@@ -80,10 +80,9 @@ tr.i-table {
 
 td.i-table, th.i-table {
     @include box-sizing(border-box);
-    overflow: hidden;
+    @include ellipsis;
+
     padding: 5px 3px 5px 3px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     vertical-align: middle;
 
     &.empty {

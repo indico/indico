@@ -183,6 +183,8 @@
 
 .keyword-highlighter {
     @include border-radius();
+    @include ellipsis;
+
     display: none !important;
     background-color: $pastel-blue;
     padding: 2px;
@@ -190,9 +192,6 @@
     top: 0.5em;
     left: 0.95em;
     max-width: 84%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     color: transparent;
 
     &.visible {

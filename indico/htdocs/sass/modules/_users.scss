@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "compass/css3/transition";
+@import "compass";
 @import "base/palette";
 @import "base/utilities";
 
@@ -154,10 +154,9 @@
             vertical-align: middle;
 
             > * {
+                @include ellipsis;
+
                 display: table-cell;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
 
                 &:not(:last-child) {
                     padding-right: 0.5em;
@@ -272,16 +271,13 @@
     .category-info {
         .category-title,
         .category-path {
-            display: block;
-            overflow: hidden;
+            @include ellipsis;
 
-            white-space: nowrap;
+            display: block;
         }
         .category-title {
             font-size: 1em;
             font-weight: bold;
-
-            text-overflow: ellipsis;
         }
         .category-path {
             font-size: 0.8em;
@@ -303,14 +299,10 @@
 
                 color: $dark-gray;
                 li {
+                    @include ellipsis;
+
                     display: inline-block;
-                    overflow: hidden;
-
                     padding: 0;
-
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-
                     border-bottom: 0;
                     &:last-child {
                         max-width: 100%;

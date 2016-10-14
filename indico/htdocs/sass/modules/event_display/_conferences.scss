@@ -70,13 +70,12 @@
         margin-left: 2em;
 
         th {
+            @include ellipsis;
+
             color: $orange;
             text-align: right;
             vertical-align: top;
             max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
 
@@ -108,9 +107,8 @@
             list-style-type: none;
 
             li {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+                @include ellipsis;
+
                 margin: 5px 0;
                 padding: 0 5px;
 
@@ -157,20 +155,19 @@
 }
 
 .contrib-session, .contrib-track, .contrib-type {
+    @include border-radius();
+    @include ellipsis;
+
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0.5em;
+    max-width: 12em;
+
     &.small {
         padding: 0.2em;
         font-size: 0.9em;
         margin-left: 0;
     }
-
-    @include border-radius();
-    display: inline-block;
-    margin-left: 5px;
-    padding: 0.5em;
-    max-width: 12em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .contrib-type {

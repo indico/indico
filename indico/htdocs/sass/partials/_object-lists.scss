@@ -79,6 +79,8 @@
     }
 
     .person-row {
+        @include ellipsis;
+
         &:before {
             color: $gray;
             margin-right: 5px;
@@ -160,12 +162,11 @@
         min-height: 2em;
 
         &.title-wrapper {
+            @include ellipsis;
+
             display: inline-flex;
             align-items: center;
             cursor: pointer;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
             flex-grow: 1;
 
             &:not(.striped) {
@@ -182,10 +183,9 @@
             }
 
             > .title {
+                @include ellipsis;
+
                 flex-grow: 1;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                overflow: hidden;
                 color: $dark-gray;
                 margin-left: 4px;
 
