@@ -62,7 +62,7 @@
                     {% if review.score %}
                         {% set score = review.score %}
                         {# TODO: show max score #}
-                        <span class="i-tag text-color highlight" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                        <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
                             {{ score }}
                         </span>
                     {% endif %}
@@ -123,7 +123,7 @@
                             {% set score = abstract.get_track_score(track) %}
                             {% if score is not none %}
                                 {% set score = score|round(1) %}
-                                <span class="i-tag text-color highlight" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                                <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
                                     {{ score }}
                                 </span>
                             {% endif %}
@@ -144,7 +144,7 @@
                       'reject': 'error',
                       'merge': 'visited',
                       'mark_as_dupe': 'strong'} %}
-    <span class="i-tag text-color {{ mapping[review.proposed_action.name] }}">
+    <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
         {{ review.proposed_action.title -}}
     </span>
 {% endmacro %}
@@ -175,7 +175,7 @@
                             'negative': _("No reviewer proposed to accept"),
                             'mixed': _("Not all reviewers proposed to accept")} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
-    <span class="i-tag text-color {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
+    <span class="i-tag outline {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
         {{ state.title -}}
     </span>
 {% endmacro %}
