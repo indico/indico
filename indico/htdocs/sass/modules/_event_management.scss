@@ -133,11 +133,11 @@
         width: 230px;
 
         span.user-name {
-           display: inline-block;
-           max-width: 120px;
-           overflow: hidden;
-           text-overflow: ellipsis;
-           vertical-align: bottom;
+            @include ellipsis;
+
+            display: inline-block;
+            max-width: 120px;
+            vertical-align: bottom;
         }
     }
 
@@ -200,13 +200,10 @@
                 }
                 /* menu title */
                 > .title {
+                    @include ellipsis;
+
                     display: inline-block;
-                    overflow: hidden;
-
                     max-width: 63%;
-
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
 
                     .position {
                         margin-left: 0.2em;

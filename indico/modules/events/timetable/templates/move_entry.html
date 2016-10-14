@@ -52,7 +52,7 @@
                             data-title="{% trans %}Move entry{% endtrans %}">
                             <span class="item-icon color"
                                   style="background: #{{ block.session.colors.background }}"></span>
-                            <span class="title">{{ block.full_title }}</span>
+                            <span class="title truncate-text">{{ block.full_title }}</span>
                             <span class="start-dt">
                                 {%- if tt_entry == parent_entry %}
                                     ({%- trans %}Currently at this level{% endtrans %})

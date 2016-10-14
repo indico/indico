@@ -25,10 +25,10 @@
 
 @mixin picker-root-element-label() {
     .label {
+        @include ellipsis;
+
         float: left;
         max-width: 80%;
-        overflow: hidden !important;
-        text-overflow: ellipsis;
         display: inline-block;
         line-height: 1.2em;
     }
@@ -64,9 +64,9 @@
         display: flex;
 
         .label {
+            @include ellipsis;
+
             line-height: 15px;
-            overflow: hidden;
-            text-overflow: ellipsis;
             vertical-align: middle;
         }
 
@@ -111,10 +111,9 @@
 
     table {
         td.subcontribution-title {
+            @include ellipsis;
+
             max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
 }

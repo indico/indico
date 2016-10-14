@@ -15,45 +15,48 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- #flashed-messages {
-     margin: 1em auto 0 auto;
-     width: 1000px;
-     &:empty {
-         display: none;
-     }
- }
+#flashed-messages {
+    margin: 1em auto 0 auto;
+    width: 1000px;
 
- .speaker-list {
-     @extend %font-family-modern-body;
-     color: $black;
+    &:empty {
+        display: none;
+    }
+}
 
-     .speaker-item {
-         &:before {
-             color: $dark-blue;
-             margin-right: 0.2em;
-         }
+.speaker-list {
+    @extend %font-family-modern-body;
 
-         display: block;
+    color: $black;
 
-         .affiliation {
-             color: $dark-gray;
-             font-size: 0.8em;
-             .text {
-                 display: inline-block;
-                 max-width: 10em;
-                 overflow: hidden;
-                 text-overflow: ellipsis;
-                 white-space: nowrap;
-                 vertical-align: text-bottom;
-             }
-         }
-     }
+    .speaker-item {
+        display: block;
 
-     .speaker-item-inline {
-         @extend .speaker-item;
-         display: inline-block;
-     }
- }
+        &:before {
+            color: $dark-blue;
+            margin-right: 0.2em;
+        }
+
+        .affiliation {
+            color: $dark-gray;
+            font-size: 0.8em;
+
+            .text {
+                @include ellipsis;
+
+                display: inline-block;
+                max-width: 10em;
+                vertical-align: text-bottom;
+            }
+        }
+    }
+
+    .speaker-item-inline {
+        @extend .speaker-item;
+
+        display: inline-block;
+    }
+}
 
 .event-message {
     margin: 20px auto 5px auto;

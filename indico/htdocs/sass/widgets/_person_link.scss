@@ -49,12 +49,11 @@
         align-items: center;
 
         .name {
+            @include ellipsis;
+
             flex-grow: 1;
             flex-shrink: 1;
             flex-basis: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .person-roles {

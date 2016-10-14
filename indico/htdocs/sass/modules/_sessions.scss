@@ -60,32 +60,3 @@
         }
     }
 }
-
-#session-display {
-    #attachments {
-        margin-bottom: 15px;
-    }
-
-    .infoline {
-        .text {
-            padding-left: 0;
-        }
-
-        ul {
-            padding: 0;
-            list-style-type: none;
-
-            li {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin: 5px 0;
-                padding: 0 5px;
-
-                a {
-                    padding: 5px;
-                }
-            }
-        }
-    }
-}

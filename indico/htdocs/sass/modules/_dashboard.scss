@@ -16,6 +16,7 @@
  */
 
 @import "base/palette";
+@import "compass";
 
 .user-dashboard, .banner.user-dashboard {
     margin-left: auto;
@@ -162,10 +163,9 @@
 }
 
 .truncate .truncate-target {
+    @include ellipsis;
+
     display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .dashboard-box .event-title.truncate-target {

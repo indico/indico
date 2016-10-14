@@ -185,20 +185,6 @@
         list-style-type: none;
         padding: 0;
         font-size: 1.1em;
-
-        &.resource-list {
-            font-size: 0.9em;
-            li {
-                a {
-                    display: inline-block;
-                    max-width: 200px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-                margin-bottom: 0.5em;
-                margin-left: 1.5em;
-            }
-        }
     }
 
     .material-show {
@@ -248,11 +234,10 @@
         margin-bottom: 0.5em;
         list-style-type: none;
         .title {
+            @include ellipsis;
+
             font-size: 1em;
             display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             max-width: 100%;
         }
         .timing {

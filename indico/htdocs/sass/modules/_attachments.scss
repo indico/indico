@@ -67,13 +67,10 @@
             padding: 0.2rem 0.3rem;
             &:first-child {
                 @include icon-before('icon-none');
-
-                overflow: hidden;
+                @include ellipsis;
 
                 max-width: 1px;
 
-                white-space: nowrap;
-                text-overflow: ellipsis;
                 &:before {
                     display: inline-block;
 
@@ -332,18 +329,17 @@
 
 .material-list {
     .folder .attachment {
-        display: inline-block;
-        overflow: hidden;
+        @include ellipsis;
 
+        display: inline-block;
         max-width: 150px;
         padding-left: 0.2em !important;
 
-        text-overflow: ellipsis;
         .title {
+            @include ellipsis;
+
             color: $light-black;
             font-size: 0.9em;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
     .folder .i-button.attachment,
@@ -352,7 +348,6 @@
         font-family: Roboto;
         font-weight: normal;
 
-        display: inline-block;
         white-space: nowrap;
 
         margin-top: 0.2em;

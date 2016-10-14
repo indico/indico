@@ -71,15 +71,14 @@
 }
 
 .item-location {
+    @include ellipsis;
+
     box-sizing: border-box;
     border-radius: 0.2em;
     color: $tt-secondary-color;
     font-size: 1em;
     float: right;
-    white-space: nowrap;
     max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     margin: 0.5rem 0.7em 0 0;
 
     &:before {

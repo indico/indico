@@ -85,7 +85,7 @@
                                         <td class="i-table" data-text="{{ track_titles }}"
                                             data-searchable="{{ track_titles | lower }}">
                                             {%- for track in tracks | sort(attribute='title') -%}
-                                                <div>{{ track.title }}</div>
+                                                <div class="truncate-text">{{ track.title }}</div>
                                             {%- endfor %}
                                             {%- if not tracks %}
                                                 {%- trans %}No track{% endtrans %}
@@ -97,7 +97,7 @@
                                         <td class="i-table" data-text="{{ track_titles }}"
                                             data-searchable="{{ track_titles | lower }}">
                                             {%- for track in tracks | sort(attribute='title') -%}
-                                                <div>{{ track.title }}</div>
+                                                <div class="truncate-text">{{ track.title }}</div>
                                             {%- endfor %}
                                             {%- if not tracks %}
                                                 {%- trans %}No track{% endtrans %}
