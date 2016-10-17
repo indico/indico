@@ -17,9 +17,17 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageTracks(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
+
+
+class WPDisplayTracks(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/tracks/'
+    menu_entry_name = 'program'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
