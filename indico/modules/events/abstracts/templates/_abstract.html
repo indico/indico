@@ -214,54 +214,8 @@
                             {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
                         {% endif %}
                     </div>
-                    <div class="i-box-content">
-                        {% if abstract.submitted_contrib_type %}
-                            <div>
-                                {% trans type=abstract.submitted_contrib_type.name -%}
-                                    Contribution type: {{ type }}
-                                {%- endtrans %}
-                            </div>
-                        {% endif %}
-                        {% if abstract.submitted_for_tracks %}
-                            <div>
-                                {% trans count=abstract.submitted_for_tracks|length -%}
-                                    Track:
-                                {%- pluralize -%}
-                                    Tracks:
-                                {%- endtrans -%}
-                                {{ _render_tracks(abstract.submitted_for_tracks) }}
-                            </div>
-                        {% endif %}
-                        {% if abstract.primary_authors %}
-                            <div>
-                                {% trans count=abstract.primary_authors|length, names=abstract.primary_authors|map(attribute='name')|join(', ') -%}
-                                    Author: {{ names }}
-                                {%- pluralize -%}
-                                    Authors: {{ names }}
-                                {%- endtrans %}
-                            </div>
-                        {% endif %}
-                        {% if abstract.secondary_authors %}
-                            <div>
-                                {% trans count=abstract.secondary_authors|length, names=abstract.secondary_authors|map(attribute='name')|join(', ') -%}
-                                    Co-author: {{ names }}
-                                {%- pluralize -%}
-                                    Co-authors: {{ names }}
-                                {%- endtrans %}
-                            </div>
-                        {% endif %}
-                        {% if abstract.speakers %}
-                            <div>
-                                {% trans count=abstract.speakers|length, names=abstract.speakers|map(attribute='name')|join(', ') -%}
-                                    Speaker: {{ names }}
-                                {%- pluralize -%}
-                                    Speakers: {{ names }}
-                                {%- endtrans %}
-                            </div>
-                        {% endif %}
-                        {# TODO custom fields #}
-                        {# TODO comment #}
-                        {# TODO attachment #}
+                    <div class="i-box-content submission-info">
+                        {{ render_submission_info(abstract) }}
                     </div>
                 </div>
             </div>
@@ -369,4 +323,126 @@
             {% endfor %}
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro render_field_value(value) %}
+        <div class="field-value {{ 'single-choice 'if value.contribution_field.field_type == 'single_choice' else ''}}">
+            <label>{{ value.contribution_field.title }}</label>
+            {% if value.friendly_data %}
+                <span class="value">{{ value.friendly_data }}</span>
+            {% else %}
+                <span class="value empty">{% trans %}No answer{% endtrans %}</span>
+            {% endif %}
+        </div>
+{% endmacro %}
+
+{% macro render_submission_info(abstract) %}
+    {% if abstract.submitted_contrib_type %}
+        <div class="info-line">
+            <label>
+                {% trans -%}
+                    Contribution type:
+                {%- endtrans %}
+            </label>
+            {{ abstract.submitted_contrib_type.name }}
+        </div>
+    {% endif %}
+    {% if abstract.submitted_for_tracks %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.submitted_for_tracks|length -%}
+                    Track:
+                {%- pluralize -%}
+                    Tracks:
+                {%- endtrans -%}
+            </label>
+            {{ _render_tracks(abstract.submitted_for_tracks) }}
+        </div>
+    {% endif %}
+    {% if abstract.primary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.primary_authors|length -%}
+                    Author
+                {%- pluralize -%}
+                    Authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.primary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.secondary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.secondary_authors|length -%}
+                    Co-author
+                {%- pluralize -%}
+                    Co-authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.secondary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.speakers %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.speakers|length -%}
+                    Speaker
+                {%- pluralize -%}
+                    Speakers
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.speakers -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="info-line submitted-data">
+        {% if abstract.field_values %}
+            <dl class="custom-field-values field-separator">
+                {% for value in abstract.field_values if value.contribution_field.is_active %}
+                    {{ render_field_value(value) }}
+                {% endfor %}
+            </dl>
+        {% endif %}
+        {% if abstract.submission_comment %}
+            <div class="comment">
+                <div class="titled-rule">
+                    {% trans %}Comment{% endtrans %}
+                </div>
+                {{ abstract.submission_comment }}
+            </div>
+        {% endif %}
+        {% if abstract.files %}
+            <div class="files field-separator">
+                <table class="tree" id="paper-files">
+                    {% for file in abstract.files %}
+                        <tr>
+                            <td>
+                                <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
+                                    <a href="{{ url_for('.download_attachment', file) }}">{{ file.filename }}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+    </div>
 {% endmacro %}
