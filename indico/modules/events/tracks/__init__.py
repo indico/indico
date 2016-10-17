@@ -38,6 +38,13 @@ def _sidemenu_items(sender, event, **kwargs):
         return SideMenuItem('program', _('Programme'), url_for('tracks.manage', event), section='organization')
 
 
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.layout.util import MenuEntryData
+    return MenuEntryData(title=_("Scientific Programme"), name='program', endpoint='tracks.program', position=1,
+                         static_site=True)
+
+
 @signals.acl.can_access.connect_via(Event)
 def _can_access_event(cls, obj, user, authorized, **kwargs):
     """Give track reviewers access to the event"""

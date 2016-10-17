@@ -47,7 +47,7 @@ class WPStaticTimetable(WPStaticEventBase, WPDisplayTimetable):
 
 
 class WPStaticConferenceProgram(WPStaticEventBase, WPConferenceProgram):
-    endpoint = 'event.conferenceProgram'
+    endpoint = 'tracks.program'
 
 
 class WPStaticDisplayRegistrationParticipantList(WPStaticEventBase, WPDisplayRegistrationParticipantList):

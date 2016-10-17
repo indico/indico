@@ -16,12 +16,15 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.tracks.forms import TrackForm
 from indico.modules.events.tracks.operations import create_track
-from indico.modules.events.tracks.views import WPManageTracks
+from indico.modules.events.tracks.settings import track_settings
+from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
 from indico.web.util import jsonify_form, jsonify_data
 from indico.util.string import to_unicode
 from MaKaC.webinterface.rh.base import RH
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -63,3 +66,11 @@ class RHCreateTrackOld(RHManageTracksBase):
                                 tracks=[{'id': int(t.getId()), 'title': to_unicode(t.getTitle())}
                                         for t in self._conf.getTrackList()])
         return jsonify_form(form)
+
+
+class RHDisplayTracks(RHConferenceBaseDisplay):
+    def _process(self):
+        page_title = get_menu_entry_by_name('program', self._conf).localized_title
+        program = track_settings.get(self.event_new, 'program')
+        return WPDisplayTracks.render_template('display.html', self._conf, event=self.event_new, page_title=page_title,
+                                               program=program)

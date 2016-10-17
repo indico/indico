@@ -24,10 +24,6 @@ from indico.util.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 
 
-def _visibility_my_tracks(event):
-    return bool(event.getAbstractMgr().isActive() and event.getCoordinatedTracks(session.avatar))
-
-
 def _visibility_call_for_abstracts(event):
     return event.getAbstractMgr().isActive() and event.hasEnabledSection('cfa')
 
@@ -94,20 +90,6 @@ def get_default_menu_entries():
             static_site=True
         ),
         MenuEntryData(
-            title=_("Scientific Programme"),
-            name='program',
-            endpoint='event.conferenceProgram',
-            position=1,
-            static_site=True
-        ),
-        MenuEntryData(
-            title=_("Manage my Tracks"),
-            name='program_my_tracks',
-            visible=_visibility_my_tracks,
-            endpoint='event.myconference-myTracks',
-            parent='program',
-        ),
-        MenuEntryData(
             title=_("Call for Abstracts"),
             name='call_for_abstracts',
             endpoint='event.conferenceCFA',
@@ -134,14 +116,6 @@ def get_default_menu_entries():
             endpoint='event.myconference',
             position=7,
             visible=_visibility_my_conference
-        ),
-        MenuEntryData(
-            title=_("My Tracks"),
-            endpoint='event.myconference-myTracks',
-            name='my_tracks',
-            visible=_visibility_my_tracks,
-            position=0,
-            parent='my_conference'
         ),
         MenuEntryData(
             title=_("Paper Reviewing"),
