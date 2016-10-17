@@ -19,5 +19,5 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Program
-event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
-event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
+event.add_url_rule('/program-old', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
+event.add_url_rule('/program-old.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
