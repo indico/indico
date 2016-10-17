@@ -96,11 +96,13 @@
 {% block page_actions -%}
     <div class="toolbar right">
         {% if contribution.can_manage(session.user) -%}
-            <a href="#" class="i-button icon-edit"
-               data-title="{% trans %}Edit contribution{% endtrans %}"
-               data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
-               data-ajax-dialog
-               data-reload-after></a>
+            <div class="group">
+                <a href="#" class="i-button icon-edit"
+                   data-title="{% trans %}Edit contribution{% endtrans %}"
+                   data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
+                   data-ajax-dialog
+                   data-reload-after></a>
+            </div>
         {%- endif %}
         <div class="group">
             <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
