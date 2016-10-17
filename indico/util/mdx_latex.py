@@ -83,7 +83,7 @@ start_single_quote_re = re.compile("(^|\s|\")'")
 start_double_quote_re = re.compile("(^|\s|'|`)\"")
 end_double_quote_re = re.compile("\"(,|\.|\s|$)")
 
-safe_mathmode_commands = {
+safe_mathmode_commands = set([
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
     'arctan', 'arg', 'array', 'Arrowvert', 'arrowvert', 'ast', 'asymp', 'atop', 'atopwithdelims', 'backslash',
     'backslash', 'bar', 'Bbb', 'begin', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
@@ -121,7 +121,8 @@ safe_mathmode_commands = {
     'triangleleft', 'triangleright', 'tt', 'underbrace', 'underleftarrow', 'underleftrightarrow', 'underline',
     'underrightarrow', 'underset', 'Uparrow', 'uparrow', 'Updownarrow', 'updownarrow', 'uplus', 'uproot', 'Upsilon',
     'upsilon', 'varepsilon', 'varphi', 'varpi', 'varrho', 'varsigma', 'vartheta', 'vcenter', 'vdash', 'vdots', 'vec',
-    'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta'}
+    'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta'
+])
 
 
 def unescape_html_entities(text):
