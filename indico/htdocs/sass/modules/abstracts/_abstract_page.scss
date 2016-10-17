@@ -20,7 +20,6 @@
 @import 'partials/boxes';
 @import 'partials/icons';
 
-
 #abstract-title {
     display: flex;
 
@@ -139,5 +138,71 @@
         @include border-top();
         margin-top: 10px;
         padding-top: 10px;
+    }
+}
+
+.submission-info {
+
+    .info-line {
+        margin-top: 1em;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        .author-list {
+            font-size: 0.95em;
+            list-style-type: none;
+            margin: 0.2em 0 0 1em;
+            padding: 0;
+
+            li {
+                display: inline-block;
+                background-color: $light-gray;
+            }
+        }
+    }
+}
+
+.submitted-data {
+
+    .field-separator {
+        @include border-top;
+        margin: 0 -10px;
+        padding: 1em 10px;
+    }
+
+    .comment {
+        @extend .text-not-important;
+        margin-bottom: 1em;
+    }
+
+    dl.custom-field-values {
+
+        .field-value {
+            margin-bottom: 0.5em;
+
+            > * {
+                display: block;
+            }
+
+            &.single-choice > * {
+                display: inline-block;
+            }
+
+            &.single-choice .value {
+                @include border-radius;
+                background-color: $light-gray;
+                padding: 0.1em;
+            }
+
+            .value {
+                padding-left: 1em;
+
+                &.empty {
+                    @extend .text-superfluous;
+                }
+            }
+        }
     }
 }
