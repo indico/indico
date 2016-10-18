@@ -2,6 +2,11 @@
 {% from 'message_box.html' import message_box %}
 
 {% block html %}
+    <div>
+        {%- trans -%}
+            The emails generated from this notification template will be sent once <strong>any</strong> of the following rules is matched.
+        {%- endtrans -%}
+    </div>
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}">
     <div id="rule-widget-{{ field.id }}"class="js-rule-list-widget">
         <ul class="rule-list"></ul>
