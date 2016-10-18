@@ -299,7 +299,8 @@ class EditEmailTemplateRuleForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     rules = EmailRuleListField(_("Rules"), [DataRequired()])
     stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
-                                 description=_("Do not evaluate any other rules once this one matches."))
+                                 description=_("If any of the rules from this email template match, do not "
+                                               "send notifications from any following email template."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -317,7 +318,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 
     reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
     include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
-    include_authors = BooleanField(_('Send to primary authorized_submittershors'), widget=SwitchWidget())
+    include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     cc_addresses = EmailListField(_("CC"), description=_("Additional CC e-mail addresses (one per line)"))
     subject = StringField(_("Subject"), [DataRequired()])
@@ -335,7 +336,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
     """Form for adding a new e-mail template."""
 
-    default_tpl = SelectField(_('Default template'), [DataRequired()], choices=[
+    default_tpl = SelectField(_('Email template'), [DataRequired()], choices=[
         ('submit', _('Submit')),
         ('accept', _('Accept')),
         ('reject', _('Reject')),

@@ -1,17 +1,14 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
 
 {{ form_header(form) }}
-    {{ form_row(form.title) }}
+    {% if not is_edit %}
+        {{ form_rows(form, fields=('title', 'default_tpl', 'stop_on_match')) }}
+    {% else %}
+        {{ form_rows(form, fields=('title', 'stop_on_match')) }}
+    {% endif %}
     {% call form_fieldset(_('Rules')) %}
         {{ form_row(form.rules, skip_label=true) }}
-        {{ form_row(form.stop_on_match) }}
     {% endcall %}
-
-    {% if not is_edit %}
-        {% call form_fieldset(_('E-mail template')) %}
-            {{ form_rows(form, fields=('default_tpl',)) }}
-        {% endcall %}
-    {% endif %}
 {% call form_footer(form) %}
     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
            data-disabled-until-change>

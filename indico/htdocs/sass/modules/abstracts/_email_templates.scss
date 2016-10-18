@@ -55,16 +55,65 @@
     }
 }
 
-.email-template-list {
-    list-style-type: none;
-    padding-left: 0;
-    width: 800px;
+#email-template-manager {
+    max-width: 800px;
 
-    .email-template {
-        margin-bottom: 10px;
+    .email-template-wrapper {
+        padding: 0 0 1em 1em;
+
+        .email-templates {
+            width: 800px;
+            max-height: 800px;
+            overflow: auto;
+
+            > ul {
+                list-style-type: none;
+                padding-left: 0;
+                padding-right: 20px;
+
+                > li {
+                    width: 775px;
+                }
+            }
+        }
+
+        .email-preview {
+            display: none;
+
+            .email-subject {
+                padding-bottom: 10px;
+            }
+
+            .email-body {
+                color: $light-black;
+            }
+        }
+
+        .regform-section-sortable-placeholder {
+            @extend .i-box;
+            @include border-all($style: dashed);
+            @include box-shadow(none);
+
+            background-color: $light-gray;
+        }
+
+        .email-preview-btn {
+            padding-right: 5px;
+            color: $link;
+        }
+
+        .email-preview-btn:hover {
+            color: $bright-orange;
+        }
     }
-
-    /* this padding is needed so that dragging after
-       the last element works properly. */
-    padding-bottom: 15px;
 }
+
+#form-group-rules {
+    margin-top: 0;
+
+    .form-field,
+    .rule-condition[data-condition="track"] select {
+        width: 100%;
+    }
+}
+

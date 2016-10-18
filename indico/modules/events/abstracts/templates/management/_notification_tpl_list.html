@@ -1,86 +1,160 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_notification_list(event) -%}
+{% macro render_notification_list(event, tracks, states, contrib_types, email_tpls) -%}
     {% if not event.abstract_email_templates %}
         {% call message_box('info', classes='no-rules-placeholder') %}
-            {% trans %}There are currently no e-mail templates{% endtrans%}
+            {% trans %}There are currently no e-mail templates{% endtrans %}
         {% endcall %}
     {% else %}
-        <ul class="email-template-list" data-url="{{ url_for('.email_tpl_sort', event) }}">
-            {% for tpl in event.abstract_email_templates|sort(attribute='position') %}
-                <li class="email-template i-box" data-id="{{ tpl.id }}">
-                    <div class="ui-i-box-sortable-handle"></div>
-                    <div class="i-box-header">
-                        <span class="i-box-title">{{ tpl.title }}</span>
-                        <div class="i-box-buttons toolbar right">
-                            <div class="group">
-                                <a class="i-button icon-eye"
-                                   data-href="{{ url_for('.email_tpl_preview', tpl) }}"
-                                   data-method="GET"
-                                   data-title="{% trans %}E-mail preview{% endtrans %}"
-                                   data-ajax-dialog>
-                                   {% trans %}Preview{% endtrans %}
-                                </a>
-                                <a class="i-button icon-edit arrow js-edit-tpl-dropdown"
-                                   data-toggle="dropdown">{% trans %}Edit{% endtrans %}</a>
-                                <ul class="dropdown">
-                                    <li>
-                                        <a data-href="{{ url_for('.email_tpl_rule_edit', tpl) }}"
-                                           title="{% trans %}Edit ruleset{% endtrans %}"
-                                           data-title="{% trans %}Edit ruleset{% endtrans %}"
+        <div class="email-template-wrapper">
+            <div class="email-templates">
+                <ul class="i-box-group vert"
+                    data-url="{{ url_for('.email_tpl_sort', event) }}">
+                    {% for tpl in event.abstract_email_templates|sort(attribute='position') %}
+                        <li class="i-box" data-id="{{ tpl.id }}">
+                            <div class="ui-i-box-sortable-handle"></div>
+                            <div class="i-box-header">
+                                <span class="i-box-title">{{ tpl.title }}</span>
+                                <div class="i-box-buttons toolbar right">
+                                    <div class="group">
+                                        <a class="i-button icon-eye"
+                                           data-href="{{ url_for('.email_tpl_preview', tpl) }}"
+                                           data-method="GET"
+                                           data-title="{% trans %}E-mail preview{% endtrans %}"
                                            data-ajax-dialog>
-                                           {% trans %}Ruleset{% endtrans %}
+                                            {% trans %}Preview{% endtrans %}
                                         </a>
-                                    </li>
-                                    <li>
-                                        <a data-href="{{ url_for('.email_tpl_text_edit', tpl) }}"
-                                           title="{% trans %}Edit e-mail text{% endtrans %}"
-                                           data-title="{% trans %}Edit e-mail text{% endtrans %}"
-                                           data-ajax-dialog>
-                                           {% trans %}E-mail text{% endtrans %}
+                                        <a class="i-button icon-edit arrow js-edit-tpl-dropdown"
+                                           data-toggle="dropdown">
+                                            {%- trans %}Edit{% endtrans -%}
                                         </a>
-                                    </li>
+                                        <ul class="dropdown">
+                                            <li>
+                                                <a data-href="{{ url_for('.email_tpl_rule_edit', tpl) }}"
+                                                   title="{% trans %}Edit ruleset{% endtrans %}"
+                                                   data-title="{% trans %}Edit ruleset{% endtrans %}"
+                                                   data-update="#email-template-manager"
+                                                   data-ajax-dialog>
+                                                   {% trans %}Ruleset{% endtrans %}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a data-href="{{ url_for('.email_tpl_text_edit', tpl) }}"
+                                                   title="{% trans %}Edit e-mail text{% endtrans %}"
+                                                   data-title="{% trans %}Edit e-mail text{% endtrans %}"
+                                                   data-update="#email-template-manager"
+                                                   data-ajax-dialog>
+                                                   {% trans %}E-mail text{% endtrans %}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="i-button js-delete-item icon-remove icon-only"
+                                           title="{% trans %}Delete template{% endtrans %}"
+                                           data-qtip-style="danger"
+                                           data-href="{{ url_for('.email_tpl_delete', tpl) }}"
+                                           data-method="DELETE"
+                                           data-confirm="{% trans %}Are you sure you want to delete this template?{% endtrans %}"
+                                           data-title="{% trans %}Delete template{% endtrans %}"
+                                           data-update="#email-template-manager">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="i-box-content">
+                                <div class="right">
+                                    <a href="#" class="email-preview-btn"
+                                       id="email-preview-btn-{{ tpl.id }}"
+                                       data-id="{{ tpl.id }}">
+                                        {%- trans %}Show preview{% endtrans -%}
+                                    </a>
+                                </div>
+                                <div>
+                                    {%- trans %}This email will be sent when the abstract is:{% endtrans -%}
+                                </div>
+                                <ul>
+                                    {% for rule in tpl.rules if rule %}
+                                        <li class="notification-rule">
+                                            <strong>{{ states[rule.state[0]] }}</strong>
+                                            {% if 'track' in rule %}
+                                                {% if not rule.track %}
+                                                    {%- trans -%}
+                                                       in <strong>no track</strong>
+                                                    {%- endtrans -%}
+                                                {% elif rule.track[0] == '*' %}
+                                                    {%- trans -%}
+                                                       in <strong>any track</strong>
+                                                    {%- endtrans -%}
+                                                {% else %}
+                                                    {%- trans %}in{% endtrans -%}
+                                                    <strong>
+                                                        {{ tracks[rule.track[0]].title }}
+                                                    </strong>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if 'contribution_type' in rule %}
+                                                    {% if not rule.contribution_type %}
+                                                        {%- trans -%}
+                                                            as <strong>no type</strong>
+                                                        {%- endtrans -%}
+                                                    {% elif rule.contribution_type[0] == '*' %}
+                                                        {%- trans -%}
+                                                            as <strong>any type</strong>
+                                                        {%- endtrans -%}
+                                                    {% else %}
+                                                        {%- trans %}as{% endtrans -%}
+                                                        <strong>
+                                                            {{ contrib_types[rule.contribution_type[0]].name }}
+                                                        </strong>
+                                                    {% endif %}
+                                            {% endif %}
+                                            {% if not loop.last %}
+                                                {%- trans %}or{% endtrans -%}
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
                                 </ul>
-                                <a href="#" class="i-button js-delete-item icon-remove icon-only"
-                                   title="{% trans %}Delete template{% endtrans %}"
-                                   data-qtip-style="danger"
-                                   data-href="{{ url_for('.email_tpl_delete', tpl) }}"
-                                   data-method="DELETE"
-                                   data-confirm="{% trans %}Are you sure you want to delete this template?{% endtrans %}"
-                                   data-title="{% trans %}Delete template{% endtrans %}"
-                                   data-update="#email-template-manager">
-                                </a>
-                        </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+                                <div class="email-preview"
+                                     id="email-preview-{{ tpl.id }}"
+                                     data-id="{{ tpl.id }}">
+                                    <div class="titled-rule">{% trans %}Email preview{% endtrans %}</div>
+                                    <div class="i-box-footer">
+                                        <div class="preformatted email-subject"><strong>{{ email_tpls[tpl.id].get_subject() }}</strong></div>
+                                        <div class="preformatted email-body">{{ email_tpls[tpl.id].get_body() }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     {% endif %}
 
     <div class="toolbar">
         <div class="group right">
             <a href="#" class="i-button icon-plus highlight"
                data-href="{{ url_for('.email_tpl_add', event) }}"
-               data-title="{% trans %}Add a new template{% endtrans %}"
-               data-ajax-dialog
-               data-update="#email-template-manager">
+               data-title="{% trans %}Add a new notification ruleset{% endtrans %}"
+               data-update="#email-template-manager"
+               data-ajax-dialog>
                 {% trans %}Add new one{% endtrans %}
             </a>
         </div>
     </div>
     <script>
         $('.js-edit-tpl-dropdown').parent().dropdown();
-        $('.email-template-list').sortable({
+        $('.email-templates > ul').sortable({
             axis: 'y',
             containment: 'parent',
             cursor: 'move',
             distance: 2,
             handle: '.ui-i-box-sortable-handle',
-            items: '> li.email-template',
+            items: '> li',
             tolerance: 'pointer',
             forcePlaceholderSize: true,
+            placeholder: 'regform-section-sortable-placeholder',
             update: function(e) {
-                var $elem = $('.email-template-list');
+                var $elem = $('.email-templates > ul');
                 var sortedList = $elem.find('li.email-template').map(function(i, elem) {
                     return $(elem).data('id');
                 }).get();
@@ -95,5 +169,25 @@
                 });
             }
         });
+
+        $('.email-preview-btn').on('click', function(evt) {
+            evt.preventDefault();
+            var id = $(this).data('id');
+            var $previewBtn = $('#email-preview-btn-' + id);
+            if ($previewBtn.data('visible')) {
+                $previewBtn.text($T.gettext('Show preview'));
+                $('#email-preview-' + id).slideToggle();
+                $previewBtn.data('visible', false);
+            } else {
+                $previewBtn.text($T.gettext('Hide preview'));
+                $('#email-preview-' + id ).slideToggle();
+                $previewBtn.data('visible', true);
+            }
+        });
+
+        $('.ui-i-box-sortable-handle').on('mousedown', function() {
+            $('.email-preview').hide();
+            $('.email-preview-btn').text($T.gettext('Show preview')).data('visible', false);
+        })
     </script>
 {%- endmacro %}
