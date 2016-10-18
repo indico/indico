@@ -107,17 +107,6 @@ class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
         return _render_notification_list(self.event_new, flash=False)
 
 
-class RHPreviewEmailTemplate(RHEditEmailTemplateBase):
-    """Preview an e-mail template."""
-
-    def _process(self):
-        self.commit = False
-        abstract = create_mock_abstract(self.event_new)
-        tpl = get_abstract_notification_tpl_module(self.email_tpl, abstract)
-        return jsonify_template('events/abstracts/management/notification_preview.html',
-                                subject=tpl.get_subject(), body=tpl.get_body())
-
-
 def _get_rules_fields(event_new):
     abstract = create_mock_abstract(event_new)
     email_tpl_dict = {et.id: get_abstract_notification_tpl_module(et, abstract)
