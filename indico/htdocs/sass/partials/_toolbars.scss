@@ -74,10 +74,13 @@ $toolbar-thin-height: 1.9em;
     .i-button {
         display: block;
         float: left;
-        font-weight: bold;
         height: $toolbar-height;
         line-height: $toolbar-button-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
+
+        &:not(.label) {
+            font-weight: bold;
+        }
 
         &.arrow:last-of-type:not(.borderless) {
             border-right-width: 1px;
