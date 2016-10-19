@@ -19,7 +19,8 @@ from indico.modules.events.layout.views import WPPage
 from indico.modules.events.registration.views import WPDisplayRegistrationParticipantList
 from indico.modules.events.sessions.views import WPDisplaySession
 from indico.modules.events.timetable.views import WPDisplayTimetable
-from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceProgram
+from indico.modules.events.tracks.views import WPDisplayTracks
+from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay
 
 
 class WPStaticEventBase:
@@ -46,7 +47,7 @@ class WPStaticTimetable(WPStaticEventBase, WPDisplayTimetable):
     menu_entry_name = 'timetable'
 
 
-class WPStaticConferenceProgram(WPStaticEventBase, WPConferenceProgram):
+class WPStaticConferenceProgram(WPStaticEventBase, WPDisplayTracks):
     endpoint = 'tracks.program'
 
 

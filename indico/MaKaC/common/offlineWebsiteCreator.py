@@ -53,6 +53,7 @@ from indico.modules.events.registration.controllers.display import RHParticipant
 from indico.modules.events.sessions.util import get_session_timetable_pdf, get_session_ical_file
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.timetable.controllers.display import RHTimetable
+from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.util.string import remove_tags
 from indico.web.flask.util import url_for
@@ -317,14 +318,12 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Those which are backed by a WP class get their name from that class;
         # the others are simply hardcoded.
         self._menu_offline_items = {'overview': None, 'abstracts_book': None}
-        wps = {WPStaticConferenceProgram}
-        for cls in wps:
-            self._menu_offline_items[cls.menu_entry_name] = cls(self._rh, self._conf)
         rhs = {RHParticipantList: WPStaticDisplayRegistrationParticipantList,
                RHContributionList: WPStaticContributionList,
                RHAuthorList: WPStaticAuthorList,
                RHSpeakerList: WPStaticSpeakerList,
-               RHTimetable: WPStaticTimetable}
+               RHTimetable: WPStaticTimetable,
+               RHDisplayTracks: WPStaticConferenceProgram}
         for rh_cls, wp in rhs.iteritems():
             rh = rh_cls()
             rh.view_class = wp
@@ -367,16 +366,13 @@ class ConferenceOfflineCreator(OfflineEventCreator):
 
     def _get_builtin_page(self, entry):
         obj = self._menu_offline_items.get(entry.name)
-        if isinstance(obj, WPBase):
-            content = obj.display()
-            self._addPage(content, obj.endpoint, self._conf)
-        elif isinstance(obj, RH):
+        if isinstance(obj, RH):
             obj._checkParams({'confId': self._conf.id})
             self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
         if entry.name == 'program':
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf)
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, event=self._conf.as_event)
 
     def _get_custom_page(self, page):
         html = WPStaticCustomPage.render_template('page.html', self._conf, page=page)
