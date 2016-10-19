@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 from sqlalchemy import type_coerce
+from sqlalchemy.event import listens_for
 from sqlalchemy.sql.schema import CheckConstraint
 from sqlalchemy.sql.sqltypes import SchemaType, SmallInteger
 from sqlalchemy.sql.type_api import TypeDecorator
@@ -72,11 +73,9 @@ class PyIntEnum(TypeDecorator, SchemaType):
             return None
         return self.enum(value)
 
-    def _set_table(self, column, table):
-        e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum if x not in self.exclude_values),
-                            'valid_enum_{}'.format(column.name))
-        e.info['alembic_dont_render'] = True
-        assert e.table is table
+    def _set_parent_with_dispatch(self, parent):
+        TypeDecorator._set_parent_with_dispatch(self, parent)
+        SchemaType._set_parent_with_dispatch(self, parent)
 
     def alembic_render_type(self, autogen_context):
         imports = autogen_context['imports']
@@ -88,3 +87,13 @@ class PyIntEnum(TypeDecorator, SchemaType):
             ))
         else:
             return '{}({})'.format(type(self).__name__, self.enum.__name__)
+
+
+@listens_for(PyIntEnum, 'before_parent_attach')
+def _type_before_parent_attach(type_, col):
+    @listens_for(col, 'after_parent_attach')
+    def _col_after_parent_attach(col, table):
+        e = CheckConstraint(type_coerce(col, type_).in_(x.value for x in type_.enum if x not in type_.exclude_values),
+                            'valid_enum_{}'.format(col.name))
+        e.info['alembic_dont_render'] = True
+        assert e.table is table

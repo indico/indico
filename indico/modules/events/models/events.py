@@ -211,7 +211,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     logo_metadata = db.Column(
         JSON,
         nullable=False,
-        default=None
+        default=JSON.NULL
     )
     #: The logo's raw image data
     logo = db.deferred(db.Column(
@@ -222,7 +222,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     stylesheet_metadata = db.Column(
         JSON,
         nullable=False,
-        default=None
+        default=JSON.NULL
     )
     #: The stylesheet's raw image data
     stylesheet = db.deferred(db.Column(
@@ -609,11 +609,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         subquery = (select([Event.id,
                             db.func.first_value(Event.id).over(order_by=(Event.start_dt, Event.id)).label('first'),
-                            # XXX, use this after updating to sqlalchemy 1.1:
-                            # db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
-                            #                                range_=(None, None)).label('last')
-                            db.literal_column('last_value(id) OVER (ORDER BY start_dt ASC, id ASC RANGE '
-                                              'BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)').label('last'),
+                            db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
+                                                              range_=(None, None)).label('last'),
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
                     .where((Event.category_id == self.category_id) & ~Event.is_deleted)
