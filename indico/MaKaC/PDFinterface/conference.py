@@ -95,7 +95,7 @@ def extract_affiliations(contrib):
 
 class ProgrammeToPDF(PDFBase):
 
-    def __init__(self, event):
+    def __init__(self, event, tz=None):
         self._event = event
         self._conf = event.as_legacy
         self._tz = self._event.tzinfo

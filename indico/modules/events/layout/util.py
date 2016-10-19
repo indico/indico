@@ -201,6 +201,7 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None)
 
 
 @memoize_request
+@unify_event_args(legacy=True)
 def get_menu_entry_by_name(name, event):
     entries = menu_entries_for_event(event)
     return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
@@ -236,7 +237,6 @@ def get_css_url(event, force_theme=None, for_preview=False):
         return '{}/{}'.format(css_base, layout_settings.get(event, 'theme'))
 
 
-@unify_event_args(legacy=True)
 def is_menu_entry_enabled(entry_name, event):
     """Check whether the MenuEntry is enabled"""
     return get_menu_entry_by_name(entry_name, event).is_enabled
