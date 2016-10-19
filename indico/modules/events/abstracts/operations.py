@@ -30,6 +30,7 @@ from indico.modules.events.abstracts.notifications import send_abstract_notifica
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
+from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 
 
@@ -69,6 +70,7 @@ def delete_abstract(abstract, delete_contrib=False):
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
                    send_notification=False):
     abstract.judge = judge
+    abstract.judgment_dt = now_utc()
     abstract.judgment_comment = abstract_data['judgment_comment']
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted

@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from datetime import time
 
+from flask import request
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
@@ -34,7 +35,7 @@ from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
-                                     IndicoDateTimeField)
+                                     IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget
@@ -130,11 +131,9 @@ class AbstractReviewingSettingsForm(IndicoForm):
         return data
 
 
-class AbstractJudgmentForm(IndicoForm):
-    """Form for judging an abstract"""
+class AbstractJudgmentFormBase(IndicoForm):
+    """Form base class for abstract judgment operations"""
 
-    judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=AbstractAction,
-                                     skip={AbstractAction.change_tracks})
     accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
                                       get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
                                       description=_("The abstract will be accepted in this track"))
@@ -146,17 +145,43 @@ class AbstractJudgmentForm(IndicoForm):
     session = QuerySelectField(_("Session"), [HiddenUnless('judgment', AbstractAction.accept)],
                                get_label='title', allow_blank=True, blank_text=_("Choose a session..."),
                                description=_("The generated contribution will be allocated in this session"))
-    merged_into = AbstractField(_("Merge into"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
-                                description=_("The current abstract will be merged onto the selected one"))
-    merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
-                                 description=_("Authors and speakers of the current abstract will be added to the "
-                                               "selected one"))
     duplicate_of = AbstractField(_("Duplicate of"),
                                  [HiddenUnless('judgment', AbstractAction.mark_as_duplicate), DataRequired()],
                                  description=_("The current abstract will be marked as duplicate of the selected one"))
+    merged_into = AbstractField(_("Merge into"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
+                                description=_("The current abstract will be merged onto the selected one"))
+    merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge)],
+                                 description=_("Authors and speakers of the current abstract will be added to the "
+                                               "selected one"))
     judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
     # TODO: show only if notifications apply?
     send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
+
+    def __init__(self, *args, **kwargs):
+        super(AbstractJudgmentFormBase, self).__init__(*args, **kwargs)
+        self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
+        self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.title)
+        self.accepted_contrib_type.query = (ContributionType.query
+                                            .with_parent(self.event)
+                                            .order_by(ContributionType.name))
+
+    @property
+    def split_data(self):
+        abstract_data = self.data
+        judgment_data = {
+            'judgment': abstract_data.pop('judgment'),
+            'send_notification': abstract_data.pop('send_notifications'),
+            'contrib_session': abstract_data.pop('contrib_session', None),
+            'merge_persons': abstract_data.pop('merge_persons', None)
+        }
+        return judgment_data, abstract_data
+
+
+class AbstractJudgmentForm(AbstractJudgmentFormBase):
+    """Form for judging an abstract"""
+
+    judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=AbstractAction,
+                                     skip={AbstractAction.change_tracks})
 
     def __init__(self, *args, **kwargs):
         abstract = kwargs.pop('abstract')
@@ -168,15 +193,24 @@ class AbstractJudgmentForm(IndicoForm):
         if len(candidate_contrib_types) == 1:
             kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
         super(AbstractJudgmentForm, self).__init__(*args, **kwargs)
-        self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
-        self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.title)
-        self.accepted_contrib_type.query = (ContributionType.query
-                                                            .with_parent(self.event)
-                                                            .order_by(ContributionType.name))
+
+
+class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
+    judgment = HiddenEnumField(enum=AbstractAction, skip={AbstractAction.change_tracks})
+    abstract_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
+
+    def is_submitted(self):
+        return super(BulkAbstractJudgmentForm, self).is_submitted() and 'submitted' in request.form
 
 
 class AbstractReviewingRolesForm(IndicoForm):
     """Settings form for abstract reviewing roles"""
+
     roles = TrackRoleField()
 
     def __init__(self, *args, **kwargs):

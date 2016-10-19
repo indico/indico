@@ -73,17 +73,60 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <a class="i-button icon-checkmark js-requires-selected-row js-dialog-action accept">
-                        {% trans %}Accept{% endtrans %}
+                    <a class="i-button arrow icon-hammer js-requires-selected-row disabled"
+                       data-toggle="dropdown">
+                        {%- trans %}Judge{% endtrans -%}
                     </a>
-                    <a class="i-button icon-disable js-requires-selected-row js-dialog-action danger">
-                        {% trans %}Reject{% endtrans %}
-                    </a>
-                    {# TODO: Add icon for merge #}
-                    <a class="i-button js-requires-selected-row js-dialog-action"
-                       {# TODO: data-href="{{ url_for('.merge_abstracts', event) }}" #}>
-                        {% trans %}Merge{% endtrans %}
-                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a class="accept js-requires-selected-row"
+                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                               data-title="{% trans %}Accept selected abstracts{% endtrans %}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                               data-params='{"judgment": "accept"}'
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Accept{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="js-requires-selected-row js-dialog-action danger"
+                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                               data-title="{% trans %}Reject selected abstracts{% endtrans %}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                               data-params='{"judgment": "reject"}'
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Reject{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="js-requires-selected-row js-dialog-action"
+                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                               data-title="{% trans %}Merge selected abstracts{% endtrans %}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                               data-params='{"judgment": "merge"}'
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Merge{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="js-requires-selected-row js-dialog-action"
+                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                               data-title="{% trans %}Mark selected abstracts as duplicate{% endtrans %}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                               data-params='{"judgment": "mark_as_duplicate"}'
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Mark as duplicate{% endtrans -%}
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="group">
                     <button class="i-button icon-users js-requires-selected-row disabled"
