@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import RHManageTracks, RHCreateTrack, RHDisplayTracks, RHCreateTrackOld
+from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHDisplayTracks, RHTracksPDF,
+                                                      RHCreateTrackOld)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_template_folder='events/tracks',
@@ -24,6 +25,8 @@ _bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_t
 
 _bp.add_url_rule('/manage/tracks/', 'manage', RHManageTracks)
 _bp.add_url_rule('/manage/tracks/create', 'create', RHCreateTrack, methods=('GET', 'POST'))
+
 _bp.add_url_rule('/program', 'program', RHDisplayTracks)
+_bp.add_url_rule('/program.pdf', 'program_pdf', RHTracksPDF)
 
 _bp.add_url_rule('/manage/tracks/create-old', 'create_track_old', RHCreateTrackOld, methods=('GET', 'POST'))

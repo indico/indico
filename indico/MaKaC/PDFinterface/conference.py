@@ -63,6 +63,7 @@ from MaKaC.common import utils
 from indico.core.db import db
 from indico.core.config import Config
 from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
+from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import create_event_logo_tmp_file
@@ -94,15 +95,12 @@ def extract_affiliations(contrib):
 
 class ProgrammeToPDF(PDFBase):
 
-    def __init__(self, conf, doc=None, story=None, tz=None):
-        self._conf = conf
-        self._event = conf.as_event
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        PDFBase.__init__(self, doc, story)
-        self._title = _("Conference Scientific Programme")
+    def __init__(self, event):
+        self._event = event
+        self._conf = event.as_legacy
+        self._tz = self._event.tzinfo
+        self._title = get_menu_entry_by_name('program', event).localized_title
+        PDFBase.__init__(self, title='program.pdf')
 
     def firstPage(self, c, doc):
         c.saveState()
@@ -142,9 +140,7 @@ class ProgrammeToPDF(PDFBase):
         p = Paragraph(escape(self._conf.getProgramDescription()), style)
         story.append(p)
         story.append(Spacer(1, 0.4*inch))
-
         for track in self._event.tracks:
-
             bogustext = track.title.encode('utf-8')
             p = Paragraph(escape(bogustext), styles["Heading1"])
             self._story.append(p)
