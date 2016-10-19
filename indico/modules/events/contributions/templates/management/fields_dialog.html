@@ -4,7 +4,7 @@
 <div class="manage-contribution-fields">
     <div class="toolbar">
         <a class="i-button arrow icon-plus highlight" data-toggle="dropdown">
-            {% trans %}New contribution field{% endtrans %}
+            {%- trans %}Add new field{% endtrans -%}
         </a>
         <ul class="dropdown">
             {% for form_type in custom_field_types %}
@@ -21,7 +21,7 @@
 
     {% set abstract_content_item = {'title': _("Abstracts content")} %}
     {% call(item) sortable_list([abstract_content_item], draggable=false, invisible_handle=true,
-                                id='contributions-fixed-fields') %}
+                                id='contributions-fixed-fields', classes='tiles') %}
         <a class="icon-edit js-action-button" data-ajax-dialog
            data-href="{{ url_for('.manage_description_field', event) }}"
            data-title="{% trans %}Abstracts content{% endtrans %}"</a>
@@ -31,7 +31,7 @@
     {% endcall %}
 
     {% if custom_fields %}
-        {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields") %}
+        {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields", classes='tiles') %}
             <a class="icon-edit js-action-button js-edit-contribution-field" data-ajax-dialog
                data-href="{{ url_for('.manage_field', event, custom_field) }}"
                data-title="{% trans %}Edit custom field{% endtrans %}"></a>

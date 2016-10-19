@@ -45,7 +45,8 @@ class WPManageAbstracts(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
         return (WPConferenceModifBase.getCSSFiles(self) +
                 self._asset_env['markdown_sass'].urls() +
                 self._asset_env['selectize_css'].urls() +
-                self._asset_env['abstracts_sass'].urls())
+                self._asset_env['abstracts_sass'].urls() +
+                self._asset_env['contributions_sass'].urls())
 
     def _getHeadContent(self):
         return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)

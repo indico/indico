@@ -14,9 +14,9 @@
             <div class="icon icon-upload"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Submission{% endtrans %}
+                    {%- trans %}Submission{% endtrans -%}
                 </div>
-                {% trans %}Configure the submission dates, the abstract fields, etc.{% endtrans %}
+                {%- trans %}Configure general submission settings and email notification templates.{% endtrans -%}
             </div>
             <div class="toolbar">
                 <div class="group">
@@ -24,15 +24,7 @@
                        data-href="{{ url_for('.email_tpl_list', event) }}"
                        data-title="{% trans %}Configure e-mail notifications{% endtrans %}"
                        data-ajax-dialog>
-                        {% trans %}Notifications{% endtrans %}
-                    </a>
-                </div>
-                <div class="group">
-                    <a href="#" class="i-button icon-list js-dialog-action"
-                       data-title="{% trans %}Manage fields{% endtrans %}"
-                       data-href="{{ url_for('contributions.manage_fields', event) }}"
-                       data-ajax-dialog>
-                        {% trans %}Abstract fields{% endtrans %}
+                        {%- trans %}Notifications{% endtrans -%}
                     </a>
                 </div>
                 <div class="group">
@@ -40,7 +32,35 @@
                        data-href="{{ url_for('.manage_submission_settings', event) }}"
                        data-title="{% trans %}Configure abstract submission{% endtrans %}"
                        data-ajax-dialog>
-                        {% trans %}Settings{% endtrans %}
+                        {%- trans %}Settings{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="icon icon-wrench"></div>
+            <div class="text">
+                <div class="label">
+                    {%- trans %}Fields and types{% endtrans -%}
+                </div>
+                {%- trans %}Configure the contribution types and abstract fields.{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button"
+                       data-href="{{ url_for('contributions.manage_types', event) }}"
+                       data-title="{% trans %}Manage contribution types{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Contribution types{% endtrans -%}
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button js-dialog-action"
+                       data-title="{% trans %}Manage fields{% endtrans %}"
+                       data-href="{{ url_for('contributions.manage_fields', event) }}"
+                       data-ajax-dialog>
+                        {%- trans %}Abstract fields{% endtrans -%}
                     </a>
                 </div>
             </div>
@@ -50,9 +70,9 @@
             <div class="icon icon-file-check"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Reviewing{% endtrans %}
+                    {%- trans %}Reviewing{% endtrans -%}
                 </div>
-                {% trans %}Configure the reviewing questions and answers, the reviewing teams, etc.{% endtrans %}
+                {%- trans %}Configure the reviewing questions and answers, the reviewing teams, etc.{% endtrans -%}
             </div>
             <div class="toolbar">
                 <div class="group">
@@ -60,7 +80,7 @@
                        data-href="{{ url_for('.manage_reviewing_roles', event) }}"
                        data-title="{% trans %}Abstract Reviewing Roles{% endtrans %}"
                        data-ajax-dialog>
-                        {% trans %}Roles{% endtrans %}
+                        {%- trans %}Roles{% endtrans -%}
                     </a>
                 </div>
                 <div class="group">
@@ -68,7 +88,7 @@
                        data-href="{{ url_for('.manage_reviewing_settings', event) }}"
                        data-title="{% trans %}Configure abstract reviewing{% endtrans %}"
                        data-ajax-dialog>
-                        {% trans %}Settings{% endtrans %}
+                        {%- trans %}Settings{% endtrans -%}
                     </a>
                 </div>
             </div>
@@ -78,11 +98,11 @@
             <div class="icon icon-book"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Book of abstracts{% endtrans %}
+                    {%- trans %}Book of abstracts{% endtrans -%}
                 </div>
-                {% trans url=url_for('.export_boa', event) -%}
+                {%- trans url=url_for('.export_boa', event) -%}
                     Customize and <a href={{ url }}>download</a> the book of abstracts
-                {%- endtrans %}
+                {%- endtrans -%}
             </div>
             <div class="toolbar">
                 <div class="group">
@@ -90,7 +110,7 @@
                        data-href="{{ url_for('.manage_boa', event) }}"
                        data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
                        data-ajax-dialog>
-                        {% trans %}Settings{% endtrans %}
+                        {%- trans %}Settings{% endtrans -%}
                     </a>
                 </div>
             </div>
@@ -102,14 +122,14 @@
             <div class="icon icon-list"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}List of abstracts{% endtrans %}
+                    {%- trans %}List of abstracts{% endtrans -%}
                 </div>
-                {% trans -%}View and perform actions on abstracts{%- endtrans %}
+                {%- trans %}View and perform actions on abstracts{% endtrans -%}
             </div>
             <div class="toolbar">
                 <div class="group">
                     <a href="{{ url_for('.manage_abstract_list', event) }}" class="i-button icon-settings">
-                        {% trans %}Manage{% endtrans %}
+                        {%- trans %}Manage{% endtrans -%}
                         <span class="badge">{{ abstracts_count }}</span>
                     </a>
                 </div>
