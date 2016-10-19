@@ -5,7 +5,7 @@
 {%- endblock %}
 
 {% block body -%}
-    Your abstract "{abstract_title}" with ID #{abstract_id} has been merged into "{merge_target_abstract_title}".
+    Your abstract "{abstract_title}" with ID #{abstract_id} has been merged into "{target_abstract_title}".
 
     Kind regards,
     The organizers of {event_title}
