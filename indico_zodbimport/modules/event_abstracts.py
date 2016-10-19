@@ -125,6 +125,8 @@ class AbstractMigration(object):
                  'AbstractStatusProposedToAccept': AbstractState.submitted,
                  'AbstractStatusInConflict': AbstractState.submitted}
 
+    JUDGED_STATES = {AbstractState.accepted, AbstractState.rejected, AbstractState.duplicate, AbstractState.merged}
+
     ACTION_MAP = {'AbstractAcceptance': AbstractAction.accept,
                   'AbstractRejection': AbstractAction.reject,
                   'AbstractReallocation': AbstractAction.change_tracks,
@@ -481,6 +483,9 @@ class AbstractMigration(object):
             if abstract.state == AbstractState.accepted:
                 abstract.accepted_contrib_type_id = old_abstract.accepted_type_id
                 abstract.accepted_track = accepted_track
+
+            if abstract.state in self.JUDGED_STATES:
+                abstract.judge = self._user_from_legacy(old_state._responsible, janitor=True)
 
             # tracks
             reallocated = set(r._track for r in getattr(zodb_abstract, '_trackReallocations', {}).itervalues())
