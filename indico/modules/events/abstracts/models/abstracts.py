@@ -431,7 +431,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return False
         elif self.event_new in user.global_abstract_reviewer_for_events:
             return True
-        elif user.reviewer_for_tracks & self.reviewed_for_tracks:
+        elif user.abstract_reviewer_for_tracks & self.reviewed_for_tracks:
             return True
         else:
             return False
