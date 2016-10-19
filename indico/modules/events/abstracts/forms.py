@@ -286,9 +286,9 @@ class MultiTrackMixin(object):
 
 
 class AbstractsScheduleForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), default_time=time(0, 0),
+    start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),
                                    description=_("The moment users can start submitting abstracts"))
-    end_dt = IndicoDateTimeField(_("End"), [LinkedDateTime('start_dt')], default_time=time(23, 59),
+    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
                                  description=_("The moment the submission process will end"))
     modification_end_dt = IndicoDateTimeField(_("Modification deadline"), [Optional(), LinkedDateTime('end_dt')],
                                               default_time=time(23, 59),

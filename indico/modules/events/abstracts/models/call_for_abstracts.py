@@ -33,13 +33,15 @@ class CallForAbstracts(object):
 
     @property
     def has_started(self):
-        start_dt = abstracts_settings.get(self.event, 'start_dt')
-        return start_dt is not None and start_dt <= now_utc()
+        return self.start_dt is not None and self.start_dt <= now_utc()
 
     @property
     def has_ended(self):
-        end_dt = abstracts_settings.get(self.event, 'end_dt')
-        return end_dt is not None and end_dt <= now_utc()
+        return self.end_dt is not None and self.end_dt <= now_utc()
+
+    @property
+    def modification_ended(self):
+        return self.modification_end_dt is not None and self.modification_end_dt <= now_utc()
 
     @property
     def start_dt(self):
@@ -48,6 +50,10 @@ class CallForAbstracts(object):
     @property
     def end_dt(self):
         return abstracts_settings.get(self.event, 'end_dt')
+
+    @property
+    def modification_end_dt(self):
+        return abstracts_settings.get(self.event, 'modification_end_dt') or self.end_dt
 
     def schedule(self, start_dt, end_dt, modification_end_dt):
         abstracts_settings.set_multi(self.event, {
