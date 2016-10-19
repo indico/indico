@@ -48,6 +48,7 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.tracks.settings import track_settings
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.models.users import UserTitle
@@ -206,6 +207,9 @@ class AbstractMigration(object):
         return self.event.tzinfo.localize(dt).astimezone(utc)
 
     def _migrate_tracks(self):
+        program = convert_to_unicode(getattr(self.conf, 'programDescription', ''))
+        if program:
+            track_settings.set(self.event, 'program', program)
         for pos, old_track in enumerate(self.conf.program, 1):
             track = Track(title=convert_to_unicode(old_track.title),
                           description=convert_to_unicode(old_track.description),
