@@ -385,7 +385,7 @@ pagesizeNameToCanvas = {'A4': Canvas,
 
 class PDFBase:
 
-    def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False):
+    def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False, title=None):
 
         if doc:
             self._doc = doc
@@ -398,6 +398,9 @@ class PDFBase:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize = landscape(PDFSizes().PDFpagesizes[pagesize]))
             else:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize = PDFSizes().PDFpagesizes[pagesize])
+
+        if title is not None:
+            self._doc.title = title
 
         if story is not None:
             self._story = story
@@ -422,21 +425,16 @@ class PDFBase:
         """
         pass
 
-
     def laterPages(self, c, doc):
         """set the layout of the page after the first
         This function is call by doc.build method one each page after the first
         """
         pass
 
-
     def getBody(self, story=None):
-        if not story:
-            story = self._story
         """add the content to the story
         """
         pass
-
 
     def getPDFBin(self):
         #build the pdf in the fileDummy
