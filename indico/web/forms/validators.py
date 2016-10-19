@@ -191,9 +191,9 @@ class LinkedDateTime(object):
         linked_field_dt = as_utc(linked_field.data)
         field_dt = as_utc(field.data)
         if self.not_before and field_dt < linked_field_dt:
-            raise ValidationError(_("{} can't be before than {}").format(field.label, linked_field.label))
+            raise ValidationError(_("{} can't be before {}").format(field.label, linked_field.label))
         if self.not_after and field_dt > linked_field_dt:
-            raise ValidationError(_("{} can't be after than {}").format(field.label, linked_field.label))
+            raise ValidationError(_("{} can't be after {}").format(field.label, linked_field.label))
         if self.not_equal and field_dt == linked_field_dt:
             raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
 
