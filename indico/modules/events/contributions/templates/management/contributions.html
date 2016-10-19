@@ -10,16 +10,16 @@
     {%- if event.type == 'conference' -%}
         <a id="contributions-settings-dropdown"
            class="i-button borderless icon-settings arrow js-dropdown"
-           data-toggle="dropdown"></a>
+           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
         <ul class="dropdown">
             <li>
                 <a href="#"
                    title="{% trans %}Manage contribution types{% endtrans %}"
-                   data-ajax-dialog
                    data-reload-after="customData"
                    data-title="{% trans %}Manage contribution types{% endtrans %}"
                    data-href="{{ url_for('.manage_types', event) }}"
-                   data-qtip-position="right">
+                   data-qtip-position="right"
+                   data-ajax-dialog>
                     {% trans %}Contribution types{% endtrans %}</a>
             </li>
             <li>
@@ -34,6 +34,13 @@
             </li>
         </ul>
     {%- endif -%}
+{% endblock %}
+
+{% block description %}
+    {%- trans -%}
+        Manage the contributions of the event from the list below or configure the <strong>contribution types</strong>
+        and <strong>custom fields</strong> from the settings menu above.
+    {%- endtrans -%}
 {% endblock %}
 
 {% block content %}
