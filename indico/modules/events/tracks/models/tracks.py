@@ -72,7 +72,7 @@ class Track(DescriptionMixin, db.Model):
         collection_class=set,
         lazy=True,
         backref=db.backref(
-            'reviewer_for_tracks',
+            'abstract_reviewer_for_tracks',
             collection_class=set,
             lazy=True
         )

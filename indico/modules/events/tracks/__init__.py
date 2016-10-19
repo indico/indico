@@ -50,8 +50,8 @@ def _can_access_event(cls, obj, user, authorized, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    target.reviewer_for_tracks |= source.reviewer_for_tracks
-    source.reviewer_for_tracks.clear()
+    target.abstract_reviewer_for_tracks |= source.abstract_reviewer_for_tracks
+    source.abstract_reviewer_for_tracks.clear()
     target.convener_for_tracks |= source.convener_for_tracks
     source.convener_for_tracks.clear()
 
