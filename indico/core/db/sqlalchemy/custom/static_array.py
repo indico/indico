@@ -7,8 +7,9 @@ StaticArray class and functions that SQLAlchemy can process instead of non hasha
 
 from cStringIO import StringIO
 
-from sqlalchemy import types
-from sqlalchemy import String
+from sqlalchemy import types, String
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql.base import PGDialect
 from sqlalchemy.sql import expression
 from sqlalchemy.ext.compiler import compiles
 
@@ -18,10 +19,7 @@ class StaticArray(types.TypeDecorator):
 
     def __init__(self):
         super(StaticArray, self).__init__()
-        import sqlalchemy.dialects.postgresql.base as pg
-
-        self.__supported = {pg.PGDialect: pg.PGArray}
-        del pg
+        self.__supported = {PGDialect: ARRAY}
 
     def load_dialect_impl(self, dialect):
         if dialect.__class__ in self.__supported:
