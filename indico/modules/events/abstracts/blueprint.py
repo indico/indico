@@ -30,7 +30,8 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsExportPDF, RHAbstractExportPDF,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
-                                                                    RHManageReviewingRoles, RHResetAbstractJudgment)
+                                                                    RHManageReviewingRoles, RHResetAbstractJudgment,
+                                                                    RHBulkAbstractJudgment)
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractsDownloadAttachment
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -68,6 +69,7 @@ _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', RHDelete
 _bp.add_url_rule('/manage/abstracts/person-list', 'person_list', RHAbstractPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/attachments', 'download_attachments', RHAbstractsDownloadAttachments,
                  methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/judge', 'manage_judge_abstracts', RHBulkAbstractJudgment, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', RHAbstractListStaticURL, methods=('POST',))
 
 # E-mail templates

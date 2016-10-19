@@ -26,7 +26,8 @@ from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
-                                                   AbstractsScheduleForm, AbstractJudgmentForm)
+                                                   AbstractsScheduleForm, AbstractJudgmentForm,
+                                                   BulkAbstractJudgmentForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
@@ -92,20 +93,43 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
 class RHManageAbstract(RHManageAbstractBase):
     """Display abstract management page"""
+
     def _process(self):
         form = AbstractJudgmentForm(abstract=self.abstract)
         if form.process_ajax():
             return form.ajax_response
-        if form.validate_on_submit():
-            abstract_data = form.data
-            judgment = abstract_data.pop('judgment')
-            send_notification = abstract_data.pop('send_notifications')
-            contrib_session = abstract_data.pop('contrib_session', None)
-            merge_persons = abstract_data.pop('merge_persons', None)
-            judge_abstract(self.abstract, abstract_data, judgment=judgment, contrib_session=contrib_session,
-                           merge_persons=merge_persons, send_notification=send_notification, )
-        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract, form=form,
-                                                 management=True)
+        elif form.validate_on_submit():
+            judgment_data, abstract_data = form.split_data
+            judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
+        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract,
+                                                 form=form)
+
+
+class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
+    """Perform bulk judgment operations on selected abstracts"""
+
+    def _process(self):
+        form = BulkAbstractJudgmentForm(event=self.event_new, abstract_id=[a.id for a in self.abstracts],
+                                        judgment=request.form.get('judgment'))
+        if form.process_ajax():
+            return form.ajax_response
+        elif form.validate_on_submit():
+            judgment_data, abstract_data = form.split_data
+            submitted_abstracts = {abstract for abstract in self.abstracts if abstract.state == AbstractState.submitted}
+            for abstract in submitted_abstracts:
+                judge_abstract(abstract, abstract_data, judge=session.user, **judgment_data)
+            num_judged_abstracts = len(submitted_abstracts)
+            num_prejudged_abstracts = len(self.abstracts) - num_judged_abstracts
+            if num_judged_abstracts:
+                flash(ngettext("One abstract has been judged.",
+                               "{num} abstracts have been judged.",
+                               num_judged_abstracts).format(num=num_judged_abstracts), 'success')
+            if num_prejudged_abstracts:
+                flash(ngettext("One abstract has been skipped since it is already judged.",
+                               "{num} abstracts have been skipped since they are already judged.",
+                               num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
 
 
 class RHResetAbstractJudgment(RHManageAbstractBase):
