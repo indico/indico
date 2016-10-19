@@ -16,13 +16,17 @@
 
 from __future__ import unicode_literals
 
+from io import BytesIO
+
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.tracks.forms import TrackForm
 from indico.modules.events.tracks.operations import create_track
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
+from indico.web.flask.util import send_file
 from indico.web.util import jsonify_form, jsonify_data
 from indico.util.string import to_unicode
+from MaKaC.PDFinterface.conference import ProgrammeToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -74,3 +78,9 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
         program = track_settings.get(self.event_new, 'program')
         return WPDisplayTracks.render_template('display.html', self._conf, event=self.event_new, page_title=page_title,
                                                program=program)
+
+
+class RHTracksPDF(RHConferenceBaseDisplay):
+    def _process(self):
+        pdf = ProgrammeToPDF(self.event_new)
+        return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
