@@ -108,7 +108,7 @@ def abstract_objects(dummy_abstract, create_dummy_contrib_type, create_dummy_tra
 
 
 @pytest.mark.usefixtures('request_context')
-def test_abstract_notification(mocker, abstract_objects, create_email_template):
+def test_abstract_notification(mocker, abstract_objects, create_email_template, dummy_user):
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
 
     event, abstract, track, contrib_type = abstract_objects
@@ -121,6 +121,7 @@ def test_abstract_notification(mocker, abstract_objects, create_email_template):
 
     abstract.accepted_contrib_type = contrib_type
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
 
@@ -139,6 +140,7 @@ def test_notification_rules(mocker, abstract_objects, create_email_template, dum
     assert send_email.call_count == 0
 
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 0
@@ -153,7 +155,7 @@ def test_notification_rules(mocker, abstract_objects, create_email_template, dum
 
 @pytest.mark.usefixtures('request_context')
 def test_notification_several_conditions(db, mocker, abstract_objects, create_email_template, create_dummy_track,
-                                         create_dummy_contrib_type):
+                                         create_dummy_contrib_type, dummy_user):
     event, abstract, track, contrib_type = abstract_objects
     event.abstract_email_templates = [
         create_email_template(event, 0, 'accept', 'accepted', [
@@ -164,6 +166,7 @@ def test_notification_several_conditions(db, mocker, abstract_objects, create_em
 
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
@@ -182,7 +185,7 @@ def test_notification_several_conditions(db, mocker, abstract_objects, create_em
 
 
 @pytest.mark.usefixtures('request_context')
-def test_notification_any_conditions(mocker, abstract_objects, create_email_template):
+def test_notification_any_conditions(mocker, abstract_objects, create_email_template, dummy_user):
     event, abstract, track, contrib_type = abstract_objects
     event.abstract_email_templates = [
         create_email_template(event, 0, 'accept', 'accepted', [
@@ -192,13 +195,14 @@ def test_notification_any_conditions(mocker, abstract_objects, create_email_temp
 
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
 
 
 @pytest.mark.usefixtures('request_context')
-def test_notification_stop_on_match(mocker, abstract_objects, create_email_template):
+def test_notification_stop_on_match(mocker, abstract_objects, create_email_template, dummy_user):
     event, abstract, track, contrib_type = abstract_objects
     event.abstract_email_templates = [
         create_email_template(event, 0, 'merge', 'merged poster', [
@@ -211,6 +215,7 @@ def test_notification_stop_on_match(mocker, abstract_objects, create_email_templ
 
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     send_abstract_notifications(abstract)
     assert send_email.call_count == 2
 
@@ -221,7 +226,7 @@ def test_notification_stop_on_match(mocker, abstract_objects, create_email_templ
 
 
 @pytest.mark.usefixtures('request_context')
-def test_email_content(monkeypatch, abstract_objects, create_email_template):
+def test_email_content(monkeypatch, abstract_objects, create_email_template, dummy_user):
     def _mock_send_email(email, event, user):
         assert email['subject'] == '[Indico] Abstract Acceptance notification (#314)'
         assert text_compare(email['body'], """
@@ -248,4 +253,5 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template):
     abstract.accepted_contrib_type = contrib_type
     abstract.accepted_track = track
     abstract.state = AbstractState.accepted
+    abstract.judge = dummy_user
     send_abstract_notifications(abstract)
