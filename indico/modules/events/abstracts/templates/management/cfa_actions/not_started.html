@@ -7,18 +7,18 @@
 {% endblock %}
 
 {% block text %}
-    {% trans %}Start now or schedule opening.{% endtrans %}
+    {% if not cfa.start_dt %}
+        {% trans %}Start now or schedule opening.{% endtrans %}
+    {% else %}
+        {% set tz = event.timezone %}
+        {% trans date=cfa.start_dt|format_date(timezone=tz), time=cfa.start_dt|format_time(timezone=tz) -%}
+            Scheduled to open on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }}).
+        {%- endtrans %}
+    {% endif %}
 {% endblock %}
 
 {% block buttons %}
-    <div class="group">
-        <a href="#" class="i-button icon-time js-abstracts-schedule-dialog"
-           data-href="{{ url_for('.schedule_abstracts_call', event) }}"
-           data-title="{% trans %}Schedule call for abstracts{% endtrans %}"
-           data-ajax-dialog>
-            {%- trans %}Schedule{% endtrans -%}
-        </a>
-    </div>
+    {{ super() }}
     <div class="group">
         <a href="#" class="i-button highlight"
            data-href="{{ url_for('.open_abstracts_call', event) }}"

@@ -18,21 +18,12 @@
 {% endblock %}
 
 {% block buttons %}
+    {{ super() }}
     <div class="group">
-        <a href="#" class="i-button icon-time"
-           data-href="{{ url_for('.schedule_abstracts_call', event) }}"
-           data-title="{% trans %}Reschedule call for abstracts{% endtrans %}"
-           data-ajax-dialog>
-            {%- trans %}Reschedule{% endtrans -%}
+        <a href="#" class="i-button highlight"
+           data-href="{{ url_for('.close_abstracts_call', event) }}"
+           data-method="POST">
+            {%- trans %}Close now{% endtrans -%}
         </a>
     </div>
-    {% block now_button %}
-        <div class="group">
-            <a href="#" class="i-button highlight"
-               data-href="{{ url_for('.close_abstracts_call', event) }}"
-               data-method="POST">
-                {%- trans %}Close now{% endtrans -%}
-            </a>
-        </div>
-    {% endblock %}
 {% endblock %}

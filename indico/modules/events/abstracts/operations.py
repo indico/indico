@@ -105,10 +105,11 @@ def reset_abstract_judgment(abstract):
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
     event.cfa.schedule(start_dt, end_dt, modification_end_dt)
     logger.info("Call for abstracts for %s scheduled by %s", event, session.user)
-    log_data = {
-        'Start': start_dt.isoformat(),
-        'End': end_dt.isoformat()
-    }
+    log_data = {}
+    if start_dt:
+        log_data['Start'] = start_dt.isoformat()
+    if end_dt:
+        log_data['End'] = end_dt.isoformat()
     if modification_end_dt:
         log_data['Modification deadline'] = modification_end_dt.isoformat()
     event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts', 'Call for abstracts scheduled', session.user,

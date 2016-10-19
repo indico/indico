@@ -140,9 +140,13 @@ class RHScheduleCFA(RHManageAbstractsBase):
         form = AbstractsScheduleForm(obj=FormDefaults(**abstracts_settings.get_all(self.event_new)),
                                      event=self.event_new)
         if form.validate_on_submit():
+            rescheduled = self.event_new.cfa.start_dt is not None
             schedule_cfa(self.event_new, **form.data)
-            flash(_("Call for abstracts has been scheduled"), 'success')
-            return jsonify_data()
+            if rescheduled:
+                flash(_("Call for abstracts has been rescheduled"), 'success')
+            else:
+                flash(_("Call for abstracts has been scheduled"), 'success')
+            return jsonify_data(flash=False)
         return jsonify_form(form)
 
 

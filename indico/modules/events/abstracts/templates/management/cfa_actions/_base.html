@@ -1,3 +1,23 @@
 {% extends '_module_actions_base.html' %}
 
 {% block icon_classes %}icon-file{% endblock %}
+
+
+{% block buttons %}
+    {% set title -%}
+        {%- if cfa.start_dt -%}
+            {%- trans %}Reschedule call for abstracts{% endtrans -%}
+        {%- else -%}
+            {%- trans %}Schedule call for abstracts{% endtrans -%}
+        {%- endif -%}
+    {%- endset -%}
+    <div class="group">
+        <a href="#" class="i-button icon-time js-abstracts-schedule-dialog"
+           data-href="{{ url_for('.schedule_abstracts_call', event) }}"
+           data-title="{{ title }}"
+           data-ajax-dialog
+           data-reload-after>
+            {{- _('Reschedule') if cfa.start_dt else _('Schedule') -}}
+        </a>
+    </div>
+{% endblock %}
