@@ -789,7 +789,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @return_ascii
     def __repr__(self):
-        # TODO: add self.protection_repr once we use it
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
                            _text=text_to_repr(self.title, max_length=75))
 
