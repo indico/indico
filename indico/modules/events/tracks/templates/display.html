@@ -7,7 +7,7 @@
 {% block page_actions %}
     <div class="toolbar right">
         <div class="group">
-            <a href="#pdf_url"
+            <a href="{{ url_for('.program_pdf', event) }}"
                class="i-button icon-file-pdf"
                title="{% trans %}Download PDF{% endtrans %}"></a>
         </div>
