@@ -85,7 +85,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
                                             name='duplicate_of_id_only_duplicate'),
                          db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judge_id IS NOT NULL)'
                                             .format(AbstractState.accepted, AbstractState.rejected,
-                                                    AbstractState.duplicate, AbstractState.merged),
+                                                    AbstractState.merged, AbstractState.duplicate),
                                             name='judge_if_judged'),
                          {'schema': 'event_abstracts'})
 
