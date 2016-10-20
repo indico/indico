@@ -30,8 +30,6 @@ from werkzeug.utils import secure_filename
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.common import timezoneUtils, HelperMaKaCInfo
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
-from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay, WPStaticConferenceProgram,
                                              WPStaticContributionDisplay, WPStaticContributionList, WPStaticCustomPage,
                                              WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
@@ -370,7 +368,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             obj._checkParams({'confId': self._conf.id})
             self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
         if entry.name == 'abstracts_book':
-            self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
+            self._addPdf(self._conf, 'abstracts.export_boa', AbstractBook, event=self.event)
         if entry.name == 'program':
             self._addPdf(self._conf, 'tracks.program_pdf', ProgrammeToPDF, event=self._conf.as_event)
 

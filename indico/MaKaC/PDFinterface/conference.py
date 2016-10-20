@@ -63,6 +63,7 @@ from MaKaC.common import utils
 from indico.core.db import db
 from indico.core.config import Config
 from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
+from indico.modules.events.abstracts.settings import boa_settings, BOASortField, BOACorrespondingAuthorType
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -376,13 +377,13 @@ class ContributionBook(PDFLaTeXBase):
 
     _tpl_filename = "contribution_list_boa.tpl"
 
-    def _sort_contribs(self, contribs, sort_by, aw):
+    def _sort_contribs(self, contribs, sort_by):
         mapping = {'number': 'id', 'name': 'title'}
-        if sort_by == 'schedule':
+        if sort_by == BOASortField.schedule:
             key_func = lambda c: (c.start_dt is None, c.start_dt)
-        elif sort_by == 'sessionTitle':
+        elif sort_by == BOASortField.session_title:
             key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '')
-        elif sort_by == 'speaker':
+        elif sort_by == BOASortField.speaker:
             def key_func(c):
                 speakers = c.speakers
                 if not c.speakers:
@@ -392,13 +393,12 @@ class ContributionBook(PDFLaTeXBase):
             key_func = attrgetter(mapping.get(sort_by) or 'title')
         return sorted(contribs, key=key_func)
 
-    def __init__(self, conf, aw, contribs=None, tz=None, sort_by=""):
+    def __init__(self, event, aw, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
-        self._conf = conf
+        self._conf = event.as_legacy
 
-        event = conf.as_event
         tz = tz or event.timezone
-        contribs = self._sort_contribs(contribs or event.contributions, sort_by, aw)
+        contribs = self._sort_contribs(contribs or event.contributions, sort_by)
         affiliation_contribs = {}
         corresp_authors = {}
 
@@ -411,22 +411,22 @@ class ContributionBook(PDFLaTeXBase):
             }
 
             # figure out "corresponding author(s)"
-            if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
+            if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.submitter:
                 corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links if pl.is_submitter]
-            elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
+            if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.speakers:
                 corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.speakers]
 
         self._args.update({
             'affiliation_contribs': affiliation_contribs,
             'corresp_authors': corresp_authors,
             'contribs': contribs,
-            'conf': conf,
+            'conf': event.as_legacy,
             'tz': tz or event.timezone,
-            'url': conf.getURL(),
+            'url': event.url,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
             'aw': aw,
-            'boa_text': conf.getBOAConfig().getText()
+            'boa_text': boa_settings.get(event, 'extra_text')
         })
 
         if event.logo:
@@ -439,15 +439,10 @@ class AbstractBook(ContributionBook):
     _tpl_filename = "book_of_abstracts.tpl"
     _table_of_contents = True
 
-    def __init__(self, conf, aw, tz=None):
-        if not tz:
-            tz = conf.getTimezone()
+    def __init__(self, event, tz=None):
+        sort_by = boa_settings.get(event, 'sort_by')
 
-        sort_by = conf.getBOAConfig().getSortBy()
-        if not sort_by.strip() or sort_by not in ["number", "name", "sessionTitle", "speaker", "schedule"]:
-            sort_by = "number"
-
-        super(AbstractBook, self).__init__(conf, aw, None, tz, sort_by)
+        super(AbstractBook, self).__init__(event, None, sort_by=sort_by)
 
         del self._args["url"]
 

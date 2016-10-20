@@ -47,7 +47,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF, AbstractBook
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -207,6 +207,14 @@ class RHManageBOA(RHManageAbstractsBase):
             flash(_('Book of Abstract settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
+
+
+class RHExportBOA(RHManageAbstractsBase):
+    """Export book of abstracts"""
+
+    def _process(self):
+        pdf = AbstractBook(self.event_new)
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHManageAbstractSubmission(RHManageAbstractsBase):

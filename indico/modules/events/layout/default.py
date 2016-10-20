@@ -32,10 +32,6 @@ def _visibility_my_conference(event):
     return session.user is not None
 
 
-def _visibility_abstracts_book(event):
-    return event.getAbstractMgr().isActive() and event.hasEnabledSection('cfa')
-
-
 def _visibility_paper_review(event):
     return event.getConfPaperReview().hasReviewing()
 
@@ -179,13 +175,5 @@ def get_default_menu_entries():
             visible=_visibility_paper_review_transfer,
             position=6,
             parent='paper_reviewing'
-        ),
-        MenuEntryData(
-            title=_("Book of Abstracts"),
-            name='abstracts_book',
-            endpoint='event.conferenceDisplay-abstractBook',
-            position=9,
-            visible=_visibility_abstracts_book,
-            static_site='files/generatedPdf/BookOfAbstracts.pdf'
         )
     ]
