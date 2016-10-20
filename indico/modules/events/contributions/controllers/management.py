@@ -450,15 +450,15 @@ class RHContributionsExportPDF(RHManageContributionsActionsBase):
 
 class RHContributionsExportPDFBook(RHManageContributionsActionsBase):
     def _process(self):
-        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone)
-        return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')
+        pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone)
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHContributionsExportPDFBookSorted(RHManageContributionsActionsBase):
     def _process(self):
-        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone,
+        pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone,
                                sort_by='board_number')
-        return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHManageContributionTypes(RHManageContributionsBase):

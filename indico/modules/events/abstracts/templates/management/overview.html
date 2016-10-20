@@ -81,7 +81,9 @@
                 <div class="label">
                     {% trans %}Book of abstracts{% endtrans %}
                 </div>
-                {% trans url='#' -%}Customize and <a href={{ url }}>download</a> the book of abstracts{%- endtrans %}
+                {% trans url=url_for('.export_boa', event) -%}
+                    Customize and <a href={{ url }}>download</a> the book of abstracts
+                {%- endtrans %}
             </div>
             <div class="toolbar">
                 <div class="group">

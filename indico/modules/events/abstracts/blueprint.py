@@ -31,7 +31,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHResetAbstractJudgment,
-                                                                    RHBulkAbstractJudgment)
+                                                                    RHBulkAbstractJudgment, RHExportBOA)
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractsDownloadAttachment
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -50,6 +50,7 @@ _bp.add_url_rule('/manage/abstracts/schedule', 'schedule_abstracts_call', RHSche
 _bp.add_url_rule('/manage/abstracts/open', 'open_abstracts_call', RHOpenCFA, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/close', 'close_abstracts_call', RHCloseCFA, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
+_bp.add_url_rule('/book-of-abstracts.pdf', 'export_boa', RHExportBOA)
 _bp.add_url_rule('/manage/abstracts/settings', 'manage_submission_settings', RHManageAbstractSubmission,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings', RHManageAbstractReviewing,
