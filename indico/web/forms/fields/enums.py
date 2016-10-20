@@ -18,13 +18,25 @@ from __future__ import unicode_literals, absolute_import
 
 from operator import attrgetter
 
-from wtforms import SelectFieldBase
+from wtforms import SelectFieldBase, HiddenField
 from wtforms.widgets import Select, RadioInput
 
 from indico.web.forms.widgets import JinjaWidget
 
 
-class IndicoEnumSelectField(SelectFieldBase):
+class _EnumFieldMixin(object):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            if not valuelist[0] and self.none is not None:
+                self.data = None
+            else:
+                try:
+                    self.data = self.enum[valuelist[0]]
+                except KeyError:
+                    raise ValueError(self.gettext('Not a valid choice'))
+
+
+class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
     """Select field backed by a :class:`TitledEnum`"""
 
     widget = Select()
@@ -49,17 +61,25 @@ class IndicoEnumSelectField(SelectFieldBase):
             title = item.title if self.titles is None else self.titles[item]
             yield (item.name, title, item == self.data)
 
-    def process_formdata(self, valuelist):
-        if valuelist:
-            if not valuelist[0] and self.none is not None:
-                self.data = None
-            else:
-                try:
-                    self.data = self.enum[valuelist[0]]
-                except KeyError:
-                    raise ValueError(self.gettext('Not a valid choice'))
-
 
 class IndicoEnumRadioField(IndicoEnumSelectField):
     widget = JinjaWidget('forms/radio_buttons_widget.html', orientation='horizontal', single_kwargs=True)
     option_widget = RadioInput()
+
+
+class HiddenEnumField(_EnumFieldMixin, HiddenField):
+    """Hidden field that only accepts values from an Enum"""
+
+    def __init__(self, label=None, validators=None, enum=None, only=None, skip=None, none=None, **kwargs):
+        super(HiddenEnumField, self).__init__(label, validators, **kwargs)
+        self.enum = enum
+        self.only = only
+        self.skip = skip or set()
+        self.none = none
+
+    def process_formdata(self, valuelist):
+        old_data = self.data
+        super(HiddenEnumField, self).process_formdata(valuelist)
+        if self.data is not None and (self.data in self.skip or (self.only is not None and self.data not in self.only)):
+            self.data = old_data
+            raise ValueError(self.gettext('Not a valid choice'))
