@@ -85,7 +85,8 @@
     <div class="info-line submitted-data">
         {% if abstract.field_values %}
             <dl class="custom-field-values field-separator">
-                {% for value in abstract.field_values if value.contribution_field.is_active %}
+                {% for value in abstract.field_values|sort(attribute='contribution_field.position')
+                   if value.contribution_field.is_active %}
                     {{ _render_field_value(value) }}
                 {% endfor %}
             </dl>
