@@ -23,6 +23,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.settings import abstracts_reviewing_settings
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.date_time import now_utc
@@ -436,6 +437,30 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return False
 
+    def is_convener(self, user):
+        if not user:
+            return False
+        elif not self.event_new.can_manage(user, role='track_convener'):
+            return False
+        elif self.event_new in user.global_convener_for_events:
+            return True
+        elif user.convener_for_tracks & self.reviewed_for_tracks:
+            return True
+        else:
+            return False
+
+    def can_judge(self, user, check_state=True):
+        if not user:
+            return False
+        elif check_state and self.state != AbstractState.submitted:
+            return False
+        elif self.event_new.can_manage(user):
+            return True
+        elif self.event_new.cfa.allow_convener_judgment and self.is_convener(user):
+            return True
+        else:
+            return False
+
     def can_edit(self, user):
         if not user:
             return False
@@ -451,6 +476,9 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return True
         else:
             return False
+
+    def can_see_reviews(self, user):
+        return self.can_judge(user) or self.is_convener(user)
 
     def get_track_reviewing_state(self, track):
         if track not in self.reviewed_for_tracks:
