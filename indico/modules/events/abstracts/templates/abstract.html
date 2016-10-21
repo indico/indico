@@ -10,10 +10,12 @@
         <div class="i-timetable-connect-down"></div>
         <div class="i-timeline-separator"></div>
         {{ render_abstract_comments(abstract) }}
-        {{ render_abstract_reviews(abstract) }}
-        <div class="i-timeline-separator"></div>
-        <div class="i-timetable-connect-up"></div>
-        {% if abstract.state.name == 'submitted' %}
+        {% if abstract.can_see_reviews(session.user) %}
+            {{ render_abstract_reviews(abstract) }}
+            <div class="i-timeline-separator"></div>
+        {% endif %}
+        {% if abstract.can_judge(session.user) %}
+            <div class="i-timetable-connect-up"></div>
             {{ render_decision_box(abstract, form) }}
         {% endif %}
     </div>
