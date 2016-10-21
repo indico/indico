@@ -1,0 +1,437 @@
+{% from 'events/abstracts/_abstract/_common.html' import render_edited_hint %}
+
+{% macro _render_tracks(tracks) %}
+    {% for track in tracks %}
+        <span class="abstract-track">{{ track.title }}</span>
+        {%- if not loop.last -%},{% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro _render_submission_info(abstract) %}
+    {% if abstract.submitted_contrib_type %}
+        <div class="info-line">
+            <label>
+                {% trans -%}
+                    Contribution type:
+                {%- endtrans %}
+            </label>
+            {{ abstract.submitted_contrib_type.name }}
+        </div>
+    {% endif %}
+    {% if abstract.submitted_for_tracks %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.submitted_for_tracks|length -%}
+                    Track:
+                {%- pluralize -%}
+                    Tracks:
+                {%- endtrans -%}
+            </label>
+            {{ _render_tracks(abstract.submitted_for_tracks) }}
+        </div>
+    {% endif %}
+    {% if abstract.primary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.primary_authors|length -%}
+                    Author
+                {%- pluralize -%}
+                    Authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.primary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.secondary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.secondary_authors|length -%}
+                    Co-author
+                {%- pluralize -%}
+                    Co-authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.secondary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.speakers %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.speakers|length -%}
+                    Speaker
+                {%- pluralize -%}
+                    Speakers
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.speakers -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="info-line submitted-data">
+        {% if abstract.field_values %}
+            <dl class="custom-field-values field-separator">
+                {% for value in abstract.field_values if value.contribution_field.is_active %}
+                    {{ _render_field_value(value) }}
+                {% endfor %}
+            </dl>
+        {% endif %}
+        {% if abstract.submission_comment %}
+            <div class="comment">
+                <div class="titled-rule">
+                    {% trans %}Comment{% endtrans %}
+                </div>
+                {{ abstract.submission_comment }}
+            </div>
+        {% endif %}
+        {% if abstract.files %}
+            <div class="files field-separator">
+                <table class="tree" id="paper-files">
+                    {% for file in abstract.files %}
+                        <tr>
+                            <td>
+                                <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
+                                    <a href="{{ url_for('.download_attachment', file) }}">{{ file.filename }}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro _render_summary_state(abstract) %}
+    {% set mapping = {'under_review': 'highlight',
+                      'withdrawn': 'outline dashed',
+                      'accepted': 'success',
+                      'rejected': 'error',
+                      'merged': 'visited',
+                      'duplicate': 'strong'} %}
+    <div class="i-tag {{ mapping[abstract.public_state.name] }}">
+        {{ abstract.public_state.title }}
+    </div>
+{% endmacro %}
+
+{% macro _render_abstract_summary(abstract, management=false) %}
+    <div class="abstract-summary">
+        <div class="abstract-summary-badge">
+            {{ _render_summary_state(abstract) }}
+        </div>
+        <div class="abstract-summary-content">
+            {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
+                <div>
+                    {% if abstract.submitted_contrib_type %}
+                        {% trans name=abstract.submitter.name, type=abstract.submitted_contrib_type.name|lower -%}
+                            <strong>{{ name }}</strong> submitted this <span class="abstract-contribution-type">{{ type }}</span>
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract
+                        {%- endtrans %}
+                    {% endif %}
+                </div>
+                {% if abstract.submitted_for_tracks %}
+                    <div>
+                        {% trans count=abstract.submitted_for_tracks|length -%}
+                            For track:
+                        {%- pluralize -%}
+                            For tracks:
+                        {%- endtrans %}
+                        {{ _render_tracks(abstract.submitted_for_tracks) }}
+                    </div>
+                {% endif %}
+            {% elif abstract.state.name == 'accepted' %}
+                <div>
+                    {% if abstract.accepted_contrib_type and abstract.accepted_track %}
+                        {% trans name=abstract.submitter.name,
+                            type=abstract.accepted_contrib_type.name,
+                            track=abstract.accepted_track.title -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            for track <span class="abstract-track">{{ track }}</span>
+                            as <span class="abstract-contribution-type">{{ type }}</span>.
+                        {% endtrans %}
+                    {% elif abstract.accepted_contrib_type %}
+                        {% trans name=abstract.submitter.name,
+                            type=abstract.accepted_contrib_type.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            as <span class="abstract-contribution-type">{{ type }}</span>.
+                        {% endtrans %}
+                    {% elif abstract.accepted_track %}
+                        {% trans name=abstract.submitter.name,
+                            track=abstract.accepted_track.title -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
+                            for track <span class="abstract-track">{{ track }}</span>.
+                        {% endtrans %}
+                    {% else %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract and it was finally accepted.
+                        {%- endtrans %}
+                    {% endif %}
+                </div>
+                <div>
+                    {% trans url=url_for('contributions.display_contribution', abstract.contribution) %}
+                        <a href="{{ url }}">Go to contribution</a>
+                    {% endtrans %}
+                </div>
+            {% elif abstract.state.name == 'merged' %}
+                <div>
+                    {% trans name=abstract.submitter.name -%}
+                        <strong>{{ name }}</strong> submitted this abstract but it was merged into another.
+                    {%- endtrans %}
+                </div>
+                {% if abstract.merged_into.can_access(session.user) %}
+                    <div>
+                        {% set endpoint = '.manage_abstract' if management else '.display_abstract' %}
+                        {% trans url=url_for(endpoint, abstract.merged_into) %}
+                            <a href="{{ url }}">Go to abstract</a>
+                        {% endtrans %}
+                    </div>
+                {% endif %}
+            {% elif abstract.state.name == 'duplicate' %}
+                {% trans name=abstract.submitter.name -%}
+                    <strong>{{ name }}</strong> submitted this abstract but it was marked as duplicate of another.
+                {%- endtrans %}
+                {% if abstract.duplicate_of.can_access(session.user) %}
+                    <div>
+                        {% set endpoint = '.manage_abstract' if management else '.display_abstract' %}
+                        {% trans url=url_for(endpoint, abstract.duplicate_of) %}
+                            <a href="{{ url }}">Go to abstract</a>
+                        {% endtrans %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _render_field_value(value) %}
+        <div class="field-value {{ 'single-choice 'if value.contribution_field.field_type == 'single_choice' else ''}}">
+            <label>{{ value.contribution_field.title }}</label>
+            {% if value.friendly_data %}
+                <span class="value">{{ value.friendly_data }}</span>
+            {% else %}
+                <span class="value empty">{% trans %}No answer{% endtrans %}</span>
+            {% endif %}
+        </div>
+{% endmacro %}
+
+{% macro render_abstract_public(abstract, management=false) %}
+    {% set abstract_endpoint = '.manage_abstract' if management else '.display_abstract' %}
+    <div id="abstract-title">
+        <h3 class="abstract-title">
+            {{ abstract.title }}
+            <span class="abstract-id">
+                #{{ abstract.friendly_id }}
+            </span>
+        </h3>
+        <div class="toolbar thin">
+            {% if management %}
+                <div class="group">
+                    {# TODO: scroll to decision buttons #}
+                    <a href="#" class="i-button highlight icon-hammer">
+                        {% trans %}Judge{% endtrans %}
+                    </a>
+                </div>
+            {% elif abstract.event_new.can_manage(session.user) %}
+                <div class="group">
+                    <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                        {% trans %}Management view{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
+            {% if abstract.submitter == session.user or abstract.event_new.can_manage(session.user) %}
+                <div class="group">
+                    {% if abstract.state.name not in ('submitted', 'withdrawn') %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it has been processed already{% endtrans %}"></a>
+                    {% elif abstract.state.name == 'withdrawn' and not abstract.event_new.can_access(session.user) %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it was withdrawn{% endtrans %}"></a>
+                    {% elif abstract.public_state.name == 'under_review' and not abstract.event_new.can_access(session.user) %}
+                        <a class="i-button icon-edit disabled"
+                            title="{% trans %}The abstract cannot be edited because it is under review already {% endtrans %}"></a>
+                    {% else %}
+                        {# TODO: open abstract edition form #}
+                        <a href="#" class="i-button icon-edit" title="{% trans %}Edit abstract{% endtrans %}"></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="group">
+            {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
+                <a class="i-button icon-file-download"
+                   href="{{ url_for(endpoint, abstract) }}"
+                   title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="abstract-public">
+        {{ _render_abstract_summary(abstract, management) }}
+        <div class="abstract-content">
+            <div class="abstract-authorship-block">
+                <div class="abstract-authorship-label">
+                    {% trans count=abstract.primary_authors|length -%}
+                        Author:
+                    {%- pluralize -%}
+                        Authors:
+                    {%- endtrans %}
+                </div>
+                <div class="abstract-authorship-list">
+                    {{ abstract.primary_authors|map(attribute='name')|join(', ') }}
+                </div>
+            </div>
+            {% if abstract.secondary_authors %}
+                <div class="abstract-authorship-label">
+                    {% trans count=abstract.secondary_authors|length -%}
+                        Co-author:
+                    {%- pluralize -%}
+                        Co-authors:
+                    {%- endtrans %}
+                </div>
+                <div class="abstract-authorship-list">
+                    {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                </div>
+            {% endif %}
+            {{ abstract.description }}
+        </div>
+
+        <div id="abstract-submission-details" class="i-timeline">
+            <div class="i-timeline-item">
+                <div class="i-timeline-item-label action"></div>
+                <div class="i-timeline-item-box header-indicator">
+                    <div class="i-box-header">
+                        {% trans name=abstract.submitter.name, date=abstract.submitted_dt|format_human_date -%}
+                            <strong>{{ name }}</strong> submitted this abstract on {{ date }}
+                        {%- endtrans %}
+                        {% if abstract.modified_dt %}
+                            {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
+                        {% endif %}
+                    </div>
+                    <div class="i-box-content submission-info">
+                        {{ _render_submission_info(abstract) }}
+                    </div>
+                </div>
+            </div>
+
+            {% if abstract.state.name != 'submitted' %}
+                <div class="i-timeline-item">
+                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-box header-indicator">
+                        <div class="i-box-header flex">
+                            <div class="stretch">
+                                {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
+                                    <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
+                                {%- endtrans %}
+                            </div>
+                            {% if abstract.event_new.can_manage(session.user) %}
+                                <div>
+                                    <a class="i-button-icon icon-remove"
+                                       title="{% trans %}Reset judgement{% endtrans %}"
+                                       data-href="{{ url_for('.reset_abstract_judgment', abstract) }}"
+                                       data-method="POST"
+                                       data-title="{% trans %}Reset judgment{% endtrans %}"
+                                       data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="i-box-content">
+                            {% if abstract.state.name == 'accepted' %}
+                                {% set url = url_for('contributions.display_contribution', abstract.contribution) %}
+                                {% if abstract.accepted_contrib_type and abstract.accepted_track %}
+                                    {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title -%}
+                                        The abstract was accepted
+                                        as <span class="abstract-contribution-type">{{ type }}</span>
+                                        for track <span class="abstract-track">{{ track }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% elif abstract.accepted_contrib_type %}
+                                    {% trans type=abstract.accepted_contrib_type.name -%}
+                                        The abstract was accepted
+                                        as <span class="abstract-contribution-type">{{ type }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% elif abstract.accepted_track %}
+                                    {% trans track=abstract.accepted_track.title -%}
+                                        The abstract was accepted
+                                        for track <span class="abstract-track">{{ track }}</span>
+                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% else %}
+                                    {% trans -%}
+                                        The abstract was accepted and a <a href="{{ url }}">contribution</a> was created in the event.
+                                    {%- endtrans %}
+                                {% endif %}
+                            {% elif abstract.state.name == 'rejected' %}
+                                {% trans %}The abstract was rejected.{% endtrans %}
+                            {% elif abstract.state.name == 'merged' %}
+                                {% trans url=url_for(abstract_endpoint, abstract.merged_into), other=abstract.merged_into.title -%}
+                                    The abstract was merged into <a href="{{ url }}">{{ other }}</a>.
+                                {%- endtrans %}
+                            {% elif abstract.state.name == 'duplicate'%}
+                                {% trans url=url_for(abstract_endpoint, abstract.duplicate_of), other=abstract.duplicate_of.title -%}
+                                    The abstract was marked as a duplicate of <a href="{{ url }}">{{ other }}</a>
+                                {%- endtrans %}
+                            {% endif %}
+                            {% if abstract.judgment_comment %}
+                                <div class="titled-rule">
+                                    {% trans %}Comment{% endtrans %}
+                                </div>
+                                {{ abstract.judgment_comment }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_abstract_comments(abstract) %}
+    {% if abstract.comments %}
+        <div id="abstract-comments" class="i-timeline">
+            {% for comment in abstract.comments %}
+                <div class="i-timeline-item">
+                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-box header-indicator">
+                        <div class="i-box-header flex">
+                            <div class="stretch">
+                                {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
+                                    <strong>{{ name }}</strong> commented on {{ date }}
+                                {%- endtrans %}
+                                {% if comment.modified_dt %}
+                                    {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
+                                {% endif %}
+                            </div>
+                            {% if comment.can_edit(user) %}
+                                <div class="abstract-comment-badges">
+                                    <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="i-box-content">
+                            {{ comment.text }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
