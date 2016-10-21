@@ -242,7 +242,7 @@
             </span>
         </h3>
         <div class="toolbar thin">
-            {% if management %}
+            {% if abstract.can_judge(session.user) and abstract.state.name == 'submitted' %}
                 <div class="group">
                     {# TODO: scroll to decision buttons #}
                     <a href="#" class="i-button highlight icon-hammer">
@@ -336,9 +336,54 @@
                     <div class="i-timeline-item-box header-indicator">
                         <div class="i-box-header flex">
                             <div class="stretch">
-                                {% trans name=abstract.judge.name, action=abstract.state.title|lower, date=abstract.judgment_dt|format_human_date -%}
-                                    <strong>{{ name }}</strong> {{ action }} this abstract on {{ date }}.
-                                {%- endtrans %}
+                                {% set judgement_dt = abstract.judgment_dt|format_human_date %}
+                                {% set action = abstract.state.name %}
+                                {% if abstract.can_judge(session.user) %}
+                                    {% set judge_name = abstract.judge.name %}
+                                    {% if action == 'withdrawn' %}
+                                        {% trans name=judge_name, date=judgement_dt -%}
+                                            <strong>{{ name }}</strong> withdrew this abstract on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'accepted' %}
+                                        {% trans name=judge_name, date=judgement_dt -%}
+                                            <strong>{{ name }}</strong> accepted this abstract on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'rejected' %}
+                                        {% trans name=judge_name, date=judgement_dt -%}
+                                            <strong>{{ name }}</strong> rejected this abstract on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'merged' %}
+                                        {% trans name=judge_name, date=judgement_dt -%}
+                                            <strong>{{ name }}</strong> merged this abstract on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'duplicate' %}
+                                        {% trans name=judge_name, date=judgement_dt -%}
+                                            <strong>{{ name }}</strong> marked this abstract as duplicate on {{ date }}.
+                                        {% endtrans %}
+                                    {% endif %}
+                                {% else %}
+                                    {% if action == 'withdrawn' %}
+                                        {% trans date=judgement_dt -%}
+                                            This abstract was withdrawn on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'accepted' %}
+                                        {% trans date=judgement_dt -%}
+                                            This abstract was accepted on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'rejected' %}
+                                        {% trans date=judgement_dt -%}
+                                            This abstract was rejected on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'merged' %}
+                                        {% trans date=judgement_dt -%}
+                                            This abstract was merged on {{ date }}.
+                                        {% endtrans %}
+                                    {% elif action == 'duplicate' %}
+                                        {% trans date=judgement_dt -%}
+                                            This abstract was marked as duplicate on {{ date }}.
+                                        {% endtrans %}
+                                    {% endif %}
+                                {% endif %}
                             </div>
                             {% if abstract.event_new.can_manage(session.user) %}
                                 <div>
