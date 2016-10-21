@@ -75,3 +75,16 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
 
 class WPMyAbstracts(WPDisplayAbstractsBase):
     menu_entry_name = 'user_abstracts'
+
+
+class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
+    menu_entry_name = 'user_tracks'
+
+    def getJSFiles(self):
+        return (WPDisplayAbstracts.getJSFiles(self) +
+                self._asset_env['modules_event_management_js'].urls())
+
+    def getCSSFiles(self):
+        return (WPDisplayAbstracts.getCSSFiles(self) +
+                self._asset_env['event_display_sass'].urls() +
+                self._asset_env['tracks_sass'].urls())

@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template, request, session
+from flask import render_template, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.forms import AbstractJudgmentForm, make_review_form
+from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data
 
 
 def build_review_form(abstract, track):
@@ -76,3 +77,36 @@ class AbstractPageMixin(AbstractMixin):
         return self.page_class.render_template('abstract.html', self._conf, abstract=self.abstract,
                                                judgment_form=judgment_form, review_forms=review_forms,
                                                management=self.management)
+
+
+class DisplayAbstractListMixin:
+    """Display the list of abstracts"""
+
+    view_class = None
+    template = None
+
+    def _process(self):
+        if self.list_generator.static_link_used:
+            return redirect(self.list_generator.get_list_url())
+        return self._render_template(**self.list_generator.get_list_kwargs())
+
+    def _render_template(self, **kwargs):
+        return self.view_class.render_template(self.template, self._conf, event=self.event_new, **kwargs)
+
+
+class CustomizeAbstractListMixin:
+    """Filter options and columns to display for the abstract list of an event"""
+
+    view_class = None
+
+    def _process_GET(self):
+        list_config = self.list_generator._get_config()
+        return self.view_class.render_template('management/abstract_list_filter.html', self._conf,
+                                               event=self.event_new, visible_items=list_config['items'],
+                                               static_items=self.list_generator.static_items,
+                                               extra_filters=self.list_generator.extra_filters,
+                                               filters=list_config['filters'])
+
+    def _process_POST(self):
+        self.list_generator.store_configuration()
+        return jsonify_data(flash=False, **self.list_generator.render_list())
