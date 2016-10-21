@@ -26,6 +26,7 @@ from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.files import AbstractFile
+from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
@@ -87,8 +88,7 @@ def judge_abstract(abstract, abstract_data, judgment, contrib_session=None, merg
             abstract.merged_into.person_links |= abstract.person_links
     db.session.flush()
     if send_notification:
-        # TODO: send notification
-        pass
+        send_abstract_notifications(abstract)
     logger.info('Abstract %s judged by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'Abstract "{}" has been judged'.format(abstract.title), session.user)
