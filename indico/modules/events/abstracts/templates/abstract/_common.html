@@ -1,0 +1,12 @@
+{% macro render_edited_hint(dt, user=None) %}
+    {% if user %}
+        <span class="abstract-comment-edited"
+            title="{% trans dt=dt|format_human_date, name=user.name %}On {{ dt }} by {{ name }}{% endtrans %}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% else %}
+        <span class="abstract-comment-edited" title="{{ dt|format_human_date }}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% endif %}
+{% endmacro %}

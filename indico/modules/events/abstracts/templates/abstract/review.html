@@ -1,0 +1,117 @@
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint %}
+
+{% macro render_abstract_reviews(abstract) %}
+    <div id="abstract-reviews" class="i-timeline">
+        {% set reviews = abstract.reviews|selectattr('track', 'none')|list %}
+        {% if reviews %}
+            <h3>{% trans %}No track{% endtrans %}</h3>
+            {% for review in reviews %}
+                {{ _render_review(review) }}
+            {% endfor %}
+        {% endif %}
+        {% for track in abstract.reviewed_for_tracks %}
+            {% set reviews = abstract.reviews|selectattr('track', 'equalto', track)|list %}
+            {% if reviews %}
+                <h3>
+                    {% trans title=track.title -%}
+                        Track: {{ title }}
+                    {%- endtrans %}
+                </h3>
+                {% for review in reviews %}
+                    {{ _render_review(review) }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro render_abstract_comments(abstract) %}
+    {% if abstract.comments %}
+        <div id="abstract-comments" class="i-timeline">
+            {% for comment in abstract.comments %}
+                <div class="i-timeline-item">
+                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-box header-indicator">
+                        <div class="i-box-header flex">
+                            <div class="stretch">
+                                {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
+                                    <strong>{{ name }}</strong> commented on {{ date }}
+                                {%- endtrans %}
+                                {% if comment.modified_dt %}
+                                    {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
+                                {% endif %}
+                            </div>
+                            {% if comment.can_edit(user) %}
+                                <div class="abstract-comment-badges">
+                                    <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="i-box-content">
+                            {{ comment.text }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro _render_review_state(review) %}
+    {% set mapping = {'accept': 'success',
+                      'reject': 'error',
+                      'merge': 'visited',
+                      'mark_as_dupe': 'strong'} %}
+    <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
+        {{ review.proposed_action.title -}}
+    </span>
+{% endmacro %}
+
+{% macro _render_review(review) %}
+    <div class="i-timeline-item">
+        <div class="i-timeline-item-label action abstract-comment-pic"></div>
+        <div class="i-timeline-item-box header-indicator">
+            <div class="i-box-header flex">
+                <div class="stretch">
+                    {% trans name=review.user.name, date=review.created_dt|format_human_date -%}
+                        <strong>{{ name }}</strong> reviewed {{ date }}
+                    {%- endtrans %}
+                    {% if review.modified_dt %}
+                        {{ render_edited_hint(comment.modified_dt) }}
+                    {% endif %}
+                </div>
+                <div class="abstract-comment-badges">
+                    <span>
+                        {% trans action=_render_review_state(review) %}
+                            Proposes to {{ action }}
+                        {% endtrans %}
+                    </span>
+                    {% if review.score %}
+                        {% set score = review.score %}
+                        {# TODO: show max score #}
+                        <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                            {{ score }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if review.ratings %}
+                {% for rating in review.ratings %}
+                    <div>
+                        {# TODO: UI #}
+                        {{ rating.question.text }}
+                        {{ rating.value }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if review.comment %}
+                <div class="titled-rule">
+                    {% trans %}Comment{% endtrans %}
+                </div>
+                <div class="i-box-content">
+                    {{ review.comment }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
