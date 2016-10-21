@@ -23,8 +23,9 @@ from indico.modules.events.abstracts.controllers.email_templates import (RHAddEm
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHSortEmailTemplates,
                                                                          RHEmailTemplateREST)
-from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHAbstractList,
-                                                                    RHAbstractListCustomize, RHAbstractListStaticURL,
+from indico.modules.events.abstracts.controllers.management import (RHAbstractList,
+                                                                    RHAbstracts, RHAbstractListCustomize,
+                                                                    RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract,
                                                                     RHManageAbstractReviewing, RHCreateAbstract,
                                                                     RHDeleteAbstracts, RHAbstractPersonList,
@@ -36,9 +37,13 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHManageReviewingRoles, RHBulkAbstractJudgment,
                                                                     RHAbstractNotificationLog)
 from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDownloadAttachment,
-                                                                   RHReviewAbstractForTrack, RHJudgeAbstract,
-                                                                   RHResetAbstractState, RHListOtherAbstracts,
-                                                                   RHWithdrawAbstract)
+                                                                   RHResetAbstractState,
+                                                                   RHWithdrawAbstract,
+                                                                   RHDisplayReviewableTracks,
+                                                                   RHDisplayReviewableTrackAbstracts,
+                                                                   RHDisplayAbstractListCustomize, RHListOtherAbstracts,
+                                                                   RHReviewAbstractForTrack,
+                                                                   RHJudgeAbstract)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -53,6 +58,13 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>'
                  RHAbstractsDownloadAttachment)
 _bp.add_url_rule('/abstracts/mine', 'my_abstracts', RHMyAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', RHMyAbstractsExportPDF)
+
+# Reviewing pages (display area)
+_bp.add_url_rule('/call-for-abstracts/reviewing/', 'display_reviewable_tracks', RHDisplayReviewableTracks)
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/', 'display_reviewable_track_abstracts',
+                 RHDisplayReviewableTrackAbstracts)
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/customize', 'display_customize_abstract_list',
+                 RHDisplayAbstractListCustomize, methods=('GET', 'POST'))
 
 # Book of Abstracts
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
