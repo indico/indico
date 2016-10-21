@@ -13,6 +13,8 @@
         {{ render_abstract_reviews(abstract) }}
         <div class="i-timeline-separator"></div>
         <div class="i-timetable-connect-up"></div>
-        {{ render_decision_box(abstract, form) }}
+        {% if abstract.state.name == 'submitted' %}
+            {{ render_decision_box(abstract, form) }}
+        {% endif %}
     </div>
 {% endblock %}
