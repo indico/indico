@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.models.abstracts import AbstractState
-from indico.util.i18n import _
+from indico.util.i18n import _, orig_string
 from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
 
@@ -164,7 +164,7 @@ class SubmitterTitlePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.submitter.title
+        return orig_string(abstract.submitter.title)
 
 
 class ContributionURLPlaceholder(Placeholder):
