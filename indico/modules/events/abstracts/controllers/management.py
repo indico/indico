@@ -25,9 +25,8 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.controllers.base import AbstractMixin
-
-from indico.modules.events.abstracts.controllers.base import AbstractPageMixin
+from indico.modules.events.abstracts.controllers.base import (AbstractPageMixin, AbstractMixin,
+                                                              DisplayAbstractListMixin, CustomizeAbstractListMixin)
 from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, BulkAbstractJudgmentForm)
@@ -39,8 +38,8 @@ from indico.modules.events.abstracts.operations import (create_abstract, delete_
                                                         close_cfa, judge_abstract)
 from indico.modules.events.abstracts.schemas import abstracts_schema
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
-from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
-                                                  generate_spreadsheet_from_abstracts)
+from indico.modules.events.abstracts.util import (make_abstract_form, get_roles_for_event,
+                                                  generate_spreadsheet_from_abstracts, AbstractListGeneratorManagement)
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.tracks.models.tracks import Track
@@ -83,7 +82,7 @@ class RHAbstractListBase(RHManageAbstractsBase):
 
     def _checkParams(self, params):
         RHManageAbstractsBase._checkParams(self, params)
-        self.list_generator = AbstractListGenerator(event=self.event_new)
+        self.list_generator = AbstractListGeneratorManagement(event=self.event_new)
 
 
 class RHManageAbstractsActionsBase(RHAbstractListBase):
@@ -254,31 +253,13 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
         return jsonify_form(form, disabled_fields=disabled_fields)
 
 
-class RHAbstractList(RHAbstractListBase):
-    """Display the list of abstracts"""
-
-    def _process(self):
-        if self.list_generator.static_link_used:
-            return redirect(self.list_generator.get_list_url())
-        list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageAbstracts.render_template('management/abstract_list.html', self._conf, event=self.event_new,
-                                                 **list_kwargs)
+class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
+    template = 'management/abstract_list.html'
+    view_class = WPManageAbstracts
 
 
-class RHAbstractListCustomize(RHAbstractListBase):
-    """Filter options and columns to display for the abstract list of an event"""
-
-    def _process_GET(self):
-        list_config = self.list_generator._get_config()
-        return WPManageAbstracts.render_template('management/abstract_list_filter.html', self._conf,
-                                                 event=self.event_new, visible_items=list_config['items'],
-                                                 static_items=self.list_generator.static_items,
-                                                 extra_filters=self.list_generator.extra_filters,
-                                                 filters=list_config['filters'])
-
-    def _process_POST(self):
-        self.list_generator.store_configuration()
-        return jsonify_data(flash=False, **self.list_generator.render_list())
+class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
+    view_class = WPManageAbstracts
 
 
 class RHAbstractListStaticURL(RHAbstractListBase):

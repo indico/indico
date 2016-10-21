@@ -54,3 +54,31 @@
 #no-tracks-box {
     margin-top: 20px;
 }
+
+.track-review-list {
+    ul {
+        padding-left: 10px;
+    }
+}
+
+.track-review-row {
+    list-style-type: none;
+
+    .title {
+        font-size: 14pt;
+    }
+
+    .label {
+        display: inline-block;
+        background-color: $gray;
+        border: 0;
+        padding: 3px;
+        margin: 10px 5px 10px 0;
+    }
+
+    .badge {
+        font-weight: bold;
+        font-size: 0.6em;
+        cursor: default;
+    }
+}

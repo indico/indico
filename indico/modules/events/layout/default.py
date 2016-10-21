@@ -24,10 +24,6 @@ from indico.util.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 
 
-def _visibility_call_for_abstracts(event):
-    return event.getAbstractMgr().isActive() and event.hasEnabledSection('cfa')
-
-
 def _visibility_my_conference(event):
     return session.user is not None
 
@@ -84,13 +80,6 @@ def get_default_menu_entries():
             endpoint='event.conferenceDisplay-overview',
             position=0,
             static_site=True
-        ),
-        MenuEntryData(
-            title=_("Call for Abstracts"),
-            name='call_for_abstracts',
-            endpoint='event.conferenceCFA',
-            position=2,
-            visible=_visibility_call_for_abstracts,
         ),
         MenuEntryData(
             title=_("Submit Abstract"),
