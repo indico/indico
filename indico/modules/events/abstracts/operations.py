@@ -66,8 +66,9 @@ def delete_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
 
 
-def judge_abstract(abstract, abstract_data, judgment, contrib_session=None, merge_persons=False,
+def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
                    send_notification=False):
+    abstract.judge = judge
     abstract.judgment_comment = abstract_data['judgment_comment']
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
