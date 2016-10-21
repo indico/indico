@@ -104,8 +104,7 @@ class RHManageAbstract(RHManageAbstractBase):
             merge_persons = abstract_data.pop('merge_persons', None)
             judge_abstract(self.abstract, abstract_data, judgment=judgment, contrib_session=contrib_session,
                            merge_persons=merge_persons, send_notification=send_notification, )
-        return WPManageAbstracts.render_template('management/abstract.html', self._conf, abstract=self.abstract,
-                                                 form=form)
+        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract, form=form)
 
 
 class RHResetAbstractJudgment(RHManageAbstractBase):
@@ -129,7 +128,7 @@ class RHAbstracts(RHManageAbstractsBase):
 
     def _process(self):
         abstracts_count = Abstract.query.with_parent(self.event_new).count()
-        return WPManageAbstracts.render_template('management/abstracts.html', self._conf, event=self.event_new,
+        return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
                                                  abstracts_count=abstracts_count, cfa=self.event_new.cfa)
 
 

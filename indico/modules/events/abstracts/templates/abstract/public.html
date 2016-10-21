@@ -1,3 +1,5 @@
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint %}
+
 {% macro _render_tracks(tracks) %}
     {% for track in tracks %}
         <span class="abstract-track">{{ track.title }}</span>
@@ -5,17 +7,125 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro render_edited_hint(dt, user=None) %}
-    {% if user %}
-        <span class="abstract-comment-edited"
-            title="{% trans dt=dt|format_human_date, name=user.name %}On {{ dt }} by {{ name }}{% endtrans %}">
-            · {% trans %}edited{% endtrans %}
-        </span>
-    {% else %}
-        <span class="abstract-comment-edited" title="{{ dt|format_human_date }}">
-            · {% trans %}edited{% endtrans %}
-        </span>
+{% macro _render_submission_info(abstract) %}
+    {% if abstract.submitted_contrib_type %}
+        <div class="info-line">
+            <label>
+                {% trans %}Contribution type:{% endtrans %}
+            </label>
+            {{ abstract.submitted_contrib_type.name }}
+        </div>
     {% endif %}
+    {% if abstract.submitted_for_tracks %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.submitted_for_tracks|length -%}
+                    Track:
+                {%- pluralize -%}
+                    Tracks:
+                {%- endtrans -%}
+            </label>
+            {{ _render_tracks(abstract.submitted_for_tracks) }}
+        </div>
+    {% endif %}
+    {% if abstract.primary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.primary_authors|length -%}
+                    Author
+                {%- pluralize -%}
+                    Authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.primary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.secondary_authors %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.secondary_authors|length -%}
+                    Co-author
+                {%- pluralize -%}
+                    Co-authors
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.secondary_authors -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if abstract.speakers %}
+        <div class="info-line">
+            <label>
+                {% trans count=abstract.speakers|length -%}
+                    Speaker
+                {%- pluralize -%}
+                    Speakers
+                {%- endtrans %}
+            </label>
+            <ul class="author-list">
+                {% for user in abstract.speakers -%}
+                    <li class="event-user">
+                        {{ user.full_name }}
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="info-line submitted-data">
+        {% if abstract.field_values %}
+            <dl class="custom-field-values field-separator">
+                {% for value in abstract.field_values if value.contribution_field.is_active %}
+                    {{ _render_field_value(value) }}
+                {% endfor %}
+            </dl>
+        {% endif %}
+        {% if abstract.submission_comment %}
+            <div class="comment">
+                <div class="titled-rule">
+                    {% trans %}Comment{% endtrans %}
+                </div>
+                {{ abstract.submission_comment }}
+            </div>
+        {% endif %}
+        {% if abstract.files %}
+            <div class="files field-separator">
+                <table class="tree" id="paper-files">
+                    {% for file in abstract.files %}
+                        <tr>
+                            <td>
+                                <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
+                                    <a href="{{ url_for('.download_attachment', file) }}">{{ file.filename }}</a>
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro _render_summary_state(abstract) %}
+    {% set mapping = {'under_review': 'highlight',
+                      'withdrawn': 'outline dashed',
+                      'accepted': 'success',
+                      'rejected': 'error',
+                      'merged': 'visited',
+                      'duplicate': 'strong'} %}
+    <div class="i-tag {{ mapping[abstract.public_state.name] }}">
+        {{ abstract.public_state.title }}
+    </div>
 {% endmacro %}
 
 {% macro _render_abstract_summary(abstract, management=false) %}
@@ -110,16 +220,15 @@
     </div>
 {% endmacro %}
 
-{% macro _render_summary_state(abstract) %}
-    {% set mapping = {'under_review': 'highlight',
-                      'withdrawn': 'outline dashed',
-                      'accepted': 'success',
-                      'rejected': 'error',
-                      'merged': 'visited',
-                      'duplicate': 'strong'} %}
-    <div class="i-tag {{ mapping[abstract.public_state.name] }}">
-        {{ abstract.public_state.title }}
-    </div>
+{% macro _render_field_value(value) %}
+        <div class="field-value {{ 'single-choice 'if value.contribution_field.field_type == 'single_choice' else ''}}">
+            <label>{{ value.contribution_field.title }}</label>
+            {% if value.friendly_data %}
+                <span class="value">{{ value.friendly_data }}</span>
+            {% else %}
+                <span class="value empty">{% trans %}No answer{% endtrans %}</span>
+            {% endif %}
+        </div>
 {% endmacro %}
 
 {% macro render_abstract_public(abstract, management=false) %}
@@ -215,7 +324,7 @@
                         {% endif %}
                     </div>
                     <div class="i-box-content submission-info">
-                        {{ render_submission_info(abstract) }}
+                        {{ _render_submission_info(abstract) }}
                     </div>
                 </div>
             </div>
@@ -290,159 +399,5 @@
                 </div>
             {% endif %}
         </div>
-    </div>
-{% endmacro %}
-
-{% macro render_abstract_comments(abstract) %}
-    {% if abstract.comments %}
-        <div id="abstract-comments" class="i-timeline">
-            {% for comment in abstract.comments %}
-                <div class="i-timeline-item">
-                    <div class="i-timeline-item-label action"></div>
-                    <div class="i-timeline-item-box header-indicator">
-                        <div class="i-box-header flex">
-                            <div class="stretch">
-                                {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
-                                    <strong>{{ name }}</strong> commented on {{ date }}
-                                {%- endtrans %}
-                                {% if comment.modified_dt %}
-                                    {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
-                                {% endif %}
-                            </div>
-                            {% if comment.can_edit(user) %}
-                                <div class="abstract-comment-badges">
-                                    <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="i-box-content">
-                            {{ comment.text }}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
-{% macro render_field_value(value) %}
-        <div class="field-value {{ 'single-choice 'if value.contribution_field.field_type == 'single_choice' else ''}}">
-            <label>{{ value.contribution_field.title }}</label>
-            {% if value.friendly_data %}
-                <span class="value">{{ value.friendly_data }}</span>
-            {% else %}
-                <span class="value empty">{% trans %}No answer{% endtrans %}</span>
-            {% endif %}
-        </div>
-{% endmacro %}
-
-{% macro render_submission_info(abstract) %}
-    {% if abstract.submitted_contrib_type %}
-        <div class="info-line">
-            <label>
-                {% trans -%}
-                    Contribution type:
-                {%- endtrans %}
-            </label>
-            {{ abstract.submitted_contrib_type.name }}
-        </div>
-    {% endif %}
-    {% if abstract.submitted_for_tracks %}
-        <div class="info-line">
-            <label>
-                {% trans count=abstract.submitted_for_tracks|length -%}
-                    Track:
-                {%- pluralize -%}
-                    Tracks:
-                {%- endtrans -%}
-            </label>
-            {{ _render_tracks(abstract.submitted_for_tracks) }}
-        </div>
-    {% endif %}
-    {% if abstract.primary_authors %}
-        <div class="info-line">
-            <label>
-                {% trans count=abstract.primary_authors|length -%}
-                    Author
-                {%- pluralize -%}
-                    Authors
-                {%- endtrans %}
-            </label>
-            <ul class="author-list">
-                {% for user in abstract.primary_authors -%}
-                    <li class="event-user">
-                        {{ user.full_name }}
-                    </li>
-                {%- endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    {% if abstract.secondary_authors %}
-        <div class="info-line">
-            <label>
-                {% trans count=abstract.secondary_authors|length -%}
-                    Co-author
-                {%- pluralize -%}
-                    Co-authors
-                {%- endtrans %}
-            </label>
-            <ul class="author-list">
-                {% for user in abstract.secondary_authors -%}
-                    <li class="event-user">
-                        {{ user.full_name }}
-                    </li>
-                {%- endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    {% if abstract.speakers %}
-        <div class="info-line">
-            <label>
-                {% trans count=abstract.speakers|length -%}
-                    Speaker
-                {%- pluralize -%}
-                    Speakers
-                {%- endtrans %}
-            </label>
-            <ul class="author-list">
-                {% for user in abstract.speakers -%}
-                    <li class="event-user">
-                        {{ user.full_name }}
-                    </li>
-                {%- endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    <div class="info-line submitted-data">
-        {% if abstract.field_values %}
-            <dl class="custom-field-values field-separator">
-                {% for value in abstract.field_values if value.contribution_field.is_active %}
-                    {{ render_field_value(value) }}
-                {% endfor %}
-            </dl>
-        {% endif %}
-        {% if abstract.submission_comment %}
-            <div class="comment">
-                <div class="titled-rule">
-                    {% trans %}Comment{% endtrans %}
-                </div>
-                {{ abstract.submission_comment }}
-            </div>
-        {% endif %}
-        {% if abstract.files %}
-            <div class="files field-separator">
-                <table class="tree" id="paper-files">
-                    {% for file in abstract.files %}
-                        <tr>
-                            <td>
-                                <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
-                                    <a href="{{ url_for('.download_attachment', file) }}">{{ file.filename }}</a>
-                                </span>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        {% endif %}
     </div>
 {% endmacro %}

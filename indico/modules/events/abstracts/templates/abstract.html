@@ -1,0 +1,18 @@
+{% extends 'events/abstracts/management/_base.html' %}
+
+{% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
+{% from 'events/abstracts/abstract/judge.html' import render_decision_box %}
+{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_abstract_comments %}
+
+{% block content %}
+    {{ render_abstract_public(abstract, management=management) }}
+    <div id="abstract-private" class="i-timeline">
+        <div class="i-timetable-connect-down"></div>
+        <div class="i-timeline-separator"></div>
+        {{ render_abstract_comments(abstract) }}
+        {{ render_abstract_reviews(abstract) }}
+        <div class="i-timeline-separator"></div>
+        <div class="i-timetable-connect-up"></div>
+        {{ render_decision_box(abstract, form) }}
+    </div>
+{% endblock %}

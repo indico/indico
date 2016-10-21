@@ -36,7 +36,7 @@ class RHDisplayAbstract(AbstractMixin, RHConferenceBaseDisplay):
         AbstractMixin._checkProtection(self)
 
     def _process(self):
-        return WPDisplayAbstracts.render_template('display/abstract.html', self._conf, abstract=self.abstract)
+        return WPDisplayAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract)
 
 
 class RHDisplayAbstractExportPDF(RHDisplayAbstract):
