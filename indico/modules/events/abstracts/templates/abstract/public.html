@@ -249,12 +249,21 @@
                         {% trans %}Judge{% endtrans %}
                     </a>
                 </div>
-            {% elif abstract.event_new.can_manage(session.user) %}
-                <div class="group">
-                    <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
-                        {% trans %}Management view{% endtrans %}
-                    </a>
-                </div>
+            {% endif %}
+            {% if abstract.event_new.can_manage(session.user) %}
+                {% if management %}
+                    <div class="group">
+                        <a href="{{ url_for('.display_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                            {% trans %}Display view{% endtrans %}
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="group">
+                        <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                            {% trans %}Management view{% endtrans %}
+                        </a>
+                    </div>
+                {% endif %}
             {% endif %}
             {% if abstract.submitter == session.user or abstract.event_new.can_manage(session.user) %}
                 <div class="group">
