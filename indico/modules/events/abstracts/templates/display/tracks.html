@@ -1,0 +1,28 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title %}
+    {% trans %}Tracks I can review or convene{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if not tracks %}
+        <p>
+            {%- trans -%}
+                There are currently no tracks which you are reviewer or convener of.
+            {%- endtrans -%}
+        </p>
+    {% else %}
+        <ul class="programme">
+            {% for track in tracks %}
+                <li>
+                    <span class="title">
+                        <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}">{{ track.title }}</a>
+                    </span>
+                    <div class="description">
+                        {{ track.description }}
+                    </div>
+                </li>
+            {%  endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

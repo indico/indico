@@ -111,3 +111,12 @@ def _extend_event_menu(sender, **kwargs):
 
     return MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
                          position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.layout.util import MenuEntryData
+
+    return MenuEntryData(title=_("View my Tracks"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
+                         position=2, parent='call_for_abstracts', visible=lambda event: event.has_feature('abstracts'),
+                         static_site=True)
