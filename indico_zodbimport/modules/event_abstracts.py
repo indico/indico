@@ -490,6 +490,7 @@ class AbstractMigration(object):
 
             if abstract.state in self.JUDGED_STATES:
                 abstract.judge = self._user_from_legacy(old_state._responsible, janitor=True)
+                abstract.judgment_dt = as_utc(old_state._date)
 
             # tracks
             reallocated = set(r._track for r in getattr(zodb_abstract, '_trackReallocations', {}).itervalues())
