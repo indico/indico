@@ -88,6 +88,10 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judge_if_judged'),
+                         db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judgment_dt IS NOT NULL)'
+                                            .format(AbstractState.accepted, AbstractState.rejected,
+                                                    AbstractState.merged, AbstractState.duplicate),
+                                            name='judgment_dt_if_judged'),
                          {'schema': 'event_abstracts'})
 
     possible_render_modes = {RenderMode.markdown}

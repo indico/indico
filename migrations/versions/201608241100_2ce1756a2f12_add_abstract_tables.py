@@ -86,6 +86,8 @@ def upgrade():
                            name='duplicate_of_id_only_duplicate'),
         sa.CheckConstraint('(state IN (3, 4, 5, 6)) = (judge_id IS NOT NULL)',
                            name='judge_if_judged'),
+        sa.CheckConstraint('(state IN (3, 4, 5, 6)) = (judgment_dt IS NOT NULL)',
+                           name='judgment_dt_if_judged'),
         schema='event_abstracts'
     )
 
