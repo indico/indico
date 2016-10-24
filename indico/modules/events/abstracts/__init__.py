@@ -36,11 +36,10 @@ logger = Logger.get('events.abstracts')
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
+    if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
         return
-    if event.has_feature('abstracts'):
-        return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.manage_abstracts', event),
-                            section='organization')
+    return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.manage_abstracts', event),
+                        section='organization')
 
 
 @signals.event.get_feature_definitions.connect
@@ -83,10 +82,6 @@ class AbstractsFeature(EventFeature):
 
     @classmethod
     def is_allowed_for_event(cls, event):
-        return event.type_ == EventType.conference
-
-    @classmethod
-    def is_default_for_event(cls, event):
         return event.type_ == EventType.conference
 
 
