@@ -50,6 +50,13 @@
         .i-box-header {
             // To match i-timeline-item-label height
             min-height: $min-height;
+
+            time {
+                &:before {
+                    content: '\00B7\00a0';  // bullet+nbsp
+                }
+                color: $gray;
+            }
         }
 
         &.header-indicator {
