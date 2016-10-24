@@ -16,12 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request
-from flask import session
+from flask import request, session
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.views import WPDisplayAbstracts
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import AbstractToPDF
@@ -53,24 +51,26 @@ class RHDisplayAbstractExportPDF(RHDisplayAbstract):
 class RHDisplayReviewableTracks(RHConferenceBaseDisplay):
     def _process(self):
         user = session.user
-        tracks_set, events_set = set(), set()
-        tracks_set.update(user.convener_for_tracks, user.abstract_reviewer_for_tracks)
-        events_set.update(user.global_convener_for_events, user.global_abstract_reviewer_for_events)
-        for e in events_set:
-            tracks_set.update(e.tracks)
-        tracks = {t for t in tracks_set if t.event_id == self.event_new.id}
+        tracks_set = (user.convener_for_tracks | user.abstract_reviewer_for_tracks) & set(self.event_new.tracks)
+        if user in self.event_new.global_abstract_reviewers or user in self.event_new.global_conveners:
+            tracks_set.update(self.event_new.tracks)
         return WPDisplayAbstracts.render_template('display/tracks.html', self._conf, event=self.event_new,
-                                                  tracks=tracks)
+                                                  tracks=tracks_set)
 
 
 class RHDisplayReviewableTrackAbstracts(RHConferenceBaseDisplay):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.track
+        }
+    }
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
 
     def _process(self):
-        abstracts_set = set()
-        abstracts_set.update(self.track.abstracts_accepted, self.track.abstracts_reviewed,
-                             self.track.abstracts_submitted)
+        abstracts_set = set(self.track.abstracts_accepted) | self.track.abstracts_reviewed |\
+                        self.track.abstracts_submitted
         return WPDisplayAbstracts.render_template('display/abstracts.html', self._conf, track_title=self.track.title,
                                                   abstracts=abstracts_set)

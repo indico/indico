@@ -1,0 +1,25 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title %}
+    {% trans %}Abstracts from <span class="track-name">{{ track_title }}</span>{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if not abstracts %}
+        <p>
+            {%- trans -%}
+                There are currently no abstracts within this track which you are reviewer or convener of.
+            {%- endtrans -%}
+        </p>
+    {% else %}
+        <ul class="programme">
+            {% for abstract in abstracts %}
+                <li>
+                    <span class="title">
+                        <a href="{{ url_for('abstracts.display_abstract', abstract) }}">{{ abstract.title }}</a>
+                    </span>
+                </li>
+            {%  endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
