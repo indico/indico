@@ -163,6 +163,11 @@ $(document).ready(function() {
         });
     });
 
+    // Prevent # in the URL when clicking disabled links
+    $('body').on('click', 'a.disabled', function(evt) {
+        evt.preventDefault();
+    });
+
     $('.contextHelp[data-src]').qtip({
         content: {
             text: function() {
@@ -181,7 +186,7 @@ $(document).ready(function() {
         // Silly IE11 will clear the second password field if
         // password autocompletion is enabled!
         // https://social.msdn.microsoft.com/Forums/en-US/7d02173f-8f45-4a74-90bf-5dfbd8f9c1de/ie-11-issue-with-two-password-input-fields
-        $('input:password').each(function(){
+        $('input:password').each(function() {
             if (!this.value && this.getAttribute('value')) {
                 this.value = this.getAttribute('value');
             }
