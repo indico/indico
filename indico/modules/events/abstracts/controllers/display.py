@@ -16,8 +16,14 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
+from flask import session
+from werkzeug.exceptions import Forbidden
+
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
-from indico.modules.events.abstracts.views import WPDisplayAbstracts
+from indico.modules.events.abstracts.util import get_user_abstracts
+from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts
 from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import AbstractToPDF
@@ -44,3 +50,24 @@ class RHDisplayAbstractExportPDF(RHDisplayAbstract):
         pdf = AbstractToPDF(self.abstract)
         file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
         return send_file(file_name, pdf.generate(), 'application/pdf')
+
+
+class RHMyAbstractsBase(RHConferenceBaseDisplay):
+    """Base RH concerning the list of current user abstracts"""
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.abstracts = get_user_abstracts(self.event_new, session.user)
+
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if not session.user:
+            raise Forbidden
+
+
+class RHMyAbstracts(RHMyAbstractsBase):
+    """Display the list of current user abstracts"""
+
+    def _process(self):
+        return WPMyAbstracts.render_template('display/user_abstract_list.html', self._conf, event=self.event_new,
+                                             abstracts=self.abstracts)

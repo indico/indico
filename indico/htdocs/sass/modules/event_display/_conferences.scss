@@ -154,7 +154,7 @@
     }
 }
 
-.contrib-session, .contrib-track, .contrib-type {
+.contrib-session, .contrib-track, .contrib-type, .contrib-state {
     @include border-radius();
     @include ellipsis;
 

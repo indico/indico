@@ -93,13 +93,6 @@ def get_default_menu_entries():
             visible=_visibility_call_for_abstracts,
         ),
         MenuEntryData(
-            title=_("View my Abstracts"),
-            name='user_abstracts',
-            endpoint='event.userAbstracts',
-            position=0,
-            parent='call_for_abstracts'
-        ),
-        MenuEntryData(
             title=_("Submit Abstract"),
             name='abstract_submission',
             endpoint='event.abstractSubmission',

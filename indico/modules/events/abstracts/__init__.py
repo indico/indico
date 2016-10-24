@@ -107,7 +107,14 @@ def _get_notification_placeholders(sender, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.abstracts.util import get_user_abstracts
     from indico.modules.events.layout.util import MenuEntryData
 
-    return MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
-                         position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
+    def _is_visible(conf):
+        return (session.user and conf.has_feature('abstracts') and
+                bool(get_user_abstracts(conf.as_event, session.user)))
+
+    yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
+                        position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
+    yield MenuEntryData(title=_("My Abstracts"), name='user_abstracts', visible=_is_visible,
+                        endpoint='abstracts.my_abstracts', position=0, parent='call_for_abstracts')

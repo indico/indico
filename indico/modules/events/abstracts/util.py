@@ -26,10 +26,12 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
+from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
@@ -374,3 +376,11 @@ def get_roles_for_event(event):
     roles['*']['reviewer'] = [reviewer.id for reviewer in event.global_abstract_reviewers]
     roles['*']['convener'] = [reviewer.id for reviewer in event.global_conveners]
     return roles
+
+
+@memoize_request
+def get_user_abstracts(event, user):
+    return (Abstract.query.with_parent(event)
+            .filter(db.or_(Abstract.submitter == user,
+                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
+            .all())
