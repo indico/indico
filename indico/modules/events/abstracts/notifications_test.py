@@ -28,6 +28,7 @@ from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.users.models.users import UserTitle
+from indico.util.date_time import now_utc
 
 
 def text_compare(v1, v2):
@@ -122,6 +123,7 @@ def test_abstract_notification(mocker, abstract_objects, create_email_template, 
     abstract.accepted_contrib_type = contrib_type
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
 
@@ -141,6 +143,7 @@ def test_notification_rules(mocker, abstract_objects, create_email_template, dum
 
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 0
@@ -167,6 +170,7 @@ def test_notification_several_conditions(db, mocker, abstract_objects, create_em
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
@@ -196,6 +200,7 @@ def test_notification_any_conditions(mocker, abstract_objects, create_email_temp
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     abstract.accepted_track = track
     send_abstract_notifications(abstract)
     assert send_email.call_count == 1
@@ -216,6 +221,7 @@ def test_notification_stop_on_match(mocker, abstract_objects, create_email_templ
     send_email = mocker.patch('indico.modules.events.abstracts.notifications.send_email')
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     send_abstract_notifications(abstract)
     assert send_email.call_count == 2
 
@@ -254,4 +260,5 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
     abstract.accepted_track = track
     abstract.state = AbstractState.accepted
     abstract.judge = dummy_user
+    abstract.judgment_dt = now_utc(False)
     send_abstract_notifications(abstract)
