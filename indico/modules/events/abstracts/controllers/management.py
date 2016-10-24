@@ -151,10 +151,15 @@ class RHAbstractExportPDF(RHManageAbstractBase):
 class RHAbstracts(RHManageAbstractsBase):
     """Display abstracts management page"""
 
+    EVENT_FEATURE = None
+
     def _process(self):
-        abstracts_count = Abstract.query.with_parent(self.event_new).count()
-        return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
-                                                 abstracts_count=abstracts_count, cfa=self.event_new.cfa)
+        if not self.event_new.has_feature('abstracts'):
+            return WPManageAbstracts.render_template('management/disabled.html', self._conf, event=self.event_new)
+        else:
+            abstracts_count = Abstract.query.with_parent(self.event_new).count()
+            return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
+                                                     abstracts_count=abstracts_count, cfa=self.event_new.cfa)
 
 
 class RHScheduleCFA(RHManageAbstractsBase):
