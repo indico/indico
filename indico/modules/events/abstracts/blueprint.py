@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.boa import RHManageBOA, RHExportBOA
 from indico.modules.events.abstracts.controllers.display import (RHDisplayAbstract, RHDisplayAbstractExportPDF,
-                                                                 RHMyAbstracts)
+                                                                 RHMyAbstracts, RHMyAbstractsExportPDF)
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHPreviewEmailTemplate,
@@ -49,6 +49,7 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_
 _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
                  RHAbstractsDownloadAttachment)
 _bp.add_url_rule('/abstracts/mine', 'my_abstracts', RHMyAbstracts)
+_bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', RHMyAbstractsExportPDF)
 
 # Book of Abstracts
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))

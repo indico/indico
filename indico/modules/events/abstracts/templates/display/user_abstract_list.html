@@ -59,6 +59,13 @@
 {%- endblock %}
 
 {% block content -%}
+    <div class="toolbar">
+        <div class="group right">
+            <a class="i-button icon-file-pdf"
+               href="{{ url_for('abstracts.my_abstracts_pdf', event) }}"
+               title="{% trans %}Export to PDF{% endtrans %}"></a>
+        </div>
+    </div>
     <div id="display-contribution-list" class="contribution-list">
         {{ render_abstract_list(event, abstracts) }}
     </div>
