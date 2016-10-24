@@ -43,9 +43,8 @@ class WPManageAbstracts(WPJinjaMixin, WPConferenceModifBase):
                           for url in self._asset_env['mathjax_js'].urls()))
 
 
-class WPDisplayAbstracts(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplayAbstractsBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/abstracts/'
-    menu_entry_name = 'call_for_abstracts'
 
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
@@ -55,7 +54,9 @@ class WPDisplayAbstracts(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     def getCSSFiles(self):
         return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
                 self._asset_env['markdown_sass'].urls() +
-                self._asset_env['abstracts_sass'].urls())
+                self._asset_env['abstracts_sass'].urls() +
+                self._asset_env['event_display_sass'].urls() +
+                self._asset_env['contributions_sass'].urls())
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
@@ -64,3 +65,11 @@ class WPDisplayAbstracts(WPJinjaMixin, WPConferenceDefaultDisplayBase):
         return (WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') +
                 '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
                           for url in self._asset_env['mathjax_js'].urls()))
+
+
+class WPDisplayAbstracts(WPDisplayAbstractsBase):
+    menu_entry_name = 'call_for_abstracts'
+
+
+class WPMyAbstracts(WPDisplayAbstractsBase):
+    menu_entry_name = 'user_abstracts'

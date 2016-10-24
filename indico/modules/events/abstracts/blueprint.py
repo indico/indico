@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.boa import RHManageBOA, RHExportBOA
-from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract, RHDisplayAbstractExportPDF
+from indico.modules.events.abstracts.controllers.display import (RHDisplayAbstract, RHDisplayAbstractExportPDF,
+                                                                 RHMyAbstracts)
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHPreviewEmailTemplate,
@@ -35,6 +36,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHManageReviewingRoles, RHResetAbstractJudgment,
                                                                     RHBulkAbstractJudgment, RHAbstractNotificationLog)
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractsDownloadAttachment
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -46,6 +48,7 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/notifications', 'notification_log
 _bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_pdf_export', RHDisplayAbstractExportPDF)
 _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
                  RHAbstractsDownloadAttachment)
+_bp.add_url_rule('/abstracts/mine', 'my_abstracts', RHMyAbstracts)
 
 # Book of Abstracts
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
@@ -98,3 +101,10 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHMa
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/reset',
                  'reset_abstract_judgment', RHResetAbstractJudgment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
+
+
+# Legacy URLs
+_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<event_id>')
+
+_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'my_abstracts',
+                        make_compat_redirect_func(_bp, 'my_abstracts', view_args_conv={'event_id': 'confId'}))
