@@ -73,12 +73,15 @@
         <div class="i-timeline-item-box header-indicator">
             <div class="i-box-header flex">
                 <div class="stretch">
-                    {% trans name=review.user.name, date=review.created_dt|format_human_date -%}
-                        <strong>{{ name }}</strong> reviewed {{ date }}
+                    {% trans name=review.user.name -%}
+                        <strong>{{ name }}</strong> reviewed this abstract
                     {%- endtrans %}
                     {% if review.modified_dt %}
                         {{ render_edited_hint(comment.modified_dt) }}
                     {% endif %}
+                    <time datetime="{{ review.created_dt.isoformat() }}">
+                        {{- review.created_dt|format_human_date -}}
+                    </time>
                 </div>
                 <div class="abstract-comment-badges">
                     <span>
