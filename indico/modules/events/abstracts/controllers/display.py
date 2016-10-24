@@ -26,7 +26,7 @@ from indico.modules.events.abstracts.util import get_user_abstracts
 from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts
 from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file
-from MaKaC.PDFinterface.conference import AbstractToPDF
+from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -71,3 +71,10 @@ class RHMyAbstracts(RHMyAbstractsBase):
     def _process(self):
         return WPMyAbstracts.render_template('display/user_abstract_list.html', self._conf, event=self.event_new,
                                              abstracts=self.abstracts)
+
+
+class RHMyAbstractsExportPDF(RHMyAbstractsBase):
+    def _process(self):
+        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
+        pdf = AbstractsToPDF(self.event_new, sorted_abstracts)
+        return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
