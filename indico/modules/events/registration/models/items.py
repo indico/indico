@@ -260,7 +260,8 @@ class RegistrationFormItem(db.Model):
     #: unversioned field data
     data = db.Column(
         JSON,
-        nullable=False
+        nullable=False,
+        default=JSON.NULL
     )
 
     #: The ID of the latest data
