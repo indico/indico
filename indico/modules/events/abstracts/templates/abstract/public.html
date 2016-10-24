@@ -232,6 +232,43 @@
         </div>
 {% endmacro %}
 
+{% macro _render_judgment_action(abstract) %}
+    {% set action = abstract.state.name %}
+    {% if action == 'withdrawn' %}
+        {% trans name=abstract.submitter.name -%}
+            <strong>{{ name }}</strong> withdrew this abstract
+        {%- endtrans %}
+    {% elif abstract.can_judge(session.user) %}
+        {% if action == 'accepted' %}
+            {% trans name=abstract.judge.name -%}
+                <strong>{{ name }}</strong> accepted this abstract
+            {%- endtrans %}
+        {% elif action == 'rejected' %}
+            {% trans name=abstract.judge.name -%}
+                <strong>{{ name }}</strong> rejected this abstract
+            {%- endtrans %}
+        {% elif action == 'merged' %}
+            {% trans name=abstract.judge.name -%}
+                <strong>{{ name }}</strong> merged this abstract into another
+            {%- endtrans %}
+        {% elif action == 'duplicate' %}
+            {% trans name=abstract.judge.name -%}
+                <strong>{{ name }}</strong> marked this abstract as duplicate of another
+            {%- endtrans %}
+        {% endif %}
+    {% else %}
+        {% if action == 'accepted' %}
+            {% trans %}This abstract was accepted{% endtrans %}
+        {% elif action == 'rejected' %}
+            {% trans %}This abstract was rejected{% endtrans %}
+        {% elif action == 'merged' %}
+            {% trans %}This abstract was merged{% endtrans %}
+        {% elif action == 'duplicate' %}
+            {% trans %}This abstract was marked as duplicate{% endtrans %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
 {% macro render_abstract_public(abstract, management=false) %}
     {% set abstract_endpoint = '.manage_abstract' if management else '.display_abstract' %}
     <div id="abstract-title">
@@ -348,43 +385,6 @@
                     <div class="i-timeline-item-box header-indicator">
                         <div class="i-box-header flex">
                             <div class="stretch">
-                                {% set action = abstract.state.name %}
-                                {% if abstract.can_judge(session.user) %}
-                                    {% set judge_name = abstract.judge.name %}
-                                    {% if action == 'withdrawn' %}
-                                        {% trans name=judge_name -%}
-                                            <strong>{{ name }}</strong> withdrew this abstract
-                                        {%- endtrans %}
-                                    {% elif action == 'accepted' %}
-                                        {% trans name=judge_name -%}
-                                            <strong>{{ name }}</strong> accepted this abstract
-                                        {%- endtrans %}
-                                    {% elif action == 'rejected' %}
-                                        {% trans name=judge_name -%}
-                                            <strong>{{ name }}</strong> rejected this abstract
-                                        {%- endtrans %}
-                                    {% elif action == 'merged' %}
-                                        {% trans name=judge_name -%}
-                                            <strong>{{ name }}</strong> merged this abstract
-                                        {%- endtrans %}
-                                    {% elif action == 'duplicate' %}
-                                        {% trans name=judge_name -%}
-                                            <strong>{{ name }}</strong> marked this abstract as duplicate
-                                        {%- endtrans %}
-                                    {% endif %}
-                                {% else %}
-                                    {% if action == 'withdrawn' %}
-                                        {% trans %}This abstract was withdrawn{% endtrans %}
-                                    {% elif action == 'accepted' %}
-                                        {% trans %}This abstract was accepted{% endtrans %}
-                                    {% elif action == 'rejected' %}
-                                        {% trans %}This abstract was rejected{% endtrans %}
-                                    {% elif action == 'merged' %}
-                                        {% trans %}This abstract was merged{% endtrans %}
-                                    {% elif action == 'duplicate' %}
-                                        {% trans %}This abstract was marked as duplicate{% endtrans %}
-                                    {% endif %}
-                                {% endif %}
                                 {{ _render_judgment_action(abstract) }}
                                 <time datetime="{{ abstract.judgment_dt.isoformat() }}">
                                     {{- abstract.judgment_dt|format_human_date -}}
