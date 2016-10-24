@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.abstracts.settings import abstracts_settings
+from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
@@ -30,6 +30,10 @@ class CallForAbstracts(object):
     @return_ascii
     def __repr__(self):
         return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
+
+    @property
+    def allow_convener_judgment(self):
+        return abstracts_reviewing_settings.get(self.event, 'allow_convener_judgment')
 
     @property
     def has_started(self):
