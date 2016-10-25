@@ -323,8 +323,12 @@
                         <a class="i-button icon-edit disabled"
                             title="{% trans %}The abstract cannot be edited because it is under review already {% endtrans %}"></a>
                     {% else %}
-                        {# TODO: open abstract edition form #}
-                        <a href="#" class="i-button icon-edit" title="{% trans %}Edit abstract{% endtrans %}"></a>
+                        <a href="#" class="i-button icon-edit"
+                           title="{% trans %}Edit abstract{% endtrans %}"
+                           data-href="{{ url_for('.edit_abstract', abstract, management=management) }}"
+                           data-title="{% trans %}Edit abstract{% endtrans %}"
+                           data-ajax-dialog
+                           data-reload-after></a>
                     {% endif %}
                 </div>
             {% endif %}

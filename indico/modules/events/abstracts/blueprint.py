@@ -36,7 +36,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstractLi
                                                                     RHAbstractsExportJSON,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHBulkAbstractJudgment,
-                                                                    RHAbstractNotificationLog)
+                                                                    RHAbstractNotificationLog, RHEditAbstract)
 from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDownloadAttachment,
                                                                    RHResetAbstractState,
                                                                    RHWithdrawAbstract,
@@ -146,6 +146,8 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>'
 
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/edit', 'edit_abstract',
+                     RHEditAbstract, methods=('GET', 'POST'), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/withdraw', 'withdraw_abstract',
                      RHWithdrawAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reset', 'reset_abstract_state',
