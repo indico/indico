@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
-from flask import jsonify, session
+from flask import jsonify, session, request
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -159,14 +159,15 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 class AbstractField(AjaxFieldMixin, QuerySelectField):
     """A selectize-based field to select an abstract from an event."""
 
-    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True)
+    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                             search_method='POST')
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter abstract title or #id'))
         kwargs['query_factory'] = self._get_query
         kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
-        self.excluded_abstract = None
+        self.excluded_abstract_ids = set()
         super(AbstractField, self).__init__(*args, **kwargs)
 
     def process_ajax(self):
@@ -178,8 +179,9 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
 
     def _get_query(self):
         query = Abstract.query.with_parent(self.event).options(joinedload('submitter').lazyload('*'))
-        if self.excluded_abstract is not None:
-            query = query.filter(Abstract.id != self.excluded_abstract.id)
+        excluded = self.excluded_abstract_ids | set(map(int, request.form.getlist('excluded_abstract_id')))
+        if excluded:
+            query = query.filter(Abstract.id.notin_(excluded))
         return query.order_by(Abstract.friendly_id)
 
     def _get_object_list(self):
@@ -197,6 +199,10 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
     @property
     def search_url(self):
         return self.get_ajax_url()
+
+    @property
+    def search_payload(self):
+        return {'excluded_abstract_id': list(self.excluded_abstract_ids)}
 
 
 class TrackRoleField(JSONField):

@@ -163,6 +163,7 @@ class SelectizeWidget(JinjaWidget):
     """Renders a selectize-based widget
 
     :param search_url: The URL used to retrieve items.
+    :param search_method: The method used to retrieve items.
     :param min_trigger_length: Number of characters needed to start
                                searching for suggestions.
     :param allow_by_id: Whether to allow `#123` searches regardless of
@@ -178,12 +179,13 @@ class SelectizeWidget(JinjaWidget):
                          in locally available data.
     """
 
-    def __init__(self, search_url=None, min_trigger_length=3, allow_by_id=False, preload=False,
+    def __init__(self, search_url=None, search_method='GET', min_trigger_length=3, allow_by_id=False, preload=False,
                  value_field='id', label_field='name', search_field='name'):
         self.min_trigger_length = min_trigger_length
         self.allow_by_id = allow_by_id
         self.preload = preload
         self.search_url = search_url
+        self.search_method = search_method
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
@@ -206,6 +208,8 @@ class SelectizeWidget(JinjaWidget):
         options.update(kwargs.pop('options', {}))
         return super(SelectizeWidget, self).__call__(field, options=options,
                                                      search_url=getattr(field, 'search_url', self.search_url),
+                                                     search_method=self.search_method,
+                                                     search_payload=getattr(field, 'search_payload', None),
                                                      min_trigger_length=self.min_trigger_length, preload=self.preload,
                                                      allow_by_id=self.allow_by_id, input_args=kwargs)
 

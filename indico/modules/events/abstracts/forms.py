@@ -193,6 +193,8 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
         if len(candidate_contrib_types) == 1:
             kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
         super(AbstractJudgmentForm, self).__init__(*args, **kwargs)
+        self.duplicate_of.excluded_abstract_ids = {abstract.id}
+        self.merged_into.excluded_abstract_ids = {abstract.id}
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
@@ -203,6 +205,8 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
+        self.duplicate_of.excluded_abstract_ids = set(kwargs['abstract_id'])
+        self.merged_into.excluded_abstract_ids = set(kwargs['abstract_id'])
 
     def is_submitted(self):
         return super(BulkAbstractJudgmentForm, self).is_submitted() and 'submitted' in request.form
