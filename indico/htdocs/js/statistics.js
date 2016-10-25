@@ -33,7 +33,7 @@ function processJqPlotOptions(options) {
             zoom: false
         },
         grid: {
-            background: 'rgba(0, 0, 0, 0)',
+            background: 'transparent',
             drawBorder: false,
             shadow: false
         },
