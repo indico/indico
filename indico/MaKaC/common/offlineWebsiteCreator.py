@@ -372,7 +372,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
         if entry.name == 'program':
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, event=self._conf.as_event)
+            self._addPdf(self._conf, 'tracks.program_pdf', ProgrammeToPDF, event=self._conf.as_event)
 
     def _get_custom_page(self, page):
         html = WPStaticCustomPage.render_template('page.html', self._conf, page=page)
