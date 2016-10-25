@@ -212,3 +212,40 @@
     margin-top: 5px;
     margin-right: 10px;
 }
+
+.abstract-question-list {
+    list-style-type: none;
+
+    > li {
+        label {
+            color: $dark-gray;
+            font-weight: normal;
+            font-style: italic;
+
+            border-right: 2px solid $pastel-gray;
+            padding-right: 0.5em;
+        }
+
+        .value {
+            .number {
+                vertical-align: middle;
+                margin-left: 0.5em;
+                color: $light-black;
+            }
+
+            .rating {
+                .bullet {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: 0.5em;
+                    height: 1em;
+                    border-radius: 1em;
+                    background-color: $pastel-gray;
+
+                    &.full {
+                        background-color: $pastel-green;
+                    }
+                }
+            }
+        }
+}

@@ -6,7 +6,7 @@
         {% if reviews %}
             <h3>{% trans %}No track{% endtrans %}</h3>
             {% for review in reviews %}
-                {{ _render_review(review) }}
+                {{ _render_review(abstract.event_new.cfa, review) }}
             {% endfor %}
         {% endif %}
         {% for track in abstract.reviewed_for_tracks %}
@@ -18,7 +18,7 @@
                     {%- endtrans %}
                 </h3>
                 {% for review in reviews %}
-                    {{ _render_review(review) }}
+                    {{ _render_review(abstract.event_new.cfa, review) }}
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -67,7 +67,15 @@
     </span>
 {% endmacro %}
 
-{% macro _render_review(review) %}
+{% macro _render_rating(cfa, value) %}
+    <span class="rating">
+    {% for bullet in range(cfa.rating_range[0], cfa.rating_range[1]) %}
+        <span class="bullet {{ 'full' if bullet < value else '' }}"></span>
+    {% endfor %}
+    </span>
+{% endmacro %}
+
+{% macro _render_review(cfa, review) %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
         <div class="i-timeline-item-box header-indicator">
@@ -100,11 +108,15 @@
             </div>
             {% if review.ratings %}
                 {% for rating in review.ratings %}
-                    <div>
-                        {# TODO: UI #}
-                        {{ rating.question.text }}
-                        {{ rating.value }}
-                    </div>
+                    <ul class="abstract-question-list">
+                        <li>
+                            <label>{{ rating.question.text }}</label>
+                            <span class="value">
+                                {{ _render_rating(cfa, rating.value) }}
+                                <span class="number">{{ rating.value }}</span>
+                            </span>
+                        </li>
+                    </ul>
                 {% endfor %}
             {% endif %}
             {% if review.comment %}

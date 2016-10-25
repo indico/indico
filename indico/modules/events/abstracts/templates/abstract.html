@@ -14,8 +14,15 @@
             {{ render_abstract_reviews(abstract) }}
             <div class="i-timeline-separator"></div>
         {% endif %}
-        {% if abstract.can_judge(session.user) %}
+
+        {% set can_review = abstract.can_review(session.user) %}
+        {% set can_judge = abstract.can_judge(session.user, check_state=true) %}
+
+        {% if can_review or can_judge %}
             <div class="i-timetable-connect-up"></div>
+        {% endif %}
+
+        {% if can_judge %}
             {{ render_decision_box(abstract, form) }}
         {% endif %}
     </div>
