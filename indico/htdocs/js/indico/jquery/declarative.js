@@ -159,8 +159,8 @@
                     return;
                 }
 
-                // Handle html update
-                if (update) {
+                // Handle html update or reload
+                if (update || reload !== undefined) {
                     $.ajax({
                         method: method,
                         url: url,
@@ -168,8 +168,13 @@
                         error: handleAjaxError,
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
-                            handleFlashes(data, true, $this);
-                            handleHtmlUpdate(data, $this);
+                            if (update) {
+                                handleFlashes(data, true, $this);
+                                handleHtmlUpdate(data, $this);
+                            } else if (reload !== undefined) {
+                                IndicoUI.Dialogs.Util.progress();
+                                location.reload();
+                            }
                         }
                     });
                     return;
