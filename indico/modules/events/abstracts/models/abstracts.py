@@ -23,7 +23,6 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.reviews import AbstractAction
-from indico.modules.events.abstracts.settings import abstracts_reviewing_settings
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.date_time import now_utc
@@ -222,7 +221,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         backref=db.backref(
             'abstracts',
             primaryjoin='(Abstract.submitter_id == User.id) & ~Abstract.is_deleted',
-            cascade='all, delete-orphan',
             lazy='dynamic'
         )
     )
@@ -233,7 +231,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         backref=db.backref(
             'modified_abstracts',
             primaryjoin='(Abstract.modified_by_id == User.id) & ~Abstract.is_deleted',
-            cascade='all, delete-orphan',
             lazy='dynamic'
         )
     )
@@ -279,7 +276,6 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         backref=db.backref(
             'judged_abstracts',
             primaryjoin='(Abstract.judge_id == User.id) & ~Abstract.is_deleted',
-            cascade='all, delete-orphan',
             lazy='dynamic'
         )
     )
