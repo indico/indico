@@ -116,6 +116,7 @@
         position: absolute;
         width: 100%;
     }
+}
 
 .truncate-text {
     @include ellipsis;
