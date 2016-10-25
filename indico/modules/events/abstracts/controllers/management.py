@@ -36,7 +36,7 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
-                                                        close_cfa, judge_abstract)
+                                                        close_cfa, judge_abstract, update_abstract)
 from indico.modules.events.abstracts.schemas import abstracts_schema
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (make_abstract_form, get_roles_for_event,
@@ -154,6 +154,24 @@ class RHAbstractNotificationLog(RHManageAbstractBase):
 
     def _process(self):
         return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
+
+
+class RHEditAbstract(RHManageAbstractBase):
+    def _process(self):
+        abstract_form_class = make_abstract_form(self.event_new)
+        form = abstract_form_class(obj=self.abstract, abstract=self.abstract, event=self.event_new)
+        # TODO Handle reviewed_for_tracks properly
+        if form.validate_on_submit():
+            data = form.data
+            if isinstance(data['submitted_for_tracks'], Track):
+                data['submitted_for_tracks'] = {data['submitted_for_tracks']}
+            elif data['submitted_for_tracks'] is None:
+                data['submitted_for_tracks'] = set()
+            update_abstract(self.abstract, *get_field_values(data))
+            flash(_("Abstract modified successfully"), 'success')
+            return jsonify_data(flash=False)
+        self.commit = False
+        return jsonify_form(form)
 
 
 class RHAbstractExportPDF(RHManageAbstractBase):

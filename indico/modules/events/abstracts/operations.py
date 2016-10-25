@@ -77,6 +77,17 @@ def withdraw_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been withdrawn'.format(abstract.title), session.user)
 
 
+def update_abstract(abstract, data, custom_fields_data=None):
+    abstract.populate_from_dict(data)
+    if custom_fields_data:
+        set_custom_fields(abstract, custom_fields_data)
+    db.session.flush()
+    logger.info('Abstract %s modified by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'Abstract "{}" has been modified'.format(abstract.title), session.user)
+    return abstract
+
+
 def delete_abstract(abstract, delete_contrib=False):
     abstract.is_deleted = True
     contrib = abstract.contribution
