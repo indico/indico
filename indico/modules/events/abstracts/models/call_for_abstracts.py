@@ -59,6 +59,10 @@ class CallForAbstracts(object):
     def modification_end_dt(self):
         return abstracts_settings.get(self.event, 'modification_end_dt') or self.end_dt
 
+    @property
+    def rating_range(self):
+        return tuple(abstracts_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
+
     def schedule(self, start_dt, end_dt, modification_end_dt):
         abstracts_settings.set_multi(self.event, {
             'start_dt': start_dt,

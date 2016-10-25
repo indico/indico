@@ -455,7 +455,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return False
 
-    def can_judge(self, user, check_state=True):
+    def can_judge(self, user, check_state=False):
         if not user:
             return False
         elif check_state and self.state != AbstractState.submitted:

@@ -279,7 +279,7 @@
             </span>
         </h3>
         <div class="toolbar thin">
-            {% if abstract.can_judge(session.user) and abstract.state.name == 'submitted' %}
+            {% if abstract.can_judge(session.user, check_state=true) %}
                 <div class="group">
                     {# TODO: scroll to decision buttons #}
                     <a href="#" class="i-button highlight icon-hammer">
