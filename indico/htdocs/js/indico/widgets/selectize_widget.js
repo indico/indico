@@ -23,6 +23,8 @@
             fieldId: null,
             minTriggerLength: 0,
             searchUrl: null,
+            searchMethod: 'GET',
+            searchPayload: null,
             selectizeOptions: null,
             allowById: false,
             preload: false
@@ -48,7 +50,12 @@
                 if (!data) {
                     return callback();
                 }
-                $.ajax(options.searchUrl, {
+                if (options.searchPayload) {
+                    $.extend(data, options.searchPayload);
+                }
+                $.ajax({
+                    url: options.searchUrl,
+                    method: options.searchMethod,
                     data: data,
                     cache: false
                 }).fail(function(data) {
