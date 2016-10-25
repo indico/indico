@@ -107,7 +107,7 @@
             $('.participant-list').height() > threeRowsHeight);
         var initialHeight = $('.participant-list-wrapper').height();
 
-        $('.participant-list-wrapper > .trigger, .participant-list-wrapper.transparent-overlay').on('click', function() {
+        $('.participant-list-wrapper.transparent-overlay').on('click', function() {
             var toggler = $('.participant-list-wrapper > .trigger');
             var participantList = toggler.siblings('.participant-list');
             var wrapper = participantList.parent();
