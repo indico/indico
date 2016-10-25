@@ -109,7 +109,7 @@
     position: relative;
 
     &:before {
-        @include gradient(rgba(0, 0, 0, 0.0), white);
+        @include gradient(transparent, white);
         bottom: 0;
         content: '';
         height: 3em;
