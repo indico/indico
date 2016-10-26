@@ -1,0 +1,50 @@
+{% macro render_entry(entry) %}
+    {% set legacy = entry.data._legacy %}
+    <div class="log-entry">
+        <div class="metadata flex {% if legacy %}legacy{% endif %}">
+            <div class="subject stretch text-truncate">
+                {% if legacy %}
+                    {%- trans name=entry.data.template_name -%}
+                        Template: <span class="template">{{ name }}</span>
+                    {%- endtrans -%}
+                {% else %}
+                    {{- entry.subject -}}
+                {% endif %}
+            </div>
+            <time datetime="{{ entry.sent_dt.isoformat() }}">
+                {{- entry.sent_dt|format_human_date -}}
+            </time>
+        </div>
+        {% if not legacy %}
+            <div class="content">
+                <div class="metadata">
+                    <div class="flex">
+                        {%- trans recipients=entry.recipients|sort|join(', ') -%}
+                            <strong>Recipients:</strong> <span class="recipients">{{ recipients }}</span>
+                        {%- endtrans -%}
+                    </div>
+                    <div class="flex">
+                        {%- trans name=entry.data.template_name -%}
+                            <strong>Template:</strong> <span class="template">{{ name }}</span>
+                        {%- endtrans -%}
+                    </div>
+                </div>
+                <div class="body">
+                    {{- entry.body -}}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+<div id="abstract-notification-log">
+    {% for log_entry in abstract.email_logs|reverse %}
+        {{ render_entry(log_entry) }}
+    {% endfor %}
+</div>
+
+<script>
+    $('#abstract-notification-log .metadata:not(.legacy)').on('click', function() {
+        $(this).toggleClass('open').siblings('.content').slideToggle();
+    });
+</script>
