@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global showUndoWarning:false, applySearchFilters:false, setupListGenerator:false, setupSearchBox:false */
+/* global reloadManagementAttachmentInfoColumn:false */
+
 (function(global) {
     'use strict';
 
@@ -89,7 +92,8 @@
                             var startDateCol = row.find('td.start-date > .vertical-aligner');
                             var oldLabelHtml = startDateCol.children().detach();
 
-                            startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
+                            startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
+                            /* eslint-disable max-len */
                             showUndoWarning(
                                 $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
                                 $T.gettext("Undo successful! Timetable entry and session have been restored."),
@@ -245,7 +249,7 @@
             distance: 10,
             axis: 'y',
             containment: '#subcontribution-list table',
-            start: function(e, ui){
+            start: function(e, ui) {
                 ui.placeholder.height(ui.helper.outerHeight());
             },
             update: function(e, ui) {
