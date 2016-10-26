@@ -1,0 +1,94 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+#abstract-notification-log {
+    $padding: 0.25rem;
+
+    width: 800px;
+    min-height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .log-entry {
+        @include border-top();
+        padding: $padding;
+
+        &:last-child {
+            @include border-bottom();
+        }
+    }
+
+    .log-entry > .metadata {
+        margin: -$padding;
+        padding: $padding;
+        padding-left: $padding * 2;
+
+        .subject {
+            font-weight: bold;
+        }
+
+        .template {
+            @include border-bottom($style: dashed);
+            font-weight: normal;
+        }
+
+        time {
+            color: $dark-gray;
+        }
+    }
+
+    .log-entry > .metadata:not(.legacy) {
+        cursor: pointer;
+
+        &:hover,
+        &.open {
+            @include inner-border-left($gray, $width: 2px);
+            background-color: $light-gray;
+            background-origin: border-box;
+        }
+    }
+
+    .log-entry .content {
+        @include inner-border-left($gray, $width: 2px);
+        display: none;
+        margin-left: -$padding;
+        margin-top: $padding * 2;
+        padding-left: $padding * 2;
+
+        .metadata {
+            color: $dark-gray;
+            font-size: 0.9em;
+        }
+
+        .recipients {
+            margin-left: 0.5em;
+            align-self: center;
+        }
+
+        .template {
+            @include border-bottom($style: dashed);
+            align-self: center;
+            margin-left: 0.5em;
+            word-break: break-word;
+        }
+
+        .body {
+            margin-top: $padding;
+            word-break: break-word;
+        }
+    }
+}
