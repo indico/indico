@@ -34,6 +34,7 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import AjaxFieldMixin
 from indico.web.forms.fields import MultipleItemsField, JSONField
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
@@ -180,19 +181,17 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter abstract title or #id'))
         kwargs['query_factory'] = self._get_query
         kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
-        self.excluded_abstract_ids = set()
+        self.ajax_endpoint = kwargs.pop('ajax_endpoint')
         super(AbstractField, self).__init__(*args, **kwargs)
 
-    def process_ajax(self):
-        result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
-                   'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
-                  for abstract in self._get_query()
-                  if abstract.can_access(session.user)]
-        return jsonify(result)
+    @classmethod
+    def _serialize_abstract(cls, abstract):
+        return {'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
+                'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
 
     def _get_query(self):
         query = Abstract.query.with_parent(self.event).options(joinedload('submitter').lazyload('*'))
-        excluded = self.excluded_abstract_ids | set(map(int, request.form.getlist('excluded_abstract_id')))
+        excluded = set(map(int, request.form.getlist('excluded_abstract_id')))
         if excluded:
             query = query.filter(Abstract.id.notin_(excluded))
         return query.order_by(Abstract.friendly_id)
@@ -203,7 +202,7 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
                 if abstract.can_access(session.user)]
 
     def _value(self):
-        return self._serialize_abstract(self.data)
+        return self._serialize_abstract(self.data) if self.data else None
 
     @property
     def event(self):
@@ -214,7 +213,7 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
 
     @property
     def search_url(self):
-        return self.get_ajax_url()
+        return url_for(self.ajax_endpoint, self.event, __wtf_ajax=self.short_name)
 
     @property
     def search_payload(self):

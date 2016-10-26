@@ -21,7 +21,7 @@ from operator import attrgetter
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import AbstractMixin
+from indico.modules.events.abstracts.controllers.base import AbstractPageMixin
 from indico.modules.events.abstracts.util import get_user_abstracts
 from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts
 from indico.util.fs import secure_filename
@@ -30,19 +30,17 @@ from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-class RHDisplayAbstract(AbstractMixin, RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
+class RHDisplayAbstract(AbstractPageMixin, RHConferenceBaseDisplay):
+    management = False
+    page_class = WPDisplayAbstracts
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        AbstractMixin._checkParams(self)
+        AbstractPageMixin._checkParams(self)
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
-        AbstractMixin._checkProtection(self)
-
-    def _process(self):
-        return WPDisplayAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract, management=False)
+        AbstractPageMixin._checkProtection(self)
 
 
 class RHDisplayAbstractExportPDF(RHDisplayAbstract):

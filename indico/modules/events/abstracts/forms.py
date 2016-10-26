@@ -38,7 +38,32 @@ from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, 
                                      IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget
+
+
+def make_review_form(event):
+    """Extends the abstract WTForm to add the extra fields.
+
+    Each extra field will use a field named ``custom_ID``.
+
+    :param event: The `Event` for which to create the abstract form.
+    :return: An `AbstractForm` subclass.
+    """
+    from wtforms.fields import RadioField
+    from wtforms.validators import DataRequired
+    from indico.modules.events.abstracts.forms import AbstractReviewForm
+
+    form_class = type(b'_AbstractForm', (AbstractReviewForm,), {})
+    for question in event.abstract_review_questions:
+        name = 'question_{}'.format(question.id)
+        range_ = event.cfa.rating_range
+        field = RadioField(question.text,
+                           validators=[DataRequired()],
+                           choices=[(unicode(n), unicode(n)) for n in range(range_[0], range_[1] + 1)],
+                           widget=JinjaWidget('events/abstracts/forms/rating_widget.html',
+                                              question=question, cfa=event.cfa))
+        setattr(form_class, name, field)
+    return form_class
 
 
 class AbstractContentSettingsForm(IndicoForm):
@@ -150,9 +175,11 @@ class AbstractJudgmentFormBase(IndicoForm):
                                description=_("The generated contribution will be allocated in this session"))
     duplicate_of = AbstractField(_("Duplicate of"),
                                  [HiddenUnless('judgment', AbstractAction.mark_as_duplicate), DataRequired()],
-                                 description=_("The current abstract will be marked as duplicate of the selected one"))
+                                 description=_("The current abstract will be marked as duplicate of the selected one"),
+                                 ajax_endpoint='abstracts.other_abstracts')
     merged_into = AbstractField(_("Merge into"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
-                                description=_("The current abstract will be merged onto the selected one"))
+                                description=_("The current abstract will be merged onto the selected one"),
+                                ajax_endpoint='abstracts.other_abstracts')
     merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge)],
                                  description=_("Authors and speakers of the current abstract will be added to the "
                                                "selected one"))
@@ -200,6 +227,34 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
         self.merged_into.excluded_abstract_ids = {abstract.id}
 
 
+class AbstractReviewForm(IndicoForm):
+    """Form for reviewing an abstract"""
+
+    _order = ('comment', 'proposed_action', 'proposed_contribution_type', 'proposed_related_abstract')
+
+    comment = TextAreaField(_("Comments"))
+    proposed_action = IndicoEnumSelectField(
+        _("Proposed Action"), [DataRequired()],
+        enum=AbstractAction, skip={AbstractAction.change_tracks})
+    proposed_related_abstract = AbstractField(
+        _("Target Abstract"),
+        [HiddenUnless('proposed_action', {AbstractAction.mark_as_duplicate, AbstractAction.merge}), DataRequired()],
+        description=_("The current abstract should be marked as duplicate of the selected one"),
+        ajax_endpoint='abstracts.other_abstracts')
+    proposed_contrib_type = QuerySelectField(
+        _("Contribution type"), [HiddenUnless('proposed_action', AbstractAction.accept)],
+        get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("Choose the contribution type..."))
+
+    def __init__(self, *args, **kwargs):
+        abstract = kwargs.pop('abstract')
+        self.event = abstract.event_new
+        super(AbstractReviewForm, self).__init__(*args, **kwargs)
+        self.proposed_related_abstract.abstract = abstract
+        self.proposed_contrib_type.query = (ContributionType.query
+                                            .with_parent(self.event)
+                                            .order_by(ContributionType.name))
+
+
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
     judgment = HiddenEnumField(enum=AbstractAction, skip={AbstractAction.change_tracks})
     abstract_id = HiddenFieldList()
@@ -219,7 +274,7 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
                              None)
             if validator is None:
                 continue
-            if validator.value.name != judgment:
+            if not any(v.name == judgment for v in validator.value):
                 delattr(self, field.name)
 
     def is_submitted(self):

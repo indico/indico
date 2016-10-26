@@ -240,12 +240,12 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             track_review_state = abstract.get_track_reviewing_state(track)
             review_state = track_review_state.title
             if track_review_state == AbstractReviewingState.positive:
-                track_reviews = abstract.get_track_reviews(track)
+                track_reviews = abstract.get_reviews(track=track)
                 proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews}
                 contrib_types = u', '.join(proposed_contrib_types)
                 review_state = u'{}: {}'.format(review_state, contrib_types)
             elif track_review_state == AbstractReviewingState.mixed:
-                track_reviews = abstract.get_track_reviews(track)
+                track_reviews = abstract.get_reviews(track=track)
                 other_tracks = {x.title for r in track_reviews for x in r.proposed_tracks}
                 if other_tracks:
                     review_state = _(u"{}: Proposed for other tracks: {}").format(review_state,

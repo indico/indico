@@ -1,4 +1,4 @@
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
     {% if abstract.reviewed_for_tracks > 1 %}
@@ -40,52 +40,57 @@
     </span>
 {% endmacro %}
 
-{% macro render_decision_box(abstract, form) %}
-    <div id="abstract-decision-box" class="i-timeline-item">
-        <div class="i-timeline-item-label action icon-hammer"></div>
-        <div class="i-timeline-item-box content-indicator">
-            <div class="i-box-content">
-                <div class="flex">
+{% macro render_decision_box(abstract, form, management=false) %}
+    <div class="i-timeline-item-label action icon-hammer"></div>
+    <div class="i-timeline-item-box content-indicator">
+        <div class="i-box-content">
+            <div class="flex">
+                <div class="stretch">
+                    <strong>
+                        {% trans %}Review summary{% endtrans %}
+                    </strong>
+                </div>
+                <div class="abstract-comment-badges">
+                    {% trans state=_render_abstract_reviewing_state(abstract) -%}
+                        Reviews are {{ state }}
+                    {%- endtrans %}
+                    {% if abstract.score %}
+                        {% set score = abstract.score|round(1) %}
+                        {# TODO: show max score #}
+                        <span class="i-tag highlight" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                            {{ score }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
+                <div class="track-review flex">
                     <div class="stretch">
-                        <strong>
-                            {% trans %}Review summary{% endtrans %}
-                        </strong>
+                        {{ track.title }}
                     </div>
-                    <div class="abstract-comment-badges">
-                        {% trans state=_render_abstract_reviewing_state(abstract) -%}
-                            Reviews are {{ state }}
-                        {%- endtrans %}
-                        {% if abstract.score %}
-                            {% set score = abstract.score|round(1) %}
-                            {# TODO: show max score #}
-                            <span class="i-tag highlight" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                    <div>
+                        {{ _render_abstract_track_reviewing_state(abstract, track) }}
+                        {% set score = abstract.get_track_score(track) %}
+                        {% if score is not none %}
+                            {% set score = score|round(1) %}
+                            <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
                                 {{ score }}
                             </span>
                         {% endif %}
                     </div>
                 </div>
-                {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
-                    <div class="track-review flex">
-                        <div class="stretch">
-                            {{ track.title }}
-                        </div>
-                        <div>
-                            {{ _render_abstract_track_reviewing_state(abstract, track) }}
-                            {% set score = abstract.get_track_score(track) %}
-                            {% if score is not none %}
-                                {% set score = score|round(1) %}
-                                <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
-                                    {{ score }}
-                                </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="i-box-footer">
-                {{ simple_form(form, fields=form._order, back_button=false, skip_labels=true, submit=_("Judge"),
-                               disabled_until_change=false, form_header_kwargs={'orientation': 'vertical'}) }}
-            </div>
+            {% endfor %}
+        </div>
+        <div class="i-box-footer">
+            {{ form_header(form, orientation='vertical') }}
+            {{ form_rows(form, fields=form._order) }}
+            {% call form_footer(form, skip_label=skip_labels) %}
+                <button class="i-button big highlight judge-button"
+                        data-method="POST"
+                        data-href="{{ url_for('.judge_abstract', abstract, management=management) }}">
+                    {% trans %}Judge{% endtrans %}
+                </button>
+            {% endcall %}
         </div>
     </div>
 {% endmacro %}

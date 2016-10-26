@@ -78,3 +78,11 @@ class AbstractReviewQuestion(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.text)
+
+    def get_review_rating(self, review):
+        """Get the rating given for a particular review.
+
+        :param review: the review object
+        """
+        results = [rating for rating in review.ratings if rating.question == self]
+        return results[0] if results else None
