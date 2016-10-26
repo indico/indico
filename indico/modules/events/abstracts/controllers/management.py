@@ -101,8 +101,8 @@ class RHManageAbstract(RHManageAbstractBase):
         elif form.validate_on_submit():
             judgment_data, abstract_data = form.split_data
             judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
-        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract,
-                                                 form=form)
+        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract, form=form,
+                                                 management=True)
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
