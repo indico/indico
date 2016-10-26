@@ -21,10 +21,11 @@ import os
 import posixpath
 import re
 import shutil
+from contextlib import contextmanager
 
 import requests
 from bs4 import BeautifulSoup
-from flask import request
+from flask import current_app, request
 from werkzeug.utils import secure_filename
 
 from MaKaC.common.contribPacker import ZIPFileHandler
@@ -78,6 +79,22 @@ def _fix_url_path(path):
     path = path.lstrip('/')
     path = _remove_qs(path)
     return path
+
+
+def _rule_for_endpoint(endpoint):
+    return next((x for x in current_app.url_map.iter_rules(endpoint) if 'GET' in x.methods), None)
+
+
+@contextmanager
+def _override_request_endpoint(endpoint):
+    rule = _rule_for_endpoint(endpoint)
+    assert rule is not None
+    old_rule = request.url_rule
+    request.url_rule = rule
+    try:
+        yield
+    finally:
+        request.url_rule = old_rule
 
 
 class OfflineEvent:
@@ -165,7 +182,7 @@ class OfflineEventCreator(object):
 
     def _get_static_files(self, html):
         config = Config.getInstance()
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, 'lxml')
         images = set(_fix_url_path(x['src']) for x in soup.select('img[src]'))
         scripts = set(_fix_url_path(x['src']) for x in soup.select('script[src]'))
         styles = set(_fix_url_path(x['href']) for x in soup.select('link[rel="stylesheet"]'))
@@ -366,7 +383,8 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         obj = self._menu_offline_items.get(entry.name)
         if isinstance(obj, RH):
             obj._checkParams({'confId': self._conf.id})
-            self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
+            with _override_request_endpoint(obj.view_class.endpoint):
+                self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, 'abstracts.export_boa', AbstractBook, event=self.event)
         if entry.name == 'program':
@@ -392,8 +410,9 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         rh = rh_class()
         rh.view_class = view_class
         request.view_args = params
-        rh._checkParams(params)
-        html = rh._process()
+        with _override_request_endpoint(rh.view_class.endpoint):
+            rh._checkParams(params)
+            html = rh._process()
         self._addPage(html, rh.view_class.endpoint, url_for_target)
 
     def _getContrib(self, contrib):
@@ -419,8 +438,9 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         rh = RHContributionAuthor()
         params = {'confId': self._conf.id, 'contrib_id': contrib.id, 'person_id': author.id}
         request.view_args = params
-        rh._checkParams(params)
-        html = rh._process()
+        with _override_request_endpoint('contributions.display_author'):
+            rh._checkParams(params)
+            html = rh._process()
         self._addPage(html, 'contributions.display_author', self._conf, contrib_id=contrib.id, person_id=author.id)
 
     def _getSession(self, session):
