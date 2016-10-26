@@ -1,0 +1,23 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="{{ field.id }}" class="rating-widget">
+        <span class="rating-value">{{ '-' if field.object_data is none else field.data }}</span>
+        {% for bullet in range(cfa.rating_range[1], cfa.rating_range[0] - 1, -1) %}
+            {% set radio_id = '%s-%d'|format(field.id, bullet) %}
+            <input type="radio" id="{{ radio_id }}" name="{{ field.name }}" value="{{ bullet }}"
+                   {{ 'checked' if field.data == bullet|string }}>
+            <label class="bullet" title="{{ bullet }}" for="{{ radio_id }}"></label>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('#{{ field.id }} input[type="radio"]').on('click', function() {
+            var $this = $(this);
+            var $widget = $this.closest('.rating-widget');
+            $widget.find('.rating-value').text($this.val());
+        });
+    </script>
+{% endblock %}

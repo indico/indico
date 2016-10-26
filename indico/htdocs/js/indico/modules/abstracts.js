@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false */
+/* global setupListGenerator:false, initForms:false, showFormErrors:false, getFormParams:false */
 
 (function(global) {
     'use strict';
@@ -36,5 +36,67 @@
         });
 
         setupListGenerator(filterConfig);
+    };
+
+    global.setupAbstractPage = function setupAbstractPage() {
+        $('body').on('indico:confirmed', '.judge-button', function(evt) {
+            var $box = $('#abstract-decision-box');
+            var $this = $(this);
+            var $form = $box.find('form');
+
+            evt.preventDefault();
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                data: getFormParams($form),
+                success: function(data) {
+                    if (data.page_html) {
+                        $('.management-page').replaceWith(data.page_html);
+                        $box = $('#abstract-decision-box');
+                    } else {
+                        $box.html(data.box_html);
+                    }
+                    initForms($box);
+                    showFormErrors($box);
+                }
+            });
+        }).on('indico:confirmed', '.review-button', function(evt) {
+            var $this = $(this);
+            var $box = $this.closest('.abstract-review-box');
+            var $form = $box.find('form');
+            var $page = $('.management-page');
+
+            evt.preventDefault();
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                data: getFormParams($form),
+                success: function(data) {
+                    if (data.page_html) {
+                        $page.replaceWith(data.page_html);
+                    } else {
+                        $box.replaceWith(data.box_html);
+                    }
+                    initForms($page);
+                    showFormErrors($page);
+                }
+            });
+        }).on('click', '.change-review-button', function(evt) {
+            evt.preventDefault();
+
+            var $reviewDisplay = $(this).closest('.i-timeline-item');
+            var $reviewBox = $reviewDisplay.next('.abstract-review-box');
+            $reviewDisplay.hide();
+            $reviewBox.show();
+        }).on('indico:htmlUpdated', function() {
+            initForms($(this));
+            showFormErrors($(this));
+        });
     };
 })(window);

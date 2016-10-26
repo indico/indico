@@ -26,16 +26,17 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
+
+from indico.modules.events.abstracts.controllers.base import AbstractPageMixin
 from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
-                                                   AbstractsScheduleForm, AbstractJudgmentForm,
-                                                   BulkAbstractJudgmentForm)
+                                                   AbstractsScheduleForm, BulkAbstractJudgmentForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
-                                                        close_cfa, judge_abstract, reset_abstract_judgment)
+                                                        close_cfa, judge_abstract)
 from indico.modules.events.abstracts.schemas import abstracts_schema
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
@@ -103,18 +104,20 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 
-class RHManageAbstract(RHManageAbstractBase):
+class RHManageAbstract(AbstractPageMixin, RHConferenceModifBase):
     """Display abstract management page"""
 
-    def _process(self):
-        form = AbstractJudgmentForm(abstract=self.abstract)
-        if form.process_ajax():
-            return form.ajax_response
-        elif form.validate_on_submit():
-            judgment_data, abstract_data = form.split_data
-            judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
-        return WPManageAbstracts.render_template('abstract.html', self._conf, abstract=self.abstract, form=form,
-                                                 management=True)
+    CSRF_ENABLED = True
+    management = True
+    page_class = WPManageAbstracts
+
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+        AbstractPageMixin._checkProtection(self)
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        AbstractPageMixin._checkParams(self)
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
@@ -153,15 +156,6 @@ class RHAbstractNotificationLog(RHManageAbstractBase):
 
     def _process(self):
         return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
-
-
-class RHResetAbstractJudgment(RHManageAbstractBase):
-    def _process(self):
-        # TODO: make this an AJAX RH
-        if self.abstract.state not in (AbstractState.submitted, AbstractState.withdrawn):
-            reset_abstract_judgment(self.abstract)
-            flash(_("Abstract judgment has been reset"), 'success')
-        return redirect(url_for('.manage_abstract', self.abstract))
 
 
 class RHAbstractExportPDF(RHManageAbstractBase):

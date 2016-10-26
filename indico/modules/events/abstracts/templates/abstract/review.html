@@ -1,16 +1,13 @@
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint %}
 
-{% macro render_abstract_reviews(abstract) %}
+{% macro render_abstract_reviews(abstract, review_forms, management=false) %}
     <div id="abstract-reviews" class="i-timeline">
-        {% set reviews = abstract.reviews|selectattr('track', 'none')|list %}
-        {% if reviews %}
-            <h3>{% trans %}No track{% endtrans %}</h3>
-            {% for review in reviews %}
-                {{ _render_review(abstract.event_new.cfa, review) }}
-            {% endfor %}
-        {% endif %}
         {% for track in abstract.reviewed_for_tracks %}
             {% set reviews = abstract.reviews|selectattr('track', 'equalto', track)|list %}
+            {% if not abstract.can_see_reviews(session.user) %}
+                {% set reviews = reviews|selectattr('user', 'equalto', session.user)|list %}
+            {% endif %}
             {% if reviews %}
                 <h3>
                     {% trans title=track.title -%}
@@ -18,10 +15,56 @@
                     {%- endtrans %}
                 </h3>
                 {% for review in reviews %}
-                    {{ _render_review(abstract.event_new.cfa, review) }}
+                    {{ _render_review(abstract.event_new.cfa, review, review_forms[track.id], management=management) }}
                 {% endfor %}
             {% endif %}
         {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro render_review_boxes(abstract, review_forms, management=false) %}
+    {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
+        {% set user_reviewed = abstract.get_reviews(track=track)|selectattr('user', 'equalto', session.user)|list %}
+        {% if not user_reviewed and track.can_review_abstracts(session.user) %}
+            {{ render_review_box(review_forms[track.id], abstract, track, management=management) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_review_box(form, abstract, track, edit=false, management=false) %}
+    <div id="abstract-review-box-{{ track.id }}"
+         class="i-timeline-item abstract-review-box {{'weak-hidden' if edit else ''}}">
+        <div class="i-timeline-item-label action icon-checkmark"></div>
+        <div class="i-timeline-item-box content-indicator">
+            <div class="i-box-content">
+                <div class="flex">
+                    <div class="stretch">
+                        <strong>
+                            {% trans track_title=track.title -%}
+                                Review for track "{{ track_title }}"
+                            {%- endtrans %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            <div class="i-box-footer">
+                {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
+                {{ form_rows(form, skip=form._order) }}
+                {{ form_rows(form, fields=form._order) }}
+                {% set form_id = '#track-review-form-' + track.id|string %}
+                {% call form_footer(form, skip_label=skip_labels) %}
+                    <button class="i-button big highlight review-button"
+                            data-method="POST"
+                            data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}">
+                        {% if edit %}
+                            {% trans %}Change{% endtrans %}
+                        {% else %}
+                            {% trans %}Review{% endtrans %}
+                        {% endif %}
+                    </button>
+                {% endcall %}
+            </div>
+        </div>
     </div>
 {% endmacro %}
 
@@ -69,16 +112,17 @@
 
 {% macro _render_rating(cfa, value) %}
     <span class="rating">
-    {% for bullet in range(cfa.rating_range[0], cfa.rating_range[1]) %}
-        <span class="bullet {{ 'full' if bullet < value else '' }}"></span>
-    {% endfor %}
+        {%- for bullet in range(cfa.rating_range[0], cfa.rating_range[1] + 1) -%}
+            <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
+        {%- endfor -%}
     </span>
 {% endmacro %}
 
-{% macro _render_review(cfa, review) %}
+{% macro _render_review(cfa, review, form, management=false) %}
+    {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
-        <div class="i-timeline-item-box header-indicator">
+        <div class="i-timeline-item-box header-indicator review-results">
             <div class="i-box-header flex">
                 <div class="stretch">
                     {% trans name=review.user.name -%}
@@ -105,9 +149,15 @@
                         </span>
                     {% endif %}
                 </div>
+                {% if can_change_review %}
+                    <div>
+                        <a class="i-button-icon icon-edit change-review-button"
+                           title="{% trans %}Change review{% endtrans %}"></a>
+                    </div>
+                {% endif %}
             </div>
             {% if review.ratings %}
-                {% for rating in review.ratings %}
+                {% for rating in review.ratings|sort(attribute='question.position') %}
                     <ul class="abstract-question-list">
                         <li>
                             <label>{{ rating.question.text }}</label>
@@ -129,4 +179,7 @@
             {% endif %}
         </div>
     </div>
+    {% if can_change_review %}
+        {{ render_review_box(form, review.abstract, review.track, edit=true, management=management) }}
+    {% endif %}
 {% endmacro %}

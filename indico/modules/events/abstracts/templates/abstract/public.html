@@ -187,9 +187,9 @@
                 </div>
                 <div>
                     {% if abstract.contribution %}
-                        {% trans url=url_for('contributions.display_contribution', abstract.contribution) %}
-                            <a href="{{ url }}">Go to contribution</a>
-                        {% endtrans %}
+                        <a href="{{ url_for('contributions.display_contribution', abstract.contribution) }}">
+                            {% trans %}Go to contribution{%- endtrans %}
+                        </a>
                     {% endif %}
                 </div>
             {% elif abstract.state.name == 'merged' %}
@@ -396,8 +396,9 @@
                                 <div>
                                     <a class="i-button-icon icon-remove"
                                        title="{% trans %}Reset judgement{% endtrans %}"
-                                       data-href="{{ url_for('.reset_abstract_judgment', abstract) }}"
+                                       data-href="{{ url_for('.reset_abstract_judgment', abstract, management=management) }}"
                                        data-method="POST"
+                                       data-update='{"display_html": ".mainContent .col2", "management_html": ".management-page"}'
                                        data-title="{% trans %}Reset judgment{% endtrans %}"
                                        data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
                                 </div>
@@ -406,7 +407,7 @@
                         <div class="i-box-content">
                             {% if abstract.state.name == 'accepted' %}
                                 {% if abstract.contribution %}
-                                    {% set link_start = '<a href="' + url_for('contributions.display_contribution', abstract.contribution) + '">' %}
+                                    {% set link_start = '<a href="%s">'|format(url_for('contributions.display_contribution', abstract.contribution)) %}
                                     {% set link_end = '</a>' %}
                                 {% else %}
                                     {% set link_start = '' %}

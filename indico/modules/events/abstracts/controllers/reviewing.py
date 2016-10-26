@@ -17,20 +17,26 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import flash, request, session, jsonify
+from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import AbstractMixin
+from indico.modules.events.abstracts.controllers.base import AbstractMixin, build_review_form, render_abstract_page
+from indico.modules.events.abstracts.forms import AbstractJudgmentForm
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
+from indico.modules.events.abstracts.models.reviews import AbstractReview
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
+from indico.modules.events.abstracts.operations import judge_abstract, reset_abstract_judgment
+from indico.modules.events.tracks.models.tracks import Track
+from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
+from indico.web.util import jsonify_data
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-class RHAbstractsReviewBase(AbstractMixin, RHConferenceBaseDisplay):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.abstract
-        }
-    }
+class RHAbstractReviewBase(AbstractMixin, RHConferenceBaseDisplay):
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
@@ -39,9 +45,10 @@ class RHAbstractsReviewBase(AbstractMixin, RHConferenceBaseDisplay):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         AbstractMixin._checkParams(self)
+        self.management = request.view_args.get('management')
 
 
-class RHAbstractsDownloadAttachment(RHAbstractsReviewBase):
+class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
     """Download an attachment file belonging to an abstract."""
 
     normalize_url_spec = {
@@ -51,8 +58,98 @@ class RHAbstractsDownloadAttachment(RHAbstractsReviewBase):
     }
 
     def _checkParams(self, params):
-        RHAbstractsReviewBase._checkParams(self, params)
+        RHAbstractReviewBase._checkParams(self, params)
         self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
 
     def _process(self):
         return self.abstract_file.send()
+
+
+class RHListOtherAbstracts(RHConferenceBaseDisplay):
+    """AJAX endpoint that lists all abstracts in the event (dict representation)."""
+
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.excluded_ids = set(request.form.getlist('excluded_abstract_id'))
+
+    def _process(self):
+        query = (Abstract
+                 .query.with_parent(self.event_new)
+                 .options(joinedload('submitter').lazyload('*'))
+                 .filter(Abstract.id.notin_(self.excluded_ids))
+                 .order_by(Abstract.friendly_id))
+
+        result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
+                   'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
+                  for abstract in query
+                  if abstract.can_access(session.user)]
+        return jsonify(result)
+
+
+class RHJudgeAbstract(RHAbstractReviewBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = AbstractJudgmentForm(abstract=self.abstract)
+        if form.validate_on_submit():
+            judgment_data, abstract_data = form.split_data
+            judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+
+        tpl = get_template_module('events/abstracts/abstract/judge.html')
+        return jsonify_data(box_html=tpl.render_decision_box(self.abstract, form, management=self.management))
+
+
+class RHResetAbstractJudgment(RHAbstractReviewBase):
+    def _process(self):
+        if self.abstract.state not in (AbstractState.submitted, AbstractState.withdrawn):
+            reset_abstract_judgment(self.abstract)
+            flash(_("Abstract judgment has been reset"), 'success')
+        html = render_abstract_page(self.abstract, management=self.management)
+        return jsonify_data(display_html=html, management_html=html)
+
+
+class RHReviewAbstractForTrack(RHAbstractReviewBase):
+    CSRF_ENABLED = True
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.abstract
+        },
+        'preserved_args': {'track_id'}
+    }
+
+    def _checkProtection(self):
+        if not self.abstract.can_review(session.user, check_state=True):
+            raise Forbidden
+        RHAbstractReviewBase._checkProtection(self)
+
+    def _checkParams(self, params):
+        RHAbstractReviewBase._checkParams(self, params)
+        self.track = Track.get_one(request.view_args['track_id'])
+        reviews = self.abstract.get_reviews(user=session.user, track=self.track)
+        self.review = reviews[0] if reviews else None
+
+    def _process(self):
+        form = build_review_form(self.abstract, self.track)
+
+        if form.validate_on_submit():
+            if self.review:
+                form.populate_obj(self.review)
+                for question in self.event_new.abstract_review_questions:
+                    rating = question.get_review_rating(self.review)
+                    if not rating:
+                        rating = AbstractReviewRating(question=question, review=self.review)
+                    rating.value = int(form.data["question_{}".format(question.id)])
+            else:
+                self.review = AbstractReview(abstract=self.abstract, track=self.track, user=session.user)
+                form.populate_obj(self.review)
+                for question in self.event_new.abstract_review_questions:
+                    value = int(form.data["question_{}".format(question.id)])
+                    self.review.ratings.append(
+                        AbstractReviewRating(question=question, value=value))
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+        tpl = get_template_module('events/abstracts/abstract/review.html')
+        return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))

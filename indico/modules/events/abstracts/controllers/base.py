@@ -16,10 +16,37 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import render_template, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.forms import AbstractJudgmentForm, make_review_form
+from indico.web.forms.base import FormDefaults
+
+
+def build_review_form(abstract, track):
+    review_form_class = make_review_form(abstract.event_new)
+    reviews_for_track = abstract.get_reviews(user=session.user, track=track)
+    review_for_track = reviews_for_track[0] if reviews_for_track else None
+
+    if review_for_track:
+        answers = {'question_{}'.format(rating.question.id): rating.value
+                   for rating in review_for_track.ratings}
+        defaults = FormDefaults(obj=review_for_track, **answers)
+    else:
+        defaults = FormDefaults()
+
+    return review_form_class(prefix="track-{}".format(track.id), obj=defaults, abstract=abstract)
+
+
+def render_abstract_page(abstract, management=False):
+    review_forms = {track.id: build_review_form(abstract, track)
+                    for track in abstract.reviewed_for_tracks
+                    if track.can_review(session.user)}
+    judgment_form = AbstractJudgmentForm(abstract=abstract)
+
+    return render_template('events/abstracts/abstract.html', abstract=abstract, judgment_form=judgment_form,
+                           review_forms=review_forms, management=management, no_javascript=True)
 
 
 class AbstractMixin:
@@ -35,3 +62,17 @@ class AbstractMixin:
     def _checkProtection(self):
         if not self.abstract.can_access(session.user):
             raise Forbidden
+
+
+class AbstractPageMixin(AbstractMixin):
+    """Display abstract page"""
+
+    def _process(self):
+        review_forms = {track.id: build_review_form(self.abstract, track)
+                        for track in self.abstract.reviewed_for_tracks
+                        if track.can_review(session.user)}
+        judgment_form = AbstractJudgmentForm(abstract=self.abstract)
+
+        return self.page_class.render_template('abstract.html', self._conf, abstract=self.abstract,
+                                               judgment_form=judgment_form, review_forms=review_forms,
+                                               management=self.management)

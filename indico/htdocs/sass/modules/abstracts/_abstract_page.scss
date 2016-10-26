@@ -20,6 +20,20 @@
 @import 'partials/boxes';
 @import 'partials/icons';
 
+%rating-bullet {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0.8em;
+    height: 1.2em;
+    margin-right: 0.2em;
+    border-radius: 1em;
+    background-color: $pastel-gray;
+}
+
+%rating-bullet-selected {
+    background-color: $blue;
+}
+
 #abstract-title {
     display: flex;
 
@@ -218,11 +232,11 @@
 
     > li {
         label {
+            @include border-right($width: 2px);
             color: $dark-gray;
             font-weight: normal;
             font-style: italic;
 
-            border-right: 2px solid $pastel-gray;
             padding-right: 0.5em;
         }
 
@@ -233,19 +247,41 @@
                 color: $light-black;
             }
 
-            .rating {
-                .bullet {
-                    display: inline-block;
-                    vertical-align: middle;
-                    width: 0.5em;
-                    height: 1em;
-                    border-radius: 1em;
-                    background-color: $pastel-gray;
-
-                    &.full {
-                        background-color: $pastel-green;
-                    }
+            .rating .bullet {
+                @extend %rating-bullet;
+                &.full {
+                    @extend %rating-bullet-selected;
                 }
             }
         }
+    }
+}
+
+.rating-widget {
+    user-select: none;
+    display: flex;
+    flex-direction: row-reverse;
+
+    input[type="radio"] {
+        display: none;
+
+        &:checked ~ label.bullet {
+            @extend %rating-bullet-selected;
+        }
+    }
+    .bullet {
+        @extend %rating-bullet;
+        cursor: pointer;
+    }
+
+    .rating-value {
+        margin-left: 0.25em;
+        font-size: 1.2em;
+        line-height: 1.1;
+        width: 0.5em;
+    }
+}
+
+.abstract-review-box.weak-hidden {
+    display: none;
 }
