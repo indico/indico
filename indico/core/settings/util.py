@@ -50,7 +50,9 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
     settings = dict(proxy.defaults)
     if acl_cls and proxy.acl_names:
         settings.update({name: set() for name in proxy.acl_names})
-    settings.update({k: proxy._convert_to_python(k, v) for k, v in cls.get_all(proxy.module, **kwargs).iteritems()})
+    settings.update({k: proxy._convert_to_python(k, v)
+                     for k, v in cls.get_all(proxy.module, **kwargs).iteritems()
+                     if not proxy.strict or k in proxy.defaults})
     if acl_cls and proxy.acl_names:
         settings.update(acl_cls.get_all_acls(proxy.module, **kwargs))
     return settings
