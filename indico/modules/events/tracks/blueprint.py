@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHCreateTrackOld, RHEditTrack,
+from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHEditTrack,
                                                       RHSortTracks, RHDeleteTrack, RHDisplayTracks, RHTracksPDF)
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -31,5 +31,3 @@ _bp.add_url_rule('/manage/tracks/<int:track_id>', 'delete_track', RHDeleteTrack,
 
 _bp.add_url_rule('/program', 'program', RHDisplayTracks)
 _bp.add_url_rule('/program.pdf', 'program_pdf', RHTracksPDF)
-
-_bp.add_url_rule('/manage/tracks/create-old', 'create_track_old', RHCreateTrackOld, methods=('GET', 'POST'))

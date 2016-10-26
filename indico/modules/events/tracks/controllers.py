@@ -27,7 +27,6 @@ from indico.modules.events.tracks.operations import create_track, update_track, 
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_form, jsonify_data
@@ -77,7 +76,8 @@ class RHCreateTrack(RHManageTracksBase):
         if form.validate_on_submit():
             track = create_track(self.event_new, form.data)
             flash(_('Track "{}" has been created.').format(track.title), 'success')
-            return jsonify_data(html=_render_track_list(self.event_new))
+            return jsonify_data(html=_render_track_list(self.event_new), new_track_id=track.id,
+                                tracks=[{'id': t.id, 'title': t.title} for t in self.event_new.tracks])
         return jsonify_form(form)
 
 
@@ -105,22 +105,6 @@ class RHDeleteTrack(RHManageTrackBase):
         delete_track(self.track)
         flash(_('Track "{}" has been deleted.').format(self.track.title), 'success')
         return jsonify_data(html=_render_track_list(self.event_new))
-
-
-class RHCreateTrackOld(RHManageTracksBase):
-    """Create a track"""
-
-    def _process(self):
-        form = TrackForm()
-        if form.validate_on_submit():
-            track = self._conf.newTrack()
-            track.setTitle(form.title.data.encode('utf-8'))
-            track.setDescription(form.description.data.encode('utf-8'))
-            self._conf.addTrack(track)
-            return jsonify_data(flash=False, new_track_id=int(track.getId()),
-                                tracks=[{'id': int(t.getId()), 'title': to_unicode(t.getTitle())}
-                                        for t in self._conf.getTrackList()])
-        return jsonify_form(form)
 
 
 class RHDisplayTracks(RHConferenceBaseDisplay):
