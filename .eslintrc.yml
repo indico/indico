@@ -118,3 +118,4 @@ globals:
   handleAjaxError: false
   ajaxDialog: false
   cornerMessage: false
+  enableIfChecked: false
