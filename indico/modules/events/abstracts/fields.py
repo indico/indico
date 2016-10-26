@@ -78,6 +78,11 @@ class EmailRuleListField(JSONField):
             } for c in self.accepted_condition_types
         }
 
+    def pre_validate(self, form):
+        super(EmailRuleListField, self).pre_validate(form)
+        if not all(self.data):
+            raise ValueError(_('Rules may not be empty'))
+
     def _value(self):
         return super(EmailRuleListField, self)._value() if self.data else '[]'
 
