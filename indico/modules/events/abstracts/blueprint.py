@@ -32,7 +32,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHResetAbstractJudgment,
-                                                                    RHBulkAbstractJudgment)
+                                                                    RHBulkAbstractJudgment, RHAbstractNotificationLog)
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractsDownloadAttachment
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -41,6 +41,7 @@ _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', templ
 
 # Display pages
 _bp.add_url_rule('/abstracts/<int:abstract_id>/', 'display_abstract', RHDisplayAbstract)
+_bp.add_url_rule('/abstracts/<int:abstract_id>/notifications', 'notification_log', RHAbstractNotificationLog)
 _bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_pdf_export', RHDisplayAbstractExportPDF)
 _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
                  RHAbstractsDownloadAttachment)

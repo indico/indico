@@ -21,6 +21,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request, session
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
@@ -130,6 +131,17 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
                                num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+
+
+class RHAbstractNotificationLog(RHManageAbstractBase):
+
+    def _checkProtection(self):
+        RHManageAbstractBase._checkProtection(self)
+        if not self.abstract.can_judge(session.user, check_state=False):
+            raise Forbidden
+
+    def _process(self):
+        return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
 
 
 class RHResetAbstractJudgment(RHManageAbstractBase):
