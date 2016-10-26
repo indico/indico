@@ -45,6 +45,7 @@ from indico.modules.events.abstracts.settings import (abstracts_settings, boa_se
                                                       BOACorrespondingAuthorType, BOASortField)
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
@@ -174,6 +175,7 @@ class AbstractMigration(object):
 
     def run(self):
         self.importer.print_success(cformat('%{blue!}{}').format(self.event), event_id=self.event.id)
+        self._migrate_feature()
         self._migrate_tracks()
         self._migrate_boa_settings()
         self._migrate_settings()
@@ -205,6 +207,10 @@ class AbstractMigration(object):
 
     def _event_to_utc(self, dt):
         return self.event.tzinfo.localize(dt).astimezone(utc)
+
+    def _migrate_feature(self):
+        if self.amgr._activated:
+            set_feature_enabled(self.event, 'abstracts', True)
 
     def _migrate_tracks(self):
         program = convert_to_unicode(getattr(self.conf, 'programDescription', ''))

@@ -1,7 +1,7 @@
 """Add abstracts tables
 
 Revision ID: 2ce1756a2f12
-Revises: 5596683819c9
+Revises: ccd9d0858ff
 Create Date: 2016-08-22 14:57:28.005919
 """
 
@@ -16,7 +16,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '2ce1756a2f12'
-down_revision = '5596683819c9'
+down_revision = 'ccd9d0858ff'
 
 
 def upgrade():
