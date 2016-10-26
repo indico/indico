@@ -67,7 +67,7 @@ class AbstractSettingsCloner(EventCloner):
             new_event.abstract_email_templates.append(tpl)
 
     def _clone_email_template_rule(self, old_rule):
-        rule = {'state': [old_rule['state']]}
+        rule = {'state': old_rule['state']}
         if 'track' in old_rule:
             try:
                 rule['track'] = [self._track_id_map[t] for t in old_rule['track']]
