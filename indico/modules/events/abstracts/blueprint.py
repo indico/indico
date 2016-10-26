@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.abstracts.controllers.boa import RHManageBOA, RHExportBOA
 from indico.modules.events.abstracts.controllers.display import RHDisplayAbstract, RHDisplayAbstractExportPDF
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHPreviewEmailTemplate,
                                                                          RHSortEmailTemplates)
-from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHManageBOA, RHAbstractList,
+from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract,
                                                                     RHManageAbstractReviewing, RHCreateAbstract,
@@ -31,7 +32,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractsExportCSV, RHAbstractsExportExcel,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHResetAbstractJudgment,
-                                                                    RHBulkAbstractJudgment, RHExportBOA)
+                                                                    RHBulkAbstractJudgment)
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractsDownloadAttachment
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -44,13 +45,15 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_
 _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
                  RHAbstractsDownloadAttachment)
 
+# Book of Abstracts
+_bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
+_bp.add_url_rule('/book-of-abstracts.pdf', 'export_boa', RHExportBOA)
+
 # Management
 _bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', RHAbstracts)
 _bp.add_url_rule('/manage/abstracts/schedule', 'schedule_abstracts_call', RHScheduleCFA, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/open', 'open_abstracts_call', RHOpenCFA, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/close', 'close_abstracts_call', RHCloseCFA, methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))
-_bp.add_url_rule('/book-of-abstracts.pdf', 'export_boa', RHExportBOA)
 _bp.add_url_rule('/manage/abstracts/settings', 'manage_submission_settings', RHManageAbstractSubmission,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings', RHManageAbstractReviewing,

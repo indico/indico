@@ -24,7 +24,7 @@ from flask import redirect, flash, jsonify, request, session
 
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
-from indico.modules.events.abstracts.forms import (BOASettingsForm, AbstractSubmissionSettingsForm,
+from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, AbstractJudgmentForm,
                                                    BulkAbstractJudgmentForm)
@@ -34,7 +34,7 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
                                                         close_cfa, judge_abstract, reset_abstract_judgment)
-from indico.modules.events.abstracts.settings import boa_settings, abstracts_settings, abstracts_reviewing_settings
+from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (AbstractListGenerator, make_abstract_form, get_roles_for_event,
                                                   generate_spreadsheet_from_abstracts)
 from indico.modules.events.abstracts.views import WPManageAbstracts
@@ -47,7 +47,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF, AbstractBook
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -195,26 +195,6 @@ class RHCloseCFA(RHManageAbstractsBase):
         close_cfa(self.event_new)
         flash(_("Call for abstracts is now closed"), 'success')
         return redirect(url_for('.manage_abstracts', self.event_new))
-
-
-class RHManageBOA(RHManageAbstractsBase):
-    """Configure book of abstracts"""
-
-    def _process(self):
-        form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event_new)))
-        if form.validate_on_submit():
-            boa_settings.set_multi(self.event_new, form.data)
-            flash(_('Book of Abstract settings have been saved'), 'success')
-            return jsonify_data()
-        return jsonify_form(form)
-
-
-class RHExportBOA(RHManageAbstractsBase):
-    """Export book of abstracts"""
-
-    def _process(self):
-        pdf = AbstractBook(self.event_new)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHManageAbstractSubmission(RHManageAbstractsBase):
