@@ -17,10 +17,14 @@
 
 
 %inner-border-base {
-    content: ".";
-    color: transparent;
-    font-size: 0;
-    position: absolute;
+    position: relative;
+
+    &:before {
+        content: ".";
+        color: transparent;
+        font-size: 0;
+        position: absolute;
+    }
 }
 
 @mixin border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
@@ -55,8 +59,9 @@
 }
 
 @mixin inner-border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @extend %inner-border-base;
+
     &:before {
-        @extend %inner-border-base;
         @include border-top($color, $style, $width);
         width: 100%;
         left: 0;
@@ -65,8 +70,9 @@
 }
 
 @mixin inner-border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @extend %inner-border-base;
+
     &:before {
-        @extend %inner-border-base;
         @include border-right($color, $style, $width);
         height: 100%;
         right: 0;
@@ -75,8 +81,9 @@
 }
 
 @mixin inner-border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @extend %inner-border-base;
+
     &:before {
-        @extend %inner-border-base;
         @include border-bottom($color, $style, $width);
         height: 100%;
         left: 0;
@@ -85,8 +92,9 @@
 }
 
 @mixin inner-border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @extend %inner-border-base;
+
     &:before {
-        @extend %inner-border-base;
         @include border-left($color, $style, $width);
         height: 100%;
         left: 0;
