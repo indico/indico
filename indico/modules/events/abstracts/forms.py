@@ -207,6 +207,17 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
         super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
         self.duplicate_of.excluded_abstract_ids = set(kwargs['abstract_id'])
         self.merged_into.excluded_abstract_ids = set(kwargs['abstract_id'])
+        if kwargs['judgment']:
+            self._remove_unused_fields(kwargs['judgment'])
+
+    def _remove_unused_fields(self, judgment):
+        for field in list(self):
+            validator = next((v for v in field.validators if isinstance(v, HiddenUnless) and v.field == 'judgment'),
+                             None)
+            if validator is None:
+                continue
+            if validator.value.name != judgment:
+                delattr(self, field.name)
 
     def is_submitted(self):
         return super(BulkAbstractJudgmentForm, self).is_submitted() and 'submitted' in request.form
