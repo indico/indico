@@ -52,6 +52,10 @@
                                         <td class="i-table" data-searchable="{{ abstract.state.title | lower }}">
                                             {{- abstract.state.title -}}
                                         </td>
+                                    {% elif item.id == 'submitter' %}
+                                        <td class="i-table" data-searchable="{{ abstract.submitter.full_name }}">
+                                            {{- abstract.submitter.full_name -}}
+                                        </td>
                                     {% elif item.id == 'authors' %}
                                         <td class="i-table person-row-cell"
                                             data-searchable="{{ abstract.primary_authors | join(', ', attribute='name') | lower }}">
