@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict, namedtuple
 
 from flask import request, flash
-from sqlalchemy.orm import joinedload, subqueryload, joinedload
+from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -56,6 +56,7 @@ class AbstractListGenerator(ListGeneratorBase):
         type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
         self.static_items = OrderedDict([
             ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
+            ('submitter', {'title': _('Submitter')}),
             ('authors', {'title': _('Primary authors')}),
             ('accepted_track', {'title': _('Accepted track'),
                                 'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
@@ -108,7 +109,8 @@ class AbstractListGenerator(ListGeneratorBase):
     def _build_query(self):
         return (Abstract.query
                 .with_parent(self.event)
-                .options(joinedload('accepted_track'),
+                .options(joinedload('submitter'),
+                         joinedload('accepted_track'),
                          joinedload('accepted_contrib_type'),
                          joinedload('submitted_contrib_type'),
                          subqueryload('field_values'),
@@ -239,6 +241,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     field_names = ['ID', 'Title']
     static_item_mapping = OrderedDict([
         ('state', ('State', lambda x: x.state.title)),
+        ('submitter', ('Submitter', lambda x: x.submitter.full_name)),
         ('authors', ('Primary authors', lambda x: [a.full_name for a in x.primary_authors])),
         ('accepted_track', ('Accepted track', lambda x: x.accepted_track.title if x.accepted_track else None)),
         ('submitted_for_tracks', ('Submitted for tracks',
