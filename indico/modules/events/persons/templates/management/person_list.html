@@ -152,34 +152,30 @@
                     <tr class="i-table">
                         <th class="i-table checkbox-column" data-sorter="false"></th>
                         <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
-                        <th class="i-table">{% trans %}Email{% endtrans %}</th>
+                        <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                         <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
-                        <th class="i-table"></th>
+                        <th class="i-table" data-sorter="false"></th>
                         {%- if event.type != 'lecture' -%}
-                            <th class="i-table"></th>
-                            <th class="i-table"></th>
-                            <th class="i-table"></th>
+                            <th class="i-table" data-sorter="false"></th>
+                            <th class="i-table" data-sorter="false"></th>
+                            <th class="i-table" data-sorter="false"></th>
                         {% endif %}
-                        <th class="i-table"></th>
-                        <th class="i-table"></th>
-                        <th class="i-table"></th>
+                        <th class="i-table" data-sorter="false"></th>
+                        <th class="i-table" data-sorter="false"></th>
+                        <th class="i-table" data-sorter="false"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for person_data in persons -%}
                         <tr id="person-{{ person_data.person.id }}" class="i-table"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
-                                {% if person_data.roles.no_account %}
-                            data-no-account
-                                {% endif %}
-                                {% if person_data.person.invited_dt %}
-                            data-already-invited
-                                {% endif %}>
+                            {% if person_data.roles.no_account %}data-no-account{% endif %}
+                            {% if person_data.person.invited_dt %}data-already-invited{% endif %}>
                             {{ render_person_row(person_data) }}
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
-                            <td colspan="{{ 7 if event.type == 'lecture' else 10 }}">
+                            <td colspan="{{ 8 if event.type == 'lecture' else 11 }}">
                                 {%- trans %}No persons{% endtrans -%}
                             </td>
                         </tr>
