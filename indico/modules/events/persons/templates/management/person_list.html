@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block content %}
+    {%- set has_no_account = persons|selectattr('roles.no_account')|any -%}
+    {%- set has_uninvited = persons|selectattr('roles.no_account')|selectattr('person.invited_dt', 'none')|any -%}
+
     <div id="person-list">
         <div class="flashed-messages"></div>
         <div>
@@ -81,7 +84,9 @@
                     </div>
                 {% endif %}
                 <div class="group">
-                    <a id="no-account-dropdown" href="#" class="i-button arrow highlight disabled js-dropdown" data-toggle="dropdown">
+                    <a href="#"
+                       class="i-button arrow highlight js-dropdown {{ 'disabled' if not has_no_account }}"
+                       data-toggle="dropdown">
                         {% trans %}Send invitation{% endtrans %}
                     </a>
                     <ul class="dropdown">
@@ -94,21 +99,25 @@
                                data-method="POST"
                                data-ajax-dialog
                                data-reload-after>
-                                {% trans %}To all users with no account{% endtrans %}</a>
+                                {% trans %}To all users with no account{% endtrans %}
+                            </a>
                         </li>
-                        <li>
-                            <a href="#" id="not-invited-only"
-                               title="{% trans %}Send an email to all users with no Indico account who have not
-                                     received an invitation email yet{% endtrans %}"
-                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
-                                                      not_invited_only=true) }}"
-                               data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
-                               data-title="{% trans %}Send email{% endtrans %}"
-                               data-method="POST"
-                               data-ajax-dialog
-                               data-reload-after>
-                                {% trans %}To users not invited yet{% endtrans %}</a>
-                        </li>
+                        {% if has_uninvited %}
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Send an email to all users with no Indico account who have not
+                                         received an invitation email yet{% endtrans %}"
+                                   data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
+                                                          not_invited_only=true) }}"
+                                   data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
+                                   data-title="{% trans %}Send email{% endtrans %}"
+                                   data-method="POST"
+                                   data-ajax-dialog
+                                   data-reload-after>
+                                    {% trans %}To users not invited yet{% endtrans %}
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="right">
@@ -169,8 +178,7 @@
                     {% for person_data in persons -%}
                         <tr id="person-{{ person_data.person.id }}" class="i-table"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
-                            {% if person_data.roles.no_account %}data-no-account{% endif %}
-                            {% if person_data.person.invited_dt %}data-already-invited{% endif %}>
+                            {{ 'data-no-account' if person_data.roles.no_account }}>
                             {{ render_person_row(person_data) }}
                         </tr>
                     {%- else -%}

@@ -104,12 +104,6 @@
             }
         });
 
-        if ($('#person-list [data-no-account]').length > 0) {
-            $('#no-account-dropdown').removeClass('disabled');
-        }
-        if ($('#person-list [data-no-account]').length === $('#person-list [data-already-invited]').length) {
-            $('#not-invited-only').parent().hide();
-        }
         if (options.hasNoAccountFilter) {
             $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
                 switchTo('persons');
