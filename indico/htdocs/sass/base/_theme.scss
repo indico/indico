@@ -15,66 +15,69 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@mixin _semantic-background($color) {
+    @include border-all($color);
+    background: $color;
+}
+
+@mixin _semantic-outline($color) {
+    @include border-all($color);
+    color: $color;
+}
+
 %semantic-background {
+    @include _semantic-background($dark-gray);
     color: white;
-    background: $dark-gray;
 
     &.highlight {
-        background: $blue;
+        @include _semantic-background($blue);
     }
 
     &.success {
-        background: $green;
+        @include _semantic-background($green);
     }
 
     &.error {
-        background: $red;
+        @include _semantic-background($red);
     }
 
     &.warning {
-        background: $yellow;
+        @include _semantic-background($yellow);
     }
 
     &.visited {
-        background: $purple;
+        @include _semantic-background($purple);
     }
 
     &.strong {
-        background: $black;
+        @include _semantic-background($black);
     }
 }
 
 %semantic-outline {
-    @include border-all($dark-gray);
-    color: $dark-gray;
+    @include _semantic-outline($dark-gray);
 
     &.highlight {
-        border-color: $blue;
-        color: $blue;
+        @include _semantic-outline($blue);
     }
 
     &.success {
-        border-color: $green;
-        color: $green;
+        @include _semantic-outline($green);
     }
 
     &.error {
-        border-color: $red;
-        color: $red;
+        @include _semantic-outline($red);
     }
 
     &.warning {
-        border-color: $yellow;
-        color: $yellow;
+        @include _semantic-outline($yellow);
     }
 
     &.visited {
-        border-color: $purple;
-        color: $purple;
+        @include _semantic-outline($purple);
     }
 
     &.strong {
-        border-color: $black;
-        color: $black;
+        @include _semantic-outline($black);
     }
 }
