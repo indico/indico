@@ -42,17 +42,6 @@
             hasNoAccountFilter: false
         }, options);
 
-        function switchTo(what) {
-            if (what === 'persons') {
-                if ($('#filter-no-account').prop('checked')) {
-                    $('#filter-no-account').prop('checked', false);
-                }
-            } else {
-                $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
-            }
-            refreshPersonFilters();
-        }
-
         enableIfChecked('#person-list', '.select-row:visible', '#person-list .js-requires-selected-row');
         $('#person-list [data-toggle=dropdown]').closest('.group').dropdown();
         $('#person-list [data-filter]').on('click', refreshPersonFilters);
@@ -106,12 +95,14 @@
 
         if (options.hasNoAccountFilter) {
             $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
-                switchTo('persons');
+                $('#filter-no-account').prop('checked', false);
+                refreshPersonFilters();
             });
             $('#filter-no-account').on('change', function() {
                 if (this.checked) {
-                    switchTo('no-account');
+                    $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
                 }
+                refreshPersonFilters();
             });
         }
     };

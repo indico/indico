@@ -61,7 +61,7 @@ class RHPersonsBase(RHConferenceModifBase):
 
         chairpersons = {link.person for link in self.event_new.person_links}
         persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
+                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(lambda: False)})
 
         event_persons_query = (self.event_new.persons.options(event_strategy, contribution_strategy,
                                                               subcontribution_strategy, session_block_strategy).all())
@@ -124,8 +124,7 @@ class RHPersonsList(RHPersonsBase):
                                    .join(Session).options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
-        person_list = sorted(persons.viewvalues(),
-                             key=lambda x: x['person'].display_full_name.lower())
+        person_list = sorted(persons.viewvalues(), key=lambda x: x['person'].display_full_name.lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
