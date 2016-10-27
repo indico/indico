@@ -21,7 +21,8 @@ from indico.modules.events.abstracts.controllers.display import (RHDisplayAbstra
                                                                  RHMyAbstracts, RHMyAbstractsExportPDF)
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
-                                                                         RHDeleteEmailTemplate, RHSortEmailTemplates)
+                                                                         RHDeleteEmailTemplate, RHSortEmailTemplates,
+                                                                         RHEmailTemplateREST)
 from indico.modules.events.abstracts.controllers.management import (RHAbstracts, RHAbstractList,
                                                                     RHAbstractListCustomize, RHAbstractListStaticURL,
                                                                     RHManageAbstractSubmission, RHManageAbstract,
@@ -97,6 +98,8 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit', 'email
                  RHEditEmailTemplateRules, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit-text', 'email_tpl_text_edit',
                  RHEditEmailTemplateText, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_rest',
+                 RHEmailTemplateREST, methods=('PATCH',))
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract, methods=('GET', 'POST'))

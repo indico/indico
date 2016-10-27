@@ -1,10 +1,9 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
 
 {{ form_header(form) }}
+    {{ form_row(form.title) }}
     {% if not is_edit %}
-        {{ form_rows(form, fields=('title', 'default_tpl', 'stop_on_match')) }}
-    {% else %}
-        {{ form_rows(form, fields=('title', 'stop_on_match')) }}
+        {{ form_row(form.default_tpl) }}
     {% endif %}
     {% call form_fieldset(_('Rules')) %}
         {{ form_row(form.rules, skip_label=true) }}
