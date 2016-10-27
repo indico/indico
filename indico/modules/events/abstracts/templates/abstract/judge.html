@@ -1,30 +1,39 @@
 {% from 'forms/_form.html' import simple_form %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
+    {% if abstract.reviewed_for_tracks > 1 %}
+        {% set conflicting_msg = _("Proposed to accept in different tracks") %}
+    {% else %}
+        {% set conflicting_msg = _("All reviewers proposed to accept this abstract "
+                                    "but as different contribution types") %}
+    {% endif %}
     {% set mapping_class = {'positive': 'success',
                             'conflicting': 'visited',
                             'negative': 'error',
                             'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
-                            'in_progress': _("Not reviewed for all tracks"),
-                            'positive': _("All reviewers proposed to accept"),
-                            'conflicting': _("Proposed to accept in different tracks"),
-                            'negative': _("No reviewer proposed to accept"),
-                            'mixed': _("Not all reviewers proposed to accept")} %}
+                            'in_progress': _("Not reviewed in all tracks"),
+                            'positive': _("All reviewers proposed to accept this abstract"),
+                            'conflicting': conflicting_msg,
+                            'negative': _("No reviewer proposed to accept this abstract"),
+                            'mixed': _("Not all reviewers proposed to accept this abstract")} %}
     {% set state = abstract.reviewing_state %}
     <span class="i-tag {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
-        {{ state.title -}}
+        {{- state.title -}}
     </span>
 {% endmacro %}
 
 {% macro _render_abstract_track_reviewing_state(abstract, track) %}
     {% set mapping_class = {'positive': 'success',
+                            'conflicting': 'visited',
                             'negative': 'error',
                             'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
-                            'positive': _("All reviewers proposed to accept"),
-                            'negative': _("No reviewer proposed to accept"),
-                            'mixed': _("Not all reviewers proposed to accept")} %}
+                            'positive': _("All reviewers proposed to accept this abstract"),
+                            'conflicting': _("All reviewers proposed to accept this abstract "
+                                             "but as different contribution types"),
+                            'negative': _("No reviewer proposed to accept this abstract"),
+                            'mixed': _("Not all reviewers proposed to accept this abstract")} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
     <span class="i-tag outline {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
         {{ state.title -}}
