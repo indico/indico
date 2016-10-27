@@ -150,6 +150,7 @@ class _AbstractSubmissionNotification:
         msg.append(tw.fill(_("The submission of your abstract has been successfully processed.")))
         msg.append("")
         tw.break_long_words = False
+        tw.break_on_hyphens = False
         msg.append(tw.fill(i18nformat("""_("Abstract submitted"):\n<%s>.""") % urlHandlers.UHUserAbstracts.getURL(self._conf)))
         msg.append("")
         msg.append(tw.fill(i18nformat("""_("Status of your abstract"):\n<%s>.""") % urlHandlers.UHAbstractDisplay.getURL(self._abstract)))
