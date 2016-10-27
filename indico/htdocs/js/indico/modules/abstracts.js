@@ -99,4 +99,72 @@
             showFormErrors($(this));
         });
     };
+
+    global.setupAbstractEmailTemplatesPage = function setupAbstractEmailTemplatesPage() {
+        $('.js-edit-tpl-dropdown').parent().dropdown();
+        $('.email-templates > ul').sortable({
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            distance: 2,
+            handle: '.ui-i-box-sortable-handle',
+            items: '> li',
+            tolerance: 'pointer',
+            forcePlaceholderSize: true,
+            placeholder: 'regform-section-sortable-placeholder',
+            update: function() {
+                var $elem = $('.email-templates > ul');
+                var sortedList = $elem.find('li.email-template').map(function(i, elem) {
+                    return $(elem).data('id');
+                }).get();
+
+                $.ajax({
+                    url: $elem.data('url'),
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({sort_order: sortedList}),
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError
+                });
+            }
+        });
+
+        $('.email-preview-btn').on('click', function(evt) {
+            evt.preventDefault();
+            var id = $(this).data('id');
+            var $previewBtn = $('#email-preview-btn-' + id);
+            if ($previewBtn.data('visible')) {
+                $previewBtn.text($T.gettext('Show preview'));
+                $('#email-preview-' + id).slideToggle();
+                $previewBtn.data('visible', false);
+            } else {
+                $previewBtn.text($T.gettext('Hide preview'));
+                $('#email-preview-' + id).slideToggle();
+                $previewBtn.data('visible', true);
+            }
+        });
+
+        $('#email-template-manager .ui-i-box-sortable-handle').on('mousedown', function() {
+            $('.email-preview').hide();
+            $('.email-preview-btn').text($T.gettext('Show preview')).data('visible', false);
+        });
+
+        $('.js-toggle-stop-on-match').on('click', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var stopOnMatch = !$this.data('stop-on-match');
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: JSON.stringify({stop_on_match: stopOnMatch}),
+                dataType: 'json',
+                contentType: 'application/json',
+                error: handleAjaxError,
+                success: function() {
+                    $this.data('stop-on-match', stopOnMatch);
+                    $this.toggleClass('danger text-color', stopOnMatch);
+                }
+            });
+        });
+    };
 })(window);

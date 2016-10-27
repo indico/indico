@@ -298,9 +298,6 @@ class EditEmailTemplateRuleForm(IndicoForm):
 
     title = StringField(_("Title"), [DataRequired()])
     rules = EmailRuleListField(_("Rules"), [DataRequired()])
-    stop_on_match = BooleanField(_("Stop on match"), [DataRequired()], widget=SwitchWidget(), default=True,
-                                 description=_("If any of the rules from this email template match, do not "
-                                               "send notifications from any following email template."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -341,7 +338,8 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
         ('accept', _('Accept')),
         ('reject', _('Reject')),
         ('merge', _('Merge'))
-    ], description=_("The template that will be used as a basis for this notification. You can customize it later."))
+    ], description=_("The default template that will be used as a basis for this notification. "
+                     "You can customize it later."))
 
 
 class AbstractForm(IndicoForm):

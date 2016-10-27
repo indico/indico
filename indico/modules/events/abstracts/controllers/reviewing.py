@@ -16,7 +16,6 @@
 
 
 from __future__ import unicode_literals
-
 from flask import flash, request, session, jsonify
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden

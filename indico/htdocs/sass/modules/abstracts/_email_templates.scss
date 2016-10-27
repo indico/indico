@@ -61,6 +61,10 @@
     .email-template-wrapper {
         padding: 0 0 1em 1em;
 
+        .explanation {
+            color: $light-black;
+        }
+
         .email-templates {
             width: 800px;
             max-height: 800px;
@@ -100,10 +104,10 @@
         .email-preview-btn {
             padding-right: 5px;
             color: $link;
-        }
 
-        .email-preview-btn:hover {
-            color: $bright-orange;
+            &:hover {
+                color: $bright-orange;
+            }
         }
     }
 }
@@ -114,6 +118,10 @@
     .form-field,
     .rule-condition[data-condition="track"] select {
         width: 100%;
+    }
+
+    .rule-list {
+        width: 700px;
     }
 }
 

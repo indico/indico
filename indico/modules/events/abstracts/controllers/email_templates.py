@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
+
 from flask import request
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.abstracts.controllers.management import RHManageAbstractsBase
@@ -105,6 +107,23 @@ class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
     def _process(self):
         db.session.delete(self.email_tpl)
         return _render_notification_list(self.event_new, flash=False)
+
+
+class RHEmailTemplateREST(RHEditEmailTemplateBase):
+    """Enable or disable stop on match of a notification template"""
+
+    def _process_PATCH(self):
+        if request.json is None:
+            raise BadRequest('Expected JSON payload')
+
+        invalid_fields = request.json.viewkeys() - {'stop_on_match'}
+        if invalid_fields:
+            raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
+
+        if 'stop_on_match' in request.json:
+            self.email_tpl.stop_on_match = request.json['stop_on_match']
+
+        return jsonify_data(flash=False)
 
 
 def _get_rules_fields(event_new):
