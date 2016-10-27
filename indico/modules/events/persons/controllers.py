@@ -152,17 +152,15 @@ class RHEmailEventPersons(RHConferenceModifBase):
         user_ids = request.form.getlist('user_id')
         recipients = set(self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1'))
         recipients |= set(self._find_users(user_ids))
-        default_body = ''
-        default_subject = ''
         disabled_until_change = True
         if self.no_account:
-            tpl = get_template_module('events/persons/management/invitation.html', event=self.event_new)
-            default_body = tpl.get_html_body()
-            default_subject = tpl.get_subject()
+            tpl = get_template_module('events/persons/emails/invitation.html', event=self.event_new)
             disabled_until_change = False
+        else:
+            tpl = get_template_module('events/persons/emails/generic.html', event=self.event_new)
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
                                      recipients=', '.join(sorted(x.email for x in recipients)),
-                                     body=default_body, subject=default_subject, register_link=self.no_account)
+                                     body=tpl.get_html_body(), subject=tpl.get_subject(), register_link=self.no_account)
         if form.validate_on_submit():
             self._send_emails(form, recipients)
             num = len(recipients)
@@ -178,8 +176,8 @@ class RHEmailEventPersons(RHConferenceModifBase):
                                               event=self.event_new, register_link=self.no_account)
             email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
                                                  event=self.event_new, register_link=self.no_account)
-            email = make_email(to_list=recipient.email, from_address=form.from_address.data,
-                               body=email_body, subject=email_subject, html=True)
+            tpl = get_template_module('events/persons/emails/email.html', subject=email_subject, body=email_body)
+            email = make_email(to_list=recipient.email, from_address=form.from_address.data, template=tpl, html=True)
             send_email(email, self.event_new, 'Event Persons')
 
     def _find_event_persons(self, person_ids, not_invited_only):
