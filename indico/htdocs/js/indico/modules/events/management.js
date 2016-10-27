@@ -18,7 +18,7 @@
 (function(global) {
     'use strict';
 
-    global.refreshPersonFilters = function refreshPersonFilters() {
+    function refreshPersonFilters() {
         var personRows = $('#person-list tr[data-person-roles]');
         var filters = $('#person-list [data-filter]:checked').map(function() {
             return $(this).data('filter');
@@ -35,9 +35,24 @@
         personRows.addClass('hidden');
         visibleEntries.removeClass('hidden');
         $('#person-list').trigger('indico:syncEnableIfChecked');
-    };
+    }
 
-    global.setupEventPersonsList = function setupEventPersonsList() {
+    global.setupEventPersonsList = function setupEventPersonsList(options) {
+        options = $.extend({
+            hasNoAccountFilter: false
+        }, options);
+
+        function switchTo(what) {
+            if (what === 'persons') {
+                if ($('#filter-no-account').prop('checked')) {
+                    $('#filter-no-account').prop('checked', false);
+                }
+            } else {
+                $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
+            }
+            refreshPersonFilters();
+        }
+
         enableIfChecked('#person-list', '.select-row:visible', '#person-list .js-requires-selected-row');
         $('#person-list [data-toggle=dropdown]').closest('.group').dropdown();
         $('#person-list [data-filter]').on('click', refreshPersonFilters);
@@ -77,7 +92,7 @@
                     $.each(items, function() {
                         var item = $('<li>');
                         if (this.url) {
-                            item.append($('<a>', {text: this.title, 'href': this.url}));
+                            item.append($('<a>', {text: this.title, href: this.url}));
                         } else {
                             item.text(this.title);
                         }
@@ -88,11 +103,22 @@
                 }
             }
         });
+
         if ($('#person-list [data-no-account]').length > 0) {
             $('#no-account-dropdown').removeClass('disabled');
         }
         if ($('#person-list [data-no-account]').length === $('#person-list [data-already-invited]').length) {
             $('#not-invited-only').parent().hide();
+        }
+        if (options.hasNoAccountFilter) {
+            $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
+                switchTo('persons');
+            });
+            $('#filter-no-account').on('change', function() {
+                if (this.checked) {
+                    switchTo('no-account');
+                }
+            });
         }
     };
 

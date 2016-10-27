@@ -1,4 +1,4 @@
-{% extends 'events/persons/management/_person_list_base.html' %}
+{% extends 'layout/base.html' if event.type == 'lecture' else 'layout/full_content_base.html' %}
 
 {% from 'events/persons/management/_person_list_row.html' import render_person_row %}
 {% from 'message_box.html' import message_box %}
@@ -7,104 +7,190 @@
     {% trans %}Event Roles{% endtrans %}
 {% endblock %}
 
-{% block filters %}
-    <div id="person-filters" class="group i-selection">
-        <span class="i-button label">{% trans %}Show{% endtrans %}</span>
-        <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
-        <label for="filter-chairpersons" class="i-button">
-            {%- if event.type == 'lecture' -%}
-                {%- trans %}Speakers{% endtrans -%}
-            {%- else -%}
-                {%- trans %}Chairpersons{% endtrans -%}
-            {%- endif -%}
-        </label>
-        {% if event.type != 'lecture' %}
-            <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
-            <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-            <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
-            <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
-        {% endif %}
-        <span class="i-button label">{% trans %}or{% endtrans %}</span>
-        <input type="checkbox" id="filter-no-account" data-filter="no_account">
-        <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
-    </div>
-{% endblock %}
-
-{% block persons %}
-    {% if num_no_account %}
-        {% call message_box('warning') %}
-            {% trans count = num_no_account -%}
-                There is one user with no Indico account. An Indico account may be needed to upload materials and/or
-                manage contents.
-            {%- pluralize -%}
-                There are {{ count }} users with no Indico account. An Indico account may be needed to upload materials
-                and/or manage contents.
-            {%- endtrans -%}
-        {% endcall %}
-    {% endif %}
-    <table id="person-list" class="i-table-widget tablesorter">
-        <thead>
-            <tr class="i-table">
-                <th class="i-table checkbox-column" data-sorter="false"></th>
-                <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
-                <th class="i-table">{% trans %}Email{% endtrans %}</th>
-                <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
-                <th class="i-table"></th>
-                {%- if event.type != 'lecture' -%}
-                    <th class="i-table"></th>
-                    <th class="i-table"></th>
-                    <th class="i-table"></th>
+{% block content %}
+    <div id="person-list">
+        <div class="flashed-messages"></div>
+        <div>
+            <div class="toolbar form-group">
+                <div class="group">
+                    <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" data-select-all="#person-list input.select-row:visible:not(:disabled)">
+                                {% trans %}All{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-select-none="#person-list input.select-row:visible">
+                                {% trans %}None{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="group">
+                    <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
+                       data-href="{{ url_for('persons.email_event_persons', event) }}"
+                       data-title="{% trans %}Send email{% endtrans %}"
+                       data-method="POST"
+                       data-params-selector="#person-list input[name=person_id]:checkbox:checked:visible"
+                       data-ajax-dialog
+                       data-reload-after>
+                        {%- trans %}Send emails{% endtrans -%}
+                    </a>
+                </div>
+                {% if event.type != 'lecture' %}
+                    <div class="group i-selection">
+                        <span class="i-button label">{% trans %}Privileges{% endtrans %}</span>
+                        <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
+                            {% trans %}Grant{% endtrans %}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Grant submission rights to all speakers{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.grant_submission_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Submission rights{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Grant modification rights to all session conveners{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.grant_modification_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Modification rights{% endtrans %}</a>
+                            </li>
+                        </ul>
+                        <a href="#" class="i-button arrow js-dropdown" data-toggle="dropdown">
+                            {% trans %}Revoke{% endtrans %}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"
+                                   title="{% trans %}Revoke submission rights{% endtrans %}"
+                                   data-confirm="{% trans %}Are you sure you want to perform this operation?{% endtrans %}"
+                                   data-href="{{ url_for('.revoke_submission_rights', event) }}"
+                                   data-method="POST"
+                                   data-qtip-position="right">
+                                    {% trans %}Submission rights{% endtrans %}</a>
+                            </li>
+                        </ul>
+                    </div>
                 {% endif %}
-                <th class="i-table"></th>
-                <th class="i-table"></th>
-                <th class="i-table"></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for person_data in persons -%}
-                <tr id="person-{{ person_data.person.id }}" class="i-table"
-                    data-person-roles="{{ person_data.roles | tojson | forceescape }}"
-                    {% if person_data.roles.no_account %}
-                        data-no-account
-                    {% endif %}
-                    {% if person_data.person.invited_dt %}
-                        data-already-invited
-                    {% endif %}>
-                    {{ render_person_row(person_data) }}
-                </tr>
-            {%- else -%}
-                <tr class="i-table">
-                    <td colspan="{{ 7 if event.type == 'lecture' else 10 }}">
-                        {%- trans %}No persons{% endtrans -%}
-                    </td>
-                </tr>
-            {%- endfor %}
-        </tbody>
-    </table>
-
+                <div class="group">
+                    <a id="no-account-dropdown" href="#" class="i-button arrow highlight disabled js-dropdown" data-toggle="dropdown">
+                        {% trans %}Send invitation{% endtrans %}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#"
+                               title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
+                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
+                               data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
+                               data-title="{% trans %}Send email{% endtrans %}"
+                               data-method="POST"
+                               data-ajax-dialog
+                               data-reload-after>
+                                {% trans %}To all users with no account{% endtrans %}</a>
+                        </li>
+                        <li>
+                            <a href="#" id="not-invited-only"
+                               title="{% trans %}Send an email to all users with no Indico account who have not
+                                     received an invitation email yet{% endtrans %}"
+                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
+                                                      not_invited_only=true) }}"
+                               data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
+                               data-title="{% trans %}Send email{% endtrans %}"
+                               data-method="POST"
+                               data-ajax-dialog
+                               data-reload-after>
+                                {% trans %}To users not invited yet{% endtrans %}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="right">
+                    <div id="person-filters" class="group i-selection">
+                        <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                        <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
+                        <label for="filter-chairpersons" class="i-button">
+                            {%- if event.type == 'lecture' -%}
+                                {%- trans %}Speakers{% endtrans -%}
+                            {%- else -%}
+                                {%- trans %}Chairpersons{% endtrans -%}
+                            {%- endif -%}
+                        </label>
+                        {% if event.type != 'lecture' %}
+                            <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+                            <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+                            <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
+                            <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+                        {% endif %}
+                        <span class="i-button label">{% trans %}or{% endtrans %}</span>
+                        <input type="checkbox" id="filter-no-account" data-filter="no_account">
+                        <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            {% if num_no_account %}
+                {% call message_box('warning') %}
+                    {% trans count = num_no_account -%}
+                        There is one user with no Indico account. An Indico account may be needed to upload materials and/or
+                        manage contents.
+                        {%- pluralize -%}
+                        There are {{ count }} users with no Indico account. An Indico account may be needed to upload materials
+                        and/or manage contents.
+                    {%- endtrans -%}
+                {% endcall %}
+            {% endif %}
+            <table id="person-list" class="i-table-widget tablesorter">
+                <thead>
+                    <tr class="i-table">
+                        <th class="i-table checkbox-column" data-sorter="false"></th>
+                        <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
+                        <th class="i-table">{% trans %}Email{% endtrans %}</th>
+                        <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
+                        <th class="i-table"></th>
+                        {%- if event.type != 'lecture' -%}
+                            <th class="i-table"></th>
+                            <th class="i-table"></th>
+                            <th class="i-table"></th>
+                        {% endif %}
+                        <th class="i-table"></th>
+                        <th class="i-table"></th>
+                        <th class="i-table"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for person_data in persons -%}
+                        <tr id="person-{{ person_data.person.id }}" class="i-table"
+                            data-person-roles="{{ person_data.roles | tojson | forceescape }}"
+                                {% if person_data.roles.no_account %}
+                            data-no-account
+                                {% endif %}
+                                {% if person_data.person.invited_dt %}
+                            data-already-invited
+                                {% endif %}>
+                            {{ render_person_row(person_data) }}
+                        </tr>
+                    {%- else -%}
+                        <tr class="i-table">
+                            <td colspan="{{ 7 if event.type == 'lecture' else 10 }}">
+                                {%- trans %}No persons{% endtrans -%}
+                            </td>
+                        </tr>
+                    {%- endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     <script>
-        $(document).ready(function() {
-            function switch_to(what, $target) {
-                if (what == 'persons') {
-                    if ($('#filter-no-account').prop('checked')) {
-                        $('#filter-no-account').prop('checked', false);
-                    }
-                } else {
-                    $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
-                }
-                refreshPersonFilters();
-            }
-
-            $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
-                var $target = $(this);
-                switch_to('persons', $target);
-            });
-            $('#filter-no-account').on('change', function() {
-                var $target = $(this);
-                if ($target.prop('checked')) {
-                    switch_to('no-account', $target);
-                }
-            });
+        setupEventPersonsList({
+            hasNoAccountFilter: true
         });
     </script>
 {% endblock %}
