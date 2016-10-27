@@ -58,7 +58,8 @@ class Identity(db.Model):
     #: internal data used by the flask-multipass system
     multipass_data = db.Column(
         JSON,
-        nullable=False
+        nullable=False,
+        default=JSON.NULL
     )
     #: the user data from the user provider
     _data = db.Column(

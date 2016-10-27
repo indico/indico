@@ -479,7 +479,6 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
                                        self.request.identity_data, self.request.settings)
         tpl = get_template_module('users/emails/registration_request_accepted.txt', user=user)
         send_email(make_email(self.request.email, template=tpl))
-        db.session.delete(self.request)
         flash(_('The request has been approved.'), 'success')
         return jsonify_data()
 
