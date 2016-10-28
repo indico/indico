@@ -129,3 +129,18 @@ class AbstractComment(db.Model):
         if user is None:
             return False
         return self.user == user or self.abstract.event_new.can_manage(user)
+
+    def can_view(self, user):
+        if user is None:
+            return False
+        elif user == self.user:
+            return True
+        elif self.visibility == AbstractCommentVisibility.public:
+            return True
+        visibility_checks = {AbstractCommentVisibility.judges: [self.abstract.can_judge],
+                             AbstractCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
+                             AbstractCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
+                                                                   self.abstract.can_review],
+                             AbstractCommentVisibility.submitters: [self.abstract.can_judge, self.abstract.can_convene,
+                                                                    self.abstract.can_review, self.abstract.user_owns]}
+        return any(fn(user) for fn in visibility_checks[self.visibility])
