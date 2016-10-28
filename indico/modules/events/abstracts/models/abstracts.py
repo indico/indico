@@ -472,9 +472,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def can_edit(self, user):
         if not user:
             return False
-        is_owner = user == self.submitter or any(x.person.user == user for x in self.person_links)
         is_manager = self.event_new.can_manage(user)
-        if not is_owner and not is_manager:
+        if not self.user_owns(user) and not is_manager:
             return False
         elif self.public_state == AbstractPublicState.awaiting:
             return True
@@ -547,3 +546,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         self.accepted_contrib_type = None
         self.merged_into = None
         self.duplicate_of = None
+
+    def user_owns(self, user):
+        if not user:
+            return None
+        return user == self.submitter or any(x.person.user == user for x in self.person_links)
