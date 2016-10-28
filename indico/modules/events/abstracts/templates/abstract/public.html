@@ -362,15 +362,17 @@
                 </div>
             </div>
             {% if abstract.secondary_authors %}
-                <div class="abstract-authorship-label">
-                    {% trans count=abstract.secondary_authors|length -%}
-                        Co-author:
-                    {%- pluralize -%}
-                        Co-authors:
-                    {%- endtrans %}
-                </div>
-                <div class="abstract-authorship-list">
-                    {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                <div class="abstract-authorship-block">
+                    <div class="abstract-authorship-label">
+                        {% trans count=abstract.secondary_authors|length -%}
+                            Co-author:
+                        {%- pluralize -%}
+                            Co-authors:
+                        {%- endtrans %}
+                    </div>
+                    <div class="abstract-authorship-list">
+                        {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                    </div>
                 </div>
             {% endif %}
             {{ abstract.description }}
