@@ -108,3 +108,27 @@ class Track(DescriptionMixin, db.Model):
 
     def can_delete(self, user):
         return self.event_new.can_manage(user) and not self.abstracts_accepted
+
+    def can_review_abstracts(self, user):
+        if not user:
+            return False
+        elif not self.event_new.can_manage(user, role='abstract_reviewer'):
+            return False
+        elif user in self.event_new.global_abstract_reviewers:
+            return True
+        elif user in self.abstract_reviewers:
+            return True
+        else:
+            return False
+
+    def can_convene(self, user):
+        if not user:
+            return False
+        elif not self.event_new.can_manage(user, role='track_convener'):
+            return False
+        elif user in self.event_new.global_conveners:
+            return True
+        elif user in self.conveners:
+            return True
+        else:
+            return False
