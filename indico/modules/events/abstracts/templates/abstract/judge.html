@@ -83,8 +83,8 @@
         </div>
         <div class="i-box-footer">
             {{ form_header(form, orientation='vertical') }}
-            {{ form_rows(form, fields=form._order) }}
-            {% call form_footer(form, skip_label=skip_labels) %}
+            {{ form_rows(form, fields=form._order, skip_labels=true) }}
+            {% call form_footer(form) %}
                 <button class="i-button big highlight judge-button"
                         data-method="POST"
                         data-href="{{ url_for('.judge_abstract', abstract, management=management) }}">
