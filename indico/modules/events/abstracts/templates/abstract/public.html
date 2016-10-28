@@ -186,9 +186,11 @@
                     {% endif %}
                 </div>
                 <div>
-                    {% trans url=url_for('contributions.display_contribution', abstract.contribution) %}
-                        <a href="{{ url }}">Go to contribution</a>
-                    {% endtrans %}
+                    {% if abstract.contribution %}
+                        {% trans url=url_for('contributions.display_contribution', abstract.contribution) %}
+                            <a href="{{ url }}">Go to contribution</a>
+                        {% endtrans %}
+                    {% endif %}
                 </div>
             {% elif abstract.state.name == 'merged' %}
                 <div>
@@ -403,40 +405,46 @@
                         </div>
                         <div class="i-box-content">
                             {% if abstract.state.name == 'accepted' %}
-                                {% set url = url_for('contributions.display_contribution', abstract.contribution) %}
+                                {% if abstract.contribution %}
+                                    {% set link_start = '<a href="' + url_for('contributions.display_contribution', abstract.contribution) + '">' %}
+                                    {% set link_end = '</a>' %}
+                                {% else %}
+                                    {% set link_start = '' %}
+                                    {% set link_end = '' %}
+                                {% endif %}
                                 {% if abstract.accepted_contrib_type and abstract.accepted_track %}
                                     {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title -%}
                                         The abstract was accepted
                                         as <span class="abstract-contribution-type">{{ type }}</span>
                                         for track <span class="abstract-track">{{ track }}</span>
-                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_contrib_type %}
                                     {% trans type=abstract.accepted_contrib_type.name -%}
                                         The abstract was accepted
                                         as <span class="abstract-contribution-type">{{ type }}</span>
-                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_track %}
                                     {% trans track=abstract.accepted_track.title -%}
                                         The abstract was accepted
                                         for track <span class="abstract-track">{{ track }}</span>
-                                        and a <a href="{{ url }}">contribution</a> was created in the event.
+                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
                                     {%- endtrans %}
                                 {% else %}
                                     {% trans -%}
-                                        The abstract was accepted and a <a href="{{ url }}">contribution</a> was created in the event.
+                                        The abstract was accepted and a {{ link_start }}contribution{{ link_end }} was created in the event.
                                     {%- endtrans %}
                                 {% endif %}
                             {% elif abstract.state.name == 'rejected' %}
                                 {% trans %}The abstract was rejected.{% endtrans %}
                             {% elif abstract.state.name == 'merged' %}
                                 {% trans url=url_for(abstract_endpoint, abstract.merged_into), other=abstract.merged_into.title -%}
-                                    The abstract was merged into <a href="{{ url }}">{{ other }}</a>.
+                                    The abstract was merged into {{ link_start }}{{ other }}{{ link_end }}.
                                 {%- endtrans %}
                             {% elif abstract.state.name == 'duplicate'%}
                                 {% trans url=url_for(abstract_endpoint, abstract.duplicate_of), other=abstract.duplicate_of.title -%}
-                                    The abstract was marked as a duplicate of <a href="{{ url }}">{{ other }}</a>
+                                    The abstract was marked as a duplicate of {{ link_start }}{{ other }}{{ link_end }}
                                 {%- endtrans %}
                             {% endif %}
                             {% if abstract.judgment_comment %}
