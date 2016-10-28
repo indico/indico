@@ -427,6 +427,11 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return True
         return self.can_review(user) or self.can_convene(user)
 
+    def can_comment(self, user):
+        if not user:
+            return False
+        return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
+
     def can_convene(self, user):
         if not user:
             return False
