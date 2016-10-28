@@ -46,12 +46,20 @@ def _serialize_user(user):
     }
 
 
-def get_users_in_roles(data):
+def _get_users_in_roles(data):
     user_ids = {user_id
                 for user_roles in data.viewvalues()
                 for users in user_roles.viewvalues()
                 for user_id in users}
-    return db.session.query(User.id, User).filter(User.id.in_(user_ids))
+    if not user_ids:
+        return []
+    return db.session.query(User.id, User).filter(User.id.in_(user_ids)).all()
+
+
+def _get_users(ids):
+    if not ids:
+        return set()
+    return set(User.find(User.id.in_(ids), ~User.is_deleted))
 
 
 class EmailRuleListField(JSONField):
@@ -218,7 +226,7 @@ class TrackRoleField(JSONField):
 
     @property
     def users(self):
-        return {user_id: _serialize_user(user) for user_id, user in get_users_in_roles(self.data)}
+        return {user_id: _serialize_user(user) for user_id, user in _get_users_in_roles(self.data)}
 
     @property
     def role_data(self):
@@ -227,14 +235,13 @@ class TrackRoleField(JSONField):
 
         # Handle global reviewers/conveners
         role_data = self.data.pop('*')
-        global_conveners = set(User.find(User.id.in_(role_data['convener']), ~User.is_deleted))
-        global_reviewers = set(User.find(User.id.in_(role_data['reviewer']), ~User.is_deleted))
+        global_conveners = _get_users(role_data['convener'])
+        global_reviewers = _get_users(role_data['reviewer'])
         conveners |= global_conveners
         reviewers |= global_reviewers
 
-        track_dict = {track.id: track
-                      for track in Track.query.with_parent(self.event).filter(Track.id.in_(self.data))}
-        user_dict = dict(get_users_in_roles(self.data))
+        track_dict = {track.id: track for track in Track.query.with_parent(self.event).filter(Track.id.in_(self.data))}
+        user_dict = dict(_get_users_in_roles(self.data))
 
         track_roles = {}
         # Update track-specific reviewers/conveners
