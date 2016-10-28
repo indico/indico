@@ -9,6 +9,7 @@ import sqlalchemy as sa
 from alembic import op
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.modules.events.abstracts.models.abstracts import AbstractState
+from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.modules.events.abstracts.models.persons import AuthorType
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.users.models.users import UserTitle
@@ -175,6 +176,7 @@ def upgrade():
         sa.Column('modified_by_id', sa.Integer(), nullable=True, index=True),
         sa.Column('created_dt', UTCDateTime, nullable=False),
         sa.Column('modified_dt', UTCDateTime, nullable=True),
+        sa.Column('visibility', PyIntEnum(AbstractCommentVisibility), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['abstract_id'], ['event_abstracts.abstracts.id']),
         sa.ForeignKeyConstraint(['modified_by_id'], ['users.users.id']),
