@@ -16,8 +16,9 @@
  */
 
 /* eslint-disable max-len */
+/* global getParamsFromSelectors:false */
 
-(function() {
+(function(global) {
     'use strict';
 
     $(document).ready(function() {
@@ -27,6 +28,19 @@
         setupSelectAllNone();
         setupAnchorLinks();
     });
+
+    global.getParamsFromSelectors = function getParamsFromSelectors() {
+        var fieldParams = {};
+        _.each(arguments, function(selector) {
+            $(selector).each(function() {
+                if (!(this.name in fieldParams)) {
+                    fieldParams[this.name] = [];
+                }
+                fieldParams[this.name].push($(this).val());
+            });
+        });
+        return fieldParams;
+    };
 
     function setupSelectAllNone() {
         $('body').on('click', '[data-select-all]', function() {
@@ -86,14 +100,7 @@
             }
 
             if (paramsSelector) {
-                var fieldParams = {};
-                $(paramsSelector).each(function() {
-                    if (!(this.name in fieldParams)) {
-                        fieldParams[this.name] = [];
-                    }
-                    fieldParams[this.name].push($(this).val());
-                });
-                params = $.extend({}, fieldParams, params);
+                params = $.extend({}, getParamsFromSelectors(paramsSelector), params);
             }
 
             function updateHtml(selector, html, triggeredBy) {
@@ -225,4 +232,4 @@
             }).html('&para;').appendTo($elem);
         });
     }
-})();
+})(window);
