@@ -439,12 +439,14 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return False
 
-    def can_review(self, user):
+    def can_review(self, user, check_state=False):
         # The total number of tracks/events a user is a reviewer for (indico-wide)
         # is usually reasonably low so we just access the relationships instead of
         # sending a more specific query which would need to be cached to avoid
         # repeating it when performing this check on many abstracts.
         if not user:
+            return False
+        elif check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
             return False
         elif not self.event_new.can_manage(user, role='abstract_reviewer', explicit_role=True):
             return False
