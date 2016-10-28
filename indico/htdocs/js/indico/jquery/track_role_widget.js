@@ -46,13 +46,14 @@
                     _.sortBy(people, _.property('name')).forEach(function(person) {
                         $list.append($('<li class="event-user">').text(person.name)
                                      .append('<a class="remove-user icon-cross">')
-                                     .attr('data-user-id', person.id));
+                                     .attr('data-user-id', +person.id));
                     });
                 },
 
                 onAdd: function(people) {
                     people.forEach(function(person) {
-                        roleData.push(person.id);
+                        // XXX: person.id is a string for users from search results
+                        roleData.push(+person.id);
                         self._update();
                     });
                 }
