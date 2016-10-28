@@ -134,6 +134,9 @@ class AbstractReviewingSettingsForm(IndicoForm):
 class AbstractJudgmentFormBase(IndicoForm):
     """Form base class for abstract judgment operations"""
 
+    _order = ('judgment', 'accepted_track', 'accepted_contrib_type', 'session', 'duplicate_of', 'merged_into',
+              'merge_persons', 'judgment_comment', 'send_notifications')
+
     accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
                                       get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
                                       description=_("The abstract will be accepted in this track"))
