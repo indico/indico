@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
 from indico.modules.events.abstracts.controllers.base import AbstractMixin
 from indico.modules.events.abstracts.views import WPDisplayAbstracts
-from indico.modules.events.tracks.models.tracks import Track
 from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import AbstractToPDF
@@ -46,31 +44,3 @@ class RHDisplayAbstractExportPDF(RHDisplayAbstract):
         pdf = AbstractToPDF(self.abstract)
         file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
         return send_file(file_name, pdf.generate(), 'application/pdf')
-
-
-class RHDisplayReviewableTracks(RHConferenceBaseDisplay):
-    def _process(self):
-        user = session.user
-        tracks_set = (user.convener_for_tracks | user.abstract_reviewer_for_tracks) & set(self.event_new.tracks)
-        if user in self.event_new.global_abstract_reviewers or user in self.event_new.global_conveners:
-            tracks_set.update(self.event_new.tracks)
-        return WPDisplayAbstracts.render_template('display/tracks.html', self._conf, event=self.event_new,
-                                                  tracks=tracks_set)
-
-
-class RHDisplayReviewableTrackAbstracts(RHConferenceBaseDisplay):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.track
-        }
-    }
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self.track = Track.get_one(request.view_args['track_id'])
-
-    def _process(self):
-        abstracts_set = set(self.track.abstracts_accepted) | self.track.abstracts_reviewed |\
-                        self.track.abstracts_submitted
-        return WPDisplayAbstracts.render_template('display/abstracts.html', self._conf, track_title=self.track.title,
-                                                  abstracts=abstracts_set)
