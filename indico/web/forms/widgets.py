@@ -80,12 +80,13 @@ class JinjaWidget(object):
                           separate kwargs.
     """
 
-    def __init__(self, template, plugin=None, single_line=False, single_kwargs=False, **context):
+    def __init__(self, template, plugin=None, single_line=False, single_kwargs=False, inline_js=False, **context):
         self.template = template
         self.plugin = plugin
         self.context = context
         self.single_line = single_line
         self.single_kwargs = single_kwargs
+        self.inline_js = inline_js
 
     def __call__(self, field, **kwargs):
         if self.plugin:
@@ -99,11 +100,14 @@ class JinjaWidget(object):
             kwargs = {'input_args': kwargs}
         template_module = get_template_module(template, field=field, **dict(self.context, **kwargs))
         javascript = template_module.javascript()
-        if '<script' in javascript:
+        html = template_module.html()
+        if self.inline_js:
+            html += "\n" + javascript
+        elif '<script' in javascript:
             inject_js(template_module.javascript())
         elif html_commment_re.sub('', javascript).strip():
             raise ValueError("Template did not provide valid javascript")
-        return HTMLString(template_module.html())
+        return HTMLString(html)
 
 
 class PasswordWidget(JinjaWidget):
@@ -180,7 +184,7 @@ class SelectizeWidget(JinjaWidget):
     """
 
     def __init__(self, search_url=None, search_method='GET', min_trigger_length=3, allow_by_id=False, preload=False,
-                 value_field='id', label_field='name', search_field='name'):
+                 value_field='id', label_field='name', search_field='name', inline_js=False):
         self.min_trigger_length = min_trigger_length
         self.allow_by_id = allow_by_id
         self.preload = preload
@@ -189,7 +193,7 @@ class SelectizeWidget(JinjaWidget):
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
-        super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
+        super(SelectizeWidget, self).__init__('forms/selectize_widget.html', inline_js=inline_js)
 
     def __call__(self, field, **kwargs):
         choices = ([{'name': getattr(field.data, self.search_field), 'id': field.data.id}]
