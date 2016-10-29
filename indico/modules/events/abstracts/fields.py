@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
-from flask import jsonify, session, request
+from flask import json, jsonify, session, request
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -201,6 +201,9 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
         return [(key, abstract)
                 for key, abstract in super(AbstractField, self)._get_object_list()
                 if abstract.can_access(session.user)]
+
+    def _value(self):
+        return self._serialize_abstract(self.data)
 
     @property
     def event(self):

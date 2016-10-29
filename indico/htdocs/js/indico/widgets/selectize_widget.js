@@ -26,6 +26,7 @@
             searchMethod: 'GET',
             searchPayload: null,
             selectizeOptions: null,
+            selectedItem: null,
             allowById: false,
             preload: false
         }, options);
@@ -43,6 +44,7 @@
             }
         }
 
+        var $field;
         var params = {
             load: function(query, callback) {
                 var self = this;
@@ -67,6 +69,9 @@
                         self.settings.load = null;
                     }
                     callback(res);
+                    if (options.selectedItem !== null) {
+                        $field[0].selectize.setValue(options.selectedItem.id);
+                    }
                 });
             },
             score: function(query) {
@@ -87,7 +92,7 @@
         };
 
         _.extend(params, options.selectizeOptions);
-        var $field = $('#' + options.fieldId);
+        $field = $('#' + options.fieldId);
         $field.selectize(params);
 
         // disallow removing options

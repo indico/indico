@@ -192,13 +192,14 @@ class SelectizeWidget(JinjaWidget):
         super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
 
     def __call__(self, field, **kwargs):
-        choices = [{'name': field.data.name, 'id': field.data.id}] if field.data is not None else []
+        choices = ([{'name': getattr(field.data, self.search_field), 'id': field.data.id}]
+                   if field.data is not None else [])
         options = {
             'valueField': self.value_field,
             'labelField': self.label_field,
             'searchField': self.search_field,
             'persist': False,
-            'options': choices,
+            'items': choices,
             'create': False,
             'maxItems': 1,
             'closeAfterSelect': True,
