@@ -173,7 +173,7 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
     """A selectize-based field to select an abstract from an event."""
 
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                             search_method='POST')
+                             search_method='POST', inline_js=True)
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)
