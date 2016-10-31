@@ -30,10 +30,11 @@
         }
     }
 
-    function hideFieldUnless(field, conditionField, requiredValue, checkedOnly) {
+    function hideFieldUnless(field, conditionField, requiredValues, checkedOnly) {
         conditionField.on('change', function() {
             var value = checkedOnly ? conditionField.filter(':checked').val() || false : conditionField.val();
-            var active = !!((requiredValue === null && value) || (requiredValue !== null && requiredValue === value));
+            var active = !!((!requiredValues.length && value) ||
+                            (requiredValues.length && _.contains(requiredValues, value)));
             field.closest('.form-group').toggle(active);
             if (!field.is(':input')) {
                 field.find(':input').prop('disabled', !active);
@@ -83,7 +84,7 @@
             var field = $(this);
             var data = field.data('hidden-unless');
             var conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
-            hideFieldUnless(field, conditionField, data.value, data.checked_only);
+            hideFieldUnless(field, conditionField, data.values, data.checked_only);
             conditionField.triggerHandler('change');
         });
 

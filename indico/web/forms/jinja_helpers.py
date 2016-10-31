@@ -61,8 +61,11 @@ def _attrs_for_validators(field, validators):
             condition_field = field.get_form()[validator.field]
             checked_only = isinstance(condition_field, (RadioField, BooleanField, IndicoEnumRadioField))
             val = validator.value
+            val = val if isinstance(val, (set, list, tuple)) else [val]
+            values = [(v.name if isinstance(v, TitledEnum) else v) for v in val]
+
             attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
-                                                      'value': val if not isinstance(val, TitledEnum) else val.name,
+                                                      'values': values,
                                                       'checked_only': checked_only})
     return attrs
 
