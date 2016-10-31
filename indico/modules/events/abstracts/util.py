@@ -27,6 +27,7 @@ from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractS
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
@@ -384,3 +385,29 @@ def get_user_abstracts(event, user):
             .filter(db.or_(Abstract.submitter == user,
                            Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
             .all())
+
+
+def get_track_reviewer_abstract_counts(event, user):
+    """
+    Get the number of unreviewed/reviewed abstracts per track for a
+    specific user.
+
+    Note that this does not take into account if the user is a
+    reviewer for a track; it just checks whether the user has
+    reviewed an abstract in a track or not.
+
+    :return: A ``{track: (unreviewed_count, reviewed_count)}`` dict.
+    """
+    # COUNT() does not count NULL values so we pass NULL in case an
+    # abstract is not in the submitted state. That way we still get
+    # the track - filtering using WHERE would only include tracks
+    # that have some abstract in the submitted state.
+    count_total = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
+    count_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id}, value=Abstract.state))
+    query = (Track.query.with_parent(event)
+             .with_entities(Track, count_total - count_reviewed, count_reviewed)
+             .outerjoin(Track.abstracts_reviewed)
+             .outerjoin(AbstractReview, db.and_(AbstractReview.abstract_id == Abstract.id,
+                                                AbstractReview.user_id == user.id))
+             .group_by(Track.id))
+    return {track: (unreviewed, reviewed) for track, unreviewed, reviewed in query}
