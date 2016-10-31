@@ -282,6 +282,15 @@ $i-box-padding: 10px;
     }
 }
 
+.i-box.footer-only {
+    padding-top: 0;
+
+    .i-box-footer {
+        @include single-box-shadow(none);
+        margin-top: 0;
+    }
+}
+
 // ============================================================================
 // Group of boxes
 // ============================================================================
