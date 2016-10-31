@@ -38,6 +38,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
     abstract = Abstract(event_new=event, submitter=session.user)
     files = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
+    abstract.reviewed_for_tracks = abstract.submitted_for_tracks
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
