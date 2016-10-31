@@ -26,6 +26,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -89,6 +90,14 @@ def delete_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
 
 
+def create_abstract_comment(abstract, comment_data, user):
+    comment = AbstractComment(user=user)
+    comment.populate_from_dict(comment_data)
+    comment.abstract = abstract
+    db.session.flush()
+    logger.info("Abstract %s received a comment from %s", abstract, user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
+                           'Abstract "{}" has received a comment'.format(abstract.title), session.user)
 def merge_person_links(target_abstract, source_abstract):
     """
     Merge `person_links` of different abstracts.
