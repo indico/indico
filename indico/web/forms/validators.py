@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import re
 from datetime import timedelta
+from types import NoneType
 
 from wtforms.validators import StopValidation, ValidationError, EqualTo, Regexp
 
@@ -60,12 +61,13 @@ class HiddenUnless(object):
 
     def __init__(self, field, value=None, preserve_data=False):
         self.field = field
-        self.value = value
+        self.value = value if isinstance(value, (set, list, tuple, NoneType)) else {value}
         self.preserve_data = preserve_data
 
     def __call__(self, form, field):
         value = form[self.field].data
-        active = (value and self.value is None) or (value == self.value and self.value is not None)
+        active = (value and self.value is None) or (self.value is not None and value in self.value)
+
         if not active:
             field.errors[:] = []
             if field.raw_data:
