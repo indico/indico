@@ -73,10 +73,6 @@ class PyIntEnum(TypeDecorator, SchemaType):
             return None
         return self.enum(value)
 
-    def _set_parent_with_dispatch(self, parent):
-        TypeDecorator._set_parent_with_dispatch(self, parent)
-        SchemaType._set_parent_with_dispatch(self, parent)
-
     def alembic_render_type(self, autogen_context):
         imports = autogen_context['imports']
         imports.add('from indico.core.db.sqlalchemy import PyIntEnum')
