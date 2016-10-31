@@ -42,7 +42,7 @@ def build_review_form(abstract, track):
 def render_abstract_page(abstract, management=False):
     review_forms = {track.id: build_review_form(abstract, track)
                     for track in abstract.reviewed_for_tracks
-                    if track.can_review(session.user)}
+                    if track.can_review_abstracts(session.user)}
     judgment_form = AbstractJudgmentForm(abstract=abstract)
 
     return render_template('events/abstracts/abstract.html', abstract=abstract, judgment_form=judgment_form,
@@ -70,7 +70,7 @@ class AbstractPageMixin(AbstractMixin):
     def _process(self):
         review_forms = {track.id: build_review_form(self.abstract, track)
                         for track in self.abstract.reviewed_for_tracks
-                        if track.can_review(session.user)}
+                        if track.can_review_abstracts(session.user)}
         judgment_form = AbstractJudgmentForm(abstract=self.abstract)
 
         return self.page_class.render_template('abstract.html', self._conf, abstract=self.abstract,
