@@ -84,7 +84,7 @@
                                     {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
                                 {% endif %}
                             </div>
-                            {% if comment.can_edit(user) %}
+                            {% if comment.can_edit(session.user) %}
                                 <div class="abstract-comment-badges">
                                     <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
                                 </div>
