@@ -144,8 +144,8 @@
                     </span>
                     {% if review.score %}
                         {% set score = review.score %}
-                        {# TODO: show max score #}
-                        <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
+                        {% set max_score = cfa.rating_range[1]|round(1) %}
+                        <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
                             {{ score }}
                         </span>
                     {% endif %}
