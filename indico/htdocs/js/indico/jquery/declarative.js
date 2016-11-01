@@ -42,6 +42,12 @@
         return fieldParams;
     };
 
+    global.getFormParams = function getFormParams($form) {
+        return getParamsFromSelectors($form.find('input[type=text]:not(:disabled), input[type=hidden]:not(:disabled), \
+                                                  input:checked:not(:disabled), textarea:not(:disabled), \
+                                                  select:not(:disabled)'));
+    };
+
     function setupSelectAllNone() {
         $('body').on('click', '[data-select-all]', function() {
             var selector = $(this).data('select-all');
