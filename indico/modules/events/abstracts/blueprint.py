@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.boa import RHManageBOA, RHExportBOA
 from indico.modules.events.abstracts.controllers.display import (RHDisplayAbstract, RHDisplayAbstractExportPDF,
-                                                                 RHMyAbstracts, RHMyAbstractsExportPDF)
+                                                                 RHMyAbstracts, RHMyAbstractsExportPDF,
+                                                                 RHSubmitAbstract)
 from indico.modules.events.abstracts.controllers.email_templates import (RHAddEmailTemplate, RHEditEmailTemplateRules,
                                                                          RHEditEmailTemplateText, RHEmailTemplateList,
                                                                          RHDeleteEmailTemplate, RHSortEmailTemplates,
@@ -64,6 +65,7 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>'
                  RHAbstractsDownloadAttachment)
 _bp.add_url_rule('/abstracts/mine', 'my_abstracts', RHMyAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', RHMyAbstractsExportPDF)
+_bp.add_url_rule('/abstracts/submit', 'submit', RHSubmitAbstract, methods=('GET', 'POST'))
 
 # Reviewing pages (display area)
 _bp.add_url_rule('/call-for-abstracts/reviewing/', 'display_reviewable_tracks', RHDisplayReviewableTracks)

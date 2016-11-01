@@ -32,6 +32,7 @@ from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
@@ -39,8 +40,12 @@ from indico.util.fs import secure_filename
 
 def create_abstract(event, abstract_data, custom_fields_data=None):
     abstract = Abstract(event_new=event, submitter=session.user)
+    tracks = abstract_data.pop('submitted_for_tracks') or set()
     files = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
+    if isinstance(tracks, Track):
+        tracks = {tracks}
+    abstract.submitted_for_tracks = tracks
     abstract.reviewed_for_tracks = abstract.submitted_for_tracks
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)

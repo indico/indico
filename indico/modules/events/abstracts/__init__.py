@@ -130,3 +130,6 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(title=_("Reviewing Area"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
                         position=2, parent='call_for_abstracts',
                         visible=_reviewing_area_visible)
+    yield MenuEntryData(title=_("Submit Abstract"), name='abstract_submission',
+                        visible=lambda event: event.has_feature('abstracts'),
+                        endpoint='abstracts.submit', position=1, parent='call_for_abstracts')
