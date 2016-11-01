@@ -67,7 +67,6 @@
             var $this = $(this);
             var $box = $this.closest('.abstract-review-box');
             var $form = $box.find('form');
-            var $page = $('.management-page');
 
             evt.preventDefault();
 
@@ -78,8 +77,10 @@
                 error: handleAjaxError,
                 data: getFormParams($form),
                 success: function(data) {
+                    var $page = $('.management-page');
                     if (data.page_html) {
                         $page.replaceWith(data.page_html);
+                        $page = $('.management-page');
                     } else {
                         $box.replaceWith(data.box_html);
                     }
