@@ -58,6 +58,7 @@
         var $buttonAddExisting = $('#add-existing-' + options.fieldId);
         var $buttonAddNew = $('#add-new-' + options.fieldId);
         var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
+        var $form = $field.closest('form');
         var customOrder = !$buttonAlphaOrder.hasClass('active');
 
         function updatePersonOrder() {
@@ -353,6 +354,15 @@
                 });
             }
             $field.principalfield('refresh');
+        });
+
+
+        $form.on('submit', function(evt) {
+            var e = $.Event('ajaxDialog:validateBeforeSubmit');
+            $(this).trigger(e);
+            if (e.isDefaultPrevented()) {
+                evt.preventDefault();
+            }
         });
 
         $field.closest('form').on('ajaxDialog:validateBeforeSubmit', function(evt) {
