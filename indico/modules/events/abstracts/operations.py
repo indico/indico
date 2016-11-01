@@ -90,12 +90,12 @@ def delete_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
 
 
-def create_abstract_comment(abstract, comment_data, user):
-    comment = AbstractComment(user=user)
+def create_abstract_comment(abstract, comment_data):
+    comment = AbstractComment(user=session.user)
     comment.populate_from_dict(comment_data)
     comment.abstract = abstract
     db.session.flush()
-    logger.info("Abstract %s received a comment from %s", abstract, user)
+    logger.info("Abstract %s received a comment from %s", abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
                            'Abstract "{}" has received a comment'.format(abstract.title), session.user)
 def merge_person_links(target_abstract, source_abstract):

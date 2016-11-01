@@ -26,6 +26,7 @@ from wtforms.validators import NumberRange, Optional, DataRequired, ValidationEr
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
                                                     AbstractPersonLinkListField, AbstractField, TrackRoleField)
 from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
@@ -414,6 +415,12 @@ class AbstractsScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(AbstractsScheduleForm, self).__init__(*args, **kwargs)
+
+
+class AbstractCommentForm(IndicoForm):
+    text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment...")})
+    visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=AbstractCommentVisibility,
+                                       skip={AbstractCommentVisibility.submitters, AbstractCommentVisibility.users})
 
 
 class AbstractReviewedForTracksForm(IndicoForm):

@@ -22,7 +22,8 @@ from operator import attrgetter
 from flask import render_template, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.forms import AbstractJudgmentForm, make_review_form, AbstractReviewedForTracksForm
+from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm, make_review_form,
+                                                   AbstractReviewedForTracksForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
 from indico.modules.events.util import ZipGeneratorMixin
@@ -50,15 +51,15 @@ def build_review_form(abstract, track):
 
 
 def render_abstract_page(abstract, management=False):
+    comment_form = AbstractCommentForm(formdata=None)
     review_forms = {track.id: build_review_form(abstract, track)
                     for track in abstract.reviewed_for_tracks
                     if track.can_review_abstracts(session.user)}
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
-    return render_template('events/abstracts/abstract.html', abstract=abstract, judgment_form=judgment_form,
-                           review_forms=review_forms, review_track_list_form=review_track_list_form,
-                           management=management, no_javascript=True)
-
+    return render_template('events/abstracts/abstract.html', abstract=abstract, comment_form=comment_form,
+                           judgment_form=judgment_form, review_forms=review_forms,
+                           review_track_list_form=review_track_list_form, management=management, no_javascript=True)
 
 class AbstractMixin:
     normalize_url_spec = {
@@ -79,15 +80,15 @@ class AbstractPageMixin(AbstractMixin):
     """Display abstract page"""
 
     def _process(self):
+        comment_form = AbstractCommentForm()
         review_forms = {track.id: build_review_form(self.abstract, track)
                         for track in self.abstract.reviewed_for_tracks
                         if track.can_review_abstracts(session.user)}
         judgment_form = AbstractJudgmentForm(abstract=self.abstract)
         review_track_list_form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
-
         return self.page_class.render_template('abstract.html', self._conf, abstract=self.abstract,
-                                               judgment_form=judgment_form, review_forms=review_forms,
-                                               review_track_list_form=review_track_list_form,
+                                               comment_form=comment_form, judgment_form=judgment_form,
+                                               review_forms=review_forms, review_track_list_form=review_track_list_form,
                                                management=self.management)
 
 
