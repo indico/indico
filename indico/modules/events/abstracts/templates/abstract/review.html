@@ -68,9 +68,13 @@
     </div>
 {% endmacro %}
 
-{% macro render_abstract_comments(abstract) %}
-    {% if abstract.comments %}
+{% macro render_comments_section(abstract, form=none) %}
+    {% set can_comment = abstract.can_comment(session.user) %}
+    {% if abstract.comments or can_comment %}
         <div id="abstract-comments" class="i-timeline">
+            <h3>
+                {%- trans %}Comments{% endtrans -%}
+            </h3>
             {% for comment in abstract.comments %}
                 <div class="i-timeline-item">
                     <div class="i-timeline-item-label action"></div>
@@ -96,8 +100,30 @@
                     </div>
                 </div>
             {% endfor %}
+            {% if can_comment %}
+                {{ render_comment_box(abstract, form) }}
+            {% endif %}
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro render_comment_box(abstract, form) %}
+    <div id="abstract-comment-box" class="i-timeline-item">
+        <div class="i-timeline-item-label action icon-file"></div>
+        <div class="i-timeline-item-box footer-only header-indicator">
+            <div class="i-box-footer">
+                {{ form_header(form, orientation='vertical') }}
+                {{ form_rows(form, skip_labels=true) }}
+                {% call form_footer(form) %}
+                    <button class="i-button big comment-button"
+                            data-method="POST"
+                            data-href="{{ url_for('.comment_abstract', abstract) }}">
+                        {% trans %}Comment{% endtrans %}
+                    </button>
+                {% endcall %}
+            </div>
+        </div>
+    </div>
 {% endmacro %}
 
 {% macro _render_review_state(review) %}
