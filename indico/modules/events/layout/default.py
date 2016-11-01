@@ -82,13 +82,6 @@ def get_default_menu_entries():
             static_site=True
         ),
         MenuEntryData(
-            title=_("Submit Abstract"),
-            name='abstract_submission',
-            endpoint='event.abstractSubmission',
-            position=1,
-            parent='call_for_abstracts'
-        ),
-        MenuEntryData(
             title=_("My Conference"),
             name='my_conference',
             endpoint='event.myconference',

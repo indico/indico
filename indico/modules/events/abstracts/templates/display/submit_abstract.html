@@ -1,0 +1,22 @@
+{% from 'events/display/indico/_common.html' import render_users %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title -%}
+    {% trans %}Submit abstract{% endtrans %}
+{%- endblock %}
+
+{%- block content %}
+    {% if form %}
+        {{ simple_form(form, form_header_kwargs={'action': url_for('.submit', event)}) }}
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">
+                {%- trans start_dt=event.cfa.start_dt|format_human_date, end_dt=event.cfa.end_dt|format_human_date -%}
+                    The call for abstracts is closed. Submission period: {{ start_dt }} to {{ end_dt }}
+                {%- endtrans -%}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

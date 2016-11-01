@@ -155,5 +155,12 @@
         else {
             $form.dropzone(options);
         }
+
+        $form.on('ajaxDialog:success', function(evt, data) {
+            if (data.redirect) {
+                IndicoUI.Dialogs.Util.progress();
+                location.href = data.redirect;
+            }
+        });
     };
 })(window);

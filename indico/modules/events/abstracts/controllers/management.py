@@ -43,7 +43,6 @@ from indico.modules.events.abstracts.util import (make_abstract_form, get_roles_
                                                   AbstractListGeneratorManagement)
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values, update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -275,10 +274,6 @@ class RHCreateAbstract(RHAbstractListBase):
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             data = form.data
-            if isinstance(data['submitted_for_tracks'], Track):
-                data['submitted_for_tracks'] = {data['submitted_for_tracks']}
-            elif data['submitted_for_tracks'] is None:
-                data['submitted_for_tracks'] = set()
             abstract = create_abstract(self.event_new, *get_field_values(data))
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
