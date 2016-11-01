@@ -26,13 +26,14 @@ from indico.modules.events.abstracts.controllers.base import (AbstractMixin, Dis
                                                               AbstractsExportExcel,
                                                               CustomizeAbstractListMixin, build_review_form,
                                                               render_abstract_page)
-from indico.modules.events.abstracts.forms import AbstractJudgmentForm, AbstractReviewedForTracksForm
+from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
+                                                   AbstractReviewedForTracksForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
-                                                        update_reviewed_for_tracks)
+                                                        create_abstract_comment, update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
                                                   get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
@@ -120,7 +121,6 @@ class RHJudgeAbstract(RHAbstractReviewBase):
             judgment_data, abstract_data = form.split_data
             judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
-
         tpl = get_template_module('events/abstracts/abstract/judge.html')
         return jsonify_data(box_html=tpl.render_decision_box(self.abstract, form, management=self.management))
 
@@ -218,6 +218,16 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
         return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))
+
+
+class RHLeaveComment(RHAbstractReviewBase):
+    def _process(self):
+        form = AbstractCommentForm()
+        if form.validate_on_submit():
+            create_abstract_comment(self.abstract, form.data)
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+        tpl = get_template_module('events/abstracts/abstract/review.html')
+        return jsonify_data(box_html=tpl.render_comment_box(self.abstract, form))
 
 
 class RHDisplayReviewableTracks(RHAbstractsBase):

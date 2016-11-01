@@ -2,7 +2,7 @@
 
 {% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
 {% from 'events/abstracts/abstract/judge.html' import render_decision_box %}
-{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_abstract_comments, render_review_boxes, render_reviewed_for_tracks_box %}
+{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_comments_section, render_review_boxes, render_reviewed_for_tracks_box %}
 
 {% block content %}
     {{ render_abstract_public(abstract, management=management) }}
@@ -11,7 +11,7 @@
             <div class="i-timetable-connect-down"></div>
         {% endif %}
         <div class="i-timeline-separator"></div>
-        {{ render_abstract_comments(abstract) }}
+        {{ render_comments_section(abstract, comment_form) }}
         {% if abstract.reviews %}
             {{ render_abstract_reviews(abstract, review_forms, management=management) }}
             <div class="i-timeline-separator"></div>

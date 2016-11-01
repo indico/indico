@@ -39,7 +39,33 @@
     };
 
     global.setupAbstractPage = function setupAbstractPage() {
-        $('body').on('indico:confirmed', '.judge-button', function(evt) {
+        $('body').on('indico:confirmed', '.comment-button', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            var $box = $('#abstract-comment-box');
+            var $form = $box.find('form');
+            var $page = $('.management-page');
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                data: getFormParams($form),
+                success: function(data) {
+                    if (data.page_html) {
+                        var $newPage = $(data.page_html);
+                        $page.replaceWith($newPage);
+                        $page = $newPage;
+                    } else {
+                        $box.html(data.box_html);
+                    }
+                    initForms($page);
+                    showFormErrors($page);
+                }
+            });
+        }).on('indico:confirmed', '.judge-button', function(evt) {
             var $box = $('#abstract-decision-box');
             var $this = $(this);
             var $form = $box.find('form');
@@ -79,8 +105,9 @@
                 success: function(data) {
                     var $page = $('.management-page');
                     if (data.page_html) {
-                        $page.replaceWith(data.page_html);
-                        $page = $('.management-page');
+                        var $newPage = $(data.page_html);
+                        $page.replaceWith($newPage);
+                        $page = $newPage;
                     } else {
                         $box.replaceWith(data.box_html);
                     }
