@@ -381,7 +381,7 @@
                 </div>
             </div>
 
-            {% if abstract.state.name != 'submitted' %}
+            {% if abstract.state.name not in ('submitted', 'withdrawn') %}
                 <div class="i-timeline-item">
                     <div class="i-timeline-item-label action"></div>
                     <div class="i-timeline-item-box header-indicator">
