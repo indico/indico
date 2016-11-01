@@ -120,10 +120,10 @@
     }
 }
 
-.contribution-list {
+.contribution-list, .track-review-list {
     @extend %font-family-modern-body;
 
-    .contribution-row {
+    .contribution-row, .track-review-row {
         padding: 0 10px;
         border-left: 3px solid $pastel-gray;
         margin-bottom: 1em;
