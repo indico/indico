@@ -167,6 +167,20 @@
                         Proposed to accept as {{ type }}
                     {%- endtrans %}
                 </div>
+            {% elif review.proposed_action.name == 'change_tracks' %}
+                <div class="i-box-content">
+                    {% set tracks -%}
+                        {% for track in review.proposed_tracks -%}
+                            <span class="abstract-track">{{ track.title|escape }}</span>
+                            {%- if not loop.last -%}, {% endif -%}
+                        {% endfor %}
+                    {%- endset %}
+                    {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
+                        Possible destination track: {{ tracks }}
+                    {%- pluralize -%}
+                        Possible destination tracks: {{ tracks }}
+                    {%- endtrans %}
+                </div>
             {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
                 <div class="i-box-content">
                     {% set other_abstract = review.proposed_related_abstract %}

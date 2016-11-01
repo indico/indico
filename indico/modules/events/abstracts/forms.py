@@ -230,29 +230,40 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
 class AbstractReviewForm(IndicoForm):
     """Form for reviewing an abstract"""
 
-    _order = ('comment', 'proposed_action', 'proposed_contribution_type', 'proposed_related_abstract')
+    _order = ('comment', 'proposed_action', 'proposed_contribution_type', 'proposed_related_abstract',
+              'proposed_tracks')
 
     comment = TextAreaField(_("Comments"))
     proposed_action = IndicoEnumSelectField(
-        _("Proposed Action"), [DataRequired()],
-        enum=AbstractAction, skip={AbstractAction.change_tracks})
+        _("Proposed Action"),
+        [DataRequired()],
+        enum=AbstractAction)
     proposed_related_abstract = AbstractField(
         _("Target Abstract"),
         [HiddenUnless('proposed_action', {AbstractAction.mark_as_duplicate, AbstractAction.merge}), DataRequired()],
         description=_("The current abstract should be marked as duplicate of the selected one"),
         ajax_endpoint='abstracts.other_abstracts')
     proposed_contribution_type = QuerySelectField(
-        _("Contribution type"), [HiddenUnless('proposed_action', AbstractAction.accept)],
+        _("Contribution type"),
+        [HiddenUnless('proposed_action', AbstractAction.accept)],
         get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("Choose the contribution type..."))
+    proposed_tracks = IndicoQuerySelectMultipleCheckboxField(
+        _("Propose for tracks"),
+        [Length(min=1), HiddenUnless('proposed_action', AbstractAction.change_tracks)],
+        collection_class=set, get_label='title')
 
     def __init__(self, *args, **kwargs):
         abstract = kwargs.pop('abstract')
-        self.event = abstract.event_new
         super(AbstractReviewForm, self).__init__(*args, **kwargs)
+        self.event = abstract.event_new
         self.proposed_related_abstract.abstract = abstract
         self.proposed_contribution_type.query = (ContributionType.query
                                                  .with_parent(self.event)
                                                  .order_by(ContributionType.name))
+        self.proposed_tracks.query = (Track.query
+                                      .with_parent(self.event)
+                                      .filter(Track.id.notin_(track.id for track in abstract.reviewed_for_tracks))
+                                      .order_by(Track.title))
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
