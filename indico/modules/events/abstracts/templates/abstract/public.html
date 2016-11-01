@@ -460,7 +460,7 @@
             {% endif %}
         </div>
 
-        {% if abstract.can_judge(session.user, check_state=false) %}
+        {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
             <a class="open-abstract-notification-log"
                data-href="{{ url_for('.notification_log', abstract) }}"
                data-title="{% trans %}Sent notifications{% endtrans %}"
