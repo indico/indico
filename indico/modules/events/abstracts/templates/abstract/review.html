@@ -119,6 +119,7 @@
 {% endmacro %}
 
 {% macro _render_review(cfa, review, form, management=false) %}
+    {% set abstract_url = 'abstracts.manage_abstract' if management else 'abstracts.display_abstract' %}
     {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
@@ -156,7 +157,37 @@
                     </div>
                 {% endif %}
             </div>
+            {% set contribution_type = review.proposed_contribution_type %}
+            {% if review.proposed_action.name == 'accept' and contribution_type %}
+                <div class="i-box-content">
+                    {% set contribution_type -%}
+                        <strong>{{ contribution_type.name|escape }}</strong>
+                    {%- endset %}
+                    {% trans type=contribution_type|safe -%}
+                        Proposed to accept as {{ type }}
+                    {%- endtrans %}
+                </div>
+            {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
+                <div class="i-box-content">
+                    {% set other_abstract = review.proposed_related_abstract %}
+                    {% set abstract_link -%}
+                        <a href="{{ url_for(abstract_url, other_abstract) }}">{{ other_abstract.title|escape }}</a>
+                    {%- endset %}
+                    {% if review.proposed_action.name == 'merge' %}
+                        {% trans title=abstract_link|safe -%}
+                            Proposed to be merged into {{ title }}
+                        {%- endtrans %}
+                    {% elif review.proposed_action.name == 'mark_as_duplicate' %}
+                        {% trans title=abstract_link|safe -%}
+                            Proposed as duplicate of {{ title }}
+                        {%- endtrans %}
+                    {% endif %}
+                </div>
+            {% endif %}
             {% if review.ratings %}
+                <div class="titled-rule">
+                    {% trans %}Ratings{% endtrans %}
+                </div>
                 {% for rating in review.ratings|sort(attribute='question.position') %}
                     <ul class="abstract-question-list">
                         <li>

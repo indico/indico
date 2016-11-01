@@ -241,7 +241,7 @@ class AbstractReviewForm(IndicoForm):
         [HiddenUnless('proposed_action', {AbstractAction.mark_as_duplicate, AbstractAction.merge}), DataRequired()],
         description=_("The current abstract should be marked as duplicate of the selected one"),
         ajax_endpoint='abstracts.other_abstracts')
-    proposed_contrib_type = QuerySelectField(
+    proposed_contribution_type = QuerySelectField(
         _("Contribution type"), [HiddenUnless('proposed_action', AbstractAction.accept)],
         get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("Choose the contribution type..."))
 
@@ -250,9 +250,9 @@ class AbstractReviewForm(IndicoForm):
         self.event = abstract.event_new
         super(AbstractReviewForm, self).__init__(*args, **kwargs)
         self.proposed_related_abstract.abstract = abstract
-        self.proposed_contrib_type.query = (ContributionType.query
-                                            .with_parent(self.event)
-                                            .order_by(ContributionType.name))
+        self.proposed_contribution_type.query = (ContributionType.query
+                                                 .with_parent(self.event)
+                                                 .order_by(ContributionType.name))
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
