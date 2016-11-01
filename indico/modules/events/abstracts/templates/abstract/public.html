@@ -283,8 +283,7 @@
         <div class="toolbar thin">
             {% if abstract.can_judge(session.user, check_state=true) %}
                 <div class="group">
-                    {# TODO: scroll to decision buttons #}
-                    <a href="#" class="i-button highlight icon-hammer">
+                    <a href="#abstract-decision-box" class="i-button highlight icon-hammer">
                         {% trans %}Judge{% endtrans %}
                     </a>
                 </div>
