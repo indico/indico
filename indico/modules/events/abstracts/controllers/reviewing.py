@@ -18,12 +18,14 @@
 from __future__ import unicode_literals
 
 from flask import request, session
+from indico.core.db import db
+from indico.modules.users import User
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
                                                               CustomizeAbstractListMixin)
 from indico.modules.events.abstracts.models.files import AbstractFile
-from indico.modules.events.abstracts.util import AbstractListGeneratorDisplay
+from indico.modules.events.abstracts.util import AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
 from indico.modules.events.tracks.models.tracks import Track
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -68,13 +70,24 @@ class RHAbstractsDownloadAttachment(RHAbstractsReviewBase):
 
 
 class RHDisplayReviewableTracks(RHAbstractsBase):
+    def _checkProtection(self):
+        RHAbstractsBase._checkProtection(self)
+        if not session.user:
+            raise Forbidden
+
     def _process(self):
-        user = session.user
-        tracks_set = (user.convener_for_tracks | user.abstract_reviewer_for_tracks) & set(self.event_new.tracks)
-        if user in self.event_new.global_abstract_reviewers or user in self.event_new.global_conveners:
-            tracks_set.update(self.event_new.tracks)
+        query = Track.query.with_parent(self.event_new)
+        track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event_new, session.user)
+
+        # if the user is not a global convener only show their tracks
+        if (session.user not in self.event_new.global_abstract_reviewers and
+                session.user not in self.event_new.global_conveners):
+            query = query.filter(db.or_(Track.conveners.any(User.id == session.user.id),
+                                        Track.abstract_reviewers.any(User.id == session.user.id)))
+
         return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self._conf, event=self.event_new,
-                                                           tracks=tracks_set)
+                                                           tracks=query.all(),
+                                                           abstract_count=track_reviewer_abstract_count)
 
 
 class RHDisplayAbstractListBase(RHAbstractsBase):

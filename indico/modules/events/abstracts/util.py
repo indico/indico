@@ -410,14 +410,14 @@ def get_roles_for_event(event):
 
 def get_track_reviewer_abstract_counts(event, user):
     """
-    Get the number of unreviewed/reviewed abstracts per track for a
+    Get the number of total/reviewed abstracts per track for a
     specific user.
 
     Note that this does not take into account if the user is a
     reviewer for a track; it just checks whether the user has
     reviewed an abstract in a track or not.
 
-    :return: A ``{track: (unreviewed_count, reviewed_count)}`` dict.
+    :return: A ``{track: (total_count, reviewed_count)}`` dict.
     """
     # COUNT() does not count NULL values so we pass NULL in case an
     # abstract is not in the submitted state. That way we still get
@@ -426,9 +426,9 @@ def get_track_reviewer_abstract_counts(event, user):
     count_total = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
     count_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id}, value=Abstract.state))
     query = (Track.query.with_parent(event)
-             .with_entities(Track, count_total - count_reviewed, count_reviewed)
+             .with_entities(Track, count_total, count_reviewed)
              .outerjoin(Track.abstracts_reviewed)
              .outerjoin(AbstractReview, db.and_(AbstractReview.abstract_id == Abstract.id,
                                                 AbstractReview.user_id == user.id))
              .group_by(Track.id))
-    return {track: (unreviewed, reviewed) for track, unreviewed, reviewed in query}
+    return {track: (total, reviewed) for track, total, reviewed in query}

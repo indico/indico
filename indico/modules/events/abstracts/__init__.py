@@ -112,7 +112,7 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts', endpoint='event.conferenceCFA',
                         position=2, visible=lambda event: event.has_feature('abstracts'))
 
-    yield MenuEntryData(title=_("View my Tracks"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
+    yield MenuEntryData(title=_("Reviewing Area"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
                         position=2, parent='call_for_abstracts',
                         visible=lambda event: session.user and event.has_feature('abstracts'))
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
