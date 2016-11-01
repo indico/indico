@@ -137,6 +137,14 @@ def merge_person_links(target_abstract, source_abstract):
         target_abstract.person_links.append(link)
 
 
+def delete_abstract_comment(comment):
+    db.session.delete(comment)
+    db.session.flush()
+    logger.info("Abstract comment %s deleted by %s", comment, session.user)
+    comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
+                                   'Abstract comment "{}" was removed'.format(comment.id), session.user)
+
+
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
                    send_notification=False):
     abstract.judge = judge
