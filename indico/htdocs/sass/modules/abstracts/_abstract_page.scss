@@ -282,6 +282,12 @@
     }
 }
 
-.abstract-review-box.weak-hidden {
-    display: none;
+.abstract-review-box {
+    &.weak-hidden {
+        display: none;
+    }
+
+    .i-timeline-item-box .i-box-footer {
+        overflow: visible;
+    }
 }
