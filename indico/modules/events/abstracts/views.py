@@ -64,3 +64,16 @@ class WPDisplayAbstracts(WPJinjaMixin, WPConferenceDefaultDisplayBase):
         return (WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') +
                 '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
                           for url in self._asset_env['mathjax_js'].urls()))
+
+
+class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
+    menu_entry_name = 'user_tracks'
+
+    def getJSFiles(self):
+        return (WPDisplayAbstracts.getJSFiles(self) +
+                self._asset_env['modules_event_management_js'].urls())
+
+    def getCSSFiles(self):
+        return (WPDisplayAbstracts.getCSSFiles(self) +
+                self._asset_env['event_display_sass'].urls() +
+                self._asset_env['tracks_sass'].urls())

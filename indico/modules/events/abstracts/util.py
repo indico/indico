@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
@@ -37,17 +38,14 @@ from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
 
-class AbstractListGenerator(ListGeneratorBase):
-    """Listing and filtering actions in the abstract list."""
-
-    endpoint = '.manage_abstract_list'
-    list_link_type = 'abstract'
+class AbstractListGeneratorBase(ListGeneratorBase):
+    """Listing and filtering actions in an abstract list."""
 
     def __init__(self, event):
-        super(AbstractListGenerator, self).__init__(event)
+        super(AbstractListGeneratorBase, self).__init__(event)
+
         self.default_list_config = {
-            'items': ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks', 'reviewed_for_tracks',
-                      'accepted_track', 'state'),
+            'items': (),
             'filters': {'fields': {}, 'items': {}, 'extra': {}}
         }
         track_empty = {None: 'No track'}
@@ -72,10 +70,7 @@ class AbstractListGenerator(ListGeneratorBase):
             ('submitted_dt', {'title': _('Submission date')}),
             ('modified_dt', {'title': _('Modification date')})
         ])
-        self.extra_filters = OrderedDict([
-            ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
-            ('comments', {'title': _('Must have comments'), 'type': 'bool'})
-        ])
+        self.extra_filters = {}
         self.list_config = self._get_config()
 
     def _get_static_columns(self, ids):
@@ -98,7 +93,7 @@ class AbstractListGenerator(ListGeneratorBase):
                 .all())
 
     def _get_filters_from_request(self):
-        filters = super(AbstractListGenerator, self)._get_filters_from_request()
+        filters = super(AbstractListGeneratorBase, self)._get_filters_from_request()
         for field in self.event.contribution_fields:
             if field.field_type == 'single_choice':
                 options = request.form.getlist('field_{}'.format(field.id))
@@ -216,6 +211,43 @@ class AbstractListGenerator(ListGeneratorBase):
     def flash_info_message(self, abstract):
         flash(_("The abstract '{}' is not displayed in the list due to the enabled filters")
               .format(abstract.title), 'info')
+
+
+class AbstractListGeneratorManagement(AbstractListGeneratorBase):
+    """Listing and filtering actions in the abstract list in the management view"""
+
+    list_link_type = 'abstract_management'
+    endpoint = '.manage_abstract_list'
+
+    def __init__(self, event):
+        super(AbstractListGeneratorManagement, self).__init__(event)
+        self.default_list_config['items'] = ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks',
+                                             'reviewed_for_tracks', 'accepted_track', 'state')
+        self.extra_filters = OrderedDict([
+            ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
+            ('comments', {'title': _('Must have comments'), 'type': 'bool'})
+        ])
+
+
+class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
+    """Listing and filtering actions in the abstract list in the display view"""
+
+    list_link_type = 'abstract_display'
+    endpoint = '.display_reviewable_track_abstracts'
+
+    def __init__(self, event, track):
+        super(AbstractListGeneratorDisplay, self).__init__(event)
+        self.track = track
+        self.default_list_config['items'] = ('submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state')
+        items = {'state', 'submitter', 'accepted_contrib_type', 'submitted_contrib_type'}
+        self.static_items = OrderedDict((key, value)
+                                        for key, value in self.static_items.iteritems()
+                                        if key in items)
+
+    def _build_query(self):
+        query = super(AbstractListGeneratorDisplay, self)._build_query()
+        query = query.filter(Abstract.reviewed_for_tracks.contains(self.track))
+        return query
 
 
 def build_default_email_template(event, tpl_type):
@@ -374,3 +406,29 @@ def get_roles_for_event(event):
     roles['*']['reviewer'] = [reviewer.id for reviewer in event.global_abstract_reviewers]
     roles['*']['convener'] = [reviewer.id for reviewer in event.global_conveners]
     return roles
+
+
+def get_track_reviewer_abstract_counts(event, user):
+    """
+    Get the number of total/reviewed abstracts per track for a
+    specific user.
+
+    Note that this does not take into account if the user is a
+    reviewer for a track; it just checks whether the user has
+    reviewed an abstract in a track or not.
+
+    :return: A ``{track: (total_count, reviewed_count)}`` dict.
+    """
+    # COUNT() does not count NULL values so we pass NULL in case an
+    # abstract is not in the submitted state. That way we still get
+    # the track - filtering using WHERE would only include tracks
+    # that have some abstract in the submitted state.
+    count_total = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
+    count_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id}, value=Abstract.state))
+    query = (Track.query.with_parent(event)
+             .with_entities(Track, count_total, count_reviewed)
+             .outerjoin(Track.abstracts_reviewed)
+             .outerjoin(AbstractReview, db.and_(AbstractReview.abstract_id == Abstract.id,
+                                                AbstractReview.user_id == user.id))
+             .group_by(Track.id))
+    return {track: (total, reviewed) for track, total, reviewed in query}
