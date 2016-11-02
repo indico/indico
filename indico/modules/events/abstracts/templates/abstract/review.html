@@ -104,7 +104,8 @@
     {% set mapping = {'accept': 'success',
                       'reject': 'error',
                       'merge': 'visited',
-                      'mark_as_dupe': 'strong'} %}
+                      'mark_as_duplicate': 'strong',
+                      'change_tracks': 'warning'} %}
     <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
         {{ review.proposed_action.title -}}
     </span>
