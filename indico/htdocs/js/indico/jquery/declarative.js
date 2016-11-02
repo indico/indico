@@ -98,6 +98,7 @@
             var params = $this.data('params') || {};
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
+            var ajax = $this.data('ajax') !== undefined;
             var highlightUpdate = $this.data('highlight-update') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
@@ -173,7 +174,7 @@
                 }
 
                 // Handle html update or reload
-                if (update || reload !== undefined) {
+                if (ajax || update || reload !== undefined) {
                     $.ajax({
                         method: method,
                         url: url,
@@ -181,6 +182,11 @@
                         error: handleAjaxError,
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
+                            var successEvt = $.Event('declarative:success');
+                            $this.trigger(successEvt, [data]);
+                            if (successEvt.isDefaultPrevented()) {
+                                return;
+                            }
                             if (update) {
                                 handleFlashes(data, true, $this);
                                 handleHtmlUpdate(data, $this);
