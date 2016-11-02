@@ -10,3 +10,10 @@
         </span>
     {% endif %}
 {% endmacro %}
+
+{% macro render_tracks(tracks) %}
+    {% for track in tracks %}
+        <span class="abstract-track">{{ track.title }}</span>
+        {%- if not loop.last -%},{% endif %}
+    {% endfor %}
+{% endmacro %}

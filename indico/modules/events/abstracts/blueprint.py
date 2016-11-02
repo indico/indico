@@ -48,7 +48,8 @@ from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDo
                                                                    RHDisplayAbstractsExportPDF,
                                                                    RHDisplayAbstractsExportCSV,
                                                                    RHDisplayAbstractsExportExcel,
-                                                                   RHDisplayAbstractsDownloadAttachments)
+                                                                   RHDisplayAbstractsDownloadAttachments,
+                                                                   RHEditReviewedForTrackList)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -131,7 +132,6 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
 
-# Abstract reviewing actions
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
     _bp.add_url_rule(prefix + '/<int:abstract_id>/withdraw', 'withdraw_abstract',
@@ -144,6 +144,8 @@ for prefix in ('/manage/abstracts', '/abstracts'):
                      RHReviewAbstractForTrack, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/judge', 'judge_abstract',
                      RHJudgeAbstract, methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/reviewing-tracks', 'edit_review_tracks',
+                     RHEditReviewedForTrackList, methods=('POST',), defaults=defaults)
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<event_id>')

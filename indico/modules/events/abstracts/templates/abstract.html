@@ -2,7 +2,7 @@
 
 {% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
 {% from 'events/abstracts/abstract/judge.html' import render_decision_box %}
-{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_abstract_comments, render_review_boxes %}
+{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_abstract_comments, render_review_boxes, render_reviewed_for_tracks_box %}
 
 {% block content %}
     {{ render_abstract_public(abstract, management=management) }}
@@ -29,6 +29,7 @@
         {% endif %}
 
         {% if can_judge %}
+            {{ render_reviewed_for_tracks_box(abstract, review_track_list_form, management=management) }}
             <div id="abstract-decision-box" class="i-timeline-item">
                 {{ render_decision_box(abstract, judgment_form, management=management) }}
             </div>
