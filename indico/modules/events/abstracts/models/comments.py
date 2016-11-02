@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.i18n import _
@@ -120,6 +121,10 @@ class AbstractComment(db.Model):
             lazy='dynamic'
         )
     )
+
+    @locator_property
+    def locator(self):
+        return dict(self.abstract.locator, comment_id=self.id)
 
     @return_ascii
     def __repr__(self):
