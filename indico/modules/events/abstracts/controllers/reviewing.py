@@ -29,11 +29,13 @@ from indico.modules.events.abstracts.controllers.base import (AbstractMixin, Dis
 from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
                                                    AbstractReviewedForTracksForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
-                                                        create_abstract_comment, update_reviewed_for_tracks)
+                                                        create_abstract_comment, delete_abstract_comment,
+                                                        update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
                                                   get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
@@ -228,6 +230,29 @@ class RHLeaveComment(RHAbstractReviewBase):
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
         return jsonify_data(box_html=tpl.render_comment_box(self.abstract, form))
+
+
+class RHAbstractCommentBase(RHAbstractReviewBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.comment
+        }
+    }
+
+    def _checkParams(self, params):
+        RHAbstractReviewBase._checkParams(self, params)
+        self.comment = AbstractComment.get_one(request.view_args['comment_id'])
+
+    def _checkProtection(self):
+        RHAbstractReviewBase._checkProtection(self)
+        if not self.comment.can_edit(session.user):
+            raise Forbidden
+
+
+class RHDeleteAbstractComment(RHAbstractCommentBase):
+    def _process(self):
+        delete_abstract_comment(self.comment)
+        return jsonify_data()
 
 
 class RHDisplayReviewableTracks(RHAbstractsBase):
