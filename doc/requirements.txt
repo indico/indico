@@ -1,3 +1,4 @@
 pojson
 babel
 repoze.sphinx.autointerface
+ZODB3==3.10.5
