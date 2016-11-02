@@ -55,6 +55,19 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
     return abstract
 
 
+def withdraw_abstract(abstract, delete_contrib=False):
+    abstract.state = AbstractState.withdrawn
+    contrib = abstract.contribution
+    abstract.contribution = None
+    if delete_contrib and contrib:
+        delete_contribution(contrib)
+    db.session.flush()
+    signals.event.abstract_withdrawn.send(abstract)
+    logger.info('Abstract %s withdrawn by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
+                           'Abstract "{}" has been withdrawn'.format(abstract.title), session.user)
+
+
 def delete_abstract(abstract, delete_contrib=False):
     abstract.is_deleted = True
     contrib = abstract.contribution
@@ -98,7 +111,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
                            'Abstract "{}" has been judged'.format(abstract.title), session.user)
 
 
-def reset_abstract_judgment(abstract):
+def reset_abstract_state(abstract):
     abstract.reset_judgment()
     db.session.flush()
     logger.info('Abstract %s judgment reset by %s', abstract, session.user)

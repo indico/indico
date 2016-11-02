@@ -303,7 +303,32 @@
                     </div>
                 {% endif %}
             {% endif %}
-            {% if abstract.submitter == session.user or abstract.event_new.can_manage(session.user) %}
+            {% set can_manage = abstract.event_new.can_manage(session.user) %}
+
+            {% if abstract.submitter == session.user or can_manage %}
+                <div class="group">
+                    {% if abstract.state.name != 'withdrawn' and (can_manage or abstract.public_state.name == 'awaiting') %}
+                        <a title="{% trans %}Withdraw abstract{% endtrans %}"
+                           data-href="{{ url_for('.withdraw_abstract', abstract, management=management) }}"
+                           data-method="POST"
+                           data-update='{"display_html": ".mainContent .col2", "management_html": ".management-page"}'
+                           data-title="{% trans %}Withdraw Abstract{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to withdraw this abstract? This operation is irreversible.{% endtrans %}"
+                           class="i-button text-color danger icon-cross">
+                            {% trans %}Withdraw{% endtrans %}
+                        </a>
+                    {% elif abstract.state.name == 'withdrawn' and can_manage %}
+                        <a title="{% trans %}This abstract has been withdrawn but can be restored using this option{% endtrans %}"
+                           data-href="{{ url_for('.reset_abstract_state', abstract, management=management) }}"
+                           data-method="POST"
+                           data-update='{"display_html": ".mainContent .col2", "management_html": ".management-page"}'
+                           data-title="{% trans %}Restore Abstract{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to restore this abstract? This operation is irreversible.{% endtrans %}"
+                           class="i-button accept icon-lamp">
+                            {% trans %}Restore{% endtrans %}
+                        </a>
+                    {% endif %}
+                </div>
                 <div class="group">
                     {% if abstract.state.name not in ('submitted', 'withdrawn') %}
                         <a class="i-button icon-edit disabled"
@@ -321,7 +346,7 @@
                 </div>
             {% endif %}
             <div class="group">
-            {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
+                {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
                 <a class="i-button icon-file-download"
                    href="{{ url_for(endpoint, abstract) }}"
                    title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
@@ -395,7 +420,7 @@
                                 <div>
                                     <a class="i-button-icon icon-remove"
                                        title="{% trans %}Reset judgement{% endtrans %}"
-                                       data-href="{{ url_for('.reset_abstract_judgment', abstract, management=management) }}"
+                                       data-href="{{ url_for('.reset_abstract_state', abstract, management=management) }}"
                                        data-method="POST"
                                        data-update='{"display_html": ".mainContent .col2", "management_html": ".management-page"}'
                                        data-title="{% trans %}Reset judgment{% endtrans %}"
