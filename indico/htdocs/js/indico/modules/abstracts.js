@@ -125,6 +125,8 @@
         }).on('indico:htmlUpdated', function() {
             initForms($(this));
             showFormErrors($(this));
+        }).on('declarative:success', '.js-delete-comment', function() {
+            $(this).parents('.i-timeline-item').remove();
         }).on('click', '#edit-reviewed-for-track-list', function(evt) {
             evt.preventDefault();
             $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');

@@ -91,6 +91,14 @@
                             {% if comment.can_edit(session.user) %}
                                 <div class="abstract-comment-badges">
                                     <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
+                                    <a class="i-button-icon icon-cross js-delete-comment"
+                                       title="{% trans %}Remove comment{% endtrans %}"
+                                       data-method="POST"
+                                       data-href="{{ url_for('.delete_abstract_comment', comment) }}"
+                                       data-title="{% trans %}Remove comment{% endtrans %}"
+                                       data-confirm="{% trans %}Are you sure you want to remove this comment?{% endtrans %}"
+                                       data-ajax>
+                                    </a>
                                 </div>
                             {% endif %}
                         </div>

@@ -41,6 +41,7 @@ from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDo
                                                                    RHResetAbstractState,
                                                                    RHWithdrawAbstract,
                                                                    RHLeaveComment,
+                                                                   RHDeleteAbstractComment,
                                                                    RHDisplayReviewableTracks,
                                                                    RHDisplayReviewableTrackAbstracts,
                                                                    RHListOtherAbstracts,
@@ -133,8 +134,12 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment', 'comment_abstract', RHLeaveComment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
+
+# Abstract-specific
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment', 'comment_abstract', RHLeaveComment, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
+                 'delete_abstract_comment', RHDeleteAbstractComment, methods=('DELETE',))
 
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
