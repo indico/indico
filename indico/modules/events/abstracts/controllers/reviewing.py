@@ -36,6 +36,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHAbstractReviewBase(AbstractMixin, RHConferenceBaseDisplay):
+    CSRF_ENABLED = True
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
@@ -88,7 +89,10 @@ class RHListOtherAbstracts(RHConferenceBaseDisplay):
 
 
 class RHJudgeAbstract(RHAbstractReviewBase):
-    CSRF_ENABLED = True
+    def _checkProtection(self):
+        if not self.abstract.can_judge(session.user, check_state=True):
+            raise Forbidden
+        RHAbstractReviewBase._checkProtection(self)
 
     def _process(self):
         form = AbstractJudgmentForm(abstract=self.abstract)
@@ -103,9 +107,14 @@ class RHJudgeAbstract(RHAbstractReviewBase):
 
 class RHResetAbstractState(RHAbstractReviewBase):
     def _checkProtection(self):
-        if (not self.abstract.can_judge(session.user, check_state=True) and
-                not (self.abstract.state == AbstractState.withdrawn and self.event_new.can_manage(session.user))):
+        if self.abstract.state == AbstractState.submitted:
             raise Forbidden
+        # only let pass through
+        # - judges (when abstract is not in withdrawn state)
+        # - managers (all states except for 'submitted')
+        if not self.abstract.can_judge(session.user) or self.abstract.state == AbstractState.withdrawn:
+            if not self.event_new.can_manage(session.user):
+                raise Forbidden
         RHAbstractReviewBase._checkProtection(self)
 
     def _process(self):
@@ -118,9 +127,7 @@ class RHResetAbstractState(RHAbstractReviewBase):
 
 class RHWithdrawAbstract(RHAbstractReviewBase):
     def _checkProtection(self):
-        abstract = self.abstract
-        if (not self.event_new.can_manage(session.user) and
-                (abstract.public_state != AbstractPublicState.awaiting or session.user != abstract.submitter)):
+        if not self.abstract.can_withdraw(session.user, check_state=True):
             raise Forbidden
         RHAbstractReviewBase._checkProtection(self)
 

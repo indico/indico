@@ -62,7 +62,7 @@ def withdraw_abstract(abstract, delete_contrib=False):
     if delete_contrib and contrib:
         delete_contribution(contrib)
     db.session.flush()
-    signals.event.abstract_withdrawn.send(abstract)
+    signals.event.abstract_state_changed.send(abstract)
     logger.info('Abstract %s withdrawn by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                            'Abstract "{}" has been withdrawn'.format(abstract.title), session.user)
@@ -112,11 +112,11 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
 
 
 def reset_abstract_state(abstract):
-    abstract.reset_judgment()
+    abstract.reset_state()
     db.session.flush()
-    logger.info('Abstract %s judgment reset by %s', abstract, session.user)
+    logger.info('Abstract %s state reset by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Judgment from abstract "{}" has been reset'.format(abstract.title), session.user)
+                           'State of abstract "{}" has been reset'.format(abstract.title), session.user)
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
