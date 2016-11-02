@@ -115,8 +115,8 @@ class CustomizeAbstractListMixin:
                                                event=self.event_new, visible_items=list_config['items'],
                                                static_items=self.list_generator.static_items,
                                                extra_filters=self.list_generator.extra_filters,
-                                               filters=list_config['filters'],
-                                               reviewing_page=self.view_class == WPDisplayAbstractsReviewing)
+                                               contrib_fields=self.list_generator.get_all_contribution_fields(),
+                                               filters=list_config['filters'])
 
     def _process_POST(self):
         self.list_generator.store_configuration()
