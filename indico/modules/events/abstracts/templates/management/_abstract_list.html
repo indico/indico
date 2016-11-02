@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                         {% for abstract in abstracts %}
-                            {% if context_track is not none and abstract.accepted_track.id != context_track.id  %}
+                            {% if context_track is not none and abstract.state.name == 'accepted' and abstract.accepted_track != context_track  %}
                                 <tr class="i-table abstract-row accepted-on-other-track disabled"
                                     title='{% trans other_track=abstract.accepted_track.title -%}This abstract has already
                                             been accepted for the track "{{ other_track }}"{%- endtrans %}'
@@ -62,7 +62,7 @@
                                     {% if item.id == 'state' %}
                                         <td class="i-table" data-searchable="{{ abstract.state.title | lower }}">
                                             {{- abstract.state.title -}}
-                                            {% if context_track is not none and abstract.accepted_track.id != context_track.id  %}
+                                            {% if context_track is not none and abstract.state.name == 'accepted' and abstract.accepted_track != context_track  %}
                                                 <span class="icon-warning"></span>
                                             {% endif %}
                                         </td>
