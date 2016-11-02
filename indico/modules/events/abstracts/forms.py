@@ -378,7 +378,7 @@ class AbstractForm(IndicoForm):
 
 
 class SingleTrackMixin(object):
-    submitted_for_tracks = QuerySelectField(_("Track"), get_label=lambda x: x.title, allow_blank=True)
+    submitted_for_tracks = QuerySelectField(_("Track"), get_label='title', allow_blank=True)
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
@@ -391,8 +391,7 @@ class SingleTrackMixin(object):
 
 
 class MultiTrackMixin(object):
-    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label=lambda x: x.title,
-                                                                  collection_class=set)
+    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label='title', collection_class=set)
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
@@ -415,3 +414,12 @@ class AbstractsScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(AbstractsScheduleForm, self).__init__(*args, **kwargs)
+
+
+class AbstractReviewedForTracksForm(IndicoForm):
+    reviewed_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label='title', collection_class=set)
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(AbstractReviewedForTracksForm, self).__init__(*args, **kwargs)
+        self.reviewed_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)

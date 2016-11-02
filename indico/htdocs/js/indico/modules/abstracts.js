@@ -63,9 +63,9 @@
                     showFormErrors($box);
                 }
             });
-        }).on('indico:confirmed', '.review-button', function(evt) {
+        }).on('indico:confirmed', '.review-button, #save-reviewing-tracks-list', function(evt) {
             var $this = $(this);
-            var $box = $this.closest('.abstract-review-box');
+            var $box = $this.closest('.i-timeline-item');
             var $form = $box.find('form');
 
             evt.preventDefault();
@@ -98,6 +98,9 @@
         }).on('indico:htmlUpdated', function() {
             initForms($(this));
             showFormErrors($(this));
+        }).on('click', '#edit-reviewed-for-track-list', function(evt) {
+            evt.preventDefault();
+            $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');
         });
     };
 

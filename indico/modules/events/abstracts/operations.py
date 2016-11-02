@@ -143,3 +143,12 @@ def close_cfa(event):
     event.cfa.close()
     logger.info("Call for abstracts for %s closed by %s", event, session.user)
     event.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts', 'Call for abstracts closed', session.user)
+
+
+def update_reviewed_for_tracks(abstract, tracks):
+    abstract.reviewed_for_tracks = tracks
+    db.session.flush()
+    logger.info('The list of tracks the abstract %s is reviewed for has been updated by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'The list of tracks the abstract "{}" is reviewed for has been updated'
+                           .format(abstract.title), session.user)

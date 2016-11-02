@@ -26,12 +26,13 @@ from indico.modules.events.abstracts.controllers.base import (AbstractMixin, Dis
                                                               AbstractsExportExcel,
                                                               CustomizeAbstractListMixin, build_review_form,
                                                               render_abstract_page)
-from indico.modules.events.abstracts.forms import AbstractJudgmentForm
+from indico.modules.events.abstracts.forms import AbstractJudgmentForm, AbstractReviewedForTracksForm
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import judge_abstract, reset_abstract_state, withdraw_abstract
+from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
+                                                        update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
                                                   get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
@@ -265,3 +266,14 @@ class RHDisplayAbstractsExportCSV(AbstractsExportCSV, RHDisplayAbstractsActionsB
 
 class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActionsBase):
     pass
+
+
+class RHEditReviewedForTrackList(RHAbstractReviewBase):
+    def _process(self):
+        form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
+        if form.validate_on_submit:
+            update_reviewed_for_tracks(self.abstract, form.reviewed_for_tracks.data)
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+        tpl = get_template_module('events/abstracts/abstract/review.html')
+        return jsonify_data(box_html=tpl.render_reviewed_for_tracks_box(self.abstract, form=form,
+                                                                        management=self.management))

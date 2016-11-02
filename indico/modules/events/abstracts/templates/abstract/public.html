@@ -1,11 +1,4 @@
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint %}
-
-{% macro _render_tracks(tracks) %}
-    {% for track in tracks %}
-        <span class="abstract-track">{{ track.title }}</span>
-        {%- if not loop.last -%},{% endif %}
-    {% endfor %}
-{% endmacro %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_tracks %}
 
 {% macro _render_submission_info(abstract) %}
     {% if abstract.submitted_contrib_type %}
@@ -25,7 +18,7 @@
                     Tracks:
                 {%- endtrans -%}
             </label>
-            {{ _render_tracks(abstract.submitted_for_tracks) }}
+            {{ render_tracks(abstract.submitted_for_tracks) }}
         </div>
     {% endif %}
     {% if abstract.primary_authors %}
@@ -154,7 +147,7 @@
                         {%- pluralize -%}
                             For tracks:
                         {%- endtrans %}
-                        {{ _render_tracks(abstract.submitted_for_tracks) }}
+                        {{ render_tracks(abstract.submitted_for_tracks) }}
                     </div>
                 {% endif %}
             {% elif abstract.state.name == 'accepted' %}
