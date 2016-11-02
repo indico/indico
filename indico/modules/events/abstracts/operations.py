@@ -137,6 +137,16 @@ def merge_person_links(target_abstract, source_abstract):
         target_abstract.person_links.append(link)
 
 
+def update_abstract_comment(comment, comment_data):
+    comment.populate_from_dict(comment_data)
+    comment.modified_by = session.user
+    comment.modified_dt = now_utc()
+    db.session.flush()
+    logger.info("Abstract comment %s modified by %s", comment, session.user)
+    comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                                   'Abstract comment "{}" was modified'.format(comment.id), session.user)
+
+
 def delete_abstract_comment(comment):
     db.session.delete(comment)
     db.session.flush()
