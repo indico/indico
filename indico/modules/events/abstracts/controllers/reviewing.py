@@ -115,9 +115,9 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.abstract
-        },
-        'preserved_args': {'track_id'}
+            lambda self: self.abstract,
+            lambda self: self.track
+        }
     }
 
     def _checkProtection(self):
