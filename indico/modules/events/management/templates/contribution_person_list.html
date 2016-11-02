@@ -42,9 +42,8 @@
                     <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
                     <th class="i-table author-type-column">{% trans %}Author type{% endtrans %}</th>
                     {% if include_submitters %}
-                        <th class="i-table submitter-column" data-sorter="false">{% trans %}Submitter{% endtrans %}</th>
+                        <th class="i-table roles-column" data-sorter="false">{% trans %}Roles{% endtrans %}</th>
                     {% endif %}
-                    <th class="i-table speaker-column" data-sorter="false"></th>
                 </tr>
             </thead>
             <tbody>
@@ -68,19 +67,17 @@
                                 -
                             {% endif %}
                         </td>
-                        {% if include_submitters %}
-                            {% set is_submitter = person_roles.submitter %}
-                            <td class="i-table submitter-column">
+                        <td class="i-table roles-column">
+                            {% if include_submitters %}
+                                {% set is_submitter = person_roles.submitter %}
                                 {%- if is_submitter %}
                                     {% set submitter_title = _("This person submitted an abstract") %}
                                 {%- else -%}
                                     {% set submitter_title = _("This person hasn't submitted any abstracts") %}
                                 {% endif -%}
-                                <i class="icon-checkmark submitter-icon {{ 'inactive' if not is_submitter }}"
+                                <i class="icon-user-check submitter-icon {{ 'inactive' if not is_submitter }}"
                                    title="{{ submitter_title }}"></i>
-                            </td>
-                        {% endif %}
-                        <td class="i-table speaker-column">
+                            {% endif %}
                             {%- if is_speaker %}
                                 {% set speaker_title = _('This person is a speaker') %}
                             {%- else -%}
