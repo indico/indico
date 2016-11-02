@@ -283,28 +283,12 @@
         <div class="toolbar thin">
             {% if abstract.can_judge(session.user, check_state=true) %}
                 <div class="group">
-                    <a href="#abstract-decision-box" class="i-button highlight icon-hammer">
+                    <a href="#abstract-decision-box" class="i-button text-color highlight icon-hammer">
                         {% trans %}Judge{% endtrans %}
                     </a>
                 </div>
             {% endif %}
-            {% if abstract.event_new.can_manage(session.user) %}
-                {% if management %}
-                    <div class="group">
-                        <a href="{{ url_for('.display_abstract', abstract) }}" class="i-button highlight icon-switchon">
-                            {% trans %}Display view{% endtrans %}
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="group">
-                        <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
-                            {% trans %}Management view{% endtrans %}
-                        </a>
-                    </div>
-                {% endif %}
-            {% endif %}
             {% set can_manage = abstract.event_new.can_manage(session.user) %}
-
             {% if abstract.submitter == session.user or can_manage %}
                 <div class="group">
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
@@ -330,6 +314,12 @@
                     {% endif %}
                 </div>
                 <div class="group">
+                    {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
+                    <a class="i-button icon-file-download"
+                       href="{{ url_for(endpoint, abstract) }}"
+                       title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
+                </div>
+                <div class="group">
                     {% if abstract.state.name not in ('submitted', 'withdrawn') %}
                         <a class="i-button icon-edit disabled"
                             title="{% trans %}The abstract cannot be edited because it has been processed already{% endtrans %}"></a>
@@ -345,12 +335,21 @@
                     {% endif %}
                 </div>
             {% endif %}
-            <div class="group">
-                {% set endpoint = '.manage_abstract_pdf_export' if management else '.display_abstract_pdf_export' %}
-                <a class="i-button icon-file-download"
-                   href="{{ url_for(endpoint, abstract) }}"
-                   title="{% trans %}Download abstract submission in PDF{% endtrans %}"></a>
-            </div>
+            {% if can_manage %}
+                {% if management %}
+                    <div class="group">
+                        <a href="{{ url_for('.display_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                            {% trans %}Display view{% endtrans %}
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="group">
+                        <a href="{{ url_for('.manage_abstract', abstract) }}" class="i-button highlight icon-switchon">
+                            {% trans %}Management view{% endtrans %}
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 
