@@ -406,8 +406,8 @@
                         <div class="i-box-content">
                             {% if abstract.state.name == 'accepted' %}
                                 {% if abstract.contribution %}
-                                    {% set link_start = '<a href="%s">'|format(url_for('contributions.display_contribution', abstract.contribution)) %}
-                                    {% set link_end = '</a>' %}
+                                    {% set link_start = '<a href="%s">'|safe|format(url_for('contributions.display_contribution', abstract.contribution)) %}
+                                    {% set link_end = '</a>'|safe %}
                                 {% else %}
                                     {% set link_start = '' %}
                                     {% set link_end = '' %}
