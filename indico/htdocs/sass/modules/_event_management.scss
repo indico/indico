@@ -520,8 +520,12 @@ th.i-table {
         width: 11em;
     }
 
-    .speaker-column {
-        width: 2.1em;
+    .roles-column {
+        width: 5em;
+
+        .submitter-icon {
+            padding-right: 0.75em;
+        }
     }
 
     .form-group-mail {
