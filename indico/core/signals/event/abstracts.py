@@ -25,6 +25,10 @@ abstract_deleted = _signals.signal('abstract-deleted', """
 Called when an abstract is deleted. The *sender* is the abstract.
 """)
 
+abstract_withdrawn = _signals.signal('abstract-withdrawn', """
+Called when an abstract is withdrawn. The *sender* is the abstract.
+""")
+
 abstract_updated = _signals.signal('abstract-updated', """
 Called when an abstract is modified. The *sender* is the abstract.
 """)

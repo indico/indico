@@ -37,7 +37,8 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstracts,
                                                                     RHAbstractNotificationLog)
 from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDownloadAttachment,
                                                                    RHReviewAbstractForTrack, RHJudgeAbstract,
-                                                                   RHResetAbstractJudgment, RHListOtherAbstracts)
+                                                                   RHResetAbstractState, RHListOtherAbstracts,
+                                                                   RHWithdrawAbstract)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -103,15 +104,15 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>', 'email_tpl_
 
 # Abstract-specific management
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', RHManageAbstract, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/reset',
-                 'reset_abstract_judgment', RHResetAbstractJudgment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export', RHAbstractExportPDF)
 
 # Abstract reviewing actions
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
-    _bp.add_url_rule(prefix + '/<int:abstract_id>/reset', 'reset_abstract_judgment',
-                     RHResetAbstractJudgment, methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/withdraw', 'withdraw_abstract',
+                     RHWithdrawAbstract, methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/reset', 'reset_abstract_state',
+                     RHResetAbstractState, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export',
                      RHAbstractExportPDF, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',

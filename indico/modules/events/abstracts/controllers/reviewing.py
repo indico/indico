@@ -22,11 +22,11 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import AbstractMixin, build_review_form, render_abstract_page
 from indico.modules.events.abstracts.forms import AbstractJudgmentForm
-from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState, AbstractPublicState
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
-from indico.modules.events.abstracts.operations import judge_abstract, reset_abstract_judgment
+from indico.modules.events.abstracts.operations import judge_abstract, reset_abstract_state, withdraw_abstract
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -101,18 +101,38 @@ class RHJudgeAbstract(RHAbstractReviewBase):
         return jsonify_data(box_html=tpl.render_decision_box(self.abstract, form, management=self.management))
 
 
-class RHResetAbstractJudgment(RHAbstractReviewBase):
+class RHResetAbstractState(RHAbstractReviewBase):
+    def _checkProtection(self):
+        if (not self.abstract.can_judge(session.user, check_state=True) and
+                not (self.abstract.state == AbstractState.withdrawn and self.event_new.can_manage(session.user))):
+            raise Forbidden
+        RHAbstractReviewBase._checkProtection(self)
+
     def _process(self):
-        if self.abstract.state not in (AbstractState.submitted, AbstractState.withdrawn):
-            reset_abstract_judgment(self.abstract)
-            flash(_("Abstract judgment has been reset"), 'success')
+        if self.abstract.state != AbstractState.submitted:
+            reset_abstract_state(self.abstract)
+            flash(_("Abstract state has been reset"), 'success')
+        html = render_abstract_page(self.abstract, management=self.management)
+        return jsonify_data(display_html=html, management_html=html)
+
+
+class RHWithdrawAbstract(RHAbstractReviewBase):
+    def _checkProtection(self):
+        abstract = self.abstract
+        if (not self.event_new.can_manage(session.user) and
+                (abstract.public_state != AbstractPublicState.awaiting or session.user != abstract.submitter)):
+            raise Forbidden
+        RHAbstractReviewBase._checkProtection(self)
+
+    def _process(self):
+        if self.abstract.state != AbstractState.withdrawn:
+            withdraw_abstract(self.abstract)
+            flash(_("Abstract has been withdrawn"), 'success')
         html = render_abstract_page(self.abstract, management=self.management)
         return jsonify_data(display_html=html, management_html=html)
 
 
 class RHReviewAbstractForTrack(RHAbstractReviewBase):
-    CSRF_ENABLED = True
-
     normalize_url_spec = {
         'locators': {
             lambda self: self.abstract,
