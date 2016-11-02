@@ -1,7 +1,8 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
-{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) %}
+{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=None) %}
+    {% set is_management = context_track is none %}
     {% if abstracts %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -32,9 +33,17 @@
                     </thead>
                     <tbody>
                         {% for abstract in abstracts %}
-                            <tr class="i-table abstract-row"
-                                data-friendly-id="{{ abstract.friendly_id }}"
-                                data-title="{{ abstract.title }}">
+                            {% if context_track is not none and abstract.accepted_track.id != context_track.id  %}
+                                <tr class="i-table abstract-row accepted-on-other-track disabled"
+                                    title='{% trans other_track=abstract.accepted_track.title -%}This abstract has already
+                                            been accepted for the track "{{ other_track }}"{%- endtrans %}'
+                                    data-friendly-id="{{ abstract.friendly_id }}"
+                                    data-title="{{ abstract.title }}">
+                            {% else %}
+                                 <tr class="i-table abstract-row"
+                                        data-friendly-id="{{ abstract.friendly_id }}"
+                                        data-title="{{ abstract.title }}">
+                            {% endif %}
                                 <td class="i-table id-column">
                                     <input type="checkbox" class="select-row" name="abstract_id"
                                            value="{{ abstract.id }}">
@@ -43,7 +52,9 @@
                                     {{- abstract.friendly_id -}}
                                 </td>
                                 <td class="i-table" data-searchable="{{ abstract.title | lower }}">
-                                    <a class="js-mathjax" href="{{ url_for('abstracts.manage_abstract', abstract) }}">
+                                    {% set url = url_for('.manage_abstract' if is_management else '.display_abstract',
+                                                         abstract) %}
+                                    <a class="js-mathjax" href="{{ url }}">
                                         {{- abstract.title -}}
                                     </a>
                                 </td>
@@ -51,6 +62,9 @@
                                     {% if item.id == 'state' %}
                                         <td class="i-table" data-searchable="{{ abstract.state.title | lower }}">
                                             {{- abstract.state.title -}}
+                                            {% if context_track is not none and abstract.accepted_track.id != context_track.id  %}
+                                                <span class="icon-warning"></span>
+                                            {% endif %}
                                         </td>
                                     {% elif item.id == 'submitter' %}
                                         <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name }}">

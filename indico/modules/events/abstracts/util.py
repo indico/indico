@@ -240,11 +240,14 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
     def __init__(self, event, track):
         super(AbstractListGeneratorDisplay, self).__init__(event)
         self.track = track
-        self.default_list_config['items'] = ('submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state')
-        items = {'state', 'submitter', 'accepted_contrib_type', 'submitted_contrib_type'}
+        self.default_list_config['items'] = ('accepted_contrib_type', 'state')
+        items = {'submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state'}
         self.static_items = OrderedDict((key, value)
                                         for key, value in self.static_items.iteritems()
                                         if key in items)
+
+    def _get_sorted_contribution_fields(self, item_ids):
+        return []
 
     def _build_query(self):
         query = super(AbstractListGeneratorDisplay, self)._build_query()
