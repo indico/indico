@@ -485,6 +485,14 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return False
 
+    def can_withdraw(self, user, check_state=False):
+        if not user:
+            return False
+        elif self.event_new.can_manage(user):
+            return not check_state or self.state != AbstractPublicState.withdrawn
+        elif user == self.submitter:
+            return not check_state or self.public_state == AbstractPublicState.awaiting
+
     def can_see_reviews(self, user):
         return self.can_judge(user) or self.can_convene(user)
 
@@ -530,7 +538,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return None
         return sum(scores) / len(scores)
 
-    def reset_judgment(self):
+    def reset_state(self):
         self.state = AbstractState.submitted
         self.judgment_comment = ''
         self.judge = None
