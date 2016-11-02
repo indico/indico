@@ -426,26 +426,31 @@ def get_user_abstracts(event, user):
 
 
 def get_track_reviewer_abstract_counts(event, user):
-    """
-    Get the number of total/reviewed abstracts per track for a
-    specific user.
+    """Get the numbers of abstracts per track for a specific user.
 
     Note that this does not take into account if the user is a
     reviewer for a track; it just checks whether the user has
     reviewed an abstract in a track or not.
 
-    :return: A ``{track: (total_count, reviewed_count)}`` dict.
+    :return: A dict mapping tracks to dicts containing the counts.
     """
     # COUNT() does not count NULL values so we pass NULL in case an
     # abstract is not in the submitted state. That way we still get
     # the track - filtering using WHERE would only include tracks
     # that have some abstract in the submitted state.
-    count_total = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
-    count_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id}, value=Abstract.state))
+    count_total = db.func.count()
+    count_reviewable = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
+    count_reviewable_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id},
+                                                      value=Abstract.state))
+    count_total_reviewed = db.func.count(AbstractReview.id)
     query = (Track.query.with_parent(event)
-             .with_entities(Track, count_total, count_reviewed)
+             .with_entities(Track,
+                            count_total,
+                            count_total_reviewed,
+                            count_reviewable - count_reviewable_reviewed)
              .outerjoin(Track.abstracts_reviewed)
              .outerjoin(AbstractReview, db.and_(AbstractReview.abstract_id == Abstract.id,
                                                 AbstractReview.user_id == user.id))
              .group_by(Track.id))
-    return {track: {'total': total, 'reviewed': reviewed} for track, total, reviewed in query}
+    return {track: {'total': total, 'reviewed': reviewed, 'unreviewed': unreviewed}
+            for track, total, reviewed, unreviewed in query}
