@@ -44,6 +44,10 @@ class CallForAbstracts(object):
         return self.end_dt is not None and self.end_dt <= now_utc()
 
     @property
+    def is_open(self):
+        return self.has_started and not self.has_ended
+
+    @property
     def modification_ended(self):
         return self.modification_end_dt is not None and self.modification_end_dt <= now_utc()
 
@@ -62,6 +66,9 @@ class CallForAbstracts(object):
     @property
     def rating_range(self):
         return tuple(abstracts_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
+
+    def can_submit_abstracts(self, user):
+        return self.is_open or abstracts_settings.acls.contains_user(self.event, 'authorized_submitters', user)
 
     def schedule(self, start_dt, end_dt, modification_end_dt):
         abstracts_settings.set_multi(self.event, {
