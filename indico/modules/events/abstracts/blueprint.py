@@ -41,9 +41,14 @@ from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDo
                                                                    RHWithdrawAbstract,
                                                                    RHDisplayReviewableTracks,
                                                                    RHDisplayReviewableTrackAbstracts,
-                                                                   RHDisplayAbstractListCustomize, RHListOtherAbstracts,
+                                                                   RHListOtherAbstracts,
                                                                    RHReviewAbstractForTrack,
-                                                                   RHJudgeAbstract)
+                                                                   RHJudgeAbstract,
+                                                                   RHDisplayAbstractListCustomize,
+                                                                   RHDisplayAbstractsExportPDF,
+                                                                   RHDisplayAbstractsExportCSV,
+                                                                   RHDisplayAbstractsExportExcel,
+                                                                   RHDisplayAbstractsDownloadAttachments)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -65,6 +70,14 @@ _bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/', 'display_revie
                  RHDisplayReviewableTrackAbstracts)
 _bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/customize', 'display_customize_abstract_list',
                  RHDisplayAbstractListCustomize, methods=('GET', 'POST'))
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/attachments', 'display_download_attachments',
+                 RHDisplayAbstractsDownloadAttachments, methods=('POST',))
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.pdf', 'display_abstracts_pdf_export',
+                 RHDisplayAbstractsExportPDF, methods=('POST',))
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.csv', 'display_abstracts_csv_export',
+                 RHDisplayAbstractsExportCSV, methods=('POST',))
+_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.xlsx', 'display_abstracts_xlsx_export',
+                 RHDisplayAbstractsExportExcel, methods=('POST',))
 
 # Book of Abstracts
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', RHManageBOA, methods=('GET', 'POST'))

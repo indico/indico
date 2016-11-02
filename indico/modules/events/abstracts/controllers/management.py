@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import os
 from collections import defaultdict
 from operator import attrgetter
 
@@ -25,8 +24,10 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.controllers.base import (AbstractPageMixin, AbstractMixin,
-                                                              DisplayAbstractListMixin, CustomizeAbstractListMixin)
+from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
+                                                              CustomizeAbstractListMixin, AbstractsExportPDFMixin,
+                                                              AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
+                                                              AbstractsExportExcel, AbstractPageMixin)
 from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, BulkAbstractJudgmentForm)
@@ -39,18 +40,17 @@ from indico.modules.events.abstracts.operations import (create_abstract, delete_
 from indico.modules.events.abstracts.schemas import abstracts_schema
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import (make_abstract_form, get_roles_for_event,
-                                                  generate_spreadsheet_from_abstracts, AbstractListGeneratorManagement)
+                                                  AbstractListGeneratorManagement)
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import get_field_values, update_object_principals, ZipGeneratorMixin
+from indico.modules.events.util import get_field_values, update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
-from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerAbstractToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -332,52 +332,20 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
                                 event_persons=abstract_persons_dict, event=self.event_new, include_submitters=True)
 
 
-class RHAbstractsDownloadAttachments(RHManageAbstractsActionsBase, ZipGeneratorMixin):
-    """Generate a ZIP file with attachment files for a given list of abstracts"""
-
-    def _prepare_folder_structure(self, item):
-        abstract_title = secure_filename('{}_{}'.format(item.abstract.title, unicode(item.abstract.id)), 'abstract')
-        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
-        return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
-
-    def _iter_items(self, abstracts):
-        for abstract in abstracts:
-            for f in abstract.files:
-                yield f
-
-    def _process(self):
-        return self._generate_zip_file(self.abstracts, name_prefix='abstract-attachments',
-                                       name_suffix=self.event_new.id)
+class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsActionsBase):
+    pass
 
 
-class RHAbstractsExportPDF(RHManageAbstractsActionsBase):
-    def _process(self):
-        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        pdf = ConfManagerAbstractsToPDF(self.event_new, sorted_abstracts)
-        return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
+class RHAbstractsExportPDF(AbstractsExportPDFMixin, RHManageAbstractsActionsBase):
+    pass
 
 
-class RHAbstractsExportBase(RHManageAbstractsActionsBase):
-    """RH for all abstract list export classes"""
-
-    def _generate_spreadsheet(self):
-        export_config = self.list_generator.get_list_export_config()
-        return generate_spreadsheet_from_abstracts(self.abstracts, export_config['static_item_ids'],
-                                                   export_config['dynamic_items'])
+class RHAbstractsExportCSV(AbstractsExportCSV, RHManageAbstractsActionsBase):
+    pass
 
 
-class RHAbstractsExportCSV(RHAbstractsExportBase):
-    """Export list of abstracts to CSV"""
-
-    def _process(self):
-        return send_csv('abstracts.csv', *self._generate_spreadsheet())
-
-
-class RHAbstractsExportExcel(RHAbstractsExportBase):
-    """Export list of abstracts to XLSX"""
-
-    def _process(self):
-        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet())
+class RHAbstractsExportExcel(AbstractsExportExcel, RHManageAbstractsActionsBase):
+    pass
 
 
 class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
