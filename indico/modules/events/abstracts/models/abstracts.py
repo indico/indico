@@ -425,7 +425,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return True
         if any(x.person.user == user for x in self.person_links):
             return True
-        return self.can_review(user)
+        return self.can_review(user) or self.can_convene(user)
 
     def can_convene(self, user):
         if not user:

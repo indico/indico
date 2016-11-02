@@ -22,6 +22,9 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
+                                                              AbstractsExportPDFMixin,
+                                                              AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
+                                                              AbstractsExportExcel,
                                                               CustomizeAbstractListMixin, build_review_form,
                                                               render_abstract_page)
 from indico.modules.events.abstracts.forms import AbstractJudgmentForm
@@ -246,3 +249,27 @@ class RHDisplayReviewableTrackAbstracts(DisplayAbstractListMixin, RHDisplayAbstr
 class RHDisplayAbstractListCustomize(CustomizeAbstractListMixin, RHDisplayAbstractListBase):
     view_class = WPDisplayAbstractsReviewing
 
+
+class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
+    """Base class for classes performing actions on abstract"""
+
+    def _checkParams(self, params):
+        RHDisplayAbstractListBase._checkParams(self, params)
+        ids = map(int, request.form.getlist('abstract_id'))
+        self.abstracts = Abstract.query.with_parent(self.track, 'abstracts_reviewed').filter(Abstract.id.in_(ids)).all()
+
+
+class RHDisplayAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHDisplayAbstractsActionsBase):
+    pass
+
+
+class RHDisplayAbstractsExportPDF(AbstractsExportPDFMixin, RHDisplayAbstractsActionsBase):
+    pass
+
+
+class RHDisplayAbstractsExportCSV(AbstractsExportCSV, RHDisplayAbstractsActionsBase):
+    pass
+
+
+class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActionsBase):
+    pass

@@ -16,62 +16,70 @@
             {%- endtrans -%}
         </p>
     {% else %}
-        <div class="toolbar left">
-            <div class="group">
-                <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
-                    data-href="{{ url_for('.display_customize_abstract_list', event, track) }}"
-                    data-title="{% trans %}Abstract list configuration{% endtrans %}"
-                    data-dialog-classes="list-filter-dialog"
-                    data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                    data-ajax-dialog>
-                    {% trans %}Customize list{% endtrans %}
-                </button>
-            </div>
-            <div class="group">
-                <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-list-form disabled"
-                   data-href="{{ url_for('.download_attachments', event) }}">
-                    {%- trans %}Download attachments{%- endtrans %}
-                </a>
-            </div>
-            <div class="group">
-                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
-                    {%- trans %}Export{% endtrans -%}
-                </a>
-                <ul class="dropdown">
-                    <li>
-                        <a href="#"
-                           class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                           data-href="{{ url_for('.abstracts_pdf_export', event) }}">PDF</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                           class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
-                           data-href="{{ url_for('.abstracts_csv_export', event) }}">CSV</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                           class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
-                           data-href="{{ url_for('.abstracts_xlsx_export', event) }}">XLSX (Excel)</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                           class="icon-file-css js-requires-selected-row disabled js-submit-list-form"
-                           {# TODO: data-href="{{ url_for('.abstracts_json_export', event) }}" #}>JSON</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="toolbar right">
-            <div class="group">
-                <div id="filter-statistics">
-                    {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
+        <div class="list abstracts">
+            <div class="clearfix">
+                <div class="toolbar left">
+                    <div class="group">
+                        <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
+                           data-toggle="dropdown"></a>
+                        <ul class="dropdown">
+                            <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
+                            <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="group">
+                        <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
+                            data-href="{{ url_for('.display_customize_abstract_list', event, track) }}"
+                            data-title="{% trans %}Abstract list configuration{% endtrans %}"
+                            data-dialog-classes="list-filter-dialog"
+                            data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                            data-ajax-dialog>
+                            {% trans %}Customize list{% endtrans %}
+                        </button>
+                    </div>
+                    <div class="group">
+                        <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                           data-href="{{ url_for('.display_download_attachments', track) }}">
+                            {%- trans %}Download attachments{%- endtrans %}
+                        </a>
+                    </div>
+                    <div class="group">
+                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                            {%- trans %}Export{% endtrans -%}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"
+                                   class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">PDF</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_csv_export', track) }}">CSV</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_xlsx_export', track) }}">XLSX (Excel)</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <div class="group">
+                        <div id="filter-statistics">
+                            {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div id="abstract-list">
-            {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) }}
+            <div id="abstract-list">
+                {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, track) }}
+            </div>
+            <script>
+                setupListGenerator();
+            </script>
         </div>
     {% endif %}
 {% endblock %}
