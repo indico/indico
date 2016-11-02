@@ -43,6 +43,8 @@ from indico.web.flask.templating import get_template_module
 class AbstractListGeneratorBase(ListGeneratorBase):
     """Listing and filtering actions in an abstract list."""
 
+    show_contribution_fields = True
+
     def __init__(self, event):
         super(AbstractListGeneratorBase, self).__init__(event)
 
@@ -83,10 +85,14 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         """
         return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
 
+    def get_all_contribution_fields(self):
+        """Return the list of contribution fields for the event"""
+        return self.event.contribution_fields if self.show_contribution_fields else []
+
     def _get_sorted_contribution_fields(self, item_ids):
         """Return the contribution fields ordered by their position in the abstract form."""
 
-        if not item_ids:
+        if not item_ids or not self.show_contribution_fields:
             return []
         return (ContributionField.query
                 .with_parent(self.event)
@@ -236,6 +242,7 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
 
     list_link_type = 'abstract_display'
     endpoint = '.display_reviewable_track_abstracts'
+    show_contribution_fields = False
 
     def __init__(self, event, track):
         super(AbstractListGeneratorDisplay, self).__init__(event)
@@ -245,9 +252,6 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
         self.static_items = OrderedDict((key, value)
                                         for key, value in self.static_items.iteritems()
                                         if key in items)
-
-    def _get_sorted_contribution_fields(self, item_ids):
-        return []
 
     def _build_query(self):
         query = super(AbstractListGeneratorDisplay, self)._build_query()
