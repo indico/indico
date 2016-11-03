@@ -53,7 +53,7 @@
                 {{ form_rows(form, fields=form._order) }}
                 {% set form_id = '#track-review-form-' + track.id|string %}
                 {% call form_footer(form, skip_label=skip_labels) %}
-                    <button class="i-button big highlight review-button"
+                    <button class="i-button big highlight js-review"
                             data-method="POST"
                             data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}">
                         {% if edit %}
@@ -90,7 +90,11 @@
                             </div>
                             {% if comment.can_edit(session.user) %}
                                 <div class="abstract-comment-badges">
-                                    <a class="i-button-icon icon-edit" title="{% trans %}Edit comment{% endtrans %}"></a>
+                                    <a class="i-button-icon icon-edit js-edit-comment"
+                                       title="{% trans %}Edit comment{% endtrans %}"
+                                       data-href="{{ url_for('.edit_abstract_comment', comment) }}"
+                                       data-method="GET"
+                                       data-ajax></a>
                                     <a class="i-button-icon icon-cross js-delete-comment"
                                        title="{% trans %}Remove comment{% endtrans %}"
                                        data-method="POST"
@@ -120,18 +124,33 @@
         <div class="i-timeline-item-label action icon-file"></div>
         <div class="i-timeline-item-box footer-only header-indicator">
             <div class="i-box-footer">
-                {{ form_header(form, orientation='vertical') }}
-                {{ form_rows(form, skip_labels=true) }}
-                {% call form_footer(form) %}
-                    <button class="i-button big comment-button"
-                            data-method="POST"
-                            data-href="{{ url_for('.comment_abstract', abstract) }}">
-                        {% trans %}Comment{% endtrans %}
-                    </button>
-                {% endcall %}
+                {{ render_comment_form(form, abstract) }}
             </div>
         </div>
     </div>
+{% endmacro %}
+
+{% macro render_comment_form(form, abstract, comment=none) %}
+    {% set url = url_for('.edit_abstract_comment', comment) if comment else url_for('.comment_abstract', abstract) %}
+    {{ form_header(form, orientation='vertical') }}
+    {{ form_rows(form, skip_labels=true) }}
+    {% call form_footer(form) %}
+        <button class="i-button big highlight text-color js-comment"
+                data-method="POST"
+                data-href="{{ url }}">
+            {% if comment %}
+                {% trans %}Update comment{% endtrans %}
+            {% else %}
+                {% trans %}Comment{% endtrans %}
+            {% endif %}
+        </button>
+        {% if comment %}
+            <button class="i-button big text-color danger js-edit-comment-cancel"
+                    data-confirm="{% trans %}Do you want to discard the changes to this comment?{% endtrans %}">
+                {% trans %}Cancel{% endtrans %}
+            </button>
+        {% endif %}
+    {% endcall %}
 {% endmacro %}
 
 {% macro _render_review_state(review) %}
@@ -187,7 +206,7 @@
                 </div>
                 {% if can_change_review %}
                     <div>
-                        <a class="i-button-icon icon-edit change-review-button"
+                        <a class="i-button-icon icon-edit js-change-review"
                            title="{% trans %}Change review{% endtrans %}"></a>
                     </div>
                 {% endif %}

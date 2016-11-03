@@ -35,7 +35,7 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
-                                                        update_reviewed_for_tracks)
+                                                        update_abstract_comment, update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
                                                   get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
@@ -229,7 +229,7 @@ class RHLeaveComment(RHAbstractReviewBase):
             create_abstract_comment(self.abstract, form.data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(box_html=tpl.render_comment_box(self.abstract, form))
+        return jsonify_data(form_html=tpl.render_comment_form(self.abstract, form))
 
 
 class RHAbstractCommentBase(RHAbstractReviewBase):
@@ -247,6 +247,16 @@ class RHAbstractCommentBase(RHAbstractReviewBase):
         RHAbstractReviewBase._checkProtection(self)
         if not self.comment.can_edit(session.user):
             raise Forbidden
+
+
+class RHEditAbstractComment(RHAbstractCommentBase):
+    def _process(self):
+        form = AbstractCommentForm(obj=self.comment)
+        if form.validate_on_submit():
+            update_abstract_comment(self.comment, form.data)
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+        tpl = get_template_module('events/abstracts/abstract/review.html')
+        return jsonify_data(form_html=tpl.render_comment_form(form, self.abstract, comment=self.comment))
 
 
 class RHDeleteAbstractComment(RHAbstractCommentBase):
