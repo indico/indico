@@ -107,20 +107,26 @@ def _get_notification_placeholders(sender, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.abstracts.util import get_user_abstracts
+    from indico.modules.events.abstracts.util import get_user_abstracts, get_user_tracks
     from indico.modules.events.layout.util import MenuEntryData
 
-    def _is_visible(conf):
-        return (session.user and conf.has_feature('abstracts') and
-                bool(get_user_abstracts(conf.as_event, session.user)))
+    def _my_abstracts_visible(conf):
+        if not session.user or not conf.has_feature('abstracts'):
+            return False
+        return bool(get_user_abstracts(conf.as_event, session.user))
+
+    def _reviewing_area_visible(conf):
+        if not session.user or not conf.has_feature('abstracts'):
+            return False
+        return bool(get_user_tracks(conf.as_event, session.user))
 
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
                         position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
 
     yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts', endpoint='event.conferenceCFA',
                         position=2, visible=lambda event: event.has_feature('abstracts'))
-    yield MenuEntryData(title=_("My Abstracts"), name='user_abstracts', visible=_is_visible,
+    yield MenuEntryData(title=_("My Abstracts"), name='user_abstracts', visible=_my_abstracts_visible,
                         endpoint='abstracts.my_abstracts', position=0, parent='call_for_abstracts')
     yield MenuEntryData(title=_("Reviewing Area"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
                         position=2, parent='call_for_abstracts',
-                        visible=lambda event: session.user and event.has_feature('abstracts'))
+                        visible=_reviewing_area_visible)
