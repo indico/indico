@@ -449,7 +449,7 @@ def get_track_reviewer_abstract_counts(event, user):
     # abstract is not in the submitted state. That way we still get
     # the track - filtering using WHERE would only include tracks
     # that have some abstract in the submitted state.
-    count_total = db.func.count()
+    count_total = db.func.count(Abstract.id)
     count_reviewable = db.func.count(db.case({AbstractState.submitted.value: Abstract.id}, value=Abstract.state))
     count_reviewable_reviewed = db.func.count(db.case({AbstractState.submitted.value: AbstractReview.id},
                                                       value=Abstract.state))
