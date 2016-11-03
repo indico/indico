@@ -379,6 +379,12 @@ class AbstractForm(IndicoForm):
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
 
 
+class NoTrackMixin(object):
+    def __init__(self, *args, **kwargs):
+        self.track_field_disabled = True
+        super(NoTrackMixin, self).__init__(*args, **kwargs)
+
+
 class SingleTrackMixin(object):
     submitted_for_tracks = QuerySelectField(_("Track"), get_label='title', allow_blank=True)
 
