@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.controllers.boa import RHManageBOA, RHExportBOA
+from indico.modules.events.abstracts.controllers.common import RHEditAbstract
 from indico.modules.events.abstracts.controllers.display import (RHDisplayAbstract, RHDisplayAbstractExportPDF,
                                                                  RHMyAbstracts, RHMyAbstractsExportPDF,
                                                                  RHSubmitAbstract)
@@ -36,7 +37,7 @@ from indico.modules.events.abstracts.controllers.management import (RHAbstractLi
                                                                     RHAbstractsExportJSON,
                                                                     RHScheduleCFA, RHOpenCFA, RHCloseCFA,
                                                                     RHManageReviewingRoles, RHBulkAbstractJudgment,
-                                                                    RHAbstractNotificationLog, RHEditAbstract)
+                                                                    RHAbstractNotificationLog)
 from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDownloadAttachment,
                                                                    RHResetAbstractState,
                                                                    RHWithdrawAbstract,
