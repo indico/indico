@@ -229,7 +229,7 @@ class RHLeaveComment(RHAbstractReviewBase):
             create_abstract_comment(self.abstract, form.data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(form_html=tpl.render_comment_form(self.abstract, form))
+        return jsonify_data(form_html=tpl.render_comment_form(form, self.abstract))
 
 
 class RHAbstractCommentBase(RHAbstractReviewBase):
