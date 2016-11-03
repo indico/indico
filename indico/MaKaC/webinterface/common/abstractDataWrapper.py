@@ -35,6 +35,7 @@ class Author(Fossilizable):
         self._firstName = data.get("first_name", "")
         self._familyName = data.get("family_name", "")
         self._affiliation = data.get("affiliation", "")
+        self._address = data.get("address", "")
         self._email = data.get("email", "")
         self._phone = data.get("phone", "")
         self._speaker = data.get("isSpeaker", False)
@@ -44,6 +45,7 @@ class Author(Fossilizable):
         self._firstName = author.getFirstName()
         self._familyName = author.getSurName()
         self._affiliation = author.getAffiliation()
+        self._address = author.getAddress()
         self._email = author.getEmail()
         self._phone = author.getTelephone()
         self._speaker = author.getAbstract().isSpeaker(author)
@@ -65,6 +67,9 @@ class Author(Fossilizable):
 
     def getAffiliation(self):
         return self._affiliation
+
+    def getAddress(self):
+        return self._address
 
     def getEmail(self):
         return self._email
@@ -131,7 +136,7 @@ class AbstractData(object):
                                              surName=authData.getFamilyName(),
                                              email=authData.getEmail(),
                                              affiliation=authData.getAffiliation(),
-                                             address="",
+                                             address=authData.getAddress(),
                                              telephone=authData.getPhone())
             if authData.isSpeaker():
                 abstract.addSpeaker(auth)
@@ -142,7 +147,7 @@ class AbstractData(object):
                                         surName=authData.getFamilyName(),
                                         email=authData.getEmail(),
                                         affiliation=authData.getAffiliation(),
-                                        address="",
+                                        address=authData.getAddress(),
                                         telephone=authData.getPhone())
             if authData.isSpeaker():
                 abstract.addSpeaker(auth)
@@ -164,6 +169,7 @@ class AbstractData(object):
                       "first_name": author["firstName"],
                       "family_name": author["familyName"],
                       "affiliation": author["affiliation"],
+                      "address": author["address"],
                       "email": author["email"],
                       "phone": author["phone"],
                       "isSpeaker": isSpeaker
@@ -179,6 +185,7 @@ class AbstractData(object):
                       "first_name": author["firstName"],
                       "family_name": author["familyName"],
                       "affiliation": author["affiliation"],
+                      "address": author["address"],
                       "email": author["email"],
                       "phone": author["phone"],
                       "isSpeaker": isSpeaker
@@ -194,6 +201,7 @@ class AbstractData(object):
                       "first_name": author.getFirstName(),
                       "family_name": author.getFamilyName(),
                       "affiliation": author.getAffiliation(),
+                      "address": author.getAddress(),
                       "email": author.getEmail(),
                       "phone": author.getTelephone(),
                       "isSpeaker": author.isSpeaker()
@@ -208,6 +216,7 @@ class AbstractData(object):
                       "first_name": author.getFirstName(),
                       "family_name": author.getFamilyName(),
                       "affiliation": author.getAffiliation(),
+                      "address": author.getAddress(),
                       "email": author.getEmail(),
                       "phone": author.getTelephone(),
                       "isSpeaker": author.isSpeaker()

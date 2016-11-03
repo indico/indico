@@ -34,6 +34,9 @@ class IAuthorFossil(IFossil):
     def getAffiliation(self):
         """ Author affiliation """
 
+    def getAddress(self):
+        """ Author affiliation address"""
+
     def getEmail(self):
         """ Author email """
 
