@@ -255,9 +255,8 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
                                         if key in items)
 
     def _build_query(self):
-        query = super(AbstractListGeneratorDisplay, self)._build_query()
-        query = query.filter(Abstract.reviewed_for_tracks.contains(self.track))
-        return query
+        return (super(AbstractListGeneratorDisplay, self)._build_query()
+                .filter(Abstract.reviewed_for_tracks.contains(self.track)))
 
 
 def build_default_email_template(event, tpl_type):

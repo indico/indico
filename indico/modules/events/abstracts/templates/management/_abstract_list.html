@@ -33,17 +33,22 @@
                     </thead>
                     <tbody>
                         {% for abstract in abstracts %}
-                            {% if context_track is not none and abstract.state.name == 'accepted' and abstract.accepted_track != context_track  %}
-                                <tr class="i-table abstract-row accepted-on-other-track disabled"
-                                    title='{% trans other_track=abstract.accepted_track.title -%}This abstract has already
-                                            been accepted for the track "{{ other_track }}"{%- endtrans %}'
-                                    data-friendly-id="{{ abstract.friendly_id }}"
-                                    data-title="{{ abstract.title }}">
+                            {% if (context_track is not none and abstract.state.name == 'accepted' and
+                                   abstract.accepted_track != context_track) %}
+                                {% set accepted_other = true %}
+                                {% set accepted_other_msg -%}
+                                    {%- trans other_track=abstract.accepted_track.title -%}
+                                        This abstract has already been accepted for the track "{{ other_track }}"
+                                    {%- endtrans -%}
+                                {%- endset %}
                             {% else %}
-                                 <tr class="i-table abstract-row"
-                                        data-friendly-id="{{ abstract.friendly_id }}"
-                                        data-title="{{ abstract.title }}">
+                                {% set accepted_other = false %}
+                                {% set accepted_other_msg = '' %}
                             {% endif %}
+                            <tr class="i-table abstract-row {{ 'accepted-on-other-track disabled' if accepted_other }}"
+                                title="{{ accepted_other_msg }}"
+                                data-friendly-id="{{ abstract.friendly_id }}"
+                                data-title="{{ abstract.title }}">
                                 <td class="i-table id-column">
                                     <input type="checkbox" class="select-row" name="abstract_id"
                                            value="{{ abstract.id }}">

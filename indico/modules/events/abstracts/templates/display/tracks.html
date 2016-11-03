@@ -4,12 +4,11 @@
     {%- trans %}Reviewing Area{% endtrans -%}
 {% endblock %}
 
+{% block description %}
+    {%- trans %}The reviewing area shows the tracks for which you are a reviewer or convener.{% endtrans -%}
+{% endblock %}
+
 {% block content %}
-    <header>
-        <div class="page-description">
-            {%- trans %}The reviewing area shows the tracks for which you are a reviewer or convener.{% endtrans -%}
-        </div>
-    </header>
     <div class="track-review-list">
         {% if not tracks %}
             <div class="info-message-box">
@@ -53,9 +52,7 @@
                                      title="{{ tooltip if count.total }}">
                                     {%- trans %}Reviewer{% endtrans -%}
                                     {%- if count.unreviewed -%}
-                                        <span class="badge">
-                                            {{- count.unreviewed -}}
-                                        </span>
+                                        <span class="badge">{{ count.unreviewed }}</span>
                                     {% endif %}
                                 </div>
                             {% endif %}
