@@ -29,7 +29,9 @@
         {% endif %}
 
         {% if can_judge %}
-            {{ render_reviewed_for_tracks_box(abstract, review_track_list_form, management=management) }}
+            {% if abstract.event_new.tracks %}
+                {{ render_reviewed_for_tracks_box(abstract, review_track_list_form, management=management) }}
+            {% endif %}
             <div id="abstract-decision-box" class="i-timeline-item">
                 {{ render_decision_box(abstract, judgment_form, management=management) }}
             </div>

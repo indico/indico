@@ -380,10 +380,12 @@ def make_abstract_form(event):
     :param event: The `Event` for which to create the abstract form.
     :return: An `AbstractForm` subclass.
     """
-    from indico.modules.events.abstracts.forms import AbstractForm, MultiTrackMixin, SingleTrackMixin
+    from indico.modules.events.abstracts.forms import AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin
 
     mixins = []
-    if abstracts_settings.get(event, 'allow_multiple_tracks'):
+    if not event.tracks:
+        mixins.append(NoTrackMixin)
+    elif abstracts_settings.get(event, 'allow_multiple_tracks'):
         mixins.append(MultiTrackMixin)
     else:
         mixins.append(SingleTrackMixin)
