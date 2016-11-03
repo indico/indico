@@ -88,14 +88,14 @@
     margin: 2em 0;
 }
 
-.i-timetable-connect-down {
+.i-timeline-connect-down {
     @include border-left($width: 2px);
     margin-left: 71px;
     margin-bottom: -2em;
     height: 2em;
 }
 
-.i-timetable-connect-up {
+.i-timeline-connect-up {
     @include border-left($width: 2px);
     margin-left: 71px;
     margin-top: -2em;

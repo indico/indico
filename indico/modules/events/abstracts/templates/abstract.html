@@ -8,7 +8,7 @@
     {{ render_abstract_public(abstract, management=management) }}
     <div id="abstract-private" class="i-timeline">
         {% if abstract.comments or abstract.reviews %}
-            <div class="i-timetable-connect-down"></div>
+            <div class="i-timeline-connect-down"></div>
         {% endif %}
         <div class="i-timeline-separator"></div>
         {{ render_comments_section(abstract, comment_form) }}
@@ -21,7 +21,7 @@
         {% set can_judge = abstract.can_judge(session.user, check_state=true) %}
 
         {% if can_review or can_judge %}
-            <div class="i-timetable-connect-up"></div>
+            <div class="i-timeline-connect-up"></div>
         {% endif %}
 
         {% if can_review %}
