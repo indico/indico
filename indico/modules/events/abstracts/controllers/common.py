@@ -22,7 +22,6 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractReviewBase
 from indico.modules.events.abstracts.operations import update_abstract
 from indico.modules.events.abstracts.util import make_abstract_form
-from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form
@@ -37,14 +36,8 @@ class RHEditAbstract(RHAbstractReviewBase):
     def _process(self):
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(obj=self.abstract, abstract=self.abstract, event=self.event_new)
-        # TODO: Handle reviewed_for_tracks properly!
         if form.validate_on_submit():
-            data = form.data
-            if isinstance(data['submitted_for_tracks'], Track):
-                data['submitted_for_tracks'] = {data['submitted_for_tracks']}
-            elif data['submitted_for_tracks'] is None:
-                data['submitted_for_tracks'] = set()
-            update_abstract(self.abstract, *get_field_values(data))
+            update_abstract(self.abstract, *get_field_values(form.data))
             flash(_("Abstract modified successfully"), 'success')
             return jsonify_data(flash=False)
         self.commit = False

@@ -47,7 +47,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
     if isinstance(tracks, Track):
         tracks = {tracks}
     abstract.submitted_for_tracks = tracks
-    abstract.reviewed_for_tracks = abstract.submitted_for_tracks
+    abstract.reviewed_for_tracks = tracks
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
@@ -64,6 +64,21 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
     return abstract
 
 
+def update_abstract(abstract, abstract_data, custom_fields_data=None):
+    tracks = abstract_data.pop('submitted_for_tracks') or set()
+    if isinstance(tracks, Track):
+        tracks = {tracks}
+    abstract.submitted_for_tracks = tracks
+    abstract.reviewed_for_tracks = tracks
+    abstract.populate_from_dict(abstract_data)
+    if custom_fields_data:
+        set_custom_fields(abstract, custom_fields_data)
+    db.session.flush()
+    logger.info('Abstract %s modified by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'Abstract "{}" has been modified'.format(abstract.title), session.user)
+
+
 def withdraw_abstract(abstract, delete_contrib=False):
     abstract.state = AbstractState.withdrawn
     contrib = abstract.contribution
@@ -75,17 +90,6 @@ def withdraw_abstract(abstract, delete_contrib=False):
     logger.info('Abstract %s withdrawn by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                            'Abstract "{}" has been withdrawn'.format(abstract.title), session.user)
-
-
-def update_abstract(abstract, data, custom_fields_data=None):
-    abstract.populate_from_dict(data)
-    if custom_fields_data:
-        set_custom_fields(abstract, custom_fields_data)
-    db.session.flush()
-    logger.info('Abstract %s modified by %s', abstract, session.user)
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Abstract "{}" has been modified'.format(abstract.title), session.user)
-    return abstract
 
 
 def delete_abstract(abstract, delete_contrib=False):
