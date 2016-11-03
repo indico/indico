@@ -20,7 +20,6 @@ from flask import flash, request, session, jsonify
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
-from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
                                                               AbstractsExportPDFMixin,
                                                               AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
@@ -33,10 +32,10 @@ from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import judge_abstract, reset_abstract_state, withdraw_abstract
-from indico.modules.events.abstracts.util import AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts
+from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
+                                                  get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
@@ -224,18 +223,11 @@ class RHDisplayReviewableTracks(RHAbstractsBase):
             raise Forbidden
 
     def _process(self):
-        query = Track.query.with_parent(self.event_new)
         track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event_new, session.user)
-
-        # if the user is not a global convener only show their tracks
-        if (session.user not in self.event_new.global_abstract_reviewers and
-                session.user not in self.event_new.global_conveners):
-            query = query.filter(db.or_(Track.conveners.any(User.id == session.user.id),
-                                        Track.abstract_reviewers.any(User.id == session.user.id)))
 
         return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self._conf, event=self.event_new,
                                                            abstract_count=track_reviewer_abstract_count,
-                                                           tracks=query.all())
+                                                           tracks=get_user_tracks(self.event_new, session.user))
 
 
 class RHDisplayReviewableTrackAbstracts(DisplayAbstractListMixin, RHDisplayAbstractListBase):
