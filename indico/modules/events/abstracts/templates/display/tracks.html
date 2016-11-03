@@ -1,17 +1,23 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% block title %}
-    {% trans %}Reviewing Area{% endtrans %}
+    {%- trans %}Reviewing Area{% endtrans -%}
 {% endblock %}
 
 {% block content %}
+    <header>
+        <div class="page-description">
+            {%- trans %}The reviewing area shows the tracks for which you are a reviewer or convener.{% endtrans -%}
+        </div>
+    </header>
     <div class="track-review-list">
         {% if not tracks %}
-            <p>
-                {%- trans -%}
-                    There are currently no tracks for which you are a reviewer or convener.
-                {%- endtrans -%}
-            </p>
+            <div class="info-message-box">
+                <span class="icon"></span>
+                <div class="message-text">
+                    {%- trans %}There are currently no tracks for which you are a reviewer or convener.{% endtrans -%}
+                </div>
+            </div>
         {% else %}
             <ul>
                 {% for track in tracks %}
@@ -21,15 +27,36 @@
                                 <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}">
                                     {{- track.title -}}
                                 </a>
-                                <span class="badge"
-                                      title="{{ abstract_count[track]['total'] }} {% trans %}total{% endtrans %}">
-                                    {{- abstract_count[track]['total'] - abstract_count[track]['reviewed'] }}
-                                    {% trans %}left to review{% endtrans -%}
-                                </span>
                             </div>
                             {% if track.can_review_abstracts(session.user) %}
-                                <div class="label i-tag">
+                                {% set count = abstract_count[track] %}
+                                {% set tooltip -%}
+                                    {% if count.unreviewed %}
+                                        {% trans unreviewed=count.unreviewed -%}
+                                            {{ unreviewed }} left to review
+                                        {%- endtrans -%}
+                                        ,
+                                    {% endif %}
+                                    {% if count.reviewed %}
+                                        {% trans reviewed=count.reviewed, total=count.total -%}
+                                            {{ reviewed }}/{{ total }} already reviewed
+                                        {%- endtrans %}
+                                    {% else %}
+                                        {% trans total=count.total -%}
+                                            {{ total }} abstract
+                                        {%- pluralize total -%}
+                                            {{ total }} abstracts
+                                        {%- endtrans %}
+                                    {% endif %}
+                                {%- endset %}
+                                <div class="label i-tag {{ 'no-unreviewed' if not count.unreviewed }}"
+                                     title="{{ tooltip if count.total }}">
                                     {%- trans %}Reviewer{% endtrans -%}
+                                    {%- if count.unreviewed -%}
+                                        <span class="badge">
+                                            {{- count.unreviewed -}}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                             {% if track.can_convene(session.user) %}
