@@ -301,11 +301,13 @@
                             {{ render_tracks(abstract.reviewed_for_tracks) }}
                         </div>
                     </div>
-                    <div>
-                        <a href="#" id="edit-reviewed-for-track-list">
-                            {%- trans %}Edit track list{% endtrans -%}
-                        </a>
-                    </div>
+                    {% if abstract.edit_track_mode.name != 'none' %}
+                        <div>
+                            <a href="#" id="edit-reviewed-for-track-list">
+                                {%- trans %}Edit track list{% endtrans -%}
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="i-box-footer hidden">

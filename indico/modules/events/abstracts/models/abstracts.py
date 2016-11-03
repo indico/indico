@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals, division
 
+from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -29,7 +30,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import TitledIntEnum, IndicoEnum
 
 
 class AbstractState(TitledIntEnum):
@@ -64,6 +65,12 @@ class AbstractReviewingState(TitledIntEnum):
     conflicting = 3
     negative = 4
     mixed = 5
+
+
+class EditTrackMode(int, IndicoEnum):
+    none = 0
+    both = 1
+    reviewed_for = 2
 
 
 class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
@@ -365,6 +372,18 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def candidate_tracks(self):
         states = {AbstractReviewingState.positive, AbstractReviewingState.conflicting}
         return {t for t in self.reviewed_for_tracks if self.get_track_reviewing_state(t) in states}
+
+    @property
+    def edit_track_mode(self):
+        if not inspect(self).persistent:
+            return EditTrackMode.both
+        elif self.state not in {AbstractState.submitted, AbstractState.withdrawn}:
+            return EditTrackMode.none
+        elif (self.public_state in (AbstractPublicState.awaiting, AbstractPublicState.withdrawn) and
+                self.reviewed_for_tracks == self.submitted_for_tracks):
+            return EditTrackMode.both
+        else:
+            return EditTrackMode.reviewed_for
 
     @property
     def public_state(self):
