@@ -42,6 +42,7 @@ from indico.modules.events.abstracts.controllers.reviewing import (RHAbstractsDo
                                                                    RHWithdrawAbstract,
                                                                    RHLeaveComment,
                                                                    RHDeleteAbstractComment,
+                                                                   RHEditAbstractComment,
                                                                    RHDisplayReviewableTracks,
                                                                    RHDisplayReviewableTrackAbstracts,
                                                                    RHListOtherAbstracts,
@@ -138,6 +139,8 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abs
 
 # Abstract-specific
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment', 'comment_abstract', RHLeaveComment, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
+                 'edit_abstract_comment', RHEditAbstractComment, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
                  'delete_abstract_comment', RHDeleteAbstractComment, methods=('DELETE',))
 

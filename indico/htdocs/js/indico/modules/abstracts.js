@@ -39,11 +39,11 @@
     };
 
     global.setupAbstractPage = function setupAbstractPage() {
-        $('body').on('indico:confirmed', '.comment-button', function(evt) {
+        $('body').on('indico:confirmed', '.js-comment', function(evt) {
             evt.preventDefault();
 
             var $this = $(this);
-            var $box = $('#abstract-comment-box');
+            var $box = $this.parents('.i-timeline-item');
             var $form = $box.find('form');
             var $page = $('.management-page');
 
@@ -59,13 +59,13 @@
                         $page.replaceWith($newPage);
                         $page = $newPage;
                     } else {
-                        $box.html(data.box_html);
+                        $form.replaceWith(data.form_html);
                     }
                     initForms($page);
                     showFormErrors($page);
                 }
             });
-        }).on('indico:confirmed', '.judge-button', function(evt) {
+        }).on('indico:confirmed', '.js-judge', function(evt) {
             var $box = $('#abstract-decision-box');
             var $this = $(this);
             var $form = $box.find('form');
@@ -89,7 +89,7 @@
                     showFormErrors($box);
                 }
             });
-        }).on('indico:confirmed', '.review-button, #save-reviewing-tracks-list', function(evt) {
+        }).on('indico:confirmed', '.js-review, #save-reviewing-tracks-list', function(evt) {
             var $this = $(this);
             var $box = $this.closest('.i-timeline-item');
             var $form = $box.find('form');
@@ -115,18 +115,26 @@
                     showFormErrors($page);
                 }
             });
-        }).on('click', '.change-review-button', function(evt) {
+        }).on('click', '.js-change-review', function(evt) {
             evt.preventDefault();
 
             var $reviewDisplay = $(this).closest('.i-timeline-item');
             var $reviewBox = $reviewDisplay.next('.abstract-review-box');
             $reviewDisplay.hide();
             $reviewBox.show();
+        }).on('declarative:success', '.js-delete-comment', function() {
+            $(this).parents('.i-timeline-item').remove();
+        }).on('declarative:success', '.js-edit-comment', function(evt, data) {
+            var $oldContent = $(this).parents('.i-timeline-item').find('.i-box-content');
+            var $newContent = $(data.form_html);
+            $oldContent.replaceWith($newContent);
+            $newContent.find('.js-edit-comment-cancel').on('indico:confirmed', function(evt_) {
+                evt_.preventDefault();
+                $newContent.replaceWith($oldContent);
+            });
         }).on('indico:htmlUpdated', function() {
             initForms($(this));
             showFormErrors($(this));
-        }).on('declarative:success', '.js-delete-comment', function() {
-            $(this).parents('.i-timeline-item').remove();
         }).on('click', '#edit-reviewed-for-track-list', function(evt) {
             evt.preventDefault();
             $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');
