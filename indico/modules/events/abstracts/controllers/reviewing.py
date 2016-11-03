@@ -94,9 +94,12 @@ class RHListOtherAbstracts(RHConferenceBaseDisplay):
     def _process(self):
         query = (Abstract
                  .query.with_parent(self.event_new)
+                 .filter(Abstract.state.notin_({AbstractState.duplicate, AbstractState.merged}))
                  .options(joinedload('submitter').lazyload('*'))
-                 .filter(Abstract.id.notin_(self.excluded_ids))
                  .order_by(Abstract.friendly_id))
+
+        if self.excluded_ids:
+            query = query.filter(Abstract.id.notin_(self.excluded_ids))
 
         result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
                    'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
