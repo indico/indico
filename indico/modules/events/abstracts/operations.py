@@ -25,7 +25,7 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState, EditTrackMode
 from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractAction
@@ -39,15 +39,30 @@ from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 
 
+def _update_tracks(abstract, tracks, only_reviewed_for=False):
+    edit_track_mode = abstract.edit_track_mode
+    if edit_track_mode == EditTrackMode.none:
+        return
+
+    if tracks is None:
+        tracks = set()
+    elif isinstance(tracks, Track):
+        tracks = {tracks}
+
+    if edit_track_mode == EditTrackMode.both:
+        if not only_reviewed_for:
+            abstract.submitted_for_tracks = tracks
+        abstract.reviewed_for_tracks = tracks
+    elif edit_track_mode == EditTrackMode.reviewed_for:
+        abstract.reviewed_for_tracks = tracks
+
+
 def create_abstract(event, abstract_data, custom_fields_data=None):
     abstract = Abstract(event_new=event, submitter=session.user)
-    tracks = abstract_data.pop('submitted_for_tracks') or set()
+    tracks = abstract_data.pop('submitted_for_tracks', None)
     files = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
-    if isinstance(tracks, Track):
-        tracks = {tracks}
-    abstract.submitted_for_tracks = tracks
-    abstract.reviewed_for_tracks = tracks
+    _update_tracks(abstract, tracks)
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
@@ -65,11 +80,9 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
 
 
 def update_abstract(abstract, abstract_data, custom_fields_data=None):
-    tracks = abstract_data.pop('submitted_for_tracks') or set()
-    if isinstance(tracks, Track):
-        tracks = {tracks}
-    abstract.submitted_for_tracks = tracks
-    abstract.reviewed_for_tracks = tracks
+    tracks = abstract_data.pop('submitted_for_tracks', None)
+    if abstract.edit_track_mode == EditTrackMode.both:
+        _update_tracks(abstract, tracks)
     abstract.populate_from_dict(abstract_data)
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
@@ -235,7 +248,7 @@ def close_cfa(event):
 
 
 def update_reviewed_for_tracks(abstract, tracks):
-    abstract.reviewed_for_tracks = tracks
+    _update_tracks(abstract, tracks, only_reviewed_for=True)
     db.session.flush()
     logger.info('The list of tracks the abstract %s is reviewed for has been updated by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',

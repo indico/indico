@@ -25,6 +25,7 @@ from wtforms.validators import NumberRange, Optional, DataRequired, ValidationEr
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
                                                     AbstractPersonLinkListField, AbstractField, TrackRoleField)
+from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
@@ -383,7 +384,9 @@ class SingleTrackMixin(object):
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
-        if abstracts_settings.get(event, 'tracks_required'):
+        self.track_field_disabled = (kwargs.get('abstract') and
+                                     kwargs['abstract'].edit_track_mode != EditTrackMode.both)
+        if abstracts_settings.get(event, 'tracks_required') and not self.track_field_disabled:
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(SingleTrackMixin, self).__init__(*args, **kwargs)
         if not abstracts_settings.get(event, 'tracks_required'):
@@ -396,7 +399,9 @@ class MultiTrackMixin(object):
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
-        if abstracts_settings.get(event, 'tracks_required'):
+        self.track_field_disabled = (kwargs.get('abstract') and
+                                     kwargs['abstract'].edit_track_mode != EditTrackMode.both)
+        if abstracts_settings.get(event, 'tracks_required') and not self.track_field_disabled:
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
