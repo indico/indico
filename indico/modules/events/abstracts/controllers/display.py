@@ -95,8 +95,7 @@ class RHSubmitAbstract(RHDisplayAbstractsBase):
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
-            data = form.data
-            abstract = create_abstract(self.event_new, *get_field_values(data))
+            abstract = create_abstract(self.event_new, *get_field_values(form.data))
             flash(_("Your abstract with title '{}' has been successfully submitted. It is registered with the number "
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
