@@ -23,7 +23,8 @@ from wtforms.widgets.core import Input, Select, TextArea, HiddenInput
 from wtforms.validators import Length, NumberRange
 
 from indico.util.struct.enum import TitledEnum
-from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoEnumRadioField
+from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoQuerySelectMultipleCheckboxField,
+                                     IndicoEnumRadioField)
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SelectizeWidget
 
@@ -76,8 +77,9 @@ def render_field(field, widget_attrs, disabled=None):
         widget_attrs = dict(widget_attrs)
         widget_attrs.pop('placeholder', None)
     args = _attrs_for_validators(field, field.validators)
-    args['required'] = (field.flags.required and not field.flags.conditional
-                        and not isinstance(field, IndicoSelectMultipleCheckboxField))
+    args['required'] = (field.flags.required and not field.flags.conditional and
+                        not isinstance(field, (IndicoSelectMultipleCheckboxField,
+                                               IndicoQuerySelectMultipleCheckboxField)))
     args.update(widget_attrs)
     if disabled is not None:
         args['disabled'] = disabled

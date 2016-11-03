@@ -397,7 +397,7 @@ class MultiTrackMixin(object):
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
         if abstracts_settings.get(event, 'tracks_required'):
-            inject_validators(self, 'submitted_for_tracks', [Length(min=1)])
+            inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
 
