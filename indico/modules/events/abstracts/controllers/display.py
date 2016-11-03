@@ -34,16 +34,21 @@ from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-class RHDisplayAbstract(AbstractPageMixin, RHConferenceBaseDisplay):
+class RHDisplayAbstractsBase(RHConferenceBaseDisplay):
+    CSRF_ENABLED = True
+    EVENT_FEATURE = 'abstracts'
+
+
+class RHDisplayAbstract(AbstractPageMixin, RHDisplayAbstractsBase):
     management = False
     page_class = WPDisplayAbstracts
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+        RHDisplayAbstractsBase._checkParams(self, params)
         AbstractPageMixin._checkParams(self)
 
     def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+        RHDisplayAbstractsBase._checkProtection(self)
         AbstractPageMixin._checkProtection(self)
 
 
@@ -54,15 +59,15 @@ class RHDisplayAbstractExportPDF(RHDisplayAbstract):
         return send_file(file_name, pdf.generate(), 'application/pdf')
 
 
-class RHMyAbstractsBase(RHConferenceBaseDisplay):
+class RHMyAbstractsBase(RHDisplayAbstractsBase):
     """Base RH concerning the list of current user abstracts"""
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+        RHDisplayAbstractsBase._checkParams(self, params)
         self.abstracts = get_user_abstracts(self.event_new, session.user)
 
     def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+        RHDisplayAbstractsBase._checkProtection(self)
         if not session.user:
             raise Forbidden
 
@@ -82,7 +87,7 @@ class RHMyAbstractsExportPDF(RHMyAbstractsBase):
         return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHSubmitAbstract(RHMyAbstractsBase):
+class RHSubmitAbstract(RHDisplayAbstractsBase):
     def _process(self):
         if not self.event_new.cfa.can_submit_abstracts(session.user):
             return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
