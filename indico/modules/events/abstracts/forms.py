@@ -251,7 +251,7 @@ class AbstractReviewForm(IndicoForm):
         get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("Choose the contribution type..."))
     proposed_tracks = IndicoQuerySelectMultipleCheckboxField(
         _("Propose for tracks"),
-        [Length(min=1), HiddenUnless('proposed_action', AbstractAction.change_tracks)],
+        [DataRequired(), HiddenUnless('proposed_action', AbstractAction.change_tracks)],
         collection_class=set, get_label='title')
 
     def __init__(self, *args, **kwargs):
