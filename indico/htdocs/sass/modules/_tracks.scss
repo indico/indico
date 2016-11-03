@@ -69,16 +69,16 @@
     }
 
     .label {
-        display: inline-block;
         background-color: $gray;
         border: 0;
-        padding: 3px;
+        cursor: default;
+        display: inline-block;
         margin: 10px 5px 10px 0;
+        padding: 3px;
+
+        &.no-unreviewed {
+            background-color: $green;
+        }
     }
 
-    .badge {
-        font-weight: bold;
-        font-size: 0.6em;
-        cursor: default;
-    }
 }
