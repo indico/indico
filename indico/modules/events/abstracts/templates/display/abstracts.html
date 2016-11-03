@@ -13,9 +13,7 @@
         <div class="info-message-box">
             <span class="icon"></span>
             <div class="message-text">
-                {%- trans -%}
-                    There are currently no abstracts within this track for which you are a reviewer or convener.
-                {%- endtrans -%}
+                {%- trans -%}There are no abstracts in this track.{%- endtrans -%}
             </div>
         </div>
     {% else %}
@@ -32,11 +30,11 @@
                     </div>
                     <div class="group">
                         <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
-                            data-href="{{ url_for('.display_customize_abstract_list', event, track) }}"
-                            data-title="{% trans %}Abstract list configuration{% endtrans %}"
-                            data-dialog-classes="list-filter-dialog"
-                            data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                            data-ajax-dialog>
+                                data-href="{{ url_for('.display_customize_abstract_list', event, track) }}"
+                                data-title="{% trans %}Abstract list configuration{% endtrans %}"
+                                data-dialog-classes="list-filter-dialog"
+                                data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                data-ajax-dialog>
                             {% trans %}Customize list{% endtrans %}
                         </button>
                     </div>
@@ -54,17 +52,23 @@
                             <li>
                                 <a href="#"
                                    class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                                   data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">PDF</a>
+                                   data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">
+                                    PDF
+                                </a>
                             </li>
                             <li>
                                 <a href="#"
                                    class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
-                                   data-href="{{ url_for('.display_abstracts_csv_export', track) }}">CSV</a>
+                                   data-href="{{ url_for('.display_abstracts_csv_export', track) }}">
+                                    CSV
+                                </a>
                             </li>
                             <li>
                                 <a href="#"
                                    class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
-                                   data-href="{{ url_for('.display_abstracts_xlsx_export', track) }}">XLSX (Excel)</a>
+                                   data-href="{{ url_for('.display_abstracts_xlsx_export', track) }}">
+                                    XLSX (Excel)
+                                </a>
                             </li>
                         </ul>
                     </div>
