@@ -31,7 +31,7 @@
                 {%- endtrans %}
             </label>
             <ul class="author-list">
-                {% for user in abstract.primary_authors -%}
+                {% for user in abstract.primary_authors|sort(attribute='display_order_key') -%}
                     <li class="event-user">
                         {{ user.full_name }}
                     </li>
@@ -49,7 +49,7 @@
                 {%- endtrans %}
             </label>
             <ul class="author-list">
-                {% for user in abstract.secondary_authors -%}
+                {% for user in abstract.secondary_authors|sort(attribute='display_order_key') -%}
                     <li class="event-user">
                         {{ user.full_name }}
                     </li>
