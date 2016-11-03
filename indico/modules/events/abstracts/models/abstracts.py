@@ -499,11 +499,10 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         is_manager = self.event_new.can_manage(user)
         if not self.user_owns(user) and not is_manager:
             return False
-        elif self.public_state == AbstractPublicState.awaiting:
+        elif is_manager and self.public_state in (AbstractPublicState.under_review, AbstractPublicState.withdrawn):
             return True
-        elif self.public_state == AbstractPublicState.under_review and is_manager:
-            return True
-        elif self.public_state == AbstractPublicState.withdrawn and is_manager:
+        elif (self.public_state == AbstractPublicState.awaiting and
+                (is_manager or self.event_new.cfa.can_edit_abstracts(user))):
             return True
         else:
             return False

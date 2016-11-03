@@ -70,6 +70,10 @@ class CallForAbstracts(object):
     def can_submit_abstracts(self, user):
         return self.is_open or abstracts_settings.acls.contains_user(self.event, 'authorized_submitters', user)
 
+    def can_edit_abstracts(self, user):
+        modification_end = self.modification_end_dt
+        return self.can_submit_abstracts(user) or (modification_end is not None and modification_end > now_utc())
+
     def schedule(self, start_dt, end_dt, modification_end_dt):
         abstracts_settings.set_multi(self.event, {
             'start_dt': start_dt,
