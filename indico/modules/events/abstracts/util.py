@@ -32,6 +32,7 @@ from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
+from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
@@ -423,6 +424,16 @@ def get_user_abstracts(event, user):
             .filter(db.or_(Abstract.submitter == user,
                            Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
             .all())
+
+
+@memoize_request
+def get_user_tracks(event, user):
+    """Get the list of tracks where the user is a reviewer/convener"""
+    query = Track.query.with_parent(event)
+    if user not in event.global_abstract_reviewers and user not in event.global_conveners:
+        query = query.filter(db.or_(Track.conveners.any(User.id == user.id),
+                                    Track.abstract_reviewers.any(User.id == user.id)))
+    return query.all()
 
 
 def get_track_reviewer_abstract_counts(event, user):
