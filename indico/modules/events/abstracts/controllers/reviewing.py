@@ -317,6 +317,11 @@ class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActi
 
 
 class RHEditReviewedForTrackList(RHAbstractReviewBase):
+    def _checkProtection(self):
+        RHAbstractReviewBase._checkProtection(self)
+        if not self.abstract.can_judge(session.user, check_state=True):
+            raise Forbidden
+
     def _process(self):
         form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
         if form.validate_on_submit:
