@@ -17,6 +17,8 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from collections import defaultdict
+from operator import attrgetter
 
 from flask import session
 
@@ -24,6 +26,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
@@ -81,6 +84,45 @@ def delete_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
 
 
+def merge_person_links(target_abstract, source_abstract):
+    """
+    Merge `person_links` of different abstracts.
+
+    Add to `target_abstract` new `AbstractPersonLink`s whose `EventPerson`
+    exists in the `source_abstract` but is not yet in the `target_abstract`.
+
+    :param target_abstract: The target abstract (to which the links should then be added)
+    :param source_abstract: The source abstract
+    """
+    new_links = set()
+    source_links = source_abstract.person_links
+    source_link_map = defaultdict(set)
+    for link in source_links:
+        source_link_map[link.person.id].add(link)
+    unique_persons = {link.person for link in source_links} - {link.person for link in target_abstract.person_links}
+    sort_position = max(link.display_order for link in target_abstract.person_links) + 1
+    persons_sorted = sort_position > 1
+
+    for person in unique_persons:
+        for source_link in source_link_map[person.id]:
+            link = AbstractPersonLink(person=person, author_type=source_link.author_type,
+                                      is_speaker=source_link.is_speaker)
+            # if the persons in the abstract are sorted, add at the end
+            # otherwise, keep alphabetical order
+            if persons_sorted:
+                link.display_order = sort_position
+                sort_position += 1
+            else:
+                link.display_order = 0
+            new_links.add(link)
+            for column_name in {'_title', '_affiliation', '_address', '_phone', '_first_name', '_last_name'}:
+                setattr(link, column_name, getattr(source_link, column_name))
+
+    # Add new links in order
+    for link in sorted(new_links, key=attrgetter('display_order_key')):
+        target_abstract.person_links.append(link)
+
+
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
                    send_notification=False):
     abstract.judge = judge
@@ -102,7 +144,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
         abstract.state = AbstractState.merged
         abstract.merged_into = abstract_data['merged_into']
         if merge_persons:
-            abstract.merged_into.person_links |= abstract.person_links
+            merge_person_links(abstract.merged_into, abstract)
     db.session.flush()
     if send_notification:
         send_abstract_notifications(abstract)
