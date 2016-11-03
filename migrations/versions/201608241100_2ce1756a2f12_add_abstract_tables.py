@@ -267,7 +267,7 @@ def upgrade():
 
     op.create_table(
         'track_abstract_reviewers',
-        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True, index=True),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
         sa.Column('event_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
         sa.Column('track_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
@@ -281,7 +281,7 @@ def upgrade():
 
     op.create_table(
         'track_conveners',
-        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True, index=True),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('user_id', sa.Integer(), nullable=False, autoincrement=False, index=True),
         sa.Column('event_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
         sa.Column('track_id', sa.Integer(), nullable=True, autoincrement=False, index=True),
