@@ -15,5 +15,7 @@
     {% for track in tracks %}
         <span class="abstract-track">{{ track.title }}</span>
         {%- if not loop.last -%},{% endif %}
+    {% else %}
+        <em>{% trans %}None{% endtrans %}</em>
     {% endfor %}
 {% endmacro %}
