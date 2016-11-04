@@ -16,18 +16,9 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-
-from indico.core import signals
-from indico.core.db import db
-from indico.modules.events.persons import logger
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.core.signals.event import _signals
 
 
-def update_person(person, data):
-    person.populate_from_dict(data)
-    db.session.flush()
-    signals.event.person_updated.send(person)
-    logger.info('Person %s updated by %s', person, session.user)
-    person.event_new.log(EventLogRealm.management, EventLogKind.change, 'Persons',
-                         "Person with email '{}' has been updated".format(person.email), session.user)
+person_updated = _signals.signal('person-updated', """
+Called when an EventPerson is modified. The *sender* is the EventPerson.
+""")
