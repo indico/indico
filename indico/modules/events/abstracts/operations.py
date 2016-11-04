@@ -33,7 +33,6 @@ from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
@@ -43,11 +42,6 @@ def _update_tracks(abstract, tracks, only_reviewed_for=False):
     edit_track_mode = abstract.edit_track_mode
     if edit_track_mode == EditTrackMode.none:
         return
-
-    if tracks is None:
-        tracks = set()
-    elif isinstance(tracks, Track):
-        tracks = {tracks}
 
     if edit_track_mode == EditTrackMode.both:
         if not only_reviewed_for:

@@ -22,6 +22,7 @@ from flask import request
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired, Length
+from wtforms.widgets import Select
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
                                                     AbstractPersonLinkListField, AbstractField, TrackRoleField)
@@ -35,6 +36,7 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoQuerySelectMultipleField
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
                                      IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
@@ -385,8 +387,28 @@ class NoTrackMixin(object):
         super(NoTrackMixin, self).__init__(*args, **kwargs)
 
 
+class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
+    # single-choice version of the multi select field that uses
+    # a collection instead of a single value for `data`
+    widget = Select()
+
+    def iter_choices(self):
+        yield ('__None', self.blank_text, self.data is None)
+        for choice in super(_SingleChoiceQuerySelectMultipleField, self).iter_choices():
+            yield choice
+
+    def process_formdata(self, valuelist):
+        # remove "no value" indicator. QuerySelectMultipleField validation
+        # is broken in WTForms so it never causes a validation error to have
+        # invalid data in valuelist but maybe it gets fixed at some point...
+        valuelist = list(set(valuelist) - {'__None'})
+        if len(valuelist) > 1:
+            raise ValueError('Received more than one value')
+        super(_SingleChoiceQuerySelectMultipleField, self).process_formdata(valuelist)
+
+
 class SingleTrackMixin(object):
-    submitted_for_tracks = QuerySelectField(_("Track"), get_label='title', allow_blank=True)
+    submitted_for_tracks = _SingleChoiceQuerySelectMultipleField(_("Track"), get_label='title', collection_class=set)
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
