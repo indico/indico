@@ -46,8 +46,8 @@ class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
         super(IndicoEnumSelectField, self).__init__(label, validators, **kwargs)
         self.enum = enum
         self.sorted = sorted
-        self.only = only
-        self.skip = skip or set()
+        self.only = set(only) if only is not None else None
+        self.skip = set(skip or set())
         self.none = none
         self.titles = titles
 
