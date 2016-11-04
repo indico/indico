@@ -89,5 +89,5 @@ class AbstractReviewQuestion(db.Model):
         results = [rating for rating in review.ratings if rating.question == self]
         rating = results[0] if results else None
         if rating is None and allow_create:
-            rating = AbstractReviewRating(question=self.question, review=review)
+            rating = AbstractReviewRating(question=self, review=review)
         return rating

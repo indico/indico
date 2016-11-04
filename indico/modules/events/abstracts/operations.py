@@ -113,17 +113,37 @@ def delete_abstract(abstract, delete_contrib=False):
                            'Abstract "{}" has been deleted'.format(abstract.title), session.user)
 
 
-def create_abstract_comment(abstract, comment_data):
-    comment = AbstractComment(user=session.user)
-    comment.populate_from_dict(comment_data)
-    comment.abstract = abstract
+def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
+                   send_notification=False):
+    abstract.judge = judge
+    abstract.judgment_dt = now_utc()
+    abstract.judgment_comment = abstract_data['judgment_comment']
+    if judgment == AbstractAction.accept:
+        abstract.state = AbstractState.accepted
+        abstract.accepted_track = abstract_data['accepted_track']
+        abstract.accepted_contrib_type = abstract_data['accepted_contrib_type']
+        if not abstract.contribution:
+            # TODO: generate contribution
+            pass
+    elif judgment == AbstractAction.reject:
+        abstract.state = AbstractState.rejected
+    elif judgment == AbstractAction.mark_as_duplicate:
+        abstract.state = AbstractState.duplicate
+        abstract.duplicate_of = abstract_data['duplicate_of']
+    elif judgment == AbstractAction.merge:
+        abstract.state = AbstractState.merged
+        abstract.merged_into = abstract_data['merged_into']
+        if merge_persons:
+            _merge_person_links(abstract.merged_into, abstract)
     db.session.flush()
-    logger.info("Abstract %s received a comment from %s", abstract, session.user)
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                           'Abstract "{}" has received a comment'.format(abstract.title), session.user)
+    if send_notification:
+        send_abstract_notifications(abstract)
+    logger.info('Abstract %s judged by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'Abstract "{}" has been judged'.format(abstract.title), session.user)
 
 
-def merge_person_links(target_abstract, source_abstract):
+def _merge_person_links(target_abstract, source_abstract):
     """
     Merge `person_links` of different abstracts.
 
@@ -162,6 +182,33 @@ def merge_person_links(target_abstract, source_abstract):
         target_abstract.person_links.append(link)
 
 
+def update_reviewed_for_tracks(abstract, tracks):
+    _update_tracks(abstract, tracks, only_reviewed_for=True)
+    db.session.flush()
+    logger.info('The list of tracks the abstract %s is reviewed for has been updated by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'The list of tracks the abstract "{}" is reviewed for has been updated'
+                           .format(abstract.title), session.user)
+
+
+def reset_abstract_state(abstract):
+    abstract.reset_state()
+    db.session.flush()
+    logger.info('Abstract %s state reset by %s', abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+                           'State of abstract "{}" has been reset'.format(abstract.title), session.user)
+
+
+def create_abstract_comment(abstract, comment_data):
+    comment = AbstractComment(user=session.user)
+    comment.populate_from_dict(comment_data)
+    comment.abstract = abstract
+    db.session.flush()
+    logger.info("Abstract %s received a comment from %s", abstract, session.user)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
+                           'Abstract "{}" has received a comment'.format(abstract.title), session.user)
+
+
 def update_abstract_comment(comment, comment_data):
     comment.populate_from_dict(comment_data)
     comment.modified_by = session.user
@@ -178,44 +225,6 @@ def delete_abstract_comment(comment):
     logger.info("Abstract comment %s deleted by %s", comment, session.user)
     comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
                                    'Abstract comment "{}" was removed'.format(comment.id), session.user)
-
-
-def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
-                   send_notification=False):
-    abstract.judge = judge
-    abstract.judgment_dt = now_utc()
-    abstract.judgment_comment = abstract_data['judgment_comment']
-    if judgment == AbstractAction.accept:
-        abstract.state = AbstractState.accepted
-        abstract.accepted_track = abstract_data['accepted_track']
-        abstract.accepted_contrib_type = abstract_data['accepted_contrib_type']
-        if not abstract.contribution:
-            # TODO: generate contribution
-            pass
-    elif judgment == AbstractAction.reject:
-        abstract.state = AbstractState.rejected
-    elif judgment == AbstractAction.mark_as_duplicate:
-        abstract.state = AbstractState.duplicate
-        abstract.duplicate_of = abstract_data['duplicate_of']
-    elif judgment == AbstractAction.merge:
-        abstract.state = AbstractState.merged
-        abstract.merged_into = abstract_data['merged_into']
-        if merge_persons:
-            merge_person_links(abstract.merged_into, abstract)
-    db.session.flush()
-    if send_notification:
-        send_abstract_notifications(abstract)
-    logger.info('Abstract %s judged by %s', abstract, session.user)
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Abstract "{}" has been judged'.format(abstract.title), session.user)
-
-
-def reset_abstract_state(abstract):
-    abstract.reset_state()
-    db.session.flush()
-    logger.info('Abstract %s state reset by %s', abstract, session.user)
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'State of abstract "{}" has been reset'.format(abstract.title), session.user)
 
 
 def create_abstract_review(abstract, track, user, review_data, questions_data):
@@ -268,12 +277,3 @@ def close_cfa(event):
     event.cfa.close()
     logger.info("Call for abstracts for %s closed by %s", event, session.user)
     event.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts', 'Call for abstracts closed', session.user)
-
-
-def update_reviewed_for_tracks(abstract, tracks):
-    _update_tracks(abstract, tracks, only_reviewed_for=True)
-    db.session.flush()
-    logger.info('The list of tracks the abstract %s is reviewed for has been updated by %s', abstract, session.user)
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'The list of tracks the abstract "{}" is reviewed for has been updated'
-                           .format(abstract.title), session.user)
