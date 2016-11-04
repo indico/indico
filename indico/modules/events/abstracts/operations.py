@@ -32,7 +32,7 @@ from indico.modules.events.abstracts.models.reviews import AbstractAction, Abstr
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
-from indico.modules.events.contributions.operations import delete_contribution
+from indico.modules.events.contributions.operations import delete_contribution, create_contribution_from_abstract
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
@@ -123,8 +123,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
         abstract.accepted_track = abstract_data['accepted_track']
         abstract.accepted_contrib_type = abstract_data['accepted_contrib_type']
         if not abstract.contribution:
-            # TODO: generate contribution
-            pass
+            abstract.contribution = create_contribution_from_abstract(abstract, contrib_session)
     elif judgment == AbstractAction.reject:
         abstract.state = AbstractState.rejected
     elif judgment == AbstractAction.mark_as_duplicate:

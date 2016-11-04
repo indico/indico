@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from flask import session
 
 from indico.core import signals
@@ -24,6 +26,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.timetable.operations import (schedule_contribution, update_timetable_entry,
                                                         delete_timetable_entry)
@@ -153,3 +156,28 @@ def delete_subcontribution(subcontrib):
     logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
     subcontrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
                              'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user)
+
+
+@no_autoflush
+def create_contribution_from_abstract(abstract, contrib_session=None):
+    event = abstract.event_new
+    contrib_person_links = set()
+    person_link_attrs = {'_title', 'address', 'affiliation', 'first_name', 'last_name', 'phone', 'author_type',
+                         'is_speaker', 'display_order'}
+    for abstract_person_link in abstract.person_links:
+        link = ContributionPersonLink(person=abstract_person_link.person)
+        link.populate_from_attrs(abstract_person_link, person_link_attrs)
+        contrib_person_links.add(link)
+
+    duration = contrib_session.default_contribution_duration if contrib_session else timedelta(minutes=15)
+    custom_fields_data = {'custom_{}'.format(field_value.contribution_field.id): field_value.data for
+                          field_value in abstract.field_values}
+    return create_contribution(event, {'friendly_id': abstract.friendly_id,
+                                       'title': abstract.title,
+                                       'duration': duration,
+                                       'description': abstract.description,
+                                       'type': abstract.accepted_contrib_type,
+                                       'track': abstract.accepted_track,
+                                       'session': contrib_session,
+                                       'person_link_data': {link: True for link in contrib_person_links}},
+                               custom_fields_data=custom_fields_data)
