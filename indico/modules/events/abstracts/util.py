@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
+import os
 from collections import OrderedDict, defaultdict, namedtuple
 
 from flask import request, flash
 from sqlalchemy.orm import joinedload, subqueryload
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
@@ -28,7 +30,7 @@ from indico.modules.events.abstracts.models.email_templates import AbstractEmail
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.settings import abstracts_settings
+from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase, serialize_person_link
@@ -39,6 +41,7 @@ from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+from MaKaC.PDFinterface.conference import AbstractBook
 
 
 class AbstractListGeneratorBase(ListGeneratorBase):
@@ -466,3 +469,27 @@ def get_track_reviewer_abstract_counts(event, user):
              .group_by(Track.id))
     return {track: {'total': total, 'reviewed': reviewed, 'unreviewed': unreviewed}
             for track, total, reviewed, unreviewed in query}
+
+
+def create_boa(event):
+    """Create the book of abstracts if necessary
+
+    :return: The path to the PDF file
+    """
+    path = boa_settings.get(event, 'cache_path')
+    if path and os.path.exists(path):
+        return path
+    pdf = AbstractBook(event)
+    tmp_path = pdf.generate()
+    path = os.path.join(Config.getInstance().getXMLCacheDir(), 'boa-{}.pdf'.format(event.id))
+    os.rename(tmp_path, path)
+    boa_settings.set(event, 'cache_path', path)
+    return path
+
+
+def clear_boa_cache(event):
+    """Delete the cached book of abstract"""
+    path = boa_settings.get(event, 'cache_path')
+    if path:
+        os.remove(path)
+        boa_settings.delete(event, 'cache_path')

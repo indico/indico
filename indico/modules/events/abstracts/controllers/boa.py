@@ -18,14 +18,15 @@ from __future__ import unicode_literals
 
 from flask import flash
 
+from indico.modules.events.abstracts.controllers.display import RHDisplayAbstractsBase
 from indico.modules.events.abstracts.controllers.management import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
+from indico.modules.events.abstracts.util import clear_boa_cache, create_boa
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from MaKaC.PDFinterface.conference import AbstractBook
 
 
 class RHManageBOA(RHManageAbstractsBase):
@@ -35,15 +36,14 @@ class RHManageBOA(RHManageAbstractsBase):
         form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event_new)))
         if form.validate_on_submit():
             boa_settings.set_multi(self.event_new, form.data)
+            clear_boa_cache(self.event_new)
             flash(_('Book of Abstract settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
 
 
-class RHExportBOA(RHManageAbstractsBase):
+class RHExportBOA(RHDisplayAbstractsBase):
     """Export the book of abstracts"""
 
     def _process(self):
-        # TODO: Add caching
-        pdf = AbstractBook(self.event_new)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+        return send_file('book-of-abstracts.pdf', create_boa(self.event_new), 'application/pdf')
