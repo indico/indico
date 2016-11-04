@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
-from flask import json, jsonify, session, request
+from flask import session, request
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -35,7 +35,6 @@ from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.forms.base import AjaxFieldMixin
 from indico.web.forms.fields import MultipleItemsField, JSONField
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
 
@@ -170,7 +169,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                 raise ValueError(_("{} has no role").format(person_link.full_name))
 
 
-class AbstractField(AjaxFieldMixin, QuerySelectField):
+class AbstractField(QuerySelectField):
     """A selectize-based field to select an abstract from an event."""
 
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
@@ -213,7 +212,7 @@ class AbstractField(AjaxFieldMixin, QuerySelectField):
 
     @property
     def search_url(self):
-        return url_for(self.ajax_endpoint, self.event, __wtf_ajax=self.short_name)
+        return url_for(self.ajax_endpoint, self.event)
 
     @property
     def search_payload(self):
