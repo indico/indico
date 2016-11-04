@@ -1,6 +1,6 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_tracks %}
 
-{% macro _render_submission_info(abstract) %}
+{% macro _render_submission_info(abstract, management) %}
     {% if abstract.submitted_contrib_type %}
         <div class="info-line">
             <label>
@@ -99,7 +99,9 @@
                         <tr>
                             <td>
                                 <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
-                                    <a href="{{ url_for('.download_attachment', file) }}">{{ file.filename }}</a>
+                                    <a href="{{ url_for('.download_attachment', file, management=management) }}">
+                                        {{ file.filename }}
+                                    </a>
                                 </span>
                             </td>
                         </tr>
@@ -379,7 +381,7 @@
                         {% endif %}
                     </div>
                     <div class="i-box-content submission-info">
-                        {{ _render_submission_info(abstract) }}
+                        {{ _render_submission_info(abstract, management) }}
                     </div>
                 </div>
             </div>
