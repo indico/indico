@@ -31,8 +31,6 @@ from indico.modules.events.abstracts.forms import (AbstractCommentForm, Abstract
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.files import AbstractFile
-from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
-from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
                                                         update_abstract_comment, create_abstract_review,
