@@ -61,6 +61,7 @@ def render_abstract_page(abstract, management=False):
                            judgment_form=judgment_form, review_forms=review_forms,
                            review_track_list_form=review_track_list_form, management=management, no_javascript=True)
 
+
 class AbstractMixin:
     normalize_url_spec = {
         'locators': {

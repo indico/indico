@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.util.string import format_repr, return_ascii
 
 
@@ -79,10 +80,14 @@ class AbstractReviewQuestion(db.Model):
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.text)
 
-    def get_review_rating(self, review):
-        """Get the rating given for a particular review.
+    def get_review_rating(self, review, allow_create=False):
+        """Get the rating given in particular review.
 
         :param review: the review object
+        :param allow_create: if there is not rating for that review a new one is created
         """
         results = [rating for rating in review.ratings if rating.question == self]
-        return results[0] if results else None
+        rating = results[0] if results else None
+        if rating is None and allow_create:
+            rating = AbstractReviewRating(question=self.question, review=review)
+        return rating
