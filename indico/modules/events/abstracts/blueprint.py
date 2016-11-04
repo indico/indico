@@ -111,8 +111,8 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abs
                  management.RHAbstractExportPDF)
 
 # Abstract-specific
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment', 'comment_abstract', reviewing.RHLeaveComment,
-                 methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment',
+                 'comment_abstract', reviewing.RHSubmitAbstractComment, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
                  'edit_abstract_comment', reviewing.RHEditAbstractComment, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',

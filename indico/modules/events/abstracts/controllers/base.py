@@ -50,16 +50,23 @@ def build_review_form(abstract, track):
     return review_form_class(prefix="track-{}".format(track.id), obj=defaults, abstract=abstract)
 
 
-def render_abstract_page(abstract, management=False):
-    comment_form = AbstractCommentForm(formdata=None)
+def render_abstract_page(abstract, view_class=None, management=False):
+    comment_form = AbstractCommentForm(abstract=abstract, user=session.user, formdata=None)
     review_forms = {track.id: build_review_form(abstract, track)
                     for track in abstract.reviewed_for_tracks
                     if track.can_review_abstracts(session.user)}
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
-    return render_template('events/abstracts/abstract.html', abstract=abstract, comment_form=comment_form,
-                           judgment_form=judgment_form, review_forms=review_forms,
-                           review_track_list_form=review_track_list_form, management=management, no_javascript=True)
+    params = {'abstract': abstract,
+              'comment_form': comment_form,
+              'review_forms': review_forms,
+              'review_track_list_form': review_track_list_form,
+              'judgment_form': judgment_form,
+              'management': management}
+    if view_class:
+        return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
+    else:
+        return render_template('events/abstracts/abstract.html', no_javascript=True, **params)
 
 
 class AbstractMixin:
@@ -81,16 +88,7 @@ class AbstractPageMixin(AbstractMixin):
     """Display abstract page"""
 
     def _process(self):
-        comment_form = AbstractCommentForm()
-        review_forms = {track.id: build_review_form(self.abstract, track)
-                        for track in self.abstract.reviewed_for_tracks
-                        if track.can_review_abstracts(session.user)}
-        judgment_form = AbstractJudgmentForm(abstract=self.abstract)
-        review_track_list_form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
-        return self.page_class.render_template('abstract.html', self._conf, abstract=self.abstract,
-                                               comment_form=comment_form, judgment_form=judgment_form,
-                                               review_forms=review_forms, review_track_list_form=review_track_list_form,
-                                               management=self.management)
+        return render_abstract_page(self.abstract, view_class=self.view_class, management=self.management)
 
 
 class DisplayAbstractListMixin:

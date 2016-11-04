@@ -107,7 +107,7 @@ class RHManageAbstract(AbstractPageMixin, RHConferenceModifBase):
 
     CSRF_ENABLED = True
     management = True
-    page_class = WPManageAbstracts
+    view_class = WPManageAbstracts
 
     def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)

@@ -461,6 +461,16 @@ class AbstractCommentForm(IndicoForm):
     visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=AbstractCommentVisibility,
                                        skip={AbstractCommentVisibility.submitters, AbstractCommentVisibility.users})
 
+    def __init__(self, *args, **kwargs):
+        comment = kwargs.get('obj')
+        user = comment.user if comment else kwargs.pop('user')
+        abstract = kwargs.pop('abstract')
+        super(IndicoForm, self).__init__(*args, **kwargs)
+        if not abstract.can_judge(user) and not abstract.can_convene(user):
+            self.visibility.skip.add(AbstractCommentVisibility.judges)
+        elif not abstract.can_review(user):
+            del self.visibility
+
 
 class AbstractReviewedForTracksForm(IndicoForm):
     reviewed_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label='title', collection_class=set)
