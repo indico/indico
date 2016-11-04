@@ -120,6 +120,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
                          joinedload('accepted_track'),
                          joinedload('accepted_contrib_type'),
                          joinedload('submitted_contrib_type'),
+                         joinedload('contribution').load_only('id', 'event_id'),
                          subqueryload('field_values'),
                          subqueryload('submitted_for_tracks'),
                          subqueryload('reviewed_for_tracks'),
