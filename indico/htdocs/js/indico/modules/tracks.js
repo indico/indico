@@ -20,9 +20,10 @@
 
     global.setupTrackManagement = function setupTrackManagement() {
         var heightLimit = 50;
-        var $trackList = $('#track-list');
-        $trackList.on('indico:htmlUpdated', function() {
-            $('.track-content').each(function() {
+        $('#track-list-container').on('indico:htmlUpdated', function() {
+            var $trackList = $('#track-list');
+
+            $trackList.find('.track-content').each(function() {
                 var $this = $(this);
                 if ($this.height() > heightLimit) {
                     $this.addClass('track-content-collapsed track-content-collapsible');
@@ -31,33 +32,32 @@
                     });
                 }
             });
+
+            $trackList.sortable({
+                axis: 'y',
+                containment: 'parent',
+                cursor: 'move',
+                distance: 2,
+                handle: '.ui-i-box-sortable-handle',
+                items: '> li.track-row',
+                tolerance: 'pointer',
+                forcePlaceholderSize: true,
+                update: function() {
+                    var sortedList = $trackList.find('li.track-row').map(function() {
+                        return $(this).data('id');
+                    }).get();
+
+                    $.ajax({
+                        url: $trackList.data('url'),
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({sort_order: sortedList}),
+                        complete: IndicoUI.Dialogs.Util.progress(),
+                        error: handleAjaxError
+                    });
+                }
+            });
         }).trigger('indico:htmlUpdated');
-
-        $trackList.sortable({
-            axis: 'y',
-            containment: 'parent',
-            cursor: 'move',
-            distance: 2,
-            handle: '.ui-i-box-sortable-handle',
-            items: '> li.track-row',
-            tolerance: 'pointer',
-            forcePlaceholderSize: true,
-            update: function() {
-                var $elem = $('#track-list');
-                var sortedList = $elem.find('li.track-row').map(function() {
-                    return $(this).data('id');
-                }).get();
-
-                $.ajax({
-                    url: $elem.data('url'),
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({sort_order: sortedList}),
-                    complete: IndicoUI.Dialogs.Util.progress(),
-                    error: handleAjaxError
-                });
-            }
-        });
     };
 })(window);
 
