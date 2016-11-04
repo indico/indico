@@ -210,9 +210,9 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
         return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))
 
 
-class RHLeaveComment(RHAbstractReviewBase):
+class RHSubmitAbstractComment(RHAbstractReviewBase):
     def _process(self):
-        form = AbstractCommentForm()
+        form = AbstractCommentForm(abstract=self.abstract, user=session.user)
         if form.validate_on_submit():
             create_abstract_comment(self.abstract, form.data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
@@ -239,7 +239,7 @@ class RHAbstractCommentBase(RHAbstractReviewBase):
 
 class RHEditAbstractComment(RHAbstractCommentBase):
     def _process(self):
-        form = AbstractCommentForm(obj=self.comment)
+        form = AbstractCommentForm(obj=self.comment, abstract=self.abstract, user=session.user)
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))

@@ -41,7 +41,7 @@ class RHDisplayAbstractsBase(RHConferenceBaseDisplay):
 
 class RHDisplayAbstract(AbstractPageMixin, RHDisplayAbstractsBase):
     management = False
-    page_class = WPDisplayAbstracts
+    view_class = WPDisplayAbstracts
 
     def _checkParams(self, params):
         RHDisplayAbstractsBase._checkParams(self, params)
