@@ -28,6 +28,7 @@ from indico.modules.attachments.controllers.event_package import AttachmentPacka
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import get_contrib_field_types
+from indico.modules.events.contributions.controllers.common import ContributionListMixin
 from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
                                                        ContributionStartDateForm, ContributionDurationForm,
                                                        ContributionTypeForm)
@@ -137,17 +138,11 @@ class RHManageSubContributionsActionsBase(RHManageContributionBase):
                             .all())
 
 
-class RHContributions(RHManageContributionsBase):
+class RHContributions(ContributionListMixin, RHManageContributionsBase):
     """Display contributions management page"""
 
-    def _process(self):
-        if self.list_generator.static_link_used:
-            return redirect(self.list_generator.get_list_url())
-        contrib_list_args = self.list_generator.get_list_kwargs()
-        selected_entry = request.args.get('selected')
-        selected_entry = int(selected_entry) if selected_entry else None
-        return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
-                                                     selected_entry=selected_entry, **contrib_list_args)
+    template = 'management/contributions.html'
+    view_class = WPManageContributions
 
 
 class RHContributionListCustomize(RHManageContributionsBase):

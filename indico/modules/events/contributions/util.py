@@ -21,7 +21,7 @@ from datetime import timedelta
 from io import BytesIO
 from operator import attrgetter
 
-from flask import flash, session
+from flask import flash, session, request
 from pytz import timezone
 from sqlalchemy.orm import load_only, contains_eager, noload, joinedload, subqueryload
 
@@ -180,8 +180,10 @@ class ContributionListGenerator(ListGeneratorBase):
         tracks = [{'id': int(t.id), 'title': t.title} for t in self.event.tracks]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
+        selected_entry = request.args.get('selected')
+        selected_entry = int(selected_entry) if selected_entry else None
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
-                'total_duration': total_duration}
+                'total_duration': total_duration, 'selected_entry': selected_entry}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.
@@ -194,6 +196,7 @@ class ContributionListGenerator(ListGeneratorBase):
         """
         contrib_list_kwargs = self.get_list_kwargs()
         total_entries = contrib_list_kwargs.pop('total_entries')
+        selected_entry = contrib_list_kwargs.pop('selected_entry')
         tpl_contrib = get_template_module('events/contributions/management/_contribution_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
         contribs = contrib_list_kwargs['contribs']
@@ -201,7 +204,8 @@ class ContributionListGenerator(ListGeneratorBase):
                                                                contrib_list_kwargs.pop('total_duration'))
         return {'html': tpl_contrib.render_contrib_list(self.event, total_entries, **contrib_list_kwargs),
                 'hide_contrib': contrib not in contribs if contrib else None,
-                'filter_statistics': filter_statistics}
+                'filter_statistics': filter_statistics,
+                'selected_entry': selected_entry}
 
     def flash_info_message(self, contrib):
         flash(_("The contribution '{}' is not displayed in the list due to the enabled filters")
