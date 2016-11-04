@@ -17,11 +17,11 @@
     <a class="i-button highlight icon-plus"
        data-href="{{ url_for('.create_track', event) }}"
        data-title="{% trans %}Add new track{% endtrans %}"
-       data-update="#track-list"
+       data-update="#track-list-container"
        data-ajax-dialog>
         {% trans %}Add track{% endtrans %}
     </a>
-    <div>
+    <div id="track-list-container">
         {{ render_track_list(event) }}
     </div>
     <script>
