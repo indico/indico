@@ -110,30 +110,31 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/', 'manage_abstract', mana
 _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export',
                  management.RHAbstractExportPDF)
 
-# Abstract-specific
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comment',
-                 'comment_abstract', reviewing.RHSubmitAbstractComment, methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
-                 'edit_abstract_comment', reviewing.RHEditAbstractComment, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/abstracts/<int:abstract_id>/comments/<int:comment_id>',
-                 'delete_abstract_comment', reviewing.RHDeleteAbstractComment, methods=('DELETE',))
-
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export',
+                     management.RHAbstractExportPDF, defaults=defaults)
+    # Abstract actions
     _bp.add_url_rule(prefix + '/<int:abstract_id>/edit', 'edit_abstract',
                      common.RHEditAbstract, methods=('GET', 'POST'), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/withdraw', 'withdraw_abstract',
                      reviewing.RHWithdrawAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reset', 'reset_abstract_state',
                      reviewing.RHResetAbstractState, methods=('POST',), defaults=defaults)
-    _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export',
-                     management.RHAbstractExportPDF, defaults=defaults)
-    _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',
-                     reviewing.RHReviewAbstractForTrack, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/judge', 'judge_abstract',
                      reviewing.RHJudgeAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reviewing-tracks', 'edit_review_tracks',
                      reviewing.RHEditReviewedForTrackList, methods=('POST',), defaults=defaults)
+    # Abstract reviewing
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',
+                     reviewing.RHReviewAbstractForTrack, methods=('POST',), defaults=defaults)
+    # Abstract comments
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/comment', 'comment_abstract',
+                     reviewing.RHSubmitAbstractComment, methods=('POST',))
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/comments/<int:comment_id>', 'edit_abstract_comment',
+                     reviewing.RHEditAbstractComment, methods=('GET', 'POST'))
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/comments/<int:comment_id>', 'delete_abstract_comment',
+                     reviewing.RHDeleteAbstractComment, methods=('DELETE',))
 
 
 # Legacy URLs
