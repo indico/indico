@@ -28,8 +28,6 @@ _bp.add_url_rule('/abstracts/<int:abstract_id>/', 'display_abstract', display.RH
 _bp.add_url_rule('/abstracts/<int:abstract_id>/notifications', 'notification_log', management.RHAbstractNotificationLog)
 _bp.add_url_rule('/abstracts/<int:abstract_id>/abstract.pdf', 'display_abstract_pdf_export',
                  display.RHDisplayAbstractExportPDF)
-_bp.add_url_rule('/abstracts/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
-                 reviewing.RHAbstractsDownloadAttachment)
 _bp.add_url_rule('/abstracts/mine', 'my_abstracts', display.RHMyAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', display.RHMyAbstractsExportPDF)
 _bp.add_url_rule('/abstracts/submit', 'submit', display.RHSubmitAbstract, methods=('GET', 'POST'))
@@ -112,6 +110,8 @@ _bp.add_url_rule('/manage/abstracts/<int:abstract_id>/abstract.pdf', 'manage_abs
 
 for prefix in ('/manage/abstracts', '/abstracts'):
     defaults = {'management': prefix != '/abstracts'}
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
+                     common.RHAbstractsDownloadAttachment, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract.pdf', 'manage_abstract_pdf_export',
                      management.RHAbstractExportPDF, defaults=defaults)
     # Abstract actions

@@ -30,7 +30,6 @@ from indico.modules.events.abstracts.forms import (AbstractCommentForm, Abstract
                                                    AbstractReviewedForTracksForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
-from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
                                                         update_abstract_comment, create_abstract_review,
@@ -64,24 +63,7 @@ class RHAbstractReviewBase(AbstractMixin, RHAbstractsBase):
     def _checkParams(self, params):
         RHAbstractsBase._checkParams(self, params)
         AbstractMixin._checkParams(self)
-        self.management = request.view_args.get('management')
-
-
-class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
-    """Download an attachment file belonging to an abstract."""
-
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.abstract_file
-        }
-    }
-
-    def _checkParams(self, params):
-        RHAbstractReviewBase._checkParams(self, params)
-        self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
-
-    def _process(self):
-        return self.abstract_file.send()
+        self.management = request.view_args.get('management', False)
 
 
 class RHListOtherAbstracts(RHAbstractsBase):

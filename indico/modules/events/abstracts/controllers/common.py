@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session
+from flask import flash, session, request
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.reviewing import RHAbstractReviewBase
+from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract
 from indico.modules.events.abstracts.util import make_abstract_form
 from indico.modules.events.util import get_field_values
@@ -43,3 +44,20 @@ class RHEditAbstract(RHAbstractReviewBase):
         self.commit = False
         disabled_fields = ('submitted_for_tracks',) if form.track_field_disabled else ()
         return jsonify_form(form, disabled_fields=disabled_fields)
+
+
+class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
+    """Download an attachment file belonging to an abstract."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.abstract_file
+        }
+    }
+
+    def _checkParams(self, params):
+        RHAbstractReviewBase._checkParams(self, params)
+        self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
+
+    def _process(self):
+        return self.abstract_file.send()
