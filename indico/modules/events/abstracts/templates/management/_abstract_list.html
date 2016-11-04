@@ -28,6 +28,7 @@
                             {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
+                            <th class="i-table thin-column"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,6 +154,13 @@
                                         {{- friendly_data if friendly_data else '-' -}}
                                     </td>
                                 {% endfor %}
+                                <td class="i-table">
+                                    {% if abstract.state.name == 'accepted' and abstract.contribution %}
+                                        <a class="icon-arrow-right"
+                                           href="{{ url_for('contributions.display_contribution', abstract.contribution) }}"
+                                           title="{% trans %}Go to contribution{% endtrans %}"></a>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
