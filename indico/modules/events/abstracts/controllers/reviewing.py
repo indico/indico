@@ -84,13 +84,13 @@ class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
         return self.abstract_file.send()
 
 
-class RHListOtherAbstracts(RHConferenceBaseDisplay):
+class RHListOtherAbstracts(RHAbstractsBase):
     """AJAX endpoint that lists all abstracts in the event (dict representation)."""
 
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+        RHAbstractsBase._checkParams(self, params)
         self.excluded_ids = set(request.form.getlist('excluded_abstract_id'))
 
     def _process(self):

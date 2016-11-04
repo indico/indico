@@ -124,9 +124,7 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
     def _process(self):
         form = BulkAbstractJudgmentForm(event=self.event_new, abstract_id=[a.id for a in self.abstracts],
                                         judgment=request.form.get('judgment'))
-        if form.process_ajax():
-            return form.ajax_response
-        elif form.validate_on_submit():
+        if form.validate_on_submit():
             judgment_data, abstract_data = form.split_data
             submitted_abstracts = {abstract for abstract in self.abstracts if abstract.state == AbstractState.submitted}
             for abstract in submitted_abstracts:
@@ -146,7 +144,6 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
 
 
 class RHAbstractNotificationLog(RHManageAbstractBase):
-
     def _checkProtection(self):
         RHManageAbstractBase._checkProtection(self)
         if not self.abstract.can_judge(session.user, check_state=False):
