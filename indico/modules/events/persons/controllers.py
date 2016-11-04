@@ -46,6 +46,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHPersonsBase(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
     def get_persons(self):
         contribution_strategy = joinedload('contribution_links')
         contribution_strategy.joinedload('contribution')
@@ -141,6 +143,8 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersons(RHConferenceModifBase):
     """Send emails to selected EventPersons"""
 
+    CSRF_ENABLED = True
+
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')
         self.no_account = request.args.get('no_account') == '1'
@@ -193,6 +197,8 @@ class RHEmailEventPersons(RHConferenceModifBase):
 class RHGrantSubmissionRights(RHConferenceModifBase):
     """Grants submission rights to all contribution speakers"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         count = 0
         for cont in self._target.as_event.contributions:
@@ -214,6 +220,8 @@ class RHGrantSubmissionRights(RHConferenceModifBase):
 class RHGrantModificationRights(RHConferenceModifBase):
     """Grants session modification rights to all session conveners"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         count = 0
         for sess in self.event_new.sessions:
@@ -231,6 +239,8 @@ class RHGrantModificationRights(RHConferenceModifBase):
 
 class RHRevokeSubmissionRights(RHConferenceModifBase):
     """Revokes submission rights"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         count = 0
