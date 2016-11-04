@@ -36,7 +36,7 @@
         <table class="i-table-widget tablesorter">
             <thead>
                 <tr class="i-table">
-                    <th class="i-table checkbox-column" data-sorter="false"></th>
+                    <th class="i-table thin-column" data-sorter="false"></th>
                     <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
                     <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                     <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
@@ -50,7 +50,7 @@
                 {% for event_person, person_roles in event_persons.iteritems() -%}
                     {% set is_speaker = person_roles.speaker %}
                     <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
-                        <td class="i-table checkbox-column">
+                        <td class="i-table thin-column">
                             <input type="checkbox" value="{{ event_person.id }}" class="select-row"
                                    name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
                                    {{ 'disabled' if not event_person.email }}>
