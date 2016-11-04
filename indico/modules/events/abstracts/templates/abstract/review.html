@@ -184,7 +184,7 @@
                         <strong>{{ name }}</strong> reviewed this abstract
                     {%- endtrans %}
                     {% if review.modified_dt %}
-                        {{ render_edited_hint(comment.modified_dt) }}
+                        {{ render_edited_hint(review.modified_dt) }}
                     {% endif %}
                     <time datetime="{{ review.created_dt.isoformat() }}">
                         {{- review.created_dt|format_human_date -}}

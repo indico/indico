@@ -28,7 +28,8 @@ from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState, EditTrackMode
 from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
-from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.contributions.operations import delete_contribution
@@ -120,6 +121,8 @@ def create_abstract_comment(abstract, comment_data):
     logger.info("Abstract %s received a comment from %s", abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
                            'Abstract "{}" has received a comment'.format(abstract.title), session.user)
+
+
 def merge_person_links(target_abstract, source_abstract):
     """
     Merge `person_links` of different abstracts.
@@ -213,6 +216,32 @@ def reset_abstract_state(abstract):
     logger.info('Abstract %s state reset by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'State of abstract "{}" has been reset'.format(abstract.title), session.user)
+
+
+def create_abstract_review(abstract, track, user, review_data, questions_data):
+    review = AbstractReview(abstract=abstract, track=track, user=user)
+    review.populate_from_dict(review_data)
+    for question in abstract.event_new.abstract_review_questions:
+        value = int(questions_data['question_{}'.format(question.id)])
+        review.ratings.append(AbstractReviewRating(question=question, value=value))
+    db.session.flush()
+    logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
+                           'Abstract "{}" received a review'.format(abstract.title), user)
+    return review
+
+
+def update_abstract_review(review, review_data, questions_data):
+    event = review.abstract.event_new
+    review.populate_from_dict(review_data)
+    review.modified_dt = now_utc()
+    for question in event.abstract_review_questions:
+        rating = question.get_review_rating(review, allow_create=True)
+        rating.value = int(questions_data['question_{}'.format(question.id)])
+    db.session.flush()
+    logger.info("Abstract review %s modified", review)
+    event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
+              'Review "{}" for abstract "{}" was modified'.format(review.id, review.abstract.title), session.user)
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):

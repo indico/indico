@@ -35,7 +35,8 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
-                                                        update_abstract_comment, update_reviewed_for_tracks)
+                                                        update_abstract_comment, create_abstract_review,
+                                                        update_abstract_review, update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
                                                   get_user_tracks)
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
@@ -201,22 +202,11 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
 
     def _process(self):
         form = build_review_form(self.abstract, self.track)
-
         if form.validate_on_submit():
             if self.review:
-                form.populate_obj(self.review)
-                for question in self.event_new.abstract_review_questions:
-                    rating = question.get_review_rating(self.review)
-                    if not rating:
-                        rating = AbstractReviewRating(question=question, review=self.review)
-                    rating.value = int(form.data["question_{}".format(question.id)])
+                update_abstract_review(self.review, **form.split_data)
             else:
-                self.review = AbstractReview(abstract=self.abstract, track=self.track, user=session.user)
-                form.populate_obj(self.review)
-                for question in self.event_new.abstract_review_questions:
-                    value = int(form.data["question_{}".format(question.id)])
-                    self.review.ratings.append(
-                        AbstractReviewRating(question=question, value=value))
+                create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
         return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))

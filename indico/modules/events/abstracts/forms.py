@@ -21,7 +21,7 @@ from datetime import time
 from flask import request
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired, Length
+from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 from wtforms.widgets import Select
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
@@ -57,7 +57,7 @@ def make_review_form(event):
     from wtforms.validators import DataRequired
     from indico.modules.events.abstracts.forms import AbstractReviewForm
 
-    form_class = type(b'_AbstractForm', (AbstractReviewForm,), {})
+    form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
     for question in event.abstract_review_questions:
         name = 'question_{}'.format(question.id)
         range_ = event.cfa.rating_range
@@ -268,6 +268,12 @@ class AbstractReviewForm(IndicoForm):
                                       .with_parent(self.event)
                                       .filter(Track.id.notin_(track.id for track in abstract.reviewed_for_tracks))
                                       .order_by(Track.title))
+
+    @property
+    def split_data(self):
+        data = self.data
+        return {'questions_data': {k: v for k, v in data.iteritems() if k.startswith('question_')},
+                'review_data': {k: v for k, v in data.iteritems() if not k.startswith('question_')}}
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
