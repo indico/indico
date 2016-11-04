@@ -97,6 +97,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 def update_event(event, data):
     event.populate_from_dict(data)
     db.session.flush()
+    signals.event.updated.send(event)
     logger.info('Event %r updated with %r', event, data)
 
 

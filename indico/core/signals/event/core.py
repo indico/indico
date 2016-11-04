@@ -27,6 +27,10 @@ Called when an event is deleted. The *sender* is the event object.
 The `user` kwarg contains the user performing the deletion if available.
 """)
 
+updated = _signals.signal('updated', """
+Called when basic data of an event is updated. The *sender* is the event.
+""")
+
 cloned = _signals.signal('cloned', """
 Called when an event is cloned. The *sender* is the `Event` object of
 the old event, the new event is passed in the `new_event` kwarg.
@@ -64,6 +68,10 @@ the old category is in the `old_parent` kwarg.
 
 created = _signals.signal('created', """
 Called when a new event is created. The `sender` is the new Event.
+""")
+
+session_updated = _signals.signal('session-updated', """
+Called when a session is updated. The *sender* is the session.
 """)
 
 session_deleted = _signals.signal('session-deleted', """

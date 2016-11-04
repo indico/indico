@@ -31,9 +31,8 @@ from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
-from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.operations import create_event
+from indico.modules.events.operations import create_event, update_event
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import L_, _
@@ -170,7 +169,7 @@ class Conference(CommonObjectBase):
 
     @timezone.setter
     def timezone(self, timezone):
-        self.as_event.timezone = to_unicode(timezone).strip()
+        update_event(self.as_event, {'timezone': to_unicode(timezone).strip()})
 
     @property
     def title(self):

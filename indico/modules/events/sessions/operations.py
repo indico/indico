@@ -52,6 +52,7 @@ def update_session(event_session, data):
     """Update a session based on the information in the `data`"""
     event_session.populate_from_dict(data)
     db.session.flush()
+    signals.event.session_updated.send(event_session)
     event_session.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session "{}" has been updated'.format(event_session.title), session.user)
     logger.info('Session %s modified by %s', event_session, session.user)
