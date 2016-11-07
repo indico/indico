@@ -54,7 +54,7 @@ _bp.add_url_rule('/book-of-abstracts.pdf', 'export_boa', boa.RHExportBOA)
 _bp.add_url_rule('/abstracts/other-list', 'other_abstracts', reviewing.RHListOtherAbstracts, methods=('POST',))
 
 # Management
-_bp.add_url_rule('/manage/abstracts/', 'manage_abstracts', management.RHAbstractsDashboard)
+_bp.add_url_rule('/manage/abstracts/', 'management', management.RHAbstractsDashboard)
 _bp.add_url_rule('/manage/abstracts/schedule', 'schedule_abstracts_call', management.RHScheduleCFA,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/open', 'open_abstracts_call', management.RHOpenCFA, methods=('POST',))
