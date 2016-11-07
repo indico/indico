@@ -249,7 +249,6 @@
                             $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
                         });
                     } else {
-                        $buttons.append($buttonsSeparator);
                         $speakerLabel.qtip({
                             content: {
                                 text: $T.gettext("People in the 'Others' section <strong>must</strong> be speakers.")
