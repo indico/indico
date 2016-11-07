@@ -90,8 +90,8 @@ class RHMyAbstractsExportPDF(RHMyAbstractsBase):
 class RHSubmitAbstract(RHDisplayAbstractsBase):
     def _process(self):
         if not self.event_new.cfa.can_submit_abstracts(session.user):
-            return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                    form=None)
+            return redirect(url_for('event.conferenceCFA', self.event_new))
+
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
