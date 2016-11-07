@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import time
 
-from flask import request
+from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
@@ -35,7 +35,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.fields import IndicoQuerySelectMultipleField
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
@@ -55,7 +55,6 @@ def make_review_form(event):
     """
     from wtforms.fields import RadioField
     from wtforms.validators import DataRequired
-    from indico.modules.events.abstracts.forms import AbstractReviewForm
 
     form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
     for question in event.abstract_review_questions:
@@ -68,6 +67,21 @@ def make_review_form(event):
                                               question=question, cfa=event.cfa))
         setattr(form_class, name, field)
     return form_class
+
+
+def build_review_form(abstract, track):
+    review_form_class = make_review_form(abstract.event_new)
+    reviews_for_track = abstract.get_reviews(user=session.user, track=track)
+    review_for_track = reviews_for_track[0] if reviews_for_track else None
+
+    if review_for_track:
+        answers = {'question_{}'.format(rating.question.id): rating.value
+                   for rating in review_for_track.ratings}
+        defaults = FormDefaults(obj=review_for_track, **answers)
+    else:
+        defaults = FormDefaults()
+
+    return review_form_class(prefix='track-{}'.format(track.id), obj=defaults, abstract=abstract)
 
 
 class AbstractContentSettingsForm(IndicoForm):
