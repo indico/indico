@@ -181,6 +181,7 @@ class AbstractField(QuerySelectField):
         kwargs['query_factory'] = self._get_query
         kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
+        self.excluded_abstract_ids = set()
         super(AbstractField, self).__init__(*args, **kwargs)
 
     @classmethod
@@ -202,6 +203,11 @@ class AbstractField(QuerySelectField):
 
     def _value(self):
         return self._serialize_abstract(self.data) if self.data else None
+
+    def pre_validate(self, form):
+        super(AbstractField, self).pre_validate(form)
+        if self.data is not None and self.data.id in self.excluded_abstract_ids:
+            raise ValueError(_('This abstract cannot be selected.'))
 
     @property
     def event(self):
