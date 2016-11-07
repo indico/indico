@@ -176,7 +176,7 @@ class RHOpenCFA(RHManageAbstractsBase):
     def _process(self):
         open_cfa(self.event_new)
         flash(_("Call for abstracts is now open"), 'success')
-        return redirect(url_for('.manage_abstracts', self.event_new))
+        return redirect(url_for('.management', self.event_new))
 
 
 class RHCloseCFA(RHManageAbstractsBase):
@@ -185,7 +185,7 @@ class RHCloseCFA(RHManageAbstractsBase):
     def _process(self):
         close_cfa(self.event_new)
         flash(_("Call for abstracts is now closed"), 'success')
-        return redirect(url_for('.manage_abstracts', self.event_new))
+        return redirect(url_for('.management', self.event_new))
 
 
 class RHManageAbstractSubmission(RHManageAbstractsBase):

@@ -52,7 +52,7 @@ def _clear_boa_cache(sender, obj=None, **kwargs):
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
         return
-    return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.manage_abstracts', event),
+    return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.management', event),
                         section='organization')
 
 
