@@ -25,7 +25,9 @@ from indico.modules.events.abstracts.util import make_abstract_form
 from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPManageAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
+from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_form
+from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
 
 
 class RHDisplayAbstract(RHAbstractBase):
@@ -68,3 +70,32 @@ class RHAbstractsDownloadAttachment(RHAbstractBase):
 
     def _process(self):
         return self.abstract_file.send()
+
+
+class RHAbstractNotificationLog(RHAbstractBase):
+    """Show the notifications sent for an abstract"""
+
+    def _check_abstract_protection(self):
+        return self.abstract.can_judge(session.user)
+
+    def _process(self):
+        return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
+
+
+class RHAbstractExportPDF(RHAbstractBase):
+    def _process(self):
+        pdf = AbstractToPDF(self.abstract)
+        filename = 'abstract-{}.pdf'.format(self.abstract.friendly_id)
+        return send_file(filename, pdf.generate(), 'application/pdf')
+
+
+class RHAbstractExportFullPDF(RHAbstractBase):
+    """Export an abstract as PDF (with review details)"""
+
+    def _check_abstract_protection(self):
+        return self.abstract.can_see_reviews(session.user)
+
+    def _process(self):
+        pdf = ConfManagerAbstractToPDF(self.abstract)
+        filename = 'abstract-{}-reviews.pdf'.format(self.abstract.friendly_id)
+        return send_file(filename, pdf.generate(), 'application/pdf')

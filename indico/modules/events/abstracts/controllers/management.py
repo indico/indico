@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, flash, session
 
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHManageAbstractsBase
+from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm, AbstractReviewingRolesForm,
                                                    AbstractReviewingSettingsForm, AbstractsScheduleForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
@@ -30,12 +30,10 @@ from indico.modules.events.abstracts.settings import abstracts_settings, abstrac
 from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.util import update_object_principals
-from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):
@@ -51,24 +49,6 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
             abstracts_count = Abstract.query.with_parent(self.event_new).count()
             return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
                                                      abstracts_count=abstracts_count, cfa=self.event_new.cfa)
-
-
-class RHAbstractNotificationLog(RHAbstractBase):
-    def _check_abstract_protection(self):
-        return self.abstract.can_judge(session.user)
-
-    def _process(self):
-        return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
-
-
-class RHAbstractExportPDF(RHAbstractBase):
-    def _check_abstract_protection(self):
-        return self.abstract.can_see_reviews(session.user)
-
-    def _process(self):
-        pdf = ConfManagerAbstractToPDF(self.abstract)
-        filename = secure_filename('abstract-{}-reviews.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
-        return send_file(filename, pdf.generate(), 'application/pdf')
 
 
 class RHScheduleCFA(RHManageAbstractsBase):
@@ -89,7 +69,7 @@ class RHScheduleCFA(RHManageAbstractsBase):
 
 
 class RHOpenCFA(RHManageAbstractsBase):
-    """Opens the call for abstracts"""
+    """Open the call for abstracts"""
 
     def _process(self):
         open_cfa(self.event_new)
@@ -98,7 +78,7 @@ class RHOpenCFA(RHManageAbstractsBase):
 
 
 class RHCloseCFA(RHManageAbstractsBase):
-    """Closes the call for abstracts"""
+    """Close the call for abstracts"""
 
     def _process(self):
         close_cfa(self.event_new)

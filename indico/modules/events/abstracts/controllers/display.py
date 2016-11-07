@@ -21,23 +21,15 @@ from operator import attrgetter
 from flask import session, flash, redirect, request
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHAbstractBase
+from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
 from indico.modules.events.abstracts.views import WPMyAbstracts, WPSubmitAbstract
 from indico.modules.events.util import get_field_values
-from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
-from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
-
-
-class RHDisplayAbstractExportPDF(RHAbstractBase):
-    def _process(self):
-        pdf = AbstractToPDF(self.abstract)
-        filename = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
-        return send_file(filename, pdf.generate(), 'application/pdf')
+from MaKaC.PDFinterface.conference import AbstractsToPDF
 
 
 class RHMyAbstractsBase(RHAbstractsBase):
