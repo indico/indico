@@ -132,5 +132,24 @@
                }
            }
        }
-   }
+    }
+
+    &.tiles {
+        ul {
+            margin: 0;
+        }
+
+        li.i-label {
+            @include border-radius();
+
+            &:not(:last-child) {
+                margin-bottom: 5px;
+            }
+
+            &:not(.placeholder) {
+                @include border-all();
+                background-color: $light-gray;
+            }
+        }
+    }
 }
