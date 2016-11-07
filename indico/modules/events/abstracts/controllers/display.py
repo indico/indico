@@ -21,10 +21,10 @@ from operator import attrgetter
 from flask import session, flash, redirect, request
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import AbstractPageMixin, RHAbstractsBase, RHAbstractBase
+from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHAbstractBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
-from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts, WPSubmitAbstract
+from indico.modules.events.abstracts.views import WPMyAbstracts, WPSubmitAbstract
 from indico.modules.events.util import get_field_values
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -33,24 +33,11 @@ from indico.web.util import jsonify_data
 from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
 
 
-class RHDisplayAbstract(AbstractPageMixin, RHAbstractsBase):
-    management = False
-    view_class = WPDisplayAbstracts
-
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
-        AbstractPageMixin._checkParams(self)
-
-    def _checkProtection(self):
-        RHAbstractsBase._checkProtection(self)
-        AbstractPageMixin._checkProtection(self)
-
-
 class RHDisplayAbstractExportPDF(RHAbstractBase):
     def _process(self):
         pdf = AbstractToPDF(self.abstract)
-        file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
-        return send_file(file_name, pdf.generate(), 'application/pdf')
+        filename = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
+        return send_file(filename, pdf.generate(), 'application/pdf')
 
 
 class RHMyAbstractsBase(RHAbstractsBase):

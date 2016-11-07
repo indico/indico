@@ -173,7 +173,6 @@
 {% endmacro %}
 
 {% macro _render_review(cfa, review, form, management=false) %}
-    {% set abstract_url = 'abstracts.manage_abstract' if management else 'abstracts.display_abstract' %}
     {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
@@ -239,7 +238,9 @@
                 <div class="i-box-content">
                     {% set other_abstract = review.proposed_related_abstract %}
                     {% set abstract_link -%}
-                        <a href="{{ url_for(abstract_url, other_abstract) }}">{{ other_abstract.title|escape }}</a>
+                        <a href="{{ url_for('.display_abstract', other_abstract) }}">
+                            {{ other_abstract.title|escape }}
+                        </a>
                     {%- endset %}
                     {% if review.proposed_action.name == 'merge' %}
                         {% trans title=abstract_link|safe -%}

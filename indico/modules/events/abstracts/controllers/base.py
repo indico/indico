@@ -141,28 +141,6 @@ class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
         return self.abstract.can_access(session.user)
 
 
-class AbstractMixin:
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.abstract
-        }
-    }
-
-    def _checkParams(self):
-        self.abstract = Abstract.get_one(request.view_args['abstract_id'], is_deleted=False)
-
-    def _checkProtection(self):
-        if not self.abstract.can_access(session.user):
-            raise Forbidden
-
-
-class AbstractPageMixin(AbstractMixin):
-    """Display abstract page"""
-
-    def _process(self):
-        return render_abstract_page(self.abstract, view_class=self.view_class, management=self.management)
-
-
 class DisplayAbstractListMixin:
     """Display the list of abstracts"""
 
