@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import current_app, g, request
+
 from indico.modules.events.abstracts.controllers import boa, common, display, email_templates, management, reviewing
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -135,6 +137,14 @@ for prefix in ('/manage/abstracts', '/abstracts'):
                      reviewing.RHEditAbstractComment, methods=('GET', 'POST'))
     _bp.add_url_rule(prefix + '/<int:abstract_id>/comments/<int:comment_id>', 'delete_abstract_comment',
                      reviewing.RHDeleteAbstractComment, methods=('DELETE',))
+
+
+@_bp.url_defaults
+def _add_management_flag(endpoint, values):
+    if ('management' not in values and
+            endpoint.split('.')[0] == _bp.name and
+            current_app.url_map.is_endpoint_expecting(endpoint, 'management')):
+        values['management'] = g.rh.management
 
 
 # Legacy URLs
